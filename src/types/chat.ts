@@ -112,6 +112,9 @@ export interface UIMessage extends Message {
   isLoading?: boolean
   /** True while a <think> block is still open (streaming). */
   isThinkingInProgress?: boolean
+  /** When the turn's run started, on this browser's clock: now minus the running
+   *  time the stream opened with. Live turns only. */
+  runStartedAt?: number
   /** True when the user clicked Stop during generation — only ever that. A turn
    *  cut short by a reload is not stopped: the backend keeps running it and the
    *  chat picks it back up from the turn's stream. */
