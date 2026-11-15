@@ -127,8 +127,10 @@ function escapeCurrencyDollars(content: string): string {
         continue
       }
 
+      // A `$` with a digit right after it opens a price, it does not close
+      // math: "$50K–$80K" is a range, not the formula "50K–".
       const close = findNextUnescapedDollar(value, next + 1)
-      if (close !== -1 && isLikelyInlineMath(value.slice(next, close))) {
+      if (close !== -1 && !/\d/.test(value[close + 1] ?? '') && isLikelyInlineMath(value.slice(next, close))) {
         out += char
       } else {
         out += '&#36;'
