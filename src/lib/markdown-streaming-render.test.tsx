@@ -58,3 +58,21 @@ describe("MarkdownRenderer final output", () => {
     for (const f of fixtures.slice(0, 3)) expect(html(f, true)).toBe(html(f, false))
   })
 })
+
+describe("MarkdownRenderer citation markers", () => {
+  const sources = [1, 2, 3].map((n) => ({ title: `Source ${n}`, url: `https://example.com/${n}`, domain: "example.com" }))
+  const cited = (content: string) => renderToStaticMarkup(<MarkdownRenderer content={content} webCitations={sources} />)
+
+  it("turns each of two markers side by side into a chip", () => {
+    const out = cited("A 1M-token context window [1][2] and more [3].")
+    expect(out).not.toMatch(/\[\d\]/)
+    for (const n of [1, 2, 3]) expect(out).toContain(`aria-label="Source ${n}: Source ${n}"`)
+  })
+
+  it("leaves a reference link and an index into a name as written", () => {
+    const out = cited("See [the docs][1] for a[2].")
+    expect(out).toContain("[the docs][1]")
+    expect(out).toContain("a[2]")
+    expect(out).not.toContain("aria-label=\"Source")
+  })
+})

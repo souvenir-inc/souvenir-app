@@ -33,7 +33,7 @@ function proseText(text: string): string {
   return text
     .replace(WIDGET_BLOCK, block => `\n${widgetText(block)}\n`)
     .replace(/[ \t]*(?<![[\]\w^_])\{\d+\}/g, '')
-    .replace(/[ \t]*(?<![[\]\w])\[\d+\](?!\()/g, '')
+    .replace(/[ \t]*(?<![[\]\w])(?:\[\d+\])+(?!\()/g, '')
     .replace(/[ \t]+([.,;:!?)])/g, '$1')
 }
 

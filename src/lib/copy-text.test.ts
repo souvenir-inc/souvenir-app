@@ -20,5 +20,6 @@ describe('messageCopyText', () => {
 
   it('leaves plain text alone', () => {
     expect(messageCopyText('Just an answer, see a[2] in the formula.')).toBe('Just an answer, see a[2] in the formula.')
+    expect(messageCopyText('A long window [1][2] and more [3].')).toBe('A long window and more.')
   })
 })
