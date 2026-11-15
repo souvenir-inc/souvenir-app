@@ -227,7 +227,8 @@ function citationLinks(text: string): string {
     // Excludes [N] directly attached to a word character (letter/digit) so that
     // exponent notation like a[2], b[2] is never treated as a citation reference.
     // Real citation markers always follow whitespace or punctuation, not a bare letter.
-    .replace(/(?<![[\]\w])\[(\d+)\](?!\()/g, (_, n) => `[[${n}]](citation://${n})`);
+    // Markers side by side (`[1][2]`) are taken as one run, so each becomes a chip.
+    .replace(/(?<![[\]\w])(?:\[\d+\])+(?!\()/g, (run) => run.replace(/\[(\d+)\]/g, (_, n) => `[[${n}]](citation://${n})`));
 }
 
 const VISUALLY_HIDDEN: React.CSSProperties = {
