@@ -23,6 +23,19 @@ describe("preprocessMarkdown", () => {
     expect(output).toContain("&#36;500+/mo");
   });
 
+  it("reads a price range with magnitude suffixes as currency, not math", () => {
+    const input = "**And yes: the $50K–$80K/month planning figure was for one deployment.** If you need *two models*, reaching **$100K–$160K/month**—is a reasonable budget.";
+    const output = preprocessMarkdown(input);
+
+    expect(output).not.toContain("$");
+    expect(output).toContain("&#36;50K–&#36;80K/month");
+    expect(output).toContain("**&#36;100K–&#36;160K/month**");
+  });
+
+  it("still reads a formula with a number and a variable as math", () => {
+    expect(preprocessMarkdown("So $2x + 1 = 7$ gives x.")).toContain("$2x + 1 = 7$");
+  });
+
   it("converts \\[...\\] into a display-math block on its own lines", () => {
     const input = "Then:\n\n\\[\n\\varphi(n)=n\\left(1-\\frac1{p_1}\\right)\n\\]\n\nand that's it.";
     const output = preprocessMarkdown(input);
