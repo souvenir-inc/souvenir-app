@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest"
 
+import { parseSteps } from "@/lib/chat/steps"
 import { toUIMessage } from "@/lib/normalizers/message-transformer"
+import { messageParts } from "@/lib/reasoning"
 import { INCOMPLETE_ANSWER_MESSAGE } from "@/lib/turn-outcome"
 import type { Message } from "@/types/chat"
 
@@ -13,43 +15,55 @@ const base: Message = {
 }
 
 describe("toUIMessage", () => {
-  it("hydrates persisted tool calls into done activity rows", () => {
+  it("rebuilds the turn from its saved steps, in order", () => {
     const ui = toUIMessage({
       ...base,
-      tool_calls: [
-        { tool: "search_web", args: { query: "paris population" }, duration_s: 1.2 },
-        { tool: "read_url", args: { url: "https://insee.fr" }, duration_s: 0.4 },
-        "csv_execute",
-      ],
+      content: "Looking it up.\n\nHere is what I found.",
+      thinking: "Check the population.",
+      steps: parseSteps([
+        { kind: "reasoning", text: "Check the population.", at: 1_000, endAt: 1_500 },
+        { kind: "text", text: "Looking it up.", at: 1_600, endAt: 1_900 },
+        {
+          kind: "tool", id: "call-a", tool: "search_web", args: { query: "paris population" }, at: 2_000, endAt: 3_200, failed: false,
+          results: [{ title: "Paris", url: "https://en.wikipedia.org/wiki/Paris", snippet: "Capital of France" }],
+        },
+        { kind: "tool", id: "call-b", tool: "read_url", args: { url: "https://insee.fr" }, at: 3_300, endAt: 3_700, failed: true, results: [] },
+        { kind: "tool", id: "call-c", tool: "csv_execute", args: null, at: 3_800, endAt: null, failed: false, results: [] },
+        { kind: "text", text: "\n\nHere is what I found.", at: 4_000, endAt: 4_400 },
+      ]),
     })
     expect(ui.activities).toEqual([
-      { id: "m1-tool-0", type: "web-search", toolName: "search_web", detail: "paris population", status: "done", durationS: 1.2 },
-      { id: "m1-tool-1", type: "tool-call", toolName: "read_url", detail: "https://insee.fr", status: "done", durationS: 0.4 },
-      { id: "m1-tool-2", type: "csv-execute", toolName: "csv_execute", detail: undefined, status: "done" },
+      {
+        id: "call-a", type: "web-search", toolName: "search_web", detail: "paris population", status: "done", durationS: 1.2,
+        results: [{ title: "Paris", url: "https://en.wikipedia.org/wiki/Paris", domain: "en.wikipedia.org" }],
+      },
+      { id: "call-b", type: "tool-call", toolName: "read_url", detail: "https://insee.fr", status: "error", durationS: 0.4 },
+      { id: "call-c", type: "csv-execute", toolName: "csv_execute", detail: undefined, status: "stopped" },
     ])
-    // The raw calls are not kept in UI state.
-    expect("tool_calls" in ui).toBe(false)
+    expect(ui.reasoningTimeline).toEqual([
+      { kind: "reasoning", id: "reasoning-0", content: "Check the population.", at: 1_000, endAt: 1_500 },
+      { kind: "text", id: "text-1", start: 0 },
+      { kind: "activity", id: "activity-2", activityId: "call-a", at: 2_000, endAt: 3_200 },
+      { kind: "activity", id: "activity-3", activityId: "call-b", at: 3_300, endAt: 3_700 },
+      { kind: "activity", id: "activity-4", activityId: "call-c", at: 3_800 },
+      { kind: "text", id: "text-5", start: 16 },
+    ])
+    expect(messageParts(ui.reasoningTimeline!, ui.content).map((part) => part.kind === "text" ? part.content : part.items.length))
+      .toEqual([1, "Looking it up.", 3, "Here is what I found."])
+    // The raw steps are not kept in UI state.
+    expect("steps" in ui).toBe(false)
   })
 
-  it("gives web-search rows their results and does not add a second search row", () => {
-    const ui = toUIMessage({
-      ...base,
-      sources: [{ id: "0", url: "https://en.wikipedia.org/wiki/Paris", title: "Paris" }],
-      web_searches: [{ query: "paris", links: ["https://en.wikipedia.org/wiki/Paris"], results: [{ url: "https://en.wikipedia.org/wiki/Paris", title: "Paris" }] }],
-      tool_calls: [{ tool: "search_web", args: {} }],
-    })
-    expect(ui.activities).toHaveLength(1)
-    expect(ui.activities?.[0]).toMatchObject({ type: "web-search", detail: "paris", results: [{ title: "Paris", url: "https://en.wikipedia.org/wiki/Paris" }] })
-    expect(ui.webCitations).toEqual([{ title: "Paris", url: "https://en.wikipedia.org/wiki/Paris", domain: "en.wikipedia.org" }])
+  it("reads a turn saved without steps as its text alone", () => {
+    const ui = toUIMessage({ ...base, thinking: "plan" })
+    expect(ui.activities).toBeUndefined()
+    expect(ui.reasoningTimeline).toBeUndefined()
+    expect(messageParts([], ui.content)).toEqual([{ kind: "text", id: "text", content: "Here is what I found." }])
   })
 
-  it("keeps the synthesised search row alongside non-search tool calls", () => {
-    const ui = toUIMessage({
-      ...base,
-      sources: [{ id: "0", url: "https://a.com", title: "A" }],
-      tool_calls: [{ tool: "read_url", args: { url: "https://a.com" } }],
-    })
-    expect(ui.activities?.map((a) => a.id)).toEqual(["m1-websearch", "m1-tool-0"])
+  it("drops steps that do not match the schema", () => {
+    expect(parseSteps([{ kind: "tool", tool: "search_web" }])).toEqual([])
+    expect(parseSteps(null)).toEqual([])
   })
 
   it("shows an incomplete answer with nothing else as the full error", () => {

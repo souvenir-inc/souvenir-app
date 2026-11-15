@@ -29,7 +29,7 @@ import {
   splitReasoningText,
   thoughtLabel,
   type ReasoningSection,
-  type ReasoningTimelineItem,
+  type WorkItem,
 } from "@/lib/reasoning";
 import { ModelIcon } from "@/components/ModelIcon";
 import type { ActivityItem, ModelSelectedMeta } from "@/types/chat";
@@ -422,37 +422,6 @@ function ReasoningStep({
   );
 }
 
-function ReasoningSections({
-  sections,
-  isStreaming,
-  expandSole,
-}: {
-  sections: ReasoningSection[];
-  isStreaming: boolean;
-  /** Nothing else shares the panel, so a lone step opens with it. */
-  expandSole: boolean;
-}) {
-  const valid = sections.filter((s) => cleanReasoningHeading(s.heading).length > 2);
-  if (valid.length === 0) return null;
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
-      {valid.map((s, i) => (
-        // Position-keyed: the body grows with every delta, so a content key
-        // would remount the row (replaying its entrance) on each one.
-        <ReasoningStep
-          key={`${i}-${s.heading}`}
-          section={s}
-          index={i}
-          total={valid.length}
-          isActive={isStreaming && i === valid.length - 1}
-          defaultExpanded={expandSole && valid.length === 1}
-        />
-      ))}
-    </div>
-  );
-}
-
 // ── Batched tool activities ───────────────────────────────────────────────────
 
 // A finished batch collapses to one summary row so a long tool run does not
@@ -549,8 +518,8 @@ function TimelineReasoningStep({ content, active, expandSole }: { content: strin
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       {chunks.map((section, index) => (
-        // Position-keyed so a growing body does not remount the row (see
-        // ReasoningSections).
+        // Position-keyed: the body grows with every delta, so a content key
+        // would remount the row (replaying its entrance) on each one.
         <ReasoningStep
           key={`${index}-${section.heading}`}
           section={section}
@@ -567,9 +536,8 @@ function TimelineReasoningStep({ content, active, expandSole }: { content: strin
 
 export interface ReasoningContentProps {
   thinkingContent: string;
-  reasoningSections?: ReasoningSection[];
   activities?: ActivityItem[];
-  reasoningTimeline?: ReasoningTimelineItem[];
+  reasoningTimeline?: WorkItem[];
   isStreaming: boolean;
   /** The turn is still open (the stream is waiting or running). Thinking may
    *  have stopped while the turn waits on a question card. */
@@ -580,7 +548,6 @@ export interface ReasoningContentProps {
 
 export function ReasoningContent({
   thinkingContent,
-  reasoningSections,
   activities,
   reasoningTimeline,
   isStreaming,
@@ -588,10 +555,6 @@ export function ReasoningContent({
   promptDecisions,
 }: ReasoningContentProps) {
   const hasActivities = Boolean(activities?.length);
-  // Show structured sections whenever they exist - even during streaming.
-  // When streaming, the last section gets the shimmer "active" treatment.
-  // Fall back to raw thinkingContent only when no sections are available.
-  const hasStructured = reasoningSections && reasoningSections.length > 0;
   const hasTimeline = Boolean(reasoningTimeline?.length);
   const activityById = new Map((activities ?? []).map((activity) => [activity.id, activity]));
   const anyRunning = (activities ?? []).some(isActivityRunning);
@@ -668,11 +631,11 @@ export function ReasoningContent({
     );
   }
 
-  const steps = hasStructured
-    ? <ReasoningSections sections={reasoningSections!} isStreaming={isStreaming} expandSole={!hasActivities} />
-    : thinkingContent
-      ? <TimelineReasoningStep content={thinkingContent} active={isStreaming} expandSole={!hasActivities} />
-      : null;
+  // No timeline: reasoning that came as plain text (a shared reply, or a
+  // model that writes its thinking inline).
+  const steps = thinkingContent
+    ? <TimelineReasoningStep content={thinkingContent} active={isStreaming} expandSole={!hasActivities} />
+    : null;
 
   if (!steps) return hasActivities ? <ActivityGroup activities={activities!} /> : null;
 
@@ -699,12 +662,10 @@ export interface ReasoningBlockProps {
   modelName?: string;
   modelMeta?: ModelSelectedMeta;
   activities?: ActivityItem[];
-  /** Structured reasoning steps from the backend - rendered as collapsible steps when done. */
-  reasoningSections?: ReasoningSection[];
-  /** Live arrival-ordered reasoning/tool trace. */
-  reasoningTimeline?: ReasoningTimelineItem[];
-  /** How long the model thought, for the settled "Thought for Ns" label.
-   *  Unknown (e.g. a message reloaded from history) reads as "Thought". */
+  /** This stretch of work in order: reasoning, tool rows, question markers. */
+  reasoningTimeline?: WorkItem[];
+  /** How long this stretch of work took, for the settled "Thought for Ns"
+   *  label. Unknown (a trace saved without times) reads as "Thought". */
   durationMs?: number;
   /** The turn is still open — true while a question card waits on the user,
    *  even though thinking itself has stopped. */
@@ -715,8 +676,7 @@ export interface ReasoningBlockProps {
 
 function latestHeading(
   thinkingContent: string,
-  reasoningSections?: ReasoningSection[],
-  reasoningTimeline?: ReasoningTimelineItem[],
+  reasoningTimeline?: WorkItem[],
 ): string {
   const lastReasoning = reasoningTimeline?.findLast((item) => item.kind === "reasoning");
   if (lastReasoning) {
@@ -724,9 +684,6 @@ function latestHeading(
     const timelineHeading = cleanReasoningHeading(parsedTimeline.findLast((section) => section.heading)?.heading ?? "");
     if (timelineHeading) return timelineHeading;
   }
-
-  const sectionHeading = cleanReasoningHeading(reasoningSections?.at(-1)?.heading ?? "");
-  if (sectionHeading) return sectionHeading;
 
   const parsedThinking = splitReasoningText(thinkingContent);
   return cleanReasoningHeading(parsedThinking.findLast((section) => section.heading)?.heading ?? "");
@@ -736,7 +693,6 @@ export function ReasoningBlock({
   thinkingContent,
   isThinkingInProgress,
   activities,
-  reasoningSections,
   reasoningTimeline,
   durationMs,
   isTurnActive,
@@ -764,10 +720,10 @@ export function ReasoningBlock({
   let summary = "";
   if (runningActivity) summary = activityVerb(runningActivity);
   else if (live && !open) {
-    summary = waitingOnUser ? "Waiting for your answer" : latestHeading(thinkingContent, reasoningSections, reasoningTimeline);
+    summary = waitingOnUser ? "Waiting for your answer" : latestHeading(thinkingContent, reasoningTimeline);
   }
 
-  if (!thinkingContent && !reasoningSections?.length && !reasoningTimeline?.length && !activities?.length && !isThinkingInProgress) return null;
+  if (!thinkingContent && !reasoningTimeline?.length && !activities?.length && !isThinkingInProgress) return null;
 
   return (
     <div style={{ width: "100%", margin: "4px 0 10px", fontFamily: "var(--font-body)" }}>
@@ -786,7 +742,6 @@ export function ReasoningBlock({
       <ThinkingCollapse open={open} id={panelId}>
         <ReasoningContent
           thinkingContent={thinkingContent}
-          reasoningSections={reasoningSections}
           activities={activities}
           reasoningTimeline={reasoningTimeline}
           isStreaming={!!isThinkingInProgress}

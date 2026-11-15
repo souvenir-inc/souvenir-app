@@ -11,7 +11,7 @@
 import React, { useState } from 'react'
 import { ReasoningBlock, type ReasoningBlockProps } from '@/components/chat/ReasoningBlock'
 import type { ActivityItem } from '@/types/chat'
-import type { ReasoningTimelineItem } from '@/lib/reasoning'
+import type { WorkItem } from '@/lib/reasoning'
 
 const SECTIONS = [
   { heading: 'Planned what to search for and in what order', body: 'The question is about 2026 GTM, so recent sources matter more than evergreen advice. I will start broad, then narrow to founder-led distribution.' },
@@ -49,8 +49,8 @@ const ACTIVITIES: ActivityItem[] = [
   },
 ]
 
-function timeline(reasoningCount: number, activityCount: number): ReasoningTimelineItem[] {
-  const items: ReasoningTimelineItem[] = []
+function timeline(reasoningCount: number, activityCount: number): WorkItem[] {
+  const items: WorkItem[] = []
   SECTIONS.slice(0, reasoningCount).forEach((section, i) => {
     items.push({ kind: 'reasoning', id: `r-${i}`, content: `**${section.heading}**\n\n${section.body}` })
     // The tool batch lands after the first reasoning segment, mirroring a real
@@ -88,15 +88,6 @@ const STATES = {
     props: {
       thinkingContent: '',
       reasoningTimeline: timeline(3, 4),
-      activities: ACTIVITIES,
-      isThinkingInProgress: false,
-    },
-  },
-  'sections-only': {
-    label: 'Done — persisted sections (no timeline)',
-    props: {
-      thinkingContent: '',
-      reasoningSections: SECTIONS,
       activities: ACTIVITIES,
       isThinkingInProgress: false,
     },

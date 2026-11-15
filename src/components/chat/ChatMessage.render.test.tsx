@@ -105,7 +105,22 @@ describe('ChatMessage markup', () => {
     } as Partial<UIMessage>)],
     ['assistant stopped with error notice', assistant({ content: 'Half', stoppedByUser: true, errorNotice: 'Rate limit exceeded' })],
     ['assistant error', assistant({ content: 'Failed', isError: true })],
-    ['assistant activities', assistant({ content: 'Done', activities: [{ id: 'x', status: 'done' }] } as Partial<UIMessage>)],
+    ['assistant activities', assistant({
+      content: 'Done',
+      activities: [{ id: 'x', status: 'done' }],
+      reasoningTimeline: [{ kind: 'activity', id: 'activity-0', activityId: 'x' }, { kind: 'text', id: 'text-1', start: 0 }],
+    } as Partial<UIMessage>)],
+    ['assistant text, work, then text', assistant({
+      content: 'Looking it up.\n\nIt is sunny.',
+      thinking: 'Check the forecast.',
+      activities: [{ id: 'x', type: 'web-search', toolName: 'search_web', detail: 'ames weather', status: 'done' }],
+      reasoningTimeline: [
+        { kind: 'text', id: 'text-0', start: 0 },
+        { kind: 'reasoning', id: 'reasoning-1', content: 'Check the forecast.', at: 1_000, endAt: 2_000 },
+        { kind: 'activity', id: 'activity-2', activityId: 'x', at: 2_000, endAt: 13_000 },
+        { kind: 'text', id: 'text-3', start: 14 },
+      ],
+    } as Partial<UIMessage>)],
     ['assistant loading', { ...base, role: 'assistant', isLoading: true } as UIMessage],
   ])('%s', (_name, message) => {
     act(() => root.render(<ChatMessage message={message} isLast onRegenerate={() => {}} onRetry={() => {}} />))

@@ -6,6 +6,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AguiSSEDecoder } from '@/lib/sse-decoder'
+import { messageParts } from '@/lib/reasoning'
 import type { UIMessage } from '@/types/chat'
 import { STREAM_FIXTURES } from './stream-fixtures'
 import { processStreamEvents } from './stream-events'
@@ -79,13 +80,12 @@ describe('stream events', () => {
     expect(ctx.onChatMoveToTop).toHaveBeenCalledWith('chat-1')
   })
 
-  it('keeps reasoning sections and ends the thinking span', () => {
+  it('keeps reasoning in the timeline and ends the thinking span', () => {
     const reply = play(STREAM_FIXTURES.reasoning)
     expect(reply.thinking).toContain('First I consider the question.')
-    expect(reply.reasoning_sections?.length).toBeGreaterThan(0)
+    expect(reply.reasoningTimeline?.map((item) => item.kind)).toEqual(['reasoning', 'text'])
     expect(reply.isThinkingInProgress).toBe(false)
     expect(reply.content).toBe('The answer is 42.')
-    expect(typeof reply.reasoningDurationMs).toBe('number')
     expect(ctx.onTitleUpdate).toHaveBeenCalledWith('chat-1', 'Meaning of life')
     // The first reasoning chunk and the first answer token flush right away.
     expect(calls.filter((c) => c === 'queue!').length).toBeGreaterThanOrEqual(3)
@@ -104,7 +104,63 @@ describe('stream events', () => {
       { title: 'Ames forecast', url: 'https://www.weather.example.com/ames', domain: 'weather.example.com' },
       { title: 'https://news.example.org/a', url: 'https://news.example.org/a', domain: 'news.example.org' },
     ])
-    expect(reply.reasoningTimeline?.length).toBe(1)
+    expect(reply.reasoningTimeline?.map((item) => item.kind)).toEqual(['activity', 'text'])
+  })
+
+  it('keeps text, tool calls and more text in the order they happened, timed by the server', () => {
+    const at = (timestamp: number, event: object) => ({ ...event, timestamp })
+    const reply = play([
+      { type: 'RUN_STARTED', threadId: 'chat-1', runId: 'run-1' },
+      at(1_000, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'm1', delta: 'Looking it up.' }),
+      at(2_000, { type: 'TOOL_CALL_START', toolCallId: 'call-a', toolCallName: 'search_web' }),
+      at(2_000, { type: 'TOOL_CALL_START', toolCallId: 'call-b', toolCallName: 'search_web' }),
+      at(2_100, { type: 'TOOL_CALL_END', toolCallId: 'call-a' }),
+      at(2_100, { type: 'TOOL_CALL_END', toolCallId: 'call-b' }),
+      at(4_500, { type: 'TOOL_CALL_RESULT', messageId: 't1', toolCallId: 'call-a', content: 'raw' }),
+      at(4_500, { type: 'CUSTOM', name: 'tool_finished', value: {
+        tool_call_id: 'call-a', failed: false,
+        results: [{ title: 'Ames forecast', url: 'https://weather.example.com/ames', snippet: 'Sunny' }],
+      } }),
+      at(5_000, { type: 'TOOL_CALL_RESULT', messageId: 't2', toolCallId: 'call-b', content: 'raw' }),
+      at(5_000, { type: 'CUSTOM', name: 'tool_finished', value: { tool_call_id: 'call-b', failed: true, results: [] } }),
+      at(6_000, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'm1', delta: '\n\nIt is sunny.' }),
+      { type: 'RUN_FINISHED', threadId: 'chat-1', runId: 'run-1' },
+    ])
+
+    expect(reply.content).toBe('Looking it up.\n\nIt is sunny.')
+    expect(reply.reasoningTimeline).toEqual([
+      { kind: 'text', id: 'text-0', start: 0 },
+      { kind: 'activity', id: 'activity-1', activityId: 'call-a', roundIndex: undefined, at: 2_000, endAt: 4_500 },
+      { kind: 'activity', id: 'activity-2', activityId: 'call-b', roundIndex: undefined, at: 2_000, endAt: 5_000 },
+      { kind: 'text', id: 'text-3', start: 14 },
+    ])
+    const [first, second] = reply.activities!
+    expect(first).toMatchObject({
+      id: 'call-a', type: 'web-search', status: 'done', durationS: 2.5,
+      results: [{ title: 'Ames forecast', url: 'https://weather.example.com/ames', domain: 'weather.example.com' }],
+    })
+    expect(second).toMatchObject({ id: 'call-b', status: 'error', durationS: 3 })
+    expect(messageParts(reply.reasoningTimeline!, reply.content)).toEqual([
+      { kind: 'text', id: 'text-0', content: 'Looking it up.' },
+      { kind: 'work', id: 'activity-1', items: reply.reasoningTimeline!.slice(1, 3), durationMs: 3_000 },
+      { kind: 'text', id: 'text-3', content: 'It is sunny.' },
+    ])
+  })
+
+  it('carries on after the trace earlier stretches of the run left on the reply', () => {
+    turn = createStreamTurn({
+      id: 'loading-1', role: 'assistant', content: 'Before the question.', created_at: '', chat_id: 'chat-1',
+      reasoningTimeline: [{ kind: 'text', id: 'text-0', start: 0 }, { kind: 'activity', id: 'activity-1', activityId: 'call-0', at: 1, endAt: 2 }],
+    })
+    const reply = play([
+      { type: 'RUN_STARTED', threadId: 'chat-1', runId: 'run-1' },
+      { type: 'TEXT_MESSAGE_CONTENT', messageId: 'm1', delta: 'After the answer.' },
+      { type: 'RUN_FINISHED', threadId: 'chat-1', runId: 'run-1' },
+    ])
+    expect(reply.content).toBe('Before the question.\n\nAfter the answer.')
+    expect(reply.reasoningTimeline?.map((item) => item.id)).toEqual(['text-0', 'activity-1', 'text-2'])
+    expect(messageParts(reply.reasoningTimeline!, reply.content).map((part) => part.kind === 'text' ? part.content : part.kind))
+      .toEqual(['Before the question.', 'work', 'After the answer.'])
   })
 
   it('follows a tool call from streamed arguments to done', () => {

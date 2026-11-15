@@ -29,7 +29,7 @@ import {
   uploadedAttachments,
   type Attachment,
 } from "./stream-payload"
-import { finishTurn, startReasoningClock, stopReasoningClock, type StreamEventContext, type StreamTurn } from "./stream-turn"
+import { finishTurn, type StreamEventContext, type StreamTurn } from "./stream-turn"
 import {
   handleAgentStarted,
   handleAgentUpdate,
@@ -38,6 +38,7 @@ import {
   handleToolComplete,
   handleToolError,
   handleToolExecuting,
+  handleToolFinished,
   handleToolProgress,
   handleWebSearch,
 } from "./tool-events"
@@ -64,6 +65,7 @@ export function processStreamEvents(ctx: StreamEventContext, turn: StreamTurn, d
 
     if (!decoded.appEvent) continue
     const { eventName, parsed } = decoded.appEvent
+    turn.eventAt = typeof decoded.event.timestamp === "number" ? decoded.event.timestamp : undefined
     // Run before any specific handler so file links are captured
     // regardless of which SSE event the backend places them in.
     applyEventAttachments(ctx, turn, parsed)
@@ -140,6 +142,7 @@ export function handleAppEvent(ctx: StreamEventContext, turn: StreamTurn, eventN
     return
   }
   if (is("tool_complete")) return handleToolComplete(ctx, turn, parsed)
+  if (eventName === "tool_finished") return handleToolFinished(ctx, turn, parsed)
   if (is("tool_error")) return handleToolError(ctx, turn, parsed)
   if (is("image")) return handleImage(ctx, turn, parsed)
   if (eventName === "generated_file") {
@@ -210,14 +213,11 @@ function handleTitle(ctx: StreamEventContext, turn: StreamTurn, parsed: Payload)
 function handleReasoning(ctx: StreamEventContext, turn: StreamTurn, eventName: "reasoning_heading" | "reasoning_body", parsed: Payload) {
   const { reasoning } = turn
   const wasEmpty = reasoning.isEmpty()
-  startReasoningClock(turn)
-  reasoning.event(eventName, reasoningEventText(parsed), eventRoundIndex(parsed))
-  const sections = reasoning.sections()
+  reasoning.event(eventName, reasoningEventText(parsed), eventRoundIndex(parsed), turn.eventAt)
   ctx.queueUpdate({
     thinking: reasoning.text(),
     isThinkingInProgress: true,
     isLoading: true,
-    ...(sections.length > 0 ? { reasoning_sections: sections } : {}),
     reasoningTimeline: reasoning.timeline(),
   }, wasEmpty)  // flush immediately on first reasoning chunk
 }
@@ -239,14 +239,15 @@ function handleContent(ctx: StreamEventContext, turn: StreamTurn, parsed: Payloa
   // Only a leading <think> block is reasoning; while it is open,
   // everything after it is reasoning too.
   const { visibleText, thinkingText, thinkingOpen } = extractThinkingContent(turn.assistantContent)
-  if (thinkingText || thinkingOpen) startReasoningClock(turn)
+  // Text that grew marks where this stretch of the answer starts, after whatever the turn did before it.
+  if (visibleText.length > turn.answerLength) turn.reasoning.answer(turn.answerLength)
+  turn.answerLength = visibleText.length
   ctx.queueUpdate({
     content: visibleText,
     thinking: turn.reasoning.text() || thinkingText || undefined,
     isThinkingInProgress: thinkingOpen && !turn.reasoning.text(),
     isLoading: true,
-    // The first answer token ends the reasoning time.
-    ...(visibleText ? stopReasoningClock(turn) : {}),
+    reasoningTimeline: turn.reasoning.timeline(),
   }, wasEmpty)  // flush immediately on first content chunk
 }
 

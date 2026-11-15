@@ -10,12 +10,14 @@ import { BlockSequenceRenderer } from "./ResponseBlocks";
 import { SourceList } from "./CitationChip";
 import { ImageGenerationPreview, findPendingImageGeneration } from "./ImageGenerationPreview";
 import { deriveCitationsFromSources } from "@/lib/citations";
+import { messageParts } from "@/lib/reasoning";
 import { PINS_ENABLED, HIGHLIGHTS_ENABLED } from "@/lib/feature-flags";
 import { usePinboardActions } from "@/context/pinboard-context";
 import { useHighlight } from "@/context/highlight-context";
 import { trackBrowserEvent } from "@/lib/analytics/events";
 import { SelectionPopover } from "@/components/SelectionPopover";
-import type { UIMessage } from "@/types/chat";
+import type { UIMessage, WebCitation } from "@/types/chat";
+import type { LibraryCitation } from "@/components/Library/chat/library-citations";
 import { GeneratedImageCard } from "./message/GeneratedImageCard";
 import { StandaloneActivitiesBlock } from "./message/StandaloneActivitiesBlock";
 import { StreamingTextContent } from "./message/StreamingTextContent";
@@ -53,6 +55,53 @@ const stoppedStyle: React.CSSProperties = {
   color: "var(--neutral-500)",
   fontStyle: "italic",
 };
+
+// ── AnswerText - one stretch of the answer ────────────────────────────────────
+
+function AnswerText({
+  content,
+  citations,
+  libraryCitations,
+  isNewMessage,
+  animate,
+  isLoading,
+  stopped,
+  onCaughtUp,
+}: {
+  content: string;
+  citations?: WebCitation[];
+  libraryCitations?: LibraryCitation[];
+  isNewMessage: boolean;
+  animate: boolean;
+  isLoading: boolean;
+  stopped: boolean;
+  onCaughtUp: (content: string) => void;
+}) {
+  // A fresh stretch mounts with its first token and reveals from there. One
+  // that mounts with text already there (a row remounted mid-stream, e.g.
+  // scrolled back into view) showed that text before, so its reveal picks up
+  // from there.
+  const [revealFrom] = useState(content);
+  return (
+    <m.div
+      initial={isNewMessage ? { opacity: 0, y: 5 } : false}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <LibraryCitationsProvider citations={libraryCitations}>
+        <StreamingTextContent
+          content={content}
+          citations={citations}
+          animate={animate}
+          isLoading={isLoading}
+          stopped={stopped}
+          revealFrom={revealFrom}
+          onCaughtUp={onCaughtUp}
+        />
+      </LibraryCitationsProvider>
+    </m.div>
+  );
+}
 
 // ── Main ChatMessage Component ────────────────────────────────────────────────
 
@@ -153,13 +202,6 @@ export function ChatMessage({
 
   const isUser = message.role === "user";
   const isAssistant = message.role === "assistant";
-  const hasThinking = Boolean(message.thinking || message.reasoning_sections?.length);
-  // Whether ReasoningBlock actually renders below. The model-header and
-  // StandaloneActivitiesBlock blocks key off `!showReasoningBlock` (not
-  // `!hasThinking`) so exactly one of the three always renders — a message
-  // with thinking data doesn't go attribution-less just because adaptive
-  // thinking is currently toggled off.
-  const showReasoningBlock = hasThinking && showReasoning;
   const canUseContentActions = Boolean(message.content.trim()) && !message.isError;
   const pinned = isAssistant && pinnedProp;
 
@@ -177,23 +219,33 @@ export function ChatMessage({
     ? message.webCitations
     : sourcesBlock?.citations.length ? sourcesBlock.citations : undefined;
 
+  // The message in the order it happened: stretches of work and of answer text.
+  const parts = useMemo(
+    () => messageParts(message.reasoningTimeline ?? [], answerText),
+    [message.reasoningTimeline, answerText],
+  );
+  const activityById = useMemo(
+    () => new Map((message.activities ?? []).map((activity) => [activity.id, activity])),
+    [message.activities],
+  );
+  // Work renders as reasoning blocks when the turn reasoned and reasoning is
+  // shown; otherwise only its tool rows show, as the plain activities list.
+  const tracesReasoning = showReasoning && Boolean(message.thinking);
+  // The stretch of answer still being revealed: completion waits on it.
+  const lastText = parts.findLast((part) => part.kind === "text")?.content ?? "";
+
   // Whether the answer text reveals progressively. Decided while the message
   // is still empty so it can't flip part-way through a reveal.
   const reduceMotion = useReducedMotion() ?? false;
   const [revealsText, setRevealsText] = useState(isNewMessage);
   if (isNewMessage && !revealsText && !message.content) setRevealsText(true);
   const animateText = revealsText && !reduceMotion;
-  // A fresh reply mounts empty and reveals from the start. A row that mounts
-  // with text already there (remounted mid-stream, e.g. scrolled back into
-  // view) showed that text before, so its reveal picks up from there.
-  const [revealFrom] = useState(answerText);
-
   // The answer is complete on screen: the stream is over and the reveal has
   // caught up (or was frozen by Stop). Completion UI — actions, sources,
   // the error notice, aria-busy — waits for this rather than the stream.
   const [caughtUpText, setCaughtUpText] = useState<string | null>(null);
   const revealSettled = !message.isLoading &&
-    (!animateText || Boolean(message.stoppedByUser) || !answerText || caughtUpText === answerText);
+    (!animateText || Boolean(message.stoppedByUser) || !lastText || caughtUpText === lastText);
 
   const onRevealSettledRef = useRef(onRevealSettled);
   const revealReportedRef = useRef(false);
@@ -294,61 +346,67 @@ export function ChatMessage({
 
         {/* No model name/logo row: answers no longer say which model wrote them. */}
 
-        {/* Activities summary line — shown when there are activities but
-            ReasoningBlock isn't the one rendering them (no thinking data, or
-            thinking is toggled off). The model-attribution header above
-            already covers logo/name, so this only renders the activities
-            summary + chevron underneath it, on its own line. */}
-        {!showReasoningBlock && message.activities && message.activities.length > 0 && (
-          <StandaloneActivitiesBlock activities={message.activities} />
-        )}
-
         {/* Waiting indicator — shown while loading before any content or thinking arrives */}
         {message.isLoading && !message.content && !message.thinking && !(message.activities && message.activities.length > 0) && (
           <BreathingDot size="md" style={waitingDotStyle} />
         )}
 
-        {/* Reasoning block — shown when adaptive thinking is enabled */}
-        {showReasoningBlock && (
+        {/* Reasoning that came as plain text, with no trace to place it in. */}
+        {showReasoning && message.thinking && !parts.some((part) => part.kind === "work") && (
           <ReasoningBlock
-            thinkingContent={message.thinking!}
+            thinkingContent={message.thinking}
             isNewMessage={isNewMessage}
             isThinkingInProgress={message.isThinkingInProgress}
-            modelName={message.modelName || message.model_name || message.model}
-            modelMeta={message.modelMeta}
-            activities={message.activities}
-            reasoningSections={message.reasoning_sections}
-            reasoningTimeline={message.reasoningTimeline}
-            durationMs={message.reasoningDurationMs}
             isTurnActive={message.isLoading}
-            promptDecisions={promptDecisions}
           />
         )}
 
-        {/* Message content - assistant only (user handled above) */}
-        {/* Text content always renders via ContentRenderer so that markdown
-            structure, links, bold, code, math, and citation chips are handled uniformly
-            regardless of whether the backend also sends a text responseBlock. */}
-        {answerText ? (
-          <m.div
-            ref={contentRef}
-            initial={isNewMessage ? { opacity: 0, y: 5 } : false}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <LibraryCitationsProvider citations={message.libraryCitations}>
-            <StreamingTextContent
-              content={answerText}
-              citations={citations}
-              animate={animateText}
-              isLoading={!!message.isLoading}
-              stopped={!!message.stoppedByUser}
-              revealFrom={revealFrom}
-              onCaughtUp={setCaughtUpText}
-            />
-            </LibraryCitationsProvider>
-          </m.div>
-        ) : null}
+        {/* The turn in the order it happened: each stretch of work (reasoning,
+            tool rows) sits where it ran, between the answer text around it.
+            Text always renders via ContentRenderer so that markdown, links,
+            code, math, and citation chips are handled uniformly. */}
+        <div ref={contentRef}>
+          {parts.map((part, index) => {
+            const isLastPart = index === parts.length - 1;
+            if (part.kind === "text") {
+              return (
+                <AnswerText
+                  key={part.id}
+                  content={part.content}
+                  citations={citations}
+                  libraryCitations={message.libraryCitations}
+                  isNewMessage={isNewMessage}
+                  animate={animateText}
+                  isLoading={isLastPart && !!message.isLoading}
+                  stopped={!!message.stoppedByUser}
+                  onCaughtUp={setCaughtUpText}
+                />
+              );
+            }
+            const items = tracesReasoning ? part.items : part.items.filter((item) => item.kind !== "reasoning");
+            const activities = items.flatMap((item) => {
+              const activity = item.kind === "activity" ? activityById.get(item.activityId) : undefined;
+              return activity ? [activity] : [];
+            });
+            // A turn with no reasoning to show keeps the plain activities list.
+            if (!tracesReasoning) {
+              return activities.length > 0 ? <StandaloneActivitiesBlock key={part.id} activities={activities} /> : null;
+            }
+            return (
+              <ReasoningBlock
+                key={part.id}
+                thinkingContent=""
+                isNewMessage={isNewMessage}
+                isThinkingInProgress={isLastPart && message.isThinkingInProgress}
+                activities={activities}
+                reasoningTimeline={items}
+                durationMs={part.durationMs}
+                isTurnActive={isLastPart && message.isLoading}
+                promptDecisions={promptDecisions}
+              />
+            );
+          })}
+        </div>
         {/* Structural blocks (tables, charts, steps, follow-ups, tags, etc.) come
             from responseBlocks. Text blocks are skipped here because message.content
             already carries the full text rendered above. */}

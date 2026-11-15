@@ -22,10 +22,9 @@ import type {
   Message,
   ChatsListResponse,
   MessagesListResponse,
-  PersistedToolCall,
 } from "@/types/chat";
 import { dropChatHistory } from "@/lib/chat/chat-message-cache";
-import type { ReasoningSection } from "@/lib/reasoning";
+import { parseSteps } from "@/lib/chat/steps";
 import { extractThinkingContent } from "@/lib/parsers/content-parser";
 import { INCOMPLETE_ANSWER_MESSAGE } from "@/lib/turn-outcome";
 import { EMPTY_TURN_MESSAGE } from "@/lib/model-error";
@@ -292,15 +291,11 @@ interface BackendMessage {
   // Web search sources attached to the message
   sources?: Array<{ id?: string; url?: string; title?: string; favicon?: string; domain?: string }> | null;
   web_citations?: Array<{ title?: string; url?: string; domain?: string }> | null;
-  // Structured web searches (query + link URLs + per-result metadata)
-  web_searches?: Array<{ query: string; links: string[]; results?: Array<Record<string, unknown>> }> | null;
   // Library citations behind the answer's [[L1]] markers (LIBRARY_FLOW_A_BACKEND_TICKET.md Part 2 BE-5)
   library_citations?: unknown;
   libraryCitations?: unknown;
-  // Structured reasoning steps
-  reasoning_sections?: ReasoningSection[] | null;
-  // Tool calls the turn made (legacy rows: bare tool names)
-  tool_calls?: Array<string | { tool?: string | null; args?: unknown; output?: unknown; duration_s?: number | null } | null> | null;
+  // The turn in the order it happened (reasoning, text, tool calls)
+  steps?: unknown;
 }
 
 /** Normalize a backend message entry into one or two Message objects. */
@@ -362,12 +357,10 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
         ...splitPersistedAnswer(aiText ?? "", raw.reasoning ?? raw.thinking_content),
         created_at: createdAt,
         chat_id: chatId,
-        reasoning_sections: raw.reasoning_sections ?? undefined,
+        steps: parseSteps(raw.steps),
         model_name: raw.model_name ?? undefined,
         sources: sources.length > 0 ? sources : undefined,
-        web_searches: raw.web_searches ?? undefined,
         library_citations: raw.libraryCitations ?? raw.library_citations ?? undefined,
-        tool_calls: normalizeToolCalls(raw),
         file_attachments: assistantAtts.length > 0 ? assistantAtts : undefined,
         image_links: imageLinks && imageLinks.length > 0 ? imageLinks : undefined,
         prompts: prompts.length > 0 ? prompts : undefined,
@@ -389,9 +382,8 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
         run,
         created_at: createdAt,
         chat_id: chatId,
-        reasoning_sections: raw.reasoning_sections ?? undefined,
+        steps: parseSteps(raw.steps),
         model_name: raw.model_name ?? undefined,
-        tool_calls: normalizeToolCalls(raw),
       });
     }
     return messages;
@@ -415,12 +407,10 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
       : { content, thinking: raw.reasoning ?? raw.thinking_content ?? undefined }),
     created_at: createdAt,
     chat_id: chatId,
-    reasoning_sections: raw.reasoning_sections ?? undefined,
+    steps: role === "assistant" ? parseSteps(raw.steps) : undefined,
     model_name: raw.model_name ?? undefined,
     sources: sources.length > 0 ? sources : undefined,
-    web_searches: raw.web_searches ?? undefined,
     library_citations: raw.libraryCitations ?? raw.library_citations ?? undefined,
-    tool_calls: role === "assistant" ? normalizeToolCalls(raw) : undefined,
     file_attachments: fileAttachments.length > 0 ? fileAttachments : undefined,
     image_links: imageLinks && imageLinks.length > 0 ? imageLinks : undefined,
   }];
@@ -441,17 +431,6 @@ function splitPersistedAnswer(
     thinking: persistedThinking || thinkingText || undefined,
     errorNotice: thinkingOpen ? INCOMPLETE_ANSWER_MESSAGE : undefined,
   };
-}
-
-/** The turn's tool calls without their outputs, which can be large and are never shown. */
-function normalizeToolCalls(raw: BackendMessage): PersistedToolCall[] | undefined {
-  if (!Array.isArray(raw.tool_calls) || raw.tool_calls.length === 0) return undefined;
-  const calls = raw.tool_calls.flatMap((call): PersistedToolCall[] => {
-    if (typeof call === "string") return call ? [call] : [];
-    if (!call || typeof call !== "object") return [];
-    return [{ tool: call.tool ?? undefined, args: call.args, duration_s: call.duration_s ?? undefined }];
-  });
-  return calls.length > 0 ? calls : undefined;
 }
 
 /** Extract and normalise file_attachments from a backend message entry. */
@@ -491,35 +470,6 @@ function parseSources(raw: BackendMessage): import("@/types/chat").Source[] {
         url: s.url ?? "",
         title: s.title ?? s.url ?? "",
       }] : []);
-  }
-  // web_searches format: [{query, links: string[], results: [{url, title, ...}]}].
-  // `results` carries the real page titles; `links` are bare URLs, so a search
-  // saved without metadata falls back to a title derived from the URL itself.
-  if (Array.isArray(raw.web_searches) && raw.web_searches.length > 0) {
-    const titleByUrl = new Map<string, string>();
-    for (const ws of raw.web_searches) {
-      for (const result of ws.results ?? []) {
-        const url = typeof result.url === "string" ? result.url : "";
-        const title = typeof result.title === "string" ? result.title.trim() : "";
-        if (url && title) titleByUrl.set(url, title);
-      }
-    }
-    const allLinks = raw.web_searches.flatMap((ws) => (ws.links ?? []).filter(Boolean));
-    if (allLinks.length > 0) {
-      return allLinks.map((url, i) => {
-        const known = titleByUrl.get(url);
-        if (known) return { id: String(i), url, title: known };
-        let domain = "";
-        let title = url;
-        try {
-          const u = new URL(url);
-          domain = u.hostname.replace(/^www\./, "");
-          const pathParts = u.pathname.split("/").filter(Boolean);
-          title = pathParts.length > 0 ? `${domain} - ${pathParts[pathParts.length - 1].replace(/-/g, " ")}` : domain;
-        } catch { /* ignore */ }
-        return { id: String(i), url, title };
-      });
-    }
   }
   // Buried in metadata
   const meta = raw.metadata;

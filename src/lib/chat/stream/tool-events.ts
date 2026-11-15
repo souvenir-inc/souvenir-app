@@ -32,7 +32,7 @@ export function handleWebSearch(ctx: StreamEventContext, turn: StreamTurn, parse
     status: "done",
     results,
   }
-  turn.reasoning.activity(activity.id, eventRoundIndex(parsed))
+  turn.reasoning.activity(activity.id, eventRoundIndex(parsed), turn.eventAt)
   ctx.flushPending()
 
   const msgId = ctx.messageId()
@@ -52,7 +52,7 @@ export function handleToolProgress(ctx: StreamEventContext, turn: StreamTurn, pa
   if (status === "error") turn.erroredToolNames.add(toolName)
 
   const activityType = toolNameToType(toolName)
-  turn.reasoning.activity(activityId, eventRoundIndex(parsed))
+  turn.reasoning.activity(activityId, eventRoundIndex(parsed), turn.eventAt)
   ctx.flushPending()
 
   const msgId = ctx.messageId()
@@ -69,10 +69,16 @@ export function handleToolExecuting(ctx: StreamEventContext, turn: StreamTurn, p
   const toolCall = parsed.tool_call as Record<string, unknown> | undefined
   const toolName = asString(toolCall?.name) ?? asString(parsed.content) ?? "tool"
   const label = asString(parsed.label)
-  const toolCallId = asString(toolCall?.tool_call_id) ?? `te-${toolName}-${Date.now()}`
+  const givenId = asString(toolCall?.tool_call_id)
+  const toolCallId = givenId ?? `te-${toolName}-${Date.now()}`
 
-  // Check if tool_calls_streaming already created a preliminary activity
-  const existingActivityId = turn.toolCallIdByName.get(toolName)
+  // Check if tool_calls_streaming already created a preliminary activity. A
+  // call that carries its id is matched by it, so two calls to the same tool
+  // in one round keep a row each.
+  const existingActivityId = givenId
+    ? (turn.toolCallIds.has(givenId) ? givenId : undefined)
+    : turn.toolCallIdByName.get(toolName)
+  turn.toolCallIds.add(toolCallId)
 
   // Register the real tool_call_id so subsequent tool_progress/tool_complete events can find it
   turn.toolCallIdByName.set(toolName, toolCallId)
@@ -85,7 +91,7 @@ export function handleToolExecuting(ctx: StreamEventContext, turn: StreamTurn, p
   if (existingActivityId) {
     turn.reasoning.renameActivity(existingActivityId, toolCallId)
   } else {
-    turn.reasoning.activity(toolCallId, eventRoundIndex(parsed))
+    turn.reasoning.activity(toolCallId, eventRoundIndex(parsed), turn.eventAt)
   }
   ctx.flushPending()
 
@@ -115,12 +121,16 @@ export function handleToolCallsStreaming(ctx: StreamEventContext, turn: StreamTu
   const toolCall = parsed.tool_call as Record<string, unknown> | undefined
   const toolName = asString(toolCall?.name) ?? asString(parsed.content) ?? ""
   if (!toolName) return
-  const existingId = turn.toolCallIdByName.get(toolName)
+  const givenId = asString(toolCall?.tool_call_id)
+  const existingId = givenId
+    ? (turn.toolCallIds.has(givenId) ? givenId : undefined)
+    : turn.toolCallIdByName.get(toolName)
   if (!existingId) {
-    // First streaming chunk for this tool — create a preliminary activity.
+    // First streaming chunk for this call — create a preliminary activity.
     // AG-UI streams carry the provider's real tool_call_id; keep the
     // synthetic fallback for payloads without one.
-    const callId = asString(toolCall?.tool_call_id) ?? `tcs-${toolName}-${Date.now()}`
+    const callId = givenId ?? `tcs-${toolName}-${Date.now()}`
+    turn.toolCallIds.add(callId)
     turn.toolCallIdByName.set(toolName, callId)
     const activityType = toolNameToType(toolName)
     const label = asString(parsed.label) ?? undefined
@@ -132,7 +142,7 @@ export function handleToolCallsStreaming(ctx: StreamEventContext, turn: StreamTu
       detail: deriveActivityDetail(toolName, toolCall?.arguments),
       status: "start",
     }
-    turn.reasoning.activity(callId, eventRoundIndex(parsed))
+    turn.reasoning.activity(callId, eventRoundIndex(parsed), turn.eventAt)
     ctx.flushPending()
     const msgId = ctx.messageId()
     if (msgId) ctx.setMessages(updateMessage(msgId, appendActivity(activity, () => turn.reasoning.timeline())))
@@ -172,6 +182,24 @@ export function handleToolComplete(ctx: StreamEventContext, turn: StreamTurn, pa
   }
 }
 
+/** tool_finished: how the call ended (schema: {tool_call_id, failed, results[]}) — the same facts its saved step keeps. */
+export function handleToolFinished(ctx: StreamEventContext, turn: StreamTurn, parsed: Payload) {
+  const toolCallId = asString(parsed.tool_call_id)
+  const msgId = ctx.messageId()
+  if (!toolCallId || !msgId) return
+  const results = webSearchResults(undefined, parsed.results)
+  const durationS = turn.reasoning.finishActivity(toolCallId, turn.eventAt)
+  ctx.setMessages(updateMessage(msgId, (msg) => ({
+    ...patchActivity(toolCallId, (a) => ({
+      ...a,
+      status: parsed.failed === true ? "error" as const : "done" as const,
+      durationS,
+      ...(results.length > 0 ? { results } : {}),
+    }))(msg),
+    reasoningTimeline: turn.reasoning.timeline(),
+  })))
+}
+
 export function handleToolError(ctx: StreamEventContext, turn: StreamTurn, parsed: Payload) {
   // Tool handler raised - schema: {content (tool name), error}
   const toolName = asString(parsed.content)
@@ -193,7 +221,7 @@ export function handleDocxProgress(ctx: StreamEventContext, turn: StreamTurn, pa
   const filename = asString(parsed.filename) ?? "document"
   const progressMessage = asString(parsed.message) ?? ""
   const activityId = `docx-${filename}`
-  turn.reasoning.activity(activityId, eventRoundIndex(parsed))
+  turn.reasoning.activity(activityId, eventRoundIndex(parsed), turn.eventAt)
   ctx.flushPending()
 
   const msgId = ctx.messageId()
@@ -212,7 +240,7 @@ export function handleAgentStarted(ctx: StreamEventContext, turn: StreamTurn, pa
   if (!agent || !msgId) return
   const activityId = `agent-${agent}-${Date.now()}`
   turn.agentActivityIds.set(agent, activityId)
-  turn.reasoning.activity(activityId, eventRoundIndex(parsed))
+  turn.reasoning.activity(activityId, eventRoundIndex(parsed), turn.eventAt)
   ctx.flushPending()
   const activity: ActivityItem = {
     id: activityId,

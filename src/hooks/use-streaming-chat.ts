@@ -285,7 +285,7 @@ export function useStreamingChat({
 
     setStreamState?.("waiting")
 
-    const turn = createStreamTurn(options?.prior?.content)
+    const turn = createStreamTurn(options?.prior)
     // The event handlers' view of this call: its refs, batching and callbacks.
     const ctx: StreamEventContext = {
       setMessages,
