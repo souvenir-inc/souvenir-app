@@ -28,14 +28,15 @@ describe('ReasoningContent', () => {
     expect(html).not.toContain('<code>unfinished')
   })
 
-  it('renders structured reasoning as visible thinking steps', () => {
+  it('renders titled reasoning as collapsed thinking steps', () => {
     const html = renderToStaticMarkup(
       <ReasoningContent
-        thinkingContent="**Researching**\nThe raw fallback must not replace structured sections."
-        reasoningSections={[
-          { heading: '**Researching**', body: 'Checking the connected sources.' },
-          { heading: 'Summarizing', body: 'Preparing the result.' },
-        ]}
+        thinkingContent=""
+        reasoningTimeline={[{
+          kind: 'reasoning',
+          id: 'r-1',
+          content: '**Researching**\nChecking the connected sources.\n**Summarizing**\nPreparing the result.',
+        }]}
         isStreaming={false}
       />,
     )
@@ -44,16 +45,16 @@ describe('ReasoningContent', () => {
     expect(html).toContain('Summarizing')
     expect(html).not.toContain('Checking the connected sources.')
     expect(html).not.toContain('Preparing the result.')
-    expect(html).not.toContain('The raw fallback must not replace structured sections.')
   })
 
   it('splits a heading into a bold verb and a muted remainder', () => {
     const html = renderToStaticMarkup(
       <ReasoningContent
         thinkingContent=""
-        reasoningSections={[{
-          heading: 'Planned what to search for and in what order',
-          body: 'The full summary.',
+        reasoningTimeline={[{
+          kind: 'reasoning',
+          id: 'r-1',
+          content: '**Planned what to search for and in what order**\nThe full summary.',
         }]}
         isStreaming={false}
       />,
@@ -70,15 +71,14 @@ describe('ReasoningContent', () => {
         isStreaming={false}
       />,
     )
-    const sections = renderToStaticMarkup(
+    const plain = renderToStaticMarkup(
       <ReasoningContent
-        thinkingContent=""
-        reasoningSections={[{ heading: 'Clarifying the topic', body: 'The only body.' }]}
+        thinkingContent={'**Clarifying the topic**\nThe only body.'}
         isStreaming={false}
       />,
     )
 
-    for (const html of [timeline, sections]) {
+    for (const html of [timeline, plain]) {
       expect(html).toContain('aria-expanded="true"')
       expect(html).toContain('The only body.')
     }
@@ -206,7 +206,7 @@ describe('ReasoningContent', () => {
     const html = renderToStaticMarkup(
       <ReasoningContent
         thinkingContent=""
-        reasoningSections={[{ heading: 'Summarizing', body: 'Body.' }]}
+        reasoningTimeline={[{ kind: 'reasoning', id: 'r-1', content: '**Summarizing**\nBody.' }]}
         isStreaming={false}
       />,
     )
@@ -260,11 +260,7 @@ describe('ReasoningContent', () => {
   it('uses the last reasoning heading as the live Thinking summary', () => {
     const html = renderToStaticMarkup(
       <ReasoningBlock
-        thinkingContent="**Clarifying research needs**\nFirst body.\n\n**Researching multi-model execution**\nSecond body."
-        reasoningSections={[
-          { heading: 'Clarifying research needs', body: 'First body.' },
-          { heading: 'Researching multi-model execution', body: 'Second body.' },
-        ]}
+        thinkingContent={'**Clarifying research needs**\nFirst body.\n\n**Researching multi-model execution**\nSecond body.'}
         isNewMessage
         isThinkingInProgress
       />,

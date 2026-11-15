@@ -52,17 +52,20 @@ export interface StreamTurn {
   agentActivityIds: Map<string, string>
   /** Prompt cards already marked in the reasoning trace (events can repeat). */
   promptMarkerIds: Set<string>
-  /** Reasoning time behind the "Thought for Ns" label: from the turn's first
-   *  reasoning to its first answer token, or to the end of the turn. */
-  reasoningStartedAt: number | null
-  reasoningDurationMs: number | undefined
+  /** Tool call ids that already have an activity row. */
+  toolCallIds: Set<string>
+  /** The server's timestamp (epoch ms) on the event being handled. */
+  eventAt: number | undefined
+  /** How much answer text the reply held before the event being handled. */
+  answerLength: number
 }
 
-/** `priorContent` is what earlier stretches of the same run wrote; this turn's text is added after it. */
-export function createStreamTurn(priorContent = ""): StreamTurn {
+/** `prior` is the reply as earlier stretches of the same run left it; this turn's text and trace are added after it. */
+export function createStreamTurn(prior?: UIMessage): StreamTurn {
+  const assistantContent = prior?.content ? `${prior.content}\n\n` : ""
   return {
-    assistantContent: priorContent ? `${priorContent}\n\n` : "",
-    reasoning: createReasoningAccumulator(),
+    assistantContent,
+    reasoning: createReasoningAccumulator(prior?.reasoningTimeline),
     streamFinished: false,
     turnFailed: false,
     terminalErrorSeen: false,
@@ -73,20 +76,10 @@ export function createStreamTurn(priorContent = ""): StreamTurn {
     erroredToolNames: new Set(),
     agentActivityIds: new Map(),
     promptMarkerIds: new Set(),
-    reasoningStartedAt: null,
-    reasoningDurationMs: undefined,
+    toolCallIds: new Set(),
+    eventAt: undefined,
+    answerLength: assistantContent.length,
   }
-}
-
-export function startReasoningClock(turn: StreamTurn) {
-  if (turn.reasoningStartedAt === null && turn.reasoningDurationMs === undefined) turn.reasoningStartedAt = Date.now()
-}
-
-export function stopReasoningClock(turn: StreamTurn): Pick<UIMessage, "reasoningDurationMs"> {
-  if (turn.reasoningStartedAt !== null && turn.reasoningDurationMs === undefined) {
-    turn.reasoningDurationMs = Date.now() - turn.reasoningStartedAt
-  }
-  return turn.reasoningDurationMs === undefined ? {} : { reasoningDurationMs: turn.reasoningDurationMs }
 }
 
 /**
@@ -107,19 +100,15 @@ export function finishTurn(ctx: StreamEventContext, turn: StreamTurn, end: TurnE
     hasOtherOutput: turn.receivedRenderableOutput,
   })
   if (outcome.isError || outcome.errorNotice) turn.turnFailed = true
-  const sections = turn.reasoning.sections()
   const timeline = turn.reasoning.timeline()
-  const duration = stopReasoningClock(turn)
   ctx.setMessages(updateMessage(msgId, (msg) => ({
     ...msg,
     ...outcome,
-    ...duration,
     isThinkingInProgress: false,
     isLoading: false,
     ...(end === "done"
       ? { stoppedByUser: false }
       : { activities: stopActiveActivities(msg.activities) }),
-    reasoning_sections: sections.length > 0 ? sections : undefined,
     reasoningTimeline: timeline.length > 0 ? timeline : undefined,
   })))
 }

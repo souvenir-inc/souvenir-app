@@ -3,18 +3,31 @@ export type ReasoningSection = {
   body: string
 }
 
+// `at` and `endAt` are the server's clock (epoch ms): the stream events'
+// timestamps while live, the saved step's on reload.
 export type ReasoningTimelineItem =
   | {
       kind: 'reasoning'
       id: string
       content: string
       roundIndex?: number
+      at?: number
+      endAt?: number
     }
   | {
       kind: 'activity'
       id: string
       activityId: string
       roundIndex?: number
+      at?: number
+      endAt?: number
+    }
+  | {
+      // A stretch of the answer, from `start` in the message's content up to
+      // the next text item's start (or the end of the content).
+      kind: 'text'
+      id: string
+      start: number
     }
   | {
       // Where the model stopped to ask the user something (a question card);
@@ -39,14 +52,14 @@ export function appendReasoningTimeline(
   incoming: string,
   newId: string,
   roundIndex?: number,
+  at?: number,
 ): ReasoningTimelineItem[] {
   if (!incoming) return timeline
   const last = timeline[timeline.length - 1]
-  const sameRound = roundIndex === undefined || last?.roundIndex === undefined || last.roundIndex === roundIndex
-  if (last?.kind === 'reasoning' && sameRound) {
-    return [...timeline.slice(0, -1), { ...last, content: last.content + incoming }]
+  if (last?.kind === 'reasoning' && (roundIndex === undefined || last.roundIndex === undefined || last.roundIndex === roundIndex)) {
+    return [...timeline.slice(0, -1), { ...last, content: last.content + incoming, endAt: at }]
   }
-  return [...timeline, { kind: 'reasoning', id: newId, content: incoming, roundIndex }]
+  return [...timeline, { kind: 'reasoning', id: newId, content: incoming, roundIndex, at, endAt: at }]
 }
 
 export function appendActivityTimeline(
@@ -54,9 +67,10 @@ export function appendActivityTimeline(
   activityId: string,
   newId: string,
   roundIndex?: number,
+  at?: number,
 ): ReasoningTimelineItem[] {
   if (timeline.some((item) => item.kind === 'activity' && item.activityId === activityId)) return timeline
-  return [...timeline, { kind: 'activity', id: newId, activityId, roundIndex }]
+  return [...timeline, { kind: 'activity', id: newId, activityId, roundIndex, at }]
 }
 
 /** Mark the point where the model asked the user something. Reasoning that
@@ -219,6 +233,52 @@ export function thoughtLabel(durationMs?: number): string {
   return `Thought for ${minutes}m${seconds ? ` ${seconds}s` : ''}`
 }
 
+/** What a turn did between two stretches of its answer. */
+export type WorkItem = Exclude<ReasoningTimelineItem, { kind: 'text' }>
+
+/** A message in the order it happened: work, answer text, more work, more text. */
+export type MessagePart =
+  | { kind: 'work'; id: string; items: WorkItem[]; durationMs?: number }
+  | { kind: 'text'; id: string; content: string }
+
+// From the first thing a stretch of work did to the last thing it finished.
+// Unknown while a step is still open, or for a trace saved without times.
+function workDuration(items: WorkItem[]): number | undefined {
+  const timed = items.filter((item) => item.kind !== 'prompt')
+  if (timed.length === 0) return undefined
+  let start = Infinity
+  let end = -Infinity
+  for (const item of timed) {
+    if (item.at === undefined || item.endAt === undefined) return undefined
+    start = Math.min(start, item.at)
+    end = Math.max(end, item.endAt)
+  }
+  return end - start
+}
+
+/** Splits a message's timeline and content into the parts it renders as. A
+ * timeline with no text items (a chat saved before steps were kept) reads as
+ * all of its work, then all of its text. */
+export function messageParts(timeline: ReasoningTimelineItem[], content: string): MessagePart[] {
+  const parts: MessagePart[] = []
+  const starts = timeline.flatMap((item) => (item.kind === 'text' ? [item.start] : []))
+  let textIndex = 0
+  for (const item of timeline) {
+    if (item.kind === 'text') {
+      const start = textIndex === 0 ? 0 : item.start
+      const text = content.slice(start, starts[textIndex + 1] ?? content.length).trim()
+      textIndex += 1
+      if (text) parts.push({ kind: 'text', id: item.id, content: text })
+      continue
+    }
+    const last = parts[parts.length - 1]
+    if (last?.kind === 'work') last.items.push(item)
+    else parts.push({ kind: 'work', id: item.id, items: [item] })
+  }
+  if (starts.length === 0 && content) parts.push({ kind: 'text', id: 'text', content })
+  return parts.map((part) => (part.kind === 'work' ? { ...part, durationMs: workDuration(part.items) } : part))
+}
+
 export type ReasoningTimelineGroup =
   | { kind: 'reasoning'; id: string; contents: string[] }
   | { kind: 'activities'; id: string; activityIds: string[] }
@@ -229,7 +289,7 @@ export type ReasoningTimelineGroup =
 // one step list so the connector line runs unbroken between them. A question
 // marker is always its own group, so it breaks whatever run it lands in.
 export function groupReasoningTimeline(
-  timeline: ReasoningTimelineItem[],
+  timeline: WorkItem[],
 ): ReasoningTimelineGroup[] {
   const groups: ReasoningTimelineGroup[] = []
   for (const item of timeline) {
@@ -267,9 +327,13 @@ export type ReasoningAccumulator = {
   timeline(): ReasoningTimelineItem[]
   snapshot(): ReasoningSnapshot
   isEmpty(): boolean
-  event(type: ReasoningEventType, content: string, roundIndex?: number): void
+  event(type: ReasoningEventType, content: string, roundIndex?: number, at?: number): void
   step(section: ReasoningSection, index?: number): void
-  activity(activityId: string, roundIndex?: number): void
+  activity(activityId: string, roundIndex?: number, at?: number): void
+  /** The activity's step ended at `at`. Returns how long it ran, in seconds, when both ends are known. */
+  finishActivity(activityId: string, at?: number): number | undefined
+  /** Answer text is arriving; `start` is where it begins in the message's content. */
+  answer(start: number): void
   renameActivity(previousId: string, nextId: string): void
   prompt(marker: { promptId: string; title: string }): void
 }
@@ -278,10 +342,14 @@ export function eventRoundIndex(data: Record<string, unknown>): number | undefin
   return typeof data.round_index === 'number' ? data.round_index : undefined
 }
 
-export function createReasoningAccumulator(): ReasoningAccumulator {
-  let text = ''
-  let timeline: ReasoningTimelineItem[] = []
-  let sequence = 0
+/** `seed` is the trace earlier stretches of the same run left on the message; this stretch's goes after it. */
+export function createReasoningAccumulator(seed: ReasoningTimelineItem[] = []): ReasoningAccumulator {
+  let timeline: ReasoningTimelineItem[] = seed
+  const reasoningText = () => timeline
+    .flatMap((item) => item.kind === 'reasoning' ? [item.content] : [])
+    .join('\n\n')
+  let text = reasoningText()
+  let sequence = seed.length
   const committed: ReasoningSection[] = []
   const previewSteps = new Map<number, ReasoningSection>()
   let heading = ''
@@ -301,11 +369,9 @@ export function createReasoningAccumulator(): ReasoningAccumulator {
     return id
   }
 
-  const appendDelta = (incoming: string, roundIndex?: number) => {
-    timeline = appendReasoningTimeline(timeline, incoming, nextId('reasoning'), roundIndex)
-    text = timeline
-      .flatMap((item) => item.kind === 'reasoning' ? [item.content] : [])
-      .join('\n\n')
+  const appendDelta = (incoming: string, roundIndex?: number, at?: number) => {
+    timeline = appendReasoningTimeline(timeline, incoming, nextId('reasoning'), roundIndex, at)
+    text = reasoningText()
     cachedSnapshot = null
   }
 
@@ -338,7 +404,7 @@ export function createReasoningAccumulator(): ReasoningAccumulator {
     },
     isEmpty: () => !text,
 
-    event(type, content, roundIndex) {
+    event(type, content, roundIndex, at) {
       if (!content) return
 
       if (type === 'reasoning_heading') {
@@ -351,13 +417,13 @@ export function createReasoningAccumulator(): ReasoningAccumulator {
         // Mirrored into the timeline as a markdown title so the segment-level
         // re-split in TimelineReasoningStep recognises it as a step heading
         // rather than burying it in the body as plain text.
-        appendDelta(`**${cleanReasoningHeading(content)}**\n\n`, roundIndex)
+        appendDelta(`**${cleanReasoningHeading(content)}**\n\n`, roundIndex, at)
         return
       }
 
       body += content
       invalidateSections()
-      appendDelta(content, roundIndex)
+      appendDelta(content, roundIndex, at)
     },
 
     step(section, index) {
@@ -365,8 +431,22 @@ export function createReasoningAccumulator(): ReasoningAccumulator {
       invalidateSections()
     },
 
-    activity(activityId, roundIndex) {
-      timeline = appendActivityTimeline(timeline, activityId, nextId('activity'), roundIndex)
+    activity(activityId, roundIndex, at) {
+      timeline = appendActivityTimeline(timeline, activityId, nextId('activity'), roundIndex, at)
+      cachedSnapshot = null
+    },
+
+    finishActivity(activityId, at) {
+      const item = timeline.find((entry) => entry.kind === 'activity' && entry.activityId === activityId)
+      if (item?.kind !== 'activity') return undefined
+      timeline = timeline.map((entry) => (entry === item ? { ...item, endAt: at } : entry))
+      cachedSnapshot = null
+      return item.at === undefined || at === undefined ? undefined : (at - item.at) / 1000
+    },
+
+    answer(start) {
+      if (timeline[timeline.length - 1]?.kind === 'text') return
+      timeline = [...timeline, { kind: 'text', id: nextId('text'), start }]
       cachedSnapshot = null
     },
 

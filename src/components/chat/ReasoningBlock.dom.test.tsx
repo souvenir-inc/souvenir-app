@@ -102,21 +102,11 @@ describe('ReasoningBlock in the DOM', () => {
 
   it('renders identical steps without duplicate React keys', () => {
     const errors = vi.spyOn(console, 'error').mockImplementation(() => {})
-    // Timeline path, then the persisted-sections path.
     render({
       thinkingContent: '',
       reasoningTimeline: reasoning('**Checking context**\nSame.\n**Checking context**\nSame.'),
       isThinkingInProgress: false,
     })
-    render({
-      thinkingContent: '',
-      reasoningSections: [
-        { heading: 'Checking context', body: 'Same.' },
-        { heading: 'Checking context', body: 'Same.' },
-      ],
-      isThinkingInProgress: false,
-    })
-
     expect(container.textContent!.match(/Checking/g)).toHaveLength(2)
 
     expect(errors.mock.calls.flat().join(' ')).not.toMatch(/same key/i)
