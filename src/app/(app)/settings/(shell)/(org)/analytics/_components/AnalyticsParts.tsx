@@ -233,14 +233,13 @@ export function AnalyticsPageSkeleton() {
           <div style={{ margin: '10px 4px 0' }}><SkeletonLine width={270} lineHeight={20} height={13} /></div>
         </PageCard>
 
-        {/* Credit usage by feature: header + Mine/Organization toggle, total, note box, chart frame */}
+        {/* Credit usage by feature: header, total, note box, chart frame */}
         <PageCard padding={0}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '16px 24px', borderBottom: '1px solid var(--neutral-100)' }}>
             <div style={{ flex: '1 0 0', minWidth: 0 }}>
               <SkeletonLine width={170} lineHeight={22} height={16} />
               <div style={{ marginTop: 2 }}><SkeletonLine width={220} lineHeight={20} height={13} /></div>
             </div>
-            <SkeletonBlock width={147} height={38} radius={11} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '20px 24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

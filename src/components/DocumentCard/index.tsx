@@ -30,7 +30,7 @@ export interface DocumentCardProps {
 
 export function DocumentCard({ ref, name, type, sizeLabel, onRemove, onClick }: DocumentCardProps & { ref?: React.Ref<HTMLDivElement> }) {
     return (
-      // eslint-disable-next-line click-events-have-key-events, no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements
       <div
         ref={ref}
         onClick={onClick}

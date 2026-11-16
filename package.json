@@ -16,7 +16,8 @@
     "generate:llm-icons": "node scripts/generate-llm-icons.mjs",
     "perf:bundle": "node scripts/perf-bundle.mjs",
     "perf:bundle:check": "node scripts/perf-bundle.mjs --check",
-    "doctor": "npx react-doctor@latest"
+    "doctor": "npx react-doctor@latest",
+    "lint:types": "eslint --config eslint.config.types.mjs"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.19.0",

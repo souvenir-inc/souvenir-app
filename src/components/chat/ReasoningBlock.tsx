@@ -288,7 +288,7 @@ function ThinkingCollapse({ open, id, children }: { open: boolean; id: string; c
   );
 }
 
-// ── Structured reasoning sections (from backend reasoning_sections[]) ────────
+// ── Reasoning steps (sections split out of the turn's reasoning text) ───────
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const REASONING_ICON_MAP: Array<{ pattern: RegExp; icon: any }> = [

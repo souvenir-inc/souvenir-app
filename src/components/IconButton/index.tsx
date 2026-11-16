@@ -142,10 +142,10 @@ export function IconButton({
 
   // ── Squircle corner smoothing ────────────────────────────────────────────────
   const cornerRadius = isMd ? 10 : isXs ? 6 : 8
-  const { ref: squircleRef, clipPath, strokeClipPath } = useSquircle(cornerRadius, 0.6, 1)
+  const { ref: attachSquircle, clipPath, strokeClipPath } = useSquircle<HTMLButtonElement>(cornerRadius, 0.6, 1)
 
   const mergedRef = (node: HTMLButtonElement | null) => {
-    ;(squircleRef as React.MutableRefObject<HTMLButtonElement | null>).current = node
+    attachSquircle(node)
     if (typeof forwardedRef === 'function') forwardedRef(node)
     else if (forwardedRef) forwardedRef.current = node
   }

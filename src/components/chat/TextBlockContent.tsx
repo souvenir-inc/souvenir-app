@@ -172,7 +172,7 @@ function normalizeBoldTitles(text: string): string {
 
 // Full block text renderer - supports headings, lists, blockquotes, bold, code, citations
 // Block index (bi) is the only stable key: same markdown can produce adjacent same-type blocks.
-/* eslint-disable react/no-array-index-as-key */
+/* eslint-disable react/no-array-index-key */
 function renderTextBlock(text: string, citations?: WebCitation[], cursor?: React.ReactNode): React.ReactNode {
   const blocks = normalizeBoldTitles(text).split(/\n\n+/);
 
@@ -236,7 +236,7 @@ function renderTextBlock(text: string, citations?: WebCitation[], cursor?: React
         if (lines.length > 0 && lines.every((l) => l.startsWith("> "))) return (
           <div key={bi} style={{ borderLeft: "2.5px solid var(--prose-quote-border)", paddingLeft: "var(--space-3)", marginBottom: isLast ? 0 : GAP, color: "var(--prose-quote-text)", fontStyle: "italic", lineHeight: "var(--prose-line-body)" }}>
             {lines.map((l, li) => (
-              // eslint-disable-next-line react/no-array-index-as-key
+              // eslint-disable-next-line react/no-array-index-key
               <React.Fragment key={li}>
                 {li > 0 && <br />}
                 <InlineRich text={l.slice(2)} citations={citations} />
@@ -252,7 +252,7 @@ function renderTextBlock(text: string, citations?: WebCitation[], cursor?: React
             {nonEmpty.map((l, li) => {
               const isLastItem = li === nonEmpty.length - 1;
               return (
-                // eslint-disable-next-line react/no-array-index-as-key
+                // eslint-disable-next-line react/no-array-index-key
                 <li key={li} style={{ lineHeight: "var(--prose-line-body)", color: "var(--prose-text)", fontSize: "var(--prose-size-body)" }}>
                   <InlineRich text={l.replace(/^[-*]\s/, "")} citations={citations} />
                   {isLastItem && tail}
@@ -267,7 +267,7 @@ function renderTextBlock(text: string, citations?: WebCitation[], cursor?: React
             {nonEmpty.map((l, li) => {
               const isLastItem = li === nonEmpty.length - 1;
               return (
-                // eslint-disable-next-line react/no-array-index-as-key
+                // eslint-disable-next-line react/no-array-index-key
                 <li key={li} style={{ lineHeight: "var(--prose-line-body)", color: "var(--prose-text)", fontSize: "var(--prose-size-body)" }}>
                   <InlineRich text={l.replace(/^\d+\.\s/, "")} citations={citations} />
                   {isLastItem && tail}
@@ -286,7 +286,7 @@ function renderTextBlock(text: string, citations?: WebCitation[], cursor?: React
         return (
           <p key={bi} style={{ margin: 0, marginBottom: isLast ? 0 : GAP, lineHeight: "var(--prose-line-body)", fontWeight: 400, fontSize: "var(--prose-size-body)", color: "var(--prose-text)" }}>
             {lines.map((line, li) => (
-              // eslint-disable-next-line react/no-array-index-as-key
+              // eslint-disable-next-line react/no-array-index-key
               <React.Fragment key={li}>
                 {li > 0 && <br />}
                 <InlineRich text={line} citations={citations} />
@@ -299,7 +299,7 @@ function renderTextBlock(text: string, citations?: WebCitation[], cursor?: React
     </div>
   );
 }
-/* eslint-enable react/no-array-index-as-key */
+/* eslint-enable react/no-array-index-key */
 
 export function TextBlockContent({ text, citations, cursor }: { text: string; citations?: WebCitation[]; cursor?: React.ReactNode }) {
   return <>{renderTextBlock(text, citations, cursor)}</>

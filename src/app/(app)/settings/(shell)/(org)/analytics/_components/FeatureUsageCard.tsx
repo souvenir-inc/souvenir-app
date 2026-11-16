@@ -1,26 +1,20 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { InformationCircleIcon } from '@strange-huge/icons'
-import { Tabs, TabsList, TabsTrigger } from '@/components/Tabs'
-import { usageQuery } from '@/lib/billing/billing-queries'
 import { orgUsageQuery } from '@/lib/org/org-queries'
 import { ApiError } from '@/lib/api/client'
 import type { OrgUsageBucket, OrgUsageByCategory } from '@/types/teams'
-import { orgScope } from '@/lib/query-keys'
 import { PageCard } from './AnalyticsParts'
 
 // Credit usage by feature — measured numbers only.
 //
-// "Mine": the viewer's own spend this billing period by feature, from GET /stripe/usage (by_category:
-// chat + agent sub-tasks, Slack, automations). "Organization": the whole workspace over the chosen
-// range, from GET /organizations/{id}/plan/usage, which reports the same categories plus a per-bucket
-// series. That endpoint is admin-only, so a member gets a 403 and keeps the cycle total alone.
+// The whole workspace over the chosen range, from GET /organizations/{id}/plan/usage, which reports
+// the categories (chat + agent sub-tasks, Slack, automations) plus a per-bucket series. That endpoint
+// is admin-only, so a member gets a 403 and keeps the cycle total alone.
 //
 // The chart draws that series: one stacked bar per bucket, day or week as the response says.
-
-type Scope = 'mine' | 'org'
 
 export type DateRange = '7d' | '1m' | '3m' | '6m'
 
@@ -181,14 +175,6 @@ function featureValues(c: OrgUsageByCategory): Record<(typeof FEATURES)[number][
 }
 
 export function FeatureUsageCard({ orgId, orgTotal, range }: { orgId: string | null | undefined; orgTotal: number; range: DateRange }) {
-  const [scope, setScope] = useState<Scope>('org')
-  const usageQ = useQuery(usageQuery(orgScope(orgId)))
-  const spend = usageQ.data?.byCategory
-  const values = spend
-    ? { chat: spend.chatCredits, slack: spend.slackCredits, automation: spend.automationCredits }
-    : null
-  const mine = values ? values.chat + values.slack + values.automation : 0
-
   // The workspace breakdown for the chosen range. Admin-only: a member's 403 leaves
   // `breakdown` undefined and the organization view falls back to the cycle total.
   const breakdownQ = useQuery(orgUsageQuery(orgId ?? null, range))
@@ -207,67 +193,42 @@ export function FeatureUsageCard({ orgId, orgTotal, range }: { orgId: string | n
             Credit usage by feature
           </h2>
           <p style={{ ...caption, margin: '2px 0 0' }}>
-            {scope === 'mine' ? 'Your own usage this billing period.' : `Everyone in the workspace, ${RANGE_CAPTION[range]}.`}
+            {`Everyone in the workspace, ${RANGE_CAPTION[range]}.`}
           </p>
         </div>
-        <Tabs value={scope} onValueChange={value => setScope(value as Scope)}>
-          <TabsList size="small" aria-label="Whose usage">
-            <TabsTrigger value="mine">Mine</TabsTrigger>
-            <TabsTrigger value="org">Organization</TabsTrigger>
-          </TabsList>
-        </Tabs>
       </div>
 
-      {scope === 'mine' ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '20px 24px' }}>
-          {!values ? (
-            <p style={caption}>{usageQ.isError ? 'Could not load your usage. Try again in a moment.' : 'Loading your usage…'}</p>
-          ) : (
-            <>
-              <FeatureSplit values={values} total={mine} />
-              {/* The series the backend reports is the workspace's, not one person's, so
-                  the chart belongs to the organization view until a per-member one exists. */}
-              <ChartNotice>Day-by-day usage isn&apos;t reported for one person yet</ChartNotice>
-              <p style={caption}>
-                <span style={strong}>{mine.toLocaleString()}</span> credits used by you
-                {orgTotal > 0 && <> · <span style={strong}>{sharePct(Math.min(mine, orgTotal), orgTotal)}</span> of the workspace</>}
-              </p>
-            </>
-          )}
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '20px 24px' }}>
-          {/* The range, not the cycle — everything else in this card is the range, and the
-              cycle total is the page's first figure above. */}
-          <p style={{ fontFamily: 'var(--font-title)', fontSize: 26, lineHeight: '34px', color: 'var(--neutral-900)', margin: 0, fontVariantNumeric: 'tabular-nums' }}>
-            {(breakdown ? orgRangeTotal : orgTotal).toLocaleString()}{' '}
-            <span style={{ fontSize: 16, lineHeight: '24px', color: 'var(--neutral-500)' }}>
-              {breakdown ? `credits over ${RANGE_CAPTION[range]}` : 'credits this cycle'}
-            </span>
-          </p>
-          {breakdown && orgValues ? (
-            <>
-              <FeatureSplit values={orgValues} total={orgRangeTotal} />
-              <UsageChart series={breakdown.series} bucket={breakdown.bucket} />
-              <p style={caption}>
-                <span style={strong}>{orgTotal.toLocaleString()}</span> credits this billing cycle
-                {' · '}chart {breakdown.bucket === 'week' ? 'by week' : 'by day'}
-              </p>
-            </>
-          ) : breakdownQ.isPending ? (
-            <ChartNotice>Loading the workspace breakdown…</ChartNotice>
-          ) : (
-            <>
-              <p style={{ ...caption, padding: '10px 12px', borderRadius: 10, background: 'var(--neutral-100)', boxShadow: 'inset 0 0 0 1px var(--border-default)' }}>
-                {breakdownForbidden
-                  ? 'Only workspace admins can see the breakdown by feature and day, so only the cycle total is shown here. See each member’s share in the table below.'
-                  : 'Could not load the workspace breakdown. Try again in a moment.'}
-              </p>
-              <ChartNotice>{breakdownForbidden ? 'Admins only' : 'Accurate data can’t be fetched right now'}</ChartNotice>
-            </>
-          )}
-        </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '20px 24px' }}>
+        {/* The range, not the cycle — everything else in this card is the range, and the
+            cycle total is the page's first figure above. */}
+        <p style={{ fontFamily: 'var(--font-title)', fontSize: 26, lineHeight: '34px', color: 'var(--neutral-900)', margin: 0, fontVariantNumeric: 'tabular-nums' }}>
+          {(breakdown ? orgRangeTotal : orgTotal).toLocaleString()}{' '}
+          <span style={{ fontSize: 16, lineHeight: '24px', color: 'var(--neutral-500)' }}>
+            {breakdown ? `credits over ${RANGE_CAPTION[range]}` : 'credits this cycle'}
+          </span>
+        </p>
+        {breakdown && orgValues ? (
+          <>
+            <FeatureSplit values={orgValues} total={orgRangeTotal} />
+            <UsageChart series={breakdown.series} bucket={breakdown.bucket} />
+            <p style={caption}>
+              <span style={strong}>{orgTotal.toLocaleString()}</span> credits this billing cycle
+              {' · '}chart {breakdown.bucket === 'week' ? 'by week' : 'by day'}
+            </p>
+          </>
+        ) : breakdownQ.isPending ? (
+          <ChartNotice>Loading the workspace breakdown…</ChartNotice>
+        ) : (
+          <>
+            <p style={{ ...caption, padding: '10px 12px', borderRadius: 10, background: 'var(--neutral-100)', boxShadow: 'inset 0 0 0 1px var(--border-default)' }}>
+              {breakdownForbidden
+                ? 'Only workspace admins can see the breakdown by feature and day, so only the cycle total is shown here. See each member’s share in the table below.'
+                : 'Could not load the workspace breakdown. Try again in a moment.'}
+            </p>
+            <ChartNotice>{breakdownForbidden ? 'Admins only' : 'Accurate data can’t be fetched right now'}</ChartNotice>
+          </>
       )}
+      </div>
     </PageCard>
   )
 }

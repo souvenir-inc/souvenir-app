@@ -117,7 +117,7 @@ function ProjectCardInner(
             <Badge color={VISIBILITY_COLOR[visibility]} label={VISIBILITY_LABEL[visibility]} />
 
             {/* ⋮ menu - always visible (not hover-only) */}
-            {/* eslint-disable-next-line click-events-have-key-events, no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements */}
+            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements */}
             {hasActions && <div
               style={{ flexShrink: 0 }}
               onClick={(e) => e.stopPropagation()}

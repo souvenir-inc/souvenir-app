@@ -165,7 +165,7 @@ export function Slider({
               const pipValue = min + i * step
               const active   = current[0] >= pipValue
               return (
-                // eslint-disable-next-line react/no-array-index-as-key
+                // eslint-disable-next-line react/no-array-index-key
                 <span key={i}
                   style={{
                     width:           PIP_SIZE,
@@ -181,7 +181,7 @@ export function Slider({
         )}
 
         {current.map((_, i) => (
-          // eslint-disable-next-line react/no-array-index-as-key -- slider thumbs are positionally stable by definition
+          // eslint-disable-next-line react/no-array-index-key -- slider thumbs are positionally stable by definition
           <SliderPrimitive.Thumb key={i}
             aria-label={props['aria-label']}
             className="kds-slider-thumb"

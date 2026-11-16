@@ -22,18 +22,18 @@ export const INLINE_CODE_STYLE: React.CSSProperties = {
 
 // Inline markdown for non-citation content (reasoning steps, callout bodies)
 function renderInlineMd(text: string): React.ReactNode[] {
-  // eslint-disable-next-line react/no-array-index-as-key
+  // eslint-disable-next-line react/no-array-index-key
   return text.split(/(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\(https?:\/\/[^)]+\))/).map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**"))
-      // eslint-disable-next-line react/no-array-index-as-key
+      // eslint-disable-next-line react/no-array-index-key
       return <strong key={i} style={{ fontWeight: 600, color: "var(--neutral-900)" }}>{part.slice(2, -2)}</strong>;
     if (part.startsWith("`") && part.endsWith("`"))
-      // eslint-disable-next-line react/no-array-index-as-key
+      // eslint-disable-next-line react/no-array-index-key
       return <code key={i} style={INLINE_CODE_STYLE}>{part.slice(1, -1)}</code>;
     const lm = part.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/);
-    // eslint-disable-next-line react/no-array-index-as-key
+    // eslint-disable-next-line react/no-array-index-key
     if (lm) return <a key={i} href={lm[2]} target="_blank" rel="noopener noreferrer" style={{ color: "var(--brown-600)", textDecoration: "underline", textUnderlineOffset: 2 }}>{lm[1]}</a>;
-    // eslint-disable-next-line react/no-array-index-as-key
+    // eslint-disable-next-line react/no-array-index-key
     return <span key={i}>{part}</span>;
   });
 }
