@@ -334,6 +334,8 @@ export type ReasoningAccumulator = {
   finishActivity(activityId: string, at?: number): number | undefined
   /** Answer text is arriving; `start` is where it begins in the message's content. */
   answer(start: number): void
+  /** `content` closed this round's reasoning but was the answer after all (`reasoning_to_answer`): take it back out. */
+  retract(content: string, roundIndex?: number): void
   renameActivity(previousId: string, nextId: string): void
   prompt(marker: { promptId: string; title: string }): void
 }
@@ -448,6 +450,21 @@ export function createReasoningAccumulator(seed: ReasoningTimelineItem[] = []): 
       if (timeline[timeline.length - 1]?.kind === 'text') return
       timeline = [...timeline, { kind: 'text', id: nextId('text'), start }]
       cachedSnapshot = null
+    },
+
+    retract(content, roundIndex) {
+      if (!content) return
+      const index = timeline.findLastIndex((item) => item.kind === 'reasoning')
+      const item = timeline[index]
+      if (item?.kind !== 'reasoning' || !item.content.endsWith(content)) return
+      if (roundIndex !== undefined && item.roundIndex !== undefined && item.roundIndex !== roundIndex) return
+      const rest = item.content.slice(0, -content.length)
+      timeline = rest
+        ? timeline.map((entry, at) => (at === index ? { ...item, content: rest } : entry))
+        : timeline.filter((_, at) => at !== index)
+      if (body.endsWith(content)) body = body.slice(0, -content.length)
+      text = reasoningText()
+      invalidateSections()
     },
 
     renameActivity(previousId, replacementId) {
