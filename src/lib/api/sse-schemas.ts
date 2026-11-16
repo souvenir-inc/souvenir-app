@@ -25,6 +25,10 @@ export const customEventSchemas = {
     content: z.string().optional().default(""),
     round_index: z.number().nullable().optional(),
   }),
+  reasoning_to_answer: z.looseObject({
+    content: z.string(),
+    round_index: z.number(),
+  }),
   message_saved: z.looseObject({ message_id: z.string().optional() }),
   // The catalog model a turn actually runs on. A Souvenir tier is routed to a
   // real model, so this is the only way the chat learns which one answered.

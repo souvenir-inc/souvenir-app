@@ -168,6 +168,33 @@ describe('reasoning stream accumulation', () => {
     expect(reasoning.text()).toBe('Before asking.\n\nAfter the answer.')
   })
 
+  it('takes back reasoning that turned out to be the answer, keeping the thinking before it', () => {
+    const reasoning = createReasoningAccumulator()
+    reasoning.event('reasoning_body', 'Easy one.', 0)
+    reasoning.event('reasoning_body', '\n\nHi there.', 0)
+    reasoning.retract('\n\nHi there.', 0)
+
+    expect(reasoning.timeline()).toMatchObject([{ kind: 'reasoning', content: 'Easy one.' }])
+    expect(reasoning.text()).toBe('Easy one.')
+  })
+
+  it('drops the reasoning item when all of it was the answer', () => {
+    const reasoning = createReasoningAccumulator()
+    reasoning.event('reasoning_body', 'Hi there.', 0)
+    reasoning.retract('Hi there.', 0)
+
+    expect(reasoning.timeline()).toEqual([])
+    expect(reasoning.isEmpty()).toBe(true)
+  })
+
+  it('leaves reasoning alone when the retracted text is not its end', () => {
+    const reasoning = createReasoningAccumulator()
+    reasoning.event('reasoning_body', 'Something else.', 1)
+    reasoning.retract('Hi there.', 1)
+
+    expect(reasoning.text()).toBe('Something else.')
+  })
+
   it('falls back to raw text when a body arrives without a heading', () => {
     const reasoning = createReasoningAccumulator()
     reasoning.event('reasoning_body', 'Unstructured reasoning')

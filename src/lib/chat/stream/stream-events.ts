@@ -89,6 +89,7 @@ export function handleAppEvent(ctx: StreamEventContext, turn: StreamTurn, eventN
   const is = (name: string) => eventName === name || parsed.type === name
   if (eventName === "metadata" || eventName === "title") return handleTitle(ctx, turn, parsed)
   if (eventName === "reasoning_heading" || eventName === "reasoning_body") return handleReasoning(ctx, turn, eventName, parsed)
+  if (eventName === "reasoning_to_answer") return handleReasoningToAnswer(ctx, turn, parsed)
   if (eventName === "content") return handleContent(ctx, turn, parsed)
   if (eventName === "model_selected") return handleModelSelected(ctx, parsed)
   if (eventName === "message_saved") return handleMessageSaved(ctx, turn, parsed)
@@ -219,6 +220,16 @@ function handleReasoning(ctx: StreamEventContext, turn: StreamTurn, eventName: "
     ...(sections.length > 0 ? { reasoning_sections: sections } : {}),
     reasoningTimeline: reasoning.timeline(),
   }, wasEmpty)  // flush immediately on first reasoning chunk
+}
+
+/** The model ended without its answer tool, so its last reasoning was the answer; the answer text follows as content. */
+function handleReasoningToAnswer(ctx: StreamEventContext, turn: StreamTurn, parsed: Payload) {
+  const { reasoning } = turn
+  reasoning.retract(reasoningEventText(parsed), eventRoundIndex(parsed))
+  ctx.queueUpdate({
+    thinking: reasoning.text() || undefined,
+    reasoningTimeline: reasoning.timeline(),
+  }, true)
 }
 
 function handleContent(ctx: StreamEventContext, turn: StreamTurn, parsed: Payload) {

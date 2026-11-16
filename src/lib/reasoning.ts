@@ -270,6 +270,8 @@ export type ReasoningAccumulator = {
   event(type: ReasoningEventType, content: string, roundIndex?: number): void
   step(section: ReasoningSection, index?: number): void
   activity(activityId: string, roundIndex?: number): void
+  /** `content` closed this round's reasoning but was the answer after all (`reasoning_to_answer`): take it back out. */
+  retract(content: string, roundIndex?: number): void
   renameActivity(previousId: string, nextId: string): void
   prompt(marker: { promptId: string; title: string }): void
 }
@@ -368,6 +370,23 @@ export function createReasoningAccumulator(): ReasoningAccumulator {
     activity(activityId, roundIndex) {
       timeline = appendActivityTimeline(timeline, activityId, nextId('activity'), roundIndex)
       cachedSnapshot = null
+    },
+
+    retract(content, roundIndex) {
+      if (!content) return
+      const index = timeline.findLastIndex((item) => item.kind === 'reasoning')
+      const item = timeline[index]
+      if (item?.kind !== 'reasoning' || !item.content.endsWith(content)) return
+      if (roundIndex !== undefined && item.roundIndex !== undefined && item.roundIndex !== roundIndex) return
+      const rest = item.content.slice(0, -content.length)
+      timeline = rest
+        ? timeline.map((entry, at) => (at === index ? { ...item, content: rest } : entry))
+        : timeline.filter((_, at) => at !== index)
+      if (body.endsWith(content)) body = body.slice(0, -content.length)
+      text = timeline
+        .flatMap((entry) => entry.kind === 'reasoning' ? [entry.content] : [])
+        .join('\n\n')
+      invalidateSections()
     },
 
     renameActivity(previousId, replacementId) {
