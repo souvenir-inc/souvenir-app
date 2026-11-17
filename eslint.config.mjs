@@ -102,6 +102,53 @@ const eslintConfig = defineConfig([
       "no-restricted-imports": ["error", { paths: [llmIcons, mermaid, mixpanel, recharts] }],
     },
   },
+  // Design-system guardrails (docs/design-system-primitives-plan.md, Phase 0). Warnings until
+  // Phase 7, when they become errors. A justified exception:
+  //   // eslint-disable-next-line no-restricted-syntax -- ds-allow: <reason>
+  {
+    files: ["src/**/*.tsx"],
+    ignores: [
+      "src/**/*.test.tsx",
+      // The primitives themselves render the raw elements.
+      "src/components/ui/**",
+      // Illustration and brand art (plan D7).
+      "src/components/PersonaCard/{scenes,job-scenes,AnimatedPersonaAvatar}.tsx",
+      "src/components/{CardBrandLogo,ModelIcon,SouvenirLogo,ConnectorGlyph,ThemedLlmIcon}/**",
+      // Hidden features (plan D6).
+      "src/components/{Pin,PinCategory,PinCommentField,PinInsert,PinSkeleton,Pinboard,PinboardExpanded,PinboardHeader,PinboardSkeleton,HighlightCard,HighlightMark,HighlightPanel}/**",
+      "src/components/layout/HighlightSidebar.tsx",
+      "src/lib/pin-markdown.tsx",
+    ],
+    rules: {
+      "no-restricted-syntax": [
+        "warn",
+        ...["button", "input", "textarea", "select"].map((tag) => ({
+          selector: `JSXOpeningElement[name.name='${tag}']`,
+          message: `Raw <${tag}>: use the primitive from @/components/ui (Button, Input, Textarea, Select).`,
+        })),
+        {
+          selector: "JSXOpeningElement[name.object.name='motion'][name.property.name='button']",
+          message: "Raw <motion.button>: use Button from @/components/ui (it already animates).",
+        },
+        {
+          selector: "JSXAttribute[name.name='role'][value.value='dialog']",
+          message: "Hand-rolled dialog: use Dialog / AlertDialog from @/components/ui.",
+        },
+        {
+          selector: "ImportDeclaration[source.value=/^@radix-ui\\u002F/]",
+          message: "Radix is wrapped by the primitives; import from @/components/ui instead.",
+        },
+        {
+          selector: "Literal[value=/^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/]",
+          message: "Hex colour: use a token, var(--…), from src/styles/tokens.",
+        },
+        {
+          selector: "Literal[value=/rgba?\\(\\s*\\d/]",
+          message: "rgb()/rgba() colour: use a token, var(--…), from src/styles/tokens.",
+        },
+      ],
+    },
+  },
   // The chart components that own Recharts. SparklineChart is loaded lazily by components/Sparkline;
   // UsageBarChart is only used by the admin analytics route.
   {

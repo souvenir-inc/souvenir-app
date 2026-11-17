@@ -17,7 +17,11 @@
     "perf:bundle": "node scripts/perf-bundle.mjs",
     "perf:bundle:check": "node scripts/perf-bundle.mjs --check",
     "doctor": "npx react-doctor@latest",
-    "lint:types": "eslint --config eslint.config.types.mjs"
+    "lint:types": "eslint --config eslint.config.types.mjs",
+    "ds:scan": "node scripts/ds-scan.mjs",
+    "ds:check": "node scripts/ds-scan.mjs --check",
+    "lint:css": "stylelint \"src/**/*.css\"",
+    "ds:screens": "node scripts/ds-screenshots.mjs"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.19.0",
@@ -83,7 +87,10 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
+    "playwright-core": "^1.63.0",
     "react-doctor": "^0.9.14",
+    "stylelint": "^16.26.1",
+    "stylelint-declaration-strict-value": "^1.13.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^3.2.6"
