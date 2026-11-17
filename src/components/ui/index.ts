@@ -53,3 +53,11 @@ export * from "@/components/ui/layout";
 export * from "@/components/ui/card";
 export { Divider as Separator } from "@/components/Divider";
 export type { DividerProps as SeparatorProps } from "@/components/Divider";
+
+// ── Forms (plan Phase 4) ──────────────────────────────────────────────────────
+export * from "@/components/ui/field";
+export * from "@/components/ui/input";
+export * from "@/components/ui/textarea";
+export * from "@/components/ui/radio-group";
+export * from "@/components/ui/segmented-control";
+export * from "@/components/ui/select";

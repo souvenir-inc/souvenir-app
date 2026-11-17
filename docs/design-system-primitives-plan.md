@@ -180,6 +180,7 @@ Why spacing stops at 85%: some spacing is layout geometry (sidebar widths, chart
 | Token values in Phase 1 | **Approved as proposed** |
 | `/ds` catalog page | **Skipped.** Primitives are checked on real screens with the Phase 0 screenshot set. |
 | Menu wrappers vs direct migration | **Option A**: `Dropdown` / `FloatingMenu` become thin wrappers over `Menu` in Phase 2; call sites move in Phase 6; wrappers deleted in Phase 7 |
+| Standard input look | **InputField** (decided with Phase 4) |
 | Scope beyond D6/D7, branching, merge cadence, diff review | On hold |
 
 ---
@@ -510,6 +511,34 @@ Legitimate raw inputs that stay, marked `// ds-allow`: `type="file"` (`Attachmen
 - Raw `<input>` + `<textarea>` ≤ 8, all allow-listed.
 - Every form control in settings, onboarding and the modals sits inside a `Field`.
 - An axe check on settings and onboarding reports no unlabelled controls.
+
+### Status: primitives done 2026-11-17 (branch `ds/phase-4-forms`); migration and one decision open
+
+Built on `@base-ui/react` (already a dependency), so no new packages.
+
+| File | Exports | Notes |
+|---|---|---|
+| `ui/field.tsx` | `Field`, `FieldLabel`, `FieldHint`, `FieldError` | Base UI Field: label `for`, `aria-describedby` (hint + error) and `aria-invalid` are wired automatically. `FieldError` renders only with content. |
+| `ui/input.tsx` | `Input` (= `InputField`), `PasswordInput` (= `PasswordInputField`) | `InputField` already was the shared input on Base UI Field; not rewritten. |
+| `ui/textarea.tsx` | `Textarea`, `textareaClassName` | InputField's surface (text-field tokens, ring states, settling focus outline); `autoResize` with `minRows` / `maxRows`; `showCount` with `maxLength`. |
+| `ui/radio-group.tsx` | `RadioGroup`, `RadioItem` | Base UI RadioGroup; the dot uses the Checkbox tokens. |
+| `ui/segmented-control.tsx` | `SegmentedControl` | Base UI RadioGroup + sliding pill; the connector-permissions look. |
+| `ui/select.tsx` | `Select` | The existing select pattern (secondary button + `Dropdown.Float` with the chosen item ticked), packaged once — not a second dropdown implementation. |
+
+Tests: `ui/forms.test.tsx`, 7 tests (Field wiring through Base UI, Textarea count and rows, RadioGroup and SegmentedControl selection, Select trigger).
+
+Proof: connector permissions (`AccountPermissions`) use `SegmentedControl`; its `.segmented` / `.segment*` CSS was removed. The values match the old CSS one for one (26px segments, 36px min width, 12px medium text, 3px track padding, 8px track / 6px pill radius, neutral-400 focus outline, 0.6 disabled opacity). **Not checked on screen**: the test account has no connected connectors, and connecting one needs a third-party OAuth sign-in.
+
+`ds-scan` change: `twArbitrary` no longer counts the primitive layer (primitives may pin exact optical pixels). Feature code: 42.
+
+**Decided 2026-11-17 — InputField is the standard input look.** The FeedbackPage forms (Report a bug, Feature request) and Contact sales moved onto `Textarea` / `Input`; FeedbackPage's own `.input` / `.textarea` CSS was removed. Labels still resolve to their controls (checked in the browser). `InputField` fix on the way: an uncontrolled field whose `defaultValue` arrives after the first render (the prefilled email) drew its placeholder over the value; "filled" now follows `defaultValue` until the person types.
+
+Not done in this phase:
+- **Combobox**: deferred until its first consumer is migrated (model selector, scope filter, global search, add-members); each is a bespoke picker and the API should come from a real one.
+- **Raw input / textarea migration** (exit target ≤ 8): the rest moves into the Phase 6 area sweeps.
+- **`EffortSlider`** onto `components/Slider`: still a Phase 2 follow-up.
+- **Other radiogroups** (`ThemeModeSwitcher`, `AvatarCarousel`, `MoveToProjectModal`, `FeedbackPage` ChoiceGroup): each has its own look or animation; migrate in their Phase 6 areas.
+- **axe check**: not run.
 
 ---
 

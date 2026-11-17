@@ -5,6 +5,8 @@ import { useForm, ValidationError } from '@formspree/react'
 import { toast } from 'sonner'
 import { CancelOneIcon, ArrowDownOneIcon } from '@strange-huge/icons'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Dropdown } from '@/components/Dropdown'
 
@@ -21,7 +23,6 @@ const TEAM_SIZE_LABELS: Record<string, string> = Object.fromEntries(
 )
 
 const SHADOW_MODAL = '0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rgba(130,122,116,0.1)'
-const SHADOW_INPUT = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--text-field-ring)'
 
 const S = {
   label: {
@@ -31,27 +32,6 @@ const S = {
     lineHeight: '22px',
     color: 'var(--neutral-700)',
     margin: 0,
-  } as React.CSSProperties,
-  inputWrap: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 2,
-    background: 'var(--field-surface)',
-    borderRadius: 10,
-    padding: '7px 10px',
-    boxShadow: SHADOW_INPUT,
-  } as React.CSSProperties,
-  input: {
-    flex: '1 0 0',
-    minWidth: 0,
-    border: 'none',
-    outline: 'none',
-    background: 'transparent',
-    fontFamily: 'var(--font-body)',
-    fontSize: 14,
-    lineHeight: '22px',
-    color: 'var(--neutral-900)',
-    padding: '0 2px',
   } as React.CSSProperties,
   fieldError: {
     display: 'block',
@@ -134,16 +114,7 @@ export function ContactSalesModal({ onClose }: { onClose: () => void }) {
                 <div style={{ display: 'flex', gap: 12 }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
                     <label htmlFor="cs-email" style={S.label}>Work email</label>
-                    <div style={S.inputWrap}>
-                      <input
-                        id="cs-email"
-                        type="email"
-                        name="email"
-                        placeholder="you@company.com"
-                        required
-                        style={S.input}
-                      />
-                    </div>
+                    <Input fluid id="cs-email" type="email" name="email" placeholder="you@company.com" required />
                     <span style={S.fieldError}>
                       <ValidationError field="email" errors={state.errors} />
                     </span>
@@ -151,16 +122,7 @@ export function ContactSalesModal({ onClose }: { onClose: () => void }) {
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
                     <label htmlFor="cs-name" style={S.label}>Full name</label>
-                    <div style={S.inputWrap}>
-                      <input
-                        id="cs-name"
-                        type="text"
-                        name="name"
-                        placeholder="Jane Smith"
-                        required
-                        style={S.input}
-                      />
-                    </div>
+                    <Input fluid id="cs-name" type="text" name="name" placeholder="Jane Smith" required />
                     <span style={S.fieldError}>
                       <ValidationError field="name" errors={state.errors} />
                     </span>
@@ -171,16 +133,7 @@ export function ContactSalesModal({ onClose }: { onClose: () => void }) {
                 <div style={{ display: 'flex', gap: 12 }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
                     <label htmlFor="cs-company" style={S.label}>Company</label>
-                    <div style={S.inputWrap}>
-                      <input
-                        id="cs-company"
-                        type="text"
-                        name="company"
-                        placeholder="Acme Inc."
-                        required
-                        style={S.input}
-                      />
-                    </div>
+                    <Input fluid id="cs-company" type="text" name="company" placeholder="Acme Inc." required />
                     <span style={S.fieldError}>
                       <ValidationError field="company" errors={state.errors} />
                     </span>
@@ -232,28 +185,7 @@ export function ContactSalesModal({ onClose }: { onClose: () => void }) {
                 {/* What are you trying to solve? */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <label htmlFor="cs-message" style={S.label}>What are you trying to solve?</label>
-                  <textarea
-                    id="cs-message"
-                    name="message"
-                    placeholder="Tell us about your use case…"
-                    rows={4}
-                    required
-                    style={{
-                      width: '100%',
-                      boxSizing: 'border-box',
-                      border: 'none',
-                      outline: 'none',
-                      background: 'var(--field-surface)',
-                      borderRadius: 10,
-                      padding: '9px 12px',
-                      boxShadow: SHADOW_INPUT,
-                      fontFamily: 'var(--font-body)',
-                      fontSize: 14,
-                      lineHeight: '22px',
-                      color: 'var(--neutral-900)',
-                      resize: 'none',
-                    }}
-                  />
+                  <Textarea id="cs-message" name="message" placeholder="Tell us about your use case…" minRows={4} required />
                   <span style={S.fieldError}>
                     <ValidationError field="message" errors={state.errors} />
                   </span>

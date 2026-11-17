@@ -120,8 +120,9 @@ function scan() {
     if (!isTsx) continue;
     add("styleBlocks", file, count(source, /style=\{/g));
     add("classNames", file, count(source, /className=/g));
-    // Arbitrary values that hold a literal (`p-[13px]`); `text-[var(--neutral-500)]` points at a token and isn't counted.
-    add("twArbitrary", file, (source.match(/(?<![\w-])-?[a-z][a-z-]*-\[[^\]\s"'`]+\]/g) || []).filter((v) => !v.includes("var(")).length);
+    // Arbitrary values that hold a literal (`p-[13px]`) in feature code; `text-[var(--neutral-500)]` points at a
+    // token and isn't counted. Primitives may pin exact optical pixels (plan Appendix B), so they're skipped.
+    if (!inUi) add("twArbitrary", file, (source.match(/(?<![\w-])-?[a-z][a-z-]*-\[[^\]\s"'`]+\]/g) || []).filter((v) => !v.includes("var(")).length);
     if (!inUi) {
       for (const tag of RAW_TAGS) add(`raw.${tag === "motion.button" ? "button" : tag}`, file, tagCount(source, tag));
       add("pattern.roleDialog", file, count(source, /role=["']dialog["']/g));

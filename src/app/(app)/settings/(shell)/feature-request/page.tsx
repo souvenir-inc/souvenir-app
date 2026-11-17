@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react'
 import { useForm, ValidationError } from '@formspree/react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { ChoiceGroup, FeedbackPage, Field, NextSteps, SentState, feedbackStyles as styles } from '@/components/FeedbackPage'
 import { useAuth } from '@/context/auth-context'
 import { useGuardedRouter } from '@/context/nav-guard-context'
@@ -86,10 +88,10 @@ export default function FeatureRequestPage() {
         <form className={styles.card} onSubmit={handleSubmit}>
           <div className={styles.body}>
             <Field label="What would help you?" htmlFor="fr-message" error={<ValidationError prefix="Message" field="message" errors={state.errors} className={styles.error} />}>
-              <textarea
+              <Textarea
                 id="fr-message"
                 name="message"
-                className={styles.textarea}
+                minRows={6} className="resize-y"
                 required
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -115,10 +117,10 @@ export default function FeatureRequestPage() {
 
             <div className={styles.row}>
               <Field label="Work email" htmlFor="fr-email" error={<ValidationError prefix="Email" field="email" errors={state.errors} className={styles.error} />}>
-                <input id="fr-email" className={styles.input} type="email" name="email" required defaultValue={user?.email ?? ''} placeholder="you@company.com" />
+                <Input fluid id="fr-email" type="email" name="email" required defaultValue={user?.email ?? ''} placeholder="you@company.com" />
               </Field>
               <Field label="Name" htmlFor="fr-name" optional>
-                <input id="fr-name" className={styles.input} type="text" name="name" defaultValue={displayName} placeholder="Jane Smith" />
+                <Input fluid id="fr-name" type="text" name="name" defaultValue={displayName} placeholder="Jane Smith" />
               </Field>
             </div>
           </div>
