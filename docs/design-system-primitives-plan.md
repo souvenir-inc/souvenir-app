@@ -465,6 +465,26 @@ All of them use `cva`, forward refs, accept `className`, and support `asChild` w
 - Each primitive is used on at least one real screen and passes the screenshot diff.
 - At least one real screen migrated per primitive as a proof (for example `settings/notifications`).
 
+### Status: done 2026-11-17 (branch `ds/phase-3-layout-type`)
+
+| File | Exports |
+|---|---|
+| `components/ui/text.tsx` | `Text` (`variant` = the 11 type styles, `tone` default/secondary/tertiary/muted/subtle/inverse/danger/success/inherit, `weight`, `truncate`, `lineClamp`, `align`, `as`), `Heading` (`level` 1–4 sets element + default size/weight; `as`, `variant`, `weight` override), `textVariants` |
+| `components/ui/layout.tsx` | `Box` (`p`/`px`/`py`, `radius`, `surface`, `bordered`, `as`), `Stack`, `Inline` (`gap`, `align`, `justify`, `wrap`), `Grid` (`cols` number or `{ base, md, lg }`, `gap`). Spacing props accept only the 4px scale (`'0'` … `'16'`). |
+| `components/ui/card.tsx` | `Card` (`variant` plain/raised/inset/panel/tile/interactive, `padding` none/sm/md/lg, `as`), `CardHeader`, `CardBody`, `CardFooter` |
+| `components/ui/index.ts` | the above, plus `Separator` (= `Divider`) |
+
+Also:
+- **`cn()` knows the token scales** (`src/lib/utils.ts`). Without it, tailwind-merge read `text-body` as a colour and dropped it when a `text-[var(--…)]` colour followed, and `p-inset-md` didn't replace `p-2`.
+- **New shadow tokens** `--shadow-soft`, `--shadow-panel`, `--shadow-tile` (`shadow-panel` etc. in Tailwind) for the settings surface shadow that was hand-written 46 times in 33 files; `Card` variants `panel` and `tile` use them.
+- **`ds-scan`'s `twArbitrary`** now counts only arbitrary values holding a literal; `text-[var(--…)]` is a token reference. Real count: 58 (it read 222 before).
+- **Tests:** `components/ui/layout-type.test.tsx`, 18 tests (variants, elements, className precedence, `cn` merging).
+- **Proof screen:** Settings → Members header and stats row moved onto `Heading`, `Text`, `Stack`, `Inline`, `Card panel` and `Card tile`. The screenshot diff is 0.19% / 0.16%: the stat tiles move 1px because their 9px gap snapped to 8px; nothing else changes.
+
+Corrections found on the way:
+- **4 settings routes were 404s in the screenshot set** (`files`, `notifications`, `preferences`, `security`): they sit behind `NEXT_PUBLIC_ENABLE_SETTINGS_PREVIEW` (off, "not wired to real data yet"). The Phase 1–2 screenshot checks therefore covered 21 live screens, not 25. Those routes are removed from `ds-screenshots.mjs`.
+- **Phase 6 hotspots:** `settings/files`, `security` and `preferences` are among the worst files in §1.8 but are hidden previews. Migrating them can't be checked visually unless the preview flag is turned on locally.
+
 ---
 
 ## Phase 4 — Form primitives

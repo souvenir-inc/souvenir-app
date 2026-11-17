@@ -46,3 +46,10 @@ export * from "@/components/ui/button";
 
 export * from "@/components/Badge";
 
+
+// ── Layout and type (plan Phase 3) ────────────────────────────────────────────
+export * from "@/components/ui/text";
+export * from "@/components/ui/layout";
+export * from "@/components/ui/card";
+export { Divider as Separator } from "@/components/Divider";
+export type { DividerProps as SeparatorProps } from "@/components/Divider";

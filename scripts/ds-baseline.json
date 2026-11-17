@@ -2,9 +2,9 @@
   "updated": "2026-11-17",
   "counts": {
     "literal.color": 138,
-    "literal.spacing": 3674,
-    "literal.radius": 913,
-    "literal.typography": 2730,
+    "literal.spacing": 3662,
+    "literal.radius": 909,
+    "literal.typography": 2697,
     "literal.shadow": 155,
     "literal.border": 20,
     "literal.motion": 298,
@@ -18,6 +18,6 @@
     "raw.label": 39,
     "pattern.roleDialog": 6,
     "pattern.radixOutsideUi": 4,
-    "twArbitrary": 222
+    "twArbitrary": 58
   }
 }

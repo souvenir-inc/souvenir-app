@@ -71,6 +71,12 @@
   --shadow-3: var(--shadow-popover);       /* menus, popovers, tooltips */
   --shadow-4: var(--shadow-popover), 0px 16px 32px -8px rgba(38, 33, 30, 0.18); /* dialogs, sheets */
 
+  /* Settings surfaces: a soft drop plus a hairline ring. The drop was written out by hand 46 times
+     in 33 files before these tokens existed. */
+  --shadow-soft:  0px 2px 2.8px 0px rgba(82, 75, 71, 0.12);
+  --shadow-panel: var(--shadow-soft), 0px 0px 0px 1px var(--neutral-200);  /* bordered panels */
+  --shadow-tile:  var(--shadow-soft), 0px 0px 0px 1px var(--neutral-100);  /* stat tiles inside a panel */
+
   /* ── Motion ──────────────────────────────────────────────────────────────── */
   --duration-instant: 80ms;
   --duration-fast:    120ms;
@@ -150,6 +156,9 @@
   --shadow-2: var(--shadow-2);
   --shadow-3: var(--shadow-3);
   --shadow-4: var(--shadow-4);
+  --shadow-soft:  var(--shadow-soft);
+  --shadow-panel: var(--shadow-panel);
+  --shadow-tile:  var(--shadow-tile);
 
   --transition-duration-instant: var(--duration-instant);
   --transition-duration-fast:    var(--duration-fast);
