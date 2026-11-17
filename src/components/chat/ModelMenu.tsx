@@ -5,6 +5,7 @@ import { TickTwoIcon, ArrowRightOneIcon, InformationCircleIcon } from '@strange-
 import { Dropdown } from '@/components/Dropdown'
 import { Tooltip } from '@/components/Tooltip'
 import { POPOVER_WIDTHS } from '@/components/Popover'
+// eslint-disable-next-line no-restricted-syntax -- ds-allow: bespoke effort slider; moves onto components/Slider in Phase 4
 import * as SliderPrimitive from '@radix-ui/react-slider'
 import styles from './EffortSlider.module.css'
 import { useModelSelectorContext, type ModelAlgorithm } from '@/context/model-selector-context'

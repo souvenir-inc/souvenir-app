@@ -405,6 +405,37 @@ Move `Popover`, `Tooltip` and the one `react-hover-card` use under `ui/`, token-
 - Screenshot diffs reviewed and accepted.
 - Ratchet lowered.
 
+### Status: done 2026-11-17 (branch `ds/phase-2-consolidate`), with follow-ups
+
+What the code turned out to be: most of the consolidation had already happened. 219 files used `ui/button`; the old `components/Button` and `components/IconButton` had no importers; `Dropdown` was already built on `ui/dropdown-menu`; most dialogs already used `ui/dialog` and only reached into Radix for `Title asChild`.
+
+| Item | Result |
+|---|---|
+| Button | Deleted `components/Button` and `components/IconButton` (dead). `ui/index.ts` now re-exports `ui/button`. In `ui/button`, `rounded-[10/8/6px]` → `rounded-lg/md/sm` and `duration-200` → `duration-base` (same pixels and timing). |
+| Spinner | Deleted `shared/LoadingSpinner.tsx` (`LoadingSpinner`, `PageLoader`): no users. |
+| Dialog | `ui/dialog` gained `bare` (no card styling, for shells that draw their own card), `overlay={false}` and `DialogTitle visuallyHidden`; `asChild` titles/descriptions no longer get the default text style. Moved onto it: 10 files that only imported Radix `Title/Description`, plus `ImageLightbox`, `DeleteChatDialog`, `MemorySection`, `InviteModal` (inner duplicate `role="dialog"` removed), `SlackConnectModal`, `NavGuardModal`, onboarding `LeaveGuardModal` and `AddSouvenirToSlackModal`. The last three gain a focus trap, Escape and focus return they didn't have. Deleted dead `chat/ModelSelector.tsx`. `ConfirmModal` was already on `ui/dialog` as an alertdialog, so no separate AlertDialog was added. |
+| Menu | No change needed: `Dropdown` / `Dropdown.Float` is the menu, built on `ui/dropdown-menu`. `FloatingMenu` is a toolbar (`role="toolbar"`), a different widget. Removed the unused raw Radix re-exports (`Dialog`, `DropdownMenu`, `ScrollArea`, `Tooltip`) from `ui/index.ts`. |
+| HoverCard | New `ui/hover-card.tsx`; `SourceCitation` imports it instead of Radix. |
+| Sheet | No change: `FloatingPanel` is the Pins/Highlights toolbar (hidden feature) and `LinksSidePanel` is an inline panel, not an overlay. |
+| Rules | `react-slot` (asChild helper) is allowed outside `ui/`. The Radix wrappers that still have their own folders (`Checkbox`, `Popover`, `Slider`, `Switch`, `Tabs`, `Tooltip`) count as the primitive layer in ESLint and `ds-scan`. |
+
+Numbers: `role="dialog"` outside the primitive layer 11 → 6 (2 are CSS selector strings in `AgentsGrid` / `AgentDetailsSidebar`; 4 are allow-listed below). Radix imports outside the primitive layer 52 → 4.
+
+Allow-listed, with a `ds-allow` comment in the code:
+- `WorkspaceLockedOverlay`: covers one panel (`position: absolute`), not the page.
+- `PresetModelSelectorDialog`: anchored, non-modal panel opened imperatively from several triggers.
+- `WelcomeModal`, `SuperLinkDrawer`: framer-motion exit animations.
+- `chat/ModelMenu` `EffortSlider`: bespoke Radix slider.
+
+Follow-ups:
+- **Motion variant for `ui/dialog`** (Radix `forceMount` + `AnimatePresence`), then move `WelcomeModal` and `SuperLinkDrawer` onto it.
+- **`PresetModelSelectorDialog`** onto `Popover` with a virtual anchor (`Popover.Anchor virtualRef`).
+- **`EffortSlider`** onto `components/Slider` (Phase 4).
+- **Old sidebar menus** (`ChatHistoryItem`, `PersonaChatItem`, `ProjectChatItem` use Radix `DropdownMenu` directly): waits on decision 9 (is the old Sidebar in scope?).
+- **Dialog screenshots**: not added yet; dialogs were checked by typecheck, lint and unit tests only.
+
+Tests: snapshot updates are limited to the class renames (`ChatMessage.render`: 7 lines; `ChatInput.render` "bare": 1 line), verified line by line. The suite otherwise has the same 13 failures as before Phase 1.
+
 ---
 
 ## Phase 3 — Layout and type primitives

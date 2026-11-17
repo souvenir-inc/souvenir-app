@@ -96,7 +96,8 @@ function scan() {
     const isArt = ART_FILE.some((re) => re.test(file));
     const isCss = file.endsWith(".css");
     const isTsx = file.endsWith(".tsx");
-    const inUi = file.startsWith("src/components/ui/");
+    // The primitive layer: components/ui plus the Radix wrappers that still have their own folders.
+    const inUi = file.startsWith("src/components/ui/") || /^src\/components\/(Checkbox|Popover|Slider|Switch|Tabs|Tooltip)\//.test(file);
     add("files", file);
 
     if (!isArt) {
@@ -123,7 +124,8 @@ function scan() {
     if (!inUi) {
       for (const tag of RAW_TAGS) add(`raw.${tag === "motion.button" ? "button" : tag}`, file, tagCount(source, tag));
       add("pattern.roleDialog", file, count(source, /role=["']dialog["']/g));
-      add("pattern.radixOutsideUi", file, count(source, /from ["']@radix-ui\//g));
+      // react-slot (asChild) is a composition helper, not a widget.
+      add("pattern.radixOutsideUi", file, count(source, /from ["']@radix-ui\/(?!react-slot["'])/g));
       add("pattern.ariaExpanded", file, count(source, /aria-expanded=/g));
       add("pattern.roleAlert", file, count(source, /role=["']alert["']/g));
       add("pattern.roleProgressbar", file, count(source, /role=["']progressbar["']/g));

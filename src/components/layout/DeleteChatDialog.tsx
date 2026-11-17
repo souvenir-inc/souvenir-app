@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import * as Dialog from "@radix-ui/react-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 interface DeleteChatDialogProps {
@@ -29,85 +29,71 @@ export function DeleteChatDialog({
   };
 
   return (
-    <Dialog.Root
+    <Dialog
       open={open}
       onOpenChange={(v) => {
         if (!v && !isDeleting) onCancel();
       }}
     >
-      <Dialog.Portal>
-        <Dialog.Overlay
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "var(--overlay-bg)",
-            backdropFilter: "blur(2px)",
-            zIndex: 100,
-          }}
-        />
-        <Dialog.Content
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            backgroundColor: "var(--modal-bg)",
-            borderRadius: "16px",
-            padding: "24px",
-            width: "min(420px, 90vw)",
-            zIndex: 101,
-            boxShadow:
-              "0 8px 32px color-mix(in srgb, var(--static-black) 12%, transparent), 0 2px 8px color-mix(in srgb, var(--static-black) 8%, transparent)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "16px",
-          }}
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <Dialog.Title
-              style={{
-                fontFamily: "var(--font-body)",
-                fontWeight: "var(--font-weight-semibold)",
-                fontSize: "var(--font-size-body-lg, 16px)",
-                lineHeight: "var(--line-height-body)",
-                color: "var(--neutral-900)",
-                margin: 0,
-              }}
-            >
-              Delete chat?
-            </Dialog.Title>
-            <Dialog.Description
-              style={{
-                fontFamily: "var(--font-body)",
-                fontWeight: "var(--font-weight-regular)",
-                fontSize: "var(--font-size-body)",
-                lineHeight: "var(--line-height-body)",
-                color: "var(--neutral-500)",
-                margin: 0,
-              }}
-            >
-              &ldquo;{chatTitle.length > 60 ? chatTitle.slice(0, 60) + "…" : chatTitle}&rdquo; will
-              be permanently deleted. This can&rsquo;t be undone.
-            </Dialog.Description>
-          </div>
-
-          <div
+      <DialogContent
+        size="sm"
+        hideClose
+        style={{
+          backgroundColor: "var(--modal-bg)",
+          borderRadius: "16px",
+          padding: "24px",
+          width: "min(420px, 90vw)",
+          boxShadow:
+            "0 8px 32px color-mix(in srgb, var(--static-black) 12%, transparent), 0 2px 8px color-mix(in srgb, var(--static-black) 8%, transparent)",
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+        }}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+          <DialogTitle
             style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "8px",
+              fontFamily: "var(--font-body)",
+              fontWeight: "var(--font-weight-semibold)",
+              fontSize: "var(--font-size-body-lg, 16px)",
+              lineHeight: "var(--line-height-body)",
+              color: "var(--neutral-900)",
+              margin: 0,
             }}
           >
-            <Button variant="ghost" onClick={onCancel} disabled={isDeleting}>
-              Cancel
-            </Button>
-            <Button variant="danger" onClick={handleConfirm} disabled={isDeleting} loading={isDeleting}>
-              Delete
-            </Button>
-          </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+            Delete chat?
+          </DialogTitle>
+          <DialogDescription
+            style={{
+              fontFamily: "var(--font-body)",
+              fontWeight: "var(--font-weight-regular)",
+              fontSize: "var(--font-size-body)",
+              lineHeight: "var(--line-height-body)",
+              color: "var(--neutral-500)",
+              margin: 0,
+            }}
+          >
+            &ldquo;{chatTitle.length > 60 ? chatTitle.slice(0, 60) + "…" : chatTitle}&rdquo; will
+            be permanently deleted. This can&rsquo;t be undone.
+          </DialogDescription>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "8px",
+          }}
+        >
+          <Button variant="ghost" onClick={onCancel} disabled={isDeleting}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleConfirm} disabled={isDeleting} loading={isDeleting}>
+            Delete
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

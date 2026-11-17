@@ -2,9 +2,7 @@
 
 import { Tooltip } from '@/components/Tooltip'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import * as Dialog from '@radix-ui/react-dialog'
-import { useFocusReturn } from '@/components/ui/dialog'
-import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Slot } from '@radix-ui/react-slot'
 import { CancelOneIcon, ArrowDownOneIcon, InformationCircleIcon } from '@strange-huge/icons'
 import { Button } from '@/components/ui/button'
@@ -380,9 +378,6 @@ export const InviteModal = React.forwardRef<HTMLDivElement, InviteModalProps>(
     return (
       <Comp
         ref={ref}
-        role="dialog"
-        aria-modal="true"
-        aria-label={workspaceName ? `Invite to ${workspaceName}` : 'Invite member'}
         className={cn(className)}
         onKeyDown={handleKeyDown}
         style={{
@@ -534,45 +529,24 @@ export function AppInviteModal({
   existingEmails,
   allowedDomains,
 }: AppInviteModalProps) {
-  // Opened from a button without a Dialog.Trigger: hand focus back to it on close.
-  const { capture, handleCloseAutoFocus } = useFocusReturn()
+  // The card draws its own surface, so the dialog shell is bare.
   return (
-    <Dialog.Root open={isOpen} onOpenChange={open => { if (!open) onClose() }}>
-      <Dialog.Portal>
-        <Dialog.Overlay
-          style={{
-            position:        'fixed',
-            inset:           0,
-            backgroundColor: 'var(--overlay-bg)',
-            zIndex:          100,
-          }}
+    <Dialog open={isOpen} onOpenChange={open => { if (!open) onClose() }}>
+      <DialogContent
+        bare
+        aria-describedby={undefined}
+        style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+      >
+        <DialogTitle visuallyHidden>{workspaceName ? `Invite to ${workspaceName}` : 'Invite member'}</DialogTitle>
+        <InviteModal
+          workspaceName={workspaceName}
+          loading={loading}
+          existingEmails={existingEmails}
+          allowedDomains={allowedDomains}
+          onClose={onClose}
+          onInvite={({ emails, role }) => onInvite(emails, role)}
         />
-        <Dialog.Content
-          aria-label={workspaceName ? `Invite to ${workspaceName}` : 'Invite member'}
-          style={{
-            position:  'fixed',
-            top:       '50%',
-            left:      '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex:    101,
-            outline:   'none',
-          }}
-          onCloseAutoFocus={handleCloseAutoFocus}
-        >
-          {capture}
-          <VisuallyHidden.Root asChild>
-            <Dialog.Title>{workspaceName ? `Invite to ${workspaceName}` : 'Invite member'}</Dialog.Title>
-          </VisuallyHidden.Root>
-          <InviteModal
-            workspaceName={workspaceName}
-            loading={loading}
-            existingEmails={existingEmails}
-            allowedDomains={allowedDomains}
-            onClose={onClose}
-            onInvite={({ emails, role }) => onInvite(emails, role)}
-          />
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+      </DialogContent>
+    </Dialog>
   )
 }

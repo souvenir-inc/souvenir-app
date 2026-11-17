@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogClose, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { CancelCircleIcon, TickTwoIcon } from '@strange-huge/icons'
 import { RoleGlyph, ROLE_TOKENS, ROLE_LABEL } from '@/components/RoleBadge'
 import { Button, IconButton } from '@/components/ui/button'
@@ -43,16 +42,16 @@ export function RolesPermissionsModal({ open, onClose }: { open: boolean; onClos
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, padding: '24px 24px 16px' }}>
           <div>
-            <DialogPrimitive.Title asChild>
+            <DialogTitle asChild>
             <h2 style={{ fontFamily: 'var(--font-title)', fontWeight: 500, fontSize: 20, lineHeight: '28px', color: 'var(--neutral-900)', margin: 0 }}>
               Roles &amp; Permissions
             </h2>
-            </DialogPrimitive.Title>
-            <DialogPrimitive.Description asChild>
+            </DialogTitle>
+            <DialogDescription asChild>
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: '4px 0 0' }}>
               Default behavior for new projects and chats across the workspace.
             </p>
-            </DialogPrimitive.Description>
+            </DialogDescription>
           </div>
           <DialogClose asChild>
             <IconButton variant="ghost" size="sm" aria-label="Close" icon={<CancelCircleIcon size={18} />} />
@@ -201,16 +200,16 @@ function RoleComparisonModal({ open, onClose }: { open: boolean; onClose: () => 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, padding: '24px 24px 16px' }}>
           <div>
-            <DialogPrimitive.Title asChild>
+            <DialogTitle asChild>
             <h2 style={{ fontFamily: 'var(--font-title)', fontWeight: 500, fontSize: 20, lineHeight: '28px', color: 'var(--neutral-900)', margin: 0 }}>
               Role comparison
             </h2>
-            </DialogPrimitive.Title>
-            <DialogPrimitive.Description asChild>
+            </DialogTitle>
+            <DialogDescription asChild>
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: '4px 0 0' }}>
               What each role can do, side by side.
             </p>
-            </DialogPrimitive.Description>
+            </DialogDescription>
           </div>
           <DialogClose asChild>
             <IconButton variant="ghost" size="sm" aria-label="Close" icon={<CancelCircleIcon size={18} />} />

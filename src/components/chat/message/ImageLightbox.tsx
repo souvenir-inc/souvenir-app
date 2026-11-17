@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { Dialog, useFocusReturn } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { IconButton } from "@/components/ui/button";
 import { ImageDownloadTwoIcon, CancelOneIcon } from "@strange-huge/icons";
 
@@ -20,11 +19,6 @@ export const overlayButtonStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-};
-
-export const srOnlyStyle: React.CSSProperties = {
-  position: "absolute", width: 1, height: 1, padding: 0, margin: -1,
-  overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", border: 0,
 };
 
 const lightboxStyle: React.CSSProperties = {
@@ -79,31 +73,28 @@ export function ImageLightbox({
   alt: string;
   onDownload: () => void;
 }) {
-  const { capture, handleCloseAutoFocus } = useFocusReturn();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogPrimitive.Portal>
-        <DialogPrimitive.Content
-          aria-describedby={undefined}
-          onClick={() => onOpenChange(false)}
-          onCloseAutoFocus={handleCloseAutoFocus}
-          style={lightboxStyle}
-        >
-          {capture}
-          <DialogPrimitive.Title style={srOnlyStyle}>Expanded image</DialogPrimitive.Title>
-          <div style={lightboxButtonsStyle} onClick={(e) => e.stopPropagation()}>
-            <IconButton onClick={onDownload} aria-label="Download image" icon={<ImageDownloadTwoIcon size={18} />} style={overlayButtonStyle} />
-            <IconButton onClick={() => onOpenChange(false)} aria-label="Close" icon={<CancelOneIcon size={18} />} style={overlayButtonStyle} />
-          </div>
-          {/* eslint-disable-next-line @next/next/no-img-element -- presigned URL, same as the card */}
-          <img
-            src={url}
-            alt={alt}
-            onClick={(e) => e.stopPropagation()}
-            style={lightboxImageStyle}
-          />
-        </DialogPrimitive.Content>
-      </DialogPrimitive.Portal>
+      <DialogContent
+        bare
+        overlay={false}
+        aria-describedby={undefined}
+        onClick={() => onOpenChange(false)}
+        style={lightboxStyle}
+      >
+        <DialogTitle visuallyHidden>Expanded image</DialogTitle>
+        <div style={lightboxButtonsStyle} onClick={(e) => e.stopPropagation()}>
+          <IconButton onClick={onDownload} aria-label="Download image" icon={<ImageDownloadTwoIcon size={18} />} style={overlayButtonStyle} />
+          <IconButton onClick={() => onOpenChange(false)} aria-label="Close" icon={<CancelOneIcon size={18} />} style={overlayButtonStyle} />
+        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element -- presigned URL, same as the card */}
+        <img
+          src={url}
+          alt={alt}
+          onClick={(e) => e.stopPropagation()}
+          style={lightboxImageStyle}
+        />
+      </DialogContent>
     </Dialog>
   );
 }

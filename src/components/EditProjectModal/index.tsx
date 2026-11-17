@@ -1,9 +1,8 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { AnimatePresence, m } from 'framer-motion'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { ArrowDownOneIcon, CancelOneIcon, TickTwoIcon } from '@strange-huge/icons'
 import { Dropdown } from '@/components/Dropdown'
 import { IconButton, Button } from '@/components/ui/button'
@@ -183,7 +182,7 @@ export function EditProjectModal({
             flexShrink:     0,
           }}
         >
-          <DialogPrimitive.Title asChild>
+          <DialogTitle asChild>
           <p
             style={{
               fontFamily: 'var(--font-title)',
@@ -206,7 +205,7 @@ export function EditProjectModal({
               </>
             )}
           </p>
-          </DialogPrimitive.Title>
+          </DialogTitle>
           <IconButton variant="ghost" size="xs" icon={<CancelOneIcon />} aria-label="Close" onClick={onClose} disabled={submitting} />
         </div>
 

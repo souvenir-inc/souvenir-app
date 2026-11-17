@@ -411,6 +411,7 @@ function WelcomeModalImpl() {
           {/* Modal card */}
           <m.div
             key="modal"
+            // eslint-disable-next-line no-restricted-syntax -- ds-allow: framer-motion exit animation; moves to ui/dialog once it has a motion variant (plan Phase 2 follow-up)
             role="dialog"
             aria-modal="true"
             initial={{ opacity: 0, scale: 0.96, y: 8 }}

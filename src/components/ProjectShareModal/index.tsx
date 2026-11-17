@@ -1,8 +1,7 @@
 'use client'
 
 import React from 'react'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { CancelOneIcon } from '@strange-huge/icons'
 import { Button, IconButton } from '@/components/ui/button'
 import { Badge } from '@/components/Badge'
@@ -62,11 +61,11 @@ export function ProjectShareModal({ open, onClose, projectId, projectVisibility,
       >
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
           <div>
-            <DialogPrimitive.Title asChild>
+            <DialogTitle asChild>
               <p style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: '0 0 4px' }}>
                 Sharing
               </p>
-            </DialogPrimitive.Title>
+            </DialogTitle>
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-500)', margin: 0 }}>
               {projectVisibility === 'workspace'
                 ? `Everyone in ${orgName || 'your workspace'} can see this project.`

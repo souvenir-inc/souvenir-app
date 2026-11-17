@@ -1,9 +1,8 @@
 'use client'
 
 import React from 'react'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { AlertCircleIcon, CancelOneIcon } from '@strange-huge/icons'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Button, IconButton } from '@/components/ui/button'
 
 // Shared by every project-delete entry point (the All Projects grid/list and
@@ -58,7 +57,7 @@ export function DeleteProjectModal({ open, projectName, chatCount, restorable = 
             flexShrink:     0,
           }}
         >
-          <DialogPrimitive.Title asChild>
+          <DialogTitle asChild>
           <p
             style={{
               fontFamily: 'var(--font-body)',
@@ -71,7 +70,7 @@ export function DeleteProjectModal({ open, projectName, chatCount, restorable = 
           >
             Delete project?
           </p>
-          </DialogPrimitive.Title>
+          </DialogTitle>
           <IconButton variant="ghost" size="xs" icon={<CancelOneIcon />} aria-label="Close" onClick={onClose} disabled={loading} />
         </div>
 
@@ -114,7 +113,7 @@ export function DeleteProjectModal({ open, projectName, chatCount, restorable = 
             </span>
           </div>
 
-          <DialogPrimitive.Description asChild>
+          <DialogDescription asChild>
           <p
             style={{
               fontFamily: 'var(--font-body)',
@@ -127,7 +126,7 @@ export function DeleteProjectModal({ open, projectName, chatCount, restorable = 
           >
             {deleteMessage(projectName, chatCount, restorable)}
           </p>
-          </DialogPrimitive.Description>
+          </DialogDescription>
         </div>
 
         {/* Footer */}

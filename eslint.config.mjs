@@ -109,8 +109,10 @@ const eslintConfig = defineConfig([
     files: ["src/**/*.tsx"],
     ignores: [
       "src/**/*.test.tsx",
-      // The primitives themselves render the raw elements.
+      // The primitive layer renders the raw elements and wraps Radix: components/ui, plus the
+      // Radix wrappers that still live in their own folders.
       "src/components/ui/**",
+      "src/components/{Checkbox,Popover,Slider,Switch,Tabs,Tooltip}/**",
       // Illustration and brand art (plan D7).
       "src/components/PersonaCard/{scenes,job-scenes,AnimatedPersonaAvatar}.tsx",
       "src/components/{CardBrandLogo,ModelIcon,SouvenirLogo,ConnectorGlyph,ThemedLlmIcon}/**",
@@ -135,7 +137,8 @@ const eslintConfig = defineConfig([
           message: "Hand-rolled dialog: use Dialog / AlertDialog from @/components/ui.",
         },
         {
-          selector: "ImportDeclaration[source.value=/^@radix-ui\\u002F/]",
+          // react-slot is a composition helper (asChild), not a widget, so it stays allowed.
+          selector: "ImportDeclaration[source.value=/^@radix-ui\\u002F(?!react-slot$)/]",
           message: "Radix is wrapped by the primitives; import from @/components/ui instead.",
         },
         {

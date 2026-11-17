@@ -1,8 +1,7 @@
 'use client'
 
 import React, { useState, useRef } from 'react'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { FolderOneIcon, CancelOneIcon, InformationCircleIcon } from '@strange-huge/icons'
 import { cn } from '@/lib/utils'
 import { Button, IconButton } from '@/components/ui/button'
@@ -219,7 +218,7 @@ export function MoveToProjectModal({
           borderBottom: '1px solid var(--neutral-100)',
           position:     'relative',
         }}>
-          <DialogPrimitive.Title asChild>
+          <DialogTitle asChild>
           <p style={{
             margin:     0,
             fontFamily: 'var(--font-title)',
@@ -230,8 +229,8 @@ export function MoveToProjectModal({
           }}>
             Move to project
           </p>
-          </DialogPrimitive.Title>
-          <DialogPrimitive.Description asChild>
+          </DialogTitle>
+          <DialogDescription asChild>
           <p style={{
             margin:     '3px 0 0',
             fontFamily: 'var(--font-body)',
@@ -242,7 +241,7 @@ export function MoveToProjectModal({
           }}>
             Moving {chatLabel}
           </p>
-          </DialogPrimitive.Description>
+          </DialogDescription>
           <div style={{ position: 'absolute', top: 14, right: 14 }}>
             <IconButton
               variant="ghost"

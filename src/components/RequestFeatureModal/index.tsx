@@ -5,8 +5,7 @@ import { useForm, ValidationError } from '@formspree/react'
 import { CancelOneIcon } from '@strange-huge/icons'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/context/auth-context'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 
 const SHADOW_MODAL = '0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rgba(130,122,116,0.1)'
@@ -96,11 +95,11 @@ export function RequestFeatureModal({ onClose }: RequestFeatureModalProps) {
 
             {/* Header */}
             <div style={{ padding: '12px 12px 0', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-              <DialogPrimitive.Title asChild>
+              <DialogTitle asChild>
               <p style={{ flex: '1 0 0', fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: 0 }}>
                 Request a feature
               </p>
-              </DialogPrimitive.Title>
+              </DialogTitle>
               <button type="button" onClick={onClose} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, borderRadius: 8, display: 'flex', color: 'var(--neutral-700)', flexShrink: 0 }}>
                 <CancelOneIcon size={20} />
               </button>
@@ -108,11 +107,11 @@ export function RequestFeatureModal({ onClose }: RequestFeatureModalProps) {
 
             {/* Subtitle */}
             <div style={{ padding: '0 12px 24px' }}>
-              <DialogPrimitive.Description asChild>
+              <DialogDescription asChild>
               <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
                 Got an idea for Souvenir?
               </p>
-              </DialogPrimitive.Description>
+              </DialogDescription>
             </div>
 
             {/* Form container */}

@@ -342,6 +342,7 @@ export function PresetModelSelectorDialog() {
       {isOpen && (
         <m.div
           key="dropdown"
+          // eslint-disable-next-line no-restricted-syntax -- ds-allow: anchored non-modal panel (see note above); moves to ui Popover with a virtual anchor later
           role="dialog"
           aria-modal
           aria-label="Select model"

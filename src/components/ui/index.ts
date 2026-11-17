@@ -41,14 +41,8 @@ export type { FlatSidebarProjectGroupProps } from "@/components/FlatSidebarProje
 export { FlatSidebarSlackConnector } from "@/components/FlatSidebarSlackConnector";
 export { FlatSidebarProfileRow } from "@/components/FlatSidebarProfileRow";
 
-export * from "@/components/Button";
+// The one Button / IconButton (plan decision D2).
+export * from "@/components/ui/button";
 
 export * from "@/components/Badge";
 
-// ── Radix Primitives ──────────────────────────────────────────────────────────
-// Re-exported for use throughout the app without direct Radix imports.
-
-export * as Dialog from "@radix-ui/react-dialog";
-export * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-export * as ScrollArea from "@radix-ui/react-scroll-area";
-export * as Tooltip from "@radix-ui/react-tooltip";
