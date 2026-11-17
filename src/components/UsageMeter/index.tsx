@@ -1,4 +1,5 @@
 import React from 'react'
+import { Meter } from '@/components/ui/meter'
 
 export interface UsageMeterProps {
   /** How full the meter is, 0–100. Values outside the range are clamped. */
@@ -9,46 +10,20 @@ export interface UsageMeterProps {
   caption?: React.ReactNode
   /** Optional text above the bar on the right, e.g. "63%". */
   trailing?: React.ReactNode
-  /** Bar thickness in px. @default 6 */
-  height?: number
+  /** Bar thickness: 4, 6 or 10 px. @default 6 */
+  height?: 4 | 6 | 10
   style?: React.CSSProperties
 }
+
+const SIZE = { 4: 'xs', 6: 'sm', 10: 'lg' } as const
 
 /**
  * The settings-wide progress meter: a neutral track with a near-black fill, so a usage bar reads the same
  * on every page (credits, storage, seats). A non-zero value always shows a small sliver.
+ * Built on the shared Meter (components/ui/meter).
  */
 export function UsageMeter({ value, label, caption, trailing, height = 6, style }: UsageMeterProps) {
-  const pct = Math.min(100, Math.max(0, value))
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', ...style }}>
-      {(caption || trailing) && (
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: '20px', color: 'var(--neutral-600)' }}>
-          <span style={{ minWidth: 0 }}>{caption}</span>
-          {trailing && <span style={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>{trailing}</span>}
-        </div>
-      )}
-      <div
-        role="progressbar"
-        aria-label={label}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.round(pct)}
-        style={{ width: '100%', height, borderRadius: 999, background: 'var(--neutral-100)', overflow: 'hidden' }}
-      >
-        <div
-          style={{
-            width: `${pct}%`,
-            minWidth: pct > 0 ? height : 0,
-            height: '100%',
-            borderRadius: 999,
-            background: 'var(--neutral-900)',
-            transition: 'width 400ms cubic-bezier(0.16, 1, 0.3, 1)',
-          }}
-        />
-      </div>
-    </div>
-  )
+  return <Meter label={label} value={value} max={100} tone="neutral" size={SIZE[height]} caption={caption} trailing={trailing} style={style} />
 }
 
 export default UsageMeter

@@ -564,6 +564,35 @@ Not done in this phase:
 - No `role="alert"`, `role="progressbar"` or `aria-expanded` toggles outside primitives.
 - The three credit banners and three usage bars are compositions of the base primitives.
 
+### Status: primitives done 2026-11-17 (branch `ds/phase-5-feedback-display`)
+
+| File | Exports | Look taken from |
+|---|---|---|
+| `ui/alert.tsx` | `Alert` (`tone` info/success/warning/danger, `title`, `icon`, `action`, `onDismiss`, `urgency` status/alert) | `InlineCreditNotice` / toasts: `--toast-{tone}-*`, `--toast-radius`, soft shadow + tone ring |
+| `ui/meter.tsx` | `Meter` (`value`, `max`, `tone` neutral/auto/success/warning/danger, `size` xs/sm/lg, `caption`, `trailing`), `meterToneFor` | `UsageMeter` (neutral) and `TokenBudgetBar` (auto: green → amber at 60% → red at 85%) |
+| `ui/empty-state.tsx` | `EmptyState` (`icon`, `title`, `description`, `action`, `size`, `role`) | new; neutral icon tile, title, muted description |
+| `ui/table.tsx` | `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell` (`align`), `TableEmpty` | settings tables: small muted headers, hairline rows, 24px side padding; real `<table>` markup |
+| `ui/collapsible.tsx` | `Collapsible`, `CollapsibleTrigger`, `CollapsiblePanel`, `Accordion`, `AccordionItem`, `AccordionTrigger`, `AccordionPanel` | Base UI; panels animate their measured height |
+| `ui/kbd.tsx` | `Kbd` | the account-menu shortcut pill (`--shortcut-pill-*`) |
+| `ui/link.tsx` | `TextLink` (`variant` inline/standalone/subtle, `external`) | next/link; external adds `rel="noreferrer"`, an arrow and screen-reader text |
+| `ui/icon.tsx` | `Icon` (`as`, `size` 12–24, `tone`, `label`) | decorative by default, `role="img"` with a label |
+| `ui/scroll-area.tsx` | `ScrollArea` (`orientation`) | the `kaya-scrollbar` style |
+
+Tests: `ui/feedback-display.test.tsx`, 15 tests.
+
+Rebuilt on the primitives:
+- **`UsageMeter`** → `Meter` (neutral); same props. `height` is now 4 / 6 / 10 (the only values in use).
+- **`TokenBudgetBar`** → `Meter` (auto) + its label row; same props. A non-zero budget now shows a minimum sliver, like `UsageMeter` already did.
+- **`AccountMenu` shortcut pill** → `Kbd`. Measured in the app: 20px tall, 4px radius, 11/16 text, 2×4px padding — the same as before.
+
+Deleted as unused: `CreditStatusBanner` and `TokenPoolBar` (no importers; two code comments that named `CreditStatusBanner` now point at `ExhaustionBanner`).
+
+Not changed:
+- **`ExhaustionBanner`** is a wrapper around the chat composer (tinted frame + status row), not a standalone alert.
+- **`InlineCreditNotice`** could compose `Alert`, but it only appears in a credit state the test account can't reach; left for its Phase 6 area so it can be checked on screen.
+- **`role="alert"` sites** (35): mostly inline error text (→ `FieldError` / `Text tone="danger"`) or load-failure panels (→ `EmptyState role="alert"`); migrate per Phase 6 area.
+- **`SettingsTable`** (4 users) keeps its grid layout; its pages move to `Table` in the settings sweep.
+
 ---
 
 ## Phase 6 — Migration sweep

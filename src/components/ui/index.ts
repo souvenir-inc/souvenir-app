@@ -61,3 +61,14 @@ export * from "@/components/ui/textarea";
 export * from "@/components/ui/radio-group";
 export * from "@/components/ui/segmented-control";
 export * from "@/components/ui/select";
+
+// ── Feedback and display (plan Phase 5) ───────────────────────────────────────
+export * from "@/components/ui/alert";
+export * from "@/components/ui/meter";
+export * from "@/components/ui/empty-state";
+export * from "@/components/ui/table";
+export * from "@/components/ui/collapsible";
+export * from "@/components/ui/kbd";
+export * from "@/components/ui/link";
+export * from "@/components/ui/icon";
+export * from "@/components/ui/scroll-area";

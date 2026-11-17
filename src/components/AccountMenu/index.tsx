@@ -20,6 +20,7 @@ import { ThemeModeSwitcher } from '@/components/ThemeModeSwitcher'
 import { useTheme } from '@/context/theme-context'
 import type { CreditsDisplay } from '@/lib/api/plan'
 import { useModKeyLabel } from '@/lib/platform'
+import { Kbd } from '@/components/ui/kbd'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -95,34 +96,7 @@ export interface AccountMenuProps {
 
 // ── Shortcut pill (⌘ ,) ────────────────────────────────────────────────────────
 
-const ShortcutPill = ({ label }: { label: string }) => (
-  <div
-    style={{
-      display:        'flex',
-      alignItems:     'center',
-      justifyContent: 'center',
-      height:         '20px',
-      padding:        '2px 4px',
-      borderRadius:   '4px',
-      background:     'var(--shortcut-pill-bg)',
-      boxShadow:      '0px 1px 1.5px 0px var(--shortcut-pill-shadow), 0px 0px 0px 1px var(--shortcut-pill-ring)',
-      flexShrink:     0,
-    }}
-  >
-    <span
-      style={{
-        fontFamily: 'var(--font-body)',
-        fontWeight: 'var(--font-weight-regular)',
-        fontSize:   'var(--font-size-caption)',
-        lineHeight: 'var(--line-height-caption)',
-        color:      'var(--shortcut-pill-text)',
-        whiteSpace: 'nowrap',
-      }}
-    >
-      {label}
-    </span>
-  </div>
-)
+const ShortcutPill = ({ label }: { label: string }) => <Kbd>{label}</Kbd>
 
 // ── Header ──────────────────────────────────────────────────────────────────────
 // Who the menu belongs to: avatar, name, email and workspace role — the same for every role.

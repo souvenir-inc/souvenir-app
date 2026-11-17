@@ -847,7 +847,7 @@ function ChatPageInner({ leftChatId }: { leftChatId?: string }) {
   const handleNewChatSend = (value: string) => {
     if (!value.trim() && newChatAttachments.length === 0) return;
     // Hard-stop backstop: an exhausted credit/topup user cannot send. The input is
-    // already disabled and the CreditStatusBanner explains why, so block silently.
+    // already disabled and the credit banner (ExhaustionBanner) explains why, so block silently.
     if (creditStatus.blocked) return;
     if (selectedProjectId && !getProject(selectedProjectId)?.canEdit) {
       setNewChatInput(value);
