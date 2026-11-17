@@ -332,6 +332,28 @@ Publish the off-scale → token mapping (draft in [Appendix B](#appendix-b--draf
 - `ds:scan` unchanged (this phase only adds tokens).
 - Screenshot set unchanged.
 
+### Status: done 2026-11-17 (branch `ds/phase-1-tokens`)
+
+New file `src/styles/tokens/scales.css`, imported by `globals.css` after `typography.css`. Every token is a plain `:root` variable (usable as `var(--…)` in inline styles and CSS modules) and is mapped into Tailwind with `@theme inline reference`.
+
+| Scale | CSS variables | Tailwind classes |
+|---|---|---|
+| Radius | `--radius-xs` 4 · `sm` 6 · `md` 8 · `lg` 10 · `xl` 12 · `2xl` 16 · `full` | `rounded-xs` … `rounded-full` |
+| Spacing half steps | `--space-0-5` 2 · `--space-1-5` 6 · `--space-2-5` 10 | Tailwind's numeric scale already matches (`p-0.5`, `gap-1.5`, `p-2.5`) |
+| Spacing aliases | `--space-inset-{xs…xl}`, `--space-stack-{xs…xl}`, `--space-inline-{xs…lg}` | `p-inset-md`, `gap-stack-lg`, `gap-inline-sm`, … |
+| Type styles | new sizes `--font-size-heading-xl/-md/-sm`, `--font-size-body-sm`, `--font-size-small` (+ line heights) | `text-display`, `text-heading-xl`, `text-heading`, `text-heading-md`, `text-heading-sm`, `text-body-lg`, `text-body`, `text-body-sm`, `text-small`, `text-caption`, `text-code` |
+| Elevation | `--shadow-1` card · `2` raised card · `3` menu/popover · `4` dialog — aliases of existing shadows, so dark mode follows | `shadow-1` … `shadow-4` |
+| Motion | `--duration-instant` 80 · `fast` 120 · `base` 200 · `slow` 320; `--ease-standard`, `--ease-emphasized`, `--ease-exit` | `duration-fast`, `ease-standard`, … |
+| Layering | `--z-base` … `--z-tooltip` (0 → 1500) | `z-modal`, `z-tooltip`, … |
+
+Differences from the draft above:
+- **Type values follow the code, not the draft table.** `body` stays 14/22 (245 of 365 uses; already the token value), `caption` stays 11/16, and 12/16 gets the new name `small`. `label` and `micro` were dropped: weight is chosen separately, since each size appears at 400, 500 and 600.
+- **`--ease-out` is named `--ease-exit`**, because `ease-out` is a Tailwind class already used in the code with its default curve.
+- **`--shadow-4`** is the popover shadow plus one deeper layer; there was no existing dialog shadow to alias.
+- **Tailwind default names that changed value:** `rounded-md` 6 → 8 px and `rounded-lg` 8 → 10 px. The three places that used them (`CatalogDiscover`, `ContactSalesModal`, `RequestDemoModal`) were moved to the class with the same pixels. Tailwind's `text-xs`…`text-2xl`, `ease-in/out`, `shadow-sm`… keep their defaults.
+
+Checks: every class above measured in the running app (light and dark); `theme.test` and `theme-contrast.test` pass; `ds:check` unchanged; Stylelint unchanged (1,261). The full unit suite has 13 failures that also fail without this change (12 `ChatInput.render` snapshots, 1 `tier-contract` 402 test).
+
 ---
 
 ## Phase 2 — Consolidate duplicates
@@ -588,20 +610,27 @@ Done in parallel where marked, the calendar time drops to about 3½–4 weeks.
 
 ## Appendix B — Draft snapping table
 
-To be confirmed against the prototype in Phase 1.
+Confirmed in Phase 1 against current code (decision: code is the source of truth).
 
 ### Font size
 
-| Literal | Token style |
-|---|---|
-| 10, 11 | `micro` (11) |
-| 12 | `caption` (12) |
-| 13 | `body-sm` / `label` (13) |
-| 14, 15 | `body` (14) |
-| 16, 17 | `body-lg` / `heading-sm` (16) |
-| 18, 20 | `heading-md` (20) |
-| 22, 24, 26, 28 | `heading-lg` (24) |
-| 32 and above | `display` (40) |
+Snap the size, then use the style's line height. Weight stays a separate choice (`--font-weight-regular/medium/semibold`).
+
+| Literal size | Type style (Tailwind class) | Size / line height |
+|---|---|---|
+| 9, 10, 11 | `caption` (`text-caption`) | 11 / 16 |
+| 12 | `small` (`text-small`) | 12 / 16 |
+| 13 | `body-sm` (`text-body-sm`) | 13 / 20 |
+| 14, 15 | `body` (`text-body`) | 14 / 22 |
+| 16, 17 | `body-lg` (`text-body-lg`) | 16 / 22 |
+| 18 | `heading-sm` (`text-heading-sm`) | 18 / 24 |
+| 20, 22 | `heading-md` (`text-heading-md`) | 20 / 28 |
+| 24, 26 | `heading` (`text-heading`) | 24 / 32 |
+| 28, 30, 32 | `heading-xl` (`text-heading-xl`) | 28 / 36 |
+| 36 and above | `display` (`text-display`) | 40 / 48 |
+| monospace 12–14 | `code` (`text-code`) | 13 / 16 |
+
+Chat answer text keeps its own prose ladder (`--prose-*` in `typography.css`); it isn't snapped to this table.
 
 ### Radius
 
