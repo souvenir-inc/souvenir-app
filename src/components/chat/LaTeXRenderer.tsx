@@ -22,13 +22,13 @@ export const renderBoldInlineContent = (
 
     if (match[2] !== undefined) {
       nodes.push(
-        <strong key={`${keyPrefix}-bi-${count++}`} style={{ fontWeight: 600 }}>
+        <strong key={`${keyPrefix}-bi-${count++}`} style={{ fontWeight: 'var(--font-weight-semibold)' }}>
           <em>{match[2]}</em>
         </strong>,
       );
     } else if (match[4] !== undefined) {
       nodes.push(
-        <strong key={`${keyPrefix}-bold-${count++}`} style={{ fontWeight: 600 }}>
+        <strong key={`${keyPrefix}-bold-${count++}`} style={{ fontWeight: 'var(--font-weight-semibold)' }}>
           {match[4]}
         </strong>,
       );
@@ -39,9 +39,9 @@ export const renderBoldInlineContent = (
         <code
           key={`${keyPrefix}-code-${count++}`}
           style={{
-            borderRadius: "4px",
+            borderRadius: "var(--radius-xs)",
             backgroundColor: "var(--neutral-100)",
-            padding: "1px 4px",
+            padding: "var(--space-0-5) var(--space-1)",
             fontFamily: "var(--font-code)",
             fontSize: "0.875em",
           }}
@@ -112,8 +112,8 @@ export const renderLatexInlineContent = (
           style={{
             backgroundColor: "var(--red-100)",
             color: "var(--red-800)",
-            padding: "1px 4px",
-            borderRadius: "4px",
+            padding: "var(--space-0-5) var(--space-1)",
+            borderRadius: "var(--radius-xs)",
           }}
         >
           {match[0]}
@@ -149,7 +149,7 @@ export function renderBlockMath(
       <div
         key={elementKey}
         className="kaya-scrollbar"
-        style={{ margin: "8px 0", overflowX: "auto" }}
+        style={{ margin: "var(--space-2) 0", overflowX: "auto" }}
         // eslint-disable-next-line react/no-danger -- KaTeX output is library-generated and sanitized
         dangerouslySetInnerHTML={{ __html: sanitizeKaTeX(html) }}
       />

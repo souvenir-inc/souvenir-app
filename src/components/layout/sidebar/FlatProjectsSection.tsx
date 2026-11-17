@@ -75,7 +75,7 @@ function FlatProjectItemsList({ projectsFilter, limit, emptyLabel }: FlatProject
     <>
       {projectsLoading && projects.length === 0 && Array.from({ length: 2 }).map((_, i) => <SidebarMenuSkeleton key={i} index={i} fluid />)}
       {!projectsLoading && projects.length === 0 && (
-        <div style={{ padding: "8px 6px", fontFamily: "var(--font-body)", fontSize: "var(--font-size-caption)", color: "var(--neutral-400)" }}>{emptyLabel}</div>
+        <div style={{ padding: "var(--space-2) var(--space-1-5)", fontFamily: "var(--font-body)", fontSize: "var(--font-size-caption)", color: "var(--neutral-400)" }}>{emptyLabel}</div>
       )}
       {!projectsLoading && visibleProjects.map(project => {
         const chats = sortChatsByRecency(getChats(project.id).filter(c => c.canEdit !== false))
@@ -173,7 +173,7 @@ export function FlatProjectsSection({
           animate={shown ? "open" : "closed"}
           initial="closed"
           variants={sectionStaggerVariants}
-          style={{ display: "flex", flexDirection: "column", gap: 4 }}
+          style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)' }}
         >
           <FlatProjectItemsList projectsFilter={filter} limit={PROJECT_LIMIT} emptyLabel={emptyLabel} />
         </m.div>
@@ -197,7 +197,7 @@ export function FlatTeamsSidebarContent({ role }: TeamsSidebarContentProps) {
   const [overflow, setOverflow] = useState<"visible" | "hidden">("visible")
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
       <FlatSidebarRow
         variant="header" label="Projects" shown={shown} onShowClick={() => setShown(s => !s)}
         onAddClick={isAdmin ? (e) => { e.stopPropagation(); push('/projects/new') } : undefined} addLabel="New Project"
@@ -223,7 +223,7 @@ export function FlatTeamsSidebarContent({ role }: TeamsSidebarContentProps) {
           animate={shown ? "open" : "closed"}
           initial="closed"
           variants={sectionStaggerVariants}
-          style={{ display: "flex", flexDirection: "column", gap: 4 }}
+          style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)' }}
         >
           <FlatProjectItemsList
             projectsFilter={includeAllProjects}

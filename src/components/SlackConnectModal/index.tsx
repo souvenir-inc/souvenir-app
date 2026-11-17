@@ -49,14 +49,14 @@ function LogoBridge() {
   const tileStyle: React.CSSProperties = {
     width: 48,
     height: 48,
-    borderRadius: 12,
+    borderRadius: 'var(--radius-xl)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
   }
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
       <div style={{ ...tileStyle, backgroundColor: 'var(--neutral-white)', boxShadow: SHADOW_CARD_BORDER }}>
         <SouvenirLogo variant="gray" size={28} alt="Souvenir" />
       </div>
@@ -151,17 +151,17 @@ export function SlackConnectModal({ isOpen, onClose, orgId, onConnected }: Slack
             maxWidth:        'calc(100vw - 48px)',
             maxHeight:       'calc(100vh - 48px)',
             overflowY:       'auto',
-            borderRadius:    18,
+            borderRadius:    'var(--radius-2xl)',
             boxSizing:       'border-box',
             backgroundColor: 'var(--modal-bg)',
             boxShadow:       SHADOW_MODAL,
           }}
         >
           {/* ── Header — title + Souvenir / link / Slack logo bridge ── */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '28px 28px 24px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-4)', padding: 'var(--space-6) var(--space-6) var(--space-6)' }}>
             <h2 style={{
               fontFamily: 'var(--font-title)',
-              fontWeight: 400,
+              fontWeight: 'var(--font-weight-regular)',
               fontSize:   'var(--font-size-heading)',
               lineHeight: 'var(--line-height-heading)',
               color:      'var(--neutral-900)',
@@ -176,21 +176,21 @@ export function SlackConnectModal({ isOpen, onClose, orgId, onConnected }: Slack
           <SectionDivider />
 
           {/* ── Permissions ── */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '24px 28px 20px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 20, borderRadius: 14, backgroundColor: 'var(--neutral-50)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', padding: 'var(--space-6) var(--space-6) var(--space-5)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', padding: 'var(--space-5)', borderRadius: 'var(--radius-xl)', backgroundColor: 'var(--neutral-50)' }}>
               <p style={{
-                fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 13, lineHeight: '18px',
+                fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px',
                 color: 'var(--neutral-700)', margin: 0,
               }}>
                 Souvenir will be able to:
               </p>
               {PERMISSIONS.map(p => (
-                <div key={p.text} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                <div key={p.text} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
                   <span aria-hidden style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, flexShrink: 0 }}>
                     {p.icon}
                   </span>
                   <p style={{
-                    fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 13, lineHeight: '18px',
+                    fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px',
                     color: 'var(--neutral-700)', margin: 0,
                   }}>
                     {p.text}
@@ -199,7 +199,7 @@ export function SlackConnectModal({ isOpen, onClose, orgId, onConnected }: Slack
               ))}
             </div>
             <p style={{
-              fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 12, lineHeight: '16px',
+              fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)',
               color: 'var(--neutral-500)', margin: 0,
             }}>
               Slack will share your name, email, and workspace ID with Souvenir. By connecting, you agree to Souvenir's privacy policy and terms of service.
@@ -209,7 +209,7 @@ export function SlackConnectModal({ isOpen, onClose, orgId, onConnected }: Slack
           <SectionDivider />
 
           {/* ── Footer ── */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, padding: '16px 28px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)', padding: 'var(--space-4) var(--space-6)' }}>
             <Button variant="cancel" size="sm" onClick={onClose} disabled={connecting}>
               Cancel
             </Button>

@@ -19,7 +19,7 @@ const REFRESH_POLL_LIMIT = 8
 const HOVER = 'color-mix(in srgb, var(--neutral-100) 60%, transparent)'
 const CARD: React.CSSProperties = {
   border:          '1px solid var(--border-default)',
-  borderRadius:    16,
+  borderRadius:    'var(--radius-2xl)',
   boxShadow:       '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
   overflow:        'hidden',
   backgroundColor: 'var(--neutral-white)',
@@ -70,15 +70,15 @@ function NoteRow({ note, open, onToggle, onForget }: {
   const quiet: React.CSSProperties = {
     display:      'inline-flex',
     alignItems:   'center',
-    gap:          6,
-    padding:      '4px 8px',
+    gap:          'var(--space-1-5)',
+    padding:      'var(--space-1) var(--space-2)',
     border:       'none',
-    borderRadius: 8,
+    borderRadius: 'var(--radius-md)',
     background:   'transparent',
     cursor:       'pointer',
     fontFamily:   BODY,
-    fontSize:     13,
-    lineHeight:   '20px',
+    fontSize:     'var(--font-size-body-sm)',
+    lineHeight:   'var(--line-height-body-sm)',
     whiteSpace:   'nowrap',
   }
 
@@ -90,10 +90,10 @@ function NoteRow({ note, open, onToggle, onForget }: {
         style={{
           display:         'flex',
           alignItems:      'center',
-          gap:             8,
-          paddingRight:    16,
+          gap:             'var(--space-2)',
+          paddingRight:    'var(--space-4)',
           backgroundColor: open || hovered ? HOVER : 'transparent',
-          transition:      'background-color 120ms ease',
+          transition:      'background-color var(--duration-fast) ease',
         }}
       >
         <button
@@ -105,15 +105,15 @@ function NoteRow({ note, open, onToggle, onForget }: {
             minWidth:   0,
             display:    'flex',
             alignItems: 'center',
-            gap:        12,
-            padding:    '12px 8px 12px 18px',
+            gap:        'var(--space-3)',
+            padding:    'var(--space-3) var(--space-2) var(--space-3) var(--space-4)',
             border:     'none',
             background: 'transparent',
             cursor:     'pointer',
             textAlign:  'left',
             fontFamily: BODY,
-            fontSize:   14,
-            lineHeight: '22px',
+            fontSize:   'var(--font-size-body)',
+            lineHeight: 'var(--line-height-body)',
           }}
         >
           <m.span
@@ -123,14 +123,14 @@ function NoteRow({ note, open, onToggle, onForget }: {
           >
             <ArrowDownOneIcon size={14} />
           </m.span>
-          <span style={{ flex: '1 0 0', minWidth: 0, fontWeight: 500, color: 'var(--neutral-900)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{note.title}</span>
-          {!confirming && <span style={{ flexShrink: 0, color: 'var(--neutral-400)', fontSize: 13 }}>Updated {ago(note.updatedAt)}</span>}
+          <span style={{ flex: '1 0 0', minWidth: 0, fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-900)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{note.title}</span>
+          {!confirming && <span style={{ flexShrink: 0, color: 'var(--neutral-400)', fontSize: 'var(--font-size-body-sm)' }}>Updated {ago(note.updatedAt)}</span>}
         </button>
 
         {confirming ? (
-          <m.div initial={{ opacity: 0, x: 6 }} animate={{ opacity: 1, x: 0 }} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ fontFamily: BODY, fontSize: 13, color: 'var(--neutral-600)', marginRight: 4, whiteSpace: 'nowrap' }}>Forget this note?</span>
-            <button type="button" onClick={() => void forget()} disabled={forgetting} style={{ ...quiet, color: 'var(--red-600)', fontWeight: 500, opacity: forgetting ? 0.6 : 1 }}>
+          <m.div initial={{ opacity: 0, x: 6 }} animate={{ opacity: 1, x: 0 }} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
+            <span style={{ fontFamily: BODY, fontSize: 'var(--font-size-body-sm)', color: 'var(--neutral-600)', marginRight: 'var(--space-1)', whiteSpace: 'nowrap' }}>Forget this note?</span>
+            <button type="button" onClick={() => void forget()} disabled={forgetting} style={{ ...quiet, color: 'var(--red-600)', fontWeight: 'var(--font-weight-medium)', opacity: forgetting ? 0.6 : 1 }}>
               {forgetting ? 'Forgetting…' : 'Forget'}
             </button>
             <button type="button" onClick={() => setConfirming(false)} disabled={forgetting} style={{ ...quiet, color: 'var(--neutral-500)' }}>
@@ -172,12 +172,12 @@ function NoteRow({ note, open, onToggle, onForget }: {
 function Skeleton() {
   return (
     <div aria-busy="true" aria-label="Loading memory">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 24px 8px', color: 'var(--neutral-400)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-4) var(--space-6) var(--space-2)', color: 'var(--neutral-400)' }}>
         <BrainTwoIcon size={16} />
-        <span className="kaya-shimmer-text" style={{ fontFamily: BODY, fontSize: 14, lineHeight: '22px' }}>Organizing memory…</span>
+        <span className="kaya-shimmer-text" style={{ fontFamily: BODY, fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)' }}>Organizing memory…</span>
       </div>
       {[0.55, 0.8, 0.65, 0.9, 0.5].map((width, i) => (
-        <div key={width} style={{ display: 'grid', gridTemplateColumns: '16px minmax(110px, 0.9fr) minmax(0, 2fr) 72px', gap: 14, alignItems: 'center', padding: '14px 24px 14px 18px', borderTop: '1px solid var(--neutral-100)' }}>
+        <div key={width} style={{ display: 'grid', gridTemplateColumns: '16px minmax(110px, 0.9fr) minmax(0, 2fr) 72px', gap: 'var(--space-3)', alignItems: 'center', padding: 'var(--space-3) var(--space-6) var(--space-3) var(--space-4)', borderTop: '1px solid var(--neutral-100)' }}>
           <div className="kaya-skeleton" style={{ width: 10, height: 10, animationDelay: `${i * 120}ms` }} />
           <div className="kaya-skeleton" style={{ width: '70%', height: 12, animationDelay: `${i * 120}ms` }} />
           <div className="kaya-skeleton" style={{ width: `${width * 100}%`, height: 12, animationDelay: `${i * 120}ms` }} />
@@ -231,30 +231,30 @@ function ManageDialog({ open, onOpenChange, orgId, summary, onSummary, draft, on
         aria-describedby={undefined}
         style={{ width: 760, height: 'calc(100dvh - 64px)' }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '14px 16px 14px 24px', borderBottom: '1px solid var(--neutral-100)' }}>
-          <DialogTitle style={{ margin: 0, fontFamily: BODY, fontWeight: 600, fontSize: 16, lineHeight: '24px', color: 'var(--neutral-900)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', padding: 'var(--space-3) var(--space-4) var(--space-3) var(--space-6)', borderBottom: '1px solid var(--neutral-100)' }}>
+          <DialogTitle style={{ margin: 0, fontFamily: BODY, fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-900)' }}>
             {orgId ? 'Organization memory summary' : 'Memory summary'}
           </DialogTitle>
           <DialogClose
             aria-label="Close"
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, border: 'none', background: 'transparent', borderRadius: 8, cursor: 'pointer', color: 'var(--neutral-500)' }}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, border: 'none', background: 'transparent', borderRadius: 'var(--radius-md)', cursor: 'pointer', color: 'var(--neutral-500)' }}
           >
             <CancelOneIcon size={14} />
           </DialogClose>
         </div>
 
-        <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', padding: '16px 24px' }}>
+        <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', padding: 'var(--space-4) var(--space-6)' }}>
           <MarkdownRenderer content={summary.summary} />
           {exchanges.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 24, paddingTop: 16, borderTop: '1px solid var(--neutral-100)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', marginTop: 'var(--space-6)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--neutral-100)' }}>
               {exchanges.map(item => (
                 <m.div
                   key={item.id}
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  style={{ display: 'flex', flexDirection: 'column', gap: 8, fontFamily: BODY, fontSize: 14, lineHeight: '22px' }}
+                  style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', fontFamily: BODY, fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)' }}
                 >
-                  <div style={{ alignSelf: 'flex-end', maxWidth: '80%', padding: '8px 12px', borderRadius: 12, backgroundColor: 'var(--neutral-100)', color: 'var(--neutral-900)' }}>{item.asked}</div>
+                  <div style={{ alignSelf: 'flex-end', maxWidth: '80%', padding: 'var(--space-2) var(--space-3)', borderRadius: 'var(--radius-xl)', backgroundColor: 'var(--neutral-100)', color: 'var(--neutral-900)' }}>{item.asked}</div>
                   {item.reply === null ? (
                     <span className="kaya-shimmer-text">Updating memory…</span>
                   ) : (
@@ -269,13 +269,13 @@ function ManageDialog({ open, onOpenChange, orgId, summary, onSummary, draft, on
           <div ref={bottom} />
         </div>
 
-        <form onSubmit={event => { event.preventDefault(); void send() }} style={{ padding: '12px 24px 20px' }}>
+        <form onSubmit={event => { event.preventDefault(); void send() }} style={{ padding: 'var(--space-3) var(--space-6) var(--space-5)' }}>
           <div style={{
             display:         'flex',
             alignItems:      'center',
-            gap:             8,
-            padding:         '6px 6px 6px 16px',
-            borderRadius:    999,
+            gap:             'var(--space-2)',
+            padding:         'var(--space-1-5) var(--space-1-5) var(--space-1-5) var(--space-4)',
+            borderRadius:    'var(--radius-full)',
             backgroundColor: 'var(--field-surface)',
             boxShadow:       '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
           }}>
@@ -285,7 +285,7 @@ function ManageDialog({ open, onOpenChange, orgId, summary, onSummary, draft, on
               onChange={event => onDraft(event.target.value)}
               placeholder="Ask or update"
               maxLength={4000}
-              style={{ flex: '1 0 0', minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontFamily: BODY, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)' }}
+              style={{ flex: '1 0 0', minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontFamily: BODY, fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)' }}
             />
             <button
               type="submit"
@@ -297,12 +297,12 @@ function ManageDialog({ open, onOpenChange, orgId, summary, onSummary, draft, on
                 justifyContent:  'center',
                 width:           32,
                 height:          32,
-                borderRadius:    999,
+                borderRadius:    'var(--radius-full)',
                 border:          'none',
                 cursor:          ready ? 'pointer' : 'default',
                 backgroundColor: ready ? 'var(--neutral-900)' : 'var(--neutral-300)',
                 color:           'var(--neutral-white)',
-                transition:      'background-color 120ms ease',
+                transition:      'background-color var(--duration-fast) ease',
               }}
             >
               <ArrowUpTwoIcon size={16} />
@@ -356,19 +356,19 @@ export function MemorySection({ title, hint, orgId, query }: { title: string; hi
   const shown = summary?.notes.filter(note => matches(note, query)) ?? []
 
   return (
-    <section style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 18 }}>
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, paddingLeft: 4 }}>
+    <section style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)', marginTop: 'var(--space-4)' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 'var(--space-4)', paddingLeft: 'var(--space-1)' }}>
         <div style={{ minWidth: 0 }}>
-          <h2 style={{ fontFamily: BODY, fontWeight: 600, fontSize: 16, lineHeight: '24px', color: 'var(--neutral-900)', margin: 0 }}>{title}</h2>
-          <p style={{ fontFamily: BODY, fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>{hint}</p>
+          <h2 style={{ fontFamily: BODY, fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-900)', margin: 0 }}>{title}</h2>
+          <p style={{ fontFamily: BODY, fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>{hint}</p>
         </div>
         {summary && summary.notes.length > 0 && (
           summary.stale ? (
-            <span className="kaya-shimmer-text" style={{ fontFamily: BODY, fontSize: 13, lineHeight: '20px', whiteSpace: 'nowrap' }}>
+            <span className="kaya-shimmer-text" style={{ fontFamily: BODY, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', whiteSpace: 'nowrap' }}>
               Refreshing with your latest notes…
             </span>
           ) : (
-            <span style={{ fontFamily: BODY, fontSize: 13, lineHeight: '20px', color: 'var(--neutral-400)', whiteSpace: 'nowrap' }}>
+            <span style={{ fontFamily: BODY, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-400)', whiteSpace: 'nowrap' }}>
               {summary.notes.length} notes · summarized {ago(summary.generatedAt)}
             </span>
           )
@@ -378,36 +378,36 @@ export function MemorySection({ title, hint, orgId, query }: { title: string; hi
       <div style={CARD}>
         {summary === null ? (
           failed ? (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '40px 24px', color: 'var(--neutral-400)', fontFamily: BODY, fontSize: 14 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-8) var(--space-6)', color: 'var(--neutral-400)', fontFamily: BODY, fontSize: 'var(--font-size-body)' }}>
               <BrainTwoIcon size={32} />
               Couldn’t load this memory. Try again in a moment.
             </div>
           ) : <Skeleton />
         ) : summary.notes.length === 0 ? (
-          <div style={{ padding: '16px 24px', fontFamily: BODY, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)' }}>{summary.summary}</div>
+          <div style={{ padding: 'var(--space-4) var(--space-6)', fontFamily: BODY, fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)' }}>{summary.summary}</div>
         ) : shown.length === 0 ? (
-          <div style={{ padding: '16px 24px', fontFamily: BODY, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)' }}>No notes match “{query.trim()}”.</div>
+          <div style={{ padding: 'var(--space-4) var(--space-6)', fontFamily: BODY, fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)' }}>No notes match “{query.trim()}”.</div>
         ) : (
           summary.groups.map((group, index) => {
             const notes = shown.filter(note => note.group === group)
             if (notes.length === 0) return null
             return (
               <div key={group} style={{ borderTop: index === 0 ? 'none' : '1px solid var(--neutral-100)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 24px 10px' }}>
-                  <span style={{ fontFamily: BODY, fontWeight: 600, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)' }}>{group}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-4) var(--space-6) var(--space-2-5)' }}>
+                  <span style={{ fontFamily: BODY, fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)' }}>{group}</span>
                   <span style={{
                     display:         'inline-flex',
                     alignItems:      'center',
                     justifyContent:  'center',
                     minWidth:        20,
                     height:          20,
-                    padding:         '0 6px',
+                    padding:         '0 var(--space-1-5)',
                     borderRadius:    99,
                     backgroundColor: 'var(--neutral-100)',
                     color:           'var(--neutral-600)',
                     fontFamily:      BODY,
-                    fontSize:        12,
-                    fontWeight:      500,
+                    fontSize:        'var(--font-size-small)',
+                    fontWeight:      'var(--font-weight-medium)',
                   }}>
                     {notes.length}
                   </span>
@@ -427,7 +427,7 @@ export function MemorySection({ title, hint, orgId, query }: { title: string; hi
         )}
       </div>
 
-      <div style={{ ...CARD, display: 'flex', alignItems: 'center', gap: 16, padding: '16px 24px' }}>
+      <div style={{ ...CARD, display: 'flex', alignItems: 'center', gap: 'var(--space-4)', padding: 'var(--space-4) var(--space-6)' }}>
         <div style={{
           display:         'flex',
           alignItems:      'center',
@@ -435,18 +435,18 @@ export function MemorySection({ title, hint, orgId, query }: { title: string; hi
           width:           36,
           height:          36,
           flexShrink:      0,
-          borderRadius:    10,
+          borderRadius:    'var(--radius-lg)',
           backgroundColor: 'var(--neutral-100)',
           color:           'var(--neutral-600)',
         }}>
           <BrainTwoIcon size={18} />
         </div>
         <div style={{ flex: '1 0 0', minWidth: 0 }}>
-          <p style={{ fontFamily: BODY, fontWeight: 600, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)', margin: 0 }}>Manage memory</p>
+          <p style={{ fontFamily: BODY, fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', margin: 0 }}>Manage memory</p>
           <p style={{
             fontFamily:      BODY,
-            fontSize:        14,
-            lineHeight:      '22px',
+            fontSize:        'var(--font-size-body)',
+            lineHeight:      'var(--line-height-body)',
             color:           'var(--neutral-500)',
             margin:          0,
             display:         '-webkit-box',

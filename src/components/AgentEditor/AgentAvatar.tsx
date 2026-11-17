@@ -56,7 +56,7 @@ export function AgentAvatar({
           backgroundColor: `color-mix(in srgb, ${config.colors[0]} 40%, transparent)`,
           boxShadow:       'var(--shadow-avatar-ring)',
           transform:       hovered ? 'scale(1.08)' : 'scale(1)',
-          transition:      'transform 300ms cubic-bezier(0.22, 1, 0.36, 1)',
+          transition:      'transform var(--duration-slow) cubic-bezier(0.22, 1, 0.36, 1)',
         }}
       />
       {/* The agent card's glass orb, so the avatar reads the same here as on the card. */}

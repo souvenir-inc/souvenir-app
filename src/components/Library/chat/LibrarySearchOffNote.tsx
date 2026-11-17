@@ -18,8 +18,8 @@ export function LibrarySearchOffNote() {
     <p
       role="note"
       style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, margin: '8px 0 0',
-        fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: '20px', color: 'var(--neutral-500)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-1-5)', margin: 'var(--space-2) 0 0',
+        fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-500)',
       }}
     >
       <InformationCircleIcon size={14} aria-hidden="true" />

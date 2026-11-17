@@ -72,11 +72,11 @@ function PopoverAction({
         position:   'relative',
         display:    'inline-flex',
         alignItems: 'center',
-        gap:        4,
+        gap:        'var(--space-1)',
         // Button ghost sm: 5px top/bottom, 8px left/right
-        padding:    '5px 8px',
+        padding:    'var(--space-1) var(--space-2)',
         border:     'none',
-        borderRadius: 8,
+        borderRadius: 'var(--radius-md)',
         cursor:     'pointer',
         background: 'none',
         overflow:   'hidden',
@@ -89,7 +89,7 @@ function PopoverAction({
         fontSize:   'var(--font-size-body)',
         lineHeight: 'var(--line-height-body)',
         boxShadow:  isHovered ? 'var(--shadow-button-subtle-inner-hover)' : undefined,
-        transition: 'box-shadow 150ms',
+        transition: 'box-shadow var(--duration-fast)',
       }}
     >
       {/* ── SVG defs: turbulence filter + blur filter + mask ── */}
@@ -127,7 +127,7 @@ function PopoverAction({
       {/* ── Corrosion glow - turbulence displacement + circle mask reveal ── */}
       <div
         aria-hidden
-        style={{ position: 'absolute', inset: 0, zIndex: 0, filter: `url(#${filterId})` }}
+        style={{ position: 'absolute', inset: 0, zIndex: 'var(--z-base)', filter: `url(#${filterId})` }}
       >
         <div style={{ position: 'absolute', inset: 0, WebkitMask: `url(#${maskId})`, mask: `url(#${maskId})` }}>
           <div
@@ -149,7 +149,7 @@ function PopoverAction({
           style={{
             position:      'absolute',
             inset:         0,
-            borderRadius:  8,
+            borderRadius:  'var(--radius-md)',
             boxShadow:     '0 0 0 1px var(--button-subtle-border-hover)',
             pointerEvents: 'none',
             zIndex:        2,
@@ -323,7 +323,7 @@ export function SelectionPopover({
             style={{
               position:      'absolute',
               inset:         0,
-              borderRadius:  12,
+              borderRadius:  'var(--radius-xl)',
               boxShadow:     SHADOW_INNER,
               pointerEvents: 'none',
             }}

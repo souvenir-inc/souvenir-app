@@ -71,7 +71,7 @@ describe("structured response blocks", () => {
     expect(html).toContain("Choose the workspace to connect.")
     expect(html).toContain("background:var(--brown-700)")
     expect(html).toContain("background:var(--neutral-100)")
-    expect(html).toContain("font-size:11px")
+    expect(html).toContain("font-size:var(--font-size-caption)") // 11px
     expect(html).toContain("font-family:var(--font-body)")
   })
 })

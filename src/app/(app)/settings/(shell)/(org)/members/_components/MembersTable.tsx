@@ -66,7 +66,7 @@ export function MembersTable({
         title="Team Members"
         style={{ flexWrap: 'wrap' }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 12, maxWidth: '100%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 'var(--space-3)', maxWidth: '100%' }}>
           <Tooltip content="Search" disabled={searchOpen}>
             <div style={{ display: 'flex', alignItems: 'center', flex: searchOpen ? '1 0 160px' : undefined, minWidth: 0, maxWidth: searchOpen ? 260 : undefined }}>
               <AnimatePresence initial={false} mode="popLayout">
@@ -151,14 +151,14 @@ export function MembersTable({
           </SettingsTableHeader>
 
           {loading ? (
-            <div style={{ padding: '32px 24px', textAlign: 'center' }}>
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-400)', margin: 0 }}>
+            <div style={{ padding: 'var(--space-7) var(--space-6)', textAlign: 'center' }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-400)', margin: 0 }}>
                 Loading members…
               </p>
             </div>
           ) : filteredMembers.length === 0 ? (
-            <div style={{ padding: '32px 24px', textAlign: 'center' }}>
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-400)', margin: 0 }}>
+            <div style={{ padding: 'var(--space-7) var(--space-6)', textAlign: 'center' }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-400)', margin: 0 }}>
                 {members.length === 0 ? 'No members yet' : 'No members match your search'}
               </p>
             </div>
@@ -182,12 +182,12 @@ export function MembersTable({
                 key={member.id}
                 minHeight={72}
               >
-                <SettingsTableCell style={{ alignSelf: 'flex-start', paddingTop: 16, paddingBottom: 16 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                <SettingsTableCell style={{ alignSelf: 'flex-start', paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', minWidth: 0 }}>
                     <Avatar name={member.name || member.email} seed={member.id} size="md" />
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', minWidth: 0 }}>
+                        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {member.name || member.email}
                         </span>
                         {isSelf && <Badge color="Blue" label="You" />}
@@ -195,7 +195,7 @@ export function MembersTable({
                           <Badge color="Yellow" label="Invite sent" />
                         )}
                       </div>
-                      <span style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 11, lineHeight: '16px', color: 'var(--neutral-500)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {member.email}
                       </span>
                     </div>

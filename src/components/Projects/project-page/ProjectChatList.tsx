@@ -23,8 +23,8 @@ type TeamTab = 'personal' | 'publish'
 
 // A line between the tooltip's two entries, light on its dark background (--tooltip-bg-*).
 const tooltipDividerStyle: React.CSSProperties = { height: 1, backgroundColor: 'rgba(var(--surface-rgb), 0.15)' }
-const tabPanelStyle: React.CSSProperties = { flex: '1 1 0', minHeight: 0, overflowY: 'auto', paddingTop: 24 }
-const listStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 0, padding: 3 }
+const tabPanelStyle: React.CSSProperties = { flex: '1 1 0', minHeight: 0, overflowY: 'auto', paddingTop: 'var(--space-6)' }
+const listStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 0, padding: 'var(--space-0-5)' }
 
 /**
  * The project's chats. Workspace and Shared projects get two tabs: "Your chats" (your own plus
@@ -50,7 +50,7 @@ export function ProjectChatList({ project, viewerId, members, canPublish, team }
   if (project.visibility === 'personal') {
     const chats = getChats(projectId)
     return (
-      <div className="kaya-scrollbar" style={{ width: '100%', maxWidth: '679px', display: 'flex', flexDirection: 'column', gap: 0, flex: '1 1 0', minHeight: 0, overflowY: 'auto', padding: 3 }}>
+      <div className="kaya-scrollbar" style={{ width: '100%', maxWidth: '679px', display: 'flex', flexDirection: 'column', gap: 0, flex: '1 1 0', minHeight: 0, overflowY: 'auto', padding: 'var(--space-0-5)' }}>
         {chats.length === 0 ? <ProjectChatEmptyRow /> : withDividers(chats.map((chat) => (
           <ProjectChatRow
             key={chat.id}
@@ -101,7 +101,7 @@ export function ProjectChatList({ project, viewerId, members, canPublish, team }
     <div style={{ width: '100%', maxWidth: '679px', flex: '1 1 0', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
       <Tabs value={activeTab} onValueChange={(v: string) => setActiveTab(v as TeamTab)} style={{ display: 'flex', flexDirection: 'column', flex: '1 1 0', minHeight: 0 }}>
         {/* Tabs centred: a 32px spacer balances the info button on the right. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 4px', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: '0 var(--space-1)', justifyContent: 'center' }}>
           <div style={{ width: 32, flexShrink: 0 }} aria-hidden />
           <TabsList size="small">
             {/* Both tabs show their chat count (0 included) once the list has loaded. */}
@@ -112,7 +112,7 @@ export function ProjectChatList({ project, viewerId, members, canPublish, team }
             side="left"
             maxWidth={280}
             content={
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
                 <div><b>Your chats</b> — your own chats here, plus what&apos;s published to {publishedAudienceLabel}.</div>
                 <div style={tooltipDividerStyle} />
                 <div><b>{publishedTabLabel}</b> — chats published here are visible to {publishedAudienceLabel}.</div>
@@ -132,9 +132,9 @@ export function ProjectChatList({ project, viewerId, members, canPublish, team }
         <TabsContent value="publish" className="kaya-scrollbar" style={tabPanelStyle}>
           <div style={listStyle}>
             {team.loading ? teamChatsLoadingRows() : publishedChats.length === 0 ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 4px', color: 'var(--neutral-500)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-3) var(--space-1)', color: 'var(--neutral-500)' }}>
                 <AlertCircleIcon size={16} />
-                <span style={{ fontFamily: 'var(--font-body)', fontSize: 14 }}>
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)' }}>
                   {canPublish ? `Hover a chat under “Your chats” to publish it to ${publishedAudienceLabel}.` : `No chats have been published to ${publishedAudienceLabel} yet.`}
                 </span>
               </div>

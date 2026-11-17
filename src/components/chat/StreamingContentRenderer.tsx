@@ -95,12 +95,12 @@ function ConnectPromptCard({ url, appLabel }: ConnectLeak) {
       style={{
         display:         'flex',
         alignItems:      'center',
-        gap:             12,
-        padding:         '14px 16px',
-        borderRadius:    10,
+        gap:             'var(--space-3)',
+        padding:         'var(--space-3) var(--space-4)',
+        borderRadius:    'var(--radius-lg)',
         border:          '1px solid var(--border-default)',
         backgroundColor: 'var(--neutral-50)',
-        margin:          '4px 0',
+        margin:          'var(--space-1) 0',
       }}
     >
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -118,7 +118,7 @@ function ConnectPromptCard({ url, appLabel }: ConnectLeak) {
           fontFamily: 'var(--font-body)',
           fontSize:   'var(--font-size-caption)',
           color:      'var(--neutral-500)',
-          margin:     '2px 0 0',
+          margin:     'var(--space-0-5) 0 0',
           lineHeight: 'var(--line-height-caption)',
         }}>
           Authorize access to finish setting this up.
@@ -162,16 +162,16 @@ function ConnectorResultCard({ data }: { data: ConnectorResultJson }) {
       style={{
         display:         'flex',
         alignItems:      'flex-start',
-        gap:             10,
-        padding:         '10px 14px',
-        borderRadius:    10,
+        gap:             'var(--space-2-5)',
+        padding:         'var(--space-2-5) var(--space-3)',
+        borderRadius:    'var(--radius-lg)',
         border:          '1px solid var(--border-default)',
         backgroundColor: 'var(--neutral-50)',
-        margin:          '4px 0',
+        margin:          'var(--space-1) 0',
       }}
     >
       {/* Success icon */}
-      <div style={{ flexShrink: 0, marginTop: 2, color: 'var(--green-500, #22c55e)' }}>
+      <div style={{ flexShrink: 0, marginTop: 'var(--space-0-5)', color: 'var(--green-500, #22c55e)' }}>
         <svg width={16} height={16} viewBox="0 0 16 16" fill="none" aria-hidden>
           <circle cx={8} cy={8} r={7.5} stroke="currentColor" strokeOpacity={0.35} />
           <path
@@ -199,7 +199,7 @@ function ConnectorResultCard({ data }: { data: ConnectorResultJson }) {
             fontFamily: 'var(--font-body)',
             fontSize:   'var(--font-size-caption)',
             color:      'var(--neutral-500)',
-            margin:     '2px 0 0',
+            margin:     'var(--space-0-5) 0 0',
             lineHeight: 'var(--line-height-caption)',
           }}>
             {summary}
@@ -240,12 +240,12 @@ export function StreamingContentRenderer({ content, isStreaming }: StreamingCont
       <div style={{
         display:         'flex',
         alignItems:      'center',
-        gap:             8,
-        padding:         '10px 14px',
-        borderRadius:    10,
+        gap:             'var(--space-2)',
+        padding:         'var(--space-2-5) var(--space-3)',
+        borderRadius:    'var(--radius-lg)',
         border:          '1px dashed var(--border-default)',
         backgroundColor: 'var(--neutral-50)',
-        margin:          '4px 0',
+        margin:          'var(--space-1) 0',
         fontFamily:      'var(--font-body)',
         fontSize:        'var(--font-size-caption)',
         color:           'var(--neutral-600)',

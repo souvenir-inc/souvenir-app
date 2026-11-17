@@ -35,7 +35,7 @@ body {
 [data-search-field] {
   outline: 2px solid transparent;
   outline-offset: 6px;
-  transition: outline-color 200ms ease, outline-offset 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: outline-color var(--duration-base) ease, outline-offset var(--duration-base) cubic-bezier(0.22, 1, 0.36, 1);
 }
 [data-search-active] {
   outline-color: var(--focus-ring) !important;
@@ -66,7 +66,7 @@ body {
 }
 .kaya-scrollbar::-webkit-scrollbar-thumb {
   background-color: var(--neutral-800-30);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
 }
 .kaya-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: var(--neutral-800-50);
@@ -97,7 +97,7 @@ body {
 }
 .kaya-scrollbar-sm::-webkit-scrollbar-thumb {
   background-color: var(--neutral-800-30);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
 }
 .kaya-scrollbar-sm::-webkit-scrollbar-thumb:hover {
   background-color: var(--neutral-800-50);
@@ -122,7 +122,7 @@ body {
 }
 .kaya-chat-textarea::-webkit-scrollbar-thumb {
   background-color: var(--neutral-500-60);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
 }
 
 /* LoadingSpinner rotation */
@@ -180,7 +180,7 @@ body {
 
 .kaya-skeleton {
   background-color: var(--neutral-200);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   animation: kaya-skeleton-pulse 2s ease-in-out infinite;
 }
 
@@ -193,7 +193,7 @@ body {
 .kaya-thinking-dots {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .kaya-thinking-dot {
@@ -400,7 +400,7 @@ body {
 }
 
 .kaya-warning-blink {
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   animation: kaya-warning-blink 1.4s ease-in-out infinite;
 }
 
@@ -415,15 +415,15 @@ body {
 .kaya-chat-markdown > :last-child  { margin-bottom: 0 !important; }
 .kaya-chat-markdown li > p {
   margin-top: 0 !important;
-  margin-bottom: 6px !important;
+  margin-bottom: var(--space-1-5) !important;
 }
 .kaya-chat-markdown li > p:last-child {
   margin-bottom: 0 !important;
 }
 .kaya-chat-markdown li > ul,
 .kaya-chat-markdown li > ol {
-  margin-top: 6px !important;
-  margin-bottom: 4px !important;
+  margin-top: var(--space-1-5) !important;
+  margin-bottom: var(--space-1) !important;
 }
 
 /* ── Attachment scroll strip ─────────────────────────────────────────────── */
@@ -459,9 +459,9 @@ body {
   display:         flex;
   align-items:     center;
   justify-content: space-between;
-  gap:             12px;
+  gap:             var(--space-3);
   border-radius:   var(--toast-radius);
-  padding:         12px 14px;
+  padding:         var(--space-3) var(--space-3);
   font-family:     var(--toast-font-family);
   font-size:       var(--toast-title-size);
   line-height:     var(--toast-title-line-height);
@@ -516,14 +516,14 @@ body {
   font-weight: var(--toast-description-weight);
   font-size:   var(--toast-description-size);
   line-height: var(--toast-description-line-height);
-  margin-top:  2px;
+  margin-top:  var(--space-0-5);
 }
 
 .kds-toast__action {
   background:    var(--toast-action-bg);
   color:         var(--toast-action-text);
-  border-radius: 6px;
-  padding:       4px 10px;
+  border-radius: var(--radius-sm);
+  padding:       var(--space-1) var(--space-2-5);
   font-family:   var(--toast-font-family);
   font-weight:   var(--toast-button-weight);
   font-size:     var(--toast-button-size);
@@ -536,8 +536,8 @@ body {
 .kds-toast__cancel {
   background:    var(--toast-cancel-bg);
   color:         var(--toast-cancel-text);
-  border-radius: 6px;
-  padding:       4px 10px;
+  border-radius: var(--radius-sm);
+  padding:       var(--space-1) var(--space-2-5);
   font-family:   var(--toast-font-family);
   font-weight:   var(--toast-button-weight);
   font-size:     var(--toast-button-size);
@@ -553,15 +553,15 @@ body {
   display:         inline-flex;
   align-items:     center;
   justify-content: center;
-  padding:         3px;
+  padding:         var(--space-0-5);
   border:          none;
-  border-radius:   8px;
+  border-radius:   var(--radius-md);
   background:      var(--neutral-white);
   color:           var(--neutral-600);
   box-shadow:
     0px 1px 2px color-mix(in srgb, var(--static-black) 8%, transparent),
     inset 0px 1px 0px var(--neutral-white-90);
-  transition: background-color 120ms ease, box-shadow 120ms ease;
+  transition: background-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
 }
 [data-sonner-toaster] [data-sonner-toast] [data-close-button].kds-toast__close.kds-toast__close:hover {
   background: var(--neutral-100);
@@ -690,7 +690,7 @@ body {
     0 0 0 var(--orb-ring, 5px) color-mix(in srgb, var(--c1) 8%, transparent),
     0 10px 24px -8px rgba(28, 25, 23, 0.22),
     0 0 36px 2px color-mix(in srgb, var(--c1) 20%, transparent);
-  transition: box-shadow 400ms ease, transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: box-shadow var(--duration-slow) ease, transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .agent-orb[data-hot="true"] {
   transform: scale(1.03);
@@ -778,14 +778,14 @@ body {
   border-radius: inherit;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 200ms ease;
+  transition: opacity var(--duration-base) ease;
   background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 30%), rgba(255, 255, 255, 0.06), transparent 60%);
 }
 .agent-card-glare::before {
   content: "";
   position: absolute;
   inset: 0;
-  padding: 1px;
+  padding: var(--space-0-5);
   border-radius: inherit;
   background: radial-gradient(180px circle at var(--mx, 50%) var(--my, 30%), color-mix(in srgb, color-mix(in srgb, var(--c0) 60%, white) 55%, transparent), transparent 70%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -797,13 +797,13 @@ body {
 
 /* The ⋮ chip on the banner: frosted glass, quiet until the card is hot. */
 .agent-card-chip {
-  border-radius: 9px;
+  border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.6);
   border: 1px solid rgba(0, 0, 0, 0.06);
   -webkit-backdrop-filter: blur(8px) saturate(140%);
   backdrop-filter: blur(8px) saturate(140%);
   opacity: 0.55;
-  transition: opacity 180ms ease;
+  transition: opacity var(--duration-base) ease;
 }
 :root[data-theme="dark"] .agent-card-chip {
   background: rgba(10, 10, 10, 0.32);
@@ -822,7 +822,7 @@ body {
    keyboard focus ring in the agent's colour. */
 .agent-card {
   transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
-  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms ease, opacity 150ms, background-size 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--duration-base) cubic-bezier(0.22, 1, 0.36, 1), box-shadow var(--duration-slow) ease, opacity var(--duration-fast), background-size 900ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .agent-card { --lift-shadow: 0 16px 32px -12px rgba(28, 25, 23, 0.18); }
 :root[data-theme="dark"] .agent-card { --lift-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.6); }
@@ -866,7 +866,7 @@ body {
   opacity: 0;
   animation: agent-zzz 2.4s ease-out infinite;
 }
-.agent-zzz > span:nth-child(1) { font-size: 10px; }
+.agent-zzz > span:nth-child(1) { font-size: var(--font-size-caption); }
 .agent-zzz > span:nth-child(2) { font-size: 8px; animation-delay: 0.8s; }
 .agent-zzz > span:nth-child(3) { font-size: 6px; animation-delay: 1.6s; }
 @keyframes agent-zzz {
@@ -877,7 +877,7 @@ body {
 
 /* "Use in chat": glows in the agent's colour, a sheen sweeps across once on hover, and it
    presses in. The arrow beside the label slides in while the card is hot (see the card). */
-.agent-card-cta { position: relative; display: inline-flex; border-radius: 999px; transition: box-shadow 200ms ease, transform 120ms ease; }
+.agent-card-cta { position: relative; display: inline-flex; border-radius: var(--radius-full); transition: box-shadow var(--duration-base) ease, transform var(--duration-fast) ease; }
 .agent-card-cta:hover { box-shadow: 0 6px 16px -4px color-mix(in srgb, var(--c0) 55%, transparent); }
 .agent-card-cta:active { transform: scale(0.96); }
 .agent-card-cta::after {
@@ -895,8 +895,8 @@ body {
 .agent-card:has(:focus-visible) { outline: 2px solid color-mix(in srgb, var(--c0) 70%, white); outline-offset: 3px; }
 @media (hover: none) { .agent-card { transform: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .agent-card { transform: none; transition: box-shadow 300ms ease, opacity 150ms; }
-  .agent-orb { transition: box-shadow 400ms ease; }
+  .agent-card { transform: none; transition: box-shadow var(--duration-slow) ease, opacity var(--duration-fast); }
+  .agent-orb { transition: box-shadow var(--duration-slow) ease; }
   .agent-orb[data-hot="true"] { transform: none; }
   .agent-orb__wake::before { animation: none; display: none; }
   .agent-zzz > span { animation: none; opacity: 0.7; }
@@ -913,7 +913,7 @@ body {
 .kaya-field {
   outline: 2px solid transparent;
   outline-offset: 6px;
-  transition: outline-color 200ms ease, outline-offset 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: outline-color var(--duration-base) ease, outline-offset var(--duration-base) cubic-bezier(0.22, 1, 0.36, 1);
 }
 .kaya-field:focus-within { outline-color: var(--focus-ring); outline-offset: 3px; }
 

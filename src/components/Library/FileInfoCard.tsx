@@ -17,12 +17,12 @@ import { FormatGlyph } from './FormatGlyph'
 import { PersonAvatar, WorkspaceAvatar } from './PersonAvatar'
 import styles from './FileScreen.module.css'
 
-const label: React.CSSProperties = { fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-600)' }
-const value: React.CSSProperties = { fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)', overflowWrap: 'anywhere' }
+const label: React.CSSProperties = { fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-600)' }
+const value: React.CSSProperties = { fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', overflowWrap: 'anywhere' }
 
 function Pair({ name, children }: { name: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '88px minmax(0, 1fr)', gap: 12, padding: '5px 0' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '88px minmax(0, 1fr)', gap: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
       <dt style={label}>{name}</dt>
       <dd style={{ ...value, margin: 0 }}>{children}</dd>
     </div>
@@ -141,7 +141,7 @@ export function FileInfoCard({ file, viewerId, onManageAccess, onRename, onClose
 
       <div className={`${styles.infoBody} kaya-scrollbar kaya-no-gutter`} data-info-scroll="">
       <div className={styles.block}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontFamily: 'var(--font-body)', fontSize: 16, lineHeight: 1.35, color: 'var(--neutral-900)' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-lg)', lineHeight: 1.35, color: 'var(--neutral-900)' }}>
           <span style={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere' }}>{file.name}</span>
           <Tooltip content={caps.rename ? 'Rename' : ONLY_OWNER_TIP}>
             <span>
@@ -149,13 +149,13 @@ export function FileInfoCard({ file, viewerId, onManageAccess, onRename, onClose
             </span>
           </Tooltip>
         </div>
-        <p style={{ margin: '2px 0 0', ...label }}>{path}</p>
-        <p style={{ margin: '8px 0 0', ...label, lineHeight: 1.55 }}>
+        <p style={{ margin: 'var(--space-0-5) 0 0', ...label }}>{path}</p>
+        <p style={{ margin: 'var(--space-2) 0 0', ...label, lineHeight: 1.55 }}>
           <OriginLine file={file} viewerId={viewerId} />
         </p>
         {/* Every file Souvenir made (a chat output or a run output) carries the AI-generated badge. */}
         {(file.source === 'generated' || file.titleIsAiGenerated) && (
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginTop: 10 }}>
+          <div style={{ display: 'flex', gap: 'var(--space-1-5)', flexWrap: 'wrap', alignItems: 'center', marginTop: 'var(--space-2-5)' }}>
             {file.source === 'generated' && <GeneratedMark file={file} />}
             <AiGeneratedTag />
           </div>
@@ -219,11 +219,11 @@ export function FileInfoCard({ file, viewerId, onManageAccess, onRename, onClose
           <Skeleton height={32} radius={10} />
         ) : (
           shownEntries.map((entry) => (
-            <div key={entry.grantId} style={{ display: 'flex', alignItems: 'center', gap: 10, minHeight: 44 }}>
+            <div key={entry.grantId} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', minHeight: 44 }}>
               {entry.person ? <PersonAvatar person={entry.person} size={32} /> : <WorkspaceAvatar size={32} />}
-              <span style={{ flex: 1, minWidth: 0, ...value, lineHeight: '20px' }}>
+              <span style={{ flex: 1, minWidth: 0, ...value, lineHeight: 'var(--line-height-body-sm)' }}>
                 {entry.kind === 'workspace' ? 'Whole workspace' : entry.person ? personName(entry.person, viewerId) : 'Someone'}
-                <small style={{ display: 'block', fontSize: 12, lineHeight: '16px', color: 'var(--neutral-600)' }}>
+                <small style={{ display: 'block', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-600)' }}>
                   {entry.via === 'owner' ? 'Owner' : entry.kind === 'workspace' ? FILE_MESSAGES.everyoneInSouvenir : entry.via === 'workspace' ? 'Through the workspace' : 'Shared directly'}
                 </small>
               </span>
@@ -231,7 +231,7 @@ export function FileInfoCard({ file, viewerId, onManageAccess, onRename, onClose
           ))
         )}
         {access.isSuccess && entries.every((entry) => entry.via === 'owner') && (
-          <p style={{ margin: '4px 0 0', ...label }}>{FILE_MESSAGES.privateFile}</p>
+          <p style={{ margin: 'var(--space-1) 0 0', ...label }}>{FILE_MESSAGES.privateFile}</p>
         )}
         {entries.length > ACCESS_PREVIEW && (
           <button type="button" className={styles.more} aria-expanded={allAccess} onClick={() => setAllAccess((open) => !open)}>
@@ -239,7 +239,7 @@ export function FileInfoCard({ file, viewerId, onManageAccess, onRename, onClose
           </button>
         )}
         {!trashed && (
-          <div style={{ marginTop: 12 }}>
+          <div style={{ marginTop: 'var(--space-3)' }}>
             <Tooltip content={ONLY_OWNER_TIP} disabled={caps.share}>
               <span style={{ display: 'block' }}>
                 <Button variant="outline" size="sm" fluid disabled={!caps.share} onClick={onManageAccess}>Manage access</Button>
@@ -253,7 +253,7 @@ export function FileInfoCard({ file, viewerId, onManageAccess, onRename, onClose
 
       {/* Actions stay pinned at the bottom of the card; only the details above scroll. */}
       <div className={styles.infoFoot}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-2)' }}>
           {/* Ask and Download need the file itself: hidden when the viewer cannot open it. */}
           {caps.open && (
             <Button variant="outline" size="sm" fluid leftIcon={<BubbleChatIcon size={14} />} disabled={trashed || file.phase === 'uploading' || (file.phase === 'failed' && !!file.failureReason)} onClick={onAsk}>

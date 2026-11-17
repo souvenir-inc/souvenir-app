@@ -24,11 +24,11 @@ const SEARCH_DEBOUNCE_MS = 200
 /** Placeholder rows while the featured apps load for the first time (same height as a menu item). */
 function AppRowsSkeleton() {
   return (
-    <div aria-hidden style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '2px 0' }}>
+    <div aria-hidden style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', padding: 'var(--space-0-5) 0' }}>
       {Array.from({ length: SKELETON_ROWS }, (_, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, height: 36, padding: '0 8px' }}>
-          <span className="kaya-skeleton" style={{ width: 20, height: 20, borderRadius: 6, flex: 'none' }} />
-          <span className="kaya-skeleton" style={{ height: 12, width: `${48 + (i * 9) % 30}%`, borderRadius: 5 }} />
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', height: 36, padding: '0 var(--space-2)' }}>
+          <span className="kaya-skeleton" style={{ width: 20, height: 20, borderRadius: 'var(--radius-sm)', flex: 'none' }} />
+          <span className="kaya-skeleton" style={{ height: 12, width: `${48 + (i * 9) % 30}%`, borderRadius: 'var(--radius-sm)' }} />
         </div>
       ))}
     </div>

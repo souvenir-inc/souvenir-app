@@ -195,9 +195,9 @@ function WeatherMeta({ icon, children }: { icon: React.ReactNode; children: Reac
         ...captionStyle,
         display: "inline-flex",
         alignItems: "center",
-        gap: 5,
-        padding: "5px 8px",
-        borderRadius: 999,
+        gap: 'var(--space-1)',
+        padding: "var(--space-1) var(--space-2)",
+        borderRadius: 'var(--radius-full)',
         color: "var(--neutral-700)",
         background: "rgba(var(--surface-rgb), 0.60)",
         border: "1px solid rgba(255,255,255,0.72)",
@@ -242,21 +242,21 @@ function ForecastTile({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: 8,
-        padding: "13px 12px 12px",
+        gap: 'var(--space-2)',
+        padding: "var(--space-3) var(--space-3) var(--space-3)",
         borderLeft: index === 0 ? undefined : "1px solid var(--neutral-100)",
       }}
     >
-      <span style={{ ...captionStyle, color: "var(--neutral-600)", fontWeight: 600 }}>{day.label}</span>
+      <span style={{ ...captionStyle, color: "var(--neutral-600)", fontWeight: 'var(--font-weight-semibold)' }}>{day.label}</span>
       <WeatherGlyph condition={day.condition} size={22} reduceMotion={reduceMotion} />
-      <div style={{ display: "flex", alignItems: "baseline", gap: 5, fontVariantNumeric: "tabular-nums" }}>
-        <span style={{ fontFamily: "var(--font-title)", fontSize: 17, fontWeight: 600, color: "var(--neutral-800)" }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 'var(--space-1)', fontVariantNumeric: "tabular-nums" }}>
+        <span style={{ fontFamily: "var(--font-title)", fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-800)" }}>
           {day.high ?? "–"}°
         </span>
         <span style={{ ...captionStyle }}>{day.low ?? "–"}°</span>
       </div>
       <Tooltip content={`${day.low}–${day.high}${unit}`} disabled={!hasRange}><div
-        style={{ width: "100%", height: 4, borderRadius: 999, background: "var(--neutral-100)", position: "relative", overflow: "hidden" }}
+        style={{ width: "100%", height: 4, borderRadius: 'var(--radius-full)', background: "var(--neutral-100)", position: "relative", overflow: "hidden" }}
       >
         {hasRange && (
           <m.div
@@ -268,7 +268,7 @@ function ForecastTile({
               left: `${left}%`,
               width: `${width}%`,
               insetBlock: 0,
-              borderRadius: 999,
+              borderRadius: 'var(--radius-full)',
               transformOrigin: "left center",
               background: `linear-gradient(90deg, ${tempColor(low, unit)}, ${tempColor(high, unit)})`,
             }}
@@ -299,8 +299,8 @@ export function XmlWeather({ xml }: { xml: string }) {
       whileHover={reduceMotion ? undefined : { y: -2 }}
       transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
       style={{
-        margin: "14px 0",
-        borderRadius: 20,
+        margin: "var(--space-3) 0",
+        borderRadius: 'var(--radius-2xl)',
         border: "1px solid var(--neutral-100)",
         backgroundColor: "var(--neutral-white)",
         boxShadow: "var(--shadow-surface-card)",
@@ -353,7 +353,7 @@ export function XmlWeather({ xml }: { xml: string }) {
                 fontFamily: "var(--font-body)",
                 fontSize: "var(--font-size-eyebrow)",
                 lineHeight: "var(--line-height-eyebrow)",
-                fontWeight: 600,
+                fontWeight: 'var(--font-weight-semibold)',
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
                 color: palette.ink,
@@ -363,7 +363,7 @@ export function XmlWeather({ xml }: { xml: string }) {
               {weather.location || "Current weather"}
             </span>
 
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 12, marginTop: 14 }}>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 'var(--space-3)', marginTop: 'var(--space-3)' }}>
               <span
                 style={{
                   fontFamily: "var(--font-title)",
@@ -376,14 +376,14 @@ export function XmlWeather({ xml }: { xml: string }) {
                 }}
               >
                 {weather.current.temp}
-                <span style={{ fontSize: "0.42em", letterSpacing: "-0.01em", verticalAlign: "top", marginLeft: 3 }}>{weather.unit}</span>
+                <span style={{ fontSize: "0.42em", letterSpacing: "-0.01em", verticalAlign: "top", marginLeft: 'var(--space-0-5)' }}>{weather.unit}</span>
               </span>
-              <span style={{ ...captionStyle, color: palette.ink, fontWeight: 600, paddingBottom: 4 }}>
+              <span style={{ ...captionStyle, color: palette.ink, fontWeight: 'var(--font-weight-semibold)', paddingBottom: 'var(--space-1)' }}>
                 {conditionLabel(weather.current.condition) || "Current"}
               </span>
             </div>
 
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginTop: "auto", paddingTop: 20 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 'var(--space-1-5)', marginTop: "auto", paddingTop: 'var(--space-5)' }}>
               {(weather.current.high || weather.current.low) && (
                 <WeatherMeta icon={<Thermometer size={13} strokeWidth={1.8} aria-hidden />}>
                   H {weather.current.high ?? "–"}° · L {weather.current.low ?? "–"}°

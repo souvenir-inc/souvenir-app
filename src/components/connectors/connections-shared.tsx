@@ -47,9 +47,9 @@ const SHELL_PAD_TOP = 'clamp(28px, 5vw, 48px)'
 
 export const SPACE = { xs: 4, sm: 6, md: 8, lg: 12, xl: 16, xxl: 24, section: 32 } as const
 
-export const heading: React.CSSProperties = { margin: 0, color: 'var(--neutral-900)', fontFamily: 'var(--font-title)', fontSize: 32, fontWeight: 400, lineHeight: 1.2 }
+export const heading: React.CSSProperties = { margin: 0, color: 'var(--neutral-900)', fontFamily: 'var(--font-title)', fontSize: 'var(--font-size-heading-xl)', fontWeight: 'var(--font-weight-regular)', lineHeight: 1.2 }
 export const muted: React.CSSProperties = { margin: 0, color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)' }
-export const panel: React.CSSProperties = { borderRadius: 12, background: 'var(--card-bg)', boxShadow: '0 0 0 1px var(--neutral-100)' }
+export const panel: React.CSSProperties = { borderRadius: 'var(--radius-xl)', background: 'var(--card-bg)', boxShadow: '0 0 0 1px var(--neutral-100)' }
 
 // The page itself is the one scroll region — fills the real height its
 // AppLayout ancestor already gives it (a bounded flex column, see
@@ -100,7 +100,7 @@ export function ConnectorsSpinner({ minHeight = 320 }: { minHeight?: number }) {
         <circle cx="20" cy="20" r="16" stroke="var(--neutral-200)" strokeWidth="4" />
         <path d="M36 20a16 16 0 0 0-16-16" stroke="var(--neutral-900)" strokeWidth="4" strokeLinecap="round" />
       </svg>
-      <p style={{ margin: 0, color: 'var(--neutral-900)', fontFamily: 'var(--font-title)', fontSize: 16, fontWeight: 400, lineHeight: 1.3 }}>Loading connectors</p>
+      <p style={{ margin: 0, color: 'var(--neutral-900)', fontFamily: 'var(--font-title)', fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-regular)', lineHeight: 1.3 }}>Loading connectors</p>
     </div>
   )
 }
@@ -224,10 +224,10 @@ export function CatalogSectionLabel({ label, sub, action }: { label: string; sub
   return (
     <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: SPACE.md, margin: `0 0 ${SPACE.lg}px` }}>
       <div style={{ minWidth: 0 }}>
-        <h2 style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 16, lineHeight: '22px', color: 'var(--neutral-900)' }}>
+        <h2 style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)' }}>
           {label}
         </h2>
-        {sub && <p style={{ ...muted, marginTop: 2, fontSize: 13, lineHeight: '20px' }}>{sub}</p>}
+        {sub && <p style={{ ...muted, marginTop: 'var(--space-0-5)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)' }}>{sub}</p>}
       </div>
       {action}
     </div>
@@ -262,7 +262,7 @@ export function CatalogCell({ summary, select, highlight, pendingSlug, category,
 export function PickSection({ label, sub, picks, select, pendingSlug, category }: { label: string; sub: string; picks: ConnectorPick[]; select: (summary: ConnectorPick) => void; pendingSlug?: string | null; category: string }) {
   if (picks.length === 0) return null
   return (
-    <div style={{ marginBottom: 40 }}>
+    <div style={{ marginBottom: 'var(--space-8)' }}>
       <CatalogSectionLabel label={label} sub={sub} />
       <div style={CATALOG_GRID}>
         {picks.map(pick => (

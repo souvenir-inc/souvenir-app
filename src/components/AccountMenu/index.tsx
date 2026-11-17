@@ -102,15 +102,15 @@ const ShortcutPill = ({ label }: { label: string }) => <Kbd>{label}</Kbd>
 // Who the menu belongs to: avatar, name, email and workspace role — the same for every role.
 
 const AccountHeader = ({ name, email, avatarSrc, roleLabel }: { name: string; email?: string; avatarSrc?: string; roleLabel?: string }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 8px 10px' }}>
+  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', padding: 'var(--space-2) var(--space-2) var(--space-2-5)' }}>
     <UserAvatar name={name} src={avatarSrc} size={36} />
     <div style={{ flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', minWidth: 0 }}>
         <p style={{ margin: 0, minWidth: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {name}
         </p>
         {roleLabel && (
-          <span style={{ flexShrink: 0, padding: '0 6px', borderRadius: 999, backgroundColor: 'var(--neutral-100)', boxShadow: 'inset 0 0 0 1px var(--border-default)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 11, lineHeight: '18px', color: 'var(--neutral-600)' }}>
+          <span style={{ flexShrink: 0, padding: '0 var(--space-1-5)', borderRadius: 'var(--radius-full)', backgroundColor: 'var(--neutral-100)', boxShadow: 'inset 0 0 0 1px var(--border-default)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', lineHeight: '18px', color: 'var(--neutral-600)' }}>
             {roleLabel}
           </span>
         )}
@@ -159,9 +159,9 @@ const PlanChip = ({ label, tone }: { label: string; tone: PlanTone }) => {
       style={{
         display:         'inline-flex',
         alignItems:      'center',
-        gap:             5,
-        padding:         '2px 8px',
-        borderRadius:    6,
+        gap:             'var(--space-1)',
+        padding:         'var(--space-0-5) var(--space-2)',
+        borderRadius:    'var(--radius-sm)',
         backgroundColor: t.bg,
         boxShadow:       t.shadow,
         color:           t.text,
@@ -177,7 +177,7 @@ const PlanChip = ({ label, tone }: { label: string; tone: PlanTone }) => {
         maxWidth:        '100%',
       }}
     >
-      <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, backgroundColor: 'currentColor', flexShrink: 0 }} />
+      <span aria-hidden style={{ width: 6, height: 6, borderRadius: 'var(--radius-full)', backgroundColor: 'currentColor', flexShrink: 0 }} />
       <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
     </span>
   )
@@ -210,12 +210,12 @@ const PlanRow = ({
   const planLabel = planWarning ? 'Free Plan' : withPlanSuffix(planType ?? 'Plan')
   const shownCredits = planWarning ? undefined : credits
   return (
-    <div style={{ padding: '0 6px 6px' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: 10, borderRadius: 10, backgroundColor: 'var(--neutral-100)', boxShadow: 'inset 0px 0px 0px 1px var(--neutral-200)' }}>
+    <div style={{ padding: '0 var(--space-1-5) var(--space-1-5)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', padding: 'var(--space-2-5)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--neutral-100)', boxShadow: 'inset 0px 0px 0px 1px var(--neutral-200)' }}>
         {/* Wraps rather than squeezing: the plan name and what the viewer can do about
             it are both short and both matter, so when they don't fit side by side the
             second one takes its own line instead of either being truncated. */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, rowGap: 4, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-2)', rowGap: 'var(--space-1)', minWidth: 0 }}>
           <PlanChip label={planLabel} tone={planTone(planLabel, !!planWarning)} />
           {planAction ? (
             <Button variant="secondary" size="xs" rightIcon={<ArrowUpRightOneIcon />} onClick={onPlanAction}>
@@ -226,8 +226,8 @@ const PlanRow = ({
           )}
         </div>
         {shownCredits && (
-          <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5 }}>
-            <span style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', fontSize: 18, lineHeight: '24px', color: 'var(--neutral-900)', whiteSpace: 'nowrap' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--space-1)' }}>
+            <span style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-heading-sm)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-900)', whiteSpace: 'nowrap' }}>
               {shownCredits.value}
             </span>
             {shownCredits.caption && <span style={CAPTION}>{shownCredits.caption}</span>}
@@ -243,7 +243,7 @@ const ThemeRow = () => {
   const { enabled } = useTheme()
   if (!enabled) return null
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '2px 8px 6px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)', padding: 'var(--space-0-5) var(--space-2) var(--space-1-5)' }}>
       <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-700)' }}>Theme</span>
       <ThemeModeSwitcher />
     </div>

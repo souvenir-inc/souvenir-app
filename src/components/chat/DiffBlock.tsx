@@ -39,8 +39,8 @@ export function DiffBlock({ code }: { code: string }) {
     <div
       style={{
         position:     "relative",
-        margin:       "12px 0",
-        borderRadius: 8,
+        margin:       "var(--space-3) 0",
+        borderRadius: 'var(--radius-md)',
         border:       "1px solid var(--border-default)",
         background:   "var(--neutral-white)",
         overflow:     "hidden",
@@ -56,8 +56,8 @@ export function DiffBlock({ code }: { code: string }) {
           right:           6,
           display:         "flex",
           alignItems:      "center",
-          padding:         6,
-          borderRadius:    6,
+          padding:         'var(--space-1-5)',
+          borderRadius:    'var(--radius-sm)',
           border:          "1px solid var(--border-default)",
           backgroundColor: "var(--neutral-white)",
           color:           "var(--neutral-500)",
@@ -70,15 +70,15 @@ export function DiffBlock({ code }: { code: string }) {
         className="kaya-scrollbar"
         style={{
           margin:     0,
-          padding:    "10px 0",
+          padding:    "var(--space-2-5) 0",
           overflowX:  "auto",
           fontFamily: "var(--font-code)",
-          fontSize:   13,
-          lineHeight: "20px",
+          fontSize:   'var(--font-size-body-sm)',
+          lineHeight: "var(--line-height-body-sm)",
         }}
       >
         {lines.map((line, i) => (
-          <div key={i} style={{ padding: "0 14px", whiteSpace: "pre", ...lineStyle(line) }}>
+          <div key={i} style={{ padding: "0 var(--space-3)", whiteSpace: "pre", ...lineStyle(line) }}>
             {line || " "}
           </div>
         ))}

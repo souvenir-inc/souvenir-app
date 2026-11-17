@@ -211,8 +211,8 @@ export function MessageBubble({
         <div ref={ref} className={cn('flex flex-col items-start', className)} style={{ maxWidth }} {...props}>
           <div
             style={{
-              padding:         '10px 16px',
-              borderRadius:    '16px 16px 16px 4px',
+              padding:         'var(--space-2-5) var(--space-4)',
+              borderRadius:    'var(--radius-2xl) var(--radius-2xl) var(--radius-2xl) var(--radius-xs)',
               backgroundColor: 'var(--neutral-100)',
               boxShadow:       '0px 1px 2px rgba(59,54,50,0.08), 0px 0px 0px 1px var(--neutral-200)',
             }}
@@ -259,8 +259,8 @@ export function MessageBubble({
             flexDirection:   'column',
             alignItems:      'flex-start',
             overflow:        'hidden',
-            padding:         '12px 16px',
-            borderRadius:    '16px 16px 4px 16px',
+            padding:         'var(--space-3) var(--space-4)',
+            borderRadius:    'var(--radius-2xl) var(--radius-2xl) var(--radius-xs) var(--radius-2xl)',
             boxShadow:       editing ? SHADOW_FOCUS : SHADOW_OUTER,
             backgroundColor: 'var(--message-bubble-user-bg)',
             width:           bubbleWidth,
@@ -361,7 +361,7 @@ export function MessageBubble({
                 all:        'unset',
                 position:   'relative',
                 cursor:     'pointer',
-                marginTop:  6,
+                marginTop:  'var(--space-1-5)',
                 fontFamily: 'var(--font-body)',
                 fontWeight: 'var(--font-weight-medium)',
                 fontSize:   'var(--font-size-caption)',
@@ -403,7 +403,7 @@ export function MessageBubble({
                 top:        `calc(100% - ${CTA_ZONE}px + ${CTA_GAP}px)`,
                 right:      0,
                 display:    'flex',
-                gap:        6,
+                gap:        'var(--space-1-5)',
                 alignItems: 'center',
               }}
             >
@@ -422,11 +422,11 @@ export function MessageBubble({
               <kbd
                 style={{
                   fontFamily: 'var(--font-body)',
-                  fontSize: 12,
+                  fontSize: 'var(--font-size-small)',
                   lineHeight: 1,
                   color:      'var(--neutral-400)',
                   userSelect: 'none',
-                  marginLeft: 2,
+                  marginLeft: 'var(--space-0-5)',
                   background: 'none',
                   border:     'none',
                   padding:    0,
@@ -451,10 +451,10 @@ export function MessageBubble({
               display:       'flex',
               alignItems:    'center',
               alignSelf:     'flex-end',
-              gap:           8,
+              gap:           'var(--space-2)',
               height:        24,
-              marginTop:     6,
-              paddingRight:  2,
+              marginTop:     'var(--space-1-5)',
+              paddingRight:  'var(--space-0-5)',
               pointerEvents: actionsRevealed ? 'auto' : 'none',
             }}
           >
@@ -467,7 +467,7 @@ export function MessageBubble({
                   fontSize:     'var(--font-size-caption)',
                   lineHeight:   'var(--line-height-caption)',
                   color:        'var(--message-bubble-action-timestamp)',
-                  paddingRight: 4,
+                  paddingRight: 'var(--space-1)',
                   userSelect:   'none',
                 }}
               >

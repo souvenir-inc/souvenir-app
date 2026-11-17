@@ -10,9 +10,9 @@ const BAR_PALETTE = ["var(--brown-700)", "var(--blue-600)", "var(--green-600)", 
 
 function BarChartShell({ title, variant, children }: { title?: string; variant: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: "var(--neutral-white)", border: "1px solid var(--brown-50)", borderRadius: 12, padding: "16px 18px 14px" }}>
-      {title && <div style={{ fontSize: 13, fontWeight: 600, color: "var(--neutral-900)", marginBottom: 4 }}>{title}</div>}
-      <div style={{ fontSize: 12, color: "var(--neutral-300)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 14 }}>
+    <div style={{ background: "var(--neutral-white)", border: "1px solid var(--brown-50)", borderRadius: 'var(--radius-xl)', padding: "var(--space-4) var(--space-4) var(--space-3)" }}>
+      {title && <div style={{ fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)", marginBottom: 'var(--space-1)' }}>{title}</div>}
+      <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-300)", fontWeight: 'var(--font-weight-medium)', textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 'var(--space-3)' }}>
         {variant} chart
       </div>
       {children}
@@ -64,28 +64,28 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
             <m.div key={pct} initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: 0.4, delay: 0.1 }}
               style={{ position: "absolute", bottom: `${pct * chartH}px`, left: 0, right: 0, height: 1, background: "var(--neutral-800-10)", pointerEvents: "none" }} />
           ))}
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 10, height: "100%" }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 'var(--space-2-5)', height: "100%" }}>
             {data.bars.map((bar, i) => {
               const barH = Math.max((bar.value / maxVal) * chartH, 4);
               const color = bar.color ?? BAR_PALETTE[i % BAR_PALETTE.length];
               return (
                 <div key={bar.label} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%", justifyContent: "flex-end" }}>
                   <m.div initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ delay: i * 0.1 + 0.55, duration: 0.2 }}
-                    style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-700)", marginBottom: 4, lineHeight: 1 }}>
+                    style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-700)", marginBottom: 'var(--space-1)', lineHeight: 1 }}>
                     {bar.value}{data.unit ?? ""}
                   </m.div>
                   <m.div initial={{ scaleY: 0 }} animate={{ scaleY: revealed ? 1 : 0 }}
                     transition={{ type: "spring", stiffness: 140, damping: 18, mass: 1, delay: i * 0.1 }}
-                    style={{ width: "100%", height: barH, background: color, borderRadius: "4px 4px 0 0", transformOrigin: "bottom" }} />
+                    style={{ width: "100%", height: barH, background: color, borderRadius: "var(--radius-xs) var(--radius-xs) 0 0", transformOrigin: "bottom" }} />
                 </div>
               );
             })}
           </div>
         </div>
-        <div style={{ height: 1, background: "var(--neutral-800-15)", margin: "0 0 8px" }} />
-        <div style={{ display: "flex", gap: 10 }}>
+        <div style={{ height: 1, background: "var(--neutral-800-15)", margin: "0 0 var(--space-2)" }} />
+        <div style={{ display: "flex", gap: 'var(--space-2-5)' }}>
           {data.bars.map((bar) => (
-            <div key={bar.label} style={{ flex: 1, textAlign: "center", fontSize: 12, color: "var(--neutral-600)", lineHeight: "16px" }}>{bar.label}</div>
+            <div key={bar.label} style={{ flex: 1, textAlign: "center", fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", lineHeight: "var(--line-height-small)" }}>{bar.label}</div>
           ))}
         </div>
       </BarChartShell>
@@ -96,20 +96,20 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
     const maxVal = data.bars.length > 0 ? Math.max(...data.bars.map((b) => b.value)) * 1.1 : 1;
     return (
       <BarChartShell title={data.title} variant={v}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-2-5)' }}>
           {data.bars.map((bar, i) => {
             const color = bar.color ?? BAR_PALETTE[i % BAR_PALETTE.length];
             const pct = bar.value / maxVal;
             return (
-              <div key={bar.label} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 120, fontSize: 12, color: "var(--neutral-700)", textAlign: "right", flexShrink: 0, lineHeight: "16px" }}>{bar.label}</div>
-                <div style={{ flex: 1, position: "relative", height: 24, background: "rgba(59,54,50,0.05)", borderRadius: 4, overflow: "hidden" }}>
+              <div key={bar.label} style={{ display: "flex", alignItems: "center", gap: 'var(--space-2-5)' }}>
+                <div style={{ width: 120, fontSize: 'var(--font-size-small)', color: "var(--neutral-700)", textAlign: "right", flexShrink: 0, lineHeight: "var(--line-height-small)" }}>{bar.label}</div>
+                <div style={{ flex: 1, position: "relative", height: 24, background: "rgba(59,54,50,0.05)", borderRadius: 'var(--radius-xs)', overflow: "hidden" }}>
                   <m.div initial={{ scaleX: 0 }} animate={{ scaleX: revealed ? 1 : 0 }}
                     transition={{ type: "spring", stiffness: 120, damping: 20, delay: i * 0.08 }}
-                    style={{ position: "absolute", inset: 0, width: `${pct * 100}%`, background: color, borderRadius: 4, transformOrigin: "left" }} />
+                    style={{ position: "absolute", inset: 0, width: `${pct * 100}%`, background: color, borderRadius: 'var(--radius-xs)', transformOrigin: "left" }} />
                 </div>
                 <m.div initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ delay: i * 0.08 + 0.5, duration: 0.2 }}
-                  style={{ width: 44, fontSize: 12, fontWeight: 600, color: "var(--neutral-900)", flexShrink: 0 }}>
+                  style={{ width: 44, fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)", flexShrink: 0 }}>
                   {bar.value}{data.unit ?? ""}
                 </m.div>
               </div>
@@ -131,9 +131,9 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
             <m.div key={pct} initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: 0.4, delay: 0.1 }}
               style={{ position: "absolute", bottom: `${pct * chartH}px`, left: 0, right: 0, height: 1, background: "var(--neutral-800-10)", pointerEvents: "none" }} />
           ))}
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 16, height: "100%" }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 'var(--space-4)', height: "100%" }}>
             {data.labels.map((label, gi) => (
-              <div key={label} style={{ flex: 1, display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 3, height: "100%" }}>
+              <div key={label} style={{ flex: 1, display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 'var(--space-0-5)', height: "100%" }}>
                 {data.datasets!.map((ds, di) => {
                   const val = ds.values[gi];
                   const barH = Math.max((val / maxVal) * chartH, 3);
@@ -142,24 +142,24 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
                   return (
                     <m.div key={ds.label} initial={{ scaleY: 0 }} animate={{ scaleY: revealed ? 1 : 0 }}
                       transition={{ type: "spring", stiffness: 140, damping: 18, mass: 1, delay: globalIdx * 0.06 }}
-                      style={{ flex: 1, height: barH, background: color, borderRadius: "3px 3px 0 0", transformOrigin: "bottom" }} />
+                      style={{ flex: 1, height: barH, background: color, borderRadius: "var(--radius-xs) var(--radius-xs) 0 0", transformOrigin: "bottom" }} />
                   );
                 })}
               </div>
             ))}
           </div>
         </div>
-        <div style={{ height: 1, background: "var(--neutral-800-15)", margin: "0 0 8px" }} />
-        <div style={{ display: "flex", gap: 16 }}>
+        <div style={{ height: 1, background: "var(--neutral-800-15)", margin: "0 0 var(--space-2)" }} />
+        <div style={{ display: "flex", gap: 'var(--space-4)' }}>
           {data.labels.map((label) => (
-            <div key={label} style={{ flex: 1, textAlign: "center", fontSize: 12, color: "var(--neutral-600)", lineHeight: "16px" }}>{label}</div>
+            <div key={label} style={{ flex: 1, textAlign: "center", fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", lineHeight: "var(--line-height-small)" }}>{label}</div>
           ))}
         </div>
-        <div style={{ display: "flex", gap: 14, marginTop: 12, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 'var(--space-3)', marginTop: 'var(--space-3)', flexWrap: "wrap" }}>
           {data.datasets.map((ds, di) => (
-            <div key={ds.label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <div style={{ width: 10, height: 10, borderRadius: 2, background: ds.color ?? BAR_PALETTE[di % BAR_PALETTE.length], flexShrink: 0 }} />
-              <span style={{ fontSize: 12, color: "var(--neutral-500)" }}>{ds.label}</span>
+            <div key={ds.label} style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)' }}>
+              <div style={{ width: 10, height: 10, borderRadius: 'var(--radius-xs)', background: ds.color ?? BAR_PALETTE[di % BAR_PALETTE.length], flexShrink: 0 }} />
+              <span style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-500)" }}>{ds.label}</span>
             </div>
           ))}
         </div>
@@ -177,12 +177,12 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
             <m.div key={pct} initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: 0.4, delay: 0.1 }}
               style={{ position: "absolute", bottom: `${pct * chartH}px`, left: 0, right: 0, height: 1, background: "var(--neutral-800-10)", pointerEvents: "none" }} />
           ))}
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 14, height: "100%" }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 'var(--space-3)', height: "100%" }}>
             {data.labels.map((label, gi) => {
               const total = totals[gi];
               const colH = (total / maxTotal) * chartH;
               return (
-                <div key={label} style={{ flex: 1, height: colH, display: "flex", flexDirection: "column-reverse", borderRadius: "4px 4px 0 0", overflow: "hidden" }}>
+                <div key={label} style={{ flex: 1, height: colH, display: "flex", flexDirection: "column-reverse", borderRadius: "var(--radius-xs) var(--radius-xs) 0 0", overflow: "hidden" }}>
                   {data.datasets!.map((ds, di) => {
                     const segH = (ds.values[gi] / maxTotal) * chartH;
                     const color = ds.color ?? BAR_PALETTE[di % BAR_PALETTE.length];
@@ -197,17 +197,17 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
             })}
           </div>
         </div>
-        <div style={{ height: 1, background: "var(--neutral-800-15)", margin: "0 0 8px" }} />
-        <div style={{ display: "flex", gap: 14 }}>
+        <div style={{ height: 1, background: "var(--neutral-800-15)", margin: "0 0 var(--space-2)" }} />
+        <div style={{ display: "flex", gap: 'var(--space-3)' }}>
           {data.labels.map((label) => (
-            <div key={label} style={{ flex: 1, textAlign: "center", fontSize: 12, color: "var(--neutral-600)", lineHeight: "16px" }}>{label}</div>
+            <div key={label} style={{ flex: 1, textAlign: "center", fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", lineHeight: "var(--line-height-small)" }}>{label}</div>
           ))}
         </div>
-        <div style={{ display: "flex", gap: 14, marginTop: 12, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 'var(--space-3)', marginTop: 'var(--space-3)', flexWrap: "wrap" }}>
           {data.datasets.map((ds, di) => (
-            <div key={ds.label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <div style={{ width: 10, height: 10, borderRadius: 2, background: ds.color ?? BAR_PALETTE[di % BAR_PALETTE.length], flexShrink: 0 }} />
-              <span style={{ fontSize: 12, color: "var(--neutral-500)" }}>{ds.label}</span>
+            <div key={ds.label} style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)' }}>
+              <div style={{ width: 10, height: 10, borderRadius: 'var(--radius-xs)', background: ds.color ?? BAR_PALETTE[di % BAR_PALETTE.length], flexShrink: 0 }} />
+              <span style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-500)" }}>{ds.label}</span>
             </div>
           ))}
         </div>
@@ -219,11 +219,11 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
     const totals = data.labels.map((_, gi) => data.datasets!.reduce((s, ds) => s + ds.values[gi], 0));
     return (
       <BarChartShell title={data.title} variant={v}>
-        <div style={{ display: "flex", gap: 10, height: chartH }}>
+        <div style={{ display: "flex", gap: 'var(--space-2-5)', height: chartH }}>
           {data.labels.map((label, gi) => {
             const total = totals[gi];
             return (
-              <div key={label} style={{ flex: 1, display: "flex", flexDirection: "column", gap: 1, borderRadius: 4, overflow: "hidden", height: "100%" }}>
+              <div key={label} style={{ flex: 1, display: "flex", flexDirection: "column", gap: 'var(--space-0-5)', borderRadius: 'var(--radius-xs)', overflow: "hidden", height: "100%" }}>
                 {data.datasets!.map((ds, di) => {
                   const pct = total > 0 ? (ds.values[gi] / total) * 100 : 0;
                   const color = ds.color ?? BAR_PALETTE[di % BAR_PALETTE.length];
@@ -231,7 +231,7 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
                     <m.div key={ds.label} initial={{ flex: 0 }} animate={{ flex: revealed ? pct : 0 }}
                       transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: gi * 0.1 + di * 0.04 }}
                       style={{ background: color, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", minHeight: pct > 8 ? 16 : 0 }}>
-                      {pct > 8 && <span style={{ fontSize: 12, color: "color-mix(in srgb, var(--static-white) 85%, transparent)", fontWeight: 600, lineHeight: 1 }}>{Math.round(pct)}%</span>}
+                      {pct > 8 && <span style={{ fontSize: 'var(--font-size-small)', color: "color-mix(in srgb, var(--static-white) 85%, transparent)", fontWeight: 'var(--font-weight-semibold)', lineHeight: 1 }}>{Math.round(pct)}%</span>}
                     </m.div>
                   );
                 })}
@@ -239,17 +239,17 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
             );
           })}
         </div>
-        <div style={{ height: 1, background: "var(--neutral-800-15)", margin: "6px 0 8px" }} />
-        <div style={{ display: "flex", gap: 10 }}>
+        <div style={{ height: 1, background: "var(--neutral-800-15)", margin: "var(--space-1-5) 0 var(--space-2)" }} />
+        <div style={{ display: "flex", gap: 'var(--space-2-5)' }}>
           {data.labels.map((label) => (
-            <div key={label} style={{ flex: 1, textAlign: "center", fontSize: 12, color: "var(--neutral-600)", lineHeight: "16px" }}>{label}</div>
+            <div key={label} style={{ flex: 1, textAlign: "center", fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", lineHeight: "var(--line-height-small)" }}>{label}</div>
           ))}
         </div>
-        <div style={{ display: "flex", gap: 14, marginTop: 12, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 'var(--space-3)', marginTop: 'var(--space-3)', flexWrap: "wrap" }}>
           {data.datasets.map((ds, di) => (
-            <div key={ds.label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <div style={{ width: 10, height: 10, borderRadius: 2, background: ds.color ?? BAR_PALETTE[di % BAR_PALETTE.length], flexShrink: 0 }} />
-              <span style={{ fontSize: 12, color: "var(--neutral-500)" }}>{ds.label}</span>
+            <div key={ds.label} style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)' }}>
+              <div style={{ width: 10, height: 10, borderRadius: 'var(--radius-xs)', background: ds.color ?? BAR_PALETTE[di % BAR_PALETTE.length], flexShrink: 0 }} />
+              <span style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-500)" }}>{ds.label}</span>
             </div>
           ))}
         </div>
@@ -268,7 +268,7 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
             <m.div key={side} initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: 0.4, delay: 0.1 }}
               style={{ position: "absolute", top: halfH - side * halfH * 0.5, left: 0, right: 0, height: 1, background: "rgba(59,54,50,0.05)", pointerEvents: "none" }} />
           ))}
-          <div style={{ position: "absolute", inset: 0, display: "flex", gap: 10 }}>
+          <div style={{ position: "absolute", inset: 0, display: "flex", gap: 'var(--space-2-5)' }}>
             {data.bars.map((bar, i) => {
               const color = bar.color ?? (bar.value >= 0 ? "var(--green-600)" : "var(--red-300)");
               const barH = Math.max(Math.abs(bar.value) / absMax * halfH, 3);
@@ -279,18 +279,18 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
                     {isPos && (
                       <m.div initial={{ scaleY: 0 }} animate={{ scaleY: revealed ? 1 : 0 }}
                         transition={{ type: "spring", stiffness: 140, damping: 18, delay: i * 0.1 }}
-                        style={{ width: "68%", height: barH, background: color, borderRadius: "3px 3px 0 0", transformOrigin: "bottom" }} />
+                        style={{ width: "68%", height: barH, background: color, borderRadius: "var(--radius-xs) var(--radius-xs) 0 0", transformOrigin: "bottom" }} />
                     )}
                   </div>
                   <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: halfH, display: "flex", alignItems: "flex-start", justifyContent: "center" }}>
                     {!isPos && (
                       <m.div initial={{ scaleY: 0 }} animate={{ scaleY: revealed ? 1 : 0 }}
                         transition={{ type: "spring", stiffness: 140, damping: 18, delay: i * 0.1 }}
-                        style={{ width: "68%", height: barH, background: color, borderRadius: "0 0 3px 3px", transformOrigin: "top" }} />
+                        style={{ width: "68%", height: barH, background: color, borderRadius: "0 0 var(--radius-xs) var(--radius-xs)", transformOrigin: "top" }} />
                     )}
                   </div>
                   <m.div initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ delay: i * 0.1 + 0.55, duration: 0.2 }}
-                    style={{ position: "absolute", top: halfH - 8, left: "50%", transform: "translateX(-50%)", fontSize: 12, fontWeight: 700, color, lineHeight: "16px", background: "var(--neutral-white)", padding: "0 3px", borderRadius: 3, zIndex: 2 }}>
+                    style={{ position: "absolute", top: halfH - 8, left: "50%", transform: "translateX(-50%)", fontSize: 'var(--font-size-small)', fontWeight: 700, color, lineHeight: "var(--line-height-small)", background: "var(--neutral-white)", padding: "0 var(--space-0-5)", borderRadius: 'var(--radius-xs)', zIndex: 2 }}>
                     {bar.value > 0 ? "+" : ""}{bar.value}
                   </m.div>
                 </div>
@@ -298,9 +298,9 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
             })}
           </div>
         </div>
-        <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+        <div style={{ display: "flex", gap: 'var(--space-2-5)', marginTop: 'var(--space-2)' }}>
           {data.bars.map((bar) => (
-            <div key={bar.label} style={{ flex: 1, textAlign: "center", fontSize: 12, color: "var(--neutral-600)", lineHeight: "16px" }}>{bar.label}</div>
+            <div key={bar.label} style={{ flex: 1, textAlign: "center", fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", lineHeight: "var(--line-height-small)" }}>{bar.label}</div>
           ))}
         </div>
       </BarChartShell>

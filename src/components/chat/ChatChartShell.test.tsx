@@ -13,7 +13,7 @@ describe("ChatChartShell", () => {
     expect(html).toContain("Chart body")
     expect(html).toContain("var(--neutral-white)")
     expect(html).toContain("1px solid var(--neutral-100)")
-    expect(html).toContain("border-radius:12px")
+    expect(html).toContain("border-radius:var(--radius-xl)") // 12px
   })
 
   it("starts the shared series palette with the product brown", () => {

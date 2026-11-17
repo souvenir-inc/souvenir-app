@@ -89,16 +89,16 @@ function Card({ title, description, actions, children }: {
   return (
     <section
       style={{
-        display: 'flex', flexDirection: 'column', gap: 8, padding: 20, borderRadius: 16,
+        display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', padding: 'var(--space-5)', borderRadius: 'var(--radius-2xl)',
         backgroundColor: 'var(--neutral-white)', boxShadow: '0px 1px 2px 0px var(--neutral-700-12), 0px 0px 0px 1px var(--neutral-100)',
       }}
     >
-      <header style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
-          <h2 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 18, lineHeight: '24px', color: 'var(--neutral-900)' }}>{title}</h2>
+      <header style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', minWidth: 0 }}>
+          <h2 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-sm)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-900)' }}>{title}</h2>
           {description && <p style={captionText}>{description}</p>}
         </div>
-        {actions && <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>{actions}</div>}
+        {actions && <div style={{ display: 'flex', gap: 'var(--space-2)', flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>{actions}</div>}
       </header>
       {children}
     </section>
@@ -142,8 +142,8 @@ function GreetingRow({ id, text, surface, lane, showLane, onLines }: {
   return (
     <div
       style={{
-        display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 96px', alignItems: 'center', gap: 16,
-        padding: '18px 0', borderTop: '1px solid var(--neutral-100)',
+        display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 96px', alignItems: 'center', gap: 'var(--space-4)',
+        padding: 'var(--space-4) 0', borderTop: '1px solid var(--neutral-100)',
       }}
     >
       <div
@@ -156,7 +156,7 @@ function GreetingRow({ id, text, surface, lane, showLane, onLines }: {
       >
         <GreetingHeading greeting={text} compact={surface.compact} />
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 'var(--space-1)' }}>
         <Badge label={lines === null ? '…' : wraps ? `${lines} lines` : '1 line'} color={wraps ? 'Yellow' : 'Green'} />
         <span style={captionText}>{text.length} chars</span>
       </div>
@@ -198,9 +198,9 @@ export function GreetingsPlayground() {
 
   return (
     <div style={{ height: '100%', overflowY: 'auto', backgroundColor: 'var(--neutral-50)' }} className="kaya-scrollbar">
-      <div style={{ maxWidth: 1180, margin: '0 auto', padding: '32px 24px 64px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <h1 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 28, lineHeight: '34px', color: 'var(--neutral-900)' }}>
+      <div style={{ maxWidth: 1180, margin: '0 auto', padding: 'var(--space-7) var(--space-6) var(--space-10)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+          <h1 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-xl)', lineHeight: '34px', color: 'var(--neutral-900)' }}>
             Greetings
           </h1>
           <Badge label="Dev only" color="Purple" />
@@ -211,7 +211,7 @@ export function GreetingsPlayground() {
         </p>
 
         <Card title="Preview settings" description={surface.detail}>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 24, flexWrap: 'wrap', paddingTop: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--space-6)', flexWrap: 'wrap', paddingTop: 'var(--space-2)' }}>
             <div style={{ width: 240 }}>
               <InputField label="Name" value={name} onChange={setNameDraft} placeholder="Empty = no name on file" fluid />
             </div>
@@ -233,7 +233,7 @@ export function GreetingsPlayground() {
               showValue
               valueFormat={n => `${n}px`}
             />
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, ...captionText, color: 'var(--neutral-700)' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', ...captionText, color: 'var(--neutral-700)' }}>
               <Switch checked={showLane} onCheckedChange={setShowLane} aria-label="Show lane edges" />
               Show lane edges
             </label>
@@ -245,7 +245,7 @@ export function GreetingsPlayground() {
           description="The mark's one-time arrival on landing (InitialPrompts.module.css). Off for anyone with reduced motion turned on."
           actions={<Button size="sm" variant="secondary" onClick={() => setReplay(n => n + 1)}>Replay</Button>}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, paddingTop: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-5)', paddingTop: 'var(--space-4)' }}>
             <div
               key={replay}
               style={{ width: '100%', maxWidth: surface.lane, padding: `0 ${surface.inset}px`, boxSizing: 'border-box', textAlign: 'center', ['--souvenir-orbit-duration' as string]: `${orbitSeconds}s` }}

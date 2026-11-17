@@ -1,29 +1,29 @@
 .card {
   border: 1px solid var(--border-default);
-  border-radius: 16px;
+  border-radius: var(--radius-2xl);
   box-shadow: 0px 2px 2.8px 0px rgba(82, 75, 71, 0.12);
   overflow: hidden;
 }
 
 .cardHead {
-  padding: 16px 24px;
+  padding: var(--space-4) var(--space-6);
   border-bottom: 1px solid var(--neutral-100);
 }
 
 .cardTitle {
   margin: 0;
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-body);
   color: var(--neutral-900);
 }
 
 .cardHint {
-  margin: 2px 0 0;
+  margin: var(--space-0-5) 0 0;
   font-family: var(--font-body);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body-sm);
   color: var(--neutral-600);
 }
 
@@ -31,8 +31,8 @@
 .tiles {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  padding: 20px 24px 24px;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-6) var(--space-6);
 }
 
 @media (max-width: 720px) {
@@ -44,14 +44,14 @@
 .tile {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 14px;
+  gap: var(--space-3);
+  padding: var(--space-3);
   border: 1px solid var(--border-default);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   background: var(--card-bg);
   text-align: left;
   cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+  transition: background var(--duration-fast) ease, border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
 }
 
 .tile:hover:not(:disabled) {
@@ -73,7 +73,7 @@
   flex: none;
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,17 +90,17 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-0-5);
 }
 
 .tileTitle {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-900);
 }
 
@@ -110,7 +110,7 @@
 
 .tileHint {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: var(--font-size-body-sm);
   line-height: 18px;
   color: var(--neutral-600);
 }
@@ -118,7 +118,7 @@
 .tileArrow {
   flex: none;
   color: var(--neutral-400);
-  transition: transform 150ms ease, color 150ms ease;
+  transition: transform var(--duration-fast) ease, color var(--duration-fast) ease;
 }
 
 .tile:hover:not(:disabled) .tileArrow {
@@ -130,18 +130,18 @@
 .list {
   list-style: none;
   margin: 0;
-  padding: 8px 12px;
+  padding: var(--space-2) var(--space-3);
 }
 
 .row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: 10px;
+  gap: var(--space-3);
+  padding: var(--space-2-5) var(--space-3);
+  border-radius: var(--radius-lg);
   color: inherit;
   text-decoration: none;
-  transition: background 120ms ease;
+  transition: background var(--duration-fast) ease;
 }
 
 .row:hover {
@@ -167,9 +167,9 @@
   display: block;
   margin: 0;
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-900);
 }
 
@@ -177,8 +177,8 @@
   display: block;
   margin: 0;
   font-family: var(--font-body);
-  font-size: 12px;
-  line-height: 16px;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
   color: var(--neutral-600);
 }
 
@@ -186,10 +186,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 4px 4px 0;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-1) 0;
   font-family: var(--font-body);
-  font-size: 12px;
-  line-height: 16px;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
   color: var(--neutral-500);
 }

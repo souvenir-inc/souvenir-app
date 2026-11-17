@@ -57,14 +57,14 @@ function Skeleton() {
       style={{
         display:      "flex",
         alignItems:   "center",
-        gap:          8,
-        margin:       "12px 0",
-        padding:      "10px 16px",
-        borderRadius: 8,
+        gap:          'var(--space-2)',
+        margin:       "var(--space-3) 0",
+        padding:      "var(--space-2-5) var(--space-4)",
+        borderRadius: 'var(--radius-md)',
         border:       "1px dashed var(--border-default)",
         background:   "var(--neutral-50)",
         color:        "var(--neutral-600)",
-        fontSize:     13,
+        fontSize:     'var(--font-size-body-sm)',
         fontFamily:   "var(--font-body)",
       }}
     >
@@ -137,15 +137,15 @@ export function MermaidDiagram({ code }: { code: string }) {
 
   if (failed) {
     return (
-      <div style={{ margin: "12px 0", borderRadius: 8, border: "1px solid var(--border-default)", background: "var(--neutral-50)" }}>
+      <div style={{ margin: "var(--space-3) 0", borderRadius: 'var(--radius-md)', border: "1px solid var(--border-default)", background: "var(--neutral-50)" }}>
         <pre
           className="kaya-scrollbar"
           style={{
             margin:     0,
-            padding:    "12px 16px",
+            padding:    "var(--space-3) var(--space-4)",
             overflowX:  "auto",
             fontFamily: "var(--font-code)",
-            fontSize:   13,
+            fontSize:   'var(--font-size-body-sm)',
             color:      "var(--neutral-700)",
           }}
         >
@@ -154,7 +154,7 @@ export function MermaidDiagram({ code }: { code: string }) {
         <p
           style={{
             margin:     0,
-            padding:    "6px 16px",
+            padding:    "var(--space-1-5) var(--space-4)",
             borderTop:  "1px solid var(--border-default)",
             fontFamily: "var(--font-body)",
             fontSize:   "var(--font-size-caption)",
@@ -192,9 +192,9 @@ export function MermaidDiagram({ code }: { code: string }) {
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 9,
+          gap: 'var(--space-2)',
           minHeight: 52,
-          padding: "10px 12px 10px 18px",
+          padding: "var(--space-2-5) var(--space-3) var(--space-2-5) var(--space-4)",
           borderBottom: "1px solid var(--neutral-100)",
         }}
       >
@@ -213,8 +213,8 @@ export function MermaidDiagram({ code }: { code: string }) {
             minWidth: 0,
             color: "var(--neutral-900)",
             fontFamily: "var(--font-body)",
-            fontSize: 13,
-            fontWeight: 600,
+            fontSize: 'var(--font-size-body-sm)',
+            fontWeight: 'var(--font-weight-semibold)',
           }}
         >
           Flow visualization
@@ -225,7 +225,7 @@ export function MermaidDiagram({ code }: { code: string }) {
           aria-label={copied ? "Diagram source copied" : "Copy diagram source"}
           whileHover={reduceMotion ? undefined : { scale: 1.04 }}
           whileTap={reduceMotion ? undefined : { scale: 0.96 }}
-          style={{ width: 32, height: 32, display: "grid", placeItems: "center", borderRadius: 9, border: "1px solid var(--neutral-100)", backgroundColor: "var(--neutral-white)", color: copied ? "var(--green-700)" : "var(--neutral-500)", cursor: "pointer" }}
+          style={{ width: 32, height: 32, display: "grid", placeItems: "center", borderRadius: 'var(--radius-lg)', border: "1px solid var(--neutral-100)", backgroundColor: "var(--neutral-white)", color: copied ? "var(--green-700)" : "var(--neutral-500)", cursor: "pointer" }}
         >
           {copied ? <Check size={14} /> : <Copy size={14} />}
         </m.button>
@@ -236,7 +236,7 @@ export function MermaidDiagram({ code }: { code: string }) {
           aria-pressed={expanded}
           whileHover={reduceMotion ? undefined : { scale: 1.04 }}
           whileTap={reduceMotion ? undefined : { scale: 0.96 }}
-          style={{ width: 32, height: 32, display: "grid", placeItems: "center", borderRadius: 9, border: "1px solid var(--neutral-100)", backgroundColor: "var(--neutral-white)", color: "var(--neutral-500)", cursor: "pointer" }}
+          style={{ width: 32, height: 32, display: "grid", placeItems: "center", borderRadius: 'var(--radius-lg)', border: "1px solid var(--neutral-100)", backgroundColor: "var(--neutral-white)", color: "var(--neutral-500)", cursor: "pointer" }}
         >
           {expanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
         </m.button>

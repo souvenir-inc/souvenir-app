@@ -55,7 +55,7 @@ export function CategorySection({
     .slice(0, DISCOVER_SECTION_SIZE)
   if (shown.length === 0) return null
   return (
-    <div style={{ marginBottom: 40 }}>
+    <div style={{ marginBottom: 'var(--space-8)' }}>
       <CatalogSectionLabel
         label={category}
         action={(

@@ -155,12 +155,12 @@ export function FloatingMenu(
             position:      'relative',
             display:       'inline-flex',
             flexDirection: 'column',
-            gap:           '4px',
-            paddingTop:    '4px',
-            paddingRight:  '4px',
-            paddingBottom: '6px',
-            paddingLeft:   '4px',
-            borderRadius:  '12px',
+            gap:           'var(--space-1)',
+            paddingTop:    'var(--space-1)',
+            paddingRight:  'var(--space-1)',
+            paddingBottom: 'var(--space-1-5)',
+            paddingLeft:   'var(--space-1)',
+            borderRadius:  'var(--radius-xl)',
             overflow:      'clip',
             boxShadow:     SHADOW_OUTER,
             ...style,
@@ -191,7 +191,7 @@ export function FloatingMenu(
               position:      'relative',
               display:       'flex',
               flexDirection: 'column',
-              gap:           '4px',
+              gap:           'var(--space-1)',
             }}
           >
             {children}

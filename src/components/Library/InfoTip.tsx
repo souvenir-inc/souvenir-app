@@ -13,7 +13,7 @@ export function InfoTip({ text, label = 'More information' }: { text: string; la
         aria-label={`${label}: ${text}`}
         style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 20, height: 20, padding: 0, border: 'none',
-          background: 'transparent', color: 'var(--neutral-400)', cursor: 'help', borderRadius: 6,
+          background: 'transparent', color: 'var(--neutral-400)', cursor: 'help', borderRadius: 'var(--radius-sm)',
         }}
       >
         <InformationCircleIcon size={14} />

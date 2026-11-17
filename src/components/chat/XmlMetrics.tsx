@@ -41,8 +41,8 @@ export function XmlMetrics({ xml }: { xml: string }) {
       style={{
         display:             "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(min(170px, 100%), 1fr))",
-        gap:                 12,
-        margin:              "12px 0",
+        gap:                 'var(--space-3)',
+        margin:              "var(--space-3) 0",
       }}
     >
       {metrics.map((metric, i) => (
@@ -51,7 +51,7 @@ export function XmlMetrics({ xml }: { xml: string }) {
           initial={reduceMotion ? false : { opacity: 0, y: 12, scale: 0.985 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.34, delay: reduceMotion ? 0 : i * 0.065, ease: [0.16, 1, 0.3, 1] }}
-          style={{ height: "100%", borderRadius: 16 }}
+          style={{ height: "100%", borderRadius: 'var(--radius-2xl)' }}
         >
           <StatCard
             label={metric.label}

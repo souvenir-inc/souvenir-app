@@ -78,7 +78,7 @@ function NewProjectPageInner() {
         height:        '100%',
         overflowY:     'auto',
         paddingTop:    80,
-        paddingBottom: 40,
+        paddingBottom: 'var(--space-8)',
         boxSizing:     'border-box',
       }}
     >
@@ -91,21 +91,21 @@ function NewProjectPageInner() {
         style={{
           width:         '100%',
           maxWidth:      '608px',
-          padding:       '0 24px',
+          padding:       '0 var(--space-6)',
           boxSizing:     'border-box',
           display:       'flex',
           flexDirection: 'column',
-          gap:           '32px',
+          gap:           'var(--space-7)',
         }}
       >
         {/* Heading */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
           <h1
             style={{
               fontFamily:  'var(--font-title)',
               fontWeight:  'var(--font-weight-regular)',
-              fontSize:    '24px',
-              lineHeight:  '32px',
+              fontSize:    'var(--font-size-heading)',
+              lineHeight:  'var(--line-height-heading)',
               color:       'var(--legacy-1a1916)',
               margin:      0,
             }}
@@ -115,15 +115,15 @@ function NewProjectPageInner() {
         </div>
 
         {/* Form */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
             <label
               htmlFor="new-project-name"
               style={{
                 fontFamily:  'var(--font-body)',
                 fontWeight:  'var(--font-weight-medium)',
-                fontSize:    '14px',
-                lineHeight:  '22px',
+                fontSize:    'var(--font-size-body)',
+                lineHeight:  'var(--line-height-body)',
                 color:       'var(--neutral-700)',
               }}
             >
@@ -147,19 +147,19 @@ function NewProjectPageInner() {
               first paint, which is exactly the layout shift Lighthouse was
               scoring as this page's CLS. */}
           {!orgReady ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
               <Skeleton width={110} height={24} radius={4} />
               <Skeleton height={44} radius={10} />
             </div>
           ) : visibilityOptions.length > 1 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
                 <label
                   style={{
                     fontFamily:  'var(--font-body)',
                     fontWeight:  'var(--font-weight-medium)',
-                    fontSize:    '14px',
-                    lineHeight:  '22px',
+                    fontSize:    'var(--font-size-body)',
+                    lineHeight:  'var(--line-height-body)',
                     color:       'var(--neutral-700)',
                   }}
                 >
@@ -204,14 +204,14 @@ function NewProjectPageInner() {
             </div>
           )}
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
             <label
               htmlFor="new-project-desc"
               style={{
                 fontFamily:  'var(--font-body)',
                 fontWeight:  'var(--font-weight-medium)',
-                fontSize:    '14px',
-                lineHeight:  '22px',
+                fontSize:    'var(--font-size-body)',
+                lineHeight:  'var(--line-height-body)',
                 color:       'var(--neutral-700)',
               }}
             >
@@ -226,17 +226,17 @@ function NewProjectPageInner() {
               style={{
                 fontFamily:   'var(--font-body)',
                 fontWeight:   'var(--font-weight-regular)',
-                fontSize:     '14px',
-                lineHeight:   '22px',
+                fontSize:     'var(--font-size-body)',
+                lineHeight:   'var(--line-height-body)',
                 color:        'var(--legacy-1a1714)',
                 background:   'var(--field-surface)',
                 border:       '1px solid var(--neutral-300)',
-                borderRadius: '10px',
+                borderRadius: 'var(--radius-lg)',
                 boxShadow:    '0px 1px 1.5px 0px rgba(82,75,71,0.12)',
                 outline:      'none',
                 resize:       'none',
                 width:        '100%',
-                padding:      '10px 12px',
+                padding:      'var(--space-2-5) var(--space-3)',
                 boxSizing:    'border-box',
               }}
               onFocus={(e) => {
@@ -256,8 +256,8 @@ function NewProjectPageInner() {
               style={{
                 fontFamily:  'var(--font-body)',
                 fontWeight:  'var(--font-weight-regular)',
-                fontSize: '12px',
-                lineHeight:  '16px',
+                fontSize: 'var(--font-size-small)',
+                lineHeight:  'var(--line-height-small)',
                 color:       'var(--neutral-500)',
                 margin:      0,
               }}
@@ -269,11 +269,11 @@ function NewProjectPageInner() {
           {/* Tags — same chip add/remove/max-5 pattern as EditProjectModal's
               tag editor, so a project's tags look and behave identically
               whether they were set here or added later. */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: '14px', lineHeight: '22px', color: 'var(--neutral-700)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
+            <label style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-700)' }}>
               Tags
             </label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-1-5)', alignItems: 'center' }}>
               <AnimatePresence initial={false}>
                 {tags.map((tag) => (
                   <m.div
@@ -282,7 +282,7 @@ function NewProjectPageInner() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.85 }}
                     transition={{ duration: 0.12 }}
-                    style={{ display: 'flex', alignItems: 'center', gap: '2px' }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-0-5)' }}
                   >
                     <Badge label={tag.label} color={tag.color} />
                     <button
@@ -320,14 +320,14 @@ function NewProjectPageInner() {
                 />
               )}
             </div>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: '12px', lineHeight: '16px', color: 'var(--neutral-500)', margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)', margin: 0 }}>
               {tags.length >= MAX_TAGS ? `Maximum of ${MAX_TAGS} tags reached` : 'Press Enter to add a tag'}
             </p>
           </div>
         </div>
 
         {/* Footer */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
           <Button variant="cancel" onClick={() => push(PROJECTS_ROUTE)}>
             Cancel
           </Button>

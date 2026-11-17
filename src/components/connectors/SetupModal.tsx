@@ -56,7 +56,7 @@ export function Modal({ label, onDismiss, busy = false, dirty = false, children 
         onEscapeKeyDown={event => { if (busy) event.preventDefault() }}
         onInteractOutside={event => { if (busy || dirty) event.preventDefault() }}
         className="p-6"
-        style={{ width: 520, maxHeight: 'min(760px, calc(100vh - 48px))', overflowY: 'auto', boxShadow: '0 24px 72px rgba(30,28,27,.28)', borderRadius: 12 }}
+        style={{ width: 520, maxHeight: 'min(760px, calc(100vh - 48px))', overflowY: 'auto', boxShadow: '0 24px 72px rgba(30,28,27,.28)', borderRadius: 'var(--radius-xl)' }}
       >
         <DialogTitle className="sr-only">{label}</DialogTitle>
         {children}

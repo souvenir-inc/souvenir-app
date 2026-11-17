@@ -91,7 +91,7 @@ export function FlatChatHistoryItem({ chat, isActive, onSelect, onRename, onDele
     {/* display:flex blockifies Dropdown.Float's inline-flex trigger wrapper. Left
         inline it generates a line box (--line-height-body, 22px) under the 32px
         row — the row's own height plus a phantom second line. */}
-    <div style={{ position: "relative", width: "100%", display: "flex", flexDirection: "column", opacity: isArchiving ? 0.5 : 1, transition: "opacity 150ms", pointerEvents: isArchiving ? "none" : undefined }}>
+    <div style={{ position: "relative", width: "100%", display: "flex", flexDirection: "column", opacity: isArchiving ? 0.5 : 1, transition: "opacity var(--duration-fast)", pointerEvents: isArchiving ? "none" : undefined }}>
       <FlatSidebarRow
         variant={isEditing ? "chat-item-edit" : "chat-item"}
         label={chat.title}

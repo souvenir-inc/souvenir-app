@@ -36,7 +36,7 @@ export function PersonAvatar({ person, size = 24, ring = false }: { person: Pers
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden',
         width: size, height: size, borderRadius: '50%',
         background: tintGradient(`var(--color-tag-${tint}-bg)`), color: `var(--color-tag-${tint}-text)`,
-        fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: Math.round(size * 0.45), lineHeight: 1,
+        fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: Math.round(size * 0.45), lineHeight: 1,
         boxShadow: ring ? `${HAIRLINE}, 0 0 0 2px var(--card-bg)` : HAIRLINE,
       }}
     >
@@ -86,9 +86,9 @@ export function AccessAvatars({ file, viewerId }: { file: LibraryFile; viewerId:
           <span
             aria-hidden="true"
             style={{
-              marginLeft: -6, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 24, height: 24, padding: '0 5px',
-              borderRadius: 12, background: tintGradient('var(--neutral-100)'), color: 'var(--neutral-700)', boxShadow: `${HAIRLINE}, 0 0 0 2px var(--card-bg)`,
-              fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 11, boxSizing: 'border-box',
+              marginLeft: -6, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 24, height: 24, padding: '0 var(--space-1)',
+              borderRadius: 'var(--radius-xl)', background: tintGradient('var(--neutral-100)'), color: 'var(--neutral-700)', boxShadow: `${HAIRLINE}, 0 0 0 2px var(--card-bg)`,
+              fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-caption)', boxSizing: 'border-box',
             }}
           >
             +{extra}

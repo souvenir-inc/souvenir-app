@@ -16,11 +16,11 @@ export default function ImageViewer({ url, caption }: { url: string; caption?: s
   const src = safeAssetUrl(url, 'image')
   if (!src) throw new Error('image-unavailable')
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)', width: '100%' }}>
       <Button variant="secondary" size="sm" onClick={() => setActualSize((value) => !value)} aria-pressed={actualSize}>
         {actualSize ? 'Fit to screen' : 'Actual size'}
       </Button>
-      <div className="kaya-scrollbar kaya-no-gutter" style={{ maxWidth: '100%', overflow: 'auto', borderRadius: 12, background: 'var(--card-bg)', boxShadow: 'var(--shadow-card-default)' }}>
+      <div className="kaya-scrollbar kaya-no-gutter" style={{ maxWidth: '100%', overflow: 'auto', borderRadius: 'var(--radius-xl)', background: 'var(--card-bg)', boxShadow: 'var(--shadow-card-default)' }}>
         {/* A presigned storage URL: it cannot go through the image optimiser, and the size is the file's own. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

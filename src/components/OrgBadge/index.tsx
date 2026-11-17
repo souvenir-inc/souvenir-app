@@ -88,7 +88,7 @@ export function OrgBadge(
     <img
       src={orgLogoSrc}
       alt=""
-      style={{ width: 16, height: 16, borderRadius: 4, objectFit: 'cover', display: 'block', flexShrink: 0 }}
+      style={{ width: 16, height: 16, borderRadius: 'var(--radius-xs)', objectFit: 'cover', display: 'block', flexShrink: 0 }}
     />
   ) : (
     <span
@@ -114,7 +114,7 @@ export function OrgBadge(
       {/* Org name — truncates; full name in title tooltip */}
       <Tooltip content={fullName ?? orgName} maxWidth={280}><span
         style={{
-          padding:      '0 2px',
+          padding:      '0 var(--space-0-5)',
           fontFamily:   'var(--font-body)',
           fontWeight:   'var(--font-weight-medium)',
           fontSize:     'var(--font-size-caption)',
@@ -146,9 +146,9 @@ export function OrgBadge(
     // unconstrained context it stays content-width.
     flexShrink:      1,
     minWidth:        0,
-    padding:         '2px',
+    padding:         'var(--space-0-5)',
     border:          'none',
-    borderRadius:    '6px',
+    borderRadius:    'var(--radius-sm)',
     backgroundColor: bgToken,
     boxShadow:       shadowTok,
   }

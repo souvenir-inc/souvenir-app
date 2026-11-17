@@ -185,7 +185,7 @@ export function OverviewView({ messages, timing, library }: {
               aria-label={`Download all ${data.outputs.length} outputs`}
               onClick={() => data.outputs.forEach((doc, index) => later(() => downloadFile(doc.url, doc.name), index * 250))}
               className={ROW_CLASS}
-              style={{ width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: 0, borderRadius: 8, cursor: 'pointer', color: 'var(--neutral-500)' }}
+              style={{ width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: 0, borderRadius: 'var(--radius-md)', cursor: 'pointer', color: 'var(--neutral-500)' }}
             >
               <DownloadOneIcon size={16} />
             </button>

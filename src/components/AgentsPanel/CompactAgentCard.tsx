@@ -70,10 +70,10 @@ export function CompactAgentCard({ agent, superlink, useLabel = 'Use agent', inU
         position:        'relative',
         display:         'flex',
         alignItems:      'center',
-        gap:             10,
+        gap:             'var(--space-2-5)',
         width:           '100%',
         boxSizing:       'border-box',
-        padding:         8,
+        padding:         'var(--space-2)',
         borderRadius:    RADIUS,
         cursor:          'pointer',
         backgroundColor: 'var(--card-bg)',
@@ -81,7 +81,7 @@ export function CompactAgentCard({ agent, superlink, useLabel = 'Use agent', inU
           ? 'var(--shadow-agent-card-hover)'
           : 'var(--shadow-agent-card)',
         transform:       active ? 'translateY(-1px)' : 'none',
-        transition:      'box-shadow 200ms, transform 200ms cubic-bezier(0.22, 1, 0.36, 1)',
+        transition:      'box-shadow var(--duration-base), transform var(--duration-base) cubic-bezier(0.22, 1, 0.36, 1)',
       }}
       data-surface="raised"
     >
@@ -106,10 +106,10 @@ export function CompactAgentCard({ agent, superlink, useLabel = 'Use agent', inU
       </div>
 
       <div style={{ flex: '1 1 0', minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', minWidth: 0 }}>
           <Tooltip content={agent.name} maxWidth={260}><span
             style={{
-              minWidth: 0, fontFamily: 'var(--font-title)', fontSize: 15, lineHeight: '20px', fontWeight: 'var(--font-weight-medium)',
+              minWidth: 0, fontFamily: 'var(--font-title)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body-sm)', fontWeight: 'var(--font-weight-medium)',
               color: unavailable ? 'var(--neutral-500)' : 'var(--neutral-950)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}
           >
@@ -125,8 +125,8 @@ export function CompactAgentCard({ agent, superlink, useLabel = 'Use agent', inU
           // Same reason copy as PersonaCard's scrim, in the same warning tone.
           <p
             style={{
-              margin: 0, display: 'flex', alignItems: 'center', gap: 4, minWidth: 0,
-              fontFamily: 'var(--font-body)', fontSize: 12, lineHeight: '16px', color: 'var(--color-tag-Yellow-text)',
+              margin: 0, display: 'flex', alignItems: 'center', gap: 'var(--space-1)', minWidth: 0,
+              fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--color-tag-Yellow-text)',
             }}
           >
             <AlertTwoIcon size={12} aria-hidden style={{ flexShrink: 0 }} />
@@ -137,7 +137,7 @@ export function CompactAgentCard({ agent, superlink, useLabel = 'Use agent', inU
         ) : (
           <Tooltip content={agent.description} maxWidth={280} disabled={!agent.description}><p
             style={{
-              margin: 0, fontFamily: 'var(--font-body)', fontSize: 12, lineHeight: '16px', color: 'var(--neutral-500)',
+              margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}
           >

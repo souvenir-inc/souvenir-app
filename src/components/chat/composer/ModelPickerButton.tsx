@@ -46,7 +46,7 @@ function MenuCaret({ side, shown }: { side: "top" | "bottom"; shown: boolean }) 
         // caret only matters once you go for it. Opacity, not display, so the
         // button never changes width as it appears.
         opacity:    shown ? 1 : 0,
-        transition: "transform 140ms ease, opacity 140ms ease",
+        transition: "transform var(--duration-fast) ease, opacity var(--duration-fast) ease",
       }}
     >
       <ArrowDownOneIcon size={16} />

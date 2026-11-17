@@ -17,14 +17,14 @@ export function SettingsRow({
       display:      'flex',
       alignItems:   'center',
       justifyContent: 'space-between',
-      padding:      '12px 24px',
+      padding:      'var(--space-3) var(--space-6)',
       borderBottom: divider ? '1px solid var(--neutral-100)' : undefined,
     }}>
       <div>
-        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)', margin: 0 }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', margin: 0 }}>
           {title}
         </p>
-        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 11, lineHeight: '16px', color: 'var(--neutral-500)', margin: 0 }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)', margin: 0 }}>
           {subtitle}
         </p>
       </div>
@@ -46,13 +46,13 @@ export function SettingsCard({
     <div
       style={{
         border:        `1px solid ${danger ? 'var(--red-400)' : 'var(--border-default)'}`,
-        borderRadius:  16,
+        borderRadius:  'var(--radius-2xl)',
         boxShadow:     '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
         display:       'flex',
         flexDirection: 'column',
         overflow:      'hidden',
-        paddingTop:    12,
-        paddingBottom: 12,
+        paddingTop:    'var(--space-3)',
+        paddingBottom: 'var(--space-3)',
       }}
     >
       {children}

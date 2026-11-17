@@ -215,7 +215,7 @@ export function StreamingIndicator(
         style={{
           display:    'flex',
           alignItems: 'center',
-          gap:        7,
+          gap:        'var(--space-1-5)',
           minHeight:  20,
           ...style,
         }}

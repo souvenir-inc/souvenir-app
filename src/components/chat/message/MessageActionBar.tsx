@@ -60,8 +60,8 @@ export function MessageActionBar({
       transition={{ duration: 0.15 }}
       style={{
         display: "flex",
-        gap: 2,
-        marginTop: 4,
+        gap: 'var(--space-0-5)',
+        marginTop: 'var(--space-1)',
         pointerEvents: revealSettled ? "auto" : "none",
       }}
     >

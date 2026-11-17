@@ -55,18 +55,18 @@ export function ProjectShareModal({ open, onClose, projectId, projectVisibility,
           // actually has. The Workspace branch stays auto-height.
           height:          projectVisibility === 'shared' ? 600 : undefined,
           boxShadow:       '0px 8px 32px rgba(18,12,8,0.18), 0px 0px 0px 1px var(--neutral-100)',
-          padding:         24,
-          gap:             16,
+          padding:         'var(--space-6)',
+          gap:             'var(--space-4)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-3)' }}>
           <div>
             <DialogTitle asChild>
-              <p style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: '0 0 4px' }}>
+              <p style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: '0 0 var(--space-1)' }}>
                 Sharing
               </p>
             </DialogTitle>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-500)', margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-500)', margin: 0 }}>
               {projectVisibility === 'workspace'
                 ? `Everyone in ${orgName || 'your workspace'} can see this project.`
                 : 'Add teammates from your workspace to this project.'}
@@ -77,8 +77,8 @@ export function ProjectShareModal({ open, onClose, projectId, projectVisibility,
           </DialogClose>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-          <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--neutral-500)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-1-5)' }}>
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-500)' }}>
             Currently
           </span>
           {projectVisibility === 'workspace' ? (
@@ -92,8 +92,8 @@ export function ProjectShareModal({ open, onClose, projectId, projectVisibility,
           // No manageable list — per spec, Workspace access is automatic
           // for everyone currently in the org, not a curated list. Revoke
           // access by removing someone from the workspace itself, not here.
-          <div style={{ padding: '16px', borderRadius: 16, border: '1px solid var(--border-default)', backgroundColor: 'var(--neutral-50)' }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: '20px', color: 'var(--neutral-600)', margin: 0 }}>
+          <div style={{ padding: 'var(--space-4)', borderRadius: 'var(--radius-2xl)', border: '1px solid var(--border-default)', backgroundColor: 'var(--neutral-50)' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-600)', margin: 0 }}>
               Workspace projects aren&apos;t shared with individual people — every
               current and future workspace member has access automatically.
               To remove someone&apos;s access, remove them from the workspace.
@@ -111,7 +111,7 @@ export function ProjectShareModal({ open, onClose, projectId, projectVisibility,
           </div>
         )}
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 4 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 'var(--space-1)' }}>
           <Button variant="outline" size="sm" onClick={onClose}>Close</Button>
         </div>
       </DialogContent>

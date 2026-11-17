@@ -29,7 +29,7 @@ export function XmlKanban({ xml }: { xml: string }) {
             : <ul className={styles.cards}>
               {column.cards.map((card, cardIndex) => <li key={`${card.title}-${cardIndex}`} className={styles.card}>
                 <div className={styles.cardTitle}>{card.title}</div>
-                {card.sub && <div className={styles.caption} style={{ marginTop: 3 }}>{card.sub}</div>}
+                {card.sub && <div className={styles.caption} style={{ marginTop: 'var(--space-0-5)' }}>{card.sub}</div>}
                 {card.tag && <span className={styles.cardTag}>{card.tag}</span>}
               </li>)}
             </ul>}

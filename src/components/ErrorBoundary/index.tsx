@@ -52,10 +52,10 @@ class ErrorBoundaryInner extends React.Component<ErrorBoundaryProps, ErrorBounda
       return (
         <div
           role="alert"
-          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16, textAlign: 'center', minWidth: 0 }}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)', padding: 'var(--space-4)', textAlign: 'center', minWidth: 0 }}
         >
           <AlertCircleIcon size={20} color="var(--color-tag-Red-text)" />
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--neutral-500)', margin: 0 }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', color: 'var(--neutral-500)', margin: 0 }}>
             {this.props.label ?? 'This section'} couldn&apos;t load.
           </p>
           <Button variant="secondary" size="sm" onClick={() => this.setState({ hasError: false })}>
@@ -72,18 +72,18 @@ class ErrorBoundaryInner extends React.Component<ErrorBoundaryProps, ErrorBounda
             flexDirection:  'column',
             alignItems:     'center',
             justifyContent: 'center',
-            gap:            12,
-            padding:        32,
+            gap:            'var(--space-3)',
+            padding:        'var(--space-7)',
             height:         '100%',
             minHeight:      320,
             textAlign:      'center',
           }}
         >
           <AlertCircleIcon size={28} color="var(--color-tag-Red-text)" />
-          <p style={{ fontFamily: 'var(--font-title)', fontSize: 18, color: 'var(--neutral-900)', margin: 0 }}>
+          <p style={{ fontFamily: 'var(--font-title)', fontSize: 'var(--font-size-heading-sm)', color: 'var(--neutral-900)', margin: 0 }}>
             Something went wrong
           </p>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-500)', margin: 0, maxWidth: 360 }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-500)', margin: 0, maxWidth: 360 }}>
             This page ran into an unexpected error. Reloading usually fixes it.
           </p>
           <Button variant="default" size="sm" onClick={() => window.location.reload()}>

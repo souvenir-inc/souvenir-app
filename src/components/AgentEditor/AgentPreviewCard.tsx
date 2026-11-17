@@ -19,7 +19,7 @@ export interface AgentPreviewCardProps {
 /** The agent exactly as it will look in lists — updates as the form changes. */
 export function AgentPreviewCard({ name, handle, description, avatarUrl, avatarChoice, tags }: AgentPreviewCardProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
       <p style={LABEL_STYLE}>Live preview</p>
       <PersonaCard
         style={{ width: '100%' }}

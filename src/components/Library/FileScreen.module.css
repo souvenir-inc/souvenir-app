@@ -45,7 +45,7 @@
   right: 16px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   pointer-events: none;
 }
 
@@ -57,19 +57,19 @@
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 /* The file name at top left, styled like the chat name in the chat top bar (TopBar), plus a down arrow. */
 .namePill {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
   min-width: 0;
   max-width: 360px;
-  padding: 5px 6px 5px 8px;
+  padding: var(--space-1) var(--space-1-5) var(--space-1) var(--space-2);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background-color: var(--card-bg);
   box-shadow: inset 0 0 0 1px var(--button-outline-border);
   color: var(--button-outline-text);
@@ -78,7 +78,7 @@
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);
   cursor: pointer;
-  transition: background-color 120ms;
+  transition: background-color var(--duration-fast);
 }
 
 .namePill:hover,
@@ -112,15 +112,15 @@
   box-sizing: border-box;
   padding: 56px 64px;
   background: var(--card-bg);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .pageTitle {
-  margin: 0 0 4px;
+  margin: 0 0 var(--space-1);
   font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 22px;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-heading-md);
   line-height: 30px;
   letter-spacing: -0.01em;
   color: var(--neutral-900);
@@ -128,23 +128,23 @@
 }
 
 .pageSub {
-  margin: 0 0 32px;
+  margin: 0 0 var(--space-7);
   font-family: var(--font-body);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body-sm);
   color: var(--neutral-500);
 }
 
 .banners {
   width: min(816px, 100%);
-  margin: 0 auto 16px;
+  margin: 0 auto var(--space-4);
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: var(--font-size-body);
   color: var(--neutral-600);
 }
 
 .banners p {
-  margin: 0 0 8px;
+  margin: 0 0 var(--space-2);
 }
 
 /* Info card: it rises in over the spacer from the top-right corner (by the File info button), clear of the scrollbar. */
@@ -165,12 +165,12 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  border-radius: 16px;
+  border-radius: var(--radius-2xl);
   background: var(--card-bg);
   box-shadow: var(--shadow-card-default);
   overflow: hidden;
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: var(--font-size-body);
 }
 
 .infoHead {
@@ -178,7 +178,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 12px 0 20px;
+  padding: var(--space-4) var(--space-3) 0 var(--space-5);
   min-height: 32px;
 }
 
@@ -191,14 +191,14 @@
 
 /* "Show all" under a capped list. */
 .more {
-  margin-top: 4px;
-  padding: 4px 0;
+  margin-top: var(--space-1);
+  padding: var(--space-1) 0;
   border: none;
   background: none;
   cursor: pointer;
   font-family: var(--font-body);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body-sm);
   color: var(--neutral-700);
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -210,21 +210,21 @@
 
 .infoFoot {
   flex: none;
-  padding: 12px 20px 16px;
+  padding: var(--space-3) var(--space-5) var(--space-4);
   border-top: 1px solid var(--neutral-100);
 }
 
 .infoHead h2 {
   margin: 0;
   font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-heading-sm);
   color: var(--neutral-900);
 }
 
 .block {
-  padding: 12px 20px;
+  padding: var(--space-3) var(--space-5);
 }
 
 .block + .block {
@@ -235,29 +235,29 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-900);
 }
 
 .label > span {
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
 }
 
 .useRow {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-2-5);
   min-height: 36px;
-  padding: 0 8px;
+  padding: 0 var(--space-2);
   margin: 0 -8px;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: var(--font-size-body);
   color: var(--neutral-900);
   text-decoration: none;
 }
@@ -289,7 +289,7 @@
   justify-content: center;
   pointer-events: none;
   z-index: 4;
-  transition: right 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: right var(--duration-slow) cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .viewerInfo .dock {
@@ -304,23 +304,23 @@
 /* State banner above the page: In Trash, Uploading, Processing (prototype .state-banner). */
 .stateBanner {
   width: min(816px, 100%);
-  margin: 0 auto 16px;
+  margin: 0 auto var(--space-4);
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px 12px 16px;
-  border-radius: 14px;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  border-radius: var(--radius-xl);
   background: var(--card-bg);
   box-shadow: var(--shadow-card-default);
   font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 22px;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-900);
 }
 
 .stateBanner b {
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 .stateBanner p {
@@ -335,8 +335,8 @@
 
 .progress {
   height: 4px;
-  margin-top: 8px;
-  border-radius: 999px;
+  margin-top: var(--space-2);
+  border-radius: var(--radius-full);
   background: var(--neutral-100);
   overflow: hidden;
 }
@@ -345,7 +345,7 @@
   display: block;
   width: 40%;
   height: 100%;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--neutral-900);
   animation: indeterminate 1.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
@@ -358,14 +358,14 @@
 .ghostLines {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 24px;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
 }
 
 .ghostLines i {
   display: block;
   height: 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--neutral-100);
 }
 
@@ -395,13 +395,13 @@
     flex-direction: column;
   }
   .main {
-    padding: 64px 16px 24px;
+    padding: var(--space-10) var(--space-4) var(--space-6);
   }
   .spacer {
     display: none;
   }
   .page {
-    padding: 32px 24px;
+    padding: var(--space-7) var(--space-6);
   }
   .slide {
     position: static;

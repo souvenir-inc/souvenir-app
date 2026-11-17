@@ -10,17 +10,17 @@ import type { UIMessage } from "@/types/chat";
 
 // ── User message: right-aligned bubble with pin + file chips above it ─────────
 
-const columnStyle: React.CSSProperties = { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6, width: "100%", maxWidth: 566 };
+const columnStyle: React.CSSProperties = { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 'var(--space-1-5)', width: "100%", maxWidth: 566 };
 
-const chipRowStyle: React.CSSProperties = { display: "flex", flexWrap: "wrap", gap: "6px", justifyContent: "flex-end" };
+const chipRowStyle: React.CSSProperties = { display: "flex", flexWrap: "wrap", gap: "var(--space-1-5)", justifyContent: "flex-end" };
 
 // Shared by pin chips and file chips.
 const chipStyle: React.CSSProperties = {
   display:         "inline-flex",
   alignItems:      "center",
-  gap:             "5px",
-  padding:         "4px 8px",
-  borderRadius:    "8px",
+  gap:             "var(--space-1)",
+  padding:         "var(--space-1) var(--space-2)",
+  borderRadius:    "var(--radius-md)",
   backgroundColor: "color-mix(in srgb, var(--neutral-800) 7%, transparent)",
   border:          "1px solid var(--neutral-800-10)",
   maxWidth:        "220px",
@@ -30,8 +30,8 @@ const chipIconStyle: React.CSSProperties = { flexShrink: 0 };
 
 const chipLabelStyle: React.CSSProperties = {
   fontFamily:   "var(--font-body)",
-  fontSize:     "12px",
-  fontWeight:   500,
+  fontSize:     "var(--font-size-small)",
+  fontWeight:   'var(--font-weight-medium)',
   color:        "var(--neutral-700)",
   overflow:     "hidden",
   textOverflow: "ellipsis",
@@ -41,7 +41,7 @@ const chipLabelStyle: React.CSSProperties = {
 // The upload progress and the extension badge share one style.
 const chipMetaStyle: React.CSSProperties = {
   fontFamily: "var(--font-body)",
-  fontSize: "12px",
+  fontSize: "var(--font-size-small)",
   color:      "var(--neutral-600)",
   flexShrink: 0,
 };

@@ -30,7 +30,7 @@ export function AgentShareModal({ open, onClose, repoId, agentName }: AgentShare
           aria-label={`Share ${agentName}`}
           style={{
             width: 680, maxWidth: 'calc(100vw - 48px)', maxHeight: 'calc(100vh - 96px)', minHeight: 380,
-            gap: 24, padding: 32, background: 'var(--modal-bg)',
+            gap: 'var(--space-6)', padding: 'var(--space-7)', background: 'var(--modal-bg)',
             boxShadow: '0px 8px 32px rgba(18,12,8,0.18), 0px 0px 0px 1px var(--neutral-100)',
           }}
         >

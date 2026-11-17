@@ -22,8 +22,8 @@ export interface SheetViewerProps {
 }
 
 const cell: React.CSSProperties = {
-  padding: '8px 12px', textAlign: 'left', whiteSpace: 'nowrap', borderBottom: '1px solid var(--border-default)',
-  fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '20px', color: 'var(--neutral-900)',
+  padding: 'var(--space-2) var(--space-3)', textAlign: 'left', whiteSpace: 'nowrap', borderBottom: '1px solid var(--border-default)',
+  fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-900)',
 }
 // A long value is cut with an ellipsis (its full text is the cell's tooltip), so one cell cannot
 // stretch its column across the screen. Tables ignore a cell's max-width, so the cut is on a wrapper.
@@ -49,33 +49,33 @@ export default function SheetViewer({ preview, loading, onSheetChange, onRowStar
   }, [markedIndex, rows.length])
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', width: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
         {sheets.length > 1 ? (
-          <div role="group" aria-label="Sheets" style={{ display: 'flex', gap: 6, flexWrap: 'wrap', minWidth: 0 }}>
+          <div role="group" aria-label="Sheets" style={{ display: 'flex', gap: 'var(--space-1-5)', flexWrap: 'wrap', minWidth: 0 }}>
             {sheets.map((name) => (
               <Button key={name} variant={name === sheet ? 'default' : 'secondary'} size="sm" aria-pressed={name === sheet} onClick={() => onSheetChange(name)}>{name}</Button>
             ))}
           </div>
         ) : (
-          <span style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, color: 'var(--neutral-700)' }}>{sheet}</span>
+          <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-700)' }}>{sheet}</span>
         )}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span aria-live="polite" style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-500)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+          <span aria-live="polite" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-500)' }}>
             {rowTotal === 0 ? 'No rows' : `Rows ${rowStart + 1} to ${end} of ${rowTotal}`}
           </span>
           <Button variant="secondary" size="sm" disabled={loading || rowStart === 0} onClick={() => onRowStart(Math.max(0, rowStart - SHEET_WINDOW))}>Previous</Button>
           <Button variant="secondary" size="sm" disabled={loading || end >= rowTotal} onClick={() => onRowStart(end)}>Next</Button>
         </div>
       </div>
-      <div className="kaya-scrollbar" style={{ overflow: 'auto', maxHeight: '65vh', borderRadius: 12, background: 'var(--card-bg)', boxShadow: 'var(--shadow-card-default)', opacity: loading ? 0.6 : 1 }}>
+      <div className="kaya-scrollbar" style={{ overflow: 'auto', maxHeight: '65vh', borderRadius: 'var(--radius-xl)', background: 'var(--card-bg)', boxShadow: 'var(--shadow-card-default)', opacity: loading ? 0.6 : 1 }}>
         <table aria-busy={loading} style={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: '100%' }}>
           <caption style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>{sheet}</caption>
           <thead>
             <tr>
-              <th scope="col" style={{ ...cell, position: 'sticky', top: 0, left: 0, zIndex: 2, background: 'var(--neutral-50)', color: 'var(--neutral-500)', fontWeight: 500 }}>#</th>
+              <th scope="col" style={{ ...cell, position: 'sticky', top: 0, left: 0, zIndex: 2, background: 'var(--neutral-50)', color: 'var(--neutral-500)', fontWeight: 'var(--font-weight-medium)' }}>#</th>
               {pad(columns).map((name, index) => (
-                <th key={index} scope="col" title={name || undefined} style={{ ...cell, position: 'sticky', top: 0, background: 'var(--neutral-50)', fontWeight: 500 }}><span style={clip}>{name}</span></th>
+                <th key={index} scope="col" title={name || undefined} style={{ ...cell, position: 'sticky', top: 0, background: 'var(--neutral-50)', fontWeight: 'var(--font-weight-medium)' }}><span style={clip}>{name}</span></th>
               ))}
             </tr>
           </thead>
@@ -85,7 +85,7 @@ export default function SheetViewer({ preview, loading, onSheetChange, onRowStar
               const markedCell: React.CSSProperties = marked ? { background: 'var(--color-tag-Yellow-bg)', boxShadow: 'inset 0 1px 0 var(--color-tag-Yellow-text), inset 0 -1px 0 var(--color-tag-Yellow-text)' } : {}
               return (
                 <tr key={rowStart + index} id={`sheet-row-${index}`} data-cited={marked || undefined}>
-                  <th scope="row" style={{ ...cell, ...stickyLeft, ...markedCell, color: 'var(--neutral-500)', fontWeight: 400 }}>{rowStart + index + 1}</th>
+                  <th scope="row" style={{ ...cell, ...stickyLeft, ...markedCell, color: 'var(--neutral-500)', fontWeight: 'var(--font-weight-regular)' }}>{rowStart + index + 1}</th>
                   {pad(row).map((value, column) => (
                     <td key={column} title={value.length > 40 ? value : undefined} style={{ ...cell, ...markedCell }}>
                       <span style={marked && column === width - 1 ? { ...clip, display: 'inline-block', verticalAlign: 'bottom' } : clip}>{value}</span>

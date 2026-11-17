@@ -33,8 +33,8 @@ export function SettingsPageShell({
         display: 'flex',
         alignItems: 'flex-start',
         justifyContent: 'center',
-        paddingTop: 64,
-        paddingBottom: 48,
+        paddingTop: 'var(--space-10)',
+        paddingBottom: 'var(--space-9)',
       }}
     >
       {/* Horizontal padding lives here, not on the scrolling element above —
@@ -44,16 +44,16 @@ export function SettingsPageShell({
           flex: '1 0 0',
           minWidth: 0,
           maxWidth: fluid ? undefined : maxWidth + 48,
-          padding: '0 24px',
+          padding: '0 var(--space-6)',
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
-          gap: 10,
+          gap: 'var(--space-2-5)',
         }}
       >
-        <header style={{ paddingLeft: 4, marginBottom: 4 }}>
+        <header style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)' }}>
           {backLabel && onBack && (
-            <div style={{ marginBottom: 8 }}>
+            <div style={{ marginBottom: 'var(--space-2)' }}>
               <Button
                 variant="ghost"
                 size="sm"
@@ -67,9 +67,9 @@ export function SettingsPageShell({
           <h1
             style={{
               fontFamily: 'var(--font-title)',
-              fontWeight: 400,
-              fontSize: 24,
-              lineHeight: '32px',
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: 'var(--font-size-heading)',
+              lineHeight: 'var(--line-height-heading)',
               color: 'var(--neutral-900)',
               margin: 0,
             }}
@@ -79,9 +79,9 @@ export function SettingsPageShell({
           <p
             style={{
               fontFamily: 'var(--font-body)',
-              fontWeight: 400,
-              fontSize: 14,
-              lineHeight: '22px',
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: 'var(--font-size-body)',
+              lineHeight: 'var(--line-height-body)',
               color: 'var(--neutral-500)',
               margin: 0,
             }}

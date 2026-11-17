@@ -39,13 +39,13 @@ export function StatCard(
           position:        'relative',
           display:         'flex',
           flexDirection:   'column',
-          gap:             8,
-          padding:         '16px 18px',
-          borderRadius:    16,
+          gap:             'var(--space-2)',
+          padding:         'var(--space-4) var(--space-4)',
+          borderRadius:    'var(--radius-2xl)',
           backgroundColor: 'var(--neutral-white)',
           border:          '1px solid var(--neutral-100)',
           boxShadow:       hovered ? 'var(--shadow-surface-card-hover)' : 'var(--shadow-surface-card)',
-          transition:      'box-shadow 150ms ease',
+          transition:      'box-shadow var(--duration-fast) ease',
           minWidth:        0,
           ...style,
         }}
@@ -66,7 +66,7 @@ export function StatCard(
         </div>
 
         {(delta || sub) && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', marginTop: 'var(--space-0-5)' }}>
             {delta && <DeltaPill trend={deltaTrend} value={delta} />}
             {sub && (
               <span

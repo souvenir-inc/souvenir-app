@@ -21,12 +21,12 @@ const cardStyle: React.CSSProperties = {
   display:         'flex',
   flexDirection:   'column',
   alignItems:      'center',
-  gap:             20,
+  gap:             'var(--space-5)',
   width:           480,
   maxWidth:        'calc(100vw - 48px)',
   margin:          '0 auto',
   padding:         '40px 44px',
-  borderRadius:    24,
+  borderRadius:    'var(--radius-2xl)',
   boxSizing:       'border-box',
   backgroundColor: 'var(--neutral-white)',
   boxShadow:       '0px 12px 16px -4px rgba(130,122,116,0.12), 0px 0px 0px 1px var(--neutral-100)',
@@ -35,18 +35,18 @@ const cardStyle: React.CSSProperties = {
 
 const titleStyle: React.CSSProperties = {
   fontFamily: 'var(--font-title)',
-  fontWeight: 400,
-  fontSize:   26,
-  lineHeight: '32px',
+  fontWeight: 'var(--font-weight-regular)',
+  fontSize:   'var(--font-size-heading)',
+  lineHeight: 'var(--line-height-heading)',
   color:      'var(--neutral-900)',
   margin:     0,
 }
 
 const bodyStyle: React.CSSProperties = {
   fontFamily: 'var(--font-body)',
-  fontWeight: 400,
-  fontSize:   16,
-  lineHeight: '24px',
+  fontWeight: 'var(--font-weight-regular)',
+  fontSize:   'var(--font-size-body-lg)',
+  lineHeight: 'var(--line-height-heading-sm)',
   color:      'var(--neutral-500)',
   margin:     0,
   maxWidth:   360,
@@ -152,7 +152,7 @@ function SlackLinkContent() {
           You&apos;re all set. Head back to Slack — mentions, threads and slash commands
           now run as you.
         </p>
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
           <Button variant="outline" size="sm" loading={busy} onClick={handleDisconnect}>
             Disconnect
           </Button>
@@ -194,7 +194,7 @@ function SlackLinkContent() {
 
 export default function SlackLinkPage() {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', minHeight: '100dvh', padding: 24 }}>
+    <div style={{ display: 'flex', alignItems: 'center', minHeight: '100dvh', padding: 'var(--space-6)' }}>
       <Suspense fallback={null}>
         <SlackLinkContent />
       </Suspense>

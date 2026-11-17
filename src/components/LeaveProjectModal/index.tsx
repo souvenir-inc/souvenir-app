@@ -106,17 +106,17 @@ export function LeaveProjectModal({ projectId, isOwner, currentUserId, onClose, 
         aria-modal="true"
         onEscapeKeyDown={(e) => { if (submitting || successorMenuOpen) e.preventDefault() }}
         onInteractOutside={(e) => { if (submitting || isInDropdown(e.target)) e.preventDefault() }}
-        style={{ width: 420, padding: 24, gap: 20 }}
+        style={{ width: 420, padding: 'var(--space-6)', gap: 'var(--space-5)' }}
       >
         <div>
           <DialogTitle>Leave project?</DialogTitle>
-          <DialogDescription style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: '8px 0 0' }}>
+          <DialogDescription style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 'var(--space-2) 0 0' }}>
             {description}
           </DialogDescription>
         </div>
 
         {isOwner && loadingMembers && (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-3)' }}>
             <Spinner size={20} />
           </div>
         )}
@@ -130,8 +130,8 @@ export function LeaveProjectModal({ projectId, isOwner, currentUserId, onClose, 
         )}
 
         {isOwner && !loadingMembers && !membersLoadFailed && hasOthers && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 13, lineHeight: '18px', color: 'var(--neutral-700)', margin: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px', color: 'var(--neutral-700)', margin: 0 }}>
               New owner
             </p>
             <Dropdown.Float
@@ -142,10 +142,10 @@ export function LeaveProjectModal({ projectId, isOwner, currentUserId, onClose, 
                 <button
                   type="button"
                   style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
-                    width: '100%', padding: '8px 10px', borderRadius: 10, border: 'none',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)',
+                    width: '100%', padding: 'var(--space-2) var(--space-2-5)', borderRadius: 'var(--radius-lg)', border: 'none',
                     backgroundColor: 'var(--neutral-white)', boxShadow: '0px 0px 0px 1px rgba(59,54,50,0.3)',
-                    cursor: 'pointer', fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, color: 'var(--neutral-900)',
+                    cursor: 'pointer', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-900)',
                   }}
                 >
                   {selectedSuccessor ? (selectedSuccessor.name || selectedSuccessor.email) : 'Select a member'}
@@ -173,7 +173,7 @@ export function LeaveProjectModal({ projectId, isOwner, currentUserId, onClose, 
         )}
 
         {isOwner && !loadingMembers && !membersLoadFailed && !hasOthers && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             {([
               { value: 'archive' as const, label: 'Archive project', desc: 'Keep it, but make it read-only.' },
               { value: 'convertPersonal' as const, label: 'Convert to personal project', desc: 'Keep working in it, just for you.' },
@@ -183,20 +183,20 @@ export function LeaveProjectModal({ projectId, isOwner, currentUserId, onClose, 
                 type="button"
                 onClick={() => setAloneAction(opt.value)}
                 style={{
-                  display: 'flex', flexDirection: 'column', gap: 2, textAlign: 'left',
-                  padding: '10px 12px', borderRadius: 10, cursor: 'pointer',
+                  display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', textAlign: 'left',
+                  padding: 'var(--space-2-5) var(--space-3)', borderRadius: 'var(--radius-lg)', cursor: 'pointer',
                   border: aloneAction === opt.value ? '1.5px solid var(--neutral-900)' : '1px solid var(--border-default)',
                   backgroundColor: aloneAction === opt.value ? 'var(--neutral-50)' : 'var(--neutral-white)',
                 }}
               >
-                <span style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, color: 'var(--neutral-900)' }}>{opt.label}</span>
-                <span style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 12, color: 'var(--neutral-500)' }}>{opt.desc}</span>
+                <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-900)' }}>{opt.label}</span>
+                <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-500)' }}>{opt.desc}</span>
               </button>
             ))}
           </div>
         )}
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
           <Button variant="secondary" disabled={submitting} onClick={onClose}>
             Cancel
           </Button>

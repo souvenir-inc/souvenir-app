@@ -76,11 +76,11 @@ function Mark({
       style={{
         padding:         0,
         border:          'none',
-        borderRadius:    2,
+        borderRadius:    'var(--radius-xs)',
         cursor:          'pointer',
         flexShrink:      0,
         backgroundColor: hovered ? color.hover : color.rest,
-        transition:      'background-color 150ms ease',
+        transition:      'background-color var(--duration-fast) ease',
       }}
     />
   )
@@ -174,7 +174,7 @@ export function JumpTimestampGutter({
         display:    'flex',
         flexDirection: 'row',
         alignItems: 'flex-start',
-        gap:        6,
+        gap:        'var(--space-1-5)',
         flexShrink: 0,
       }}
     >
@@ -186,8 +186,8 @@ export function JumpTimestampGutter({
             alignItems:     'center',
             justifyContent: 'center',
             height:         scrollH,
-            paddingTop:     5,
-            paddingBottom:  5,
+            paddingTop:     'var(--space-1)',
+            paddingBottom:  'var(--space-1)',
             boxSizing:      'border-box',
           }}
         >
@@ -211,7 +211,7 @@ export function JumpTimestampGutter({
           gap:            step.gap,
           width:          step.hoverW,
           flexShrink:     0,
-          padding:        '5px 0',
+          padding:        'var(--space-1) 0',
           overflowY:      scrollable ? 'auto'    : 'visible',
           maxHeight:      scrollable ? scrollH   : undefined,
           scrollbarWidth: 'none',

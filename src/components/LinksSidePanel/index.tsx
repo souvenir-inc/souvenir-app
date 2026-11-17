@@ -47,8 +47,8 @@ export function LinksSidePanel({
           isolation:       'isolate',
           display:         'flex',
           flexDirection:   'column',
-          padding:         '20px 22px',
-          borderRadius:    16,
+          padding:         'var(--space-5) var(--space-5)',
+          borderRadius:    'var(--radius-2xl)',
           backgroundColor: 'var(--neutral-white)',
           boxShadow:       'var(--shadow-surface-card)',
           minWidth:        0,
@@ -57,8 +57,8 @@ export function LinksSidePanel({
         }}
         {...props}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
             <Eyebrow>{label}</Eyebrow>
             <span
               style={{
@@ -67,7 +67,7 @@ export function LinksSidePanel({
                 justifyContent:  'center',
                 minWidth:        18,
                 height:          18,
-                padding:         '0 6px',
+                padding:         '0 var(--space-1-5)',
                 borderRadius:    99,
                 backgroundColor: 'var(--neutral-100)',
                 color:           'var(--neutral-700)',
@@ -93,11 +93,11 @@ export function LinksSidePanel({
             style={{
               display:             'flex',
               flexDirection:       'column',
-              gap:                 8,
+              gap:                 'var(--space-2)',
               overflowY:           'auto',
               overscrollBehaviorY: 'contain',
               minHeight:           0,
-              padding:             '4px 4px',
+              padding:             'var(--space-1) var(--space-1)',
               margin:              '-4px -4px',
             }}
           >

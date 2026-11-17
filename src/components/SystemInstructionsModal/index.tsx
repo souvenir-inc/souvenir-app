@@ -82,7 +82,7 @@ export function SystemInstructionsModal({
           width:        560,
           minHeight:    580,
           maxHeight:    'calc(100vh - 64px)',
-          borderRadius: 20,
+          borderRadius: 'var(--radius-2xl)',
           boxShadow:    '0px 8px 32px 0px rgba(26,23,20,0.24), 0px 0px 0px 1px rgba(59,54,50,0.12)',
         }}
       >

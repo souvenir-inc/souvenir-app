@@ -34,9 +34,9 @@ function ScheduleCardSkeleton({ delay }: { delay: number }) {
       display:       'flex',
       flexDirection: 'column',
       height:        240,
-      padding:       20,
+      padding:       'var(--space-5)',
       boxSizing:     'border-box',
-      borderRadius:  12,
+      borderRadius:  'var(--radius-xl)',
       boxShadow:     CARD_SHADOW,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 20, flexShrink: 0 }}>
@@ -52,11 +52,11 @@ function ScheduleCardSkeleton({ delay }: { delay: number }) {
       <div style={{ flex: '1 1 auto', minHeight: 12 }} />
       <div style={{ height: 1, width: '100%', backgroundColor: 'var(--divider-color)', flexShrink: 0 }} />
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4, height: 18, marginTop: 10, flexShrink: 0 }}>
-        <div className="kaya-skeleton" style={{ ...fade, width: 14, height: 14, borderRadius: 4 }} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', height: 18, marginTop: 'var(--space-2-5)', flexShrink: 0 }}>
+        <div className="kaya-skeleton" style={{ ...fade, width: 14, height: 14, borderRadius: 'var(--radius-xs)' }} />
         <div className="kaya-skeleton" style={{ ...fade, width: 230, height: 13 }} />
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, height: 20, marginTop: 4, flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', height: 20, marginTop: 'var(--space-1)', flexShrink: 0 }}>
         <Pill w={52} fade={fade} />
         <Pill w={88} fade={fade} />
       </div>
@@ -68,21 +68,21 @@ function ScheduleCardSkeleton({ delay }: { delay: number }) {
 // schedule" on the right, a 240px Mine/Organization tab bar, then the 2-col grid.
 export function SchedulesLoadingState() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, padding: '32px 0', width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', padding: 'var(--space-7) 0', width: '100%' }}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <div style={{ flex: '1 0 0' }}>
           <Line lh={32} h={24} w={112} />
           <Line lh={22} h={14} w={262} mt={4} />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
           <Pill w={32} h={32} r={8} />
           <Pill w={128} h={32} r={8} />
         </div>
       </div>
 
-      <div className="kaya-skeleton" style={{ width: 240, height: 32, borderRadius: 8 }} />
+      <div className="kaya-skeleton" style={{ width: 240, height: 32, borderRadius: 'var(--radius-md)' }} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-6)' }}>
         {Array.from({ length: 4 }).map((_, i) => (
           <ScheduleCardSkeleton key={i} delay={i} />
         ))}
@@ -101,19 +101,19 @@ function SectionTitle({ w }: { w: number }) {
 // (36 + 10 + 20) / next-run tile / [what it does + run history | details 280px].
 export function ScheduleDetailLoadingState() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, padding: '24px 0 32px', width: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', padding: 'var(--space-6) 0 var(--space-7)', width: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
         <Pill w={104} h={32} r={8} />
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
           <Pill w={32} h={32} r={8} />
           <Pill w={32} h={32} r={8} />
           <Pill w={96} h={32} r={8} />
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
         <Line lh={36} h={28} w={380} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, height: 22 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', height: 22 }}>
           <Pill w={52} />
           <Pill w={52} />
           <Pill w={88} />
@@ -122,17 +122,17 @@ export function ScheduleDetailLoadingState() {
       </div>
 
       {/* Next-run tile: padding 14/16 + label 16 + gap 4 + value 22 */}
-      <div style={{ ...BORDERED, height: 72, boxSizing: 'border-box', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <div style={{ ...BORDERED, height: 72, boxSizing: 'border-box', padding: 'var(--space-3) var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
         <Line lh={16} h={11} w={64} />
         <Line lh={22} h={14} w={150} />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 280px', gap: 24, alignItems: 'start' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, minWidth: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 280px', gap: 'var(--space-6)', alignItems: 'start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', minWidth: 0 }}>
           {/* What it does: title + card with 3 body lines (22 each) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             <SectionTitle w={104} />
-            <div style={{ ...BORDERED, padding: 16, boxSizing: 'border-box' }}>
+            <div style={{ ...BORDERED, padding: 'var(--space-4)', boxSizing: 'border-box' }}>
               <Line lh={22} h={14} w="100%" />
               <Line lh={22} h={14} w="94%" />
               <Line lh={22} h={14} w="58%" />
@@ -140,20 +140,20 @@ export function ScheduleDetailLoadingState() {
           </div>
 
           {/* Run history: title + run cards (padding 14/16 around a 22px header) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             <SectionTitle w={96} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
               {[0, 1, 2].map(i => (
                 <div key={i} style={{
                   height:          50,
                   boxSizing:       'border-box',
-                  padding:         '14px 16px',
-                  borderRadius:    12,
+                  padding:         'var(--space-3) var(--space-4)',
+                  borderRadius:    'var(--radius-xl)',
                   boxShadow:       CARD_SHADOW,
                   backgroundColor: 'var(--card-bg)',
                   display:         'flex',
                   alignItems:      'center',
-                  gap:             8,
+                  gap:             'var(--space-2)',
                   opacity:         1 - i * 0.15,
                 }}>
                   <div className="kaya-skeleton" style={{ width: 14, height: 14, borderRadius: '50%' }} />
@@ -166,15 +166,15 @@ export function ScheduleDetailLoadingState() {
         </div>
 
         {/* Details: title + card of 4 rows (padding 12 + 22 line, 1px dividers) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', minWidth: 0 }}>
           <SectionTitle w={56} />
-          <div style={{ ...BORDERED, padding: '4px 16px', boxSizing: 'border-box' }}>
+          <div style={{ ...BORDERED, padding: 'var(--space-1) var(--space-4)', boxSizing: 'border-box' }}>
             {[[56, 70], [64, 150], [52, 100], [76, 84]].map(([label, value], i) => (
               <div key={i} style={{
                 display:        'flex',
                 justifyContent: 'space-between',
                 alignItems:     'center',
-                gap:            16,
+                gap:            'var(--space-4)',
                 height:         i === 0 ? 46 : 47,
                 boxSizing:      'border-box',
                 borderTop:      i === 0 ? 'none' : '1px solid var(--border-default)',
@@ -194,12 +194,12 @@ export function ScheduleDetailLoadingState() {
 // draws, so the swap to the real page doesn't shift anything.
 export function SchedulesRouteLoading({ detail = false }: { detail?: boolean }) {
   return (
-    <div style={{ position: 'relative', flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', backgroundColor: 'var(--neutral-50)', padding: '10px 10px 10px 0' }}>
+    <div style={{ position: 'relative', flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', backgroundColor: 'var(--neutral-50)', padding: 'var(--space-2-5) var(--space-2-5) var(--space-2-5) 0' }}>
       <div style={{ position: 'relative', flex: '1 0 0', minHeight: 0, display: 'flex', flexDirection: 'column', borderRadius: 'var(--layout-radius)', border: '1px solid var(--border-default)', backgroundColor: 'var(--color-surface-glass)', overflow: 'hidden' }}>
         <div
           role="status"
           aria-label={detail ? 'Loading schedule' : 'Loading schedules'}
-          style={{ maxWidth: 991, width: '100%', margin: '0 auto', paddingLeft: 28, paddingRight: 28, boxSizing: 'border-box' }}
+          style={{ maxWidth: 991, width: '100%', margin: '0 auto', paddingLeft: 'var(--space-6)', paddingRight: 'var(--space-6)', boxSizing: 'border-box' }}
         >
           {detail ? <ScheduleDetailLoadingState /> : <SchedulesLoadingState />}
         </div>
