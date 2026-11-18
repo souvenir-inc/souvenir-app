@@ -53,6 +53,7 @@ export function Textarea({
   value,
   defaultValue,
   onChange,
+  id,
   ref,
   ...props
 }: TextareaProps) {
@@ -82,8 +83,11 @@ export function Textarea({
     resize()
   }, [value, resize])
 
+  // The id goes on Control, which renders it onto the textarea and registers it with
+  // the Field's label; set on the textarea alone, label and field disagreed.
   const control = (
     <FieldPrimitive.Control
+      id={id}
       render={
         <textarea
           ref={setRefs}

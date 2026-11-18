@@ -100,12 +100,15 @@ export function DialogContent({ size = 'md', hideClose = false, bare = false, ov
   const { capture, handleCloseAutoFocus } = useFocusReturn(onCloseAutoFocus)
   return (
     <DialogPrimitive.Portal>
-      {overlay && (
-        <DialogPrimitive.Overlay
-          className={styles.overlay}
-          style={{ position: 'fixed', inset: 0, zIndex: DIALOG_Z - 1, background: 'var(--overlay-bg)', backdropFilter: 'blur(2px)' }}
-        />
-      )}
+      {/* Always rendered: Radix locks background scrolling from the overlay. overlay={false}
+          only makes it invisible, for content that paints its own backdrop. */}
+      <DialogPrimitive.Overlay
+        className={overlay ? styles.overlay : undefined}
+        style={{
+          position: 'fixed', inset: 0, zIndex: DIALOG_Z - 1,
+          ...(overlay ? { background: 'var(--overlay-bg)', backdropFilter: 'blur(2px)' } : { background: 'transparent' }),
+        }}
+      />
       <DialogPrimitive.Content
         className={bare ? className : cn(styles.content, className)}
         style={bare ? { zIndex: DIALOG_Z, outline: 'none', ...style } : {
