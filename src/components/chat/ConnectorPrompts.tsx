@@ -74,6 +74,10 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
 
   // The app may already be connected (from Connectors, or another tab) by the time this card shows.
   useEffect(() => {
+    // Cleared on every mount, not only the first: StrictMode (and anything else that
+    // re-runs effects) mounts again with the same refs after the cleanup below set it,
+    // and a card left "aborted" never answers its turn or shows a failed sign-in.
+    abortedRef.current = false
     getConnector(prompt.connector.slug)
       .then((entry) => {
         if (entry.ownedConnections.some((row) => row.connected && !row.needsReconnect)) void finish()

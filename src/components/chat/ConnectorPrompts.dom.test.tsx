@@ -44,6 +44,20 @@ afterEach(() => {
   container.remove()
 })
 
+describe('ConnectPromptCard under StrictMode', () => {
+  // StrictMode (on in dev) mounts, cleans up and mounts again with the same refs. The
+  // cleanup marks the card aborted; if the second mount does not clear that, the card
+  // never answers its turn, even for an app that is already connected.
+  it('still answers an already-connected app after the double mount', async () => {
+    respondToChatPrompt.mockResolvedValue(undefined)
+    const onConnected = vi.fn()
+    await act(async () => root.render(<React.StrictMode><ConnectPromptCard prompt={prompt} onConnected={onConnected} /></React.StrictMode>))
+    await flush()
+    expect(respondToChatPrompt).toHaveBeenCalledTimes(1)
+    expect(onConnected).toHaveBeenCalledTimes(1)
+  })
+})
+
 describe('ConnectPromptCard when the answer does not reach the backend', () => {
   it('does not report connected, shows the error, and offers a retry', async () => {
     respondToChatPrompt.mockRejectedValueOnce(new Error('Network error'))
