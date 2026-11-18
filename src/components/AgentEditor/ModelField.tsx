@@ -53,8 +53,8 @@ export function ModelField({ modelId, models, loading, onChange, disabled = fals
   })()
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minHeight: 24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', minHeight: 24 }}>
         <p style={LABEL_STYLE}>Model</p>
         {!modelId && <Badge label="Required" color="Red" />}
       </div>
@@ -80,7 +80,7 @@ export function ModelField({ modelId, models, loading, onChange, disabled = fals
         onClick={() => setOpen(true)}
       >
         {/* The gap lives on the label: padding on the icon would overflow its fixed-size slot and clip the logo. */}
-        <span style={{ paddingLeft: 8 }}>
+        <span style={{ paddingLeft: 'var(--space-2)' }}>
           {selected?.modelName ?? (modelId && !loading ? 'Unavailable model' : modelId ? 'Loading…' : 'Select model')}
         </span>
       </Button>

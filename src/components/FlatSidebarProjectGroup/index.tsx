@@ -104,7 +104,7 @@ export const FlatSidebarProjectGroup = React.forwardRef<HTMLDivElement, FlatSide
     }
 
     return (
-      <div ref={ref} className={cn(className)} style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }} {...props}>
+      <div ref={ref} className={cn(className)} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', width: '100%' }} {...props}>
         {/* Not itself a role="button" any more — it used to wrap the toggle
             button, the icon, and up to 3 more role="button" spans (new chat /
             open / add) all as nested interactive descendants of one outer
@@ -125,19 +125,19 @@ export const FlatSidebarProjectGroup = React.forwardRef<HTMLDivElement, FlatSide
             display:         'flex',
             alignItems:      'center',
             justifyContent:  'space-between',
-            gap:             8,
+            gap:             'var(--space-2)',
             width:           '100%',
             height:          32,
-            padding:         '0 8px',
-            borderRadius:    10,
+            padding:         '0 var(--space-2)',
+            borderRadius:    'var(--radius-lg)',
             backgroundColor: isActive ? 'var(--sidebar-menu-item-hover-bg)' : 'transparent',
             boxShadow:       isActive ? SHADOW_ITEM_HOVER : undefined,
-            transition:      'background-color 150ms, box-shadow 150ms',
+            transition:      'background-color var(--duration-fast), box-shadow var(--duration-fast)',
             userSelect:      'none',
             boxSizing:       'border-box',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: '1 0 0', minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flex: '1 0 0', minWidth: 0 }}>
             {icon !== null && (
               onIconClick ? (
                 <button
@@ -169,7 +169,7 @@ export const FlatSidebarProjectGroup = React.forwardRef<HTMLDivElement, FlatSide
             </button>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexShrink: 0 }}>
             {badge}
 
             {onNewChat && (
@@ -183,7 +183,7 @@ export const FlatSidebarProjectGroup = React.forwardRef<HTMLDivElement, FlatSide
                   style={{
                     ...RESET_BUTTON_STYLE, display: 'inline-flex', lineHeight: 0,
                     color: newChatIconHovered ? 'var(--neutral-black)' : 'var(--sidebar-icon, var(--sidebar-menu-item-text))',
-                    opacity: isActive ? 0.7 : 0, pointerEvents: isActive ? 'auto' : 'none', transition: 'opacity 150ms, color 150ms',
+                    opacity: isActive ? 0.7 : 0, pointerEvents: isActive ? 'auto' : 'none', transition: 'opacity var(--duration-fast), color var(--duration-fast)',
                   }}
                 >
                   <QuillWriteTwoIcon size={16} animated />
@@ -202,7 +202,7 @@ export const FlatSidebarProjectGroup = React.forwardRef<HTMLDivElement, FlatSide
                   style={{
                     ...RESET_BUTTON_STYLE, display: 'inline-flex', lineHeight: 0,
                     color: openIconHovered ? 'var(--neutral-black)' : 'var(--sidebar-icon, var(--sidebar-menu-item-text))',
-                    opacity: isActive ? 0.7 : 0, pointerEvents: isActive ? 'auto' : 'none', transition: 'opacity 150ms, color 150ms',
+                    opacity: isActive ? 0.7 : 0, pointerEvents: isActive ? 'auto' : 'none', transition: 'opacity var(--duration-fast), color var(--duration-fast)',
                   }}
                 >
                   <SettingsOneIcon size={16} />
@@ -215,7 +215,7 @@ export const FlatSidebarProjectGroup = React.forwardRef<HTMLDivElement, FlatSide
                 type="button"
                 aria-label={addLabel ?? `Add to ${label}`}
                 onClick={onAddClick}
-                style={{ ...RESET_BUTTON_STYLE, display: 'inline-flex', lineHeight: 0, color: 'var(--sidebar-icon, var(--sidebar-menu-item-text))', opacity: isActive ? 0.7 : 0, pointerEvents: isActive ? 'auto' : 'none', transition: 'opacity 150ms' }}
+                style={{ ...RESET_BUTTON_STYLE, display: 'inline-flex', lineHeight: 0, color: 'var(--sidebar-icon, var(--sidebar-menu-item-text))', opacity: isActive ? 0.7 : 0, pointerEvents: isActive ? 'auto' : 'none', transition: 'opacity var(--duration-fast)' }}
               >
                 <PlusSignIcon size={16} />
               </button>
@@ -233,13 +233,13 @@ export const FlatSidebarProjectGroup = React.forwardRef<HTMLDivElement, FlatSide
               variants={heightVariants}
               // 2px of room each side (taken back with a negative margin, so rows keep their place): the
               // rows' 1px hover/selected ring sits just outside them and was clipped on the right.
-              style={{ overflow, margin: '0 -2px', padding: '0 2px' }}
+              style={{ overflow, margin: '0 -2px', padding: '0 var(--space-0-5)' }}
               onAnimationStart={(def) => { if (def === 'closed') setOverflow('hidden') }}
               onAnimationComplete={(def) => { if (def === 'open') setOverflow('visible') }}
             >
               <m.div
                 variants={staggerVariants}
-                style={{ paddingLeft: icon === null ? 6 : 28, display: 'flex', flexDirection: 'column', gap: 4 }}
+                style={{ paddingLeft: icon === null ? 6 : 28, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}
               >
                 {React.Children.map(children, (child, i) => (
                   <m.div key={i} variants={itemVariants}>{child}</m.div>

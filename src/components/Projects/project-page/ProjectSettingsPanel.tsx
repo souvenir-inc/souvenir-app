@@ -18,9 +18,9 @@ import { projectMembersQuery } from '@/lib/projects/project-queries'
 // read-only details, and the actions pinned at the bottom while the blocks above scroll. Editing
 // happens in the Edit dialog (the dark Edit button), as before.
 
-const MUTED: React.CSSProperties = { fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-600)' }
-const VALUE: React.CSSProperties = { fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)', overflowWrap: 'anywhere' }
-const BLOCK: React.CSSProperties = { padding: '10px 4px' }
+const MUTED: React.CSSProperties = { fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-600)' }
+const VALUE: React.CSSProperties = { fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', overflowWrap: 'anywhere' }
+const BLOCK: React.CSSProperties = { padding: 'var(--space-2-5) var(--space-1)' }
 const DIVIDER: React.CSSProperties = { ...BLOCK, borderTop: '1px solid var(--border-default)' }
 const PREVIEW_AVATARS = 5
 
@@ -33,17 +33,17 @@ function fullDateTime(iso: string): string {
     .replace(/[  ]/g, ' ')
 }
 // Small grey field label, as above each value in File info's blocks.
-const FIELD_LABEL: React.CSSProperties = { margin: 0, fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 12, lineHeight: '16px', color: 'var(--neutral-600)' }
+const FIELD_LABEL: React.CSSProperties = { margin: 0, fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-600)' }
 
 function BlockLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: 6, fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)' }}>{children}</div>
+    <div style={{ marginBottom: 'var(--space-1-5)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)' }}>{children}</div>
   )
 }
 
 function Pair({ name, children }: { name: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '88px minmax(0, 1fr)', gap: 12, padding: '4px 0' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '88px minmax(0, 1fr)', gap: 'var(--space-3)', padding: 'var(--space-1) 0' }}>
       <dt style={MUTED}>{name}</dt>
       <dd style={{ ...VALUE, margin: 0 }}>{children}</dd>
     </div>
@@ -60,8 +60,8 @@ function MembersBlock({ project, onManage }: { project: Project; onManage: () =>
     <div style={DIVIDER}>
       <BlockLabel>Members</BlockLabel>
       {/* A card in two rows: faces left and the count right, then a full-width Manage members. */}
-      <div style={{ ...BOX_STYLE, display: 'flex', flexDirection: 'column', gap: 10, padding: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, minHeight: 28 }}>
+      <div style={{ ...BOX_STYLE, display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)', padding: 'var(--space-3)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2-5)', minHeight: 28 }}>
           {membersQ.isPending ? (
             <Skeleton height={28} width={120} radius={14} />
           ) : (
@@ -69,11 +69,11 @@ function MembersBlock({ project, onManage }: { project: Project; onManage: () =>
               {shown.map((member, i) => (
                 <Avatar key={member.userId} name={member.name || member.email || member.userId} size="sm" title={member.name ?? member.email ?? undefined} style={{ marginLeft: i === 0 ? 0 : -6, boxShadow: '0 0 0 2px var(--field-surface)' }} />
               ))}
-              {extra > 0 && <span style={{ ...MUTED, fontSize: 13, marginLeft: 6 }}>+{extra}</span>}
+              {extra > 0 && <span style={{ ...MUTED, fontSize: 'var(--font-size-body-sm)', marginLeft: 'var(--space-1-5)' }}>+{extra}</span>}
             </div>
           )}
           {!membersQ.isPending && (
-            <span style={{ ...MUTED, fontSize: 13, whiteSpace: 'nowrap' }}>{members.length} {members.length === 1 ? 'member' : 'members'}</span>
+            <span style={{ ...MUTED, fontSize: 'var(--font-size-body-sm)', whiteSpace: 'nowrap' }}>{members.length} {members.length === 1 ? 'member' : 'members'}</span>
           )}
         </div>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -110,10 +110,10 @@ export function ProjectSettingsPanel({ project, ownerName, canEdit, canLeave, ca
   // Members sub-view: a back row (as the Agents panel's details view), then the full list.
   if (view === 'members') {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', height: '100%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
           <IconButton variant="ghost" size="sm" aria-label="Back to project settings" icon={<ArrowLeftOneIcon size={20} />} onClick={() => setView('info')} />
-          <span style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)' }}>Members</span>
+          <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)' }}>Members</span>
         </div>
         <div style={{ flex: '1 1 0', minHeight: 0 }}>
           <ProjectMembersPanel projectId={project.id} ownerUserId={project.ownerUserId} canManage={canManageMembers} onAddMember={onAddMember} />
@@ -125,19 +125,19 @@ export function ProjectSettingsPanel({ project, ownerName, canEdit, canLeave, ca
   return (
     // The panel's full height: blocks scroll, Leave / Delete stay pinned at the bottom.
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div className="kaya-scrollbar kaya-no-gutter" style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', margin: '-12px -4px 0', padding: '0 4px' }}>
+      <div className="kaya-scrollbar kaya-no-gutter" style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', margin: '-12px -4px 0', padding: '0 var(--space-1)' }}>
         {/* Name, description and tags, each labelled; the Edit button at the bottom changes them. */}
         <div style={BLOCK}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)' }}>
             <span style={FIELD_LABEL}>Name</span>
           </div>
           {/* Read-only fields: the same field box as the Edit dialog, disabled (Edit changes them). */}
-          <div style={{ ...BOX_STYLE, padding: '8px 10px', marginTop: 6 }}>
+          <div style={{ ...BOX_STYLE, padding: 'var(--space-2) var(--space-2-5)', marginTop: 'var(--space-1-5)' }}>
             <input aria-label="Project name" value={project.name} disabled readOnly style={{ ...INPUT_STYLE, color: 'var(--neutral-800)', cursor: 'not-allowed' }} />
           </div>
 
-          <p style={{ ...FIELD_LABEL, margin: '12px 0 0' }}>Description</p>
-          <div style={{ ...BOX_STYLE, padding: '8px 10px', marginTop: 6 }}>
+          <p style={{ ...FIELD_LABEL, margin: 'var(--space-3) 0 0' }}>Description</p>
+          <div style={{ ...BOX_STYLE, padding: 'var(--space-2) var(--space-2-5)', marginTop: 'var(--space-1-5)' }}>
             <textarea
               aria-label="Project description"
               value={project.description}
@@ -150,13 +150,13 @@ export function ProjectSettingsPanel({ project, ownerName, canEdit, canLeave, ca
             />
           </div>
 
-          <p style={{ ...FIELD_LABEL, margin: '12px 0 0' }}>Tags</p>
+          <p style={{ ...FIELD_LABEL, margin: 'var(--space-3) 0 0' }}>Tags</p>
           {project.tags.length > 0 ? (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-1-5)', marginTop: 'var(--space-1-5)' }}>
               {project.tags.map(tag => <Badge key={tag.id} label={tag.label} color={tag.color} />)}
             </div>
           ) : (
-            <p style={{ ...MUTED, margin: '2px 0 0' }}>No tags.</p>
+            <p style={{ ...MUTED, margin: 'var(--space-0-5) 0 0' }}>No tags.</p>
           )}
         </div>
 
@@ -165,11 +165,11 @@ export function ProjectSettingsPanel({ project, ownerName, canEdit, canLeave, ca
           <dl style={{ margin: 0 }}>
             <Pair name="Access">
               {visibility?.label}
-              {visibility && <small style={{ display: 'block', fontSize: 12, lineHeight: '16px', color: 'var(--neutral-600)' }}>{visibility.description}</small>}
+              {visibility && <small style={{ display: 'block', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-600)' }}>{visibility.description}</small>}
             </Pair>
             {ownerName && <Pair name="Owner">{ownerName === 'you' ? 'You' : ownerName}</Pair>}
             <Pair name="Contents">
-              <span style={{ display: 'flex', flexWrap: 'wrap', gap: 6, paddingTop: 1 }}>
+              <span style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-1-5)', paddingTop: 'var(--space-0-5)' }}>
                 <Badge color="Neutral" label={`${chatCount} ${chatCount === 1 ? 'chat' : 'chats'}`} />
                 <Badge color="Neutral" label={`${project.files.length} ${project.files.length === 1 ? 'file' : 'files'}`} />
               </span>
@@ -185,7 +185,7 @@ export function ProjectSettingsPanel({ project, ownerName, canEdit, canLeave, ca
       {/* Actions stay pinned at the bottom; only the blocks above scroll. */}
       {/* Edit (dark, opens the Edit dialog), Leave and Delete as equal buttons. */}
       {actionCount > 0 && (
-        <div style={{ flex: 'none', padding: '12px 4px 4px', borderTop: '1px solid var(--border-default)', display: 'grid', gridTemplateColumns: `repeat(${actionCount}, 1fr)`, gap: 8 }}>
+        <div style={{ flex: 'none', padding: 'var(--space-3) var(--space-1) var(--space-1)', borderTop: '1px solid var(--border-default)', display: 'grid', gridTemplateColumns: `repeat(${actionCount}, 1fr)`, gap: 'var(--space-2)' }}>
           {canEdit && <Button variant="default" size="sm" fluid leftIcon={<PenOneIcon size={14} />} onClick={onEdit}>Edit</Button>}
           {canLeave && <Button variant="outline" size="sm" fluid leftIcon={<UnlinkOneIcon size={14} />} onClick={onLeave}>Leave</Button>}
           {canDelete && <Button variant="danger" size="sm" fluid leftIcon={<DeleteTwoIcon size={14} />} onClick={onDelete}>Delete</Button>}

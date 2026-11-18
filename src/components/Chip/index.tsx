@@ -238,7 +238,7 @@ export function Chip(
           {/* Label */}
           <span
             style={{
-              padding:    '0 2px',
+              padding:    '0 var(--space-0-5)',
               fontFamily: 'var(--font-body)',
               fontWeight: 'var(--font-weight-medium)',
               fontSize:   'var(--font-size-caption)',
@@ -303,7 +303,7 @@ export function Chip(
           position:        'relative',
           display:         'inline-flex',
           alignItems:      'center',
-          borderRadius:    '10px',
+          borderRadius:    'var(--radius-lg)',
           // Outer padding stays constant at 4 px so hovering NEVER changes the
           // chip's outer footprint - surrounding chips don't reflow, and the
           // hover state is communicated purely by the inner icon swap.
@@ -311,8 +311,8 @@ export function Chip(
           // left slot toggled 32 → 28; the two transitions ran on different
           // timings (CSS vs framer popLayout) which produced a visible
           // shrink/flicker every hover.
-          padding:         '4px',
-          gap:             '2px',
+          padding:         'var(--space-1)',
+          gap:             'var(--space-0-5)',
           // Card-like surface is **always visible** in the Medium variant -
           // structural change in Figma 925:830. Pre-revision the bg / shadow
           // only painted on hover/active; the chip now reads as a solid
@@ -352,7 +352,7 @@ export function Chip(
             width:          28,
             height:         28,
             flexShrink:     0,
-            borderRadius:   8,
+            borderRadius:   'var(--radius-md)',
           }}
         >
           {/* Rest state: persona image or icon */}
@@ -374,7 +374,7 @@ export function Chip(
             }}
           >
             {personaAvatar ? personaAvatar : personaImage && !imageError
-              ? <Image src={personaImage} alt="" width={24} height={24} unoptimized style={{ borderRadius: '6px', display: 'block' }} onError={() => setImageError(true)} />
+              ? <Image src={personaImage} alt="" width={24} height={24} unoptimized style={{ borderRadius: 'var(--radius-sm)', display: 'block' }} onError={() => setImageError(true)} />
               : personaImage
                 ? <UserAiIcon size={20} color="var(--chip-text)" animated />
                 : (icon ?? <LogoIcon size={20} color="var(--chip-text)" />)
@@ -410,7 +410,7 @@ export function Chip(
         {/* ── Label ── label padding is constant `0 2px` so the text never
             shifts horizontally between rest/hover. ── */}
         {!hideLabel && (
-          <div style={{ paddingLeft: '2px', paddingRight: '2px', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}>
+          <div style={{ paddingLeft: 'var(--space-0-5)', paddingRight: 'var(--space-0-5)', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}>
             <span style={{
               fontFamily: 'var(--font-body)',
               fontWeight: 'var(--font-weight-medium)',
@@ -443,7 +443,7 @@ export function Chip(
               width:          28,
               height:         28,
               flexShrink:     0,
-              borderRadius:   8,
+              borderRadius:   'var(--radius-md)',
             }}
           >
             <ChipButton
@@ -467,7 +467,7 @@ export function Chip(
               width:          28,
               height:         28,
               flexShrink:     0,
-              borderRadius:   8,
+              borderRadius:   'var(--radius-md)',
             }}
           >
             {effectiveActive ? (

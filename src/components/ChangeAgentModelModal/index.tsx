@@ -124,7 +124,7 @@ export function ChangeAgentModelModal({
         onSelect={setPickedId}
       />
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8, padding: '16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-4)' }}>
         <Button variant="cancel" onClick={handleClose} disabled={saving}>
           Cancel
         </Button>

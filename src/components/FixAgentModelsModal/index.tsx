@@ -207,7 +207,7 @@ export function FixAgentModelsModal({ open, onClose, agents, onSaved }: FixAgent
           onSelect={(modelId) => applyPick(target, modelId)}
         />
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: 'var(--space-4)' }}>
           <Button variant="ghost" onClick={() => setView({ kind: 'list' })}>
             Back
           </Button>
@@ -231,7 +231,7 @@ export function FixAgentModelsModal({ open, onClose, agents, onSaved }: FixAgent
       />
 
       {/* Bulk actions */}
-      <div style={{ display: 'flex', gap: 8, padding: '16px 16px 0', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-2)', padding: 'var(--space-4) var(--space-4) 0', flexWrap: 'wrap' }}>
         <Button
           variant="secondary"
           size="sm"
@@ -258,16 +258,16 @@ export function FixAgentModelsModal({ open, onClose, agents, onSaved }: FixAgent
         style={{
           display:             'flex',
           flexDirection:       'column',
-          gap:                 4,
-          margin:              '12px 16px 0',
-          padding:             2,
+          gap:                 'var(--space-1)',
+          margin:              'var(--space-3) var(--space-4) 0',
+          padding:             'var(--space-0-5)',
           maxHeight:           360,
           overflowY:           'auto',
           overscrollBehaviorY: 'contain',
         }}
       >
         {agents.length === 0 ? (
-          <p style={{ margin: '20px 0', textAlign: 'center', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-400)' }}>
+          <p style={{ margin: 'var(--space-5) 0', textAlign: 'center', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-400)' }}>
             Every agent has a working model.
           </p>
         ) : (
@@ -285,13 +285,13 @@ export function FixAgentModelsModal({ open, onClose, agents, onSaved }: FixAgent
       </div>
 
       {/* Footer */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, padding: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-4)' }}>
         <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-400)' }}>
           {pending.length
             ? `${pending.length} of ${agents.length} ready`
             : 'No replacements picked yet'}
         </span>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
           <Button variant="cancel" onClick={handleClose} disabled={saving}>
             Cancel
           </Button>
@@ -326,14 +326,14 @@ function AgentRow({ agent, chosenModelName, failed, disabled, onPick }: {
       style={{
         display:         'flex',
         alignItems:      'center',
-        gap:             10,
-        padding:         '8px 10px',
-        borderRadius:    10,
+        gap:             'var(--space-2-5)',
+        padding:         'var(--space-2) var(--space-2-5)',
+        borderRadius:    'var(--radius-lg)',
         border:          `1px solid ${failed ? 'var(--color-tag-Red-text)' : 'var(--neutral-100)'}`,
         backgroundColor: 'var(--neutral-white)',
       }}
     >
-      <div aria-hidden style={{ width: 32, height: 32, borderRadius: 8, overflow: 'hidden', flexShrink: 0 }}>
+      <div aria-hidden style={{ width: 32, height: 32, borderRadius: 'var(--radius-md)', overflow: 'hidden', flexShrink: 0 }}>
         {/* eslint-disable-next-line @next/next/no-img-element -- dynamic avatar URL, onError fallback requires HTMLImageElement access */}
         <img
           src={src}
@@ -344,12 +344,12 @@ function AgentRow({ agent, chosenModelName, failed, disabled, onPick }: {
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)' }}>
           <Tooltip content={agent.name} maxWidth={280}><span
             style={{
               fontFamily:   'var(--font-body)',
               fontSize:     'var(--font-size-body)',
-              lineHeight:   '20px',
+              lineHeight:   'var(--line-height-body-sm)',
               color:        'var(--neutral-950)',
               overflow:     'hidden',
               textOverflow: 'ellipsis',
@@ -365,7 +365,7 @@ function AgentRow({ agent, chosenModelName, failed, disabled, onPick }: {
         </div>
         <p
           style={{
-            margin:       '2px 0 0',
+            margin:       'var(--space-0-5) 0 0',
             fontFamily:   'var(--font-body)',
             fontSize:     'var(--font-size-caption)',
             lineHeight:   'var(--line-height-caption)',

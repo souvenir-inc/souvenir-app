@@ -197,11 +197,11 @@ export function NotificationBell({ open, onOpenChange }: NotificationBellProps) 
             <span
               ref={badgeScope}
               style={{
-                minWidth: 14, height: 14, padding: '0 3px', boxSizing: 'border-box',
-                borderRadius: 9999, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+                minWidth: 14, height: 14, padding: '0 var(--space-0-5)', boxSizing: 'border-box',
+                borderRadius: 'var(--radius-full)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
                 backgroundColor: 'var(--red-500)', color: 'var(--static-white)',
                 boxShadow: '0 0 0 2px var(--neutral-50)',
-                fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 9, lineHeight: '14px',
+                fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', lineHeight: '14px',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >

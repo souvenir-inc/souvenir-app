@@ -53,8 +53,8 @@ export function ProjectChatEmptyRow() {
       style={{
         display:         'flex',
         alignItems:      'center',
-        padding:         '12px 16px',
-        borderRadius:    '12px',
+        padding:         'var(--space-3) var(--space-4)',
+        borderRadius:    'var(--radius-xl)',
         border:          '1px dashed var(--neutral-300)',
         backgroundColor: 'var(--neutral-50)',
         width:           '100%',
@@ -65,8 +65,8 @@ export function ProjectChatEmptyRow() {
         style={{
           fontFamily:   'var(--font-body)',
           fontWeight:   'var(--font-weight-regular)',
-          fontSize:     '14px',
-          lineHeight:   '22px',
+          fontSize:     'var(--font-size-body)',
+          lineHeight:   'var(--line-height-body)',
           color:        'var(--neutral-500)',
           margin:       0,
           overflow:     'hidden',
@@ -173,13 +173,13 @@ export function ProjectChatRow(
         style={{
           display:         'flex',
           alignItems:      'center',
-          gap:             '8px',
-          padding:         '12px 16px',
-          borderRadius:    '12px',
+          gap:             'var(--space-2)',
+          padding:         'var(--space-3) var(--space-4)',
+          borderRadius:    'var(--radius-xl)',
           backgroundColor,
           boxShadow,
           outline,
-          transition:      'background-color 120ms ease, box-shadow 120ms ease',
+          transition:      'background-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease',
           width:           '100%',
           boxSizing:       'border-box',
         }}
@@ -207,8 +207,8 @@ export function ProjectChatRow(
               style={{
                 fontFamily:      'var(--font-body)',
                 fontWeight:      'var(--font-weight-medium)',
-                fontSize:        '15px',
-                lineHeight:      '22px',
+                fontSize:        'var(--font-size-body)',
+                lineHeight:      'var(--line-height-body)',
                 color:           'var(--legacy-1a1714)',
                 border:          'none',
                 outline:         'none',
@@ -222,8 +222,8 @@ export function ProjectChatRow(
               style={{
                 fontFamily:   'var(--font-body)',
                 fontWeight:   'var(--font-weight-regular)',
-                fontSize: '12px',
-                lineHeight:   '16px',
+                fontSize: 'var(--font-size-small)',
+                lineHeight:   'var(--line-height-small)',
                 color:        'var(--neutral-600)',
                 overflow:     'hidden',
                 textOverflow: 'ellipsis',
@@ -240,13 +240,13 @@ export function ProjectChatRow(
             onClick={() => onChatClick?.()}
             style={{ ...RESET_BUTTON_STYLE, flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', cursor: 'pointer' }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', minWidth: 0, overflow: 'hidden' }}>
               <p
                 style={{
                   fontFamily:   'var(--font-body)',
                   fontWeight:   'var(--font-weight-medium)',
-                  fontSize:     '15px',
-                  lineHeight:   '22px',
+                  fontSize:     'var(--font-size-body)',
+                  lineHeight:   'var(--line-height-body)',
                   color:        'var(--legacy-1a1714)',
                   overflow:     'hidden',
                   textOverflow: 'ellipsis',
@@ -263,8 +263,8 @@ export function ProjectChatRow(
               style={{
                 fontFamily:   'var(--font-body)',
                 fontWeight:   'var(--font-weight-regular)',
-                fontSize: '12px',
-                lineHeight:   '16px',
+                fontSize: 'var(--font-size-small)',
+                lineHeight:   'var(--line-height-small)',
                 color:        'var(--neutral-600)',
                 overflow:     'hidden',
                 textOverflow: 'ellipsis',
@@ -279,20 +279,20 @@ export function ProjectChatRow(
 
         {/* Publish confirmation — replaces ⋮/pins while confirming */}
         {!isEditing && isConfirming && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0 }}>
 
             <span
               style={{
                 display:         'inline-flex',
                 alignItems:      'center',
-                padding:         '2px 4px',
-                borderRadius:    6,
+                padding:         'var(--space-0-5) var(--space-1)',
+                borderRadius:    'var(--radius-sm)',
                 backgroundColor: 'var(--blue-100)',
                 boxShadow:       '0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px rgba(13,110,178,0.5)',
                 fontFamily:      'var(--font-body)',
-                fontWeight:      500,
-                fontSize:        11,
-                lineHeight:      '16px',
+                fontWeight:      'var(--font-weight-medium)',
+                fontSize:        'var(--font-size-caption)',
+                lineHeight:      'var(--line-height-small)',
                 color:           'var(--blue-700)',
                 whiteSpace:      'nowrap',
                 flexShrink:      0,
@@ -330,7 +330,7 @@ export function ProjectChatRow(
               display:    'flex',
               alignItems: 'center',
               opacity:    showMoreMenu ? 1 : 0,
-              transition: 'opacity 120ms ease',
+              transition: 'opacity var(--duration-fast) ease',
               flexShrink: 0,
             }}
           >
@@ -419,19 +419,19 @@ export function ProjectChatRow(
             display:        'inline-flex',
             alignItems:     'center',
             justifyContent: 'center',
-            gap:            '4px',
+            gap:            'var(--space-1)',
             border:         'none',
             background:     'transparent',
-            padding:        '6px 8px',
+            padding:        'var(--space-1-5) var(--space-2)',
             flexShrink:     0,
-            borderRadius:   '8px',
+            borderRadius:   'var(--radius-md)',
             cursor:         hasPins ? 'pointer' : 'default',
             width:          !hasPins ? '78px' : undefined,
             overflow:       'hidden',
             boxShadow:      (showPinAction && hasPins)
               ? '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4)'
               : '0px 0px 0px 1px rgba(59,54,50,0.3)',
-            transition:     'box-shadow 120ms ease',
+            transition:     'box-shadow var(--duration-fast) ease',
           }}
         >
           {/* Warm fill on hover/active when there are pins */}
@@ -443,7 +443,7 @@ export function ProjectChatRow(
                 inset:         0,
                 background:    'color-mix(in srgb, var(--neutral-100) 60%, transparent)',
                 pointerEvents: 'none',
-                borderRadius:  '8px',
+                borderRadius:  'var(--radius-md)',
               }}
             />
           )}
@@ -458,8 +458,8 @@ export function ProjectChatRow(
                 style={{
                   fontFamily: 'var(--font-body)',
                   fontWeight: 'var(--font-weight-medium)',
-                  fontSize:   '13px',
-                  lineHeight: '20px',
+                  fontSize:   'var(--font-size-body-sm)',
+                  lineHeight: 'var(--line-height-body-sm)',
                   color:      'var(--neutral-700)',
                   whiteSpace: 'nowrap',
                   position:   'relative',
@@ -473,8 +473,8 @@ export function ProjectChatRow(
               style={{
                 fontFamily: 'var(--font-body)',
                 fontWeight: 'var(--font-weight-medium)',
-                fontSize:   '13px',
-                lineHeight: '20px',
+                fontSize:   'var(--font-size-body-sm)',
+                lineHeight: 'var(--line-height-body-sm)',
                 color:      'var(--neutral-500)',
                 whiteSpace: 'nowrap',
               }}
@@ -491,7 +491,7 @@ export function ProjectChatRow(
                 position:      'absolute',
                 inset:         0,
                 pointerEvents: 'none',
-                borderRadius:  '8px',
+                borderRadius:  'var(--radius-md)',
                 boxShadow:     'inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 61%, transparent), inset 0px -1px 0px 0px rgba(106,98,93,0.05)',
               }}
             />

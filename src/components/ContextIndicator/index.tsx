@@ -74,12 +74,12 @@ export const ContextIndicator = React.forwardRef<HTMLButtonElement, ContextIndic
         style={{
           display:         'inline-flex',
           alignItems:      'center',
-          gap:             5,
-          paddingLeft:     8,
-          paddingRight:    8,
-          paddingTop:      4,
-          paddingBottom:   4,
-          borderRadius:    8,
+          gap:             'var(--space-1)',
+          paddingLeft:     'var(--space-2)',
+          paddingRight:    'var(--space-2)',
+          paddingTop:      'var(--space-1)',
+          paddingBottom:   'var(--space-1)',
+          borderRadius:    'var(--radius-md)',
           border:          'none',
           backgroundColor: cfg.bg,
           cursor:          locked ? 'not-allowed' : isClickable ? 'pointer' : 'default',
@@ -92,7 +92,7 @@ export const ContextIndicator = React.forwardRef<HTMLButtonElement, ContextIndic
           whiteSpace:      'nowrap',
           flexShrink:      0,
           outline:         'none',
-          transition:      'opacity 150ms ease',
+          transition:      'opacity var(--duration-fast) ease',
           ...style,
         }}
         {...props}

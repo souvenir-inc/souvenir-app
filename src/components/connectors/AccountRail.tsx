@@ -23,7 +23,7 @@ export function AccountName({ account, onChanged }: { account: ConnectorConnecti
   const [focused, setFocused] = useState(false)
   const skipBlurRef = useRef(false)
   const inputRef = useRef<HTMLInputElement>(null)
-  const style: React.CSSProperties = { ...text, fontSize: 18, lineHeight: '26px', fontWeight: 600 }
+  const style: React.CSSProperties = { ...text, fontSize: 'var(--font-size-heading-sm)', lineHeight: '26px', fontWeight: 'var(--font-weight-semibold)' }
 
   if (!account.canManage) return <h1 style={style}>{account.nickname}</h1>
 
@@ -68,7 +68,7 @@ export function AccountName({ account, onChanged }: { account: ConnectorConnecti
           maxWidth: '100%',
           overflow: 'hidden',
           borderBottom: `1px ${focused ? 'solid' : 'dashed'} ${focused ? 'var(--neutral-500)' : hovered && !saving ? 'var(--neutral-300)' : 'transparent'}`,
-          transition: 'border-color 120ms ease',
+          transition: 'border-color var(--duration-fast) ease',
         }}
       >
         <span aria-hidden style={{ ...field, visibility: 'hidden' }}>{label || ' '}</span>
@@ -104,7 +104,7 @@ export function AccountName({ account, onChanged }: { account: ConnectorConnecti
         />
       </span>
       {!focused && (
-        <span aria-hidden style={{ display: 'grid', placeItems: 'center', color: hovered ? 'var(--neutral-700)' : 'var(--neutral-400)', transition: 'color 120ms ease' }}>
+        <span aria-hidden style={{ display: 'grid', placeItems: 'center', color: hovered ? 'var(--neutral-700)' : 'var(--neutral-400)', transition: 'color var(--duration-fast) ease' }}>
           <PenOneIcon size={14} />
         </span>
       )}
@@ -159,7 +159,7 @@ export function AccountRail({
 
       <RailSection title="Access">
         <label style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: SPACE.lg, cursor: owned ? 'pointer' : 'default' }}>
-          <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <span style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)' }}>
             <span style={text}>Share with workspace</span>
             <span style={secondary}>
               {owned

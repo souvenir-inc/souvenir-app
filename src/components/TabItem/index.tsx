@@ -138,7 +138,7 @@ export function TabItem(
               flexShrink: 0,
               lineHeight: 0,
               color:      textColor,
-              transition: 'color 150ms',
+              transition: 'color var(--duration-fast)',
             }}
           >
             {icon}
@@ -161,7 +161,7 @@ export function TabItem(
                 flexShrink:     0,
                 width:          isSelected ? (reservedLabelWidth ?? 'auto') : 0,
                 opacity:        isSelected ? 1 : 0,
-                transition:     'opacity 200ms ease',
+                transition:     'opacity var(--duration-base) ease',
               }}
             >
               <span
@@ -172,10 +172,10 @@ export function TabItem(
                   lineHeight: isSmall ? 'var(--line-height-caption)' : 'var(--line-height-body)',
                   color:      textColor,
                   whiteSpace: 'nowrap',
-                  padding:    '0 2px',
+                  padding:    '0 var(--space-0-5)',
                   // Slides in with the pill; clipped by the slot when inactive.
                   transform:  isSelected ? 'translateX(0)' : 'translateX(-4px)',
-                  transition: 'color 150ms, transform 200ms ease',
+                  transition: 'color var(--duration-fast), transform var(--duration-base) ease',
                 }}
               >
                 {children}
@@ -192,8 +192,8 @@ export function TabItem(
                 color:      textColor,
                 whiteSpace: 'nowrap',
                 flexShrink: 0,
-                padding:    '0 2px',
-                transition: 'color 150ms',
+                padding:    '0 var(--space-0-5)',
+                transition: 'color var(--duration-fast)',
               }}
             >
               {children}
@@ -236,7 +236,7 @@ function TabCount({ count, active, small }: { count: number | string; active: bo
           height:             size,
           padding:            small ? '0 4px' : '0 5px',
           boxSizing:          'border-box',
-          borderRadius:       999,
+          borderRadius:       'var(--radius-full)',
           fontFamily:         'var(--font-body)',
           fontSize:           small ? 10 : 12,
           fontWeight:         small ? 500 : 600,
@@ -244,7 +244,7 @@ function TabCount({ count, active, small }: { count: number | string; active: bo
           fontVariantNumeric: 'tabular-nums',
           backgroundColor:    dark ? 'var(--neutral-900)' : 'var(--neutral-200)',
           color:              dark ? 'var(--neutral-50)' : 'var(--neutral-600)',
-          transition:         'background-color 150ms, color 150ms',
+          transition:         'background-color var(--duration-fast), color var(--duration-fast)',
         }}
       >
         {count}

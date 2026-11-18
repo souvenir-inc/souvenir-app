@@ -1,7 +1,7 @@
 /* A note's own markdown, read inside a list row: headings at body scale, nothing wider than the row. */
 .note {
-  font-size: 14px;
-  line-height: 22px;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-700);
   overflow-wrap: anywhere;
 }
@@ -11,11 +11,11 @@
 .note h3,
 .note h4 {
   font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 22px;
-  font-weight: 600;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  font-weight: var(--font-weight-semibold);
   color: var(--neutral-900);
-  margin: 14px 0 4px;
+  margin: var(--space-3) 0 var(--space-1);
 }
 
 .note > :first-child,

@@ -169,11 +169,11 @@ export const RoleBadge = React.forwardRef<HTMLSpanElement | HTMLButtonElement, R
             justifyContent:  'center',
             width:           showLabel ? 'auto' : '100%',
             height:          '100%',
-            padding:         '2px',
-            borderRadius:    '6px',
+            padding:         'var(--space-0-5)',
+            borderRadius:    'var(--radius-sm)',
             backgroundColor: tokens.bg,
             boxShadow:       tokens.shadow,
-            gap:             '1px',
+            gap:             'var(--space-0-5)',
             color:           tokens.text,
           }}
         >
@@ -186,8 +186,8 @@ export const RoleBadge = React.forwardRef<HTMLSpanElement | HTMLButtonElement, R
               width:          '16px',
               height:         '16px',
               flexShrink:     0,
-              padding:        '1px',
-              borderRadius:   '4px',
+              padding:        'var(--space-0-5)',
+              borderRadius:   'var(--radius-xs)',
               overflow:       'clip',
             }}
           >
@@ -197,10 +197,10 @@ export const RoleBadge = React.forwardRef<HTMLSpanElement | HTMLButtonElement, R
           {showLabel && (
             <span
               style={{
-                padding:    '0 2px',
+                padding:    '0 var(--space-0-5)',
                 fontFamily: 'var(--font-body)',
-                fontWeight: 500,
-                fontSize:   '11px',
+                fontWeight: 'var(--font-weight-medium)',
+                fontSize:   'var(--font-size-caption)',
                 lineHeight: 1,
                 color:      tokens.text,
                 whiteSpace: 'nowrap',
@@ -212,7 +212,7 @@ export const RoleBadge = React.forwardRef<HTMLSpanElement | HTMLButtonElement, R
           )}
 
           {isInteractive && (
-            <span style={{ display: 'inline-flex', alignItems: 'center', paddingRight: '2px', color: tokens.text }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', paddingRight: 'var(--space-0-5)', color: tokens.text }}>
               <ChevronGlyph />
             </span>
           )}

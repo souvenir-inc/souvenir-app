@@ -139,7 +139,7 @@ export function UserAvatar({ name, src, size, seed, initials }: {
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
         width: size, height: size, borderRadius: radius,
         backgroundImage: tint.background, boxShadow: AVATAR_HAIRLINE, color: tint.color,
-        fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: Math.round(size * 0.38), lineHeight: 1,
+        fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: Math.round(size * 0.38), lineHeight: 1,
         userSelect: 'none',
       }}
     >

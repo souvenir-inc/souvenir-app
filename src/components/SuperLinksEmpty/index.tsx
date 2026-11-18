@@ -22,9 +22,9 @@ export function SuperLinksEmpty({ ref, onBrowsePersonas, className, style, ...pr
           display:         'flex',
           flexDirection:   'column',
           alignItems:      'center',
-          gap:             12,
-          padding:         '32px 20px',
-          borderRadius:    14,
+          gap:             'var(--space-3)',
+          padding:         'var(--space-7) var(--space-5)',
+          borderRadius:    'var(--radius-xl)',
           backgroundColor: 'var(--neutral-50)',
           boxShadow:       '0 0 0 1.5px var(--neutral-200)',
           textAlign:       'center',
@@ -41,14 +41,14 @@ export function SuperLinksEmpty({ ref, onBrowsePersonas, className, style, ...pr
             justifyContent:  'center',
             width:           40,
             height:          40,
-            borderRadius:    12,
+            borderRadius:    'var(--radius-xl)',
             backgroundColor: 'var(--neutral-100)',
             color:           'var(--neutral-700)',
           }}
         >
           <LinkSixIcon size={20} />
         </span>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
           <span
             style={{
               fontFamily: 'var(--font-title)',

@@ -120,9 +120,9 @@ export function SuperLinkRow(
         style={{
           display:         'flex',
           flexDirection:   'column',
-          gap:             10,
-          padding:         '14px 16px',
-          borderRadius:    14,
+          gap:             'var(--space-2-5)',
+          padding:         'var(--space-3) var(--space-4)',
+          borderRadius:    'var(--radius-xl)',
           backgroundColor: selected ? 'var(--neutral-50)' : 'var(--neutral-white)',
           border:          '1px solid var(--neutral-100)',
           boxShadow:       selected
@@ -132,13 +132,13 @@ export function SuperLinkRow(
                                : 'var(--shadow-surface-card)',
           cursor:          dimmed ? 'default' : 'pointer',
           opacity:         dimmed ? 0.55 : 1,
-          transition:      'box-shadow 150ms ease, background-color 150ms ease, border-color 150ms ease',
+          transition:      'box-shadow var(--duration-fast) ease, background-color var(--duration-fast) ease, border-color var(--duration-fast) ease',
           outline:         'none',
           ...style,
         }}
         {...props}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', minWidth: 0 }}>
           {/* Avatar — image when available, initials fallback */}
           {avatarUrl ? (
             <img
@@ -155,8 +155,8 @@ export function SuperLinkRow(
             <Avatar name={personaName} color={avatarColor} size="xs" />
           )}
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0, flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', minWidth: 0, flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', minWidth: 0 }}>
               <span
                 style={{
                   fontFamily: 'var(--font-title)',
@@ -189,7 +189,7 @@ export function SuperLinkRow(
           </div>
 
           {/* Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-0-5)', flexShrink: 0 }}>
             {onConfigure && (
               <Tooltip content="Open sharing settings" side="top">
                 <IconButton
@@ -230,7 +230,7 @@ export function SuperLinkRow(
             (all optional, so existing consumers with no share/recipient info
             are unaffected). */}
         {(conversations !== undefined || lastActivityAt || expiresAt) && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', rowGap: 2 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', flexWrap: 'wrap', rowGap: 'var(--space-0-5)' }}>
             {conversations !== undefined && (
               <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-500)' }}>
                 {conversations} conversation{conversations === 1 ? '' : 's'}
@@ -238,7 +238,7 @@ export function SuperLinkRow(
               </span>
             )}
             {(conversations !== undefined && (lastActivityAt || expiresAt)) && (
-              <span style={{ color: 'var(--neutral-300)', fontSize: 12 }}>·</span>
+              <span style={{ color: 'var(--neutral-300)', fontSize: 'var(--font-size-small)' }}>·</span>
             )}
             {lastActivityAt && (
               <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-500)' }}>
@@ -246,7 +246,7 @@ export function SuperLinkRow(
               </span>
             )}
             {lastActivityAt && expiresAt && (
-              <span style={{ color: 'var(--neutral-300)', fontSize: 12 }}>·</span>
+              <span style={{ color: 'var(--neutral-300)', fontSize: 'var(--font-size-small)' }}>·</span>
             )}
             {expiresAt && (
               <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-500)' }}>
@@ -257,7 +257,7 @@ export function SuperLinkRow(
         )}
 
         {/* Token usage — text line matching SuperLink component format */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
           <span style={{
             fontFamily: 'var(--font-body)',
             fontSize:   'var(--font-size-caption)',

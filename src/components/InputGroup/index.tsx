@@ -19,7 +19,7 @@ export function InputGroup({ ref, children, className, ...props }: InputGroupPro
         ref={ref}
         className={cn(className)}
         {...props}
-        style={{ display: 'flex', flexDirection: 'column', gap: '24px', ...props.style }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', ...props.style }}
       >
         {children}
       </div>

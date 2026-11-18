@@ -37,7 +37,7 @@ function TagChip({ label, selected, onToggle }: { label: string; selected: boole
       style={{
         display:         'flex',
         alignItems:      'center',
-        padding:         '6px 14px',
+        padding:         'var(--space-1-5) var(--space-3)',
         borderRadius:    100,
         border:          selected ? '1px solid var(--blue-400)' : '1px solid var(--border-default)',
         backgroundColor: selected
@@ -48,11 +48,11 @@ function TagChip({ label, selected, onToggle }: { label: string; selected: boole
         boxShadow:       selected ? '0px 0px 0px 1px var(--blue-200, #bfdbfe)' : 'none',
         cursor:          'pointer',
         fontFamily:      'var(--font-body)',
-        fontWeight:      500,
-        fontSize:        14,
-        lineHeight:      '22px',
+        fontWeight:      'var(--font-weight-medium)',
+        fontSize:        'var(--font-size-body)',
+        lineHeight:      'var(--line-height-body)',
         color:           selected ? 'var(--blue-700, #1d4ed8)' : 'var(--neutral-600)',
-        transition:      'background-color 100ms, border-color 100ms, box-shadow 100ms, color 100ms',
+        transition:      'background-color var(--duration-instant), border-color var(--duration-instant), box-shadow var(--duration-instant), color var(--duration-instant)',
         userSelect:      'none',
       }}
     >
@@ -101,7 +101,7 @@ export function SaveVersionModal({
         style={{
           width:           400,
           background:      'var(--modal-bg)',
-          borderRadius:    18,
+          borderRadius:    'var(--radius-2xl)',
           boxShadow:       '0px 12px 16px -4px var(--neutral-500-12), 0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
         }}
       >

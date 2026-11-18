@@ -135,7 +135,7 @@ function PersonaSearchInput({
   inputId: string
 }) {
   return (
-    <div style={{ padding: 8 }}>
+    <div style={{ padding: 'var(--space-2)' }}>
       <input
         id={inputId}
         type="text"
@@ -146,8 +146,8 @@ function PersonaSearchInput({
         spellCheck={false}
         style={{
           width:           '100%',
-          padding:         '7px 10px',
-          borderRadius:    10,
+          padding:         'var(--space-1-5) var(--space-2-5)',
+          borderRadius:    'var(--radius-lg)',
           border:          'none',
           outline:         'none',
           background:      'var(--field-surface)',
@@ -449,10 +449,10 @@ function DefaultModelMenu() {
                   maxHeight:            DEFAULT_MODEL_LIST_MAX_HEIGHT,
                   overflowY:            'auto',
                   overscrollBehaviorY:  'contain',
-                  padding:              '3px',
+                  padding:              'var(--space-0-5)',
                 }}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                   {sampleModels.map((model) => (
                     // `icon`+ModelIcon (not the `llm` prop) — Souvenir-mark
                     // fallback for unrecognized providers, and a slightly
@@ -1104,7 +1104,7 @@ export function ChatInput({
           borderRadius:    compact ? '16px' : '24px',
           backgroundColor: 'var(--chat-input-bg)',
           boxShadow:       shadow,
-          transition:      'box-shadow 150ms',
+          transition:      'box-shadow var(--duration-fast)',
         }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -1145,8 +1145,8 @@ export function ChatInput({
             style={{
               display:       'flex',
               flexWrap:      'wrap',
-              gap:           '12px',
-              paddingBottom: '8px',
+              gap:           'var(--space-3)',
+              paddingBottom: 'var(--space-2)',
             }}
           >
             {pinCards}
@@ -1247,7 +1247,7 @@ export function ChatInput({
           }}
         >
           {/* Left: attach button + chips slot */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
             {!compact && addButton}
             {(webSearch || activeStyle || activePersona || chips) && (
               <div
@@ -1257,7 +1257,7 @@ export function ChatInput({
                 // to a second line - matches the reference composer's overflow
                 // behaviour). Auto-chips render BEFORE consumer-provided
                 // chips so file-attachment / custom badges appear after.
-                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
               >
                 {autoChips}
                 {chips}
@@ -1266,7 +1266,7 @@ export function ChatInput({
           </div>
 
           {/* Right: model selector + mic/send button */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
             {!hideModelSelector && (disabledModelSelector ? (
               // Agent/persona chip active — that chat always uses the
               // agent's own configured model, so no menu at all. Same

@@ -43,7 +43,7 @@ function TeamAvatar({ teamId, name, size = 20 }: { teamId: string; name: string;
         display:      'inline-flex',
         width:        size,
         height:       size,
-        borderRadius: 4,
+        borderRadius: 'var(--radius-xs)',
         background:   getTeamGradient(teamId),
         flexShrink:   0,
         overflow:     'hidden',
@@ -54,7 +54,7 @@ function TeamAvatar({ teamId, name, size = 20 }: { teamId: string; name: string;
         style={{
           position:      'absolute',
           inset:         0,
-          borderRadius:  4,
+          borderRadius:  'var(--radius-xs)',
           pointerEvents: 'none',
           boxShadow:     'inset 0px 4px 4px 0px color-mix(in srgb, var(--static-black) 25%, transparent), inset 0px -1px 0.4px 0px rgba(18,60,95,0.65)',
         }}
@@ -67,8 +67,8 @@ function TeamAvatar({ teamId, name, size = 20 }: { teamId: string; name: string;
           alignItems:     'center',
           justifyContent: 'center',
           fontFamily:     'var(--font-title)',
-          fontWeight:     500,
-          fontSize:       11,
+          fontWeight:     'var(--font-weight-medium)',
+          fontSize:       'var(--font-size-caption)',
           lineHeight:     1,
           color:          'var(--color-text-on-accent)',
           userSelect:     'none',
@@ -152,17 +152,17 @@ export const TeamSwitcher = React.forwardRef<HTMLDivElement, TeamSwitcherProps>(
             alignItems:     'center',
             justifyContent: 'space-between',
             width:          '100%',
-            borderRadius:   8,
-            padding:        '4px 6px',
+            borderRadius:   'var(--radius-md)',
+            padding:        'var(--space-1) var(--space-1-5)',
             backgroundColor: hovered ? 'var(--neutral-900-04, rgba(38,33,30,0.04))' : 'transparent',
             border:         'none',
             cursor:         'pointer',
             outline:        'none',
-            transition:     'background-color 120ms ease',
+            transition:     'background-color var(--duration-fast) ease',
           }}
         >
           {/* Left: avatar + team name */}
-          <span style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flex: '1 0 0' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', minWidth: 0, flex: '1 0 0' }}>
             {activeTeam && <TeamAvatar teamId={activeTeam.id} name={activeTeam.name} size={20} />}
             <span
               style={{
@@ -181,7 +181,7 @@ export const TeamSwitcher = React.forwardRef<HTMLDivElement, TeamSwitcherProps>(
           </span>
 
           {/* Right: role badge (active team only) + chevron — grouped, 4px gap */}
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexShrink: 0 }}>
             {activeTeam?.role && (
               <RoleBadge role={activeTeam.role} showLabel mode="solar" />
             )}
@@ -191,8 +191,8 @@ export const TeamSwitcher = React.forwardRef<HTMLDivElement, TeamSwitcherProps>(
                 display:        'flex',
                 alignItems:     'center',
                 justifyContent: 'center',
-                borderRadius:   4,
-                padding:        2,
+                borderRadius:   'var(--radius-xs)',
+                padding:        'var(--space-0-5)',
                 flexShrink:     0,
                 background:     'linear-gradient(180deg, var(--neutral-white) 0%, var(--neutral-50) 100%)',
                 boxShadow:      '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4)',
@@ -225,10 +225,10 @@ export const TeamSwitcher = React.forwardRef<HTMLDivElement, TeamSwitcherProps>(
                 maxHeight={false}
                 role="menu"
                 aria-label="Switch team"
-                style={{ padding: 4, minWidth: '100%' }}
+                style={{ padding: 'var(--space-1)', minWidth: '100%' }}
               >
                 {/* All workspace + Personal Projects */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                   <DropdownMenuItem
                     fluid
                     label="All workspace"
@@ -245,18 +245,18 @@ export const TeamSwitcher = React.forwardRef<HTMLDivElement, TeamSwitcherProps>(
                   />
                 </div>
 
-                <Divider decorative style={{ margin: '4px 0', borderColor: 'rgba(59,54,50,0.1)' }} />
+                <Divider decorative style={{ margin: 'var(--space-1) 0', borderColor: 'rgba(59,54,50,0.1)' }} />
 
                 {/* Teams section header */}
                 <p style={{
                   fontFamily:    'var(--font-body)',
-                  fontWeight:    500,
-                  fontSize:      11,
-                  lineHeight:    '16px',
+                  fontWeight:    'var(--font-weight-medium)',
+                  fontSize:      'var(--font-size-caption)',
+                  lineHeight:    'var(--line-height-small)',
                   color:         'var(--neutral-400)',
                   letterSpacing: '0.06em',
                   textTransform: 'uppercase',
-                  padding:       '4px 8px 2px',
+                  padding:       'var(--space-1) var(--space-2) var(--space-0-5)',
                   margin:        0,
                 }}>
                   Teams you are part of

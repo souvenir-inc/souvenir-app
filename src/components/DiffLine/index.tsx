@@ -25,12 +25,12 @@ export function DiffLine({ ref, children, variant, className, style, ...props }:
 
     const baseStyle: React.CSSProperties = {
       display:       'block',
-      padding:       '4px 0 4px 10px',
+      padding:       'var(--space-1) 0 var(--space-1) var(--space-2-5)',
       fontFamily:    'var(--font-body)',
       fontSize:      'var(--font-size-body)',
       lineHeight:    1.5,
       borderLeft:    '2px solid transparent',
-      transition:    'background-color 120ms ease, border-color 120ms ease',
+      transition:    'background-color var(--duration-fast) ease, border-color var(--duration-fast) ease',
     }
 
     const variantStyle: React.CSSProperties =

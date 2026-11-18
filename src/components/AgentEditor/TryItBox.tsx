@@ -62,9 +62,9 @@ export function TryItBox({ repoId, versionId, pausedReason }: TryItBoxProps) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
       <p style={LABEL_STYLE}>Try it</p>
-      <div className="kaya-field" style={{ ...BOX_STYLE, padding: '8px 10px' }}>
+      <div className="kaya-field" style={{ ...BOX_STYLE, padding: 'var(--space-2) var(--space-2-5)' }}>
         <textarea
           value={input}
           rows={3}
@@ -78,7 +78,7 @@ export function TryItBox({ repoId, versionId, pausedReason }: TryItBoxProps) {
           style={{ ...INPUT_STYLE, resize: 'none' }}
         />
       </div>
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
         {streaming ? (
           <Button type="button" variant="outline" size="sm" onClick={stop}>Stop</Button>
         ) : (
@@ -101,8 +101,8 @@ export function TryItBox({ repoId, versionId, pausedReason }: TryItBoxProps) {
           className="kaya-scrollbar"
           aria-live="polite"
           style={{
-            ...BOX_STYLE, padding: '10px 12px', maxHeight: 260, overflowY: 'auto', whiteSpace: 'pre-wrap',
-            fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-800)',
+            ...BOX_STYLE, padding: 'var(--space-2-5) var(--space-3)', maxHeight: 260, overflowY: 'auto', whiteSpace: 'pre-wrap',
+            fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-800)',
           }}
         >
           {output || '…'}

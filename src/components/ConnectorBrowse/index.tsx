@@ -86,8 +86,8 @@ export function CategoryFilter({
   if (categories.length === 0) return null
   const chips: CategorySelection[] = ['all', ...categories]
   return (
-    <div aria-label="Connector categories" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <span style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 12, color: 'var(--neutral-500)' }}>
+    <div aria-label="Connector categories" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+      <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-500)' }}>
         Categories
       </span>
       <Tabs value={value} onValueChange={next => onChange(next as CategorySelection)}>
@@ -136,11 +136,11 @@ export function Pagination({
     color: 'var(--neutral-700)',
   })
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12 }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
       <button type="button" aria-label="Previous connector page" disabled={!canPrev} onClick={() => onChange(page - 1)} style={btn(!canPrev)}>
         <ArrowLeftOneIcon size={14} /> Previous
       </button>
-      <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--neutral-500)' }}>
+      <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', color: 'var(--neutral-500)' }}>
         {known ? `Page ${page} of ${pageCount}` : `Page ${page}`}
       </span>
       <button type="button" aria-label="Next connector page" disabled={!canNext} onClick={() => onChange(page + 1)} style={btn(!canNext)}>

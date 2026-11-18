@@ -172,7 +172,7 @@ export function ConnectorCatalogCard({
           }}
         >
           {isLoading ? (
-            <span className="kaya-skeleton" style={{ display: 'block', width: '100%', height: '100%', borderRadius: 6, background: SKELETON_BG }} />
+            <span className="kaya-skeleton" style={{ display: 'block', width: '100%', height: '100%', borderRadius: 'var(--radius-sm)', background: SKELETON_BG }} />
           ) : iconUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- provider-hosted logo_url
             <img
@@ -205,7 +205,7 @@ export function ConnectorCatalogCard({
           flexDirection: 'column',
           alignItems: 'flex-start',
           justifyContent: 'center',
-          gap: 4,
+          gap: 'var(--space-1)',
         }}
       >
         {isLoading ? (
@@ -213,15 +213,15 @@ export function ConnectorCatalogCard({
           // description 16), so the loading card is as tall as a loaded one.
           <>
             <span style={{ display: 'flex', alignItems: 'center', height: 'var(--line-height-body)' }}>
-              <span className="kaya-skeleton" style={{ display: 'block', width: 120, height: 14, borderRadius: 4, background: SKELETON_BG }} />
+              <span className="kaya-skeleton" style={{ display: 'block', width: 120, height: 14, borderRadius: 'var(--radius-xs)', background: SKELETON_BG }} />
             </span>
             {!isCompact && (
               <>
                 <span style={{ display: 'flex', alignItems: 'center', height: 'var(--line-height-caption)' }}>
-                  <span className="kaya-skeleton" style={{ display: 'block', width: 80, height: 10, borderRadius: 4, background: SKELETON_BG }} />
+                  <span className="kaya-skeleton" style={{ display: 'block', width: 80, height: 10, borderRadius: 'var(--radius-xs)', background: SKELETON_BG }} />
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', height: 'var(--line-height-caption)' }}>
-                  <span className="kaya-skeleton" style={{ display: 'block', width: 170, height: 10, borderRadius: 4, background: SKELETON_BG }} />
+                  <span className="kaya-skeleton" style={{ display: 'block', width: 170, height: 10, borderRadius: 'var(--radius-xs)', background: SKELETON_BG }} />
                 </span>
               </>
             )}

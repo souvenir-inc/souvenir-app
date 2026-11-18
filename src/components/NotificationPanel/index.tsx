@@ -156,7 +156,7 @@ function AgentTile({ agent }: { agent: { id: string; name: string } }) {
       </span>
       <span
         style={{
-          position: 'absolute', right: -4, bottom: -4, width: 16, height: 16, borderRadius: 9999,
+          position: 'absolute', right: -4, bottom: -4, width: 16, height: 16, borderRadius: 'var(--radius-full)',
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
           backgroundColor: 'var(--color-tag-Yellow-bg)', color: 'var(--color-tag-Yellow-text)',
           boxShadow: '0 0 0 2px var(--popover-bg)',
@@ -225,16 +225,16 @@ function NotificationRow({ notification: n, unread, onSelect, onMarkRead, onMark
         position:        'relative',
         display:         'flex',
         alignItems:      'flex-start',
-        gap:             10,
+        gap:             'var(--space-2-5)',
         width:           '100%',
         boxSizing:       'border-box',
         padding:         '8px 26px 8px 8px',
-        borderRadius:    8,
+        borderRadius:    'var(--radius-md)',
         cursor:          'pointer',
         userSelect:      'none',
         backgroundColor: hovered ? 'var(--dropdown-menu-item-hover-bg)' : 'transparent',
         boxShadow:       hovered ? 'var(--shadow-dropdown-item-hover)' : undefined,
-        transition:      'background-color 150ms, box-shadow 150ms',
+        transition:      'background-color var(--duration-fast), box-shadow var(--duration-fast)',
         // Own stacking context so the highlight wash can sit behind the content.
         isolation:       'isolate',
       }}
@@ -247,7 +247,7 @@ function NotificationRow({ notification: n, unread, onSelect, onMarkRead, onMark
           initial={{ opacity: 1 }}
           animate={{ opacity: 0 }}
           transition={{ duration: 1.4, delay: 0.35, ease: [0.4, 0, 0.2, 1] }}
-          style={{ position: 'absolute', inset: 0, borderRadius: 8, zIndex: -1, pointerEvents: 'none', backgroundColor: 'var(--color-tag-Blue-bg)' }}
+          style={{ position: 'absolute', inset: 0, borderRadius: 'var(--radius-md)', zIndex: -1, pointerEvents: 'none', backgroundColor: 'var(--color-tag-Blue-bg)' }}
         />
       )}
       {n.agent ? (
@@ -266,13 +266,13 @@ function NotificationRow({ notification: n, unread, onSelect, onMarkRead, onMark
         </span>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: '1 1 0', minWidth: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', flex: '1 1 0', minWidth: 0 }}>
         <p
           style={{
             margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)',
             fontWeight: unread ? 'var(--font-weight-medium)' : 'var(--font-weight-regular)',
             color: unread ? 'var(--dropdown-menu-item-text)' : 'var(--dropdown-menu-item-sublabel)',
-            transition: 'color 200ms ease, font-weight 200ms ease', ...clamp(2),
+            transition: 'color var(--duration-base) ease, font-weight var(--duration-base) ease', ...clamp(2),
           }}
         >
           {n.title}
@@ -284,7 +284,7 @@ function NotificationRow({ notification: n, unread, onSelect, onMarkRead, onMark
         )}
         <p
           style={{
-            margin: '2px 0 0', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0,
+            margin: 'var(--space-0-5) 0 0', display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', minWidth: 0,
             ...captionText, color: 'var(--dropdown-menu-item-muted)', whiteSpace: 'nowrap',
           }}
         >
@@ -293,7 +293,7 @@ function NotificationRow({ notification: n, unread, onSelect, onMarkRead, onMark
           {n.dev && <><span aria-hidden>·</span><span style={{ color: 'var(--color-tag-Purple-text)' }}>Fixture</span></>}
         </p>
         {n.actionable && kind.action && (
-          <div style={{ marginTop: 6 }}>
+          <div style={{ marginTop: 'var(--space-1-5)' }}>
             <Button variant="outline" size="sm" tabIndex={-1} onClick={stop(() => onSelect(n))}>
               {kind.action}
             </Button>
@@ -312,7 +312,7 @@ function NotificationRow({ notification: n, unread, onSelect, onMarkRead, onMark
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.4 }}
             transition={DOT_SPRING}
-            style={{ position: 'absolute', top: 14, right: 10, width: 8, height: 8, borderRadius: 9999, backgroundColor: 'var(--blue-500)' }}
+            style={{ position: 'absolute', top: 14, right: 10, width: 8, height: 8, borderRadius: 'var(--radius-full)', backgroundColor: 'var(--blue-500)' }}
           />
         )}
         {showActions && (
@@ -330,7 +330,7 @@ function NotificationRow({ notification: n, unread, onSelect, onMarkRead, onMark
             onClick={e => e.stopPropagation()}
             style={{
               position: 'absolute', top: 6, right: 6, zIndex: 1, transformOrigin: 'right center',
-              display: 'flex', alignItems: 'center', gap: 2, padding: 2, borderRadius: 8,
+              display: 'flex', alignItems: 'center', gap: 'var(--space-0-5)', padding: 'var(--space-0-5)', borderRadius: 'var(--radius-md)',
               backgroundColor: 'var(--popover-bg)',
               boxShadow: '0px 2px 6px -2px var(--neutral-700-12), 0px 0px 0px 1px var(--neutral-100)',
             }}
@@ -366,7 +366,7 @@ function RowAction({ label, shortcut, icon, onClick }: {
     <Tooltip
       side="top"
       delayDuration={350}
-      content={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>{label}<span style={{ opacity: 0.6 }}>{shortcut}</span></span>}
+      content={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1-5)' }}>{label}<span style={{ opacity: 0.6 }}>{shortcut}</span></span>}
     >
       <div style={{ display: 'inline-flex' }}>
         <IconButton
@@ -386,12 +386,12 @@ function RowAction({ label, shortcut, icon, onClick }: {
 
 function RowSkeleton() {
   return (
-    <div aria-hidden style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: 8 }}>
-      <div className="kaya-skeleton" style={{ width: 32, height: 32, borderRadius: 8, flexShrink: 0 }} />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6, paddingTop: 2 }}>
-        <div className="kaya-skeleton" style={{ height: 12, width: '70%', borderRadius: 4 }} />
-        <div className="kaya-skeleton" style={{ height: 10, width: '92%', borderRadius: 4 }} />
-        <div className="kaya-skeleton" style={{ height: 10, width: '30%', borderRadius: 4 }} />
+    <div aria-hidden style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2-5)', padding: 'var(--space-2)' }}>
+      <div className="kaya-skeleton" style={{ width: 32, height: 32, borderRadius: 'var(--radius-md)', flexShrink: 0 }} />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', paddingTop: 'var(--space-0-5)' }}>
+        <div className="kaya-skeleton" style={{ height: 12, width: '70%', borderRadius: 'var(--radius-xs)' }} />
+        <div className="kaya-skeleton" style={{ height: 10, width: '92%', borderRadius: 'var(--radius-xs)' }} />
+        <div className="kaya-skeleton" style={{ height: 10, width: '30%', borderRadius: 'var(--radius-xs)' }} />
       </div>
     </div>
   )
@@ -399,18 +399,18 @@ function RowSkeleton() {
 
 function EmptyState({ tab }: { tab: PanelTab }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '32px 28px 36px', textAlign: 'center' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2-5)', padding: 'var(--space-7) var(--space-6) var(--space-7)', textAlign: 'center' }}>
       <span
         aria-hidden
         style={{
-          width: 40, height: 40, borderRadius: 12, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          width: 40, height: 40, borderRadius: 'var(--radius-xl)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
           backgroundColor: 'var(--neutral-100)', color: 'var(--neutral-400)',
         }}
       >
         <BellRingIcon size={20} />
       </span>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <p style={{ margin: 0, fontFamily: 'var(--font-title)', fontSize: 16, lineHeight: '22px', color: 'var(--neutral-700)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+        <p style={{ margin: 0, fontFamily: 'var(--font-title)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-700)' }}>
           {tab === 'unread' ? 'Nothing unread' : 'You’re all caught up'}
         </p>
         <p style={{ margin: 0, ...captionText, color: 'var(--neutral-500)' }}>
@@ -431,11 +431,11 @@ function Header({ titleId, tab, onTabChange, unreadCount, onMarkAllRead }: {
   onMarkAllRead?: () => void
 }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '14px 12px 10px 16px', borderBottom: '1px solid var(--neutral-100)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)', padding: 'var(--space-3) var(--space-3) var(--space-2-5) var(--space-4)', borderBottom: '1px solid var(--neutral-100)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)', minHeight: 24 }}>
         <p
           id={titleId}
-          style={{ margin: 0, fontFamily: 'var(--font-title)', fontSize: 16, lineHeight: '22px', color: 'var(--dropdown-menu-item-text)' }}
+          style={{ margin: 0, fontFamily: 'var(--font-title)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-body)', color: 'var(--dropdown-menu-item-text)' }}
         >
           Notifications
         </p>
@@ -445,7 +445,7 @@ function Header({ titleId, tab, onTabChange, unreadCount, onMarkAllRead }: {
             onClick={onMarkAllRead}
             className="kaya-dropdown-item"
             style={{
-              border: 'none', background: 'none', padding: '2px 6px', margin: 0, borderRadius: 6, cursor: 'pointer',
+              border: 'none', background: 'none', padding: 'var(--space-0-5) var(--space-1-5)', margin: 0, borderRadius: 'var(--radius-sm)', cursor: 'pointer',
               ...captionText, color: 'var(--dropdown-menu-item-muted)', whiteSpace: 'nowrap',
             }}
           >
@@ -467,8 +467,8 @@ function Footer({ onOpenSettings }: { onOpenSettings?: () => void }) {
   return (
     <div
       style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
-        padding: '8px 12px 10px 16px', borderTop: '1px solid var(--neutral-100)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)',
+        padding: 'var(--space-2) var(--space-3) var(--space-2-5) var(--space-4)', borderTop: '1px solid var(--neutral-100)',
       }}
     >
       <span style={{ ...captionText, color: 'var(--dropdown-menu-item-muted)', whiteSpace: 'nowrap' }}>
@@ -480,7 +480,7 @@ function Footer({ onOpenSettings }: { onOpenSettings?: () => void }) {
           onClick={onOpenSettings}
           className="kaya-dropdown-item"
           style={{
-            border: 'none', background: 'none', padding: '2px 6px', margin: 0, borderRadius: 6, cursor: 'pointer',
+            border: 'none', background: 'none', padding: 'var(--space-0-5) var(--space-1-5)', margin: 0, borderRadius: 'var(--radius-sm)', cursor: 'pointer',
             ...captionText, color: 'var(--dropdown-menu-item-muted)', whiteSpace: 'nowrap',
           }}
         >
@@ -495,10 +495,10 @@ function Kbd({ children }: { children: React.ReactNode }) {
   return (
     <kbd
       style={{
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 16, height: 16, padding: '0 3px',
-        marginRight: 2, borderRadius: 4, boxSizing: 'border-box',
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 16, height: 16, padding: '0 var(--space-0-5)',
+        marginRight: 'var(--space-0-5)', borderRadius: 'var(--radius-xs)', boxSizing: 'border-box',
         backgroundColor: 'var(--neutral-100)', color: 'var(--neutral-600)',
-        fontFamily: 'var(--font-body)', fontSize: 10, lineHeight: '16px',
+        fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)',
       }}
     >
       {children}
@@ -641,7 +641,7 @@ export function NotificationPanel({
               style={{ width: '100%' }}
             >
               {showSkeleton ? (
-                <div style={{ padding: 8 }}>{[0, 1, 2].map(i => <RowSkeleton key={i} />)}</div>
+                <div style={{ padding: 'var(--space-2)' }}>{[0, 1, 2].map(i => <RowSkeleton key={i} />)}</div>
               ) : visible.length === 0 ? (
                 <EmptyState tab={tab} />
               ) : (

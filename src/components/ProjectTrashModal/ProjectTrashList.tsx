@@ -64,36 +64,36 @@ export function ProjectTrashList({ currentUserId, onRestored }: ProjectTrashList
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', width: '100%' }}>
       {/* Info banner — same boxed-hint convention as InviteModal's InfoNote. */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '10px 12px', backgroundColor: 'var(--neutral-100)', borderRadius: 10 }}>
-        <InformationCircleIcon size={16} color="var(--neutral-500)" style={{ flexShrink: 0, marginTop: 1 }} />
-        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 13, lineHeight: '18px', color: 'var(--neutral-700)', margin: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)', padding: 'var(--space-2-5) var(--space-3)', backgroundColor: 'var(--neutral-100)', borderRadius: 'var(--radius-lg)' }}>
+        <InformationCircleIcon size={16} color="var(--neutral-500)" style={{ flexShrink: 0, marginTop: 'var(--space-0-5)' }} />
+        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px', color: 'var(--neutral-700)', margin: 0 }}>
           Workspace and shared projects stay recoverable for 30 days after
           deletion. Personal projects delete instantly and never appear here.
         </p>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', width: '100%' }}>
         {loading ? (
           [0, 1, 2].map(i => (
             <div
               key={i}
               style={{
-                display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px',
-                border: '1px solid var(--border-default)', borderRadius: 10, opacity: 1 - i * 0.25,
+                display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-2-5) var(--space-3)',
+                border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', opacity: 1 - i * 0.25,
               }}
             >
-              <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <div className="kaya-skeleton" style={{ width: '50%', height: 14, borderRadius: 4 }} />
-                <div className="kaya-skeleton" style={{ width: '30%', height: 12, borderRadius: 4 }} />
+              <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
+                <div className="kaya-skeleton" style={{ width: '50%', height: 14, borderRadius: 'var(--radius-xs)' }} />
+                <div className="kaya-skeleton" style={{ width: '30%', height: 12, borderRadius: 'var(--radius-xs)' }} />
               </div>
-              <div className="kaya-skeleton" style={{ width: 64, height: 28, borderRadius: 8, flexShrink: 0 }} />
+              <div className="kaya-skeleton" style={{ width: 64, height: 28, borderRadius: 'var(--radius-md)', flexShrink: 0 }} />
             </div>
           ))
         ) : loadFailed ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: 24 }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-400)', textAlign: 'center', margin: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-6)' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-400)', textAlign: 'center', margin: 0 }}>
               Couldn't load recently deleted projects.
             </p>
             <Button variant="secondary" size="sm" onClick={() => setLoadAttempt(a => a + 1)}>
@@ -104,22 +104,22 @@ export function ProjectTrashList({ currentUserId, onRestored }: ProjectTrashList
           // Same icon-square + title + subtext convention as AgentsPanelContent's
           // and ProjectMembersPanel's own empty states, for a consistent look
           // across this app's panel/tab empty states.
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 24px', textAlign: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-9) var(--space-6)', textAlign: 'center' }}>
             <div
               aria-hidden
               style={{
-                width: 48, height: 48, borderRadius: 12,
+                width: 48, height: 48, borderRadius: 'var(--radius-xl)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 backgroundColor: 'var(--neutral-100)',
               }}
             >
               <DeleteTwoIcon size={22} color="var(--neutral-400)" />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <p style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', fontSize: 18, lineHeight: '24px', color: 'var(--neutral-900)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+              <p style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-heading-sm)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-900)' }}>
                 Nothing here
               </p>
-              <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 14, lineHeight: '20px', color: 'var(--neutral-500)' }}>
+              <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-500)' }}>
                 No projects have been deleted recently.
               </p>
             </div>
@@ -129,15 +129,15 @@ export function ProjectTrashList({ currentUserId, onRestored }: ProjectTrashList
             <div
               key={p.id}
               style={{
-                display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px',
-                border: '1px solid var(--border-default)', borderRadius: 10,
+                display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-2-5) var(--space-3)',
+                border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)',
               }}
             >
               <div style={{ flex: '1 0 0', minWidth: 0 }}>
-                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {p.title}
                 </p>
-                <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--neutral-500)', margin: 0 }}>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-500)', margin: 0 }}>
                   Last updated {fmtRelative(p.updatedAt)}
                 </p>
               </div>

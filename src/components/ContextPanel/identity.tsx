@@ -89,7 +89,7 @@ export function AgentFace({ name, handle, connector }: { name: string; handle?: 
   if (persona) return <MentionAvatar agent={{ id: persona.id, name: persona.name }} />
   if (connector?.logo) {
     return (
-      <span aria-hidden style={{ width: 28, height: 28, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--neutral-white)', boxShadow: 'inset 0 0 0 1px var(--border-default)', flexShrink: 0 }}>
+      <span aria-hidden style={{ width: 28, height: 28, borderRadius: 'var(--radius-md)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--neutral-white)', boxShadow: 'inset 0 0 0 1px var(--border-default)', flexShrink: 0 }}>
         <ConnectorLogo connector={connector} size={18} />
       </span>
     )

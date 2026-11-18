@@ -3,7 +3,7 @@
 //
 //   node scripts/ds-scan.mjs            readable summary
 //   node scripts/ds-scan.mjs --json     full counts as JSON
-//   node scripts/ds-scan.mjs --top=raw.button   files with the most of one counter
+//   node scripts/ds-scan.mjs --top=raw.button [--limit=N]   files with the most of one counter (default 30)
 //   node scripts/ds-scan.mjs --check    fail if any tracked count is above scripts/ds-baseline.json
 //   node scripts/ds-scan.mjs --update   lower the baseline to today's counts (never raises it)
 //
@@ -215,7 +215,7 @@ function update(counts) {
   if (args.includes("--json")) console.log(JSON.stringify(counts, null, 2));
   else if (top) {
     const key = top.slice(6);
-    const rows = Object.entries(byFile[key] || {}).sort((a, b) => b[1] - a[1]).slice(0, 30);
+    const rows = Object.entries(byFile[key] || {}).sort((a, b) => b[1] - a[1]).slice(0, Number(args.find((a) => a.startsWith("--limit="))?.slice(8) ?? 30));
     console.log(rows.length ? rows.map(([f, n]) => `${String(n).padStart(5)}  ${f}`).join("\n") : `No matches for ${key}`);
   } else if (args.includes("--check")) {
     if (args.includes("--update")) update(counts);

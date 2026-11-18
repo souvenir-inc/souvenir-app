@@ -34,8 +34,8 @@ function UpgradeChip({
         display:        'flex',
         alignItems:     'center',
         justifyContent: 'center',
-        padding:        2,
-        borderRadius:   6,
+        padding:        'var(--space-0-5)',
+        borderRadius:   'var(--radius-sm)',
         flexShrink:     0,
         cursor:         onClick ? 'pointer' : 'default',
         boxShadow:      SHADOW_CHIP_OUTER,
@@ -52,7 +52,7 @@ function UpgradeChip({
         style={{
           position:        'absolute',
           inset:           0,
-          borderRadius:    6,
+          borderRadius:    'var(--radius-sm)',
           backgroundColor: 'var(--blue-100)',
           pointerEvents:   'none',
         }}
@@ -64,8 +64,8 @@ function UpgradeChip({
           display:        'flex',
           alignItems:     'center',
           justifyContent: 'center',
-          paddingLeft:    2,
-          paddingRight:   2,
+          paddingLeft:    'var(--space-0-5)',
+          paddingRight:   'var(--space-0-5)',
           position:       'relative',
         }}
       >
@@ -73,7 +73,7 @@ function UpgradeChip({
           style={{
             fontFamily: 'var(--font-body)',
             fontSize:   'var(--font-size-caption)',
-            fontWeight: 500,
+            fontWeight: 'var(--font-weight-medium)',
             lineHeight: 'var(--line-height-caption)',
             color:      'var(--blue-700)',
             whiteSpace: 'nowrap',
@@ -91,8 +91,8 @@ function UpgradeChip({
           alignItems:     'center',
           justifyContent: 'center',
           overflow:       'hidden',
-          padding:        1,
-          borderRadius:   4,
+          padding:        'var(--space-0-5)',
+          borderRadius:   'var(--radius-xs)',
           flexShrink:     0,
           width:          14,
           height:         14,
@@ -201,8 +201,8 @@ export function VisibilityRow(
           alignItems:      'center',
           justifyContent:  'center',
           overflow:        'hidden',
-          padding:         '14px 16px',
-          borderRadius:    12,
+          padding:         'var(--space-3) var(--space-4)',
+          borderRadius:    'var(--radius-xl)',
           width:           '100%',
           boxSizing:       'border-box' as const,
           backgroundColor: selected || locked ? 'var(--neutral-50)' : 'var(--neutral-white)',
@@ -226,14 +226,14 @@ export function VisibilityRow(
             alignItems:     'flex-start',
             justifyContent: 'center',
             minWidth:       0,
-            gap:            2,
+            gap:            'var(--space-0-5)',
           }}
         >
           <span
             style={{
               fontFamily: 'var(--font-body)',
               fontSize:   'var(--font-size-body-lg)',
-              fontWeight: 500,
+              fontWeight: 'var(--font-weight-medium)',
               lineHeight: 'var(--line-height-body-lg)',
               color:      labelColor,
               whiteSpace: 'nowrap',
@@ -246,7 +246,7 @@ export function VisibilityRow(
               style={{
                 fontFamily: 'var(--font-body)',
                 fontSize:   'var(--font-size-caption)',
-                fontWeight: 500,
+                fontWeight: 'var(--font-weight-medium)',
                 lineHeight: 'var(--line-height-caption)',
                 color:      descColor,
               }}

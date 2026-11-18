@@ -100,8 +100,8 @@ export function MiniChip({ label, color }: { label: string; color: BadgeColor })
         display:        'inline-flex',
         alignItems:     'center',
         justifyContent: 'center',
-        padding:        '2px',
-        borderRadius:   6,
+        padding:        'var(--space-0-5)',
+        borderRadius:   'var(--radius-sm)',
         boxShadow:      s.outerShadow,
         overflow:       'hidden',
         flexShrink:     0,
@@ -110,7 +110,7 @@ export function MiniChip({ label, color }: { label: string; color: BadgeColor })
       <span aria-hidden style={{
         position:        'absolute',
         inset:           0,
-        borderRadius:    6,
+        borderRadius:    'var(--radius-sm)',
         backgroundColor: s.bg,
         pointerEvents:   'none',
       }} />
@@ -123,11 +123,11 @@ export function MiniChip({ label, color }: { label: string; color: BadgeColor })
       }} />
       <span style={{
         position:   'relative',
-        padding:    '0 4px',
+        padding:    '0 var(--space-1)',
         fontFamily: 'var(--font-body)',
-        fontWeight: 500,
-        fontSize: 12,
-        lineHeight: '16px',
+        fontWeight: 'var(--font-weight-medium)',
+        fontSize: 'var(--font-size-small)',
+        lineHeight: 'var(--line-height-small)',
         color:      s.color,
         whiteSpace: 'nowrap',
       }}>
@@ -144,28 +144,28 @@ export function SkeletonCard() {
     <div style={{
       display:         'flex',
       flexDirection:   'column',
-      gap:             10,
-      padding:         '12px 12px 16px',
-      borderRadius:    16,
+      gap:             'var(--space-2-5)',
+      padding:         'var(--space-3) var(--space-3) var(--space-4)',
+      borderRadius:    'var(--radius-2xl)',
       border:          '1px solid var(--border-default)',
       backgroundColor: 'var(--neutral-white)',
       boxShadow:       '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
     }}>
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-        <div style={{ width: 44, height: 44, borderRadius: 10, backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite', flexShrink: 0 }} />
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <div style={{ height: 16, width: '60%', borderRadius: 6, backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite' }} />
-          <div style={{ height: 12, width: '40%', borderRadius: 6, backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite' }} />
+      <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
+        <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite', flexShrink: 0 }} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
+          <div style={{ height: 16, width: '60%', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite' }} />
+          <div style={{ height: 12, width: '40%', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite' }} />
         </div>
-        <div style={{ width: 40, height: 24, borderRadius: 12, backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite', flexShrink: 0 }} />
+        <div style={{ width: 40, height: 24, borderRadius: 'var(--radius-xl)', backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite', flexShrink: 0 }} />
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <div style={{ height: 11, borderRadius: 4, backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite' }} />
-        <div style={{ height: 11, borderRadius: 4, backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite', width: '80%' }} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+        <div style={{ height: 11, borderRadius: 'var(--radius-xs)', backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite' }} />
+        <div style={{ height: 11, borderRadius: 'var(--radius-xs)', backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite', width: '80%' }} />
       </div>
-      <div style={{ display: 'flex', gap: 6, paddingTop: 8 }}>
-        <div style={{ height: 20, width: 56, borderRadius: 6, backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite' }} />
-        <div style={{ height: 20, width: 56, borderRadius: 6, backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite' }} />
+      <div style={{ display: 'flex', gap: 'var(--space-1-5)', paddingTop: 'var(--space-2)' }}>
+        <div style={{ height: 20, width: 56, borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite' }} />
+        <div style={{ height: 20, width: 56, borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite' }} />
       </div>
     </div>
   )
@@ -174,8 +174,8 @@ export function SkeletonCard() {
 /** Route-level placeholder (settings/ai/loading.tsx). */
 export function AiModelsLoading() {
   return (
-    <div role="status" aria-label="Loading models" style={{ flex: '1 0 0', display: 'flex', justifyContent: 'center', paddingTop: 64 }}>
-      <div style={{ width: '100%', maxWidth: 908, padding: '0 24px', boxSizing: 'border-box' }}>
+    <div role="status" aria-label="Loading models" style={{ flex: '1 0 0', display: 'flex', justifyContent: 'center', paddingTop: 'var(--space-10)' }}>
+      <div style={{ width: '100%', maxWidth: 908, padding: '0 var(--space-6)', boxSizing: 'border-box' }}>
         <SkeletonSection cardCount={3} />
         <SkeletonSection cardCount={3} />
       </div>
@@ -185,9 +185,9 @@ export function AiModelsLoading() {
 
 export function SkeletonSection({ cardCount = 3 }: { cardCount?: number }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, padding: '12px 24px 24px', borderBottom: '1px solid var(--neutral-100)' }}>
-      <div style={{ height: 22, width: 100, borderRadius: 6, backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite' }} />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', padding: 'var(--space-3) var(--space-6) var(--space-6)', borderBottom: '1px solid var(--neutral-100)' }}>
+      <div style={{ height: 22, width: 100, borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite' }} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-3)' }}>
         {Array.from({ length: cardCount }).map((_, i) => <SkeletonCard key={i} />)}
       </div>
     </div>
@@ -214,25 +214,25 @@ export function ModelCard({ model, toggling, onToggle }: ModelCardProps) {
       style={{
         display:         'flex',
         flexDirection:   'column',
-        gap:             8,
-        padding:         '12px 12px 16px',
-        borderRadius:    16,
+        gap:             'var(--space-2)',
+        padding:         'var(--space-3) var(--space-3) var(--space-4)',
+        borderRadius:    'var(--radius-2xl)',
         border:          '1px solid var(--border-default)',
         backgroundColor: 'var(--neutral-white)',
         boxShadow:       model.blocked
           ? '0px 2px 2.8px 0px rgba(82,75,71,0.06)'
           : '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
         opacity:         model.blocked ? 0.7 : 1,
-        transition:      'opacity 200ms, box-shadow 200ms',
+        transition:      'opacity var(--duration-base), box-shadow var(--duration-base)',
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', gap: 4, alignItems: 'flex-start' }}>
-        <div style={{ display: 'flex', flex: '1 0 0', minWidth: 0, gap: 12, alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-1)', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flex: '1 0 0', minWidth: 0, gap: 'var(--space-3)', alignItems: 'flex-start' }}>
           <div style={{
             width:           44,
             height:          44,
-            borderRadius:    10,
+            borderRadius:    'var(--radius-lg)',
             backgroundColor: 'transparent',
             display:         'flex',
             alignItems:      'center',
@@ -245,9 +245,9 @@ export function ModelCard({ model, toggling, onToggle }: ModelCardProps) {
           <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignSelf: 'stretch' }}>
             <p style={{
               fontFamily:   'var(--font-body)',
-              fontWeight:   500,
-              fontSize:     16,
-              lineHeight:   '22px',
+              fontWeight:   'var(--font-weight-medium)',
+              fontSize:     'var(--font-size-body-lg)',
+              lineHeight:   'var(--line-height-body)',
               color:        'var(--neutral-900)',
               margin:       0,
               overflow:     'hidden',
@@ -258,9 +258,9 @@ export function ModelCard({ model, toggling, onToggle }: ModelCardProps) {
             </p>
             <p style={{
               fontFamily:   'var(--font-body)',
-              fontWeight:   600,
-              fontSize: 12,
-              lineHeight:   '16px',
+              fontWeight:   'var(--font-weight-semibold)',
+              fontSize: 'var(--font-size-small)',
+              lineHeight:   'var(--line-height-small)',
               color:        'var(--neutral-500)',
               margin:       0,
               overflow:     'hidden',
@@ -283,9 +283,9 @@ export function ModelCard({ model, toggling, onToggle }: ModelCardProps) {
       {model.model_description && (
         <p style={{
           fontFamily:       'var(--font-body)',
-          fontWeight:       400,
-          fontSize: 12,
-          lineHeight:       '16px',
+          fontWeight:       'var(--font-weight-regular)',
+          fontSize: 'var(--font-size-small)',
+          lineHeight:       'var(--line-height-small)',
           color:            'var(--neutral-500)',
           margin:           0,
           overflow:         'hidden',
@@ -298,7 +298,7 @@ export function ModelCard({ model, toggling, onToggle }: ModelCardProps) {
       )}
 
       {/* Labels */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center', paddingTop: 8 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-1-5)', alignItems: 'center', paddingTop: 'var(--space-2)' }}>
         <MiniChip label={tierLbl} color={tierClr} />
         {ctxLbl && <MiniChip label={ctxLbl} color="red" />}
         {featLbl && <MiniChip label={featLbl} color="green" />}
@@ -337,16 +337,16 @@ export function ProviderSection({
     <div style={{
       display:       'flex',
       flexDirection: 'column',
-      gap:           24,
-      padding:       '12px 24px 24px',
+      gap:           'var(--space-6)',
+      padding:       'var(--space-3) var(--space-6) var(--space-6)',
       borderBottom:  divider ? '1px solid var(--neutral-100)' : undefined,
     }}>
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
         <h2 style={{
           fontFamily: 'var(--font-body)',
-          fontWeight: 500,
-          fontSize:   14,
-          lineHeight: '22px',
+          fontWeight: 'var(--font-weight-medium)',
+          fontSize:   'var(--font-size-body)',
+          lineHeight: 'var(--line-height-body)',
           color:      'var(--neutral-900)',
           margin:     0,
           whiteSpace: 'nowrap',
@@ -356,7 +356,7 @@ export function ProviderSection({
         <MiniChip label={`${enabledCount}/${totalCount} enabled`} color="brown" />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 'var(--space-3)' }}>
         {displayModels.map(model => (
           <ModelCard
             key={model.model_id}

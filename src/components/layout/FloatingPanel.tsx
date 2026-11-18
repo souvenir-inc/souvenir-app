@@ -134,7 +134,7 @@ function FloatingPanelImpl() {
               position: 'absolute',
               right:    28,
               top:      TOOLBAR_TOP + 200,
-              zIndex:   10,
+              zIndex:   'var(--z-raised)',
             }}
           >
             <JumpTimestampGutter marks={gutterMarks} onJump={handleJump} />
@@ -149,10 +149,10 @@ function FloatingPanelImpl() {
             position:  'absolute',
             right:     16,
             top:       TOOLBAR_TOP + 4,
-            zIndex:    10,
+            zIndex:    'var(--z-raised)',
           }}
         >
-          <div role="toolbar" aria-label="Chat tools" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div role="toolbar" aria-label="Chat tools" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
             {PINS_ENABLED && (
               <FloatingMenuItem
                 icon={<PinIcon size={20} />}

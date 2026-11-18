@@ -36,8 +36,8 @@ export function ModelUnavailableOverlay({ isDraft, reason, modelName, onChangeMo
           flexDirection:  'column',
           alignItems:     'center',
           justifyContent: 'center',
-          gap:            10,
-          padding:        16,
+          gap:            'var(--space-2-5)',
+          padding:        'var(--space-4)',
           textAlign:      'center',
           zIndex:         2,
         }}
