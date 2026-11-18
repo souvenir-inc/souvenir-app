@@ -106,9 +106,11 @@ function replaceValue(prop, raw) {
 /**
  * 1 for every character inside a string or a comment, 0 for code. Text there can look like a
  * declaration (`content: 'padding: 16'`, `// style={{`) and must never be rewritten.
- * In TS/TSX a quote right after a letter or digit is JSX text (`Don't`), not a string; a
- * misread only ever skips a conversion. '/" strings end at a newline, templates at their `.
+ * In TS/TSX a quote right after a letter or digit is JSX text (`Don't`), not a string — unless
+ * those letters are a keyword that takes an operand (`typeof'…'`, `case'…':`), where a string
+ * starts. '/" strings end at a newline, templates at their `.
  */
+const OPERAND_KEYWORDS = new Set(["typeof", "case", "return", "in", "of", "instanceof", "void", "delete", "await", "yield", "new", "throw", "else", "do", "from", "extends"]);
 export function codeMask(src, { css = false } = {}) {
   const mask = new Uint8Array(src.length);
   for (let i = 0; i < src.length; i++) {
@@ -122,7 +124,10 @@ export function codeMask(src, { css = false } = {}) {
       end = src.indexOf("\n", i);
       end = end < 0 ? src.length - 1 : end - 1;
     } else if (c === "'" || c === '"' || (!css && c === "`")) {
-      if (!css && c !== "`" && /[A-Za-z0-9]/.test(src[i - 1] ?? "")) continue;
+      if (!css && c !== "`" && /[A-Za-z0-9]/.test(src[i - 1] ?? "")) {
+        const word = /[A-Za-z_$][\w$]*$/.exec(src.slice(Math.max(0, i - 20), i))?.[0];
+        if (!OPERAND_KEYWORDS.has(word)) continue;
+      }
       let j = i + 1;
       while (j < src.length && src[j] !== c && (c === "`" || src[j] !== "\n")) j += src[j] === "\\" ? 2 : 1;
       end = Math.min(j, src.length - 1);
@@ -197,7 +202,8 @@ export function transformTsx(source, counter) {
   const starts = [];
   for (const m of source.matchAll(/style=\{\{/g)) if (!masked[m.index]) starts.push(m.index + "style={".length);
   for (const m of source.matchAll(/:\s*(?:React\.)?CSSProperties\s*=\s*\{/g)) if (!masked[m.index]) starts.push(m.index + m[0].length - 1);
-  for (const m of source.matchAll(/\bas (?:React\.)?CSSProperties\b/g)) {
+  // Identifier-aware on both sides: `$` continues a name, so \b alone let CSSProperties$Config match.
+  for (const m of source.matchAll(/(?<![\w$.])as (?:React\.)?CSSProperties(?![\w$])/g)) {
     if (masked[m.index]) continue;
     // `{ … } as React.CSSProperties`: walk back to the object's opening brace — but only
     // when an object literal is what is being cast. `style as CSSProperties` or a call
