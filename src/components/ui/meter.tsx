@@ -57,7 +57,7 @@ export function Meter({ label, value, max = 100, tone = 'neutral', size = 'sm', 
         aria-label={label}
         aria-valuemin={0}
         aria-valuemax={max}
-        aria-valuenow={Math.round(Math.min(max, Math.max(0, value)))}
+        aria-valuenow={Math.min(max, Math.max(0, value))}
         className={cn('w-full overflow-hidden rounded-full bg-[var(--neutral-100)]', track)}
       >
         {/* A non-zero value always shows a sliver. */}

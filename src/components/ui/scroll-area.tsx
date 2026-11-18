@@ -18,5 +18,5 @@ const OVERFLOW = {
 } as const
 
 export function ScrollArea({ orientation = 'vertical', className, ref, ...props }: ScrollAreaProps) {
-  return <div ref={ref} className={cn('kaya-scrollbar min-h-0 min-w-0', OVERFLOW[orientation], className)} {...props} />
+  return <div ref={ref} tabIndex={0} className={cn('kaya-scrollbar min-h-0 min-w-0', OVERFLOW[orientation], className)} {...props} />
 }
