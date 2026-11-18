@@ -33,6 +33,8 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
   // The app is connected but the chat was not told: retrying resends that answer alone,
   // not the whole sign-in.
   const [respondFailed, setRespondFailed] = useState(false)
+  // The answer is on its way: Try again shows it, and the last failure is not shown meanwhile.
+  const [responding, setResponding] = useState(false)
   // api_key flow
   const [apiKeyFields, setApiKeyFields] = useState<Record<string, string>>({})
   const [fieldDefs,    setFieldDefs]    = useState<ApiKeyField[] | null>(
@@ -52,7 +54,7 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
     // swallowing the failure left the run waiting for a reply that never came, with
     // this guard refusing every retry; so the flag is set after the POST resolves.
     respondingRef.current = true
-    setRespondFailed(false)
+    setResponding(true)
     try {
       await respondToChatPrompt('connected', prompt.respond_url)
     } catch (err: unknown) {
@@ -64,8 +66,10 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
       return
     } finally {
       respondingRef.current = false
+      setResponding(false)
     }
     answeredRef.current = true
+    setRespondFailed(false)
     if (abortedRef.current) return
     setState('connected')
     toast.success(`${prompt.connector.name} connected — continuing your request.`)
@@ -180,7 +184,7 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
         : <>Task needs access to {prompt.connector.name} to keep going.</>}
     >
 
-      {state === 'error' && (
+      {state === 'error' && !responding && (
         <span role="alert" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', color: 'var(--red-600)' }}>
           {errorMsg || 'Connection failed.'} Try again.
         </span>
@@ -229,7 +233,7 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
         {respondFailed && !done ? (
-          <Button size="sm" variant="approve" attention onClick={() => void finish()}>
+          <Button size="sm" variant="approve" attention={!responding} loading={responding} onClick={() => void finish()}>
             Try again
           </Button>
         ) : done ? (

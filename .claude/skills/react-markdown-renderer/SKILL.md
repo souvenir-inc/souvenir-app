@@ -82,21 +82,21 @@ export const markdownComponents: Components = {
     <p className="my-3 leading-7">{children}</p>
   ),
 
-  // Inline code
-  code: ({ inline, children, className, ...props }) => {
-    if (inline) {
-      return (
-        <code className="bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
-          {children}
-        </code>
-      );
-    }
-    return <code className={className} {...props}>{children}</code>;
-  },
+  // Code. react-markdown v9+ passes no `inline` prop: every `code` gets the inline
+  // look here, and a fenced block — which arrives as <pre><code> — has it undone by
+  // `pre` below. Keep `className`: it carries `language-*` for highlighters.
+  code: ({ children, className, ...props }) => (
+    <code
+      className={`bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-sm font-mono ${className ?? ''}`}
+      {...props}
+    >
+      {children}
+    </code>
+  ),
 
-  // Code blocks
+  // Code blocks: reset the inline-code styling on the <code> inside.
   pre: ({ children }) => (
-    <pre className="bg-zinc-900 text-zinc-100 rounded-lg p-4 overflow-x-auto my-4 text-sm leading-relaxed">
+    <pre className="bg-zinc-900 text-zinc-100 rounded-lg p-4 overflow-x-auto my-4 text-sm leading-relaxed [&>code]:bg-transparent [&>code]:p-0 [&>code]:rounded-none">
       {children}
     </pre>
   ),
@@ -164,9 +164,43 @@ const MemoizedMarkdown = memo(
   (prev, next) => prev.content === next.content
 );
 
-// Split on double newlines (paragraph/block boundaries)
+// Split into blocks that each parse the same on their own as inside the whole
+// document. A plain split on blank lines breaks two things: a fenced code block
+// with a blank line inside it, and reference links (`[docs][1]` … `[1]: https://…`),
+// whose definition ends up in a different block from the link. So: split on blank
+// lines only outside a fence, and give every block the document's definitions.
+const FENCE = /^ {0,3}(`{3,}|~{3,})/;
+const DEFINITION = /^ {0,3}\[[^\]]+\]:\s*\S/;
+
 function splitIntoBlocks(text: string): string[] {
-  return text.split(/\n\n+/).filter(Boolean);
+  const blocks: string[] = [];
+  const definitions: string[] = [];
+  let current: string[] = [];
+  let fence: string | null = null;
+  const flush = () => {
+    if (current.some((line) => line.trim())) blocks.push(current.join('\n'));
+    current = [];
+  };
+  for (const line of text.split('\n')) {
+    const marker = FENCE.exec(line)?.[1];
+    if (fence) {
+      // Only a matching fence of at least the same length closes it.
+      if (marker && marker[0] === fence[0] && marker.length >= fence.length) fence = null;
+      current.push(line);
+    } else if (marker) {
+      fence = marker;
+      current.push(line);
+    } else if (DEFINITION.test(line)) {
+      definitions.push(line);
+    } else if (!line.trim()) {
+      flush();
+    } else {
+      current.push(line);
+    }
+  }
+  flush(); // an unclosed fence (still streaming) stays one block
+  const defs = definitions.join('\n');
+  return defs ? blocks.map((block) => `${block}\n\n${defs}`) : blocks;
 }
 
 export function StreamingMessage({

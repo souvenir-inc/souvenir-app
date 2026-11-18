@@ -126,8 +126,9 @@ function transformObjectBody(body, counter) {
   // Only the style object's own properties: a nested object literal inside it
   // (a motion config, a lookup) is not a style and keeps its values.
   const depth = depthMap(body);
-  // `key: value` where value is a number or a quoted string; stops at , newline or }.
-  return body.replace(/(\b[a-zA-Z]+)(\s*:\s*)(-?\d+(?:\.\d+)?|'[^'\n]*'|"[^"\n]*")(?=\s*[,}\n])/g, (whole, key, sep, val, offset) => {
+  // `key: value` where value is a number or a quoted string, ending where the next
+  // non-space character is , or } (a newline alone does not end it: `16\n * scale`).
+  return body.replace(/(\b[a-zA-Z]+)(\s*:\s*)(-?\d+(?:\.\d+)?|'[^'\n]*'|"[^"\n]*")(?=\s*[,}])/g, (whole, key, sep, val, offset) => {
     if (depth[offset] !== 1) return whole;
     // `// ds-keep: <reason>` on the same line leaves the value alone (e.g. a framer-motion layout radius).
     const lineEnd = body.indexOf("\n", offset);

@@ -99,6 +99,10 @@ describe('ConnectPromptCard when the answer does not reach the backend', () => {
     const button = tryAgain()!
     await act(async () => { button.click(); button.click(); button.click() })
     expect(respondToChatPrompt).toHaveBeenCalledTimes(2)
+    // While it is in flight: the old failure is not shown and the card offers no other action.
+    expect(container.querySelector('[role="alert"]')).toBeNull()
+    expect(tryAgain()).toBeDefined()
+    expect([...container.querySelectorAll('button')].some((x) => x.textContent?.includes('Connect Notion'))).toBe(false)
 
     await act(async () => release())
     await flush()

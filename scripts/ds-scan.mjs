@@ -52,10 +52,14 @@ const CATEGORIES = {
 };
 const NEUTRAL = /^["'`]?(inherit|initial|unset|none|auto|transparent|currentColor|0|0px|100%|50%)["'`]?$/i;
 
-function classify(value) {
+// `isCss`: a stylesheet value. CSS has no variables by bare name, so a word there
+// (`red`, `bold`) is a literal; only in a style object can it be a JS identifier.
+function classify(value, isCss = false) {
   const v = value.trim();
-  if (/var\(--/.test(v) || /^[A-Z_][A-Z0-9_]*(\.[\w.]+)?$/.test(v) || /^(tokens?|theme)\./.test(v)) return "token";
+  if (/var\(--/.test(v)) return "token";
   if (NEUTRAL.test(v)) return "neutral";
+  if (isCss) return "literal";
+  if (/^[A-Z_][A-Z0-9_]*(\.[\w.]+)?$/.test(v) || /^(tokens?|theme)\./.test(v)) return "token";
   if (/^[a-zA-Z_$][\w$.]*$/.test(v) || /\?/.test(v) || /\$\{/.test(v) || /\(/.test(v) && !/^["'`]/.test(v) && !/^(rgba?|hsla?|calc|cubic-bezier)\(/.test(v)) return "dynamic";
   return "literal";
 }
@@ -121,7 +125,7 @@ function scan() {
         // z-index -1…9 orders siblings inside one component; page layers (10+) must use the --z-* scale.
         const local = category === "zIndex" && /^["'`]?-?\d["'`]?$/.test(value.trim());
         if (category === "color" && contentColour) continue;
-        if (category) add(`${local ? "local" : classify(value)}.${category}`, file);
+        if (category) add(`${local ? "local" : classify(value, isCss)}.${category}`, file);
       }
       if (!contentColour) add("colorLiteral.hex", file, count(source, /#[0-9a-fA-F]{3,8}(?![0-9a-zA-Z_-])/g));
       if (!contentColour) add("colorLiteral.rgb", file, count(source, /\brgba?\(\s*\d/g));

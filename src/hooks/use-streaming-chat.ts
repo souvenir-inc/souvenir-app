@@ -450,12 +450,19 @@ export function useStreamingChat({
         !stopRequestedRef.current &&
         attempt < FOLLOW_ATTEMPTS
       ) {
+        // Read while this call still holds the refs: during the wait another chat's
+        // call can take them, and its reply id must not become this retry's.
+        const retryReplyId = loadingMessageIdRef.current ?? loadingMessageId
+        const retryUserMessageId = userMessageIdRef.current ?? undefined
         await new Promise((resolve) => setTimeout(resolve, FOLLOW_RETRY_MS))
+        // Taken over during the wait: the newer call reset stopRequestedRef, so that
+        // alone would let this one start a second follow into the newer call's reply.
+        if (detached) return "done"
         if (!stopRequestedRef.current) {
-          const outcome = await fetchAiResponse("", liveChatId, loadingMessageIdRef.current ?? loadingMessageId, null, {
+          const outcome = await fetchAiResponse("", liveChatId, retryReplyId, null, {
             follow: true,
             followAttempt: attempt + 1,
-            userMessageId: userMessageIdRef.current ?? undefined,
+            userMessageId: retryUserMessageId,
             prior: options?.prior,
           })
           const result = followResultRef.current

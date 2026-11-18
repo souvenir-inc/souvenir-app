@@ -259,10 +259,17 @@ export function ChatInterface({
     // The first go is immediate; a repeat only happens because the last was refused,
     // so it backs off rather than returning at round-trip speed.
     const wait = tally.tries === 1 ? 0 : FOLLOW_REFUSED_BACKOFF_MS * (tally.tries - 1)
+    let fired = false
     const timer = setTimeout(() => {
+      fired = true
       void followStream(chatId, runningMessageId, messages.find((message) => message.id === runningMessageId))
     }, wait)
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      // A try cancelled before it ran (a re-render, a chat switch) was never made:
+      // it gives its place in the budget back.
+      if (!fired && tally.key === key) tally.tries -= 1
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per history load that finds a running turn; followStream is fresh each render
   }, [chatId, runningMessageId, historyLoadId])
 

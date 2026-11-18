@@ -124,6 +124,36 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(reply('reply-A').content).not.toContain('B.')
   })
 
+  it('does not retry a dropped follow that another chat took over during the wait', async () => {
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const xhrA = FakeXHR.all[0]
+    xhrA.start()
+    xhrA.push({ type: 'RUN_STARTED', ...runA }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'From A.' })
+    xhrA.status = 0
+    xhrA.end() // dropped: A waits before retrying
+    // Let A reach its retry wait; starting B synchronously would detach A before it got there.
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 100)) })
+
+    // Chat B opens inside A's wait and takes the hook's refs.
+    const doneB = hook.followStream('chat-B', 'reply-B')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+    const xhrB = FakeXHR.all[1]
+    xhrB.start()
+    xhrB.push({ type: 'RUN_STARTED', ...runB }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'b', delta: 'From B.' })
+
+    // A's wait ends: it must stand down, not open a third request into B's reply.
+    await act(async () => { await doneA })
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+    expect(FakeXHR.all).toHaveLength(2)
+    expect(isStreamActive('chat-B')).toBe(true)
+
+    xhrB.push({ type: 'RUN_FINISHED', ...runB })
+    xhrB.end()
+    expect(await doneB).toBe('done')
+    expect(reply('reply-B')).toMatchObject({ content: 'From B.', isLoading: false })
+  }, 10000)
+
   it('lets a follow that drops reconnect without detaching itself', async () => {
     const done = hook.followStream('chat-A', 'reply-A')
     await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))

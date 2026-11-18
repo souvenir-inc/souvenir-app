@@ -76,7 +76,9 @@ function mapValue(raw, block, counter) {
 
 const keep = (src, off) => { const e = src.indexOf("\n", off); return src.slice(off, e < 0 ? undefined : e).includes("ds-keep"); };
 function transform(src, isCss, counter) {
-  const re = isCss ? /(line-height\s*:\s*)([^;{}]+)(;)/g : /(\blineHeight\s*:\s*)('[^']*'|"[^"]*"|-?[\d.]+)(?=\s*[,}\n])/g;
+  // A value ends where the next non-space character is `,` or `}`; a newline alone does not
+  // end it, or `lineHeight: 1.5` followed by `* scale` on the next line would be split.
+  const re = isCss ? /(line-height\s*:\s*)([^;{}]+)(;)/g : /(\blineHeight\s*:\s*)('[^']*'|"[^"]*"|-?[\d.]+)(?=\s*[,}])/g;
   return src.replace(re, (w, pre, val, post = "", off) => {
     if (typeof post === "number") { off = post; post = ""; }
     if (keep(src, off)) return w;

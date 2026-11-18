@@ -121,14 +121,20 @@ async function main() {
   fs.mkdirSync(path.join(OUT, "diff"), { recursive: true });
 
   const browser = await chromium.launch();
-  const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, reducedMotion: "reduce" });
+  const contextOptions = { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, reducedMotion: "reduce" };
+  const context = await browser.newContext(contextOptions);
   await login(context);
+  // Each theme gets its own context, signed in with this one's session. Init scripts
+  // accumulate on a context and run in no defined order, so on a shared context the
+  // dark pass also ran the light pass's theme script and could come out light.
+  const session = await context.storageState();
 
   const failures = [];
   const changed = [];
   for (const theme of THEMES) {
-    await context.addInitScript((t) => { try { localStorage.setItem("souvenir-theme", t); } catch {} }, theme);
-    const page = await context.newPage();
+    const themed = await browser.newContext({ ...contextOptions, storageState: session });
+    await themed.addInitScript((t) => { try { localStorage.setItem("souvenir-theme", t); } catch {} }, theme);
+    const page = await themed.newPage();
     await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
     for (const [name, route, masks = []] of SCREENS) {
       const file = path.join(target, `${name}.${theme}.png`);
@@ -145,6 +151,7 @@ async function main() {
       }
     }
     await page.close();
+    await themed.close();
   }
 
   if (!UPDATE) {
