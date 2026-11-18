@@ -25,6 +25,18 @@ const twMerge = extendTailwindMerge({
   },
 });
 
+/**
+ * Composes default classes with a Base UI `className`, which may be a string or a
+ * function of the component's state. cn() drops functions, so a state-based
+ * className would otherwise vanish; this keeps it a function and merges per render.
+ */
+export function cnState<State>(
+  base: ClassValue,
+  className: string | ((state: State) => string | undefined) | undefined,
+): string | ((state: State) => string) {
+  return typeof className === 'function' ? (state: State) => cn(base, className(state)) : cn(base, className)
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }

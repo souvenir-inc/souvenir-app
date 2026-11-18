@@ -14,8 +14,15 @@ type Align = 'start' | 'center' | 'end'
 const ALIGN: Record<Align, string> = { start: 'text-start', center: 'text-center', end: 'text-end' }
 
 export function Table({ className, ...props }: React.TableHTMLAttributes<HTMLTableElement>) {
+  // The scrolling wrapper takes focus so a wide table can be scrolled from the keyboard,
+  // and is named after the table so the stop is announced as more than "region".
   return (
-    <div className="kaya-scrollbar w-full min-w-0 overflow-x-auto">
+    <div
+      className="kaya-scrollbar w-full min-w-0 overflow-x-auto"
+      tabIndex={0}
+      role="region"
+      aria-label={props['aria-label'] ?? 'Table'}
+    >
       <table className={cn('w-full border-collapse text-body text-[var(--neutral-900)]', className)} {...props} />
     </div>
   )
