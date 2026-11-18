@@ -340,8 +340,14 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
     const imageLinks = Array.isArray(raw.image_links)
       ? (raw.image_links.filter((u): u is string => typeof u === "string" && u.length > 0))
       : undefined;
-    const prompts = (raw.prompts ?? []).flatMap((entry) => {
-      const prompt = isPromptEvent(entry.event) ? parsePrompt(entry.event, entry) : null;
+    // History is boundary data: `prompts` has been seen as a non-array, and an entry
+    // as null. Either would throw here and reject the whole page of history, losing
+    // every message on it, so both are checked before the shape is relied on.
+    const prompts = (Array.isArray(raw.prompts) ? raw.prompts : []).flatMap((entry) => {
+      if (typeof entry !== "object" || entry === null) return [];
+      const event: unknown = (entry as { event?: unknown }).event;
+      if (typeof event !== "string" || !isPromptEvent(event)) return [];
+      const prompt = parsePrompt(event, entry);
       return prompt ? [prompt] : [];
     });
     const run = parseRun(raw.run);

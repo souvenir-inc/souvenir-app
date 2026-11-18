@@ -42,8 +42,19 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
   // The turn that asked is waiting on this answer, or has left and takes its run back up on it.
   const finish = useCallback(async () => {
     if (answeredRef.current || abortedRef.current) return
+    // The answer is only "given" once the backend has it. Marking it beforehand and
+    // swallowing the failure left the run waiting for a reply that never came, with
+    // this guard refusing every retry; so the flag is set after the POST resolves.
+    try {
+      await respondToChatPrompt('connected', prompt.respond_url)
+    } catch (err: unknown) {
+      if (abortedRef.current) return
+      setState('error')
+      setErrorMsg(err instanceof Error ? err.message : 'Could not tell the chat you connected.')
+      toast.error(`Connected ${prompt.connector.name}, but the chat was not told. Try again.`)
+      return
+    }
     answeredRef.current = true
-    await respondToChatPrompt('connected', prompt.respond_url).catch(() => {})
     if (abortedRef.current) return
     setState('connected')
     toast.success(`${prompt.connector.name} connected — continuing your request.`)

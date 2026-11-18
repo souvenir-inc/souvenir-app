@@ -129,7 +129,11 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   const [isLoadingMessages, setIsLoadingMessages] = useState(false)
   const [hasMoreMessages, setHasMoreMessages] = useState(false)
   const [historyLoadId, setHistoryLoadId] = useState(0)
-  const [runningMessageId, setRunningMessageId] = useState<string | null>(null)
+  // Kept with the chat it belongs to. A chatId change without a remount leaves this
+  // render holding the previous chat's value — the reset effect cannot alter a render
+  // that has already begun — and a running id handed to the wrong chat makes the
+  // follow attach one chat's stream to another's reply.
+  const [runningOwner, setRunningOwner] = useState<{ chatId: string; id: string } | null>(null)
   // Bumped when a background stream ends, purely to re-run the write-back
   // effect: the stream's final commit can land before completeStream() clears
   // the registry, in which case the effect would skip that commit and the chat
@@ -188,7 +192,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
     cursorRef.current = meta.cursor
     pagesRef.current = 1
     setState({ chatId: id, list, loaded: true })
-    setRunningMessageId(meta.runningId)
+    setRunningOwner(meta.runningId ? { chatId: id, id: meta.runningId } : null)
     setHasMoreMessages(meta.hasMore)
     setHistoryLoadId((n) => n + 1)
     setMessagesLoadError(null)
@@ -228,7 +232,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
 
     hasPreviousChatRef.current = true
     setMessagesLoadError(null)
-    setRunningMessageId(null)
+    setRunningOwner(null)
 
     // If this chatId was just created during an active stream, skip the
     // fetch-and-clear cycle - the stream is still writing messages. Re-tag the
@@ -480,6 +484,6 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
     refreshMessages,
     messagesLoadError,
     historyLoadId,
-    runningMessageId,
+    runningMessageId: runningOwner && runningOwner.chatId === chatId ? runningOwner.id : null,
   }
 }

@@ -49,6 +49,13 @@ import { useComposerQueue, useQueuedSend } from "./hooks/use-composer-queue";
 import { useRevealSettle } from "./hooks/use-reveal-settle";
 import { sendTurn as sendTurnWith, useMessageActions, useTurnGuards, type TurnKit } from "./hooks/use-chat-turns";
 
+// A follow that is refused outright (rather than dropping once attached) leaves the
+// reply where it was, and the refresh it triggers bumps historyLoadId, which runs the
+// follow effect again — unbounded and at network speed without these. The retries
+// inside useStreamingChat cover only an attached connection that later drops.
+const FOLLOW_REFUSED_ATTEMPTS = 3
+const FOLLOW_REFUSED_BACKOFF_MS = 2000
+
 // The container for a chat: message state, sending/queueing turns and the
 // composer. Each hook below is called in the order its effects must run.
 export function ChatInterface({
@@ -239,9 +246,23 @@ export function ChatInterface({
   // A chat opened while its reply is still being generated (a reload, another
   // tab, coming back from another chat) reads the reply from the turn's stream,
   // into the turn's own message. Only the regular chat endpoint has one.
+  // Counted here, not in the effect, so it survives the historyLoadId reruns that a
+  // refused follow causes; a different reply is a fresh budget.
+  const followTriesRef = useRef<{ key: string; tries: number }>({ key: "", tries: 0 })
   useEffect(() => {
     if (!chatId || endpoint || !runningMessageId || isStreamActive(chatId)) return
-    void followStream(chatId, runningMessageId, messages.find((message) => message.id === runningMessageId))
+    const key = `${chatId}:${runningMessageId}`
+    const tally = followTriesRef.current
+    if (tally.key !== key) { tally.key = key; tally.tries = 0 }
+    if (tally.tries >= FOLLOW_REFUSED_ATTEMPTS) return
+    tally.tries += 1
+    // The first go is immediate; a repeat only happens because the last was refused,
+    // so it backs off rather than returning at round-trip speed.
+    const wait = tally.tries === 1 ? 0 : FOLLOW_REFUSED_BACKOFF_MS * (tally.tries - 1)
+    const timer = setTimeout(() => {
+      void followStream(chatId, runningMessageId, messages.find((message) => message.id === runningMessageId))
+    }, wait)
+    return () => clearTimeout(timer)
   // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per history load that finds a running turn; followStream is fresh each render
   }, [chatId, runningMessageId, historyLoadId])
 

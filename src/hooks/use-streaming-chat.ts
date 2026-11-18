@@ -123,6 +123,13 @@ export function useStreamingChat({
   // Stops the current call's stream, and only that one — registered with the
   // stream registry so the stream can be stopped from wherever its chat is shown.
   const activeStopRef = useRef<(() => void) | null>(null)
+  // Detaches the call that currently owns this hook. loadingMessageIdRef,
+  // resolvedChatIdRef, the transport refs and the flush buffer are one set shared
+  // by every call, so two overlapping streams — chat A's recovery still reading
+  // while chat B's starts — would have the first finish onto the second's reply
+  // and clear its registry entry. A new call detaches the old one before taking
+  // the refs, which leaves the old reply untouched for its chat to follow again.
+  const activeDetachRef = useRef<(() => void) | null>(null)
 
   // ── Flush helpers ───────────────────────────────────────────────────────────
 
@@ -249,6 +256,10 @@ export function useStreamingChat({
     modelId?: string | number | null,
     options?: StreamRequestOptions,
   ): Promise<StreamOutcome> => {
+    // Before any shared ref is written: whoever held them stops reading into them.
+    // A retry of the same follow (followAttempt > 0) is that call continuing, not a
+    // rival for the refs, so it leaves its own parent alone.
+    if (!options?.followAttempt) activeDetachRef.current?.()
     stopRequestedRef.current = false
     xhrRef.current = null
     // A follow owns the reply only once its stream answers; until then the reply is left as it is.
@@ -273,6 +284,12 @@ export function useStreamingChat({
     const detachThisCall = () => {
       detached = true
       callXhr?.abort()
+    }
+    activeDetachRef.current = detachThisCall
+    // Only the call still holding the refs may clear the slot; a detached one has
+    // already been replaced by the call that detached it.
+    const releaseThisCall = () => {
+      if (activeDetachRef.current === detachThisCall) activeDetachRef.current = null
     }
 
     // Returns true if this stream's chat is still the one the user is viewing.
@@ -481,6 +498,8 @@ export function useStreamingChat({
         finishTurn(ctx, turn, "error", error instanceof FriendlyStreamError ? rawMsg : friendlyModelError(rawMsg))
       }
       return "error"
+    } finally {
+      releaseThisCall()
     }
   }
 
