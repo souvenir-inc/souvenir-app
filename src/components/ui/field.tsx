@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Field as FieldPrimitive } from '@base-ui/react/field'
-import { cn } from '@/lib/utils'
+import { cn, cnState } from '@/lib/utils'
 
 // Field: label + control + hint + error, wired together by Base UI. The label's htmlFor, the
 // control's id, aria-describedby (hint and error) and aria-invalid are all set automatically, so a
@@ -22,17 +22,16 @@ export type FieldProps = React.ComponentPropsWithoutRef<typeof FieldPrimitive.Ro
 }
 
 export function Field({ className, invalid, ...props }: FieldProps) {
-  return <FieldPrimitive.Root invalid={invalid} className={cn('flex flex-col gap-1 min-w-0', className)} {...props} />
+  return <FieldPrimitive.Root invalid={invalid} className={cnState('flex flex-col gap-1 min-w-0', className)} {...props} />
 }
 
 export function FieldLabel({ className, ...props }: React.ComponentPropsWithoutRef<typeof FieldPrimitive.Label>) {
   return (
     <FieldPrimitive.Label
-      className={cn(
+      className={cnState(cn(
         'flex items-center gap-1 m-0 text-body font-normal text-[var(--text-field-label)]',
         'data-[invalid]:text-[var(--text-field-label-error)] data-[disabled]:text-[var(--text-field-label-disabled)]',
-        className,
-      )}
+      ), className)}
       {...props}
     />
   )
@@ -42,7 +41,7 @@ export function FieldLabel({ className, ...props }: React.ComponentPropsWithoutR
 export function FieldHint({ className, ...props }: React.ComponentPropsWithoutRef<typeof FieldPrimitive.Description>) {
   return (
     <FieldPrimitive.Description
-      className={cn('m-0 text-small text-[var(--neutral-500)] data-[disabled]:text-[var(--text-field-label-disabled)]', className)}
+      className={cnState('m-0 text-small text-[var(--neutral-500)] data-[disabled]:text-[var(--text-field-label-disabled)]', className)}
       {...props}
     />
   )
@@ -55,7 +54,7 @@ export function FieldHint({ className, ...props }: React.ComponentPropsWithoutRe
 export function FieldError({ className, children, ...props }: React.ComponentPropsWithoutRef<typeof FieldPrimitive.Description>) {
   if (children == null || children === false || children === '') return null
   return (
-    <FieldPrimitive.Description role="alert" className={cn('m-0 text-small text-[var(--text-field-label-error)]', className)} {...props}>
+    <FieldPrimitive.Description role="alert" className={cnState('m-0 text-small text-[var(--text-field-label-error)]', className)} {...props}>
       {children}
     </FieldPrimitive.Description>
   )
