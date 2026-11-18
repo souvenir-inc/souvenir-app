@@ -61,7 +61,7 @@ export function Select<T extends string>({
       size={size}
       disabled={disabled}
       aria-label={aria['aria-label']}
-      aria-haspopup="listbox"
+      aria-haspopup="menu"
       rightIcon={<ArrowDownOneIcon size={16} />}
       className={className}
     >
@@ -71,7 +71,7 @@ export function Select<T extends string>({
   if (disabled) return trigger
   return (
     <Dropdown.Float open={open} onOpenChange={setOpen} placement={placement} autoFlipVertical trigger={trigger}>
-      <Dropdown size={menuSize} maxHeight={false}>
+      <Dropdown size={menuSize}>
         <Dropdown.Section fluid>
           {options.map((option) => (
             <Dropdown.Item
@@ -80,6 +80,9 @@ export function Select<T extends string>({
               subLabel={option.description}
               icon={option.icon}
               selected={option.value === value}
+              // The selection is announced, not only drawn: a single-choice menu item.
+              role="menuitemradio"
+              aria-checked={option.value === value}
               disabled={option.disabled}
               fluid
               onClick={() => { onValueChange(option.value); setOpen(false) }}

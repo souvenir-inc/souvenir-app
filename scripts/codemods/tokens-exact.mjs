@@ -102,9 +102,33 @@ function replaceValue(prop, raw) {
 
 // ── TSX ─────────────────────────────────────────────────────────────────────
 
+/** Brace depth at each index of `body` (which starts with the object's own `{`), strings skipped. */
+function depthMap(body) {
+  const depth = new Array(body.length).fill(0);
+  let d = 0;
+  for (let j = 0; j < body.length; j++) {
+    const c = body[j];
+    if (c === "'" || c === '"' || c === "`") {
+      const end = body.indexOf(c, j + 1);
+      const stop = end < 0 ? body.length - 1 : end;
+      for (let k = j; k <= stop; k++) depth[k] = d;
+      j = stop;
+      continue;
+    }
+    if (c === "{") d++;
+    depth[j] = d;
+    if (c === "}") d--;
+  }
+  return depth;
+}
+
 function transformObjectBody(body, counter) {
+  // Only the style object's own properties: a nested object literal inside it
+  // (a motion config, a lookup) is not a style and keeps its values.
+  const depth = depthMap(body);
   // `key: value` where value is a number or a quoted string; stops at , newline or }.
   return body.replace(/(\b[a-zA-Z]+)(\s*:\s*)(-?\d+(?:\.\d+)?|'[^'\n]*'|"[^"\n]*")(?=\s*[,}\n])/g, (whole, key, sep, val, offset) => {
+    if (depth[offset] !== 1) return whole;
     // `// ds-keep: <reason>` on the same line leaves the value alone (e.g. a framer-motion layout radius).
     const lineEnd = body.indexOf("\n", offset);
     if (body.slice(offset, lineEnd < 0 ? undefined : lineEnd).includes("ds-keep")) return whole;
@@ -141,9 +165,14 @@ function transformTsx(source, counter) {
   for (const m of source.matchAll(/style=\{\{/g)) starts.push(m.index + "style={".length);
   for (const m of source.matchAll(/:\s*(?:React\.)?CSSProperties\s*=\s*\{/g)) starts.push(m.index + m[0].length - 1);
   for (const m of source.matchAll(/as (?:React\.)?CSSProperties/g)) {
-    // `{ … } as React.CSSProperties`: walk back to the object's opening brace.
+    // `{ … } as React.CSSProperties`: walk back to the object's opening brace — but only
+    // when an object literal is what is being cast. `style as CSSProperties` or a call
+    // would otherwise send the walk back to some unrelated earlier object.
+    let close = m.index - 1;
+    while (close >= 0 && /\s/.test(source[close])) close--;
+    if (source[close] !== "}") continue;
     let depth = 0;
-    for (let j = m.index - 1; j >= 0; j--) {
+    for (let j = close; j >= 0; j--) {
       const c = source[j];
       if (c === "}") depth++;
       else if (c === "{") { depth--; if (depth === 0) { starts.push(j); break; } }
@@ -201,7 +230,7 @@ const walk = (p) => {
   const norm = p.split(path.sep).join("/");
   if (SKIP.some((re) => re.test(norm))) return;
   if (st.isDirectory()) for (const f of fs.readdirSync(p)) walk(path.join(p, f));
-  else if (/\.(tsx|css)$/.test(p) && !/\.(test|spec|stories)\./.test(p)) files.push(p);
+  else if (/\.(tsx|ts|css)$/.test(p) && !/\.d\.ts$/.test(p) && !/\.(test|spec|stories)\./.test(p)) files.push(p);
 };
 for (const a of args.filter((x) => !x.startsWith("--"))) walk(a);
 
