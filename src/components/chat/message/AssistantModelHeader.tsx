@@ -30,7 +30,7 @@ const loadingRowStyle: React.CSSProperties = { display: "flex", alignItems: "cen
 const loadingLabelStyle: React.CSSProperties = {
   fontSize: 'var(--font-size-body)',
   fontWeight: 'var(--font-weight-medium)',
-  lineHeight: "18px",
+  lineHeight: 'var(--line-height-body)',
 };
 
 /** Resolve the actual model display name — never expose "souvenir" as a routing label. */

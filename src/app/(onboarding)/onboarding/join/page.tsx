@@ -56,14 +56,14 @@ function AvatarStack({ members, count }: { members: InvitedMember[]; count: numb
                 alignItems: "center",
                 justifyContent: "center",
                 overflow: "hidden",
-                backgroundColor: "var(--neutral-400,#9c938b)",
+                backgroundColor: "var(--neutral-400)",
               }}
             >
               {m.image ? (
                 // eslint-disable-next-line @next/next/no-img-element -- external member avatar, arbitrary host
                 <img src={m.image} alt={m.name || m.email} width={24} height={24} style={{ objectFit: "cover", display: "block" }} />
               ) : (
-                <span style={{ fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', color: "var(--static-white)", lineHeight: 1 }}>
+                <span style={{ fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', color: "var(--static-white)", lineHeight: 'var(--leading-none)' }}>
                   {initials.slice(0, 2)}
                 </span>
               )}
@@ -82,12 +82,12 @@ function AvatarStack({ members, count }: { members: InvitedMember[]; count: numb
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: "var(--neutral-100,#F5F5F5)",
+            backgroundColor: "var(--neutral-100)",
             boxShadow: "0 0 0 2px var(--static-white)",
             fontFamily: "var(--font-body)",
             fontWeight: 'var(--font-weight-medium)',
             fontSize: 'var(--font-size-caption)',
-            color: "var(--neutral-700,#524b47)",
+            color: "var(--neutral-700)",
           }}
         >
           +{count - shown.length}
@@ -119,7 +119,7 @@ function WorkspaceCard({
         borderRadius: 11.5,
         backgroundColor: "var(--neutral-white)",
         boxSizing: "border-box",
-        boxShadow: "0px 0px 0px 1px var(--blue-600,#0d6eb2)",
+        boxShadow: "0px 0px 0px 1px var(--blue-600)",
       }}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-2)', minWidth: 0 }}>
@@ -130,7 +130,7 @@ function WorkspaceCard({
             fontWeight: 'var(--font-weight-semibold)',
             fontSize: 'var(--font-size-body)',
             lineHeight: "var(--line-height-body-sm)",
-            color: "var(--neutral-900,#26211e)",
+            color: "var(--neutral-900)",
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
@@ -138,7 +138,7 @@ function WorkspaceCard({
         >
           {invite.organizationName || `${invite.invitedByName || "Their"}'s Workspace`}
         </p>
-        <p style={{ margin: 0, fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: "var(--line-height-small)", color: "var(--neutral-500,#827a74)" }}>
+        <p style={{ margin: 0, fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: "var(--line-height-small)", color: "var(--neutral-500)" }}>
           {invite.organizationMemberCount} member{invite.organizationMemberCount === 1 ? "" : "s"}
         </p>
         <AvatarStack members={invite.organizationMembers} count={invite.organizationMemberCount} />
@@ -196,11 +196,11 @@ function OnboardingJoinContent() {
         {invite ? (
           <WorkspaceCard invite={invite} joining={joining} onJoin={() => void handleJoin()} />
         ) : loadError ? (
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 'var(--font-size-body)', color: "var(--neutral-500,#827a74)", margin: 0 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 'var(--font-size-body)', color: "var(--neutral-500)", margin: 0 }}>
             We couldn&apos;t find a workspace to join. Ask your teammate to resend the invite.
           </p>
         ) : (
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 'var(--font-size-body)', color: "var(--neutral-500,#827a74)", margin: 0 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 'var(--font-size-body)', color: "var(--neutral-500)", margin: 0 }}>
             Looking up your workspace…
           </p>
         )}

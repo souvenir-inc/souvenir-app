@@ -8,10 +8,10 @@ import styles from './EmptyOverview.module.css'
 const TRACKED = [
   { label: 'To-dos',     Icon: CheckmarkCircleTwoIcon, color: 'var(--green-500)' },
   { label: 'Agents',     Icon: UserAiIcon,             color: 'var(--blue-500)' },
-  { label: 'Connectors', Icon: LinkSixIcon,            color: 'var(--purple-500, #8b5cf6)' },
+  { label: 'Connectors', Icon: LinkSixIcon,            color: 'var(--purple-500)' },
   { label: 'Sources',    Icon: FolderLibraryIcon,      color: 'var(--orange-500, #f59e0b)' },
   { label: 'Outputs',    Icon: FileTwoIcon,            color: 'var(--red-500)' },
-  { label: 'Skills',     Icon: StarIcon,               color: 'var(--yellow-500, #eab308)' },
+  { label: 'Skills',     Icon: StarIcon,               color: 'var(--yellow-500)' },
 ] as const
 
 /** The Context tab for a chat that hasn't started: what will gather here, orbiting the chat. */

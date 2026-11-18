@@ -232,6 +232,6 @@
 
 .emptyHint {
   font-size: var(--font-size-body-sm);
-  line-height: 18px;
+  line-height: var(--line-height-body-sm);
 }
 

@@ -36,7 +36,7 @@ export function PersonAvatar({ person, size = 24, ring = false }: { person: Pers
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden',
         width: size, height: size, borderRadius: '50%',
         background: tintGradient(`var(--color-tag-${tint}-bg)`), color: `var(--color-tag-${tint}-text)`,
-        fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: Math.round(size * 0.45), lineHeight: 1,
+        fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: Math.round(size * 0.45), lineHeight: 'var(--leading-none)',
         boxShadow: ring ? `${HAIRLINE}, 0 0 0 2px var(--card-bg)` : HAIRLINE,
       }}
     >

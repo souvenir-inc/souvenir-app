@@ -40,7 +40,7 @@ export function ScheduleDeleteModal({
           width:     440,
           maxWidth:  'calc(100vw - 48px)',
           gap:       'var(--space-4)',
-          boxShadow: '0 8px 40px color-mix(in srgb, var(--static-black) 12%, transparent)',
+          boxShadow: 'var(--shadow-4)',
         }}
       >
         {/* Header */}

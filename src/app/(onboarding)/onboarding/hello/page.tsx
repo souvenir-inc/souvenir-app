@@ -31,7 +31,7 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
         fontWeight: 'var(--font-weight-regular)',
         fontSize: 'var(--font-size-body)',
         lineHeight: "var(--line-height-body)",
-        color: "var(--neutral-700,#524b47)",
+        color: "var(--neutral-700)",
         margin: 0,
       }}
     >
@@ -70,7 +70,7 @@ function RoleSelect({
             border: "none",
             backgroundColor: "var(--text-field-bg)",
             boxShadow:
-              "0px 1px 1.5px 0px var(--neutral-700-12,rgba(82,75,71,0.12)), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+              "0px 1px 1.5px 0px var(--neutral-700-12), 0px 0px 0px 1px var(--neutral-100)",
             cursor: "pointer",
             outline: "none",
           }}
@@ -81,7 +81,7 @@ function RoleSelect({
               fontWeight: 'var(--font-weight-regular)',
               fontSize: 'var(--font-size-body)',
               lineHeight: "var(--line-height-body)",
-              color: value ? "var(--text-field-text,#26211e)" : "var(--text-field-placeholder,#9c938b)",
+              color: value ? "var(--text-field-text)" : "var(--text-field-placeholder)",
             }}
           >
             {value ?? "Roles"}
@@ -89,7 +89,7 @@ function RoleSelect({
           <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden>
             <path
               d="M5 8l5 5 5-5"
-              stroke="var(--neutral-400,#9c938b)"
+              stroke="var(--neutral-400)"
               strokeWidth="1.4"
               strokeLinecap="round"
               strokeLinejoin="round"

@@ -8,7 +8,7 @@ import { Button, IconButton } from '@/components/ui/button'
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
 
-const SHADOW_MODAL        = '0px 8px 32px 0px rgba(82,75,71,0.18), 0px 0px 0px 1px var(--neutral-100)'
+const SHADOW_MODAL        = 'var(--shadow-4)'
 const SHADOW_ROW_SELECTED = '0px 0px 0px 1.5px var(--blue-400)'
 const SHADOW_ROW_HOVER    = '0px 0px 0px 1px rgba(59,54,50,0.14)'
 
@@ -365,7 +365,7 @@ export function MoveToProjectModal({
             height:        '32px',
             background:    'linear-gradient(to bottom, var(--neutral-white) 0%, transparent 100%)',
             pointerEvents: 'none',
-            zIndex:        11,
+            zIndex:        'calc(var(--z-raised) + 1)',
             opacity:       atTop ? 0 : 1,
             transition:    'opacity var(--duration-fast) ease',
           }} />
@@ -376,7 +376,7 @@ export function MoveToProjectModal({
             height:        '32px',
             background:    'linear-gradient(to top, var(--neutral-white) 0%, transparent 100%)',
             pointerEvents: 'none',
-            zIndex:        11,
+            zIndex:        'calc(var(--z-raised) + 1)',
             opacity:       atBottom ? 0 : 1,
             transition:    'opacity var(--duration-fast) ease',
           }} />

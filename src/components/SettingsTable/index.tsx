@@ -37,7 +37,7 @@ export function SettingsTable({ children, columns, columnGap, background = 'var(
         style={{
           border:        '1px solid var(--border-default)',
           borderRadius:  'var(--radius-2xl)',
-          boxShadow:     '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+          boxShadow:     'var(--shadow-soft)',
           background,
           overflow:      'hidden',
           display:       'flex',

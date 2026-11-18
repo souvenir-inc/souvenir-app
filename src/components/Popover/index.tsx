@@ -292,7 +292,7 @@ export function PopoverContent(
       align={align}
       collisionPadding={collisionPadding}
       asChild
-      style={{ zIndex: 50, outline: 'none', ...style }}
+      style={{ zIndex: 'var(--z-popover)', outline: 'none', ...style }}
       {...contentProps}
     >
       <Popover size={size} variant={variant} maxHeight={maxHeight} header={header}>

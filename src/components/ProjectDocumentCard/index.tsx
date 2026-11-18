@@ -99,7 +99,7 @@ export function ProjectDocumentCard(
           }}
         >
           <FormatGlyph format={format} size="md" />
-          <span style={{ flex: 1, minWidth: 0, lineHeight: 1.3 }}>
+          <span style={{ flex: 1, minWidth: 0, lineHeight: 'var(--leading-tight)' }}>
             {url ? (
               <Tooltip content={`Open ${name}`} maxWidth={280}>
                 <a href={url} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ ...NAME_STYLE, textDecoration: 'none' }}>

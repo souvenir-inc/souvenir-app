@@ -32,9 +32,9 @@ function SkeletonBlock({
 function SkeletonCard({ children, danger }: { children: React.ReactNode; danger?: boolean }) {
   return (
     <div style={{
-      border:       `1px solid ${danger ? 'var(--red-400, #f87171)' : 'var(--border-default)'}`,
+      border:       `1px solid ${danger ? 'var(--red-400)' : 'var(--border-default)'}`,
       borderRadius: 'var(--radius-2xl)',
-      boxShadow:    '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+      boxShadow:    'var(--shadow-soft)',
       overflow:     'hidden',
     }}>
       {children}

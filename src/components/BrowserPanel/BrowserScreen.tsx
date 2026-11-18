@@ -424,7 +424,7 @@ export function BrowserScreen({ session, expanded, onExpandedChange }: BrowserSc
   // A real border, not an inset box-shadow, so the screen inside can't paint over it.
   const THUMB_LOOK: React.CSSProperties = { borderRadius: 'var(--radius-2xl)', backgroundColor: 'var(--card-bg)', border: '1px solid var(--neutral-200)', boxSizing: 'border-box' }
   const cardPlacement: React.CSSProperties =
-    phase === 'full'      ? { position: 'fixed', zIndex: Z_BACKDROP + 1, ...fullFrame(windowSize, aspect), borderRadius: 16, backgroundColor: 'var(--neutral-white)', boxShadow: '0px 8px 32px 0px rgba(26,23,20,0.24), 0px 0px 0px 1px rgba(59,54,50,0.12)' }
+    phase === 'full'      ? { position: 'fixed', zIndex: Z_BACKDROP + 1, ...fullFrame(windowSize, aspect), borderRadius: 16, backgroundColor: 'var(--neutral-white)', boxShadow: 'var(--shadow-4)' }
     : phase === 'returning' ? { position: 'fixed', zIndex: Z_BACKDROP + 1, ...returnRect, ...THUMB_LOOK }
     : { position: 'absolute', inset: 0, ...THUMB_LOOK }
 
@@ -551,7 +551,7 @@ export function BrowserScreen({ session, expanded, onExpandedChange }: BrowserSc
                     color:           'var(--neutral-900)',
                     backgroundColor: 'color-mix(in srgb, var(--neutral-white) 90%, transparent)',
                     backdropFilter:  'blur(8px)',
-                    boxShadow:       '0px 2px 8px 0px rgba(26,23,20,0.16), 0px 0px 0px 1px rgba(59,54,50,0.10)',
+                    boxShadow:       '0px 2px 8px 0px rgba(26,23,20,0.16), 0px 0px 0px 1px var(--neutral-800-10)',
                   }}
                 >
                   <Spinner size={14} />

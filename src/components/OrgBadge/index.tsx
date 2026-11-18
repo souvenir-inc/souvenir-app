@@ -101,7 +101,7 @@ export function OrgBadge(
         backgroundColor: textToken,
         color: 'var(--neutral-white)',
         fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)',
-        fontSize: '9px', lineHeight: 1,
+        fontSize: '9px', lineHeight: 'var(--leading-none)',
       }}
     >
       {monogram || <LogoIcon size={12} color="var(--neutral-white)" />}

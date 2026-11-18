@@ -52,7 +52,7 @@ const XmlWeather = dynamic(() => import("@/components/chat/XmlWeather").then((m)
  */
 function IncompleteBlockNotice({ tag, xml }: { tag: StructuredTag; xml: string }) {
   return (
-    <div style={{ margin: "12px 0", fontFamily: "var(--font-body)", fontSize: 13, lineHeight: "20px", color: "var(--neutral-600)" }}>
+    <div style={{ margin: "12px 0", fontFamily: "var(--font-body)", fontSize: 13, lineHeight: 'var(--line-height-body-sm)', color: "var(--neutral-600)" }}>
       <p style={{ margin: 0 }}>Couldn&apos;t display this {tag} — the response ended early.</p>
       <details>
         <summary style={{ width: "fit-content", marginTop: 4, fontSize: 12, cursor: "pointer" }}>Show raw output</summary>

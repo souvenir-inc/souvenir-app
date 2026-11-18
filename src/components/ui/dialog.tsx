@@ -10,7 +10,7 @@ import styles from './dialog.module.css'
 // app's tokens so it matches ConfirmModal's surface (white card, 16px radius, same shadow, same overlay).
 // There was no shared dialog primitive before; ConfirmModal stays for plain confirm/cancel prompts.
 
-const SHADOW_MODAL = '0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rgba(130,122,116,0.1)'
+const SHADOW_MODAL = 'var(--shadow-4)'
 
 export const Dialog = DialogPrimitive.Root
 export const DialogTrigger = DialogPrimitive.Trigger
@@ -82,7 +82,8 @@ const WIDTHS = { sm: 400, md: 520, lg: 680 } as const
 
 // Below the dropdown layer (Dropdown.Float, 9998) and tooltips (9999): menus and tooltips opened
 // from inside a dialog portal to <body> and must paint above it. Toasts sit far above all three.
-const DIALOG_Z = 9997
+const DIALOG_Z = 'var(--z-modal)'
+const DIALOG_OVERLAY_Z = 'var(--z-overlay)'
 
 export interface DialogContentProps extends Omit<React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>, 'title'> {
   /** sm = confirm prompts, md = forms and sharing, lg = the file picker. */
@@ -103,7 +104,7 @@ export function DialogContent({ size = 'md', hideClose = false, bare = false, ov
       {overlay && (
         <DialogPrimitive.Overlay
           className={styles.overlay}
-          style={{ position: 'fixed', inset: 0, zIndex: DIALOG_Z - 1, background: 'var(--overlay-bg)', backdropFilter: 'blur(2px)' }}
+          style={{ position: 'fixed', inset: 0, zIndex: DIALOG_OVERLAY_Z, background: 'var(--overlay-bg)', backdropFilter: 'blur(2px)' }}
         />
       )}
       <DialogPrimitive.Content

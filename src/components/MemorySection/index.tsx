@@ -20,7 +20,7 @@ const HOVER = 'color-mix(in srgb, var(--neutral-100) 60%, transparent)'
 const CARD: React.CSSProperties = {
   border:          '1px solid var(--border-default)',
   borderRadius:    'var(--radius-2xl)',
-  boxShadow:       '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+  boxShadow:       'var(--shadow-soft)',
   overflow:        'hidden',
   backgroundColor: 'var(--neutral-white)',
 }

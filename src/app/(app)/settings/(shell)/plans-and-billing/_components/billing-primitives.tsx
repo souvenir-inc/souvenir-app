@@ -71,9 +71,9 @@ export function fmtNum(n: number | null | undefined): string {
 
 // ── Shared style constants (exact Figma values) ───────────────────────────────
 
-export const SHADOW_CARD    = '0px 2px 2.8px 0px rgba(82,75,71,0.12)'                                   // bordered section card
-export const SHADOW_TILE     = '0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)' // white inner tile
-export const SHADOW_MODAL   = '0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rgba(130,122,116,0.1)'
+export const SHADOW_CARD    = 'var(--shadow-soft)'                                   // bordered section card
+export const SHADOW_TILE     = 'var(--shadow-tile)' // white inner tile
+export const SHADOW_MODAL   = 'var(--shadow-4)'
 export const SHADOW_INPUT   = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)'
 
 // Same "big number" / secondary-text convention as the Monthly Limits /
@@ -82,7 +82,7 @@ export const SHADOW_INPUT   = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0p
 // pages' stat cards read consistently. SectionCard's own title already
 // renders at this size/weight, so no separate header style is needed here.
 export const statCardBigLineStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: '34px', color: 'var(--neutral-900)', margin: 0,
+  fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0,
 }
 export const statCardCaptionStyle: React.CSSProperties = {
   fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0,

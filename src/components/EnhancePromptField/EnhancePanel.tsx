@@ -49,7 +49,7 @@ export default function EnhancePanel({ flow, value }: { flow: EnhanceFlow; value
                     fontFamily: 'var(--font-body)',
                     fontWeight: 'var(--font-weight-medium)',
                     fontSize:   'var(--font-size-body-lg, 16px)',
-                    lineHeight: 1.3,
+                    lineHeight: 'var(--leading-tight)',
                     color:      'var(--neutral-900)',
                   }}>
                     {headerLabel}
@@ -176,7 +176,7 @@ export default function EnhancePanel({ flow, value }: { flow: EnhanceFlow; value
                   padding:    'var(--space-6) var(--space-1)',
                   fontFamily: 'var(--font-body)',
                   fontSize:   'var(--font-size-body)',
-                  lineHeight: 1.5,
+                  lineHeight: 'var(--leading-normal)',
                   color:      'var(--neutral-700)',
                 }}>
                   Your prompt looks comprehensive. Running another pass would surface advanced refinements.
@@ -248,7 +248,7 @@ function QAStep({
           fontFamily: 'var(--font-body)',
           fontWeight: 'var(--font-weight-medium)',
           fontSize:   'var(--font-size-body-lg, 16px)',
-          lineHeight: 1.4,
+          lineHeight: 'var(--leading-snug)',
           color:      'var(--neutral-900)',
         }}>
           {question.text}

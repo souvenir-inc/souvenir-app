@@ -80,7 +80,7 @@ export function AnimatedPieChart({ data, onComplete, animate = true }: { data: P
             <div style={{ width: 10, height: 10, borderRadius: 'var(--radius-xs)', background: arc.color, flexShrink: 0 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-700)", lineHeight: "var(--line-height-small)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{arc.label}</div>
-              <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", lineHeight: "15px" }}>
+              <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", lineHeight: 'var(--line-height-small)' }}>
                 {Math.round(arc.pct * 100)}%
                 {data.unit && <span style={{ marginLeft: 'var(--space-1)' }}>{Math.round(arc.pct * total)}{data.unit}</span>}
               </div>

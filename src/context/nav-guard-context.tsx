@@ -209,12 +209,12 @@ export function NavGuardModal() {
           backgroundColor: 'var(--modal-bg)',
           padding: 24,
           gap: 20,
-          boxShadow: '0px 8px 32px 0px rgba(82,75,71,0.18), 0px 0px 0px 1px var(--neutral-100)',
+          boxShadow: 'var(--shadow-4)',
         }}
       >
         <div>
           <DialogTitle>{message.title}</DialogTitle>
-          <DialogDescription style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: '8px 0 0' }}>
+          <DialogDescription style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: '8px 0 0' }}>
             {message.description}
           </DialogDescription>
         </div>

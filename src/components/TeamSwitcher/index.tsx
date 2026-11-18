@@ -69,7 +69,7 @@ function TeamAvatar({ teamId, name, size = 20 }: { teamId: string; name: string;
           fontFamily:     'var(--font-title)',
           fontWeight:     'var(--font-weight-medium)',
           fontSize:       'var(--font-size-caption)',
-          lineHeight:     1,
+          lineHeight:     'var(--leading-none)',
           color:          'var(--color-text-on-accent)',
           userSelect:     'none',
         }}
@@ -216,7 +216,7 @@ export const TeamSwitcher = React.forwardRef<HTMLDivElement, TeamSwitcherProps>(
                 top:          'calc(100% + 4px)',
                 left:         0,
                 right:        0,
-                zIndex:       50,
+                zIndex:       'var(--z-dropdown)',
               }}
             >
               <Popover

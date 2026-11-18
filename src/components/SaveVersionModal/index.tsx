@@ -41,17 +41,17 @@ function TagChip({ label, selected, onToggle }: { label: string; selected: boole
         borderRadius:    100,
         border:          selected ? '1px solid var(--blue-400)' : '1px solid var(--border-default)',
         backgroundColor: selected
-          ? 'var(--blue-50, #eff6ff)'
+          ? 'var(--blue-50)'
           : hovered
           ? 'var(--neutral-50)'
           : 'transparent',
-        boxShadow:       selected ? '0px 0px 0px 1px var(--blue-200, #bfdbfe)' : 'none',
+        boxShadow:       selected ? '0px 0px 0px 1px var(--blue-200)' : 'none',
         cursor:          'pointer',
         fontFamily:      'var(--font-body)',
         fontWeight:      'var(--font-weight-medium)',
         fontSize:        'var(--font-size-body)',
         lineHeight:      'var(--line-height-body)',
-        color:           selected ? 'var(--blue-700, #1d4ed8)' : 'var(--neutral-600)',
+        color:           selected ? 'var(--blue-700)' : 'var(--neutral-600)',
         transition:      'background-color var(--duration-instant), border-color var(--duration-instant), box-shadow var(--duration-instant), color var(--duration-instant)',
         userSelect:      'none',
       }}
@@ -102,7 +102,7 @@ export function SaveVersionModal({
           width:           400,
           background:      'var(--modal-bg)',
           borderRadius:    'var(--radius-2xl)',
-          boxShadow:       '0px 12px 16px -4px var(--neutral-500-12), 0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
+          boxShadow:       '0px 12px 16px -4px var(--neutral-500-12), var(--shadow-soft), 0px 0px 0px 1px var(--neutral-100)',
         }}
       >
         {/* Header */}

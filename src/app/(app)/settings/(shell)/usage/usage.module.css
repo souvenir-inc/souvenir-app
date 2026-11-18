@@ -9,7 +9,7 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-2xl);
   background: var(--surface-cream);
-  box-shadow: 0px 2px 2.8px 0px rgba(82, 75, 71, 0.12);
+  box-shadow: var(--shadow-soft);
   overflow: hidden;
 }
 
@@ -77,7 +77,7 @@
 .donutValue {
   font-family: var(--font-title);
   font-size: var(--font-size-heading-xl);
-  line-height: 34px;
+  line-height: var(--line-height-heading-xl);
   color: var(--neutral-900);
 }
 
@@ -219,7 +219,7 @@
   padding: var(--space-3) var(--space-3);
   border-radius: var(--radius-xl);
   background: var(--card-bg);
-  box-shadow: 0px 2px 2.8px 0px rgba(82, 75, 71, 0.12), 0px 0px 0px 1px var(--neutral-100);
+  box-shadow: var(--shadow-tile);
 }
 
 .statLabel {

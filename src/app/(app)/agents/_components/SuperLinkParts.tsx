@@ -39,8 +39,8 @@ export function CopyUrlButton({ url }: { url: string }) {
 // same shadow constants, non-uppercase section titles) instead of the
 // generic StatCard/var(--shadow-surface-card) chrome used elsewhere. ────────
 
-export const SHADOW_CARD = '0px 2px 2.8px 0px rgba(82,75,71,0.12)'                                    // bordered section card
-export const SHADOW_TILE = '0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)' // white inner tile
+export const SHADOW_CARD = 'var(--shadow-soft)'                                    // bordered section card
+export const SHADOW_TILE = 'var(--shadow-tile)' // white inner tile
 
 /** White stat tile — label / value / sub. Ditto /org/plans' StatTile. */
 export function StatTile({

@@ -41,7 +41,7 @@ export function AnimatedCallout({ data, onComplete }: { data: CalloutData; onCom
       </span>
       <div>
         {data.title && <div style={{ fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body)', color: "var(--neutral-900)", marginBottom: 'var(--space-1)', lineHeight: "var(--line-height-body-sm)" }}><InlineMd text={data.title} /></div>}
-        <div style={{ fontSize: 'var(--font-size-body)', lineHeight: "21px", color: "var(--neutral-700)" }}><InlineMd text={data.body} /></div>
+        <div style={{ fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: "var(--neutral-700)" }}><InlineMd text={data.body} /></div>
       </div>
     </m.div>
   );

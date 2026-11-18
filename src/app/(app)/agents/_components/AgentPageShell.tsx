@@ -67,7 +67,7 @@ export function AgentPageHeader({
       {actions && (
         <div
           style={{
-            position: 'sticky', top: 16, zIndex: 20, height: 0, width: '100%',
+            position: 'sticky', top: 16, zIndex: 'var(--z-sticky)', height: 0, width: '100%',
             display: 'flex', justifyContent: 'flex-end', pointerEvents: 'none',
           }}
         >

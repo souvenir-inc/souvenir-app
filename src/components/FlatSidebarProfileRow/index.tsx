@@ -100,7 +100,7 @@ export function FlatSidebarProfileRow({ name, sublabel, avatarSrc, planLabel, on
         {planLabel && (
           <span style={{
             display: 'inline-flex', alignItems: 'center', padding: 'var(--space-0-5) var(--space-1-5)', borderRadius: 'var(--radius-sm)',
-            backgroundColor: 'var(--blue-100)', boxShadow: '0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px rgba(13,110,178,0.5)',
+            backgroundColor: 'var(--blue-100)', boxShadow: '0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px var(--blue-600-50)',
             fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)',
             lineHeight: 'var(--line-height-caption)', color: 'var(--blue-700)',
           }}>

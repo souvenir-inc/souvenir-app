@@ -55,12 +55,12 @@ function MemberAvatar({ member }: { member: InvitedMember }) {
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "var(--neutral-400,#9c938b)",
+        backgroundColor: "var(--neutral-400)",
         color: "var(--static-white)",
         fontFamily: "var(--font-body)",
         fontWeight: 'var(--font-weight-medium)',
         fontSize: 'var(--font-size-caption)',
-        lineHeight: 1,
+        lineHeight: 'var(--leading-none)',
       }}
     >
       {initials.slice(0, 2)}
@@ -96,7 +96,7 @@ function WorkspaceJoinCard({
         borderRadius: 'var(--radius-xl)',
         backgroundColor: "var(--neutral-white)",
         boxSizing: "border-box",
-        boxShadow: "0px 0px 0px 1px var(--blue-600,#0d6eb2)",
+        boxShadow: "0px 0px 0px 1px var(--blue-600)",
       }}
     >
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 'var(--space-4)' }}>
@@ -107,7 +107,7 @@ function WorkspaceJoinCard({
             fontWeight: 'var(--font-weight-semibold)',
             fontSize: 'var(--font-size-heading-md)',
             lineHeight: "normal",
-            color: "var(--neutral-700,#524b47)",
+            color: "var(--neutral-700)",
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
@@ -122,8 +122,8 @@ function WorkspaceJoinCard({
             fontFamily: "var(--font-body)",
             fontWeight: 'var(--font-weight-regular)',
             fontSize: 'var(--font-size-caption)',
-            lineHeight: "12px",
-            color: "var(--neutral-600,#6a625d)",
+            lineHeight: 'var(--line-height-caption)',
+            color: "var(--neutral-600)",
           }}
         >
           {invite.organizationMemberCount} member{invite.organizationMemberCount === 1 ? "" : "s"}
@@ -146,8 +146,8 @@ function WorkspaceJoinCard({
                 fontFamily: "var(--font-body)",
                 fontWeight: 'var(--font-weight-regular)',
                 fontSize: 'var(--font-size-caption)',
-                lineHeight: "12px",
-                color: "var(--neutral-600,#6a625d)",
+                lineHeight: 'var(--line-height-caption)',
+                color: "var(--neutral-600)",
               }}
             >
               +{overflow}

@@ -33,7 +33,7 @@ export function StepDots({ total, activeIndex }: { total: number; activeIndex: n
             height: 4,
             width: i === activeIndex ? 12 : 4,
             borderRadius: 'var(--radius-md)',
-            backgroundColor: i === activeIndex ? "var(--neutral-600,#6a625d)" : "var(--neutral-200,#dcd1c8)",
+            backgroundColor: i === activeIndex ? "var(--neutral-600)" : "var(--neutral-200)",
             transition: "width var(--duration-base) ease, background-color var(--duration-base) ease",
           }}
         />
@@ -62,7 +62,7 @@ export function StepHeader({
           fontWeight: 'var(--font-weight-regular)',
           fontSize: 'var(--font-size-heading)',
           lineHeight: "var(--line-height-heading)",
-          color: "var(--neutral-800,#3b3632)",
+          color: "var(--neutral-800)",
           margin: 0,
         }}
       >
@@ -84,7 +84,7 @@ export function FieldLabel({ children, error }: { children: React.ReactNode; err
         fontWeight: 'var(--font-weight-regular)',
         fontSize: 'var(--font-size-body)',
         lineHeight: "var(--line-height-small)",
-        color: error ? "var(--red-600,#c62b29)" : "var(--neutral-700,#524b47)",
+        color: error ? "var(--red-600)" : "var(--neutral-700)",
         margin: 0,
       }}
     >
@@ -101,7 +101,7 @@ export function FieldError({ children }: { children: React.ReactNode }) {
         fontWeight: 'var(--font-weight-regular)',
         fontSize: 'var(--font-size-body)',
         lineHeight: "var(--line-height-small)",
-        color: "var(--red-600,#c62b29)",
+        color: "var(--red-600)",
         margin: 0,
       }}
     >
@@ -145,8 +145,8 @@ export function TextField({
           backgroundColor: "var(--field-surface)",
           boxSizing: "border-box",
           boxShadow: error
-            ? "0px 0px 0px 1px var(--red-600,#c62b29)"
-            : "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+            ? "0px 0px 0px 1px var(--red-600)"
+            : "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)",
         }}
       >
         <input
@@ -163,7 +163,7 @@ export function TextField({
             fontWeight: 'var(--font-weight-regular)',
             fontSize: 'var(--font-size-body)',
             lineHeight: "var(--line-height-small)",
-            color: "var(--neutral-900,#26211e)",
+            color: "var(--neutral-900)",
             padding: 0,
           }}
         />
@@ -266,7 +266,7 @@ export function LeaveGuardModal({
           padding: 'var(--space-6)',
           width: 380,
           gap: 'var(--space-5)',
-          boxShadow: "0px 8px 32px 0px rgba(38,33,30,0.18), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+          boxShadow: "var(--shadow-4)",
         }}
       >
         <div>
@@ -276,7 +276,7 @@ export function LeaveGuardModal({
               fontWeight: 'var(--font-weight-semibold)',
               fontSize: 'var(--font-size-body-lg)',
               lineHeight: "var(--line-height-heading-sm)",
-              color: "var(--neutral-900,#26211e)",
+              color: "var(--neutral-900)",
               margin: 0,
             }}
           >
@@ -288,7 +288,7 @@ export function LeaveGuardModal({
               fontWeight: 'var(--font-weight-regular)',
               fontSize: 'var(--font-size-body)',
               lineHeight: "var(--line-height-body)",
-              color: "var(--neutral-500,#8a8078)",
+              color: "var(--neutral-500)",
               margin: "var(--space-2) 0 0",
             }}
           >

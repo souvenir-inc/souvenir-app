@@ -9,7 +9,7 @@ import { SouvenirLogo } from '@/components/SouvenirLogo'
 import { getOrgSlackStatus, getSlackInstallUrl, getSlackStatus } from '@/lib/api/slack'
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
-const SHADOW_MODAL = '0px 12px 16px -4px rgba(130,122,116,0.12), 0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)'
+const SHADOW_MODAL = '0px 12px 16px -4px rgba(130,122,116,0.12), var(--shadow-soft), 0px 0px 0px 1px var(--neutral-100)'
 const SHADOW_CARD_BORDER = '0px 1px 1.5px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-200)'
 
 // Poll the Slack status after the install tab opens, until the bot reports
@@ -179,7 +179,7 @@ export function SlackConnectModal({ isOpen, onClose, orgId, onConnected }: Slack
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', padding: 'var(--space-6) var(--space-6) var(--space-5)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', padding: 'var(--space-5)', borderRadius: 'var(--radius-xl)', backgroundColor: 'var(--neutral-50)' }}>
               <p style={{
-                fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px',
+                fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)',
                 color: 'var(--neutral-700)', margin: 0,
               }}>
                 Souvenir will be able to:
@@ -190,7 +190,7 @@ export function SlackConnectModal({ isOpen, onClose, orgId, onConnected }: Slack
                     {p.icon}
                   </span>
                   <p style={{
-                    fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px',
+                    fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)',
                     color: 'var(--neutral-700)', margin: 0,
                   }}>
                     {p.text}

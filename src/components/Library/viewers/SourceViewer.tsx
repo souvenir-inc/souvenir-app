@@ -95,7 +95,7 @@ function Plain({ text, mono }: { text: string; mono?: boolean }) {
         color: 'var(--neutral-900)',
         ...(mono
           ? { padding: 'var(--space-4) var(--space-5)', borderRadius: 'var(--radius-md)', background: 'var(--neutral-50)', border: '1px solid var(--border-default)', fontFamily: 'var(--font-mono, ui-monospace, monospace)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)' }
-          : { fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: '26px' }),
+          : { fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)' }),
       }}
     >
       {text}
@@ -132,7 +132,7 @@ function Email({ raw, title }: { raw: string; title: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)', width: '100%' }}>
       <header style={{ paddingBottom: 'var(--space-4)', borderBottom: '1px solid var(--border-default)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)' }}>
-        <h2 style={{ margin: '0 0 var(--space-2-5)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-heading-sm)', lineHeight: '26px' }}>{email.headers.subject || '(no subject)'}</h2>
+        <h2 style={{ margin: '0 0 var(--space-2-5)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-heading-sm)', lineHeight: 'var(--line-height-heading-sm)' }}>{email.headers.subject || '(no subject)'}</h2>
         <dl style={{ display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: 'var(--space-0-5) var(--space-4)', margin: 0 }}>
           {rows.map((key) => (
             <React.Fragment key={key}>

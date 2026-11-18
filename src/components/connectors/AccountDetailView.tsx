@@ -47,7 +47,7 @@ export function AccountDetailView({
         hideClose
         aria-describedby={undefined}
         className={styles.dialog}
-        style={{ width: 'min(85vw, 1280px)', height: '85vh', maxHeight: '85vh', boxShadow: '0 24px 72px rgba(30, 28, 27, 0.28), 0 0 0 1px var(--neutral-100)' }}
+        style={{ width: 'min(85vw, 1280px)', height: '85vh', maxHeight: '85vh', boxShadow: 'var(--shadow-4)' }}
       >
         <DialogTitle className="sr-only">{`${catalog.name} · ${account.nickname}`}</DialogTitle>
         <header className={styles.header}>

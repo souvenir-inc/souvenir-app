@@ -55,7 +55,7 @@ export function AnimatedTags({ data, onComplete, animate = true }: { data: TagsD
           return (
             <m.span key={tag.label} initial={{ scale: 0.55, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
               transition={{ type: "spring", stiffness: 420, damping: 22 }}>
-              <span style={{ display: "inline-flex", alignItems: "center", background: pal.bg, border: `1px solid ${pal.border}`, color: pal.text, borderRadius: 99, padding: "var(--space-0-5) var(--space-2-5)", fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)', lineHeight: "19px" }}>
+              <span style={{ display: "inline-flex", alignItems: "center", background: pal.bg, border: `1px solid ${pal.border}`, color: pal.text, borderRadius: 99, padding: "var(--space-0-5) var(--space-2-5)", fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-body-sm)' }}>
                 {tag.label}
               </span>
             </m.span>

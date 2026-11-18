@@ -23,7 +23,7 @@ export function AccountName({ account, onChanged }: { account: ConnectorConnecti
   const [focused, setFocused] = useState(false)
   const skipBlurRef = useRef(false)
   const inputRef = useRef<HTMLInputElement>(null)
-  const style: React.CSSProperties = { ...text, fontSize: 'var(--font-size-heading-sm)', lineHeight: '26px', fontWeight: 'var(--font-weight-semibold)' }
+  const style: React.CSSProperties = { ...text, fontSize: 'var(--font-size-heading-sm)', lineHeight: 'var(--line-height-heading-sm)', fontWeight: 'var(--font-weight-semibold)' }
 
   if (!account.canManage) return <h1 style={style}>{account.nickname}</h1>
 

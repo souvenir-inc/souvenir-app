@@ -27,7 +27,7 @@ const cardStyle: React.CSSProperties = {
   background:    'var(--card-bg)',
   // --text-field-ring: neutral-100 in light, a visible 22% white hairline in dark (as Project settings).
   border:        '1px solid var(--text-field-ring)',
-  boxShadow:     '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+  boxShadow:     'var(--shadow-soft)',
   width:         '100%',
   boxSizing:     'border-box',
 }
@@ -74,7 +74,7 @@ export function ProjectInstructionsPanel({ value, editable, onOpenEditor, ref }:
 
       {/* Body — preview only; editing always happens in SystemInstructionsModal. */}
       {isEmpty ? (
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: '18px', color: 'var(--neutral-600)', margin: 0 }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-600)', margin: 0 }}>
           {editable
             ? 'Tell the agent how to work in this project: tone, format, what to focus on or avoid.'
             : 'No instructions yet.'}

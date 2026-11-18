@@ -69,7 +69,7 @@ export function FileDropOverlay({ visible }: { visible: boolean }) {
         <span style={{ fontFamily: "var(--font-body)", fontSize: 'var(--font-size-body-lg)', lineHeight: "var(--line-height-body)", fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-900)" }}>
           Drop files to attach
         </span>
-        <span style={{ fontFamily: "var(--font-body)", fontSize: 'var(--font-size-body-sm)', lineHeight: "18px", color: "var(--neutral-500)" }}>
+        <span style={{ fontFamily: "var(--font-body)", fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: "var(--neutral-500)" }}>
           They upload to this chat. Up to 10 files per message.
         </span>
       </div>

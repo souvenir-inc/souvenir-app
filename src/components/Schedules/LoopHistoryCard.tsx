@@ -300,7 +300,7 @@ export function LoopHistoryCard({
                       backgroundColor: 'var(--neutral-50)',
                       fontFamily:      'var(--font-mono, ui-monospace, monospace)',
                       fontSize:        'var(--font-size-body-sm)',
-                      lineHeight:      1.5,
+                      lineHeight:      'var(--leading-normal)',
                       color:           'var(--neutral-600)',
                       whiteSpace:      'pre-wrap',
                       overflowWrap:    'anywhere',

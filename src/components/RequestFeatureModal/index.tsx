@@ -8,7 +8,7 @@ import { useAuth } from '@/context/auth-context'
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 
-const SHADOW_MODAL = '0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rgba(130,122,116,0.1)'
+const SHADOW_MODAL = 'var(--shadow-4)'
 const SHADOW_INPUT = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--text-field-ring)'
 
 // Closing the modal (the X, a click on the overlay) previously discarded

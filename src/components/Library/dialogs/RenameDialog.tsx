@@ -66,7 +66,7 @@ export function RenameDialog({ file, onClose }: { file: LibraryFile; onClose: ()
                 {error}
               </p>
             )}
-            <p style={{ margin: 'var(--space-2) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: '18px', color: 'var(--neutral-500)' }}>
+            <p style={{ margin: 'var(--space-2) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)' }}>
               Currently &ldquo;{sanitizeDisplayText(file.title)}&rdquo;. The file type stays .{file.extension || 'as is'}. Slashes are saved as dashes.
             </p>
           </DialogBody>

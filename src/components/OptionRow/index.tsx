@@ -29,14 +29,14 @@ export interface OptionRowProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const BG_WHITE       = 'var(--neutral-white, white)'
 const BG_NEUTRAL_50  = 'var(--neutral-50)'
-const BG_NEUTRAL_100 = 'var(--neutral-100, #F5F5F5)'
+const BG_NEUTRAL_100 = 'var(--neutral-100)'
 const BORDER_BLUE    = '1px solid var(--focus-ring)'
 
 // Shadow for the numbered badge - shared constant
 const BADGE_OUTER_SHADOW = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4)'
 const BADGE_INNER_SHADOW = 'inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 61%, transparent), inset 0px -1px 0px 0px rgba(106,98,93,0.05)'
 // Shadow for the check/checkbox badge - white with yellow inner glow
-const CHECK_INNER_SHADOW = 'inset 0px 1px 0px 0px var(--yellow-200, #d8c9a7), inset 0px -1px 0px 0px rgba(106,98,93,0.05)'
+const CHECK_INNER_SHADOW = 'inset 0px 1px 0px 0px var(--yellow-200), inset 0px -1px 0px 0px rgba(106,98,93,0.05)'
 
 // ── Badge animation variants ───────────────────────────────────────────────────
 
@@ -143,7 +143,7 @@ export function OptionRow({
                     }}
                   />
                   <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <TickTwoIcon size={14} color="var(--neutral-700, #524b47)" />
+                    <TickTwoIcon size={14} color="var(--neutral-700)" />
                   </div>
                   <div
                     aria-hidden
@@ -228,7 +228,7 @@ export function OptionRow({
                     }}
                   />
                   <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <TickTwoIcon size={14} color="var(--neutral-700, #524b47)" />
+                    <TickTwoIcon size={14} color="var(--neutral-700)" />
                   </div>
                   <div
                     aria-hidden
@@ -256,7 +256,7 @@ export function OptionRow({
             fontWeight:   'var(--font-weight-medium)',
             fontSize:     'var(--font-size-body-lg, 16px)',
             lineHeight:   'var(--line-height-body-lg, 22px)',
-            color:        'var(--neutral-600, #6a625d)',
+            color:        'var(--neutral-600)',
             margin:       0,
             overflow:     'hidden',
             textOverflow: 'ellipsis',
@@ -283,7 +283,7 @@ export function OptionRow({
               ...dragHandleProps?.style,
             }}
           >
-            <DragDropVerticalIcon size={18} color="var(--neutral-500, #8a7f79)" />
+            <DragDropVerticalIcon size={18} color="var(--neutral-500)" />
           </div>
         )}
       </div>

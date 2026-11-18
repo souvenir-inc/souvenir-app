@@ -115,7 +115,7 @@ export const TeamSwitcherRow = React.forwardRef<HTMLDivElement, TeamSwitcherRowP
                 fontFamily:     'var(--font-title)',
                 fontWeight:     'var(--font-weight-medium)',
                 fontSize:       'var(--font-size-caption)',
-                lineHeight:     1,
+                lineHeight:     'var(--leading-none)',
                 color:          'var(--color-text-on-accent)',
                 userSelect:     'none',
               }}

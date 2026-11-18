@@ -32,6 +32,12 @@ const ART_FILE = [
   /^src\/lib\/llm-icons\.generated\.ts$/,
   /^src\/components\/(CardBrandLogo|ModelIcon|SouvenirLogo|ConnectorGlyph|ThemedLlmIcon)\//,
 ];
+// Content colours: a syntax-highlighting theme and weather illustration. Their colours aren't counted
+// (decided 2026-11-18); their spacing and type still are.
+const CONTENT_COLOUR_FILE = [
+  /^src\/components\/chat\/CodeBlock(\.module)?\.(tsx|css)$/,
+  /^src\/components\/chat\/XmlWeather\.tsx$/,
+];
 
 // ── Style property categories ───────────────────────────────────────────────
 const CATEGORIES = {
@@ -94,6 +100,7 @@ function scan() {
   for (const file of files) {
     const source = stripComments(fs.readFileSync(path.join(ROOT, file), "utf8"));
     const isArt = ART_FILE.some((re) => re.test(file));
+    const contentColour = CONTENT_COLOUR_FILE.some((re) => re.test(file));
     const isCss = file.endsWith(".css");
     const isTsx = file.endsWith(".tsx");
     // The primitive layer: components/ui plus the Radix wrappers that still have their own folders.
@@ -111,10 +118,13 @@ function scan() {
       }
       for (const [prop, value] of decls) {
         const category = Object.keys(CATEGORIES).find((c) => CATEGORIES[c].test(prop));
-        if (category) add(`${classify(value)}.${category}`, file);
+        // z-index -1…9 orders siblings inside one component; page layers (10+) must use the --z-* scale.
+        const local = category === "zIndex" && /^["'`]?-?\d["'`]?$/.test(value.trim());
+        if (category === "color" && contentColour) continue;
+        if (category) add(`${local ? "local" : classify(value)}.${category}`, file);
       }
-      add("colorLiteral.hex", file, count(source, /#[0-9a-fA-F]{3,8}(?![0-9a-zA-Z_-])/g));
-      add("colorLiteral.rgb", file, count(source, /\brgba?\(\s*\d/g));
+      if (!contentColour) add("colorLiteral.hex", file, count(source, /#[0-9a-fA-F]{3,8}(?![0-9a-zA-Z_-])/g));
+      if (!contentColour) add("colorLiteral.rgb", file, count(source, /\brgba?\(\s*\d/g));
     }
 
     if (!isTsx) continue;
@@ -153,7 +163,8 @@ function summary(counts) {
     lines.push(`  ${c.padEnd(16)}${String(tok).padStart(7)}${String(lit).padStart(10)}${pct(tok, tok + lit).padStart(8)}${pct(lit, tok + lit).padStart(12)}`);
   }
   lines.push(`  ${"TOTAL".padEnd(16)}${String(tTok).padStart(7)}${String(tLit).padStart(10)}${pct(tTok, tTok + tLit).padStart(8)}${pct(tLit, tTok + tLit).padStart(12)}`);
-  lines.push(`\nColour literals     hex ${g("colorLiteral.hex")} · rgb()/rgba() ${g("colorLiteral.rgb")}`);
+  lines.push(`  (not counted: ${g("local.zIndex")} z-index values -1…9, sibling order inside one component)`);
+  lines.push(`\nColour literals    hex ${g("colorLiteral.hex")} · rgb()/rgba() ${g("colorLiteral.rgb")}`);
   lines.push(`Inline style blocks ${g("styleBlocks")} · className ${g("classNames")} · Tailwind arbitrary values ${g("twArbitrary")}`);
 
   const btnPrim = g("use.Button") + g("use.IconButton") + g("use.ChipButton");
