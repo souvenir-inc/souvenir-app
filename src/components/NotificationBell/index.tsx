@@ -74,7 +74,7 @@ export function NotificationBell({ open, onOpenChange }: NotificationBellProps) 
   }, [ringKey, reduceMotion, animateBadge, badgeScope])
 
   // Layout effect, not the click handler: the panel can also be opened from
-  // outside (the "N new notifications" toast). Runs before paint, and
+  // outside (NOTIFICATIONS_OPEN_EVENT). Runs before paint, and
   // Dropdown.Float re-anchors when `offset` changes, so there's no jump.
   useLayoutEffect(() => {
     setPanelOpen?.(open)
