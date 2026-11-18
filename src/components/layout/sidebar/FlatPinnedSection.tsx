@@ -31,7 +31,7 @@ export function FlatPinnedSection({ activeChatId, onSelectChat, chatHistory }: S
           animate={shown ? "open" : "closed"}
           initial="closed"
           variants={sectionStaggerVariants}
-          style={{ display: "flex", flexDirection: "column", gap: 4 }}
+          style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)' }}
         >
           {pinnedChats.map((chat) => (
             <m.div key={chat.id} variants={sectionItemVariants}>

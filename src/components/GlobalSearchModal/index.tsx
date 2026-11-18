@@ -324,8 +324,8 @@ export function GlobalSearchModal({
               style={{
                 display:    'flex',
                 alignItems: 'center',
-                gap:        8,
-                padding:    '14px 12px 12px',
+                gap:        'var(--space-2)',
+                padding:    'var(--space-3) var(--space-3) var(--space-3)',
               }}
             >
               <div style={{ flex: 1 }}>
@@ -366,8 +366,8 @@ export function GlobalSearchModal({
                     style={{
                       display:    'flex',
                       alignItems: 'center',
-                      gap:        2,
-                      padding:    '2px 10px 10px',
+                      gap:        'var(--space-0-5)',
+                      padding:    'var(--space-0-5) var(--space-2-5) var(--space-2-5)',
                     }}
                   >
                     {FILTER_TABS.map(tab => (
@@ -397,7 +397,7 @@ export function GlobalSearchModal({
               style={{
                 maxHeight: 368,
                 overflowY: 'auto',
-                padding:   '8px 0 10px',
+                padding:   'var(--space-2) 0 var(--space-2-5)',
               }}
             >
 
@@ -419,7 +419,7 @@ export function GlobalSearchModal({
                   </>
                 ) : (
                   <p style={{
-                    margin:     '32px 0',
+                    margin:     'var(--space-7) 0',
                     textAlign:  'center',
                     fontFamily: 'var(--font-body)',
                     fontSize:   'var(--font-size-body)',
@@ -433,7 +433,7 @@ export function GlobalSearchModal({
               {/* Has query + loading */}
               {hasQuery && loading && (
                 <p style={{
-                  margin:     '32px 0',
+                  margin:     'var(--space-7) 0',
                   textAlign:  'center',
                   fontFamily: 'var(--font-body)',
                   fontSize:   'var(--font-size-body)',
@@ -449,14 +449,14 @@ export function GlobalSearchModal({
                   display:       'flex',
                   flexDirection: 'column',
                   alignItems:    'center',
-                  padding:       '32px 24px',
-                  gap:           6,
+                  padding:       'var(--space-7) var(--space-6)',
+                  gap:           'var(--space-1-5)',
                 }}>
                   <p style={{
                     margin:     0,
                     fontFamily: 'var(--font-body)',
                     fontSize:   'var(--font-size-body)',
-                    fontWeight: 500,
+                    fontWeight: 'var(--font-weight-medium)',
                     color:      'var(--neutral-700)',
                   }}>
                     No results for &ldquo;{query}&rdquo;
@@ -496,13 +496,13 @@ export function GlobalSearchModal({
                           onClick={() => setActiveFilter(type)}
                           style={{
                             display:    'block',
-                            margin:     '2px 16px 4px',
-                            padding:    '3px 0',
+                            margin:     'var(--space-0-5) var(--space-4) var(--space-1)',
+                            padding:    'var(--space-0-5) 0',
                             border:     'none',
                             background: 'transparent',
                             fontFamily: 'var(--font-body)',
                             fontSize:   'var(--font-size-caption)',
-                            fontWeight: 500,
+                            fontWeight: 'var(--font-weight-medium)',
                             color:      'var(--blue-400)',
                             cursor:     'pointer',
                             textAlign:  'left',
@@ -520,7 +520,7 @@ export function GlobalSearchModal({
               {hasQuery && !loading && activeFilter !== 'all' && (
                 filteredResults.length === 0 ? (
                   <p style={{
-                    margin:     '32px 0',
+                    margin:     'var(--space-7) 0',
                     textAlign:  'center',
                     fontFamily: 'var(--font-body)',
                     fontSize:   'var(--font-size-body)',
@@ -546,7 +546,7 @@ export function GlobalSearchModal({
             {notice && (
               <p role="note" style={{
                 margin:     0,
-                padding:    '0 16px 6px',
+                padding:    '0 var(--space-4) var(--space-1-5)',
                 fontFamily: 'var(--font-body)',
                 fontSize:   'var(--font-size-caption)',
                 color:      'var(--neutral-500)',
@@ -579,8 +579,8 @@ export function GlobalSearchModal({
               style={{
                 display:         'flex',
                 alignItems:      'center',
-                gap:             12,
-                padding:         '8px 16px 10px',
+                gap:             'var(--space-3)',
+                padding:         'var(--space-2) var(--space-4) var(--space-2-5)',
                 backgroundColor: 'var(--neutral-white)',
               }}
             >

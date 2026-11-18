@@ -22,7 +22,7 @@ function TextBar({ width, caption = false }: { width: number | string; caption?:
   )
 }
 
-const ROW: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 8, height: 32, boxSizing: 'border-box', borderRadius: 10 }
+const ROW: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 'var(--space-2)', height: 32, boxSizing: 'border-box', borderRadius: 'var(--radius-lg)' }
 
 // Widths of the destination labels as rendered: New, Agents, Schedules, Library, Connectors, Souvenir in Slack.
 const DESTINATION_WIDTHS = [30, 46, 68, 48, 76]
@@ -48,12 +48,12 @@ export function SidebarDestinationsSkeleton({ withSlack, collapsed }: { withSlac
 
 function SectionHeader({ labelWidth }: { labelWidth: number }) {
   return (
-    <div aria-hidden style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 24, padding: '2px 8px', boxSizing: 'border-box' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+    <div aria-hidden style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 24, padding: 'var(--space-0-5) var(--space-2)', boxSizing: 'border-box' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
         <TextBar width={labelWidth} />
         <div className="kaya-skeleton" style={bone({ width: 12, height: 12, borderRadius: 3 })} />
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
         <div className="kaya-skeleton" style={bone({ width: 16, height: 16, borderRadius: 4 })} />
         <div className="kaya-skeleton" style={bone({ width: 16, height: 16, borderRadius: 4 })} />
       </div>
@@ -66,7 +66,7 @@ export function SidebarProjectsSkeleton() {
   return (
     <>
       <SectionHeader labelWidth={53} />
-      <div aria-hidden style={{ ...ROW, padding: '0 8px' }}>
+      <div aria-hidden style={{ ...ROW, padding: '0 var(--space-2)' }}>
         <div className="kaya-skeleton" style={bone({ width: 20, height: 20, borderRadius: 6 })} />
         <TextBar width={104} />
       </div>
@@ -82,7 +82,7 @@ export function SidebarChatRowsSkeleton({ rows = CHAT_WIDTHS.length }: { rows?: 
   return (
     <>
       {CHAT_WIDTHS.slice(0, rows).map((w, i) => (
-        <div key={i} aria-hidden style={{ ...ROW, padding: '0 8px' }}>
+        <div key={i} aria-hidden style={{ ...ROW, padding: '0 var(--space-2)' }}>
           <TextBar width={w} />
         </div>
       ))}
@@ -110,7 +110,7 @@ export function SidebarProfileSkeleton({ collapsed }: { collapsed: boolean }) {
     )
   }
   return (
-    <div aria-hidden style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', height: 50, padding: '0 12px', boxSizing: 'border-box' }}>
+    <div aria-hidden style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', width: '100%', height: 50, padding: '0 var(--space-3)', boxSizing: 'border-box' }}>
       <div className="kaya-skeleton" style={bone({ width: 32, height: 32, borderRadius: 9999 })} />
       <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
         <TextBar width={36} />

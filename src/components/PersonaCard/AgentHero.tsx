@@ -104,7 +104,7 @@ export function AgentHero({
           borderRadius,
           ...agentHeroStyle(avatar.colors[0]),
           opacity,
-          transition:   'opacity 0.2s ease',
+          transition:   'opacity var(--duration-base) ease',
         }}
       />
       <HeroScene

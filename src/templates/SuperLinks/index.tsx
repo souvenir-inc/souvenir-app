@@ -137,11 +137,11 @@ export function SuperLinks(
             display:        'flex',
             alignItems:     'flex-end',
             justifyContent: 'space-between',
-            gap:            16,
-            padding:        '32px 28px 8px',
+            gap:            'var(--space-4)',
+            padding:        'var(--space-7) var(--space-6) var(--space-2)',
           }}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', minWidth: 0 }}>
             <Eyebrow>{workspaceLabel}</Eyebrow>
             <h1
               style={{
@@ -156,7 +156,7 @@ export function SuperLinks(
               {heading}
             </h1>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0 }}>
             <DateRangePill label={dateRange} />
             <Button size="sm" variant="default" onClick={onGenerateLink} leftIcon={<PlusSignIcon />}>
               Generate link
@@ -170,8 +170,8 @@ export function SuperLinks(
             flex:          1,
             display:       'flex',
             flexDirection: 'column',
-            gap:           16,
-            padding:       '16px 28px 32px',
+            gap:           'var(--space-4)',
+            padding:       'var(--space-4) var(--space-6) var(--space-7)',
             minHeight:     0,
           }}
         >
@@ -180,7 +180,7 @@ export function SuperLinks(
             style={{
               display:             'grid',
               gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-              gap:                 12,
+              gap:                 'var(--space-3)',
             }}
           >
             <StatCard
@@ -218,7 +218,7 @@ export function SuperLinks(
             style={{
               display:             'grid',
               gridTemplateColumns: 'minmax(0, 2fr) minmax(320px, 1fr)',
-              gap:                 12,
+              gap:                 'var(--space-3)',
               flex:                1,
               minHeight:           420,
             }}

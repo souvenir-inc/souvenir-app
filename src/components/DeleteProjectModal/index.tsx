@@ -52,7 +52,7 @@ export function DeleteProjectModal({ open, projectName, chatCount, restorable = 
             display:        'flex',
             alignItems:     'center',
             justifyContent: 'space-between',
-            padding:        '20px 20px 16px',
+            padding:        'var(--space-5) var(--space-5) var(--space-4)',
             borderBottom:   '1px solid var(--neutral-100)',
             flexShrink:     0,
           }}
@@ -61,7 +61,7 @@ export function DeleteProjectModal({ open, projectName, chatCount, restorable = 
           <p
             style={{
               fontFamily: 'var(--font-body)',
-              fontWeight: 600,
+              fontWeight: 'var(--font-weight-semibold)',
               fontSize:   'var(--font-size-body-lg)',
               lineHeight: 'var(--line-height-body-lg)',
               color:      'var(--neutral-900)',
@@ -77,10 +77,10 @@ export function DeleteProjectModal({ open, projectName, chatCount, restorable = 
         {/* Body */}
         <div
           style={{
-            padding:       '20px',
+            padding:       'var(--space-5)',
             display:       'flex',
             flexDirection: 'column',
-            gap:           '12px',
+            gap:           'var(--space-3)',
             flexShrink:    0,
           }}
         >
@@ -90,9 +90,9 @@ export function DeleteProjectModal({ open, projectName, chatCount, restorable = 
               display:         'inline-flex',
               alignSelf:       'flex-start',
               alignItems:      'center',
-              gap:             5,
-              padding:         '3px 8px 3px 6px',
-              borderRadius:    6,
+              gap:             'var(--space-1)',
+              padding:         'var(--space-0-5) var(--space-2) var(--space-0-5) var(--space-1-5)',
+              borderRadius:    'var(--radius-sm)',
               backgroundColor: 'var(--red-400-10)',
               boxShadow:       '0px 0px 0px 1px rgba(238,48,48,0.22)',
             }}
@@ -101,9 +101,9 @@ export function DeleteProjectModal({ open, projectName, chatCount, restorable = 
             <span
               style={{
                 fontFamily: 'var(--font-body)',
-                fontWeight: 600,
-                fontSize:   '11px',
-                lineHeight: '16px',
+                fontWeight: 'var(--font-weight-semibold)',
+                fontSize:   'var(--font-size-caption)',
+                lineHeight: 'var(--line-height-small)',
                 color:      'var(--red-600)',
                 letterSpacing: '0.02em',
                 textTransform: 'uppercase',
@@ -135,8 +135,8 @@ export function DeleteProjectModal({ open, projectName, chatCount, restorable = 
             display:        'flex',
             justifyContent: 'flex-end',
             alignItems:     'center',
-            gap:            8,
-            padding:        '12px 16px 16px',
+            gap:            'var(--space-2)',
+            padding:        'var(--space-3) var(--space-4) var(--space-4)',
             borderTop:      '1px solid var(--neutral-100)',
             flexShrink:     0,
           }}

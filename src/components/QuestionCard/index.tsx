@@ -102,8 +102,8 @@ function SkipButton({ onClick, disabled }: { onClick?: React.MouseEventHandler<H
         display:      'flex',
         alignItems:   'center',
         flexShrink:   0,
-        padding:      '6px 10px 8px',
-        borderRadius: 10,
+        padding:      'var(--space-1-5) var(--space-2-5) var(--space-2)',
+        borderRadius: 'var(--radius-lg)',
         border:       'none',
         boxShadow:    hovered ? '0px 0px 0px 1px rgba(59,54,50,0.5)' : '0px 0px 0px 1px rgba(59,54,50,0.3)',
         background:   hovered ? 'var(--neutral-50)' : 'transparent',
@@ -115,7 +115,7 @@ function SkipButton({ onClick, disabled }: { onClick?: React.MouseEventHandler<H
         lineHeight:   'var(--line-height-body, 22px)',
         color:        'var(--neutral-700, #524b47)',
         whiteSpace:   'nowrap',
-        transition:   'background 120ms ease, box-shadow 120ms ease',
+        transition:   'background var(--duration-fast) ease, box-shadow var(--duration-fast) ease',
       }}
     >
       Skip
@@ -144,8 +144,8 @@ function SendButton({ onClick, disabled, pending }: { onClick?: React.MouseEvent
         flexShrink:     0,
         width:          36,
         height:         36,
-        padding:        '7px 8px 9px',
-        borderRadius:   10,
+        padding:        'var(--space-1-5) var(--space-2) var(--space-2)',
+        borderRadius:   'var(--radius-lg)',
         border:         'none',
         cursor:         disabled || pending ? 'not-allowed' : 'pointer',
         opacity:        disabled || pending ? 0.6 : 1,
@@ -160,7 +160,7 @@ function SendButton({ onClick, disabled, pending }: { onClick?: React.MouseEvent
           background:    hovered
             ? 'linear-gradient(180deg, var(--neutral-600) 0%, var(--neutral-800) 100%)'
             : 'linear-gradient(180deg, var(--neutral-700, #524b47) 0%, var(--neutral-900, #26211e) 100%)',
-          pointerEvents: 'none', transition: 'background 120ms ease',
+          pointerEvents: 'none', transition: 'background var(--duration-fast) ease',
         }}
       />
       <div
@@ -232,7 +232,7 @@ function InfoCardBody({ options, selected, onSelect }: {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
 
       {/* Animated single-item content */}
       <AnimatePresence mode="wait" initial={false}>
@@ -242,22 +242,22 @@ function InfoCardBody({ options, selected, onSelect }: {
           animate={{ opacity: 1, y: 0, transition: { duration: 0.15, ease: 'easeOut' } }}
           exit={{ opacity: 0, y: -4, transition: { duration: 0.1, ease: 'easeIn' } }}
           style={{
-            padding:         '10px 12px',
+            padding:         'var(--space-2-5) var(--space-3)',
             minHeight:       56,
             display:         'flex',
             flexDirection:   'column',
-            gap:             6,
+            gap:             'var(--space-1-5)',
             backgroundColor: 'color-mix(in srgb, var(--blue-600) 8%, transparent)',
-            borderRadius:    10,
+            borderRadius:    'var(--radius-lg)',
             border:          '1px solid color-mix(in srgb, var(--blue-600) 18%, transparent)',
           }}
         >
           {/* Number badge + label row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
             <div style={{
               width:           22,
               height:          22,
-              borderRadius:    6,
+              borderRadius:    'var(--radius-sm)',
               flexShrink:      0,
               display:         'flex',
               alignItems:      'center',
@@ -268,7 +268,7 @@ function InfoCardBody({ options, selected, onSelect }: {
               <span style={{
                 fontFamily: 'var(--font-body)',
                 fontWeight: 'var(--font-weight-semibold)',
-                fontSize:   11,
+                fontSize:   'var(--font-size-caption)',
                 lineHeight: '11px',
                 display:    'block',
                 textAlign:  'center',
@@ -281,7 +281,7 @@ function InfoCardBody({ options, selected, onSelect }: {
             <span style={{
               fontFamily: 'var(--font-body)',
               fontWeight: 'var(--font-weight-semibold)',
-              fontSize:   13,
+              fontSize:   'var(--font-size-body-sm)',
               lineHeight: '18px',
               color:      'var(--blue-700)',
             }}>
@@ -292,7 +292,7 @@ function InfoCardBody({ options, selected, onSelect }: {
             <span style={{
               fontFamily: 'var(--font-body)',
               fontWeight: 'var(--font-weight-regular)',
-              fontSize:   12,
+              fontSize:   'var(--font-size-small)',
               lineHeight: '17px',
               color:      'var(--neutral-700)',
             }}>
@@ -303,12 +303,12 @@ function InfoCardBody({ options, selected, onSelect }: {
       </AnimatePresence>
 
       {/* Prev / dot indicators / next */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
-        <div style={{ opacity: isFirst ? 0.28 : 1, pointerEvents: isFirst ? 'none' : 'auto', transition: 'opacity 150ms' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 var(--space-1)' }}>
+        <div style={{ opacity: isFirst ? 0.28 : 1, pointerEvents: isFirst ? 'none' : 'auto', transition: 'opacity var(--duration-fast)' }}>
           <IconButton size="xs" variant="ghost" aria-label="Previous" icon={<ArrowLeftOneIcon size={18} />} onClick={() => goTo(currentIdx - 1)} />
         </div>
 
-        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-1)', alignItems: 'center' }}>
           {options.map((o, i) => (
             <button
               key={o.id}
@@ -318,18 +318,18 @@ function InfoCardBody({ options, selected, onSelect }: {
               style={{
                 width:           i === currentIdx ? 18 : 6,
                 height:          6,
-                borderRadius:    3,
+                borderRadius:    'var(--radius-xs)',
                 border:          'none',
                 padding:         0,
                 cursor:          'pointer',
                 backgroundColor: i === currentIdx ? 'var(--blue-600)' : 'var(--neutral-300)',
-                transition:      'width 220ms ease, background-color 220ms ease',
+                transition:      'width var(--duration-base) ease, background-color var(--duration-base) ease',
               }}
             />
           ))}
         </div>
 
-        <div style={{ opacity: isLast ? 0.28 : 1, pointerEvents: isLast ? 'none' : 'auto', transition: 'opacity 150ms' }}>
+        <div style={{ opacity: isLast ? 0.28 : 1, pointerEvents: isLast ? 'none' : 'auto', transition: 'opacity var(--duration-fast)' }}>
           <IconButton size="xs" variant="ghost" aria-label="Next" icon={<ArrowRightOneIcon size={18} />} onClick={() => goTo(currentIdx + 1)} />
         </div>
       </div>
@@ -495,13 +495,13 @@ export function QuestionCard(
         exit={{ opacity: 0, y: 12, transition: { duration: 0.1, ease: 'easeIn' } }}
         style={{
           backgroundColor: 'var(--neutral-white, white)',
-          borderRadius:    24,
-          padding:         20,
+          borderRadius:    'var(--radius-2xl)',
+          padding:         'var(--space-5)',
           width:           '100%',
           maxWidth:        754,
           display:         'flex',
           flexDirection:   'column',
-          gap:             12,
+          gap:             'var(--space-3)',
           boxShadow:       CARD_SHADOW,
           ...style,
         }}
@@ -524,12 +524,12 @@ export function QuestionCard(
               const BLUE = 'var(--blue-600)'
 
               return (
-                <div key={tab} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                <div key={tab} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-1-5)' }}>
 
                   {/* Circle flanked by symmetric half-lines that keep it centred */}
                   <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                     {/* Left half-line */}
-                    <div style={{ flex: 1, height: 2, backgroundColor: leftFilled ? BLUE : i > 0 ? 'var(--neutral-200)' : 'transparent', transition: 'background-color 300ms' }} />
+                    <div style={{ flex: 1, height: 2, backgroundColor: leftFilled ? BLUE : i > 0 ? 'var(--neutral-200)' : 'transparent', transition: 'background-color var(--duration-slow)' }} />
 
                     {/* Numbered circle */}
                     <div style={{
@@ -546,17 +546,17 @@ export function QuestionCard(
                         : isPast
                           ? `0 0 0 1.5px color-mix(in srgb, var(--blue-600) 45%, transparent)`
                           : `0 0 0 1.5px var(--neutral-200)`,
-                      transition: 'all 250ms ease',
+                      transition: 'all var(--duration-base) ease',
                     }}>
                       <span style={{
                         fontFamily:  'var(--font-body)',
                         fontWeight:  isCurrent ? 700 : 'var(--font-weight-medium)',
-                        fontSize:    11,
+                        fontSize:    'var(--font-size-caption)',
                         lineHeight:  '11px',
                         display:     'block',
                         color:       isCurrent ? 'var(--neutral-white)' : isPast ? BLUE : 'var(--neutral-400)',
                         userSelect:  'none',
-                        transition:  'color 250ms',
+                        transition:  'color var(--duration-base)',
                         textAlign:   'center',
                       }}>
                         {i + 1}
@@ -564,19 +564,19 @@ export function QuestionCard(
                     </div>
 
                     {/* Right half-line */}
-                    <div style={{ flex: 1, height: 2, backgroundColor: rightFilled ? BLUE : i < tabProgress.tabs.length - 1 ? 'var(--neutral-200)' : 'transparent', transition: 'background-color 300ms' }} />
+                    <div style={{ flex: 1, height: 2, backgroundColor: rightFilled ? BLUE : i < tabProgress.tabs.length - 1 ? 'var(--neutral-200)' : 'transparent', transition: 'background-color var(--duration-slow)' }} />
                   </div>
 
                   {/* Label */}
                   <span style={{
                     fontFamily: 'var(--font-body)',
-                    fontSize:   10,
+                    fontSize:   'var(--font-size-caption)',
                     lineHeight: '14px',
                     fontWeight: isCurrent ? 'var(--font-weight-semibold)' : 'var(--font-weight-regular)',
                     color:      isCurrent ? BLUE : isPast ? 'color-mix(in srgb, var(--blue-600) 70%, transparent)' : 'var(--neutral-400)',
                     textAlign:  'center',
                     whiteSpace: 'nowrap',
-                    transition: 'color 250ms',
+                    transition: 'color var(--duration-base)',
                   }}>
                     {tab}
                   </span>
@@ -588,14 +588,14 @@ export function QuestionCard(
         )}
 
         {/* ── Header ─────────────────────────────────────────────────────────── */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, width: '100%', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-2)', width: '100%', flexShrink: 0 }}>
           {type === 'info' ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: '1 0 0', minWidth: 1, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flex: '1 0 0', minWidth: 1, flexWrap: 'wrap' }}>
               <p id={questionId} style={{
                 fontFamily:   'var(--font-title)',
-                fontWeight:   400,
-                fontSize:     20,
-                lineHeight:   '28px',
+                fontWeight:   'var(--font-weight-regular)',
+                fontSize:     'var(--font-size-heading-md)',
+                lineHeight:   'var(--line-height-heading-md)',
                 color:        'var(--neutral-900, #26211e)',
                 margin:       0,
               }}>
@@ -620,11 +620,11 @@ export function QuestionCard(
           </p>
           )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexShrink: 0 }}>
             {hasPagination && type !== 'info' && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 0, flexShrink: 0 }}>
                 <IconButton size="xs" variant="ghost" aria-label="Previous question" icon={<ArrowLeftOneIcon size={18} />} onClick={onPrev} disabled={!onPrev} />
-                <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body, 14px)', lineHeight: 'var(--line-height-body, 22px)', color: 'var(--neutral-600, #6a625d)', whiteSpace: 'nowrap', flexShrink: 0, padding: '0 2px' }}>
+                <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body, 14px)', lineHeight: 'var(--line-height-body, 22px)', color: 'var(--neutral-600, #6a625d)', whiteSpace: 'nowrap', flexShrink: 0, padding: '0 var(--space-0-5)' }}>
                   {paginationLabel}
                 </span>
                 <IconButton size="xs" variant="ghost" aria-label="Next question" icon={<ArrowRightOneIcon size={18} />} onClick={onNext} disabled={!onNext} />
@@ -643,7 +643,7 @@ export function QuestionCard(
 
 
         {/* ── Wide section - options + footer, extends to 10px from card edges ─ */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginLeft: -10, marginRight: -10 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', marginLeft: -10, marginRight: -10 }}>
 
           {/* ─ Options - rank is NEVER inside AnimatePresence (required for Reorder drag) */}
           {type === 'rank' ? (
@@ -655,7 +655,7 @@ export function QuestionCard(
                 setRankState({ question, ids: newOrder.map((o) => o.id) })
                 onRankChange?.(newOrder.map((o) => o.id))
               }}
-              style={{ display: 'flex', flexDirection: 'column', gap: 8, listStyle: 'none', padding: 0, margin: 0 }}
+              style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', listStyle: 'none', padding: 0, margin: 0 }}
             >
               {rankedOptions.map((opt, i) => (
                 <RankableRow key={opt.id} option={opt} index={i} />
@@ -670,7 +670,7 @@ export function QuestionCard(
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1, transition: { duration: 0.15, ease: 'easeOut' } }}
                 exit={{ opacity: 0, transition: { duration: 0.08, ease: 'easeIn' } }}
-                style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
+                style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}
                 role={type === 'single' ? 'radiogroup' : 'group'}
                 aria-labelledby={questionId}
               >
@@ -698,8 +698,8 @@ export function QuestionCard(
             style={{
               display:    'flex',
               alignItems: 'flex-end',
-              gap:        10,
-              padding:    '10px 10px',
+              gap:        'var(--space-2-5)',
+              padding:    'var(--space-2-5) var(--space-2-5)',
               flexShrink: 0,
             }}
           >
@@ -789,7 +789,7 @@ export function QuestionCard(
             </div>
 
             {/* Skip (only when the caller allows skipping) + Send */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0 }}>
               {onSkip && <SkipButton onClick={onSkip} disabled={pending} />}
               <SendButton
                 pending={pending}

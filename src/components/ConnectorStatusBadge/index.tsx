@@ -42,8 +42,8 @@ export const ConnectorStatusBadge = React.forwardRef<HTMLSpanElement, ConnectorS
           display:         'inline-flex',
           alignItems:      'center',
           justifyContent:  'center',
-          padding:         '2px',
-          borderRadius:    '6px',
+          padding:         'var(--space-0-5)',
+          borderRadius:    'var(--radius-sm)',
           backgroundColor: cfg.bg,
           boxShadow:       cfg.shadow,
           overflow:        'clip',
@@ -54,7 +54,7 @@ export const ConnectorStatusBadge = React.forwardRef<HTMLSpanElement, ConnectorS
       >
         <span
           style={{
-            padding:    '0 4px',
+            padding:    '0 var(--space-1)',
             fontFamily: 'var(--font-body)',
             fontWeight: 'var(--font-weight-medium)',
             fontSize:   'var(--font-size-caption)',

@@ -118,7 +118,7 @@ export function PasswordInputField({
         style={{
           display:       'flex',
           flexDirection: 'column',
-          gap:           '4px',
+          gap:           'var(--space-1)',
           width:         fluid ? '100%' : '327px',
         }}
       >
@@ -151,14 +151,14 @@ export function PasswordInputField({
             position:        'relative',
             display:         'flex',
             alignItems:      'center',
-            gap:             '2px',
+            gap:             'var(--space-0-5)',
             backgroundColor: 'var(--text-field-bg)',
             height:          '36px',
-            paddingTop:      '2px',
-            paddingBottom:   '2px',
-            paddingLeft:     '10px',
-            paddingRight:    '2px',
-            borderRadius:    '10px',
+            paddingTop:      'var(--space-0-5)',
+            paddingBottom:   'var(--space-0-5)',
+            paddingLeft:     'var(--space-2-5)',
+            paddingRight:    'var(--space-0-5)',
+            borderRadius:    'var(--radius-lg)',
             overflow:        'hidden',
             boxShadow:       containerShadow,
             outlineStyle:    'solid',
@@ -166,7 +166,7 @@ export function PasswordInputField({
             // The ring settles in from 6px out to 3px while it fades up (and back on blur).
             outlineOffset:   isFocused && !error ? '3px' : '6px',
             outlineColor:    isFocused && !error ? 'var(--focus-ring)' : 'transparent',
-            transition:      'box-shadow 150ms, outline-color 200ms ease, outline-offset 260ms cubic-bezier(0.22, 1, 0.36, 1)',
+            transition:      'box-shadow var(--duration-fast), outline-color var(--duration-base) ease, outline-offset var(--duration-base) cubic-bezier(0.22, 1, 0.36, 1)',
             cursor:          disabled ? 'not-allowed' : 'text',
           }}
           onMouseEnter={(e) => {
@@ -179,7 +179,7 @@ export function PasswordInputField({
           }}
         >
           {/* Input - ref'd for the toggle animation */}
-          <div ref={contentRef} style={{ position: 'relative', flex: 1, padding: '0 2px', display: 'flex', alignItems: 'center', minWidth: 0 }}>
+          <div ref={contentRef} style={{ position: 'relative', flex: 1, padding: '0 var(--space-0-5)', display: 'flex', alignItems: 'center', minWidth: 0 }}>
             <AnimatePresence initial={false}>
               {!hasValue && !isFocused && (
                 <m.span

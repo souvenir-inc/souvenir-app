@@ -87,19 +87,19 @@ export function OptionRow({
         style={{
           display:         'flex',
           alignItems:      'center',
-          gap:             10,
+          gap:             'var(--space-2-5)',
           height:          42,
           width:           '100%',
           flexShrink:      0,
-          padding:         '0 10px',
-          borderRadius:    12,
+          padding:         '0 var(--space-2-5)',
+          borderRadius:    'var(--radius-xl)',
           backgroundColor: bg,
           border:          hasBorder ? BORDER_BLUE : 'none',
           outline:         focused ? `2px solid var(--focus-ring)` : 'none',
           outlineOffset:   '-2px',
           position:        'relative',
           userSelect:      'none',
-          transition:      'background-color 150ms ease',
+          transition:      'background-color var(--duration-fast) ease',
           ...style,
         }}
         {...props}
@@ -122,7 +122,7 @@ export function OptionRow({
                   style={{
                     width:           28,
                     height:          28,
-                    borderRadius:    8,
+                    borderRadius:    'var(--radius-md)',
                     flexShrink:      0,
                     display:         'flex',
                     alignItems:      'center',
@@ -137,7 +137,7 @@ export function OptionRow({
                     style={{
                       position:        'absolute',
                       inset:           0,
-                      borderRadius:    8,
+                      borderRadius:    'var(--radius-md)',
                       backgroundColor: BG_WHITE,
                       pointerEvents:   'none',
                     }}
@@ -166,7 +166,7 @@ export function OptionRow({
                   style={{
                     width:           28,
                     height:          28,
-                    borderRadius:    8,
+                    borderRadius:    'var(--radius-md)',
                     flexShrink:      0,
                     display:         'flex',
                     alignItems:      'center',
@@ -181,7 +181,7 @@ export function OptionRow({
                     style={{
                       position:        'absolute',
                       inset:           0,
-                      borderRadius:    8,
+                      borderRadius:    'var(--radius-md)',
                       backgroundColor: BG_WHITE,
                       pointerEvents:   'none',
                     }}
@@ -207,7 +207,7 @@ export function OptionRow({
                   style={{
                     width:           28,
                     height:          28,
-                    borderRadius:    8,
+                    borderRadius:    'var(--radius-md)',
                     flexShrink:      0,
                     display:         'flex',
                     alignItems:      'center',
@@ -222,7 +222,7 @@ export function OptionRow({
                     style={{
                       position:        'absolute',
                       inset:           0,
-                      borderRadius:    8,
+                      borderRadius:    'var(--radius-md)',
                       backgroundColor: BG_WHITE,
                       pointerEvents:   'none',
                     }}
@@ -277,7 +277,7 @@ export function OptionRow({
               flexShrink:     0,
               width:          24,
               height:         24,
-              borderRadius:   6,
+              borderRadius:   'var(--radius-sm)',
               cursor:         'grab',
               touchAction:    'none',
               ...dragHandleProps?.style,

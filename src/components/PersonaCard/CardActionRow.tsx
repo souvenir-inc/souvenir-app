@@ -37,7 +37,7 @@ export function CardActionRow({ primary, modelUnavailable, ctaHot, setCtaHot, at
       backgroundSize:     '100% 1px',
       backgroundPosition: 'top',
       backgroundRepeat:   'no-repeat',
-      marginInline:   14,
+      marginInline:   'var(--space-3)',
     }}
   >
     {primary && !modelUnavailable && (

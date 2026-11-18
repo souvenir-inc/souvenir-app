@@ -14,7 +14,7 @@ import type { ProjectPanels } from './use-project-panels'
 
 const screenStyle: React.CSSProperties = { position: 'relative', display: 'flex', width: '100%', flex: '1 1 auto', minHeight: 0, overflow: 'hidden' }
 const columnStyle: React.CSSProperties = { flex: '1 0 0', minWidth: 0, height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }
-const innerStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 16px 8px', boxSizing: 'border-box', gap: '12px', height: '100%' }
+const innerStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'var(--space-4) var(--space-4) var(--space-2)', boxSizing: 'border-box', gap: 'var(--space-3)', height: '100%' }
 
 /** The page frame: the outer row and the centred left column. Shared by the page and its skeleton. */
 export function ProjectFrame({ children, overlay }: { children: React.ReactNode; overlay?: React.ReactNode }) {

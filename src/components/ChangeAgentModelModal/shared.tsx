@@ -103,15 +103,15 @@ export function ModalHeader({ title, subtitle, left, right }: {
   right?:    React.ReactNode
 }) {
   return (
-    <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid var(--neutral-100)', position: 'relative', flexShrink: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingRight: 32 }}>
+    <div style={{ padding: 'var(--space-5) var(--space-5) var(--space-4)', borderBottom: '1px solid var(--neutral-100)', position: 'relative', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', paddingRight: 'var(--space-7)' }}>
         {left}
-        <p style={{ margin: 0, fontFamily: 'var(--font-title)', fontSize: '1.5rem', fontWeight: 400, lineHeight: '2rem', color: 'var(--neutral-900)' }}>
+        <p style={{ margin: 0, fontFamily: 'var(--font-title)', fontSize: '1.5rem', fontWeight: 'var(--font-weight-regular)', lineHeight: '2rem', color: 'var(--neutral-900)' }}>
           {title}
         </p>
       </div>
       {subtitle && (
-        <p style={{ margin: '3px 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', fontWeight: 400, lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-400)' }}>
+        <p style={{ margin: 'var(--space-0-5) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', fontWeight: 'var(--font-weight-regular)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-400)' }}>
           {subtitle}
         </p>
       )}
@@ -136,7 +136,7 @@ function tagColor(tag: string): BadgeColor {
 function modelTagsTooltip(model: AIModel): React.ReactNode {
   if (!model.tags || model.tags.length === 0) return 'No tags for this model yet.'
   return (
-    <span style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+    <span style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-0-5)' }}>
       {model.tags.map(tag => (
         <Badge key={tag} label={tag} color={tagColor(tag)} />
       ))}
@@ -186,16 +186,16 @@ export function ModelPickerList({
       style={{
         display:             'flex',
         flexDirection:       'column',
-        gap:                 '4px',
-        margin:              '16px 16px 0',
-        padding:             '2px',
+        gap:                 'var(--space-1)',
+        margin:              'var(--space-4) var(--space-4) 0',
+        padding:             'var(--space-0-5)',
         maxHeight,
         overflowY:           'auto',
         overscrollBehaviorY: 'contain',
       }}
     >
       {message ? (
-        <p style={{ margin: '20px 0', textAlign: 'center', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-400)' }}>
+        <p style={{ margin: 'var(--space-5) 0', textAlign: 'center', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-400)' }}>
           {message}
         </p>
       ) : (

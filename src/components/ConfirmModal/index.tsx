@@ -52,15 +52,15 @@ export function ConfirmModal({
         aria-modal="true"
         onEscapeKeyDown={(e) => { if (submitting) e.preventDefault() }}
         onInteractOutside={(e) => { if (submitting) e.preventDefault() }}
-        style={{ padding: 24, gap: 20 }}
+        style={{ padding: 'var(--space-6)', gap: 'var(--space-5)' }}
       >
         <div>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: '8px 0 0' }}>
+          <DialogDescription style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 'var(--space-2) 0 0' }}>
             {description}
           </DialogDescription>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
           <Button variant="secondary" disabled={submitting} onClick={onClose}>
             {cancelLabel}
           </Button>

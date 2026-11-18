@@ -34,10 +34,10 @@ export function OptionBadge({ ref, variant = 'number', num = 1, className, ...pr
           width:           28,
           height:          28,
           flexShrink:      0,
-          borderRadius:    8,
+          borderRadius:    'var(--radius-md)',
           overflow:        'clip',
           boxShadow:       OUTER_SHADOW,
-          padding:         '5px 8px',
+          padding:         'var(--space-1) var(--space-2)',
         }}
         {...props}
       >
@@ -47,14 +47,14 @@ export function OptionBadge({ ref, variant = 'number', num = 1, className, ...pr
           style={{
             position:        'absolute',
             inset:           0,
-            borderRadius:    8,
+            borderRadius:    'var(--radius-md)',
             backgroundColor: 'color-mix(in srgb, var(--neutral-100) 60%, transparent)',
             pointerEvents:   'none',
           }}
         />
 
         {variant === 'number' && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 2px', position: 'relative', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 var(--space-0-5)', position: 'relative', flexShrink: 0 }}>
             <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body, 14px)', lineHeight: 'var(--line-height-body, 22px)', color: 'var(--neutral-700)', margin: 0, whiteSpace: 'nowrap' }}>
               {num}
             </p>

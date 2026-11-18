@@ -40,18 +40,18 @@ export function DeleteChatDialog({
         hideClose
         style={{
           backgroundColor: "var(--modal-bg)",
-          borderRadius: "16px",
-          padding: "24px",
+          borderRadius: "var(--radius-2xl)",
+          padding: "var(--space-6)",
           width: "min(420px, 90vw)",
           boxShadow:
             "0 8px 32px color-mix(in srgb, var(--static-black) 12%, transparent), 0 2px 8px color-mix(in srgb, var(--static-black) 8%, transparent)",
           display: "flex",
           flexDirection: "column",
-          gap: "16px",
+          gap: "var(--space-4)",
         }}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1-5)" }}>
           <DialogTitle
             style={{
               fontFamily: "var(--font-body)",
@@ -83,7 +83,7 @@ export function DeleteChatDialog({
           style={{
             display: "flex",
             justifyContent: "flex-end",
-            gap: "8px",
+            gap: "var(--space-2)",
           }}
         >
           <Button variant="ghost" onClick={onCancel} disabled={isDeleting}>

@@ -57,10 +57,10 @@ export function FlatSidebarSlackConnector({ connected = false, selected = false,
           data-sidebar-selected={selected ? '' : undefined}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: 'auto', height: 32, padding: '0 6px', borderRadius: 10,
+            width: 'auto', height: 32, padding: '0 var(--space-1-5)', borderRadius: 'var(--radius-lg)',
             backgroundColor: isActive ? 'var(--sidebar-menu-item-hover-bg)' : 'transparent',
             boxShadow: isActive ? 'var(--shadow-sidebar-item-hover)' : undefined,
-            cursor: 'pointer', transition: 'background-color 150ms, box-shadow 150ms', boxSizing: 'border-box',
+            cursor: 'pointer', transition: 'background-color var(--duration-fast), box-shadow var(--duration-fast)', boxSizing: 'border-box',
           }}
         >
           <div style={{ color: 'var(--sidebar-icon, var(--sidebar-menu-item-text))', lineHeight: 0 }}>
@@ -85,13 +85,13 @@ export function FlatSidebarSlackConnector({ connected = false, selected = false,
       style={{
         position: 'relative',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        width: '100%', height: 32, padding: '0 8px', borderRadius: 10,
+        width: '100%', height: 32, padding: '0 var(--space-2)', borderRadius: 'var(--radius-lg)',
         backgroundColor: isActive ? 'var(--sidebar-menu-item-hover-bg)' : 'transparent',
         boxShadow: isActive ? 'var(--shadow-sidebar-item-hover)' : undefined,
-        cursor: 'pointer', transition: 'background-color 150ms, box-shadow 150ms', boxSizing: 'border-box',
+        cursor: 'pointer', transition: 'background-color var(--duration-fast), box-shadow var(--duration-fast)', boxSizing: 'border-box',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', minWidth: 0 }}>
         <div style={{ color: 'var(--sidebar-icon, var(--sidebar-menu-item-text))', flexShrink: 0, lineHeight: 0 }}>
           <SlackGlyph size={20} />
         </div>

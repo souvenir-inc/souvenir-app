@@ -63,17 +63,17 @@ function PersonaCardSkeleton() {
     <div
       aria-hidden
       style={{
-        width: '100%', boxSizing: 'border-box', padding: 8, borderRadius: 16, display: 'flex', alignItems: 'center', gap: 10,
+        width: '100%', boxSizing: 'border-box', padding: 'var(--space-2)', borderRadius: 'var(--radius-2xl)', display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)',
         backgroundColor: 'var(--card-bg)',
         boxShadow: '0px 1px 2px 0px var(--neutral-700-12), 0px 0px 0px 1px var(--neutral-100)',
       }}
     >
-      <div className="kaya-skeleton" style={{ width: 52, height: 52, borderRadius: 12, flexShrink: 0 }} />
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 7 }}>
-        <div className="kaya-skeleton" style={{ height: 13, width: '50%', borderRadius: 6 }} />
-        <div className="kaya-skeleton" style={{ height: 11, width: '80%', borderRadius: 6 }} />
+      <div className="kaya-skeleton" style={{ width: 52, height: 52, borderRadius: 'var(--radius-xl)', flexShrink: 0 }} />
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
+        <div className="kaya-skeleton" style={{ height: 13, width: '50%', borderRadius: 'var(--radius-sm)' }} />
+        <div className="kaya-skeleton" style={{ height: 11, width: '80%', borderRadius: 'var(--radius-sm)' }} />
       </div>
-      <div className="kaya-skeleton" style={{ height: 28, width: 80, borderRadius: 14, flexShrink: 0 }} />
+      <div className="kaya-skeleton" style={{ height: 28, width: 80, borderRadius: 'var(--radius-xl)', flexShrink: 0 }} />
     </div>
   )
 }
@@ -202,7 +202,7 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
 
   const listView = (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, width: '100%', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)', width: '100%', flexShrink: 0 }}>
         {/* Filter dropdown - same "view filter" pattern as Pinboard's
             "All pins" trigger: a Button + chevron opening a Dropdown of
             selectable rows. */}
@@ -318,14 +318,14 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
           bottom-toolbar split. position:relative + the two edge-fade overlays
           below are siblings of the actual scrolling div so they stay pinned
           to the viewport instead of scrolling away with the list. */}
-      <div style={{ position: 'relative', flex: '1 1 0', minHeight: 0, marginTop: 12 }}>
+      <div style={{ position: 'relative', flex: '1 1 0', minHeight: 0, marginTop: 'var(--space-3)' }}>
         <div
           ref={scrollRef}
           onScroll={handleScroll}
           className="kaya-scrollbar"
-          style={{ position: 'absolute', inset: 0, overflowY: 'auto', overflowX: 'hidden', padding: 3 }}
+          style={{ position: 'absolute', inset: 0, overflowY: 'auto', overflowX: 'hidden', padding: 'var(--space-0-5)' }}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             {loading ? (
               Array.from({ length: 3 }).map((_, i) => <PersonaCardSkeleton key={i} />)
             ) : filtered.length > 0 ? (
@@ -346,23 +346,23 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
                 ))}
               </TemplateCardList>
             ) : search ? (
-              <p style={{ margin: 0, padding: '8px 10px', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-500)' }}>
+              <p style={{ margin: 0, padding: 'var(--space-2) var(--space-2-5)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-500)' }}>
                 No agents matching &quot;{search}&quot;
               </p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '32px 16px', textAlign: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-7) var(--space-4)', textAlign: 'center' }}>
                 <div
                   aria-hidden
                   style={{
-                    width: 48, height: 48, borderRadius: 12,
+                    width: 48, height: 48, borderRadius: 'var(--radius-xl)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     backgroundColor: 'var(--neutral-100)',
                   }}
                 >
                   <UserAiIcon size={22} color="var(--neutral-400)" />
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <p style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 16, lineHeight: '22px', color: 'var(--neutral-700)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                  <p style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-700)' }}>
                     No agents yet
                   </p>
                   <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-500)' }}>
@@ -403,7 +403,7 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
             pointerEvents:        'none',
             zIndex:               1,
             opacity:              atTop ? 0 : 1,
-            transition:           'opacity 150ms ease',
+            transition:           'opacity var(--duration-fast) ease',
           }}
         />
         <div
@@ -418,7 +418,7 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
             pointerEvents: 'none',
             zIndex:        1,
             opacity:       atTop ? 0 : 1,
-            transition:    'opacity 150ms ease',
+            transition:    'opacity var(--duration-fast) ease',
           }}
         />
 
@@ -438,7 +438,7 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
             pointerEvents:        'none',
             zIndex:               1,
             opacity:              atBottom ? 0 : 1,
-            transition:           'opacity 150ms ease',
+            transition:           'opacity var(--duration-fast) ease',
           }}
         />
         <div
@@ -453,7 +453,7 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
             pointerEvents: 'none',
             zIndex:        1,
             opacity:       atBottom ? 0 : 1,
-            transition:    'opacity 150ms ease',
+            transition:    'opacity var(--duration-fast) ease',
           }}
         />
       </div>
@@ -462,7 +462,7 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
           Organize bottom toolbar: no divider, always at the panel's bottom
           regardless of list length (the scroll region above absorbs any
           extra space when the list is short). */}
-      <div style={{ display: 'flex', gap: 8, alignItems: 'stretch', paddingTop: 12, flexShrink: 0 }}>
+      <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'stretch', paddingTop: 'var(--space-3)', flexShrink: 0 }}>
         <Button
           variant="default"
           size="md"
@@ -513,15 +513,15 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
             transition={{ type: 'spring', stiffness: 340, damping: 36 }}
             style={{ position: 'absolute', inset: 0, boxSizing: 'border-box', padding: EDGE, display: 'flex', flexDirection: 'column', backgroundColor: 'var(--neutral-50)' }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, paddingBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0, paddingBottom: 'var(--space-3)' }}>
               <Tooltip content="Back to agents">
                 <IconButton variant="ghost" size="sm" icon={<ArrowLeftOneIcon size={20} />} aria-label="Back to agents" onClick={closeAgentDetails} />
               </Tooltip>
-              <p style={{ margin: 0, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 20, lineHeight: '28px', color: 'var(--neutral-700)' }}>
+              <p style={{ margin: 0, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-md)', lineHeight: 'var(--line-height-heading-md)', color: 'var(--neutral-700)' }}>
                 {detailsAgent?.name ?? 'Agent details'}
               </p>
             </div>
-            <div className="kaya-scrollbar" style={{ flex: '1 1 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', padding: 3 }}>
+            <div className="kaya-scrollbar" style={{ flex: '1 1 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', padding: 'var(--space-0-5)' }}>
               <AgentDetailsBody
                 key={detailsId}
                 repoId={detailsId}

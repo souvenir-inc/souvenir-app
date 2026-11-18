@@ -34,8 +34,8 @@ export interface FineTuneModalProps {
 /** Skills and memories have no per-agent backend yet, so they are shown as upcoming rather than as dead controls. */
 function ComingSoonSection({ title, hint }: { title: string; hint: string }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
         <p style={LABEL_STYLE}>{title}</p>
         <Badge color="Neutral" label="Coming soon" />
       </div>
@@ -77,7 +77,7 @@ function Body({
     <>
       <Tabs value={tab} onValueChange={setTab} style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: '1 1 auto' }}>
         {SHOW_PREFERENCES && (
-          <div style={{ padding: '12px 20px 0', flexShrink: 0 }}>
+          <div style={{ padding: 'var(--space-3) var(--space-5) 0', flexShrink: 0 }}>
             <TabsList>
               <TabsTrigger value="instructions">Instructions</TabsTrigger>
               <TabsTrigger value="preferences">Preferences</TabsTrigger>
@@ -86,17 +86,17 @@ function Body({
         )}
         <div
           className="kaya-scrollbar"
-          style={{ display: 'flex', flexDirection: 'column', padding: 20, overflowY: 'auto', minHeight: 0, flex: '1 1 auto' }}
+          style={{ display: 'flex', flexDirection: 'column', padding: 'var(--space-5)', overflowY: 'auto', minHeight: 0, flex: '1 1 auto' }}
         >
-          <TabsContent value="instructions" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <TabsContent value="instructions" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
             <EnhancePromptField label={null} value={instructions} onChange={setInstructions} ariaLabel="Agent instructions" />
             {instructions.trim().length === 0 && (
-              <p role="alert" style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--color-tag-Red-text, var(--red-700))' }}>
+              <p role="alert" style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', color: 'var(--color-tag-Red-text, var(--red-700))' }}>
                 Instructions can’t be empty.
               </p>
             )}
           </TabsContent>
-          {SHOW_PREFERENCES && <TabsContent value="preferences" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {SHOW_PREFERENCES && <TabsContent value="preferences" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
             <ComingSoonSection title="Skills" hint="Teach this agent reusable abilities it can call on." />
             <ComingSoonSection title="Memories" hint="Preferences this agent should always remember about you." />
             <CreativityField value={temperature} onChange={setTemperature} disabled={saving} />
@@ -105,7 +105,7 @@ function Body({
       </Tabs>
       <div
         style={{
-          display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '12px 20px 16px',
+          display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)', padding: 'var(--space-3) var(--space-5) var(--space-4)',
           borderTop: '1px solid var(--neutral-100)', flexShrink: 0,
         }}
       >

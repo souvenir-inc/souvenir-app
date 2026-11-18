@@ -426,15 +426,15 @@ function LeftSidebarImpl({
         // settles, which otherwise flashes "No Plan Selected" briefly.
         if (!user || (isTeamUser && !orgPlanSettled)) {
           return collapsed ? (
-            <div style={{ padding: '12px 8px', display: 'flex', justifyContent: 'center' }}>
-              <div className="kaya-skeleton" style={{ width: 32, height: 32, borderRadius: 8 }} />
+            <div style={{ padding: 'var(--space-3) var(--space-2)', display: 'flex', justifyContent: 'center' }}>
+              <div className="kaya-skeleton" style={{ width: 32, height: 32, borderRadius: 'var(--radius-md)' }} />
             </div>
           ) : (
-            <div style={{ padding: '8px 6px', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div className="kaya-skeleton" style={{ width: 36, height: 36, borderRadius: 8, flexShrink: 0 }} />
-              <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 5 }}>
-                <div className="kaya-skeleton" style={{ height: 14, width: '60%', borderRadius: 4 }} />
-                <div className="kaya-skeleton" style={{ height: 11, width: '42%', borderRadius: 4 }} />
+            <div style={{ padding: 'var(--space-2) var(--space-1-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <div className="kaya-skeleton" style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)', flexShrink: 0 }} />
+              <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                <div className="kaya-skeleton" style={{ height: 14, width: '60%', borderRadius: 'var(--radius-xs)' }} />
+                <div className="kaya-skeleton" style={{ height: 11, width: '42%', borderRadius: 'var(--radius-xs)' }} />
               </div>
             </div>
           )
@@ -479,7 +479,7 @@ function LeftSidebarImpl({
       )}
       recentItems={
         !user ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '4px 0' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', padding: 'var(--space-1) 0' }}>
             {Array.from({ length: 5 }).map((_, i) => (
               <SidebarMenuSkeleton key={i} index={i} fluid />
             ))}
@@ -492,7 +492,7 @@ function LeftSidebarImpl({
           // Rendered on every other page — including project pages, whose own
           // "projects" body-section tab is separate from this "chats" one — so
           // Recent Chats is never silently hidden behind a disconnected placeholder.
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
             <StarredSection {...sectionProps} />
             <RecentsSection {...sectionProps} />
           </div>

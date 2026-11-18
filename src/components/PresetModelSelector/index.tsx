@@ -85,7 +85,7 @@ export function PresetModelSelector(
         ref={ref}
         className={cn(className)}
         style={{
-          padding: '8px',
+          padding: 'var(--space-2)',
           ...style,
         }}
         {...props}
@@ -94,13 +94,13 @@ export function PresetModelSelector(
         <div style={{
           display:       'flex',
           flexDirection: 'column',
-          gap:           '16px',
+          gap:           'var(--space-4)',
           height:        '440px',
           maxHeight:     '440px',
         }}>
 
           {/* ── Header: search + tier tabs ── */}
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'center', width: '100%', flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'center', width: '100%', flexShrink: 0 }}>
             <div style={{ flex: '1 0 0', minWidth: 0 }}>
               <InputField
                 size="small"
@@ -141,7 +141,7 @@ export function PresetModelSelector(
           <div style={{
             display:       'flex',
             flexDirection: 'column',
-            gap:           '8px',
+            gap:           'var(--space-2)',
             flex:          '1 0 0',
             minHeight:     0,
             width:         '100%',
@@ -169,7 +169,7 @@ export function PresetModelSelector(
                    (input-type indicator), not the bookmark slot. */}
                 <div style={{
                   display:    'flex',
-                  gap:        '8px',
+                  gap:        'var(--space-2)',
                   alignItems: 'center',
                   padding:    '4px 38px 2px 34px',
                   flexShrink: 0,
@@ -189,10 +189,10 @@ export function PresetModelSelector(
                       inset:               0,
                       overflowY:           'auto',
                       overscrollBehaviorY: 'contain',
-                      padding:             '2px',
+                      padding:             'var(--space-0-5)',
                     }}
                   >
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                       {children}
                     </div>
                   </div>
@@ -213,9 +213,9 @@ export function PresetModelSelector(
                       maskImage:           'linear-gradient(to bottom, black 0%, transparent 100%)',
                       WebkitMaskImage:     'linear-gradient(to bottom, black 0%, transparent 100%)',
                       pointerEvents:       'none',
-                      zIndex:              10,
+                      zIndex:              'var(--z-raised)',
                       opacity:             atTop ? 0 : 1,
-                      transition:          'opacity 150ms ease',
+                      transition:          'opacity var(--duration-fast) ease',
                     }} />
                   ))}
                   <div aria-hidden style={{
@@ -226,7 +226,7 @@ export function PresetModelSelector(
                     pointerEvents: 'none',
                     zIndex:        11,
                     opacity:       atTop ? 0 : 1,
-                    transition:    'opacity 150ms ease',
+                    transition:    'opacity var(--duration-fast) ease',
                   }} />
 
                   {/* ── Bottom edge - progressive blur (2→6px, behind) + color fade (in front) ── */}
@@ -245,9 +245,9 @@ export function PresetModelSelector(
                       maskImage:           'linear-gradient(to top, black 0%, transparent 100%)',
                       WebkitMaskImage:     'linear-gradient(to top, black 0%, transparent 100%)',
                       pointerEvents:       'none',
-                      zIndex:              10,
+                      zIndex:              'var(--z-raised)',
                       opacity:             atBottom ? 0 : 1,
-                      transition:          'opacity 150ms ease',
+                      transition:          'opacity var(--duration-fast) ease',
                     }} />
                   ))}
                   <div aria-hidden style={{
@@ -258,7 +258,7 @@ export function PresetModelSelector(
                     pointerEvents: 'none',
                     zIndex:        11,
                     opacity:       atBottom ? 0 : 1,
-                    transition:    'opacity 150ms ease',
+                    transition:    'opacity var(--duration-fast) ease',
                   }} />
 
                 </div>

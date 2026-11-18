@@ -109,7 +109,7 @@ export function ShareAgentPanel({ repoId, invites: showInvites = true, askLimit 
         </div>
         {link ? (
           <>
-            <div style={{ ...BOX_STYLE, display: 'flex', alignItems: 'center', gap: 8, padding: '6px 6px 6px 12px' }}>
+            <div style={{ ...BOX_STYLE, display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-1-5) var(--space-1-5) var(--space-1-5) var(--space-3)' }}>
               <Tooltip content={linkUrl} maxWidth={280}>
                 <span className="min-w-0 flex-1 truncate font-[family-name:var(--font-code)] text-[13px] text-[var(--neutral-800)]">
                   {linkUrl.replace(/^https?:\/\//, '')}
@@ -130,7 +130,7 @@ export function ShareAgentPanel({ repoId, invites: showInvites = true, askLimit 
               {askLimit && (
                 <label className="flex items-center gap-2">
                   <span style={HINT_STYLE}>Credit limit</span>
-                  <span className="kaya-field" style={{ ...BOX_STYLE, padding: '4px 8px', width: 120 }}>
+                  <span className="kaya-field" style={{ ...BOX_STYLE, padding: 'var(--space-1) var(--space-2)', width: 120 }}>
                     <input
                       type="text"
                       inputMode="numeric"
@@ -157,7 +157,7 @@ export function ShareAgentPanel({ repoId, invites: showInvites = true, askLimit 
         <section className="flex flex-col gap-2" aria-label="Invite by email">
           <p style={LABEL_STYLE}>Invite by email</p>
           <div className="flex items-center gap-2">
-            <div className="kaya-field" style={{ ...BOX_STYLE, flex: 1, minWidth: 0, padding: '7px 12px' }}>
+            <div className="kaya-field" style={{ ...BOX_STYLE, flex: 1, minWidth: 0, padding: 'var(--space-1-5) var(--space-3)' }}>
               <input
                 type="email"
                 value={email}
@@ -173,7 +173,7 @@ export function ShareAgentPanel({ repoId, invites: showInvites = true, askLimit 
           {invites.length > 0 && (
             <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
               {invites.map(share => (
-                <li key={share.id} style={{ ...BOX_STYLE, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '6px 6px 6px 12px' }}>
+                <li key={share.id} style={{ ...BOX_STYLE, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)', padding: 'var(--space-1-5) var(--space-1-5) var(--space-1-5) var(--space-3)' }}>
                   <span className="min-w-0 truncate text-sm text-[var(--neutral-800)]">{(share.recipient_emails ?? []).join(', ') || 'Invited'}</span>
                   <Button variant="ghost" size="sm" onClick={() => void revoke(share.id, 'Invite revoked', 'Failed to revoke the invite')} loading={busy === share.id} disabled={busy !== null}>Revoke</Button>
                 </li>

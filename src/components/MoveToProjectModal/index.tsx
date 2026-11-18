@@ -74,16 +74,16 @@ function ProjectRow({ project, selected, onSelect }: ProjectRowProps) {
       style={{
         display:         'flex',
         alignItems:      'center',
-        gap:             10,
-        padding:         '10px 12px',
-        borderRadius:    10,
+        gap:             'var(--space-2-5)',
+        padding:         'var(--space-2-5) var(--space-3)',
+        borderRadius:    'var(--radius-lg)',
         border:          'none',
         width:           '100%',
         textAlign:       'left',
         backgroundColor: selected ? 'var(--neutral-50)' : 'transparent',
         boxShadow:       selected ? SHADOW_ROW_SELECTED : 'none',
         cursor:          'pointer',
-        transition:      'background-color 120ms, box-shadow 120ms',
+        transition:      'background-color var(--duration-fast), box-shadow var(--duration-fast)',
       }}
     >
       {/* Folder icon container */}
@@ -93,10 +93,10 @@ function ProjectRow({ project, selected, onSelect }: ProjectRowProps) {
         justifyContent:  'center',
         width:           32,
         height:          32,
-        borderRadius:    8,
+        borderRadius:    'var(--radius-md)',
         backgroundColor: selected ? 'color-mix(in srgb, var(--info-500) 10%, transparent)' : 'var(--neutral-100)',
         flexShrink:      0,
-        transition:      'background-color 120ms',
+        transition:      'background-color var(--duration-fast)',
       }}>
         <FolderOneIcon size={16} color={selected ? 'var(--blue-400)' : 'var(--neutral-500)'} variant="static" />
       </div>
@@ -107,22 +107,22 @@ function ProjectRow({ project, selected, onSelect }: ProjectRowProps) {
           margin:       0,
           fontFamily:   'var(--font-body)',
           fontSize:     'var(--font-size-body)',
-          fontWeight:   500,
+          fontWeight:   'var(--font-weight-medium)',
           lineHeight:   'var(--line-height-body)',
           color:        selected ? 'var(--blue-400)' : 'var(--neutral-800)',
           overflow:     'hidden',
           textOverflow: 'ellipsis',
           whiteSpace:   'nowrap',
-          transition:   'color 120ms',
+          transition:   'color var(--duration-fast)',
         }}>
           {project.name}
         </p>
         {project.description && (
           <p style={{
-            margin:       '2px 0 0',
+            margin:       'var(--space-0-5) 0 0',
             fontFamily:   'var(--font-body)',
             fontSize:     'var(--font-size-caption)',
-            fontWeight:   400,
+            fontWeight:   'var(--font-weight-regular)',
             lineHeight:   'var(--line-height-caption)',
             color:        'var(--neutral-400)',
             overflow:     'hidden',
@@ -145,7 +145,7 @@ function ProjectRow({ project, selected, onSelect }: ProjectRowProps) {
         display:         'flex',
         alignItems:      'center',
         justifyContent:  'center',
-        transition:      'background-color 150ms, box-shadow 150ms',
+        transition:      'background-color var(--duration-fast), box-shadow var(--duration-fast)',
       }}>
         {selected && (
           <div style={{
@@ -214,7 +214,7 @@ export function MoveToProjectModal({
         {/* ── Header ─────────────────────────────────────────────────── */}
         <div style={{
           flexShrink:   0,
-          padding:      '20px 20px 16px',
+          padding:      'var(--space-5) var(--space-5) var(--space-4)',
           borderBottom: '1px solid var(--neutral-100)',
           position:     'relative',
         }}>
@@ -223,7 +223,7 @@ export function MoveToProjectModal({
             margin:     0,
             fontFamily: 'var(--font-title)',
             fontSize:   '1.5rem',
-            fontWeight: 400,
+            fontWeight: 'var(--font-weight-regular)',
             lineHeight: '2rem',
             color:      'var(--neutral-900)',
           }}>
@@ -232,10 +232,10 @@ export function MoveToProjectModal({
           </DialogTitle>
           <DialogDescription asChild>
           <p style={{
-            margin:     '3px 0 0',
+            margin:     'var(--space-0-5) 0 0',
             fontFamily: 'var(--font-body)',
             fontSize:   'var(--font-size-caption)',
-            fontWeight: 400,
+            fontWeight: 'var(--font-weight-regular)',
             lineHeight: 'var(--line-height-caption)',
             color:      'var(--neutral-400)',
           }}>
@@ -257,8 +257,8 @@ export function MoveToProjectModal({
         {/* ── Context card — ModelFeaturedCard default (unselected) style ── */}
         <div style={{
           flexShrink:      0,
-          margin:          '16px 16px 0',
-          borderRadius:    12,
+          margin:          'var(--space-4) var(--space-4) 0',
+          borderRadius:    'var(--radius-xl)',
           position:        'relative',
           overflow:        'hidden',
           backgroundColor: 'var(--neutral-white)',
@@ -276,19 +276,19 @@ export function MoveToProjectModal({
           {/* Content */}
           <div style={{
             position:      'relative',
-            padding:       '12px 14px',
+            padding:       'var(--space-3) var(--space-3)',
             display:       'flex',
             flexDirection: 'column',
-            gap:           4,
+            gap:           'var(--space-1)',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)' }}>
               <InformationCircleIcon animated size={16} color="var(--neutral-500)" />
               <p style={{
                 margin:     0,
                 fontFamily: 'var(--font-body)',
-                fontWeight: 500,
-                fontSize:   '15px',
-                lineHeight: '20px',
+                fontWeight: 'var(--font-weight-medium)',
+                fontSize:   'var(--font-size-body)',
+                lineHeight: 'var(--line-height-body-sm)',
                 color:      'var(--neutral-700)',
               }}>
                 {noun.charAt(0).toUpperCase() + noun.slice(1)} will know everything the project knows
@@ -297,7 +297,7 @@ export function MoveToProjectModal({
             <p style={{
               margin:     0,
               fontFamily: 'var(--font-body)',
-              fontWeight: 400,
+              fontWeight: 'var(--font-weight-regular)',
               fontSize:   'var(--font-size-caption)',
               lineHeight: 'var(--line-height-caption)',
               color:      'var(--neutral-600)',
@@ -312,7 +312,7 @@ export function MoveToProjectModal({
         {/* ── Project list — the one section that grows/shrinks with the
             modal's own maxHeight; header/context-card/footer stay fixed
             size (flexShrink: 0 above/below) ── */}
-        <div style={{ flex: '1 1 auto', minHeight: 0, position: 'relative', padding: '12px 16px 0', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: '1 1 auto', minHeight: 0, position: 'relative', padding: 'var(--space-3) var(--space-4) 0', display: 'flex', flexDirection: 'column' }}>
           <div
             role="radiogroup"
             aria-label="Select a project"
@@ -321,22 +321,22 @@ export function MoveToProjectModal({
             style={{
               display:             'flex',
               flexDirection:       'column',
-              gap:                 4,
+              gap:                 'var(--space-1)',
               flex:                '1 1 auto',
               minHeight:           0,
               maxHeight:           420,
               overflowY:           'auto',
               overscrollBehaviorY: 'contain',
-              padding:             3,
-              paddingBottom:       12,
+              padding:             'var(--space-0-5)',
+              paddingBottom:       'var(--space-3)',
               opacity:             loading ? 0.5 : 1,
               pointerEvents:       loading ? 'none' : undefined,
-              transition:          'opacity 150ms',
+              transition:          'opacity var(--duration-fast)',
             }}
           >
             {projects.length === 0 ? (
               <p style={{
-                margin:     '20px 0',
+                margin:     'var(--space-5) 0',
                 textAlign:  'center',
                 fontFamily: 'var(--font-body)',
                 fontSize:   'var(--font-size-body)',
@@ -367,7 +367,7 @@ export function MoveToProjectModal({
             pointerEvents: 'none',
             zIndex:        11,
             opacity:       atTop ? 0 : 1,
-            transition:    'opacity 150ms ease',
+            transition:    'opacity var(--duration-fast) ease',
           }} />
 
           <div aria-hidden style={{
@@ -378,7 +378,7 @@ export function MoveToProjectModal({
             pointerEvents: 'none',
             zIndex:        11,
             opacity:       atBottom ? 0 : 1,
-            transition:    'opacity 150ms ease',
+            transition:    'opacity var(--duration-fast) ease',
           }} />
         </div>
 
@@ -388,8 +388,8 @@ export function MoveToProjectModal({
           display:        'flex',
           justifyContent: 'flex-end',
           alignItems:     'center',
-          gap:            8,
-          padding:        '12px 16px 16px',
+          gap:            'var(--space-2)',
+          padding:        'var(--space-3) var(--space-4) var(--space-4)',
           borderTop:      '1px solid var(--neutral-100)',
         }}>
           <Button variant="cancel" onClick={handleClose} disabled={loading}>

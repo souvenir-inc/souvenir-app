@@ -87,11 +87,11 @@ function GroupPermissionDropdown({ value, label: name, change, disabled }: { val
 function PermissionsTabSkeleton() {
   return (
     <div aria-hidden style={{ display: 'flex', flexDirection: 'column' }}>
-      <span className="kaya-skeleton" style={{ display: 'block', height: 40, borderRadius: 8 }} />
+      <span className="kaya-skeleton" style={{ display: 'block', height: 40, borderRadius: 'var(--radius-md)' }} />
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0 10px 8px', borderTop: i === 0 ? undefined : '1px solid var(--neutral-100)' }}>
-          <span className="kaya-skeleton" style={{ display: 'block', width: 160, height: 14, borderRadius: 4 }} />
-          <span className="kaya-skeleton" style={{ display: 'block', width: 132, height: 32, borderRadius: 8 }} />
+        <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--space-2-5) 0 var(--space-2-5) var(--space-2)', borderTop: i === 0 ? undefined : '1px solid var(--neutral-100)' }}>
+          <span className="kaya-skeleton" style={{ display: 'block', width: 160, height: 14, borderRadius: 'var(--radius-xs)' }} />
+          <span className="kaya-skeleton" style={{ display: 'block', width: 132, height: 32, borderRadius: 'var(--radius-md)' }} />
         </div>
       ))}
     </div>
@@ -234,7 +234,7 @@ export function PermissionsTab({
                       <ArrowDownOneIcon size={16} />
                     </span>
                     {group.name}
-                    <span style={{ color: 'var(--neutral-400)', fontWeight: 400 }}>{group.tools.length}</span>
+                    <span style={{ color: 'var(--neutral-400)', fontWeight: 'var(--font-weight-regular)' }}>{group.tools.length}</span>
                   </button>
                   <GroupPermissionDropdown value={groupMode(group.tools)} label={`Set all ${group.name.toLowerCase()}`} disabled={readOnly || saving === '__group__'} change={mode => void changeGroup(group.tools, mode)} />
                 </div>

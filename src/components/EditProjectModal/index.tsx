@@ -21,24 +21,24 @@ const EMPTY_PROJECT_TAGS: ProjectTag[] = []
 const INPUT_BASE: React.CSSProperties = {
   fontFamily:   'var(--font-body)',
   fontWeight:   'var(--font-weight-regular)',
-  fontSize:     '14px',
-  lineHeight:   '22px',
+  fontSize:     'var(--font-size-body)',
+  lineHeight:   'var(--line-height-body)',
   color:        'var(--legacy-1a1714)',
   background:   'var(--field-surface)',
   border:       '1px solid var(--border-default)',
-  borderRadius: '10px',
+  borderRadius: 'var(--radius-lg)',
   boxShadow:    '0px 1px 1.5px 0px rgba(82,75,71,0.12)',
   outline:      'none',
   width:        '100%',
-  padding:      '9px 12px',
+  padding:      'var(--space-2) var(--space-3)',
   boxSizing:    'border-box',
 }
 
 const LABEL_STYLE: React.CSSProperties = {
   fontFamily: 'var(--font-body)',
   fontWeight: 'var(--font-weight-medium)',
-  fontSize:   '14px',
-  lineHeight: '22px',
+  fontSize:   'var(--font-size-body)',
+  lineHeight: 'var(--line-height-body)',
   color:      'var(--neutral-700)',
   display:    'block',
   margin:     0,
@@ -165,7 +165,7 @@ export function EditProjectModal({
         // Autofocus goes to the Name input (autoFocus), not the first button.
         onOpenAutoFocus={(e) => { e.preventDefault(); document.getElementById('edit-project-name')?.focus() }}
         style={{
-          borderRadius: 20,
+          borderRadius: 'var(--radius-2xl)',
           boxShadow:    '0px 8px 32px 0px rgba(26,23,20,0.24), 0px 0px 0px 1px rgba(59,54,50,0.12)',
           width:        560,
           height:       580,
@@ -178,7 +178,7 @@ export function EditProjectModal({
             display:        'flex',
             alignItems:     'center',
             justifyContent: 'space-between',
-            padding:        '20px 20px 16px',
+            padding:        'var(--space-5) var(--space-5) var(--space-4)',
             flexShrink:     0,
           }}
         >
@@ -187,8 +187,8 @@ export function EditProjectModal({
             style={{
               fontFamily: 'var(--font-title)',
               fontWeight: 'var(--font-weight-regular)',
-              fontSize:   '24px',
-              lineHeight: '32px',
+              fontSize:   'var(--font-size-heading)',
+              lineHeight: 'var(--line-height-heading)',
               color:      'var(--legacy-1a1714)',
               margin:     0,
               minWidth:   0,
@@ -219,15 +219,15 @@ export function EditProjectModal({
           style={{
             display:       'flex',
             flexDirection: 'column',
-            gap:           '20px',
-            padding:       '24px 20px',
+            gap:           'var(--space-5)',
+            padding:       'var(--space-6) var(--space-5)',
             flex:          '1 1 0',
             minHeight:     0,
             overflowY:     'auto',
           }}
         >
           {/* Name */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
             <label htmlFor="edit-project-name" style={LABEL_STYLE}>Name<RequiredMark /></label>
             <input
               id="edit-project-name"
@@ -244,7 +244,7 @@ export function EditProjectModal({
               aria-describedby={form.errors.name ? 'edit-project-name-error' : undefined}
             />
             {form.errors.name && (
-              <p id="edit-project-name-error" role="alert" style={{ fontFamily: 'var(--font-body)', fontSize: '12px', lineHeight: '16px', color: 'var(--red-500, #ef4444)', margin: 0 }}>
+              <p id="edit-project-name-error" role="alert" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--red-500, #ef4444)', margin: 0 }}>
                 {form.errors.name}
               </p>
             )}
@@ -253,7 +253,7 @@ export function EditProjectModal({
           {/* Who can see this — owner-only, inline so it can't open
               underneath this modal's z-index layer. */}
           {visibilityOptions.length > 1 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
               <span id="edit-project-visibility" style={LABEL_STYLE}>Who can see this</span>
               <Dropdown.Float
                 open={visibilityOpen}
@@ -288,7 +288,7 @@ export function EditProjectModal({
                 </Dropdown>
               </Dropdown.Float>
               {visibilityNote && (
-                <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', lineHeight: '16px', color: visibilityNote.losesAccess ? 'var(--red-500, #ef4444)' : 'var(--neutral-500)', margin: 0 }}>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)', color: visibilityNote.losesAccess ? 'var(--red-500, #ef4444)' : 'var(--neutral-500)', margin: 0 }}>
                   {visibilityNote.text}
                 </p>
               )}
@@ -296,7 +296,7 @@ export function EditProjectModal({
           )}
 
           {/* Description */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
             <label htmlFor="edit-project-desc" style={LABEL_STYLE}>Description<RequiredMark /></label>
             <textarea
               id="edit-project-desc"
@@ -305,7 +305,7 @@ export function EditProjectModal({
               onChange={(e) => setField('description', e.target.value)}
               placeholder="e.g. All discovery and design work for the V2 redesign"
               rows={6}
-              style={{ ...INPUT_BASE, resize: 'none', lineHeight: '22px' }}
+              style={{ ...INPUT_BASE, resize: 'none', lineHeight: 'var(--line-height-body)' }}
               onFocus={focusInput}
               onBlur={blurInput}
               aria-required="true"
@@ -313,9 +313,9 @@ export function EditProjectModal({
           </div>
 
           {/* Tags */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
             <span style={LABEL_STYLE}>Tags</span>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-1-5)', alignItems: 'center' }}>
               <AnimatePresence initial={false}>
                 {draft.tags.map((tag) => (
                   <m.div
@@ -324,7 +324,7 @@ export function EditProjectModal({
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.85 }}
                     transition={{ duration: 0.12 }}
-                    style={{ display: 'flex', alignItems: 'center', gap: '2px' }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-0-5)' }}
                   >
                     <Badge label={tag.label} color={tag.color} />
                     <button
@@ -366,8 +366,8 @@ export function EditProjectModal({
               style={{
                 fontFamily: 'var(--font-body)',
                 fontWeight: 'var(--font-weight-regular)',
-                fontSize:   '11px',
-                lineHeight: '16px',
+                fontSize:   'var(--font-size-caption)',
+                lineHeight: 'var(--line-height-small)',
                 color:      'var(--neutral-500)',
                 margin:     0,
               }}
@@ -385,8 +385,8 @@ export function EditProjectModal({
             display:        'flex',
             justifyContent: 'flex-end',
             alignItems:     'center',
-            gap:            '8px',
-            padding:        '16px 20px',
+            gap:            'var(--space-2)',
+            padding:        'var(--space-4) var(--space-5)',
             flexShrink:     0,
           }}
         >

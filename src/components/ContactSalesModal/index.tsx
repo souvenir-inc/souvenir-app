@@ -27,19 +27,19 @@ const SHADOW_MODAL = '0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rg
 const S = {
   label: {
     fontFamily: 'var(--font-body)',
-    fontWeight: 400,
-    fontSize: 14,
-    lineHeight: '22px',
+    fontWeight: 'var(--font-weight-regular)',
+    fontSize: 'var(--font-size-body)',
+    lineHeight: 'var(--line-height-body)',
     color: 'var(--neutral-700)',
     margin: 0,
   } as React.CSSProperties,
   fieldError: {
     display: 'block',
     fontFamily: 'var(--font-body)',
-    fontSize: 12,
-    lineHeight: '16px',
+    fontSize: 'var(--font-size-small)',
+    lineHeight: 'var(--line-height-small)',
     color: 'var(--red-400)',
-    marginTop: 2,
+    marginTop: 'var(--space-0-5)',
   } as React.CSSProperties,
 } as const
 
@@ -79,13 +79,13 @@ export function ContactSalesModal({ onClose }: { onClose: () => void }) {
           if (state.submitting || (e.target instanceof Element && e.target.closest('[data-kds-dropdown-panel]'))) e.preventDefault()
         }}
         className="kaya-scrollbar p-2"
-        style={{ width: 738, maxHeight: 'calc(100dvh - 48px)', overflow: 'auto', background: 'var(--neutral-50)', borderRadius: 20, boxShadow: SHADOW_MODAL }}
+        style={{ width: 738, maxHeight: 'calc(100dvh - 48px)', overflow: 'auto', background: 'var(--neutral-50)', borderRadius: 'var(--radius-2xl)', boxShadow: SHADOW_MODAL }}
       >
         <form onSubmit={handleSubmit}>
-          <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
 
             {/* Header */}
-            <div style={{ borderBottom: '1px solid var(--neutral-100)', padding: '0 12px 24px', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+            <div style={{ borderBottom: '1px solid var(--neutral-100)', padding: '0 var(--space-3) var(--space-6)', display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
               <DialogTitle style={undefined} className="m-0 flex-[1_0_0] font-[family-name:var(--font-title)] text-2xl font-normal leading-8 text-[var(--neutral-900)]">
                 Contact sales
               </DialogTitle>
@@ -99,20 +99,20 @@ export function ContactSalesModal({ onClose }: { onClose: () => void }) {
               </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               {/* Subtitle */}
-              <div style={{ padding: '0 12px 24px' }}>
-                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+              <div style={{ padding: '0 var(--space-3) var(--space-6)' }}>
+                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
                   Deploy Autonomous Tasks to your team. We&apos;ll scope seats, governance, and rollout.
                 </p>
               </div>
 
               {/* Fields */}
-              <div style={{ border: '1px solid var(--border-default)', borderRadius: 16, padding: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ border: '1px solid var(--border-default)', borderRadius: 'var(--radius-2xl)', padding: 'var(--space-3)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
 
                 {/* Row 1: Work email + Full name */}
-                <div style={{ display: 'flex', gap: 12 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
+                <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', width: '100%' }}>
                     <label htmlFor="cs-email" style={S.label}>Work email</label>
                     <Input fluid id="cs-email" type="email" name="email" placeholder="you@company.com" required />
                     <span style={S.fieldError}>
@@ -120,7 +120,7 @@ export function ContactSalesModal({ onClose }: { onClose: () => void }) {
                     </span>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', width: '100%' }}>
                     <label htmlFor="cs-name" style={S.label}>Full name</label>
                     <Input fluid id="cs-name" type="text" name="name" placeholder="Jane Smith" required />
                     <span style={S.fieldError}>
@@ -130,8 +130,8 @@ export function ContactSalesModal({ onClose }: { onClose: () => void }) {
                 </div>
 
                 {/* Row 2: Company + Team size */}
-                <div style={{ display: 'flex', gap: 12 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
+                <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', width: '100%' }}>
                     <label htmlFor="cs-company" style={S.label}>Company</label>
                     <Input fluid id="cs-company" type="text" name="company" placeholder="Acme Inc." required />
                     <span style={S.fieldError}>
@@ -139,7 +139,7 @@ export function ContactSalesModal({ onClose }: { onClose: () => void }) {
                     </span>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', width: '100%' }}>
                     <label htmlFor="cs-team-size" style={S.label}>Team size</label>
                     <Dropdown.Float
                       open={teamSizeOpen}
@@ -183,7 +183,7 @@ export function ContactSalesModal({ onClose }: { onClose: () => void }) {
                 </div>
 
                 {/* What are you trying to solve? */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                   <label htmlFor="cs-message" style={S.label}>What are you trying to solve?</label>
                   <Textarea id="cs-message" name="message" placeholder="Tell us about your use case…" minRows={4} required />
                   <span style={S.fieldError}>
@@ -193,11 +193,11 @@ export function ContactSalesModal({ onClose }: { onClose: () => void }) {
               </div>
 
               {/* Footer */}
-              <div style={{ padding: '24px 0 12px', display: 'flex', flexDirection: 'column', gap: 9 }}>
+              <div style={{ padding: 'var(--space-6) 0 var(--space-3)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <Button variant="default" fluid type="submit" loading={state.submitting} disabled={state.submitting}>
                   Contact sales
                 </Button>
-                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
                   Response within one business day.
                 </p>
               </div>

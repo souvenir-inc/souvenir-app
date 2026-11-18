@@ -36,10 +36,10 @@ export function ScheduleDeleteModal({
         onEscapeKeyDown={(e) => { if (deleting) e.preventDefault() }}
         onInteractOutside={(e) => { if (deleting) e.preventDefault() }}
         style={{
-          padding:   28,
+          padding:   'var(--space-6)',
           width:     440,
           maxWidth:  'calc(100vw - 48px)',
-          gap:       16,
+          gap:       'var(--space-4)',
           boxShadow: '0 8px 40px color-mix(in srgb, var(--static-black) 12%, transparent)',
         }}
       >
@@ -70,7 +70,7 @@ export function ScheduleDeleteModal({
         </DialogDescription>
 
         {/* Actions */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 4 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)', marginTop: 'var(--space-1)' }}>
           <Button variant="ghost" size="sm" onClick={onClose} disabled={deleting}>
             Cancel
           </Button>

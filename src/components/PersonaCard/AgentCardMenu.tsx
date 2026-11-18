@@ -87,7 +87,7 @@ export function AgentCardMenu({
               style={{
                 position: 'fixed',
                 inset:    0,
-                zIndex:   10,
+                zIndex:   'var(--z-raised)',
               }}
               onMouseDown={() => onOpenChange(false)}
             />

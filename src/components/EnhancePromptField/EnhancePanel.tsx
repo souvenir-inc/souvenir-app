@@ -42,8 +42,8 @@ export default function EnhancePanel({ flow, value }: { flow: EnhanceFlow; value
   return (
     <>
               {/* Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                   <h2 style={{
                     margin:     0,
                     fontFamily: 'var(--font-body)',
@@ -70,7 +70,7 @@ export default function EnhancePanel({ flow, value }: { flow: EnhanceFlow; value
                     height:          28,
                     padding:         0,
                     border:          'none',
-                    borderRadius:    6,
+                    borderRadius:    'var(--radius-sm)',
                     backgroundColor: 'transparent',
                     color:           'var(--neutral-700)',
                     cursor:          'pointer',
@@ -102,7 +102,7 @@ export default function EnhancePanel({ flow, value }: { flow: EnhanceFlow; value
                 <>
                   <EnhanceScanningState />
                   {state.waiting && (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginTop: -16 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)', marginTop: -16 }}>
                       {state.slow && (
                         <p role="status" style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-600)', textAlign: 'center' }}>
                           Still working on it — this can take a little while.
@@ -130,12 +130,12 @@ export default function EnhancePanel({ flow, value }: { flow: EnhanceFlow; value
               )}
 
               {state.phase === 'diff' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                   <EnhanceSummaryBar
                     wordsAdded={summary.wordsAdded}
                     guidelineGroups={summary.guidelineGroups}
                   />
-                  <div role="group" aria-label="View" style={{ display: 'flex', gap: 6 }}>
+                  <div role="group" aria-label="View" style={{ display: 'flex', gap: 'var(--space-1-5)' }}>
                     <Button size="sm" variant={state.diffView === 'changes' ? 'default' : 'ghost'} aria-pressed={state.diffView === 'changes'} onClick={() => flow.setDiffView('changes')}>Changes</Button>
                     <Button size="sm" variant={state.diffView === 'preview' ? 'default' : 'ghost'} aria-pressed={state.diffView === 'preview'} onClick={() => flow.setDiffView('preview')}>Preview</Button>
                   </div>
@@ -143,7 +143,7 @@ export default function EnhancePanel({ flow, value }: { flow: EnhanceFlow; value
                     <div
                       aria-label="Preview of the enhanced prompt"
                       className="kaya-scrollbar"
-                      style={{ maxHeight: 240, overflowY: 'auto', overscrollBehaviorY: 'contain', padding: 2, borderRadius: 8 }}
+                      style={{ maxHeight: 240, overflowY: 'auto', overscrollBehaviorY: 'contain', padding: 'var(--space-0-5)', borderRadius: 'var(--radius-md)' }}
                     >
                       <MarkdownRenderer content={state.draft} />
                     </div>
@@ -157,8 +157,8 @@ export default function EnhancePanel({ flow, value }: { flow: EnhanceFlow; value
                       maxHeight:           240,
                       overflowY:           'auto',
                       overscrollBehaviorY: 'contain',
-                      padding:             2,
-                      borderRadius:        8,
+                      padding:             'var(--space-0-5)',
+                      borderRadius:        'var(--radius-md)',
                     }}
                   >
                     {diffSegments.map((seg, i) => (
@@ -173,7 +173,7 @@ export default function EnhancePanel({ flow, value }: { flow: EnhanceFlow; value
               {state.phase === 'complete' && (
                 <p style={{
                   margin:     0,
-                  padding:    '24px 4px',
+                  padding:    'var(--space-6) var(--space-1)',
                   fontFamily: 'var(--font-body)',
                   fontSize:   'var(--font-size-body)',
                   lineHeight: 1.5,
@@ -226,13 +226,13 @@ function QAStep({
   const isCapped = question.multiSelect && !!question.maxSelect && answers.length >= question.maxSelect
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
       {/* Step label - hidden in AUDIT (PRD §13) */}
       {!audit && (
         <p style={{
           margin:        0,
           fontFamily:    'var(--font-body)',
-          fontSize: 12,
+          fontSize: 'var(--font-size-small)',
           letterSpacing: '0.03em',
           textTransform: 'uppercase',
           color:         'var(--color-enhance-step-label)',
@@ -242,7 +242,7 @@ function QAStep({
       )}
 
       {/* Question text + sub */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
         <h3 style={{
           margin:     0,
           fontFamily: 'var(--font-body)',
@@ -273,9 +273,9 @@ function QAStep({
           style={{
             display:         'inline-flex',
             alignItems:      'center',
-            gap:             6,
-            padding:         '4px 8px',
-            borderRadius:    6,
+            gap:             'var(--space-1-5)',
+            padding:         'var(--space-1) var(--space-2)',
+            borderRadius:    'var(--radius-sm)',
             backgroundColor: 'var(--color-enhance-primary-tint)',
             color:           'var(--color-diff-added-text)',
             fontFamily:      'var(--font-body)',
@@ -311,7 +311,7 @@ function QAStep({
       {/* Option rows - KDS OptionRow (same component QuestionCard uses).
           single-select:  default | selected
           multi-select:   multi   | multi-selected */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         {question.options.map((opt, i) => {
           if (opt.id === 'custom') return null  // rendered as expandable row below
           const isSelected = answers.includes(opt.label)
@@ -348,7 +348,7 @@ function QAStep({
 
         {/* Custom row - bare InputField + Add button */}
         {question.options.some(o => o.id === 'custom') && (
-          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'flex-end' }}>
             <div style={{ flex: '1 0 0', minWidth: 0 }}>
               <InputField
                 fluid
@@ -408,7 +408,7 @@ function Footer({
 
   if (phase === 'diff') {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingTop: 4 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', paddingTop: 'var(--space-1)' }}>
         <Button size="sm" variant="ghost" onClick={onDiscard}>Discard</Button>
         <Button size="sm" variant="default" onClick={onApply} rightIcon={<ArrowRightOneIcon />}>Apply changes</Button>
       </div>
@@ -417,7 +417,7 @@ function Footer({
 
   if (phase === 'complete') {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, paddingTop: 4 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)', paddingTop: 'var(--space-1)' }}>
         <Button size="sm" variant="ghost" onClick={onClose}>Close</Button>
         <Button size="sm" variant="default" onClick={onRunDeeper} rightIcon={<ArrowRightOneIcon />}>Run deeper analysis</Button>
       </div>
@@ -426,9 +426,9 @@ function Footer({
 
   // qa
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingTop: 4 }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', paddingTop: 'var(--space-1)' }}>
       <EnhanceDotProgress total={total} current={qIdx} audit={audit} />
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
         {qIdx > 0 && <Button size="sm" variant="ghost" onClick={onBack} leftIcon={<ArrowLeftOneIcon />}>Back</Button>}
         <Button size="sm" variant="ghost" onClick={onSkip}>Skip</Button>
         <Button

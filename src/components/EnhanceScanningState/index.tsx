@@ -48,8 +48,8 @@ export function EnhanceScanningState({ ref, rotateMs = 900, messages, className,
           flexDirection:  'column',
           alignItems:     'center',
           justifyContent: 'center',
-          gap:            16,
-          padding:        '40px 24px',
+          gap:            'var(--space-4)',
+          padding:        'var(--space-8) var(--space-6)',
           ...style,
         }}
         {...props}
@@ -91,7 +91,7 @@ export function EnhanceScanningState({ ref, rotateMs = 900, messages, className,
             width:           '100%',
             maxWidth:        320,
             height:          4,
-            borderRadius:    999,
+            borderRadius:    'var(--radius-full)',
             backgroundColor: 'var(--color-enhance-progress-inactive)',
             overflow:        'hidden',
           }}
@@ -106,7 +106,7 @@ export function EnhanceScanningState({ ref, rotateMs = 900, messages, className,
               width:           '30%',
               top:             0,
               bottom:           0,
-              borderRadius:    999,
+              borderRadius:    'var(--radius-full)',
               backgroundColor: 'var(--color-enhance-primary)',
             }}
           />

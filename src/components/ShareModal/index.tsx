@@ -113,7 +113,7 @@ function PermissionMenu({ current, onSelect, onRemove, onClose }: PermissionMenu
           decorative
           style={{
             backgroundColor: 'var(--neutral-800-15)',
-            margin:          '4px 0',
+            margin:          'var(--space-1) 0',
           }}
         />
 
@@ -156,7 +156,7 @@ function PersonRow({ person, onPermissionChange, onRemove }: PersonRowProps) {
         position:   'relative',
         display:    'flex',
         alignItems: 'center',
-        gap:        10,
+        gap:        'var(--space-2-5)',
         width:      '100%',
         listStyle:  'none',
       }}
@@ -196,7 +196,7 @@ function PersonRow({ person, onPermissionChange, onRemove }: PersonRowProps) {
             style={{
               fontFamily: 'var(--font-body)',
               fontSize:   'var(--font-size-body)',
-              fontWeight: 600,
+              fontWeight: 'var(--font-weight-semibold)',
               color:      'var(--neutral-600)',
               lineHeight: 1,
               userSelect: 'none',
@@ -213,16 +213,16 @@ function PersonRow({ person, onPermissionChange, onRemove }: PersonRowProps) {
           flex:          '1 1 0',
           display:       'flex',
           flexDirection: 'column',
-          gap:           1,
+          gap:           'var(--space-0-5)',
           minWidth:      0,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)' }}>
           <span
             style={{
               fontFamily:   'var(--font-body)',
               fontSize:     'var(--font-size-body)',
-              fontWeight:   600,
+              fontWeight:   'var(--font-weight-semibold)',
               lineHeight:   'var(--line-height-body)',
               color:        'var(--neutral-950)',
               overflow:     'hidden',
@@ -240,7 +240,7 @@ function PersonRow({ person, onPermissionChange, onRemove }: PersonRowProps) {
           style={{
             fontFamily:   'var(--font-body)',
             fontSize:     'var(--font-size-caption)',
-            fontWeight:   400,
+            fontWeight:   'var(--font-weight-regular)',
             lineHeight:   'var(--line-height-caption)',
             color:        'var(--neutral-500)',
             overflow:     'hidden',
@@ -258,7 +258,7 @@ function PersonRow({ person, onPermissionChange, onRemove }: PersonRowProps) {
           style={{
             fontFamily: 'var(--font-body)',
             fontSize:   'var(--font-size-body)',
-            fontWeight: 400,
+            fontWeight: 'var(--font-weight-regular)',
             lineHeight: 'var(--line-height-body)',
             color:      'var(--neutral-500)',
             flexShrink: 0,
@@ -282,15 +282,15 @@ function PersonRow({ person, onPermissionChange, onRemove }: PersonRowProps) {
               style={{
                 display:         'flex',
                 alignItems:      'center',
-                gap:             4,
-                padding:         '5px 8px',
-                borderRadius:    8,
+                gap:             'var(--space-1)',
+                padding:         'var(--space-1) var(--space-2)',
+                borderRadius:    'var(--radius-md)',
                 border:          'none',
                 backgroundColor: hovered ? 'var(--neutral-50)' : 'transparent',
                 cursor:          'pointer',
                 fontFamily:      'var(--font-body)',
                 fontSize:        'var(--font-size-body)',
-                fontWeight:      400,
+                fontWeight:      'var(--font-weight-regular)',
                 lineHeight:      'var(--line-height-body)',
                 color:           'var(--neutral-700)',
                 boxShadow:       btnShadow,
@@ -299,7 +299,7 @@ function PersonRow({ person, onPermissionChange, onRemove }: PersonRowProps) {
                 whiteSpace:      'nowrap',
                 outline:         'none',
                 flexShrink:      0,
-                transition:      'background-color 120ms, box-shadow 120ms',
+                transition:      'background-color var(--duration-fast), box-shadow var(--duration-fast)',
               }}
             >
               {permissionLabel(person.permission as SharePermission)}
@@ -367,7 +367,7 @@ export function ShareModal({
         // Start in the email field; portaled permission menus don't count as an outside click.
         onOpenAutoFocus={e => { e.preventDefault(); inputRef.current?.focus() }}
         onInteractOutside={e => { if (e.target instanceof Element && e.target.closest('[data-kds-dropdown-panel]')) e.preventDefault() }}
-        style={{ width: 572, background: 'transparent', boxShadow: 'none', borderRadius: 18, overflow: 'visible' }}
+        style={{ width: 572, background: 'transparent', boxShadow: 'none', borderRadius: 'var(--radius-2xl)', overflow: 'visible' }}
       >
       <DialogTitle className="sr-only">{personaName ? `Share ${personaName}` : 'Share agent'}</DialogTitle>
       <Comp
@@ -376,10 +376,10 @@ export function ShareModal({
         style={{
           display:         'flex',
           flexDirection:   'column',
-          gap:             16,
+          gap:             'var(--space-4)',
           width:           572,
-          padding:         '16px 14px',
-          borderRadius:    18,
+          padding:         'var(--space-4) var(--space-3)',
+          borderRadius:    'var(--radius-2xl)',
           boxSizing:       'border-box' as const,
           backgroundColor: 'var(--modal-bg)',
           boxShadow:       SHADOW_MODAL,
@@ -396,10 +396,10 @@ export function ShareModal({
             display:        'flex',
             alignItems:     'center',
             justifyContent: 'space-between',
-            gap:            10,
+            gap:            'var(--space-2-5)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', minWidth: 0 }}>
             {/* Persona avatar */}
             {personaAvatarUrl ? (
               <Image
@@ -409,7 +409,7 @@ export function ShareModal({
                 height={36}
                 unoptimized
                 style={{
-                  borderRadius: 10,
+                  borderRadius: 'var(--radius-lg)',
                   objectFit:    'cover',
                   flexShrink:   0,
                   boxShadow:    SHADOW_AVATAR,
@@ -422,7 +422,7 @@ export function ShareModal({
                 style={{
                   width:           36,
                   height:          36,
-                  borderRadius:    10,
+                  borderRadius:    'var(--radius-lg)',
                   flexShrink:      0,
                   backgroundColor: 'var(--neutral-100)',
                   boxShadow:       SHADOW_AVATAR,
@@ -435,7 +435,7 @@ export function ShareModal({
               style={{
                 fontFamily:   'var(--font-title)',
                 fontSize:     'var(--font-size-heading)',
-                fontWeight:   400,
+                fontWeight:   'var(--font-weight-regular)',
                 lineHeight:   'var(--line-height-heading)',
                 color:        'var(--neutral-900)',
                 overflow:     'hidden',
@@ -456,9 +456,9 @@ export function ShareModal({
           style={{
             display:         'flex',
             alignItems:      'center',
-            gap:             8,
-            padding:         '7px 10px',
-            borderRadius:    10,
+            gap:             'var(--space-2)',
+            padding:         'var(--space-1-5) var(--space-2-5)',
+            borderRadius:    'var(--radius-lg)',
             backgroundColor: 'var(--field-surface)',
             boxShadow:       SHADOW_INPUT,
             boxSizing:       'border-box' as const,
@@ -493,7 +493,7 @@ export function ShareModal({
               background: 'transparent',
               fontFamily: 'var(--font-body)',
               fontSize:   'var(--font-size-body)',
-              fontWeight: 400,
+              fontWeight: 'var(--font-weight-regular)',
               lineHeight: 'var(--line-height-body)',
               color:      'var(--neutral-900)',
               minWidth:   0,
@@ -503,13 +503,13 @@ export function ShareModal({
 
         {/* ── Who has access ─────────────────────────────────────────────────── */}
         {people.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
             <span
               id="share-access-label"
               style={{
                 fontFamily: 'var(--font-body)',
                 fontSize:   'var(--font-size-body)',
-                fontWeight: 400,
+                fontWeight: 'var(--font-weight-regular)',
                 lineHeight: 'var(--line-height-body)',
                 color:      'var(--neutral-700)',
               }}
@@ -524,7 +524,7 @@ export function ShareModal({
                 padding:   0,
                 display:   'flex',
                 flexDirection: 'column',
-                gap:       14,
+                gap:       'var(--space-3)',
               }}
             >
               {people.map((person) => (
@@ -545,7 +545,7 @@ export function ShareModal({
             display:        'flex',
             justifyContent: 'flex-end',
             alignItems:     'center',
-            gap:            8,
+            gap:            'var(--space-2)',
           }}
         >
           <Button variant="cancel" size="sm" onClick={onClose}>
@@ -590,8 +590,8 @@ function CloseButton({ onClick }: { onClick?: () => void }) {
         display:         'flex',
         alignItems:      'center',
         justifyContent:  'center',
-        padding:         3,
-        borderRadius:    6,
+        padding:         'var(--space-0-5)',
+        borderRadius:    'var(--radius-sm)',
         border:          'none',
         backgroundColor: hovered ? 'var(--neutral-100)' : 'transparent',
         cursor:          'pointer',
@@ -600,7 +600,7 @@ function CloseButton({ onClick }: { onClick?: () => void }) {
         lineHeight:      0,
         outline:         'none',
         boxShadow:       focused ? '0px 0px 0px 2px var(--blue-400)' : 'none',
-        transition:      'background-color 120ms, color 120ms',
+        transition:      'background-color var(--duration-fast), color var(--duration-fast)',
       }}
     >
       <CancelOneIcon size={18} />

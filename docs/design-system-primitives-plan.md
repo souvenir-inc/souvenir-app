@@ -640,6 +640,67 @@ Run it per area, never across the whole repo in one go.
 - No screenshot diffs left unexplained.
 - `ds:scan` lists no unexpected hotspots.
 
+### Working defaults while decisions 9–10 are on hold
+
+One branch per area (`ds/phase-6-<area>`); every screenshot diff is reviewed and reported with the area; the old `Sidebar` (and its `ChatHistoryItem` / `PersonaChatItem` / `ProjectChatItem` menus) is out of scope; hidden preview pages (`settings/files`, `notifications`, `preferences`, `security`) and hidden features are skipped.
+
+### Method per area (as run on settings)
+
+1. **Pass 1 — exact tokens** (`scripts/codemods/tokens-exact.mjs`): a literal becomes the token with exactly the same value (`gap: 8` → `var(--space-2)`, `borderRadius: 10` → `var(--radius-lg)`, `fontWeight: 500` → `var(--font-weight-medium)`). Screenshots must show no change.
+2. **Pass 2 — rounding** (`--snap`): off-scale values move to the nearest step (Appendix B). Screenshot diffs are reviewed; expected result is 1–2px shifts.
+3. **Structure** (by hand, where a component is being restructured anyway): primitives (`Card`, `Text`, `Stack`, `Table`, `Field`…) and token classes instead of inline `style`.
+
+Passes 1–2 keep inline `style` objects (now token-backed) instead of converting them to `className` as D3 prefers; conversion follows in step 3. The codemod only touches `style={{}}`, objects typed `CSSProperties` and CSS modules — never chart configs, where SVG attributes can't resolve `var()`.
+
+### Area 1 — Settings: passes 1–2 done 2026-11-17 (branch `ds/phase-6-settings`)
+
+Scope: the live settings pages (account, usage, memory, library, AI, help, plans & billing, report a bug, feature request, and the org pages: general, members, analytics, activity, workspace library…), plus `SettingsPageShell`, `SettingsTable`, `SettingsSidebar`, `Library/settings`, `MemorySection`, `AiModelsView`.
+
+| | Result |
+|---|---|
+| Pass 1 | 1,269 values in 67 files; 11 live settings screens × light/dark: **no visual change** |
+| Pass 2 | 68 values rounded; diffs are 1–2px shifts (e.g. sidebar items' `5px 6px` → `4px 6px`, which accumulates down the list); pages reviewed and accepted as the new baseline |
+| Whole app after settings | style values wired **39.5% → 49.2%**; spacing 1.6% → 18.6%; radius 2.5% → 13.8%; typography 42% → 53.9% |
+
+Still to do in settings (step 3): untyped style objects (e.g. `const HINT_STYLE = {…}`) that the codemod skips, raw buttons, `SettingsTable` pages onto `Table`, `role="alert"` text onto `FieldError` / `Text`.
+
+### All areas — passes 1–2 done 2026-11-18 (branch `ds/phase-6-tokens`, renamed from `ds/phase-6-settings`)
+
+Codemod extended: transition durations (exact 80/120/200/320ms; `--snap` moves ≤400ms to the nearest step; animations and longer transitions keep their timing) and z-index (exact only — rounding would merge layers ordered on purpose). It now carries the same skip list as `ds-scan`, and `// ds-keep: <reason>` on a line leaves that value alone. `scripts/codemods/areas.mjs` maps each feature to its folders and screenshot screens and runs the codemod one area at a time.
+
+| Area | Pass 1 (exact) | Pass 2 (rounded) |
+|---|---|---|
+| settings | 9 (+1,269 earlier) | 10 (+68 earlier) |
+| onboarding | 536 | 45 |
+| change-plan | 185 | 18 |
+| slack | 151 | 74 |
+| shell | 277 | 62 |
+| chat | 1,288 | 363 |
+| agents | 484 | 70 |
+| library | 587 | 54 |
+| projects | 414 | 33 |
+| schedules | 161 | 17 |
+| connectors | 99 | 7 |
+| rest (shared components, other routes) | 481 | 75 |
+
+Checks:
+- Pass 1: all 21 live screens × light/dark show **no visual change**.
+- Pass 2: diffs are uniform 1–2px shifts (Connectors 9.3% is the whole page 2px higher); every changed screen was opened and reviewed, then accepted as the new baseline.
+- One layout-animated element (`QueuedMessagesTray` row) keeps a numeric radius (`ds-keep`): framer-motion corrects px radii during layout animation, not `var()`.
+- Tests that record inline styles were updated (3 snapshot files, 2 assertions). Every changed snapshot line is a token swap, an approved rounding, or an equivalent value (`999px` → `9999px` pill radius; `8px` → `8px 8px 8px 8px`; jsdom dropping a `var()` shorthand when a longhand follows it). Unit suite: the same 13 pre-existing failures.
+- Not checked on screen: onboarding (the test account is already onboarded) and chat widgets that need a live answer.
+
+| | Before Phase 6 | After passes 1–2 |
+|---|---|---|
+| **Style values wired** | 39.5% | **88.8%** |
+| Spacing | 1.6% | 89.6% |
+| Radius | 2.6% | 89.8% |
+| Typography | 42.0% | 89.1% |
+| Motion | 1.7% | 73.6% |
+| z-index | 3.3% | 21.7% |
+
+What is left (about 11%): z-index values off the scale (1, 2, 50, 9997–9999…) that need a per-site decision rather than rounding; hand-written shadows; colour literals in onboarding and the weather / code-block widgets; unitless line heights; untyped style objects the codemod skips; chart geometry.
+
 ---
 
 ## Phase 7 — Lock it in

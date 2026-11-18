@@ -71,12 +71,12 @@ export function InlineCreditNotice({
       style={{
         display:         'flex',
         alignItems:      'center',
-        gap:             10,
-        padding:         '10px 14px',
+        gap:             'var(--space-2-5)',
+        padding:         'var(--space-2-5) var(--space-3)',
         borderRadius:    'var(--toast-radius)',
         backgroundColor: tokens.bg,
         boxShadow:       elevation(tokens.border),
-        margin:          '0 12px 8px',
+        margin:          '0 var(--space-3) var(--space-2)',
       }}
     >
       {/* Icon */}
@@ -106,11 +106,11 @@ export function InlineCreditNotice({
           style={{
             display:      'inline-flex',
             alignItems:   'center',
-            gap:          4,
+            gap:          'var(--space-1)',
             border:       'none',
             cursor:       'pointer',
-            padding:      '4px 10px',
-            borderRadius: 8,
+            padding:      'var(--space-1) var(--space-2-5)',
+            borderRadius: 'var(--radius-md)',
             backgroundColor: tokens.text,
             color:        tokens.bg,
             fontFamily:   'var(--font-body)',
@@ -150,7 +150,7 @@ export function InlineCreditNotice({
             width:           22,
             height:          22,
             border:          'none',
-            borderRadius:    7,
+            borderRadius:    'var(--radius-md)',
             backgroundColor: 'var(--neutral-white)',
             color:           'var(--neutral-600)',
             boxShadow:       '0px 1px 2px color-mix(in srgb, var(--static-black) 8%, transparent), inset 0px 1px 0px color-mix(in srgb, var(--static-white) 90%, transparent)',

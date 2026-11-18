@@ -49,9 +49,9 @@ export function ChartCard({
           isolation:       'isolate',
           display:         'flex',
           flexDirection:   'column',
-          gap:             16,
-          padding:         '20px 22px',
-          borderRadius:    16,
+          gap:             'var(--space-4)',
+          padding:         'var(--space-5) var(--space-5)',
+          borderRadius:    'var(--radius-2xl)',
           backgroundColor: 'var(--neutral-white)',
           boxShadow:       'var(--shadow-surface-card)',
           minWidth:        0,
@@ -59,11 +59,11 @@ export function ChartCard({
         }}
         {...props}
       >
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 'var(--space-3)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', minWidth: 0 }}>
             <Eyebrow>{label}</Eyebrow>
             {(value || delta) && (
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
                 {value && (
                   <span
                     style={{
@@ -81,7 +81,7 @@ export function ChartCard({
               </div>
             )}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0 }}>
             {toolbarLeft}
             {rangeOptions && rangeValue && onRangeChange && (
               <Tabs value={rangeValue} onValueChange={onRangeChange}>

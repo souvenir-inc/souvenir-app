@@ -45,20 +45,20 @@ function ProjectTrigger({
     <div style={{
       display:         'flex',
       alignItems:      'center',
-      gap:             6,
-      padding:         '5px 10px',
-      borderRadius:    8,
+      gap:             'var(--space-1-5)',
+      padding:         'var(--space-1) var(--space-2-5)',
+      borderRadius:    'var(--radius-md)',
       backgroundColor: open ? 'var(--neutral-100)' : 'var(--field-surface)',
       boxShadow:       SHADOW_TRIGGER,
       cursor:          'pointer',
-      transition:      'background-color 120ms',
+      transition:      'background-color var(--duration-fast)',
       minWidth:        160,
     }}>
       <span style={{
         flex:       '1 0 0',
         minWidth:   0,
         fontFamily: 'var(--font-body)',
-        fontWeight: 400,
+        fontWeight: 'var(--font-weight-regular)',
         fontSize:   'var(--font-size-body)',
         color:      label === 'Select a project…' ? 'var(--neutral-300)' : 'var(--neutral-700)',
         overflow:   'hidden',
@@ -104,8 +104,8 @@ export const SlackChannelMappingRow = React.forwardRef<HTMLDivElement, SlackChan
         style={{
           display:        'flex',
           alignItems:     'center',
-          gap:            12,
-          padding:        '8px 0',
+          gap:            'var(--space-3)',
+          padding:        'var(--space-2) 0',
           borderBottom:   '1px solid var(--neutral-100)',
           ...style,
         }}
@@ -116,7 +116,7 @@ export const SlackChannelMappingRow = React.forwardRef<HTMLDivElement, SlackChan
           flex:       '1 0 0',
           minWidth:   0,
           fontFamily: 'var(--font-body)',
-          fontWeight: 500,
+          fontWeight: 'var(--font-weight-medium)',
           fontSize:   'var(--font-size-body)',
           color:      'var(--neutral-700)',
           overflow:   'hidden',
@@ -146,7 +146,7 @@ export const SlackChannelMappingRow = React.forwardRef<HTMLDivElement, SlackChan
             ))}
             {projectId && (
               <>
-                <div style={{ height: 1, backgroundColor: 'var(--neutral-100)', margin: '4px 0' }} />
+                <div style={{ height: 1, backgroundColor: 'var(--neutral-100)', margin: 'var(--space-1) 0' }} />
                 <DropdownMenuItem
                   fluid
                   label="Remove mapping"
@@ -168,14 +168,14 @@ export const SlackChannelMappingRow = React.forwardRef<HTMLDivElement, SlackChan
             justifyContent: 'center',
             width:      28,
             height:     28,
-            borderRadius: 7,
+            borderRadius: 'var(--radius-md)',
             border:     'none',
             background: 'none',
             cursor:     'pointer',
             color:      'var(--neutral-400)',
             flexShrink: 0,
             outline:    'none',
-            transition: 'color 120ms, background-color 120ms',
+            transition: 'color var(--duration-fast), background-color var(--duration-fast)',
           }}
           onMouseEnter={e => {
             ;(e.currentTarget as HTMLElement).style.color = 'var(--neutral-700)'

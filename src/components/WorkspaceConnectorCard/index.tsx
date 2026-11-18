@@ -26,25 +26,25 @@ export function WorkspaceConnectorCard({ connector, isAdmin, onManage, onRevoke 
     <div style={{
       display:         'flex',
       alignItems:      'center',
-      gap:             12,
-      padding:         '10px 16px',
+      gap:             'var(--space-3)',
+      padding:         'var(--space-2-5) var(--space-4)',
       backgroundColor: 'var(--neutral-white)',
-      borderRadius:    12,
+      borderRadius:    'var(--radius-xl)',
       boxShadow:       '0px 1px 2px 0px rgba(82,75,71,0.08), 0px 0px 0px 1px var(--neutral-100)',
     }}>
       {/* Icon */}
       <div style={{
         width:           36,
         height:          36,
-        borderRadius:    8,
+        borderRadius:    'var(--radius-md)',
         backgroundColor: 'var(--neutral-100)',
         display:         'flex',
         alignItems:      'center',
         justifyContent:  'center',
         flexShrink:      0,
         fontFamily:      'var(--font-body)',
-        fontWeight:      600,
-        fontSize:        14,
+        fontWeight:      'var(--font-weight-semibold)',
+        fontSize:        'var(--font-size-body)',
         color:           'var(--neutral-600)',
       }}>
         {connector.name.charAt(0)}
@@ -54,9 +54,9 @@ export function WorkspaceConnectorCard({ connector, isAdmin, onManage, onRevoke 
       <div style={{ flex: '1 0 0', minWidth: 0 }}>
         <p style={{
           fontFamily: 'var(--font-body)',
-          fontWeight: 500,
-          fontSize:   14,
-          lineHeight: '22px',
+          fontWeight: 'var(--font-weight-medium)',
+          fontSize:   'var(--font-size-body)',
+          lineHeight: 'var(--line-height-body)',
           color:      'var(--neutral-900)',
           margin:     0,
           overflow:   'hidden',
@@ -68,9 +68,9 @@ export function WorkspaceConnectorCard({ connector, isAdmin, onManage, onRevoke 
         {connector.connectedBy && (
           <p style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 400,
-            fontSize:   12,
-            lineHeight: '16px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize:   'var(--font-size-small)',
+            lineHeight: 'var(--line-height-small)',
             color:      'var(--neutral-400)',
             margin:     0,
           }}>
@@ -84,7 +84,7 @@ export function WorkspaceConnectorCard({ connector, isAdmin, onManage, onRevoke 
 
       {/* Admin actions */}
       {isAdmin && (
-        <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: 'var(--space-1-5)', flexShrink: 0 }}>
           {connector.status === 'connected' && onRevoke && (
             <Button variant="danger" size="sm" onClick={onRevoke}>
               Revoke
