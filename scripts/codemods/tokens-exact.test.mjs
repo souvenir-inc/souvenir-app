@@ -52,6 +52,16 @@ describe("tokens-exact on TSX", () => {
     expect(out).toContain(`content: 'padding: 16', margin: 'var(--space-2)'`);
   });
 
+  it("leaves the false branch of a conditional alone", () => {
+    const out = tsx(`<div style={{ padding: wide ? gap : 8, margin: 8 }} />`);
+    expect(out).toContain(`wide ? gap : 8`);
+    expect(out).toContain(`margin: 'var(--space-2)'`);
+  });
+
+  it("is not cut short by a brace inside a comment", () => {
+    expect(tsx(`<div style={{ /* } */ padding: 16 }} />`)).toContain(`padding: 'var(--space-4)'`);
+  });
+
   it("does not split a value that continues on the next line", () => {
     const src = `<div style={{ padding: 16\n  * scale }} />`;
     expect(tsx(src)).toBe(src);
