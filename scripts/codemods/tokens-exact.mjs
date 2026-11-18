@@ -106,9 +106,11 @@ function replaceValue(prop, raw) {
 /**
  * 1 for every character inside a string or a comment, 0 for code. Text there can look like a
  * declaration (`content: 'padding: 16'`, `// style={{`) and must never be rewritten.
- * In TS/TSX a quote right after a letter or digit is JSX text (`Don't`), not a string; a
- * misread only ever skips a conversion. '/" strings end at a newline, templates at their `.
+ * In TS/TSX a quote right after a letter or digit is JSX text (`Don't`), not a string — unless
+ * those letters are a keyword that takes an operand (`typeof'…'`, `case'…':`), where a string
+ * starts. '/" strings end at a newline, templates at their `.
  */
+const OPERAND_KEYWORDS = new Set(["typeof", "case", "return", "in", "of", "instanceof", "void", "delete", "await", "yield", "new", "throw", "else", "do", "from", "extends"]);
 export function codeMask(src, { css = false } = {}) {
   const mask = new Uint8Array(src.length);
   for (let i = 0; i < src.length; i++) {
@@ -122,7 +124,10 @@ export function codeMask(src, { css = false } = {}) {
       end = src.indexOf("\n", i);
       end = end < 0 ? src.length - 1 : end - 1;
     } else if (c === "'" || c === '"' || (!css && c === "`")) {
-      if (!css && c !== "`" && /[A-Za-z0-9]/.test(src[i - 1] ?? "")) continue;
+      if (!css && c !== "`" && /[A-Za-z0-9]/.test(src[i - 1] ?? "")) {
+        const word = /[A-Za-z_$][\w$]*$/.exec(src.slice(Math.max(0, i - 20), i))?.[0];
+        if (!OPERAND_KEYWORDS.has(word)) continue;
+      }
       let j = i + 1;
       while (j < src.length && src[j] !== c && (c === "`" || src[j] !== "\n")) j += src[j] === "\\" ? 2 : 1;
       end = Math.min(j, src.length - 1);
@@ -157,10 +162,16 @@ function transformObjectBody(body, counter) {
   // Only the style object's own properties: a nested object literal inside it
   // (a motion config, a lookup) is not a style and keeps its values.
   const depth = depthMap(body);
+  const masked = codeMask(body);
   // `key: value` where value is a number or a quoted string, ending where the next
   // non-space character is , or } (a newline alone does not end it: `16\n * scale`).
   return body.replace(/(\b[a-zA-Z]+)(\s*:\s*)(-?\d+(?:\.\d+)?|'[^'\n]*'|"[^"\n]*")(?=\s*[,}])/g, (whole, key, sep, val, offset) => {
     if (depth[offset] !== 1) return whole;
+    // A property starts right after `{` or `,`. In `padding: wide ? gap : 8` the `gap : 8`
+    // is the false branch of a conditional, not a property, and keeps its value.
+    let before = offset - 1;
+    while (before >= 0 && (masked[before] || /\s/.test(body[before]))) before--;
+    if (before >= 0 && body[before] !== "{" && body[before] !== ",") return whole;
     // `// ds-keep: <reason>` on the same line leaves the value alone (e.g. a framer-motion layout radius).
     const lineEnd = body.indexOf("\n", offset);
     if (body.slice(offset, lineEnd < 0 ? undefined : lineEnd).includes("ds-keep")) return whole;
@@ -177,17 +188,15 @@ function transformObjectBody(body, counter) {
 }
 
 /** Find the matching close brace for the `{` at index i. */
-function matchBrace(s, i) {
+// Braces inside strings and comments (per `masked`, from codeMask) do not count, so a
+// `}` in a comment cannot end the object early.
+function matchBrace(s, i, masked) {
   let depth = 0;
   for (let j = i; j < s.length; j++) {
+    if (masked[j]) continue;
     const c = s[j];
     if (c === "{") depth++;
     else if (c === "}") { depth--; if (depth === 0) return j; }
-    else if (c === "'" || c === '"' || c === "`") { // skip strings
-      const end = s.indexOf(c, j + 1);
-      if (end < 0) return -1;
-      j = end;
-    }
   }
   return -1;
 }
@@ -197,7 +206,8 @@ export function transformTsx(source, counter) {
   const starts = [];
   for (const m of source.matchAll(/style=\{\{/g)) if (!masked[m.index]) starts.push(m.index + "style={".length);
   for (const m of source.matchAll(/:\s*(?:React\.)?CSSProperties\s*=\s*\{/g)) if (!masked[m.index]) starts.push(m.index + m[0].length - 1);
-  for (const m of source.matchAll(/\bas (?:React\.)?CSSProperties\b/g)) {
+  // Identifier-aware on both sides: `$` continues a name, so \b alone let CSSProperties$Config match.
+  for (const m of source.matchAll(/(?<![\w$.])as (?:React\.)?CSSProperties(?![\w$])/g)) {
     if (masked[m.index]) continue;
     // `{ … } as React.CSSProperties`: walk back to the object's opening brace — but only
     // when an object literal is what is being cast. `style as CSSProperties` or a call
@@ -214,7 +224,7 @@ export function transformTsx(source, counter) {
     }
   }
   // Process from the end so earlier indices stay valid; skip ranges nested in one already done.
-  const ranges = starts.map((i) => [i, matchBrace(source, i)]).filter(([, e]) => e > 0).sort((a, b) => b[0] - a[0]);
+  const ranges = starts.map((i) => [i, matchBrace(source, i, masked)]).filter(([, e]) => e > 0).sort((a, b) => b[0] - a[0]);
   let out = source;
   let lastStart = Infinity;
   for (const [s, e] of ranges) {

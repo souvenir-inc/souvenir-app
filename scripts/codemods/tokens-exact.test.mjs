@@ -22,7 +22,19 @@ describe("tokens-exact on TSX", () => {
   });
 
   it("matches CSSProperties only as a whole identifier", () => {
-    const src = `const c = { padding: 16 } as CSSPropertiesConfig\n`;
+    for (const name of ["CSSPropertiesConfig", "CSSProperties$Config", "CSSProperties_2"]) {
+      const src = `const c = { padding: 16 } as ${name}\n`;
+      expect(tsx(src)).toBe(src);
+    }
+    expect(tsx(`const c = { padding: 16 } as CSSProperties\n`)).toContain(`padding: 'var(--space-4)'`);
+  });
+
+  it("reads a quote after a keyword as the start of a string", () => {
+    const src = [
+      `if (typeof'style={{ padding: 16 }}' === "string") {}`,
+      `switch (k) { case'style={{ padding: 8 }}': break }`,
+      `function f() { return'style={{ gap: 8 }}' }`,
+    ].join("\n");
     expect(tsx(src)).toBe(src);
   });
 
@@ -38,6 +50,16 @@ describe("tokens-exact on TSX", () => {
     expect(out).toContain(`// style={{ padding: 16 }}`);
     expect(out).toContain(`{ padding: 16 } */`);
     expect(out).toContain(`content: 'padding: 16', margin: 'var(--space-2)'`);
+  });
+
+  it("leaves the false branch of a conditional alone", () => {
+    const out = tsx(`<div style={{ padding: wide ? gap : 8, margin: 8 }} />`);
+    expect(out).toContain(`wide ? gap : 8`);
+    expect(out).toContain(`margin: 'var(--space-2)'`);
+  });
+
+  it("is not cut short by a brace inside a comment", () => {
+    expect(tsx(`<div style={{ /* } */ padding: 16 }} />`)).toContain(`padding: 'var(--space-4)'`);
   });
 
   it("does not split a value that continues on the next line", () => {

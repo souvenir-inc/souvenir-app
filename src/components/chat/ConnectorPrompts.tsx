@@ -55,18 +55,21 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
     // this guard refusing every retry; so the flag is set after the POST resolves.
     respondingRef.current = true
     setResponding(true)
-    try {
-      await respondToChatPrompt('connected', prompt.respond_url)
-    } catch (err: unknown) {
+    // The outcome as a value rather than try/catch/finally: React Compiler cannot
+    // compile a `finally`, and leaves the whole component unoptimised when it meets one.
+    const failure = await respondToChatPrompt('connected', prompt.respond_url).then(
+      () => null,
+      (err: unknown) => (err instanceof Error ? err : new Error('Could not tell the chat you connected.')),
+    )
+    respondingRef.current = false
+    setResponding(false)
+    if (failure) {
       if (abortedRef.current) return
       setState('error')
       setRespondFailed(true)
-      setErrorMsg(err instanceof Error ? err.message : 'Could not tell the chat you connected.')
+      setErrorMsg(failure.message)
       toast.error(`Connected ${prompt.connector.name}, but the chat was not told. Try again.`)
       return
-    } finally {
-      respondingRef.current = false
-      setResponding(false)
     }
     answeredRef.current = true
     setRespondFailed(false)
