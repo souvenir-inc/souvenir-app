@@ -352,17 +352,23 @@ export function useStreamingChat({
         onUploadProgress: options?.onUploadProgress,
         setXhr: (xhr) => {
           callXhr = xhr
-          xhrRef.current = xhr
+          // Once detached, xhrRef is the replacing call's: clearing it would leave
+          // that call's Stop with nothing to abort.
+          if (!detached) xhrRef.current = xhr
         },
         onUploadEnd: () => {
+          if (detached) return
           if (isActiveStream()) setStreamState?.("streaming")
           startFlushInterval()
         },
         // Safety-net: start flush interval if upload.loadend didn't fire yet
         // (e.g. when there are no files to upload).
-        onProgress: () => { if (!flushTimerRef.current) startFlushInterval() },
+        onProgress: () => { if (!detached && !flushTimerRef.current) startFlushInterval() },
         // Each new slice of the response stream, decoded and applied in order.
+        // A detached call reads nothing more: the reply and chat refs the events
+        // would write through now belong to the call that replaced it.
         onText: (text, flush = false) => {
+          if (detached) return
           const decodedEvents = sseDecoder.push(text)
           if (flush) decodedEvents.push(...sseDecoder.flush())
           processStreamEvents(ctx, turn, decodedEvents)
@@ -371,10 +377,12 @@ export function useStreamingChat({
         // stream is registered too — the message queue must not treat a
         // chat whose first reply is still running as idle.
         onHeaderChatId: (headerChatId) => {
+          if (detached) return
           if (!chatId || chatId.startsWith("temp-")) adoptChatId(headerChatId)
         },
         isStopRequested: () => stopRequestedRef.current || detached,
         onFollowAttached: () => {
+          if (detached) return
           // The stream replays the stretch being worked on from its start, so the reply goes back
           // to what it held before that stretch: nothing, or what earlier stretches of the run wrote.
           attached = true
@@ -393,9 +401,12 @@ export function useStreamingChat({
         onFollowFailed: (status) => { failedStatus = status },
       })
 
+      // Checked first: the flush timer and buffer are shared, and now hold the
+      // replacing call's tokens. Stopping or flushing them here would freeze that
+      // call's stream and write its pending text from this call's unwinding.
+      if (detached) return "done"
       stopFlushInterval()
       flushPending()
-      if (detached) return "done"
 
       // Stream ended without a done or error event - treat what was shown as
       // the complete response. A user Stop already finalised the message.
@@ -409,9 +420,9 @@ export function useStreamingChat({
       onStreamDone?.()
       return outcome
     } catch (error) {
+      if (detached) return "done"
       stopFlushInterval()
       flushPending()
-      if (detached) return "done"
       completeStream(resolvedChatIdRef.current, stopRequestedRef.current ? "aborted" : "error")
       // A turn that failed or was stopped part-way may still have saved its files.
       if (options?.files?.length) notifyLibraryFilesChanged()

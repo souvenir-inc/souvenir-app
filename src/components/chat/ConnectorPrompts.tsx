@@ -30,6 +30,9 @@ interface ConnectPromptCardProps {
 export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProps) {
   const [state,        setState]        = useState<'idle' | 'connecting' | 'polling' | 'connected' | 'error'>('idle')
   const [errorMsg,     setErrorMsg]     = useState('')
+  // The app is connected but the chat was not told: retrying resends that answer alone,
+  // not the whole sign-in.
+  const [respondFailed, setRespondFailed] = useState(false)
   // api_key flow
   const [apiKeyFields, setApiKeyFields] = useState<Record<string, string>>({})
   const [fieldDefs,    setFieldDefs]    = useState<ApiKeyField[] | null>(
@@ -38,21 +41,29 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
   const [showApiForm,  setShowApiForm]  = useState(false)
   const abortedRef  = useRef(false)
   const answeredRef = useRef(false)
+  // The "already connected" check and the sign-in poll can both call finish; only
+  // one answer may be in flight, or the backend gets it twice.
+  const respondingRef = useRef(false)
 
   // The turn that asked is waiting on this answer, or has left and takes its run back up on it.
   const finish = useCallback(async () => {
-    if (answeredRef.current || abortedRef.current) return
+    if (answeredRef.current || abortedRef.current || respondingRef.current) return
     // The answer is only "given" once the backend has it. Marking it beforehand and
     // swallowing the failure left the run waiting for a reply that never came, with
     // this guard refusing every retry; so the flag is set after the POST resolves.
+    respondingRef.current = true
+    setRespondFailed(false)
     try {
       await respondToChatPrompt('connected', prompt.respond_url)
     } catch (err: unknown) {
       if (abortedRef.current) return
       setState('error')
+      setRespondFailed(true)
       setErrorMsg(err instanceof Error ? err.message : 'Could not tell the chat you connected.')
       toast.error(`Connected ${prompt.connector.name}, but the chat was not told. Try again.`)
       return
+    } finally {
+      respondingRef.current = false
     }
     answeredRef.current = true
     if (abortedRef.current) return
@@ -213,7 +224,11 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
       )}
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
-        {done ? (
+        {respondFailed && !done ? (
+          <Button size="sm" variant="approve" attention onClick={() => void finish()}>
+            Try again
+          </Button>
+        ) : done ? (
           <ConnectorStatusBadge status="connected" />
         ) : showCredentialForm && !showApiForm ? (
           <Button size="sm" variant="approve" attention onClick={() => setShowApiForm(true)}>
