@@ -31,7 +31,7 @@ export function MentionAvatar({ agent }: { agent: { id: string; name: string } }
         justifyContent:  'center',
         width:           28,
         height:          28,
-        borderRadius:    8,
+        borderRadius:    'var(--radius-md)',
         ...agentHeroStyle(avatar.colors[0]),
         flexShrink:      0,
       }}

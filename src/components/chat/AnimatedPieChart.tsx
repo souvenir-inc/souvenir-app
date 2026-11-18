@@ -39,10 +39,10 @@ export function AnimatedPieChart({ data, onComplete, animate = true }: { data: P
   }, []); // eslint-disable-line
 
   return (
-    <div style={{ background: "var(--neutral-white)", border: "1px solid var(--brown-50)", borderRadius: 12, padding: "18px 20px" }}>
-      {data.title && <div style={{ fontSize: 13, fontWeight: 600, color: "var(--neutral-900)", marginBottom: 4 }}>{data.title}</div>}
-      <div style={{ fontSize: 12, color: "var(--neutral-300)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 16 }}>pie chart</div>
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+    <div style={{ background: "var(--neutral-white)", border: "1px solid var(--brown-50)", borderRadius: 'var(--radius-xl)', padding: "var(--space-4) var(--space-5)" }}>
+      {data.title && <div style={{ fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)", marginBottom: 'var(--space-1)' }}>{data.title}</div>}
+      <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-300)", fontWeight: 'var(--font-weight-medium)', textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 'var(--space-4)' }}>pie chart</div>
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: 'var(--space-5)' }}>
         <svg width={220} height={220} viewBox="0 0 220 220" style={{ display: "block", maxWidth: "100%" }}>
           <circle r={R} cx={CX} cy={CY} fill="none" stroke="color-mix(in srgb, var(--neutral-800) 7%, transparent)" strokeWidth={SW} />
           {arcs.map((arc, i) => (
@@ -51,7 +51,7 @@ export function AnimatedPieChart({ data, onComplete, animate = true }: { data: P
               strokeDasharray={`${arc.dashLen} ${arc.gapLen}`}
               strokeDashoffset={i < revealedCount ? 0 : arc.dashLen}
               transform={`rotate(${arc.startDeg} ${CX} ${CY})`}
-              style={{ transition: "stroke-dashoffset 0.52s cubic-bezier(0.16,1,0.3,1), stroke-width 120ms", strokeLinecap: "butt", cursor: "pointer" }}
+              style={{ transition: "stroke-dashoffset 0.52s cubic-bezier(0.16,1,0.3,1), stroke-width var(--duration-fast)", strokeLinecap: "butt", cursor: "pointer" }}
               onMouseEnter={() => setHoveredIdx(i)}
               onMouseLeave={() => setHoveredIdx(null)}
             />
@@ -69,20 +69,20 @@ export function AnimatedPieChart({ data, onComplete, animate = true }: { data: P
           )}
         </svg>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-2) var(--space-4)" }}>
         {arcs.map((arc, i) => (
           <m.div key={arc.label}
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: i < revealedCount ? 1 : 0, y: i < revealedCount ? 0 : 4 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
             onMouseEnter={() => setHoveredIdx(i)} onMouseLeave={() => setHoveredIdx(null)}
-            style={{ display: "flex", alignItems: "center", gap: 8, cursor: "default", opacity: hoveredIdx !== null && hoveredIdx !== i ? 0.45 : undefined, transition: "opacity 120ms" }}>
-            <div style={{ width: 10, height: 10, borderRadius: 3, background: arc.color, flexShrink: 0 }} />
+            style={{ display: "flex", alignItems: "center", gap: 'var(--space-2)', cursor: "default", opacity: hoveredIdx !== null && hoveredIdx !== i ? 0.45 : undefined, transition: "opacity var(--duration-fast)" }}>
+            <div style={{ width: 10, height: 10, borderRadius: 'var(--radius-xs)', background: arc.color, flexShrink: 0 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12, color: "var(--neutral-700)", lineHeight: "16px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{arc.label}</div>
-              <div style={{ fontSize: 12, color: "var(--neutral-600)", lineHeight: "15px" }}>
+              <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-700)", lineHeight: "var(--line-height-small)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{arc.label}</div>
+              <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", lineHeight: "15px" }}>
                 {Math.round(arc.pct * 100)}%
-                {data.unit && <span style={{ marginLeft: 4 }}>{Math.round(arc.pct * total)}{data.unit}</span>}
+                {data.unit && <span style={{ marginLeft: 'var(--space-1)' }}>{Math.round(arc.pct * total)}{data.unit}</span>}
               </div>
             </div>
           </m.div>

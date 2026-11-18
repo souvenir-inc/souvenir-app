@@ -102,7 +102,7 @@ function FaviconImg({ domain, size = 14 }: { domain?: string; size?: number }) {
       width={size}
       height={size}
       alt=""
-      style={{ borderRadius: 3, flexShrink: 0, display: "block" }}
+      style={{ borderRadius: 'var(--radius-xs)', flexShrink: 0, display: "block" }}
       onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
     />
   );
@@ -157,7 +157,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 8,
+          gap: 'var(--space-2)',
           background: "transparent",
           border: "none",
           cursor: expandable ? "pointer" : "default",
@@ -180,7 +180,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
         </span>
 
         {/* Verb */}
-        <span style={{ fontSize: 14, fontWeight: 500, color: "var(--neutral-700)", flexShrink: 0 }}>
+        <span style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-700)", flexShrink: 0 }}>
           {verb}
         </span>
 
@@ -188,8 +188,8 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
         {detailText && (
           <span
             style={{
-              fontSize: 14,
-              fontWeight: 400,
+              fontSize: 'var(--font-size-body)',
+              fontWeight: 'var(--font-weight-regular)',
               color: "var(--neutral-600)",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -204,21 +204,21 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
 
         {/* Result count */}
         {isDone && hasResults && (
-          <span style={{ fontSize: 14, fontWeight: 400, color: "var(--neutral-200)", flexShrink: 0 }}>
+          <span style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-regular)', color: "var(--neutral-200)", flexShrink: 0 }}>
             {activity.results!.length} {activity.type === "web-search" ? "result" : "file"}{activity.results!.length === 1 ? "" : "s"}
           </span>
         )}
 
         {/* Duration */}
         {isDone && activity.durationS !== undefined && (
-          <span style={{ fontSize: 12, fontWeight: 400, color: "var(--neutral-200)", flexShrink: 0 }}>
+          <span style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-regular)', color: "var(--neutral-200)", flexShrink: 0 }}>
             {activity.durationS < 1 ? `${Math.round(activity.durationS * 1000)}ms` : `${activity.durationS.toFixed(1)}s`}
           </span>
         )}
 
         {/* Percentage — only while running; a finished row shows its duration */}
         {isActive && activity.percent !== undefined && (
-          <span style={{ fontSize: 12, fontWeight: 400, color: "var(--neutral-200)", flexShrink: 0 }}>
+          <span style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-regular)', color: "var(--neutral-200)", flexShrink: 0 }}>
             {Math.round(activity.percent)}%
           </span>
         )}
@@ -228,7 +228,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
           <m.span
             animate={{ opacity: [0.3, 1, 0.3] }}
             transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
-            style={{ fontSize: 14, fontWeight: 400, color: "var(--neutral-300)", flexShrink: 0 }}
+            style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-regular)', color: "var(--neutral-300)", flexShrink: 0 }}
           >
             working…
           </m.span>
@@ -239,13 +239,13 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
           <>
             <span
               style={{
-                fontSize: 12,
-                fontWeight: 600,
+                fontSize: 'var(--font-size-small)',
+                fontWeight: 'var(--font-weight-semibold)',
                 color: "var(--neutral-600, #6A625D)",
                 letterSpacing: "0.4px",
                 background: "color-mix(in srgb, var(--neutral-800) 8%, transparent)",
-                borderRadius: 4,
-                padding: "1px 5px",
+                borderRadius: 'var(--radius-xs)',
+                padding: "var(--space-0-5) var(--space-1)",
                 flexShrink: 0,
                 textTransform: "uppercase",
               }}
@@ -290,11 +290,11 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
             <div
               className="kaya-scrollbar"
               style={{
-                marginLeft: 48, marginTop: 4, padding: "8px 10px",
+                marginLeft: 'var(--space-9)', marginTop: 'var(--space-1)', padding: "var(--space-2) var(--space-2-5)",
                 maxHeight: 240, overflowY: "auto",
-                fontSize: 13, lineHeight: 1.5, color: "var(--neutral-600)",
+                fontSize: 'var(--font-size-body-sm)', lineHeight: 1.5, color: "var(--neutral-600)",
                 whiteSpace: "pre-wrap", wordBreak: "break-word",
-                background: "rgba(59,54,50,0.04)", borderRadius: 8,
+                background: "rgba(59,54,50,0.04)", borderRadius: 'var(--radius-md)',
               }}
             >
               {activity.output}
@@ -321,7 +321,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
           }}
         >
           <div style={{ overflow: "hidden", minHeight: 0 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 5, paddingLeft: 48, paddingTop: 4, paddingBottom: 4 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)', paddingLeft: 'var(--space-9)', paddingTop: 'var(--space-1)', paddingBottom: 'var(--space-1)' }}>
               {activity.results!.map((r, ri) => (
                 <m.a
                   key={ri}
@@ -333,14 +333,14 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: ri * 0.05, duration: 0.18 }}
                   style={{
-                    display: "flex", alignItems: "center", gap: 6,
-                    fontSize: 13, fontWeight: 400, minHeight: 20,
+                    display: "flex", alignItems: "center", gap: 'var(--space-1-5)',
+                    fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-regular)', minHeight: 20,
                     textDecoration: "none",
-                    borderRadius: 6,
-                    padding: "2px 4px",
+                    borderRadius: 'var(--radius-sm)',
+                    padding: "var(--space-0-5) var(--space-1)",
                     margin: "0 -4px",
                     color: "inherit",
-                    transition: "background 120ms",
+                    transition: "background var(--duration-fast)",
                   }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(59,54,50,0.05)"; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
@@ -351,10 +351,10 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
                     {r.title}
                   </span>
                   {r.domain && r.domain !== "pin" && (
-                    <span style={{ color: "var(--neutral-300)", flexShrink: 0, fontSize: 12 }}>{r.domain}</span>
+                    <span style={{ color: "var(--neutral-300)", flexShrink: 0, fontSize: 'var(--font-size-small)' }}>{r.domain}</span>
                   )}
                   {r.domain === "pin" && (
-                    <span style={{ color: "var(--neutral-300)", flexShrink: 0, fontStyle: "italic", fontSize: 12 }}>pin</span>
+                    <span style={{ color: "var(--neutral-300)", flexShrink: 0, fontStyle: "italic", fontSize: 'var(--font-size-small)' }}>pin</span>
                   )}
                 </m.a>
               ))}
@@ -365,7 +365,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
 
       {/* Progress message (for tool_progress / docx_progress) */}
       {isActive && activity.progressMessage && (
-        <div style={{ paddingLeft: 44, fontSize: 13, color: "var(--neutral-300)", fontStyle: "italic", paddingTop: 4 }}>
+        <div style={{ paddingLeft: 44, fontSize: 'var(--font-size-body-sm)', color: "var(--neutral-300)", fontStyle: "italic", paddingTop: 'var(--space-1)' }}>
           {activity.progressMessage}
         </div>
       )}
@@ -389,19 +389,19 @@ const PROMPT_MARKER_TEXT: Record<PromptMarkerState, string> = {
 export function PromptMarkerRow({ title, state }: { title: string; state: PromptMarkerState }) {
   const detail = title.trim();
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, minHeight: 22, fontFamily: "var(--font-body)" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-2)', minHeight: 22, fontFamily: "var(--font-body)" }}>
       {state === "answered" && <CheckmarkIcon />}
       <span style={{ display: "flex", alignItems: "center", lineHeight: 0, flexShrink: 0 }}>
         <HIcon icon={MessageQuestionIcon} size={16} color={state === "answered" ? "var(--green-600)" : "var(--neutral-500)"} />
       </span>
       <span
         className={state === "waiting" ? "kaya-thinking-step-shimmer" : undefined}
-        style={{ fontSize: 14, fontWeight: 500, color: "var(--neutral-700)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+        style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-700)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
       >
         {PROMPT_MARKER_TEXT[state]}
       </span>
       {detail && (
-        <span style={{ fontSize: 14, fontWeight: 400, color: "var(--neutral-600)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0 }}>
+        <span style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-regular)', color: "var(--neutral-600)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0 }}>
           — {detail}
         </span>
       )}
@@ -415,7 +415,7 @@ export function ActivitiesSection({ activities }: { activities: ActivityItem[] }
   if (!activities || activities.length === 0) return null;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 4 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-2-5)', paddingTop: 'var(--space-1)' }}>
       {activities.map((activity, i) => (
         <m.div
           key={activity.id}

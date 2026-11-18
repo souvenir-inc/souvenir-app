@@ -37,7 +37,7 @@ function renderKatexBlock(
       <div
         key={key}
         className="kaya-scrollbar"
-        style={{ margin: "10px 0", overflowX: "auto", textAlign: "center" }}
+        style={{ margin: "var(--space-2-5) 0", overflowX: "auto", textAlign: "center" }}
       >
         {/* eslint-disable-next-line react/no-danger -- KaTeX output is library-generated and sanitized */}
         <span dangerouslySetInnerHTML={{ __html: sanitizeKaTeX(html) }} />
@@ -79,7 +79,7 @@ function renderInlineRich(line: string, citations?: WebCitation[]): React.ReactN
       nodes.push(renderKatexInline(raw.slice(1, -1), count++));
     } else if (match[1] !== undefined) {
       // **bold**
-      nodes.push(<strong key={count++} style={{ fontWeight: 600, color: "var(--neutral-900)" }}>{match[1].slice(2, -2)}</strong>);
+      nodes.push(<strong key={count++} style={{ fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)" }}>{match[1].slice(2, -2)}</strong>);
     } else if (match[2] !== undefined) {
       // `code`
       nodes.push(<code key={count++} style={INLINE_CODE_STYLE}>{match[2].slice(1, -1)}</code>);
@@ -278,13 +278,13 @@ function renderTextBlock(text: string, citations?: WebCitation[], cursor?: React
         );
 
         if (lines.length === 1 && isBoldHeading(first)) return (
-          <p key={bi} style={{ margin: 0, marginBottom: isLast ? 0 : GAP, lineHeight: "var(--prose-line-body)", fontWeight: 600, fontSize: "var(--prose-size-body)", color: "var(--prose-heading)" }}>
+          <p key={bi} style={{ margin: 0, marginBottom: isLast ? 0 : GAP, lineHeight: "var(--prose-line-body)", fontWeight: 'var(--font-weight-semibold)', fontSize: "var(--prose-size-body)", color: "var(--prose-heading)" }}>
             <InlineRich text={first} citations={citations} />{tail}
           </p>
         );
 
         return (
-          <p key={bi} style={{ margin: 0, marginBottom: isLast ? 0 : GAP, lineHeight: "var(--prose-line-body)", fontWeight: 400, fontSize: "var(--prose-size-body)", color: "var(--prose-text)" }}>
+          <p key={bi} style={{ margin: 0, marginBottom: isLast ? 0 : GAP, lineHeight: "var(--prose-line-body)", fontWeight: 'var(--font-weight-regular)', fontSize: "var(--prose-size-body)", color: "var(--prose-text)" }}>
             {lines.map((line, li) => (
               // eslint-disable-next-line react/no-array-index-key
               <React.Fragment key={li}>

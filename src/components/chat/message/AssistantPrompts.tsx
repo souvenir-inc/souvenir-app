@@ -9,7 +9,7 @@ import type { UIMessage } from "@/types/chat";
 
 // ── Inline prompt cards: connector connect / permission, and chat questions ───
 
-const stackStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 8 };
+const stackStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' };
 
 export function AssistantPrompts({
   message,

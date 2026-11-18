@@ -167,12 +167,12 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
       )}
 
       {showCredentialForm && showApiForm && !done && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
           {fields.map((field) => (
-            <div key={field.name} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div key={field.name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
               <label
                 htmlFor={`cf-${prompt.connector.slug}-${field.name}`}
-                style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', fontWeight: 500, color: 'var(--neutral-600)' }}
+                style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-600)' }}
               >
                 {field.label}
               </label>
@@ -185,8 +185,8 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
                 disabled={busy}
                 onChange={(e) => setApiKeyFields((prev) => ({ ...prev, [field.name]: e.target.value }))}
                 style={{
-                  padding:         '7px 10px',
-                  borderRadius:    8,
+                  padding:         'var(--space-1-5) var(--space-2-5)',
+                  borderRadius:    'var(--radius-md)',
                   border:          '1px solid var(--neutral-300)',
                   fontFamily:      'var(--font-body)',
                   fontSize:        'var(--font-size-caption)',
@@ -201,7 +201,7 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
         </div>
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
         {done ? (
           <ConnectorStatusBadge status="connected" />
         ) : showCredentialForm && !showApiForm ? (

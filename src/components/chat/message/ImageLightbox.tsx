@@ -11,10 +11,10 @@ import { ImageDownloadTwoIcon, CancelOneIcon } from "@strange-huge/icons";
 export const overlayButtonStyle: React.CSSProperties = {
   background: "color-mix(in srgb, var(--static-black) 55%, transparent)",
   backdropFilter: "blur(4px)",
-  borderRadius: "8px",
+  borderRadius: "var(--radius-md)",
   color: "var(--static-white)",
   border: "none",
-  padding: "6px",
+  padding: "var(--space-1-5)",
   cursor: "pointer",
   display: "flex",
   alignItems: "center",
@@ -24,19 +24,19 @@ export const overlayButtonStyle: React.CSSProperties = {
 const lightboxStyle: React.CSSProperties = {
   position: "fixed",
   inset: 0,
-  zIndex: 1000,
+  zIndex: 'var(--z-dropdown)',
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  padding: "32px",
+  padding: "var(--space-7)",
   background: "color-mix(in srgb, var(--static-black) 80%, transparent)",
   cursor: "zoom-out",
   outline: "none",
 };
 
-const lightboxButtonsStyle: React.CSSProperties = { position: "absolute", top: "16px", right: "16px", display: "flex", gap: "8px" };
+const lightboxButtonsStyle: React.CSSProperties = { position: "absolute", top: "16px", right: "16px", display: "flex", gap: "var(--space-2)" };
 
-const lightboxImageStyle: React.CSSProperties = { maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: "8px", cursor: "default" };
+const lightboxImageStyle: React.CSSProperties = { maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: "var(--radius-md)", cursor: "default" };
 
 /**
  * Saves the image instead of opening it. Routes through the /api/download proxy:

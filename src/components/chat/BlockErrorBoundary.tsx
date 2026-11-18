@@ -42,7 +42,7 @@ export class BlockErrorBoundary extends React.Component<BlockErrorBoundaryProps,
       return (
         <p
           role="note"
-          style={{ margin: "12px 0", fontFamily: "var(--font-body)", fontSize: 13, lineHeight: "20px", color: "var(--neutral-600)" }}
+          style={{ margin: "var(--space-3) 0", fontFamily: "var(--font-body)", fontSize: 'var(--font-size-body-sm)', lineHeight: "var(--line-height-body-sm)", color: "var(--neutral-600)" }}
         >
           Couldn&apos;t display this {this.props.label ?? "block"}.
         </p>

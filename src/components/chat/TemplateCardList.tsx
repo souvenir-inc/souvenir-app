@@ -24,7 +24,7 @@ export function TemplateCardList({ children }: { children: React.ReactNode }) {
       initial="closed"
       animate="open"
       variants={listVariants}
-      style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}
+      style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', width: '100%' }}
     >
       {React.Children.map(children, (child) => (
         <m.div variants={itemVariants} style={{ display: 'flex' }}>

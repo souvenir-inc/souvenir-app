@@ -27,15 +27,15 @@ export function PersonalLibrarySettings() {
 
   return (
     <SettingsPageShell title="Library" description="Where your files are saved, and how Souvenir may use them." maxWidth={860}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 32, marginTop: 14 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-7)', marginTop: 'var(--space-3)' }}>
         <SettingsSection title="Chats">
           {prefs.isPending ? (
             <SettingsCardSkeleton rows={[{ titleWidth: 132, hint: true, hintWidth: 186, control: 'select' }, { titleWidth: 168, control: 'switch' }]} />
           ) : (
           <SettingsCard>
             {!data ? (
-              <div role="alert" style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-600)' }}>{MESSAGES.listError}</span>
+              <div role="alert" style={{ padding: 'var(--space-4)', display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-600)' }}>{MESSAGES.listError}</span>
                 <Button variant="secondary" size="sm" onClick={() => void prefs.refetch()}>{MESSAGES.retry}</Button>
               </div>
             ) : (
@@ -80,7 +80,7 @@ export function PersonalLibrarySettings() {
             <StorageBlock storage={storage.data} tip={storage.data.limitBytes === null ? <InfoTip text="There is no storage limit yet." /> : undefined} />
           ) : (
             <SettingsCard>
-              <div role="alert" style={{ padding: 16, fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-600)' }}>Couldn&apos;t load storage.</div>
+              <div role="alert" style={{ padding: 'var(--space-4)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-600)' }}>Couldn&apos;t load storage.</div>
             </SettingsCard>
           )}
         </SettingsSection>

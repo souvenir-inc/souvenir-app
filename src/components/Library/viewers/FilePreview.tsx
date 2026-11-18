@@ -101,9 +101,9 @@ export default function FilePreview({ file, cite, onDownload }: FilePreviewProps
     if (errorCode === 'no_preview' || errorCode === 'preview_failed' || previewGaveUp) return <NoPreview onDownload={onDownload} />
     if (errorCode === 'preview_processing' && !previewGaveUp) return <Skeleton height={420} radius={12} style={{ width: '100%', maxWidth: 720 }} />
     return (
-      <div role="alert" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '48px 24px', textAlign: 'center' }}>
-        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-500)' }}>Couldn&apos;t load the preview.</p>
-        <div style={{ display: 'flex', gap: 8 }}>
+      <div role="alert" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2-5)', padding: 'var(--space-9) var(--space-6)', textAlign: 'center' }}>
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-500)' }}>Couldn&apos;t load the preview.</p>
+        <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
           <Button variant="secondary" onClick={() => void preview.refetch()}>{MESSAGES.retry}</Button>
           {onDownload && <Button onClick={onDownload}>Download</Button>}
         </div>
@@ -140,11 +140,11 @@ export default function FilePreview({ file, cite, onDownload }: FilePreviewProps
 
 function NoPreview({ onDownload }: { onDownload?: () => void }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '48px 24px', textAlign: 'center' }}>
-      <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 16, lineHeight: '24px', color: 'var(--neutral-900)' }}>No preview for this file</p>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2-5)', padding: 'var(--space-9) var(--space-6)', textAlign: 'center' }}>
+      <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-900)' }}>No preview for this file</p>
       {onDownload && (
         <>
-          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-500)' }}>You can download it to open it.</p>
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-500)' }}>You can download it to open it.</p>
           <Button onClick={onDownload}>Download</Button>
         </>
       )}

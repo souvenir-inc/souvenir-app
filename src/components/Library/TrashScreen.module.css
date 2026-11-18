@@ -1,25 +1,25 @@
 .header {
   display: flex;
   flex-direction: column;
-  padding: 28px 40px 16px;
+  padding: var(--space-6) var(--space-8) var(--space-4);
   flex-shrink: 0;
 }
 
 .breadcrumb {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1-5);
   min-height: 36px;
-  padding: 0 8px;
+  padding: 0 var(--space-2);
 }
 
 .crumb,
 .title {
   margin: 0;
   font-family: var(--font-title);
-  font-weight: 400;
-  font-size: 24px;
-  line-height: 36px;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-heading);
+  line-height: var(--line-height-heading-xl);
 }
 
 .crumb {
@@ -41,14 +41,14 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px 16px;
-  margin-top: 12px;
-  padding: 8px 8px 8px 16px;
-  border-radius: 12px;
+  gap: var(--space-2) var(--space-4);
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  border-radius: var(--radius-xl);
   background: var(--neutral-100);
   font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 22px;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-600);
 }
 
@@ -60,7 +60,7 @@
 .bannerActions {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
   flex: none;
 }
 
@@ -71,5 +71,5 @@
 .loadMore {
   display: flex;
   justify-content: center;
-  padding: 16px;
+  padding: var(--space-4);
 }

@@ -143,7 +143,7 @@ function ProgressRing({ value }: { value: number | null }) {
         strokeDasharray={c}
         strokeDashoffset={value === null ? c * 0.7 : c * (1 - Math.max(0.06, value))}
         transform="rotate(-90 8 8)"
-        style={{ transition: "stroke-dashoffset 400ms ease" }}
+        style={{ transition: "stroke-dashoffset var(--duration-slow) ease" }}
       />
     </svg>
   );

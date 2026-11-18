@@ -5,10 +5,10 @@ import { m, type HTMLMotionProps } from "framer-motion"
 
 const BASE_STYLE: CSSProperties = {
   minWidth: 0,
-  margin: "16px 0",
-  padding: "16px 18px 14px",
+  margin: "var(--space-4) 0",
+  padding: "var(--space-4) var(--space-4) var(--space-3)",
   border: "1px solid var(--neutral-100)",
-  borderRadius: 12,
+  borderRadius: 'var(--radius-xl)',
   background: "var(--neutral-white)",
 }
 
@@ -24,11 +24,11 @@ export function ChatChartShell({ title, children, style, ...props }: ChatChartSh
       {title && (
         <div
           style={{
-            marginBottom: 14,
+            marginBottom: 'var(--space-3)',
             color: "var(--neutral-900)",
             fontFamily: "var(--font-body)",
-            fontSize: 13,
-            fontWeight: 600,
+            fontSize: 'var(--font-size-body-sm)',
+            fontWeight: 'var(--font-weight-semibold)',
           }}
         >
           {title}

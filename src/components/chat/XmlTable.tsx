@@ -138,12 +138,12 @@ function AnimatedTable({ data, animate = true }: { data: ParsedTable; animate?: 
   }
 
   return (
-    <div style={{ margin: "16px 0" }}>
-      <div style={{ border: "1px solid var(--neutral-100)", borderRadius: 12, overflow: "hidden", fontSize: 14, background: "var(--card-bg)" }}>
+    <div style={{ margin: "var(--space-4) 0" }}>
+      <div style={{ border: "1px solid var(--neutral-100)", borderRadius: 'var(--radius-xl)', overflow: "hidden", fontSize: 'var(--font-size-body)', background: "var(--card-bg)" }}>
         {headers.length > 0 && (
           <div style={{ display: "grid", gridTemplateColumns: gridCols, background: "var(--neutral-800-05)", borderBottom: "1px solid var(--neutral-100)" }}>
             {headers.map((h, ci) => (
-              <div key={ci} style={{ padding: "9px 14px", fontWeight: 600, color: "var(--neutral-900)", fontSize: 14, letterSpacing: "0.1px", borderLeft: ci > 0 ? "1px solid var(--neutral-800-10)" : "none" }}>
+              <div key={ci} style={{ padding: "var(--space-2) var(--space-3)", fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)", fontSize: 'var(--font-size-body)', letterSpacing: "0.1px", borderLeft: ci > 0 ? "1px solid var(--neutral-800-10)" : "none" }}>
                 {h}
               </div>
             ))}
@@ -156,11 +156,11 @@ function AnimatedTable({ data, animate = true }: { data: ParsedTable; animate?: 
                 <m.div key={ri} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: ri * 0.045, duration: 0.18 }}
                   style={{ display: "grid", gridTemplateColumns: gridCols, borderBottom: rowBorderBottom(ri), background: "var(--card-bg)" }}>
                   {Array.from({ length: colCount }).map((_, ci) => (
-                    <div key={ci} style={{ padding: "10px 14px", borderLeft: ci > 0 ? "1px solid var(--neutral-800-05)" : "none" }}>
+                    <div key={ci} style={{ padding: "var(--space-2-5) var(--space-3)", borderLeft: ci > 0 ? "1px solid var(--neutral-800-05)" : "none" }}>
                       <m.div
                         animate={{ opacity: [0.35, 0.85, 0.35] }}
                         transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: (ri + ci) * 0.06 }}
-                        style={{ height: 12, width: `${skelW(ri, ci)}%`, background: "var(--neutral-800-10)", borderRadius: 4 }}
+                        style={{ height: 12, width: `${skelW(ri, ci)}%`, background: "var(--neutral-800-10)", borderRadius: 'var(--radius-xs)' }}
                       />
                     </div>
                   ))}
@@ -174,7 +174,7 @@ function AnimatedTable({ data, animate = true }: { data: ParsedTable; animate?: 
             <m.div key={ri} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.18, ease: "easeOut" }}
               style={{ display: "grid", gridTemplateColumns: gridCols, borderBottom: rowBorderBottom(ri), background: "var(--card-bg)" }}>
               {Array.from({ length: colCount }).map((_, ci) => (
-                <div key={ci} style={{ padding: "10px 14px", color: ci === 0 ? "var(--neutral-900)" : "var(--neutral-700)", fontWeight: ci === 0 ? 500 : 400, borderLeft: ci > 0 ? "1px solid var(--neutral-800-05)" : "none", fontSize: 14, lineHeight: "20px", wordBreak: "break-word" }}>
+                <div key={ci} style={{ padding: "var(--space-2-5) var(--space-3)", color: ci === 0 ? "var(--neutral-900)" : "var(--neutral-700)", fontWeight: ci === 0 ? 500 : 400, borderLeft: ci > 0 ? "1px solid var(--neutral-800-05)" : "none", fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-body-sm)", wordBreak: "break-word" }}>
                   {row[ci] ?? ""}
                 </div>
               ))}
@@ -185,8 +185,8 @@ function AnimatedTable({ data, animate = true }: { data: ParsedTable; animate?: 
       <AnimatePresence>
         {isDone && (
           <m.div key="actions" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}
-            style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, paddingLeft: 1 }}>
-            <span style={{ fontSize: 12, color: "var(--neutral-600)", flex: 1 }}>
+            style={{ display: "flex", alignItems: "center", gap: 'var(--space-1-5)', marginTop: 'var(--space-2)', paddingLeft: 'var(--space-0-5)' }}>
+            <span style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", flex: 1 }}>
               {rows.length} {rows.length === 1 ? "row" : "rows"} · {headers.length} col
             </span>
             <TableActionButton onClick={copyMarkdown}>
@@ -204,7 +204,7 @@ function TableActionButton({ onClick, children }: { onClick: () => void; childre
   const [hov, setHov] = useState(false)
   return (
     <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 9px", borderRadius: 6, border: "1px solid var(--neutral-700-12)", background: hov ? "var(--neutral-800-05)" : "transparent", cursor: "pointer", fontSize: 12, color: hov ? "var(--neutral-700)" : "var(--neutral-600)", fontFamily: "var(--font-body)", transition: "background 120ms, color 120ms" }}>
+      style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)', padding: "var(--space-0-5) var(--space-2)", borderRadius: 'var(--radius-sm)', border: "1px solid var(--neutral-700-12)", background: hov ? "var(--neutral-800-05)" : "transparent", cursor: "pointer", fontSize: 'var(--font-size-small)', color: hov ? "var(--neutral-700)" : "var(--neutral-600)", fontFamily: "var(--font-body)", transition: "background var(--duration-fast), color var(--duration-fast)" }}>
       {children}
     </button>
   )
@@ -225,13 +225,13 @@ export function XmlTable({ xml, animate = false }: XmlTableProps) {
 
   if (!mounted) {
     return (
-      <div style={{ height: 80, margin: "16px 0", borderRadius: 12, border: "1px solid var(--neutral-100)", background: "var(--neutral-800-05)" }} aria-hidden />
+      <div style={{ height: 80, margin: "var(--space-4) 0", borderRadius: 'var(--radius-xl)', border: "1px solid var(--neutral-100)", background: "var(--neutral-800-05)" }} aria-hidden />
     )
   }
 
   if (!data || data === "error") {
     return (
-      <pre className="kaya-scrollbar" style={{ fontSize: 12, color: "var(--neutral-500)", overflowX: "auto", margin: "12px 0", padding: "10px 14px", background: "var(--neutral-800-05)", borderRadius: 8, border: "1px solid var(--neutral-100)", whiteSpace: "pre-wrap", wordBreak: "break-all", fontFamily: "var(--font-code)" }}>
+      <pre className="kaya-scrollbar" style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-500)", overflowX: "auto", margin: "var(--space-3) 0", padding: "var(--space-2-5) var(--space-3)", background: "var(--neutral-800-05)", borderRadius: 'var(--radius-md)', border: "1px solid var(--neutral-100)", whiteSpace: "pre-wrap", wordBreak: "break-all", fontFamily: "var(--font-code)" }}>
         {xml}
       </pre>
     )

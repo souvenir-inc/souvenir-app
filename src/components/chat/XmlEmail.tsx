@@ -75,7 +75,7 @@ export function XmlEmail({ xml }: { xml: string }) {
           <div className={styles.recipients}>
             {([['To', email.to], ['Cc', email.cc], ['Bcc', email.bcc]] as const).map(([label, value]) => value && <span className={styles.recipient} key={label}><span className={styles.recipientLabel}>{label}</span>{value}</span>)}
           </div>
-          {email.date && <div className={styles.caption} style={{ marginTop: 8 }}>{email.date}</div>}
+          {email.date && <div className={styles.caption} style={{ marginTop: 'var(--space-2)' }}>{email.date}</div>}
         </div>
       </div>
       {email.body && <div className={styles.body}>

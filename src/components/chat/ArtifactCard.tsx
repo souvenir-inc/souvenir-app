@@ -40,9 +40,9 @@ export function ArtifactCard({ icon, title, meta, onClick, draftVersion, onViewH
     <div style={{
       display:         'flex',
       alignItems:      'center',
-      gap:             12,
-      padding:         '12px 16px',
-      borderRadius:    12,
+      gap:             'var(--space-3)',
+      padding:         'var(--space-3) var(--space-4)',
+      borderRadius:    'var(--radius-xl)',
       backgroundColor: 'var(--color-surface-glass)',
       boxShadow:       CARD_SHADOW,
       width:           '100%',
@@ -57,7 +57,7 @@ export function ArtifactCard({ icon, title, meta, onClick, draftVersion, onViewH
       <div style={{
         display:       'flex',
         flexDirection: 'column',
-        gap:           2,
+        gap:           'var(--space-0-5)',
         flex:          '1 0 0',
         minWidth:      0,
       }}>
@@ -87,7 +87,7 @@ export function ArtifactCard({ icon, title, meta, onClick, draftVersion, onViewH
           </span>
         )}
         {draftVersion != null && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', marginTop: 'var(--space-0-5)' }}>
             <Badge color="Blue" label={`Draft v${draftVersion}`} />
             {onViewHistory && (
               <button
@@ -138,7 +138,7 @@ export function ArtifactCard({ icon, title, meta, onClick, draftVersion, onViewH
         border:       'none',
         padding:      0,
         cursor:       'pointer',
-        borderRadius: 12,
+        borderRadius: 'var(--radius-xl)',
         outline:      'none',
       }}
     >
