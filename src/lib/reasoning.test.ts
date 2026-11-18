@@ -447,3 +447,22 @@ describe('thoughtLabel', () => {
     expect(thoughtLabel(125_000)).toBe('Thought for 2m 5s')
   })
 })
+
+describe('seeded timeline ids', () => {
+  // Seeded ids keep the numbers they were minted with, and those skip wherever
+  // reasoning merged into one item, so the seed's length is not a safe next number.
+  it('never mints an id the seed already uses', () => {
+    const seed = [
+      { kind: 'reasoning' as const, id: 'reasoning-0', content: 'Looking it up.' },
+      { kind: 'activity' as const, id: 'activity-4', activityId: 'call-1' },
+    ]
+    const acc = createReasoningAccumulator(seed)
+    // Counting from the seed's length (2) would mint activity-2, -3 and then -4 again.
+    acc.activity('call-2')
+    acc.activity('call-3')
+    acc.activity('call-4')
+    const ids = acc.timeline().map((item) => item.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    expect(ids.slice(0, 2)).toEqual(['reasoning-0', 'activity-4'])
+  })
+})

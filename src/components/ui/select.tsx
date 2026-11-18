@@ -60,11 +60,13 @@ export function Select<T extends string>({
       variant={variant}
       size={size}
       disabled={disabled}
-      aria-label={aria['aria-label']}
       aria-haspopup="menu"
       rightIcon={<ArrowDownOneIcon size={16} />}
       className={className}
     >
+      {/* The label is part of the name, not a replacement for it: aria-label would hide
+          the chosen value, which a disabled Select offers no other way to find. */}
+      {aria['aria-label'] && <span className="sr-only">{aria['aria-label']}: </span>}
       {current?.label ?? placeholder}
     </Button>
   )
