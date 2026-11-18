@@ -15,7 +15,7 @@ import { ROOT_ROUTE } from "@/lib/routes";
 
 // Matches the onboarding shell gradient (Figma 5795:41421).
 const CANVAS_GRADIENT =
-  "linear-gradient(180deg, var(--neutral-50) 3.76%, var(--neutral-100,#F5F5F5) 75%, var(--neutral-200,#E5E5E5) 116.79%)";
+  "linear-gradient(180deg, var(--neutral-50) 3.76%, var(--neutral-100) 75%, var(--neutral-200) 116.79%)";
 
 /** Full-screen gradient canvas that centres a single card. */
 export function InviteCanvas({ children }: { children: React.ReactNode }) {
@@ -57,7 +57,7 @@ export function InviteCard({
         width: "100%",
         maxWidth: width,
         boxShadow:
-          "0px 12px 16px -4px var(--neutral-500-12), 0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+          "0px 12px 16px -4px var(--neutral-500-12), var(--shadow-soft), 0px 0px 0px 1px var(--neutral-100)",
       }}
     >
       {children}
@@ -93,7 +93,7 @@ export function CardSubtitle({ children }: { children: React.ReactNode }) {
         fontWeight: 'var(--font-weight-regular)',
         fontSize: 'var(--font-size-body-lg)',
         lineHeight: "var(--line-height-heading-sm)",
-        color: "var(--neutral-500,#827a74)",
+        color: "var(--neutral-500)",
         margin: 0,
       }}
     >

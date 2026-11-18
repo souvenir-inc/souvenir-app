@@ -578,7 +578,7 @@ function OrgChangePlanPageInner() {
                         position: 'absolute', top: -11, left: 16,
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                         borderRadius: 'var(--radius-sm)', overflow: 'hidden', backgroundColor: 'var(--blue-100)',
-                        boxShadow: '0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px rgba(13,110,178,0.5), inset 0px 1px 0px 0px rgba(231,244,253,0.7), inset 0px -1px 0px 0px rgba(13,110,178,0.1)',
+                        boxShadow: '0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px var(--blue-600-50), inset 0px 1px 0px 0px rgba(231,244,253,0.7), inset 0px -1px 0px 0px rgba(13,110,178,0.1)',
                       }}>
                         <span style={{ fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)', color: 'var(--blue-700)', padding: 'var(--space-0-5) var(--space-1-5)' }}>
                           FREE PLAN ACTIVE

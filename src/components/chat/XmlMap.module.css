@@ -9,7 +9,7 @@
   border: 1px solid rgba(82, 75, 71, 0.12);
   border-radius: var(--radius-md);
   background: var(--neutral-white);
-  box-shadow: 0 2px 2.8px rgba(82, 75, 71, 0.12);
+  box-shadow: var(--shadow-soft);
   color: var(--neutral-900);
 }
 

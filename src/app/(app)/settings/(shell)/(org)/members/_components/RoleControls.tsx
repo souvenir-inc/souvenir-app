@@ -275,7 +275,7 @@ function ConfirmModal({
         size="sm"
         hideClose
         role="alertdialog"
-        style={{ borderRadius: 'var(--radius-2xl)', backgroundColor: 'var(--modal-bg)', border: '1px solid var(--border-default)', boxShadow: '0px 8px 32px color-mix(in srgb, var(--static-black) 12%, transparent)' }}
+        style={{ borderRadius: 'var(--radius-2xl)', backgroundColor: 'var(--modal-bg)', border: '1px solid var(--border-default)', boxShadow: 'var(--shadow-4)' }}
       >
         <div style={{ padding: 'var(--space-6) var(--space-6) var(--space-4)' }}>
           <DialogTitle style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-heading-md)', lineHeight: 'var(--line-height-heading-md)', color: 'var(--neutral-900)', margin: 0 }}>

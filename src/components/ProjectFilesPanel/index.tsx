@@ -141,7 +141,7 @@ export function ProjectFilesPanel({ files, usedBytes, totalBytes, pendingFiles, 
           // Same card chrome as Instructions; a dashed edge only while a file is dragged over.
           // --focus-ring is the signature accent: blue in light mode, pink in dark.
           border:        dragging ? '1px dashed var(--focus-ring)' : '1px solid var(--text-field-ring)',
-          boxShadow:     '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+          boxShadow:     'var(--shadow-soft)',
           width:         '100%',
           boxSizing:     'border-box',
           transition:    'background var(--duration-base), border-color var(--duration-base)',
@@ -195,7 +195,7 @@ export function ProjectFilesPanel({ files, usedBytes, totalBytes, pendingFiles, 
             <m.div
               animate={{ width: `${usedPct}%` }}
               transition={{ type: 'spring', stiffness: 200, damping: 28 }}
-              style={{ height: '100%', background: usedPct > 90 ? 'var(--red-500, #ef4444)' : 'var(--blue-500)', borderRadius: 'inherit' }}
+              style={{ height: '100%', background: usedPct > 90 ? 'var(--red-500)' : 'var(--blue-500)', borderRadius: 'inherit' }}
             />
           </div>
           <span style={{ flexShrink: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-600)' }}>

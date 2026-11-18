@@ -13,9 +13,9 @@ const TITLE = 'var(--font-title)'
 const BODY  = 'var(--font-body)'
 
 const C = {
-  ink:        'var(--neutral-900, #26211e)',
-  sub:        'var(--neutral-700, #524b47)',
-  muted:      'var(--neutral-500, #827a74)',
+  ink:        'var(--neutral-900)',
+  sub:        'var(--neutral-700)',
+  muted:      'var(--neutral-500)',
   bg:         'var(--neutral-50)',
   white:      'var(--neutral-white)',
   green:      'var(--success-600)',

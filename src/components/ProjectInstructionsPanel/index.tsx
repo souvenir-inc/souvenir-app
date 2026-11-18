@@ -27,7 +27,7 @@ const cardStyle: React.CSSProperties = {
   background:    'var(--card-bg)',
   // --text-field-ring: neutral-100 in light, a visible 22% white hairline in dark (as Project settings).
   border:        '1px solid var(--text-field-ring)',
-  boxShadow:     '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+  boxShadow:     'var(--shadow-soft)',
   width:         '100%',
   boxSizing:     'border-box',
 }

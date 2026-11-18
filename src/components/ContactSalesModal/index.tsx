@@ -22,7 +22,7 @@ const TEAM_SIZE_LABELS: Record<string, string> = Object.fromEntries(
   TEAM_SIZE_OPTIONS.map(o => [o.value, o.label])
 )
 
-const SHADOW_MODAL = '0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rgba(130,122,116,0.1)'
+const SHADOW_MODAL = 'var(--shadow-4)'
 
 const S = {
   label: {

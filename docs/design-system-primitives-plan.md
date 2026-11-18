@@ -719,6 +719,25 @@ The primitives themselves sat off the scale (`ui/dialog` 9997, `Dropdown` 9998, 
 
 Result: z-index wired 21.7% → **94.5%** (3 left, all in the out-of-scope old `Sidebar`; 74 local values not counted); total 88.8% → **89.5%**. Screens: 21 × light/dark, no visual change (pre-change diffs on settings-ai/analytics were live data and were re-baselined first). Unit suite: the same 13 pre-existing failures. Static screens don't open overlays, so dialog-over-menu stacking follows from the order above but wasn't seen on screen.
 
+### Leftovers 2 — shadows and colour literals: 2026-11-18 (branch `ds/phase-6-shadows-colours`)
+
+**Shadows.** New codemod `scripts/codemods/shadows-exact.mjs` (same skip list as `tokens-exact`): a whole value or a single layer equal to a generic `--shadow-*` token becomes that token (component-named tokens such as `--shadow-sidebar-*` are never borrowed); a ring layer (`[inset] 0 0 0 Npx <colour>`) whose colour equals a palette primitive points at it. A ring acts as a border, so it follows the theme. Blur colours are never swapped, because flipping them in dark would turn shadows into glows. 50 values in 39 files, light-identical.
+
+**Dialog elevation.** `--shadow-4` had no users and didn't match any dialog. It's now the `ui/dialog` surface shadow (`0 19px 32px rgba(18,12,8,.15), 0 2px 2.8px rgba(130,122,116,.1)`), already used by ConfirmModal-style dialogs, billing, ContactSales, ReportBug, RequestDemo and RequestFeature (exact, no change). The other hand-written modal shadows (six variants: `0 8px 32px …` ×4 colours, `0 8px 40px`, `0 24px 72px`) in 22 files were snapped to it (D5), so every modal now has one elevation. No dark override yet, the same as before; a dark-specific dialog shadow is a separate design call. The Slack settings menu and the chart tooltip boxes went to `--shadow-3` (menus/popovers).
+
+**Colour fallbacks.** 226 `var(--token, #hex)` fallbacks (Figma-export leftovers; some disagreed, e.g. `--neutral-100` with both `#F5F5F5` and `#EDE1D7`) were removed where the token is defined at `:root`. They never applied, so nothing renders differently. Kept: 5 fallbacks whose token **doesn't exist** and so is what renders: `--color-border-subtle`, `--color-text-secondary` ×2, `--orange-500`, `--neutral-900-04`. These are small bugs to fix by pointing at real tokens.
+
+| | Before | After |
+|---|---|---|
+| Shadow on tokens | 65.0% | 73.9% |
+| Hex literals | 418 | 192 |
+| rgb()/rgba() literals | 526 | 435 |
+| Total style values wired | 89.5% | 89.8% |
+
+Checks: 21 screens × light/dark show no visual change; tsc clean; unit suite the same 13 pre-existing failures (one snapshot recorded the removed `var(--purple-500, #8b5cf6)` fallback and was updated). Modal shadows were not on screen in the screenshot set; open one or two dialogs to judge the snap.
+
+Left on purpose (needs a design call, not a token): focus halos (`0 0 0 3px` in projects/new, EditProjectModal, Slack); drawer edge shadows `4px 0 24px` (FlatSidebar, SettingsSidebar); danger ring `rgba(238,48,48,.22)`; the onboarding plan-card emboss/glow and `ModelFeaturedCard` gold glow; small `0 1px 2px` card shadows (Slack, GeneratedFilesList, EffortSlider) that would get visibly heavier on `--shadow-soft`. **Proposed exemption (like D7):** the `CodeBlock` syntax palette (light + One Dark) and `XmlWeather` illustration colours are content colours, not UI.
+
 ---
 
 ## Phase 7 — Lock it in

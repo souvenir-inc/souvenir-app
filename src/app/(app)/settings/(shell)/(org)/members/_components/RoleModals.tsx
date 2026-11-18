@@ -36,7 +36,7 @@ export function RolesPermissionsModal({ open, onClose }: { open: boolean; onClos
           borderRadius: 'var(--radius-2xl)',
           background: 'var(--legacy-f9f5f1)',
           border:     '1px solid var(--border-default)',
-          boxShadow:  '0px 8px 32px color-mix(in srgb, var(--static-black) 12%, transparent)',
+          boxShadow:  'var(--shadow-4)',
         }}
       >
         {/* Header */}
@@ -194,7 +194,7 @@ function RoleComparisonModal({ open, onClose }: { open: boolean; onClose: () => 
           borderRadius: 'var(--radius-2xl)',
           background: 'var(--modal-bg)',
           border:     '1px solid var(--border-default)',
-          boxShadow:  '0px 8px 32px color-mix(in srgb, var(--static-black) 12%, transparent)',
+          boxShadow:  'var(--shadow-4)',
         }}
       >
         {/* Header */}

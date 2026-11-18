@@ -171,7 +171,7 @@ function ConnectorResultCard({ data }: { data: ConnectorResultJson }) {
       }}
     >
       {/* Success icon */}
-      <div style={{ flexShrink: 0, marginTop: 'var(--space-0-5)', color: 'var(--green-500, #22c55e)' }}>
+      <div style={{ flexShrink: 0, marginTop: 'var(--space-0-5)', color: 'var(--green-500)' }}>
         <svg width={16} height={16} viewBox="0 0 16 16" fill="none" aria-hidden>
           <circle cx={8} cy={8} r={7.5} stroke="currentColor" strokeOpacity={0.35} />
           <path

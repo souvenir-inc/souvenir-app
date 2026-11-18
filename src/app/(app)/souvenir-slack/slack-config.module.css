@@ -260,7 +260,7 @@
 .inlinePanel { margin-top: var(--space-3); padding: var(--space-3); border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--neutral-100); }
 .inlinePanelHeader { margin: 0; color: var(--neutral-900); font-family: var(--font-body); font-size: var(--font-size-body-sm); font-weight: var(--font-weight-semibold); }
 .inlinePanelHelp { margin: var(--space-0-5) 0 var(--space-2-5); color: var(--neutral-500); font-family: var(--font-body); font-size: var(--font-size-small); line-height: 18px; }
-.menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: var(--z-raised); min-width: 240px; padding: var(--space-1-5); border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--popover-bg); box-shadow: 0 12px 32px rgba(82, 75, 71, .14); }
+.menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: var(--z-raised); min-width: 240px; padding: var(--space-1-5); border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--popover-bg); box-shadow: var(--shadow-3); }
 .muted { color: var(--neutral-500); font-family: var(--font-body); font-size: var(--font-size-small); }
 .inherited { padding: var(--space-0-5) var(--space-1-5); border-radius: var(--radius-full); background: var(--neutral-100); color: var(--neutral-600); font-size: var(--font-size-caption); white-space: nowrap; }
 

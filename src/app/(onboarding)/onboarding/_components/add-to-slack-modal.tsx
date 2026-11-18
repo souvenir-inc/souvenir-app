@@ -70,17 +70,17 @@ export function AddSouvenirToSlackModal({ isOpen, onClose }: { isOpen: boolean; 
       >
         <div style={{ display: "flex", alignItems: "flex-start", gap: 'var(--space-2)' }}>
           <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 'var(--space-1)' }}>
-            <DialogTitle style={{ fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-heading-md)', lineHeight: "var(--line-height-heading-sm)", color: "var(--neutral-700,#524b47)", margin: 0 }}>
+            <DialogTitle style={{ fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-heading-md)', lineHeight: "var(--line-height-heading-sm)", color: "var(--neutral-700)", margin: 0 }}>
               Add Souvenir to Slack
             </DialogTitle>
-            <DialogDescription style={{ fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-small)", color: "var(--neutral-600,#6a625d)", margin: 0 }}>
+            <DialogDescription style={{ fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-small)", color: "var(--neutral-600)", margin: 0 }}>
               Bring Souvenir right into your workspace, ready for your workspace to use.
             </DialogDescription>
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            style={{ background: "none", border: "none", cursor: "pointer", padding: 'var(--space-0-5)', borderRadius: 'var(--radius-sm)', display: "flex", color: "var(--neutral-700,#524b47)", flexShrink: 0 }}
+            style={{ background: "none", border: "none", cursor: "pointer", padding: 'var(--space-0-5)', borderRadius: 'var(--radius-sm)', display: "flex", color: "var(--neutral-700)", flexShrink: 0 }}
           >
             <CancelOneIcon size={18} />
           </button>

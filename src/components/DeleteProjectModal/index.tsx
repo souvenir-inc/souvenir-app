@@ -42,7 +42,7 @@ export function DeleteProjectModal({ open, projectName, chatCount, restorable = 
         onInteractOutside={(e) => { if (loading) e.preventDefault() }}
         style={{
           background:      'var(--modal-bg)',
-          boxShadow:       '0px 8px 32px 0px rgba(82,75,71,0.18), 0px 0px 0px 1px var(--neutral-100)',
+          boxShadow:       'var(--shadow-4)',
           width:           480,
         }}
       >

@@ -209,7 +209,7 @@ export function NavGuardModal() {
           backgroundColor: 'var(--modal-bg)',
           padding: 24,
           gap: 20,
-          boxShadow: '0px 8px 32px 0px rgba(82,75,71,0.18), 0px 0px 0px 1px var(--neutral-100)',
+          boxShadow: 'var(--shadow-4)',
         }}
       >
         <div>

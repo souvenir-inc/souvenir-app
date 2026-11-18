@@ -540,7 +540,7 @@ function RightSidebarImpl() {
               style={{
                 background:    "var(--neutral-white)",
                 borderRadius:  "var(--radius-2xl)",
-                boxShadow:     "0px 8px 32px 0px rgba(26,23,20,0.24), 0px 0px 0px 1px rgba(59,54,50,0.12)",
+                boxShadow:     "var(--shadow-4)",
                 width:         "360px",
                 maxWidth:      "calc(100vw - 32px)",
                 display:       "flex",
@@ -614,7 +614,7 @@ function RightSidebarImpl() {
               style={{
                 background:    "var(--neutral-white)",
                 borderRadius:  "var(--radius-2xl)",
-                boxShadow:     "0px 8px 32px 0px rgba(26,23,20,0.24), 0px 0px 0px 1px rgba(59,54,50,0.12)",
+                boxShadow:     "var(--shadow-4)",
                 width:         "360px",
                 maxWidth:      "calc(100vw - 32px)",
                 display:       "flex",
@@ -697,7 +697,7 @@ function RightSidebarImpl() {
               style={{
                 background:    "var(--neutral-white)",
                 borderRadius:  "var(--radius-2xl)",
-                boxShadow:     "0px 8px 32px 0px rgba(26,23,20,0.24), 0px 0px 0px 1px rgba(59,54,50,0.12)",
+                boxShadow:     "var(--shadow-4)",
                 width:         "360px",
                 maxWidth:      "calc(100vw - 32px)",
                 display:       "flex",

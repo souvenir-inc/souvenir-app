@@ -68,7 +68,7 @@ function RecommendedChip() {
         alignItems: "center",
         padding: "var(--space-0-5) var(--space-1-5)",
         borderRadius: 'var(--radius-sm)',
-        backgroundColor: "var(--blue-100,#cadcf1)",
+        backgroundColor: "var(--blue-100)",
         boxShadow:
           "0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px var(--blue-600-50), inset 0px 1px 0px 0px var(--blue-50-70), inset 0px -1px 0px 0px var(--blue-600-10)",
       }}
@@ -79,7 +79,7 @@ function RecommendedChip() {
           fontWeight: 'var(--font-weight-medium)',
           fontSize: 'var(--font-size-caption)',
           lineHeight: "var(--line-height-small)",
-          color: "var(--blue-700,#135487)",
+          color: "var(--blue-700)",
           whiteSpace: "nowrap",
         }}
       >
@@ -124,7 +124,7 @@ function OptionHeading({ icon, title, subtitle }: { icon: React.ReactNode; title
     <div style={{ display: "flex", gap: 'var(--space-3)', alignItems: "flex-start" }}>
       {icon}
       <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-2)', width: 312 }}>
-        <p style={{ fontFamily: "var(--font-title)", fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-heading-md)', lineHeight: "var(--line-height-heading-sm)", color: "var(--color-text-primary,#524b47)", margin: 0 }}>
+        <p style={{ fontFamily: "var(--font-title)", fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-heading-md)', lineHeight: "var(--line-height-heading-sm)", color: "var(--color-text-primary)", margin: 0 }}>
           {title}
         </p>
         <p style={{ fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-small)", color: "var(--color-text-secondary,#6a625d)", margin: 0 }}>
@@ -185,7 +185,7 @@ export default function OnboardingSetupChoicePage() {
               backgroundColor: "var(--color-surface-base,var(--static-white))",
             }}
           >
-            <div style={{ flexShrink: 0, width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--neutral-700,#524b47)" }}>
+            <div style={{ flexShrink: 0, width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--neutral-700)" }}>
               <HugeiconsIcon icon={AiMagicIcon} size={16} strokeWidth={1.6} />
             </div>
             <p style={{ flex: 1, fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-small)", color: "var(--color-text-secondary,#6a625d)", margin: 0 }}>

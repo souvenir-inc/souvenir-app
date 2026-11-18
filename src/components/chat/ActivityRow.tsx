@@ -241,7 +241,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
               style={{
                 fontSize: 'var(--font-size-small)',
                 fontWeight: 'var(--font-weight-semibold)',
-                color: "var(--neutral-600, #6A625D)",
+                color: "var(--neutral-600)",
                 letterSpacing: "0.4px",
                 background: "color-mix(in srgb, var(--neutral-800) 8%, transparent)",
                 borderRadius: 'var(--radius-xs)',
@@ -258,7 +258,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
               transition={{ type: "spring", stiffness: 380, damping: 28 }}
               style={{ display: "block", flexShrink: 0 }}
             >
-              <path d="M3 5.5 L7 9.5 L11 5.5" stroke="var(--neutral-400, #9C938B)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M3 5.5 L7 9.5 L11 5.5" stroke="var(--neutral-400)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
             </m.svg>
           </>
         )}
@@ -270,7 +270,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
             transition={{ type: "spring", stiffness: 380, damping: 28 }}
             style={{ display: "block", flexShrink: 0 }}
           >
-            <path d="M3 5.5 L7 9.5 L11 5.5" stroke="var(--neutral-400, #9C938B)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M3 5.5 L7 9.5 L11 5.5" stroke="var(--neutral-400)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
           </m.svg>
         )}
       </button>

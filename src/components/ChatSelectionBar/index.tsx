@@ -45,7 +45,7 @@ export function ChipButton({ children, danger = false, ghost = false, disabled =
         fontSize:        'var(--font-size-body)',
         fontWeight:      'var(--font-weight-medium)',
         lineHeight:      'var(--line-height-body)',
-        color:           danger ? 'var(--red-500, #dc2626)' : 'var(--neutral-700)',
+        color:           danger ? 'var(--red-500)' : 'var(--neutral-700)',
         opacity:         disabled ? 0.38 : 1,
         cursor:          disabled ? 'not-allowed' : 'pointer',
         transition:      'background-color var(--duration-fast)',

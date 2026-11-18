@@ -93,7 +93,7 @@ function DenyReasonChip({ label, onClick }: DenyReasonChipProps) {
         borderRadius:    'var(--radius-md)',
         border:          'none',
         cursor:          'pointer',
-        backgroundColor: hovered ? 'var(--neutral-100, #F5F5F5)' : 'var(--neutral-white, white)',
+        backgroundColor: hovered ? 'var(--neutral-100)' : 'var(--neutral-white, white)',
         boxShadow:       hovered
           ? '0px 0px 0px 1px rgba(59,54,50,0.4)'
           : '0px 0px 0px 1px rgba(59,54,50,0.2)',
@@ -101,7 +101,7 @@ function DenyReasonChip({ label, onClick }: DenyReasonChipProps) {
         fontWeight:      'var(--font-weight-medium)',
         fontSize:        'var(--font-size-body)',
         lineHeight:      'var(--line-height-body)',
-        color:           'var(--neutral-700, #524b47)',
+        color:           'var(--neutral-700)',
         whiteSpace:      'nowrap',
         flexShrink:      0,
         transition:      'background-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease',
@@ -290,7 +290,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   fontWeight:   'var(--font-weight-medium)',
                   fontSize:     'var(--font-size-caption)',
                   lineHeight:   'var(--line-height-caption)',
-                  color:        'var(--neutral-500, #827a74)',
+                  color:        'var(--neutral-500)',
                   overflow:     'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace:   'nowrap',
@@ -307,7 +307,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 fontWeight:   'var(--font-weight-semibold, 600)',
                 fontSize:     'var(--font-size-body-lg, 16px)',
                 lineHeight:   'var(--line-height-body-lg, 24px)',
-                color:        'var(--neutral-900, #26211e)',
+                color:        'var(--neutral-900)',
                 margin:       0,
                 overflow:     'hidden',
                 textOverflow: 'ellipsis',
@@ -324,7 +324,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 fontWeight: 'var(--font-weight-regular)',
                 fontSize:   'var(--font-size-body)',
                 lineHeight: 'var(--line-height-body)',
-                color:      'var(--neutral-700, #524b47)',
+                color:      'var(--neutral-700)',
                 margin:     0,
               }}
             >
@@ -472,7 +472,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                       fontWeight: 'var(--font-weight-medium)',
                       fontSize:   'var(--font-size-body)',
                       lineHeight: 'var(--line-height-body)',
-                      color:      'var(--neutral-500, #827a74)',
+                      color:      'var(--neutral-500)',
                     }}
                   >
                     Denied
@@ -484,7 +484,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                         fontWeight: 'var(--font-weight-regular)',
                         fontSize:   'var(--font-size-body)',
                         lineHeight: 'var(--line-height-body)',
-                        color:      'var(--neutral-400, #a09890)',
+                        color:      'var(--neutral-400)',
                       }}
                     >
                       · {localDenyReason}

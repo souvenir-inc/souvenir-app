@@ -59,13 +59,13 @@ function SizePill({
         outline: "none",
         backgroundColor: "#FFFFFF",
         boxShadow: selected
-          ? "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1.5px var(--neutral-900,#26211E)"
-          : "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+          ? "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1.5px var(--neutral-900)"
+          : "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)",
         fontFamily: "var(--font-body)",
         fontWeight: 'var(--font-weight-medium)',
         fontSize: 'var(--font-size-body)',
         lineHeight: "var(--line-height-small)",
-        color: selected ? "var(--neutral-900,#26211E)" : "var(--neutral-700,#524b47)",
+        color: selected ? "var(--neutral-900)" : "var(--neutral-700)",
         whiteSpace: "nowrap",
         transition: "background-color var(--duration-fast), box-shadow var(--duration-fast)",
       }}
@@ -163,7 +163,7 @@ export default function OnboardingWorkspacePage() {
               borderRadius: 'var(--radius-lg)',
               backgroundColor: "var(--field-surface)",
               boxSizing: "border-box",
-              boxShadow: "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+              boxShadow: "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)",
             }}
           >
             <input
@@ -181,7 +181,7 @@ export default function OnboardingWorkspacePage() {
                 fontWeight: 'var(--font-weight-regular)',
                 fontSize: 'var(--font-size-body)',
                 lineHeight: "var(--line-height-small)",
-                color: "var(--neutral-900,#26211e)",
+                color: "var(--neutral-900)",
                 padding: 0,
               }}
             />
@@ -192,7 +192,7 @@ export default function OnboardingWorkspacePage() {
                 fontWeight: 'var(--font-weight-medium)',
                 fontSize: 'var(--font-size-body)',
                 lineHeight: "var(--line-height-small)",
-                color: "var(--neutral-900,#26211e)",
+                color: "var(--neutral-900)",
                 whiteSpace: "nowrap",
               }}
             >

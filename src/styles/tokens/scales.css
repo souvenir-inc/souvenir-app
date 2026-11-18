@@ -69,7 +69,7 @@
   --shadow-1: var(--shadow-surface-card);  /* cards, list rows on a page */
   --shadow-2: var(--shadow-card-deep);     /* raised cards (projects, schedules) */
   --shadow-3: var(--shadow-popover);       /* menus, popovers, tooltips */
-  --shadow-4: var(--shadow-popover), 0px 16px 32px -8px rgba(38, 33, 30, 0.18); /* dialogs, sheets */
+  --shadow-4: 0px 19px 32px 0px rgba(18, 12, 8, 0.15), 0px 2px 2.8px 0px rgba(130, 122, 116, 0.1); /* dialogs, sheets: the ui/dialog surface */
 
   /* Settings surfaces: a soft drop plus a hairline ring. The drop was written out by hand 46 times
      in 33 files before these tokens existed. */

@@ -71,9 +71,9 @@ export function fmtNum(n: number | null | undefined): string {
 
 // ── Shared style constants (exact Figma values) ───────────────────────────────
 
-export const SHADOW_CARD    = '0px 2px 2.8px 0px rgba(82,75,71,0.12)'                                   // bordered section card
-export const SHADOW_TILE     = '0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)' // white inner tile
-export const SHADOW_MODAL   = '0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rgba(130,122,116,0.1)'
+export const SHADOW_CARD    = 'var(--shadow-soft)'                                   // bordered section card
+export const SHADOW_TILE     = 'var(--shadow-tile)' // white inner tile
+export const SHADOW_MODAL   = 'var(--shadow-4)'
 export const SHADOW_INPUT   = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)'
 
 // Same "big number" / secondary-text convention as the Monthly Limits /

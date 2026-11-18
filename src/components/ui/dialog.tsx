@@ -10,7 +10,7 @@ import styles from './dialog.module.css'
 // app's tokens so it matches ConfirmModal's surface (white card, 16px radius, same shadow, same overlay).
 // There was no shared dialog primitive before; ConfirmModal stays for plain confirm/cancel prompts.
 
-const SHADOW_MODAL = '0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rgba(130,122,116,0.1)'
+const SHADOW_MODAL = 'var(--shadow-4)'
 
 export const Dialog = DialogPrimitive.Root
 export const DialogTrigger = DialogPrimitive.Trigger

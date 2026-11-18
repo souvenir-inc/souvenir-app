@@ -113,7 +113,7 @@ function SkipButton({ onClick, disabled }: { onClick?: React.MouseEventHandler<H
         fontWeight:   'var(--font-weight-medium)',
         fontSize:     'var(--font-size-body, 14px)',
         lineHeight:   'var(--line-height-body, 22px)',
-        color:        'var(--neutral-700, #524b47)',
+        color:        'var(--neutral-700)',
         whiteSpace:   'nowrap',
         transition:   'background var(--duration-fast) ease, box-shadow var(--duration-fast) ease',
       }}
@@ -159,7 +159,7 @@ function SendButton({ onClick, disabled, pending }: { onClick?: React.MouseEvent
           position:      'absolute', inset: 0, borderRadius: 'inherit',
           background:    hovered
             ? 'linear-gradient(180deg, var(--neutral-600) 0%, var(--neutral-800) 100%)'
-            : 'linear-gradient(180deg, var(--neutral-700, #524b47) 0%, var(--neutral-900, #26211e) 100%)',
+            : 'linear-gradient(180deg, var(--neutral-700) 0%, var(--neutral-900) 100%)',
           pointerEvents: 'none', transition: 'background var(--duration-fast) ease',
         }}
       />
@@ -263,7 +263,7 @@ function InfoCardBody({ options, selected, onSelect }: {
               alignItems:      'center',
               justifyContent:  'center',
               backgroundColor: 'var(--blue-600)',
-              boxShadow:       '0 0 0 1px rgba(13,110,178,0.5)',
+              boxShadow:       '0 0 0 1px var(--blue-600-50)',
             }}>
               <span style={{
                 fontFamily: 'var(--font-body)',
@@ -596,7 +596,7 @@ export function QuestionCard(
                 fontWeight:   'var(--font-weight-regular)',
                 fontSize:     'var(--font-size-heading-md)',
                 lineHeight:   'var(--line-height-heading-md)',
-                color:        'var(--neutral-900, #26211e)',
+                color:        'var(--neutral-900)',
                 margin:       0,
               }}>
                 {question}
@@ -611,7 +611,7 @@ export function QuestionCard(
             fontWeight: 'var(--font-weight-medium)',
             fontSize:   'var(--font-size-body-lg, 16px)',
             lineHeight: 'var(--line-height-body-lg, 22px)',
-            color:      'var(--neutral-900, #26211e)',
+            color:      'var(--neutral-900)',
             margin:     0,
             overflow:   'hidden',
             textOverflow: 'ellipsis',
@@ -624,14 +624,14 @@ export function QuestionCard(
             {hasPagination && type !== 'info' && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 0, flexShrink: 0 }}>
                 <IconButton size="xs" variant="ghost" aria-label="Previous question" icon={<ArrowLeftOneIcon size={18} />} onClick={onPrev} disabled={!onPrev} />
-                <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body, 14px)', lineHeight: 'var(--line-height-body, 22px)', color: 'var(--neutral-600, #6a625d)', whiteSpace: 'nowrap', flexShrink: 0, padding: '0 var(--space-0-5)' }}>
+                <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body, 14px)', lineHeight: 'var(--line-height-body, 22px)', color: 'var(--neutral-600)', whiteSpace: 'nowrap', flexShrink: 0, padding: '0 var(--space-0-5)' }}>
                   {paginationLabel}
                 </span>
                 <IconButton size="xs" variant="ghost" aria-label="Next question" icon={<ArrowRightOneIcon size={18} />} onClick={onNext} disabled={!onNext} />
               </div>
             )}
             {hasSelectionMode && !hasPagination && (
-              <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body, 14px)', lineHeight: 'var(--line-height-body, 22px)', color: 'var(--neutral-600, #6a625d)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+              <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body, 14px)', lineHeight: 'var(--line-height-body, 22px)', color: 'var(--neutral-600)', whiteSpace: 'nowrap', flexShrink: 0 }}>
                 {selectionCount} Selected
               </span>
             )}
@@ -754,7 +754,7 @@ export function QuestionCard(
                     fontWeight: 'var(--font-weight-medium)',
                     fontSize:   'var(--font-size-body-lg, 16px)',
                     lineHeight: 'var(--line-height-body-lg, 22px)',
-                    color:      'var(--neutral-600, #6a625d)',
+                    color:      'var(--neutral-600)',
                     boxSizing:  'border-box',
                     minHeight:  22,
                   }}
@@ -775,7 +775,7 @@ export function QuestionCard(
                     fontWeight:   'var(--font-weight-medium)',
                     fontSize:     'var(--font-size-body-lg, 16px)',
                     lineHeight:   'var(--line-height-body-lg, 22px)',
-                    color:        'var(--neutral-600, #6a625d)',
+                    color:        'var(--neutral-600)',
                     margin:       0,
                     cursor:       'pointer',
                     overflow:     'hidden',

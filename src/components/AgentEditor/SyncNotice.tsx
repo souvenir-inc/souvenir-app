@@ -23,7 +23,7 @@ export function SyncNotice({ notice, onLoadLatest, onDismiss }: SyncNoticeProps)
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', flexWrap: 'wrap',
         padding: 'var(--space-2-5) var(--space-3)', borderRadius: 'var(--radius-lg)',
-        backgroundColor: conflict ? 'var(--color-tag-Yellow-bg, var(--green-50))' : 'var(--blue-50, #eef4fb)',
+        backgroundColor: conflict ? 'var(--color-tag-Yellow-bg, var(--green-50))' : 'var(--blue-50)',
         boxShadow: '0px 0px 0px 1px var(--neutral-100)',
         fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-800)',
       }}

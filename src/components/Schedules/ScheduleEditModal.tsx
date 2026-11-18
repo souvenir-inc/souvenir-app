@@ -89,7 +89,7 @@ export function ScheduleEditModal({ isOpen, schedule, onSave, onClose }: Schedul
           maxHeight: 'calc(100vh - 48px)',
           minHeight: 600,
           background: 'var(--modal-bg)',
-          boxShadow: '0 8px 40px color-mix(in srgb, var(--static-black) 12%, transparent)',
+          boxShadow: 'var(--shadow-4)',
         }}
       >
         {/* Header */}

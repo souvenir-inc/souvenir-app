@@ -19,7 +19,7 @@
   overflow: hidden;
   border-radius: var(--radius-2xl);
   background: var(--neutral-white);
-  box-shadow: 0 24px 72px rgba(30, 28, 27, 0.28), 0 0 0 1px var(--neutral-100);
+  box-shadow: var(--shadow-4);
 }
 
 .header {

@@ -155,7 +155,7 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
     >
 
       {state === 'error' && (
-        <span role="alert" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', color: 'var(--red-600, #DC2626)' }}>
+        <span role="alert" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', color: 'var(--red-600)' }}>
           {errorMsg || 'Connection failed.'} Try again.
         </span>
       )}

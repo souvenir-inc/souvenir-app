@@ -108,7 +108,7 @@ export function ChatShareOverlay({ chatId, canManage, readOnly, onCopied, autoOp
           aria-describedby={undefined}          style={{
             background:    'var(--modal-bg)',
             borderRadius:  'var(--radius-2xl)',
-            boxShadow:     '0px 8px 32px 0px rgba(26,23,20,0.24), 0px 0px 0px 1px rgba(59,54,50,0.12)',
+            boxShadow:     'var(--shadow-4)',
             width:         '560px',
             maxWidth:      'calc(100vw - 32px)',
             height:        MODAL_HEIGHT,
@@ -208,9 +208,9 @@ export function ChatShareOverlay({ chatId, canManage, readOnly, onCopied, autoOp
                                 ...memberRowStyle,
                                 border: 'none',
                                 cursor: 'pointer',
-                                backgroundColor: checked ? 'var(--blue-50, #eef5fc)' : 'var(--neutral-white)',
+                                backgroundColor: checked ? 'var(--blue-50)' : 'var(--neutral-white)',
                                 boxShadow: checked
-                                  ? '0px 0px 0px 1px var(--blue-300, #a8cdec)'
+                                  ? '0px 0px 0px 1px var(--blue-300)'
                                   : '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
                               }}
                             >

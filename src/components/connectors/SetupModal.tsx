@@ -56,7 +56,7 @@ export function Modal({ label, onDismiss, busy = false, dirty = false, children 
         onEscapeKeyDown={event => { if (busy) event.preventDefault() }}
         onInteractOutside={event => { if (busy || dirty) event.preventDefault() }}
         className="p-6"
-        style={{ width: 520, maxHeight: 'min(760px, calc(100vh - 48px))', overflowY: 'auto', boxShadow: '0 24px 72px rgba(30,28,27,.28)', borderRadius: 'var(--radius-xl)' }}
+        style={{ width: 520, maxHeight: 'min(760px, calc(100vh - 48px))', overflowY: 'auto', boxShadow: 'var(--shadow-4)', borderRadius: 'var(--radius-xl)' }}
       >
         <DialogTitle className="sr-only">{label}</DialogTitle>
         {children}
@@ -226,7 +226,7 @@ export function SetupModal({
 
       {flow.state === 'error' && flow.error && (
         <div role="alert" className="mt-2">
-          <p className="m-0 text-[13px] text-[var(--red-600,#DC2626)]">{flow.error.message}</p>
+          <p className="m-0 text-[13px] text-[var(--red-600)]">{flow.error.message}</p>
           {flow.error.recovery === 'ask_admin' && (
             <p className={`${muted} mt-1 text-[13px]`}>Ask a workspace admin to enable or set up {catalog.name}.</p>
           )}

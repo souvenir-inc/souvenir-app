@@ -275,7 +275,7 @@ export default function OnboardingInvitePage() {
               ? "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--red-500)"
               : problem?.kind === "suggest"
                 ? "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--yellow-500)"
-                : "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+                : "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)",
             transition: "box-shadow var(--duration-fast) ease",
             boxSizing: "border-box",
             alignContent: "flex-start",

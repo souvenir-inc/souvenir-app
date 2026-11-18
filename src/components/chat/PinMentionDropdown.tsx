@@ -24,7 +24,7 @@ function ShortcutChip({ children }: { children: React.ReactNode }) {
         background:
           "linear-gradient(180deg, var(--neutral-white) 0%, var(--neutral-50) 100%)",
         boxShadow:
-          "0px 1px 1.5px 0px var(--neutral-700-12), 0px 0px 0px 1px var(--neutral-300-40)",
+          "var(--shadow-surface-card-hover)",
         flexShrink: 0,
       }}
     >

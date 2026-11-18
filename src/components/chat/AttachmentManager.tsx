@@ -385,7 +385,7 @@ export function AttachmentManager({
                   width:        "56px",
                   height:       "56px",
                   borderRadius: "var(--radius-xl)",
-                  border:       attachment.error ? "1px solid var(--red-400, #f87171)" : "1px solid var(--border-default)",
+                  border:       attachment.error ? "1px solid var(--red-400)" : "1px solid var(--border-default)",
                   overflow:     "hidden",
                   flexShrink:   0,
                   cursor:       attachment.uploading || attachment.error ? "default" : "pointer",
@@ -442,7 +442,7 @@ export function AttachmentManager({
                       position:        "absolute",
                       bottom:          "2px",
                       left:            "2px",
-                      backgroundColor: attachment.error ? "var(--red-600, #dc2626)" : "color-mix(in srgb, var(--static-black) 55%, transparent)",
+                      backgroundColor: attachment.error ? "var(--red-600)" : "color-mix(in srgb, var(--static-black) 55%, transparent)",
                       color:           "var(--static-white)",
                       fontSize: "var(--font-size-small)",
                       fontFamily:      "var(--font-body)",
@@ -481,7 +481,7 @@ export function AttachmentManager({
                   height:          "56px",
                   padding:         "0 var(--space-6) 0 var(--space-2)",
                   borderRadius:    "var(--radius-xl)",
-                  border:          attachment.error ? "1px solid var(--red-400, #f87171)" : "1px solid var(--border-default)",
+                  border:          attachment.error ? "1px solid var(--red-400)" : "1px solid var(--border-default)",
                   backgroundColor: "var(--card-bg)",
                   flexShrink:      0,
                   cursor:          attachment.uploading || attachment.error ? "default" : "pointer",
@@ -508,7 +508,7 @@ export function AttachmentManager({
                   <p style={{ ...CARD_TEXT, fontSize: "var(--font-size-body)", fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-900)" }}>
                     {attachment.file.name}
                   </p>
-                  <p style={{ ...CARD_TEXT, display: "flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--font-size-small)", color: attachment.error ? "var(--red-600, #dc2626)" : "var(--neutral-500)" }}>
+                  <p style={{ ...CARD_TEXT, display: "flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--font-size-small)", color: attachment.error ? "var(--red-600)" : "var(--neutral-500)" }}>
                     {attachment.error ? (
                       attachment.error
                     ) : attachment.uploading || attachment.processing ? (

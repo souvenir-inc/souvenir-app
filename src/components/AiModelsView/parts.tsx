@@ -87,7 +87,7 @@ export const BADGE_STYLES: Record<BadgeColor, {
     bg:          'var(--purple-100)',
     outerShadow: '0px 1px 1.5px 0px rgba(10,2,24,0.2), 0px 0px 0px 1px rgba(109,40,217,0.5)',
     innerShadow: 'inset 0px 1px 0px 0px rgba(237,233,254,0.7), inset 0px -1px 0px 0px rgba(109,40,217,0.1)',
-    color:       'var(--purple-700, #6d28d9)',
+    color:       'var(--purple-700)',
   },
 }
 
@@ -149,7 +149,7 @@ export function SkeletonCard() {
       borderRadius:    'var(--radius-2xl)',
       border:          '1px solid var(--border-default)',
       backgroundColor: 'var(--neutral-white)',
-      boxShadow:       '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+      boxShadow:       'var(--shadow-soft)',
     }}>
       <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
         <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--neutral-100)', animation: 'pulse 0.9s ease-in-out infinite', flexShrink: 0 }} />
