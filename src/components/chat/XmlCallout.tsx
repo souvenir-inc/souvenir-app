@@ -27,7 +27,7 @@ export function XmlCallout({ xml }: { xml: string }) {
   if (!data) return null
 
   return (
-    <div style={{ margin: "14px 0" }}>
+    <div style={{ margin: "var(--space-3) 0" }}>
       <AnimatedCallout data={data} onComplete={noop} />
     </div>
   )

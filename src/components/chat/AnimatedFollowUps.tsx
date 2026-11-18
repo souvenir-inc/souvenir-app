@@ -31,16 +31,16 @@ export function AnimatedFollowUps({ data, onComplete, onFollowUp, animate = true
 
   return (
     <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-      <div style={{ fontSize: 12, fontWeight: 500, color: "var(--neutral-600)", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+      <div style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-600)", marginBottom: 'var(--space-2-5)', textTransform: "uppercase", letterSpacing: "0.5px" }}>
         Follow-up suggestions
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1-5)' }}>
         {data.prompts.slice(0, revealed).map((prompt) => (
           <m.button key={prompt}
             initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
             onClick={() => onFollowUp?.(prompt)}
-            style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--neutral-white)", border: "1px solid var(--neutral-100)", borderRadius: 10, padding: "10px 14px", fontSize: 14, color: "var(--neutral-700)", cursor: "pointer", textAlign: "left", width: "100%", transition: "all 140ms", fontFamily: "var(--font-body)" }}
+            style={{ display: "flex", alignItems: "center", gap: 'var(--space-2)', background: "var(--neutral-white)", border: "1px solid var(--neutral-100)", borderRadius: 'var(--radius-lg)', padding: "var(--space-2-5) var(--space-3)", fontSize: 'var(--font-size-body)', color: "var(--neutral-700)", cursor: "pointer", textAlign: "left", width: "100%", transition: "all var(--duration-fast)", fontFamily: "var(--font-body)" }}
             onMouseEnter={(e) => { e.currentTarget.style.background = "color-mix(in srgb, var(--brown-700) 4%, transparent)"; e.currentTarget.style.borderColor = "color-mix(in srgb, var(--brown-700) 20%, transparent)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "var(--static-white)"; e.currentTarget.style.borderColor = "var(--neutral-100)"; }}>
             <span style={{ color: "var(--neutral-300)", flexShrink: 0 }}>�'</span>

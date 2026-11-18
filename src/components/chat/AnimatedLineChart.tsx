@@ -62,8 +62,8 @@ export function AnimatedLineChart({ data, onComplete, animate = true }: { data: 
 
   return (
     <m.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-      style={{ background: "var(--neutral-white)", border: "1px solid var(--brown-50)", borderRadius: 12, padding: "16px 18px 12px" }}>
-      {data.title && <div style={{ fontSize: 13, fontWeight: 600, color: "var(--neutral-900)", marginBottom: 14 }}>{data.title}</div>}
+      style={{ background: "var(--neutral-white)", border: "1px solid var(--brown-50)", borderRadius: 'var(--radius-xl)', padding: "var(--space-4) var(--space-4) var(--space-3)" }}>
+      {data.title && <div style={{ fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)", marginBottom: 'var(--space-3)' }}>{data.title}</div>}
       <div ref={containerRef} style={{ position: "relative" }}>
         <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`}
           style={{ display: "block", overflow: "visible", cursor: "crosshair" }}
@@ -113,15 +113,15 @@ export function AnimatedLineChart({ data, onComplete, animate = true }: { data: 
         <AnimatePresence initial={false}>
           {hoverIdx !== null && tooltipItems.length > 0 && (
             <m.div key="tooltip" initial={{ opacity: 0, y: 4, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 4, scale: 0.96 }} transition={{ duration: 0.12 }}
-              style={{ position: "absolute", top: -8, left: tooltipLeft, width: tooltipWidth, background: "#26211E", borderRadius: 8, padding: "7px 10px", pointerEvents: "none", zIndex: 10, boxShadow: "0 4px 12px rgba(18,12,8,0.22)" }}>
-              <div style={{ fontSize: 12, color: "var(--neutral-600)", fontWeight: 500, marginBottom: 5, letterSpacing: "0.3px" }}>{data.lines[0]?.points[hoverIdx]?.x}</div>
+              style={{ position: "absolute", top: -8, left: tooltipLeft, width: tooltipWidth, background: "#26211E", borderRadius: 'var(--radius-md)', padding: "var(--space-1-5) var(--space-2-5)", pointerEvents: "none", zIndex: 'var(--z-raised)', boxShadow: "0 4px 12px rgba(18,12,8,0.22)" }}>
+              <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)', letterSpacing: "0.3px" }}>{data.lines[0]?.points[hoverIdx]?.x}</div>
               {tooltipItems.map((item, ti) => (
-                <div key={item.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: ti > 0 ? 3 : 0 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                <div key={item.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 'var(--space-2)', marginTop: ti > 0 ? 3 : 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)' }}>
                     <div style={{ width: 6, height: 6, borderRadius: "50%", background: item.color, flexShrink: 0 }} />
-                    {tooltipItems.length > 1 && <span style={{ fontSize: 12, color: "var(--neutral-600)", maxWidth: 52, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.label}</span>}
+                    {tooltipItems.length > 1 && <span style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", maxWidth: 52, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.label}</span>}
                   </div>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: "var(--static-white)", fontVariantNumeric: "tabular-nums" }}>{item.value}{data.unit ?? ""}</span>
+                  <span style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', color: "var(--static-white)", fontVariantNumeric: "tabular-nums" }}>{item.value}{data.unit ?? ""}</span>
                 </div>
               ))}
             </m.div>
@@ -129,11 +129,11 @@ export function AnimatedLineChart({ data, onComplete, animate = true }: { data: 
         </AnimatePresence>
       </div>
       {data.lines.length > 1 && (
-        <div style={{ display: "flex", gap: 14, marginTop: 8, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 'var(--space-3)', marginTop: 'var(--space-2)', flexWrap: "wrap" }}>
           {data.lines.map((line, li) => (
-            <div key={line.label ?? `legend-${li}`} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <div style={{ width: 12, height: 2, background: line.color ?? LINE_COLORS[li % LINE_COLORS.length], borderRadius: 2 }} />
-              <span style={{ fontSize: 12, color: "var(--neutral-500)" }}>{line.label}</span>
+            <div key={line.label ?? `legend-${li}`} style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)' }}>
+              <div style={{ width: 12, height: 2, background: line.color ?? LINE_COLORS[li % LINE_COLORS.length], borderRadius: 'var(--radius-xs)' }} />
+              <span style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-500)" }}>{line.label}</span>
             </div>
           ))}
         </div>

@@ -4,7 +4,7 @@
 .card {
   overflow: hidden;
   border: 1px solid var(--neutral-100);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   background: linear-gradient(to bottom right, var(--widget-bg-from) 0%, var(--widget-bg-from) 60%, var(--widget-bg-to) 100%);
 }
 

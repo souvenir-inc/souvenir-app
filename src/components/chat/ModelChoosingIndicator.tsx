@@ -26,12 +26,12 @@ export function ModelChoosingIndicator({
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: "8px",
-            padding: "6px 12px",
-            borderRadius: "8px",
+            gap: "var(--space-2)",
+            padding: "var(--space-1-5) var(--space-3)",
+            borderRadius: "var(--radius-md)",
             backgroundColor: "var(--neutral-50)",
             border: "1px solid var(--border-default)",
-            marginBottom: "8px",
+            marginBottom: "var(--space-2)",
           }}
         >
           {/* Animated sparkle icon */}
@@ -52,7 +52,7 @@ export function ModelChoosingIndicator({
           <span
             style={{
               fontFamily: "var(--font-body)",
-              fontSize: "12px",
+              fontSize: "var(--font-size-small)",
               fontWeight: "var(--font-weight-medium)",
               color: "var(--neutral-600)",
             }}

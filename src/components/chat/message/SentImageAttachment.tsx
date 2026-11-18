@@ -12,10 +12,10 @@ const cardStyle: React.CSSProperties = {
   position:        "relative",
   display:         "inline-flex",
   alignItems:      "center",
-  gap:             "10px",
-  padding:         "6px",
-  paddingRight:    "12px",
-  borderRadius:    "14px",
+  gap:             "var(--space-2-5)",
+  padding:         "var(--space-1-5)",
+  paddingRight:    "var(--space-3)",
+  borderRadius:    "var(--radius-xl)",
   backgroundColor: "color-mix(in srgb, var(--neutral-800) 7%, transparent)",
   border:          "1px solid var(--neutral-800-10)",
   maxWidth:        "260px",
@@ -29,7 +29,7 @@ const tileButtonStyle: React.CSSProperties = {
   padding:      0,
   border:       "none",
   background:   "none",
-  borderRadius: 10,
+  borderRadius: 'var(--radius-lg)',
   overflow:     "hidden",
   flexShrink:   0,
   cursor:       "zoom-in",
@@ -38,14 +38,14 @@ const tileButtonStyle: React.CSSProperties = {
 const textStyle: React.CSSProperties = {
   display:       "flex",
   flexDirection: "column",
-  gap:           2,
+  gap:           'var(--space-0-5)',
   minWidth:      0,
 };
 
 const nameStyle: React.CSSProperties = {
   fontFamily:   "var(--font-body)",
-  fontSize:     "12px",
-  fontWeight:   500,
+  fontSize:     "var(--font-size-small)",
+  fontWeight:   'var(--font-weight-medium)',
   color:        "var(--neutral-700)",
   overflow:     "hidden",
   textOverflow: "ellipsis",
@@ -54,7 +54,7 @@ const nameStyle: React.CSSProperties = {
 
 const metaStyle: React.CSSProperties = {
   fontFamily: "var(--font-body)",
-  fontSize:   "12px",
+  fontSize:   "var(--font-size-small)",
   color:      "var(--neutral-600)",
   flexShrink: 0,
 };
@@ -85,7 +85,7 @@ export function SentImageAttachment({ att, url, uploading }: { att: Attachment; 
         className="focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
         style={tileButtonStyle}
       >
-        <Image src={url} alt="" fill sizes="56px" unoptimized style={{ objectFit: "cover", opacity: uploading ? 0.55 : 1, transition: "opacity 160ms ease" }} />
+        <Image src={url} alt="" fill sizes="56px" unoptimized style={{ objectFit: "cover", opacity: uploading ? 0.55 : 1, transition: "opacity var(--duration-fast) ease" }} />
       </button>
       <span style={textStyle}>
         <span style={nameStyle}>{att.file_name}</span>

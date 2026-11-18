@@ -31,7 +31,7 @@ export function XmlSteps({ xml, animate }: { xml: string; animate?: boolean }) {
   if (!data) return null
 
   return (
-    <div style={{ margin: "14px 0" }}>
+    <div style={{ margin: "var(--space-3) 0" }}>
       <AnimatedSteps data={data} onComplete={noop} animate={animateOnMount} />
     </div>
   )

@@ -63,8 +63,8 @@ export function LibrarySearch({ query, setQuery }: { query: LibraryQuery; setQue
         // Own clear button below; hide the native one.
         className="kaya-search-own-clear"
         style={{
-          flex: '1 0 0', minWidth: 0, border: 'none', outline: 'none', background: 'transparent', padding: '0 2px', appearance: 'none',
-          fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-600)',
+          flex: '1 0 0', minWidth: 0, border: 'none', outline: 'none', background: 'transparent', padding: '0 var(--space-0-5)', appearance: 'none',
+          fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-600)',
         }}
       />
       {draft && (
@@ -72,7 +72,7 @@ export function LibrarySearch({ query, setQuery }: { query: LibraryQuery; setQue
           type="button"
           aria-label="Clear search"
           onClick={() => edit('')}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 2, border: 'none', background: 'none', cursor: 'pointer', color: 'var(--neutral-400)', flexShrink: 0, borderRadius: 4 }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-0-5)', border: 'none', background: 'none', cursor: 'pointer', color: 'var(--neutral-400)', flexShrink: 0, borderRadius: 'var(--radius-xs)' }}
         >
           <CancelOneIcon size={12} />
         </button>

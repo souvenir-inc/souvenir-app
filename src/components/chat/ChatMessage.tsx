@@ -38,20 +38,20 @@ export { StreamingTextContent };
 // frame, so they shouldn't be allocated again each time.
 const assistantColumnStyle: React.CSSProperties = { width: "100%", minWidth: 0 };
 
-const waitingDotStyle: React.CSSProperties = { marginLeft: 4, marginTop: 2, backgroundColor: "var(--neutral-500)" };
+const waitingDotStyle: React.CSSProperties = { marginLeft: 'var(--space-1)', marginTop: 'var(--space-0-5)', backgroundColor: "var(--neutral-500)" };
 
 const imagesRowStyle: React.CSSProperties = {
   display: "flex",
   flexWrap: "wrap",
-  gap: "8px",
-  marginTop: "12px",
+  gap: "var(--space-2)",
+  marginTop: "var(--space-3)",
 };
 
 const stoppedStyle: React.CSSProperties = {
   display: "inline-block",
-  marginTop: "8px",
+  marginTop: "var(--space-2)",
   fontFamily: "var(--font-body)",
-  fontSize: "12px",
+  fontSize: "var(--font-size-small)",
   color: "var(--neutral-500)",
   fontStyle: "italic",
 };
@@ -340,7 +340,7 @@ export function ChatMessage({
         display: "flex",
         flexDirection: "column",
         alignItems: isUser ? "flex-end" : "flex-start",
-        padding: "12px 0",
+        padding: "var(--space-3) 0",
         width: "100%",
       }}
     >

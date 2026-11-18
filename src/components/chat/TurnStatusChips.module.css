@@ -1,8 +1,8 @@
 .row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 6px 8px;
+  gap: var(--space-2);
+  padding: 0 var(--space-1-5) var(--space-2);
   min-height: 0;
 }
 .spacer { flex: 1; }
@@ -10,17 +10,17 @@
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1-5);
   max-width: 60%;
   height: 28px;
-  padding: 0 10px 0 8px;
-  border-radius: 999px;
+  padding: 0 var(--space-2-5) 0 var(--space-2);
+  border-radius: var(--radius-full);
   border: 1px solid var(--neutral-200);
   background: var(--neutral-white);
   box-shadow: 0 1px 2px color-mix(in srgb, var(--static-black, #000) 6%, transparent);
   font-family: var(--font-body);
   font-size: 12.5px;
-  line-height: 16px;
+  line-height: var(--line-height-small);
   color: var(--neutral-700);
   white-space: nowrap;
 }
@@ -29,7 +29,7 @@
    button rather than to the browser one alone. */
 button.chip {
   cursor: pointer;
-  transition: background-color 120ms ease, border-color 120ms ease;
+  transition: background-color var(--duration-fast) ease, border-color var(--duration-fast) ease;
 }
 button.chip:hover { background: var(--neutral-50); border-color: var(--neutral-300); }
 button.chip:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
@@ -63,7 +63,7 @@ button.chip:focus-visible { outline: 2px solid var(--focus-ring); outline-offset
   box-shadow: 0 0 4px var(--blue-500, #3b82f6);
 }
 
-.label { font-weight: 500; color: var(--neutral-900); }
+.label { font-weight: var(--font-weight-medium); color: var(--neutral-900); }
 .detail {
   min-width: 0;
   overflow: hidden;
@@ -72,7 +72,7 @@ button.chip:focus-visible { outline: 2px solid var(--focus-ring); outline-offset
 }
 .time {
   font-variant-numeric: tabular-nums;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   color: var(--neutral-900);
 }
 

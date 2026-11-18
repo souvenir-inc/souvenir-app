@@ -41,7 +41,7 @@ const FILE_TYPES_LINE = FORMAT_GROUPS.map((group) => FORMAT_GROUP_LABELS[group])
 
 function CardError({ children, onRetry }: { children: React.ReactNode; onRetry?: () => void }) {
   return (
-    <div role="alert" style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 12, fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-600)' }}>
+    <div role="alert" style={{ padding: 'var(--space-4)', display: 'flex', alignItems: 'center', gap: 'var(--space-3)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-600)' }}>
       <span>{children}</span>
       {onRetry && <Button variant="secondary" size="sm" onClick={onRetry}>{MESSAGES.retry}</Button>}
     </div>
@@ -51,7 +51,7 @@ function CardError({ children, onRetry }: { children: React.ReactNode; onRetry?:
 /** The page title, like the prototype's: "Library settings", an Admin badge, and an info tip. */
 function AdminTitle() {
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2-5)' }}>
       Library settings
       <Badge label="Admin" color="Yellow" />
       <InfoTip text="These apply to everyone. Members see a short notice when you change them." />
@@ -85,9 +85,9 @@ export function AdminLibrarySettings() {
 
   return (
     <SettingsPageShell title={<AdminTitle />} description="How Library behaves for everyone in the workspace." maxWidth={860}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 32, marginTop: 14 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-7)', marginTop: 'var(--space-3)' }}>
         {changedBy && (
-          <div role="status" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '10px 14px', borderRadius: 12, background: 'var(--neutral-100)', fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-700)' }}>
+          <div role="status" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', padding: 'var(--space-2-5) var(--space-3)', borderRadius: 'var(--radius-xl)', background: 'var(--neutral-100)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-700)' }}>
             <span>{MESSAGES.changedBy(changedBy)}. The settings below show what applies now.</span>
             <Button variant="secondary" size="sm" onClick={() => data && setKnownVersion(data.version)}>Dismiss</Button>
           </div>

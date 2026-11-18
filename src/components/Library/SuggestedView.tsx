@@ -25,7 +25,7 @@ import styles from './SuggestedView.module.css'
 const ALL_FILES = toLibraryHref(LIBRARY_ROUTE, { ...DEFAULT_QUERY, tab: 'all' })
 const GENERATED_FILES = toLibraryHref(LIBRARY_ROUTE, { ...DEFAULT_QUERY, tab: 'all', source: ['generated'] })
 
-const sectionTitle: React.CSSProperties = { margin: '0 0 0 8px', fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 16, lineHeight: '24px', color: 'var(--neutral-900)' }
+const sectionTitle: React.CSSProperties = { margin: '0 0 0 var(--space-2)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-900)' }
 
 function SeeAll({ href, label }: { href: string; label: string }) {
   return (
@@ -47,12 +47,12 @@ function RecentCard({ file, onAction, first }: { file: LibraryFile; first: boole
   return (
     <div className={styles.card}>
       <Link href={LIBRARY_FILE_ROUTE(file.id)} title={name} className={`${styles.link} ${styles.cardLink}`}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, paddingRight: 22 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', minWidth: 0, paddingRight: 'var(--space-5)' }}>
           <span
             className={styles.cardTitle}
             style={{
               flex: '0 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              fontFamily: 'var(--font-body)', fontWeight: file.unread ? 600 : 500, fontSize: 14, lineHeight: '20px', color: 'var(--neutral-900)',
+              fontFamily: 'var(--font-body)', fontWeight: file.unread ? 600 : 500, fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-900)',
             }}
           >
             {name}
@@ -63,7 +63,7 @@ function RecentCard({ file, onAction, first }: { file: LibraryFile; first: boole
         <span style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <FileThumb file={file} width={96} height={64} className={styles.thumb} glyphSize="lg" />
         </span>
-        <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, lineHeight: '16px', color: 'var(--neutral-500)' }}>{activityLine(file)}</span>
+        <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)' }}>{activityLine(file)}</span>
       </Link>
       <span className={styles.more}>
         <RowMenu file={file} onAction={onAction} menuWidth={MENU_WIDTH} placement={first ? "bottom-start" : "bottom-end"} />
@@ -83,9 +83,9 @@ function FileTile({ file, row, onAction }: { file: LibraryFile; row: 'frequent' 
     <div className={styles.tile}>
       <Link href={LIBRARY_FILE_ROUTE(file.id)} title={name} className={`${styles.link} ${styles.tileLink}`}>
         <FormatGlyph format={file.format} />
-        <span style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0, paddingRight: 24 }}>
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, lineHeight: '20px', color: 'var(--neutral-900)' }}>{name}</span>
-          {meta && <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'var(--font-body)', fontSize: 12, lineHeight: '16px', color: 'var(--neutral-500)' }}>{meta}</span>}
+        <span style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', minWidth: 0, paddingRight: 'var(--space-6)' }}>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-900)' }}>{name}</span>
+          {meta && <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)' }}>{meta}</span>}
         </span>
       </Link>
       <span className={styles.more}>
@@ -117,14 +117,14 @@ export function SuggestedView() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 32, padding: '15px 40px 120px', overflowY: 'auto', overflowX: 'hidden', minHeight: 0, flex: '1 1 0' }} className={`kaya-scrollbar ${styles.page}`}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-7)', padding: '15px 40px 120px', overflowY: 'auto', overflowX: 'hidden', minHeight: 0, flex: '1 1 0' }} className={`kaya-scrollbar ${styles.page}`}>
       {view.recent.length > 0 && (
-        <section aria-labelledby="suggested-recent" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <section aria-labelledby="suggested-recent" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 32 }}>
             <h2 id="suggested-recent" style={sectionTitle}>Recent</h2>
             <SeeAll href={ALL_FILES} label="files" />
           </div>
-          <div className={styles.cardGrid} style={{ padding: 3 }}>
+          <div className={styles.cardGrid} style={{ padding: 'var(--space-0-5)' }}>
             {view.recent.map((file, index) => (
               <RecentCard key={file.id} file={file} first={index < 2} {...menu} />
             ))}
@@ -132,7 +132,7 @@ export function SuggestedView() {
         </section>
       )}
       {view.frequent.length > 0 && (
-        <section aria-labelledby="suggested-frequent" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <section aria-labelledby="suggested-frequent" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
           <div style={{ display: 'flex', alignItems: 'center', minHeight: 32 }}>
             <h2 id="suggested-frequent" style={sectionTitle}>Frequently used</h2>
           </div>
@@ -144,7 +144,7 @@ export function SuggestedView() {
         </section>
       )}
       {view.generated.length > 0 && (
-        <section aria-labelledby="suggested-generated" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <section aria-labelledby="suggested-generated" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 32 }}>
             <h2 id="suggested-generated" style={sectionTitle}>Generated</h2>
             <SeeAll href={GENERATED_FILES} label="generated files" />

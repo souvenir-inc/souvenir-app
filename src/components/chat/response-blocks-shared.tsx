@@ -13,8 +13,8 @@ export const INLINE_CODE_STYLE: React.CSSProperties = {
   fontSize: "var(--prose-size-code)",
   background: "var(--neutral-800-10)",
   color: "var(--prose-heading)",
-  borderRadius: 4,
-  padding: "1px 5px",
+  borderRadius: 'var(--radius-xs)',
+  padding: "var(--space-0-5) var(--space-1)",
   border: "1px solid var(--neutral-700-12)",
   whiteSpace: "pre",
 };
@@ -26,7 +26,7 @@ function renderInlineMd(text: string): React.ReactNode[] {
   return text.split(/(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\(https?:\/\/[^)]+\))/).map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**"))
       // eslint-disable-next-line react/no-array-index-key
-      return <strong key={i} style={{ fontWeight: 600, color: "var(--neutral-900)" }}>{part.slice(2, -2)}</strong>;
+      return <strong key={i} style={{ fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)" }}>{part.slice(2, -2)}</strong>;
     if (part.startsWith("`") && part.endsWith("`"))
       // eslint-disable-next-line react/no-array-index-key
       return <code key={i} style={INLINE_CODE_STYLE}>{part.slice(1, -1)}</code>;

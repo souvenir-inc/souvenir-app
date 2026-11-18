@@ -73,10 +73,10 @@ export function QueuedMessagesTray({ messages, status, waiting, rowExit, onEdit,
           transition={reduceMotion ? { duration: 0.15 } : SPRING}
           style={{
             position:        "relative",
-            zIndex:          0,
+            zIndex:          'var(--z-base)',
             margin:          `0 12px -${TUCK}px`,
             padding:         `8px 8px ${TUCK + 6}px`,
-            borderRadius:    "16px 16px 0 0",
+            borderRadius:    "var(--radius-2xl) var(--radius-2xl) 0 0",
             backgroundColor: "var(--neutral-100)",
             boxShadow:       "inset 0 0 0 1px var(--neutral-200)",
           }}
@@ -86,8 +86,8 @@ export function QueuedMessagesTray({ messages, status, waiting, rowExit, onEdit,
             style={{
               display:    "flex",
               alignItems: "center",
-              gap:        6,
-              padding:    "2px 8px 6px",
+              gap:        'var(--space-1-5)',
+              padding:    "var(--space-0-5) var(--space-2) var(--space-1-5)",
               color:      "var(--neutral-500)",
             }}
           >
@@ -122,7 +122,7 @@ export function QueuedMessagesTray({ messages, status, waiting, rowExit, onEdit,
               padding:   0,
               display:   "flex",
               flexDirection: "column",
-              gap:       2,
+              gap:       'var(--space-0-5)',
               maxHeight: ROW_HEIGHT * VISIBLE_ROWS,
               overflowY: "auto",
             }}
@@ -176,10 +176,10 @@ function QueuedRow({ message, position, onEdit, onRemove, reduceMotion, ref }: Q
       style={{
         display:         "flex",
         alignItems:      "center",
-        gap:             8,
+        gap:             'var(--space-2)',
         minHeight:       ROW_HEIGHT,
-        padding:         "0 4px 0 10px",
-        borderRadius:    10,
+        padding:         "0 var(--space-1) 0 var(--space-2-5)",
+        borderRadius:    10, // ds-keep: framer-motion's layout animation corrects px radii, not var()
         backgroundColor: "var(--chat-input-bg)",
         boxShadow:       "0 0 0 1px var(--neutral-200)",
       }}
@@ -230,7 +230,7 @@ function QueuedRow({ message, position, onEdit, onRemove, reduceMotion, ref }: Q
           ].filter(Boolean).join(" · ")}
         </span>
       )}
-      <span style={{ display: "flex", alignItems: "center", gap: 2, flexShrink: 0 }}>
+      <span style={{ display: "flex", alignItems: "center", gap: 'var(--space-0-5)', flexShrink: 0 }}>
         <Tooltip content="Edit" side="top">
           <IconButton
             variant="ghost-2"

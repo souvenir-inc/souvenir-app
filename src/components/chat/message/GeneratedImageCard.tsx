@@ -16,7 +16,7 @@ import { ImageLightbox, downloadImage, overlayButtonStyle } from "./ImageLightbo
 // allocate them again.
 const cardStyle: React.CSSProperties = {
   position: "relative",
-  borderRadius: "10px",
+  borderRadius: "var(--radius-lg)",
   overflow: "hidden",
   border: "1px solid var(--border-default)",
   maxWidth: "320px",
@@ -47,7 +47,7 @@ const hoverOverlayStyle: React.CSSProperties = {
   right: "8px",
 };
 
-const hoverButtonsStyle: React.CSSProperties = { display: "flex", gap: "6px" };
+const hoverButtonsStyle: React.CSSProperties = { display: "flex", gap: "var(--space-1-5)" };
 
 function isFocusVisible(el: Element) {
   try { return el.matches(":focus-visible"); } catch { return true; }
