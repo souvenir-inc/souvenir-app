@@ -701,6 +701,24 @@ Checks:
 
 What is left (about 11%): z-index values off the scale (1, 2, 50, 9997–9999…) that need a per-site decision rather than rounding; hand-written shadows; colour literals in onboarding and the weather / code-block widgets; unitless line heights; untyped style objects the codemod skips; chart geometry.
 
+### Leftovers 1 — z-index onto the scale: done 2026-11-18 (branch `ds/phase-6-zindex`)
+
+The primitives themselves sat off the scale (`ui/dialog` 9997, `Dropdown` 9998, `Tooltip` 9999, `Sheet`/`Popover` 50), so the 1000–1500 layers were unused. Each page-level site was mapped by what it is, keeping today's relative order:
+
+| Today | Sites | Now |
+|---|---|---|
+| 9999 | `Tooltip` default | `--z-tooltip` |
+| 9998, 50, 51 (portalled floating content) | `Dropdown`, `Popover`, `PresetModelSelectorDialog` | `--z-popover`, **not** `--z-dropdown`: menus open inside dialogs and must sit above `--z-modal` |
+| 9997/9996; fixed modals at 9998, 9999, 60/61, 60, 20/22 | `ui/dialog` (+overlay), `Sheet` (was 50), billing cancel modal, `RightSidebar` ×3, `ModelSwitchDialog`, `AccountDetailView` | `--z-modal` / `--z-overlay` |
+| 20–50 (absolute, in-page) | `TeamSwitcher`, `AgentCardMenu`, `AgentMentionMenu` | `--z-dropdown` |
+| 20–30 (floating page chrome) | `AgentPageShell` actions, `ProjectToolsMenu`, `ChatFilePanelSlot` | `--z-sticky` |
+| 50, 49 | `WorkspaceLockedOverlay`, `FlatSidebar` scrim | `--z-overlay` |
+| 10, 11 | `QuestionCard` drag, scroll fades over a `--z-raised` header | `--z-raised`, `calc(var(--z-raised) + 1)` |
+
+**Rule (new):** z-index −1…9 orders siblings inside one component and stays literal; `ds-scan` reports these separately and doesn't count them. Anything 10+ uses a `--z-*` token. The `Sheet` / `Tooltip` `zIndex` props now accept a token string.
+
+Result: z-index wired 21.7% → **94.5%** (3 left, all in the out-of-scope old `Sidebar`; 74 local values not counted); total 88.8% → **89.5%**. Screens: 21 × light/dark, no visual change (pre-change diffs on settings-ai/analytics were live data and were re-baselined first). Unit suite: the same 13 pre-existing failures. Static screens don't open overlays, so dialog-over-menu stacking follows from the order above but wasn't seen on screen.
+
 ---
 
 ## Phase 7 — Lock it in

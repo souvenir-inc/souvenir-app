@@ -41,7 +41,7 @@ export function CancelSubscriptionDialog({
     <div
       onClick={() => { if (!isCanceling) onKeep() }}
       style={{
-        position: 'fixed', inset: 0, zIndex: 9998, background: 'var(--overlay-bg)',
+        position: 'fixed', inset: 0, zIndex: 'var(--z-modal)', background: 'var(--overlay-bg)',
         backdropFilter: 'blur(2px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-4)',
       }}
     >

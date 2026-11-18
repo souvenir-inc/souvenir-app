@@ -34,7 +34,7 @@ export function ModelSwitchDialog({
             style={{
               position: "fixed",
               inset: 0,
-              zIndex: 60,
+              zIndex: 'var(--z-overlay)',
               backgroundColor: "color-mix(in srgb, var(--static-black) 40%, transparent)",
             }}
           />
@@ -53,7 +53,7 @@ export function ModelSwitchDialog({
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              zIndex: 61,
+              zIndex: 'var(--z-modal)',
               width: "400px",
               maxWidth: "calc(100vw - 32px)",
               backgroundColor: "var(--modal-bg)",

@@ -47,7 +47,7 @@ const toolStyle: React.CSSProperties = { border: '1px solid transparent', boxSha
  */
 export function ProjectToolsMenu({ panels }: { panels: ProjectPanels }) {
   return (
-    <div style={{ position: 'absolute', top: '50%', right: 16, transform: 'translateY(-50%)', zIndex: 20 }}>
+    <div style={{ position: 'absolute', top: '50%', right: 16, transform: 'translateY(-50%)', zIndex: 'var(--z-sticky)' }}>
       <FloatingMenu aria-label="Project tools">
         <FloatingMenuItem style={toolStyle} icon={<SettingsOneIcon size={20} animated />} label="Project settings" active={panels.open === 'settings'} onClick={() => panels.toggle('settings')} />
         <FloatingMenuItem style={toolStyle} icon={<FolderLibraryIcon size={20} />} label="Instructions & Files" active={panels.open === 'files'} onClick={() => panels.toggle('files')} />

@@ -128,7 +128,7 @@ export type DropdownPlacement =
   | 'right-start'  | 'right-end'
 
 const DROPDOWN_GAP = 8
-const DROPDOWN_Z   = 9998
+const DROPDOWN_Z   = 'var(--z-popover)'
 
 type Side  = 'top' | 'bottom' | 'left' | 'right'
 type Align = 'start' | 'center' | 'end'

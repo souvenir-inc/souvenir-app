@@ -34,15 +34,15 @@ export interface SheetContentProps extends React.ComponentPropsWithoutRef<typeof
   title?: string
   /** Scrim colour behind the sheet. */
   overlayColor?: string
-  /** z-index of the sheet; the overlay sits one below. */
-  zIndex?: number
+  /** z-index of the sheet (a token by default); the overlay sits one below. */
+  zIndex?: number | string
 }
 
 export function SheetContent({
   side = 'left',
   title,
   overlayColor = 'rgba(0, 0, 0, 0.32)',
-  zIndex = 50,
+  zIndex = 'var(--z-modal)',
   style,
   children,
   onInteractOutside,
@@ -54,7 +54,7 @@ export function SheetContent({
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay
         data-testid="sheet-overlay"
-        style={{ position: 'fixed', inset: 0, zIndex: zIndex - 1, backgroundColor: overlayColor }}
+        style={{ position: 'fixed', inset: 0, zIndex: `calc(${zIndex} - 1)`, backgroundColor: overlayColor }}
       />
       <DialogPrimitive.Content
         aria-describedby={undefined}

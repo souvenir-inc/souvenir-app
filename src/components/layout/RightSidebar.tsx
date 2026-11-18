@@ -522,7 +522,7 @@ function RightSidebarImpl() {
             style={{
               position:        "fixed",
               inset:           0,
-              zIndex:          9999,
+              zIndex:          'var(--z-modal)',
               display:         "flex",
               alignItems:      "center",
               justifyContent:  "center",
@@ -596,7 +596,7 @@ function RightSidebarImpl() {
             style={{
               position:        "fixed",
               inset:           0,
-              zIndex:          20,
+              zIndex:          'var(--z-modal)',
               display:         "flex",
               alignItems:      "center",
               justifyContent:  "center",
@@ -679,7 +679,7 @@ function RightSidebarImpl() {
             style={{
               position:        "fixed",
               inset:           0,
-              zIndex:          22,
+              zIndex:          'var(--z-modal)',
               display:         "flex",
               alignItems:      "center",
               justifyContent:  "center",

@@ -352,7 +352,7 @@ export function PresetModelSelectorDialog() {
           transition={{ type: "spring", stiffness: 400, damping: 30 }}
           style={{
             position: "fixed",
-            zIndex: 51,
+            zIndex: 'var(--z-popover)',
             ...style,
           }}
         >

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-17",
+  "updated": "2026-11-18",
   "counts": {
     "literal.color": 137,
     "literal.spacing": 384,
@@ -8,7 +8,7 @@
     "literal.shadow": 154,
     "literal.border": 20,
     "literal.motion": 81,
-    "literal.zIndex": 101,
+    "literal.zIndex": 3,
     "colorLiteral.hex": 418,
     "colorLiteral.rgb": 526,
     "raw.button": 212,

@@ -189,7 +189,7 @@ function RankableRow({ option, index }: { option: QuestionCardOption; index: num
       value={option}
       whileDrag={{
         cursor:    'grabbing',
-        zIndex:    10,
+        zIndex:    'var(--z-raised)',
         boxShadow: '0px 8px 24px rgba(82,75,71,0.18), 0px 0px 0px 1px rgba(212, 212, 212,0.3)',
       }}
       style={{

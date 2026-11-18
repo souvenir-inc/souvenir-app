@@ -365,7 +365,7 @@ export function MoveToProjectModal({
             height:        '32px',
             background:    'linear-gradient(to bottom, var(--neutral-white) 0%, transparent 100%)',
             pointerEvents: 'none',
-            zIndex:        11,
+            zIndex:        'calc(var(--z-raised) + 1)',
             opacity:       atTop ? 0 : 1,
             transition:    'opacity var(--duration-fast) ease',
           }} />
@@ -376,7 +376,7 @@ export function MoveToProjectModal({
             height:        '32px',
             background:    'linear-gradient(to top, var(--neutral-white) 0%, transparent 100%)',
             pointerEvents: 'none',
-            zIndex:        11,
+            zIndex:        'calc(var(--z-raised) + 1)',
             opacity:       atBottom ? 0 : 1,
             transition:    'opacity var(--duration-fast) ease',
           }} />

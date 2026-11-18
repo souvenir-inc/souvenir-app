@@ -188,7 +188,7 @@ export const FlatSidebar = React.forwardRef<HTMLDivElement, FlatSidebarProps>(
 
     return (
       <>
-      {overlay && <div aria-hidden data-testid="sidebar-scrim" onClick={closeDrawer} style={{ position: 'fixed', inset: 0, zIndex: 49, backgroundColor: 'rgba(0, 0, 0, 0.32)' }} />}
+      {overlay && <div aria-hidden data-testid="sidebar-scrim" onClick={closeDrawer} style={{ position: 'fixed', inset: 0, zIndex: 'var(--z-overlay)', backgroundColor: 'rgba(0, 0, 0, 0.32)' }} />}
       <div
         ref={ref}
         role="navigation"

@@ -216,7 +216,7 @@ export const TeamSwitcher = React.forwardRef<HTMLDivElement, TeamSwitcherProps>(
                 top:          'calc(100% + 4px)',
                 left:         0,
                 right:        0,
-                zIndex:       50,
+                zIndex:       'var(--z-dropdown)',
               }}
             >
               <Popover

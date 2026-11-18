@@ -64,7 +64,7 @@ export interface TooltipProps {
    * everything) — appropriate when `portal` is true. When `portal` is false,
    * pass a value that makes sense within the local stacking context instead.
    */
-  zIndex?: number
+  zIndex?: number | string
   /** Ref forwarded to the trigger element (lets wrappers like Dropdown clone-inject refs/handlers). */
   ref?: React.Ref<HTMLButtonElement>
 }
@@ -100,7 +100,7 @@ export function Tooltip({
   maxWidth,
   maxHeight,
   portal = true,
-  zIndex = 9999,
+  zIndex = 'var(--z-tooltip)',
   ...triggerProps
 }: TooltipProps & Omit<React.HTMLAttributes<HTMLElement>, "content">) {
   const isControlled = openProp !== undefined

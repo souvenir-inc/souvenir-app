@@ -111,7 +111,9 @@ function scan() {
       }
       for (const [prop, value] of decls) {
         const category = Object.keys(CATEGORIES).find((c) => CATEGORIES[c].test(prop));
-        if (category) add(`${classify(value)}.${category}`, file);
+        // z-index -1…9 orders siblings inside one component; page layers (10+) must use the --z-* scale.
+        const local = category === "zIndex" && /^["'`]?-?\d["'`]?$/.test(value.trim());
+        if (category) add(`${local ? "local" : classify(value)}.${category}`, file);
       }
       add("colorLiteral.hex", file, count(source, /#[0-9a-fA-F]{3,8}(?![0-9a-zA-Z_-])/g));
       add("colorLiteral.rgb", file, count(source, /\brgba?\(\s*\d/g));
@@ -153,7 +155,8 @@ function summary(counts) {
     lines.push(`  ${c.padEnd(16)}${String(tok).padStart(7)}${String(lit).padStart(10)}${pct(tok, tok + lit).padStart(8)}${pct(lit, tok + lit).padStart(12)}`);
   }
   lines.push(`  ${"TOTAL".padEnd(16)}${String(tTok).padStart(7)}${String(tLit).padStart(10)}${pct(tTok, tTok + tLit).padStart(8)}${pct(tLit, tTok + tLit).padStart(12)}`);
-  lines.push(`\nColour literals     hex ${g("colorLiteral.hex")} · rgb()/rgba() ${g("colorLiteral.rgb")}`);
+  lines.push(`  (not counted: ${g("local.zIndex")} z-index values -1…9, sibling order inside one component)`);
+  lines.push(`\nColour literals    hex ${g("colorLiteral.hex")} · rgb()/rgba() ${g("colorLiteral.rgb")}`);
   lines.push(`Inline style blocks ${g("styleBlocks")} · className ${g("classNames")} · Tailwind arbitrary values ${g("twArbitrary")}`);
 
   const btnPrim = g("use.Button") + g("use.IconButton") + g("use.ChipButton");
