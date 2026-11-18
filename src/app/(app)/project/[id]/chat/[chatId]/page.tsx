@@ -75,7 +75,7 @@ function CentredMessage({ children }: { children: React.ReactNode }) {
 // wait doesn't flash empty text.
 function LoadingChatSkeleton() {
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', height: '100%', overflow: 'hidden', padding: '32px 16px' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', height: '100%', overflow: 'hidden', padding: 'var(--space-7) var(--space-4)' }}>
       <div style={{ width: '100%', maxWidth: 679 }}>
         <ChatMessagesSkeleton />
       </div>
@@ -566,7 +566,7 @@ function ProjectChatPageInner() {
                 flexDirection:  'column',
                 alignItems:     'center',
                 justifyContent: 'center',
-                padding:        '40px 16px 48px',
+                padding:        'var(--space-8) var(--space-4) var(--space-9)',
               }}
             >
               <div
@@ -574,7 +574,7 @@ function ProjectChatPageInner() {
                   display:       'flex',
                   flexDirection: 'column',
                   alignItems:    'center',
-                  gap:           '24px',
+                  gap:           'var(--space-6)',
                   maxWidth:      '768px',
                   width:         '100%',
                 }}
@@ -639,13 +639,13 @@ function ProjectChatPageInner() {
                     style={{
                       display:        'flex',
                       justifyContent: 'center',
-                      gap:            '8px',
-                      marginTop:      '16px',
+                      gap:            'var(--space-2)',
+                      marginTop:      'var(--space-4)',
                       flexWrap:       'wrap',
                     }}
                   >
                     {ACTION_BUTTONS.map(btn => (
-                      <div key={btn.mode} style={{ opacity: (btn.disabled || (selectedMode && selectedMode !== btn.mode)) ? 0.4 : 1, transition: 'opacity 150ms' }}>
+                      <div key={btn.mode} style={{ opacity: (btn.disabled || (selectedMode && selectedMode !== btn.mode)) ? 0.4 : 1, transition: 'opacity var(--duration-fast)' }}>
                         <Button
                           variant="outline"
                           size="sm"
@@ -661,7 +661,7 @@ function ProjectChatPageInner() {
 
                   {/* Starter cards — generated per user by /recommendations. */}
                   {(recommendations || recommendationsLoading) && (
-                    <div style={{ marginTop: '20px', textAlign: 'left' }}>
+                    <div style={{ marginTop: 'var(--space-5)', textAlign: 'left' }}>
                       {recommendations
                         ? <StarterList cards={recommendations.cards} onSelect={(card) => handleSend(card.prompt)} />
                         : <StarterListSkeleton />}

@@ -278,7 +278,7 @@ export default function OrgMembersPage() {
 
   if (membersLoading) {
     return (
-      <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: 64, paddingBottom: 48 }}>
+      <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: 'var(--space-10)', paddingBottom: 'var(--space-9)' }}>
         <MembersPageSkeleton />
       </div>
     )
@@ -295,8 +295,8 @@ export default function OrgMembersPage() {
         display:        'flex',
         alignItems:     'flex-start',
         justifyContent: 'center',
-        paddingTop:     64,
-        paddingBottom:  48,
+        paddingTop:     'var(--space-10)',
+        paddingBottom:  'var(--space-9)',
       }}
     >
       {/* Horizontal padding lives here, not on the scrolling element above —

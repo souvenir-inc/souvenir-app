@@ -52,7 +52,7 @@ function PersonasPageInner() {
           flex: '1 1 0',
           minHeight: 0,
           overflow: 'hidden',
-          padding: 3,
+          padding: 'var(--space-0-5)',
         }}
       >
       <div
@@ -63,8 +63,8 @@ function PersonasPageInner() {
           overflowY: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          paddingTop: 36,
-          paddingBottom: 24,
+          paddingTop: 'var(--space-7)',
+          paddingBottom: 'var(--space-6)',
           boxSizing: 'border-box',
         }}
       >
@@ -73,7 +73,7 @@ function PersonasPageInner() {
         <div style={{
           width: '100%',
           maxWidth: contentMaxWidth,
-          padding: '0 12px',
+          padding: '0 var(--space-3)',
           boxSizing: 'border-box',
           margin: '0 auto',
           display: 'flex',
@@ -82,7 +82,7 @@ function PersonasPageInner() {
         }}>
 
           {/* ── Header + Tabs + Toolbar ── */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
 
             {/* Tabs — always on top */}
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabId)}>
@@ -97,14 +97,14 @@ function PersonasPageInner() {
               <h1 style={{
                 fontFamily: 'var(--font-title)',
                 fontWeight: 'var(--font-weight-regular)',
-                fontSize: 24,
-                lineHeight: '32px',
+                fontSize: 'var(--font-size-heading)',
+                lineHeight: 'var(--line-height-heading)',
                 color: 'var(--legacy-1a1916)',
                 margin: 0,
               }}>
                 {activeTab === 'super-links' ? 'Super Links' : 'Agents'}
               </h1>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                 {/* Super Links' own "Generate link" trigger now lives with the
                     links list section below (where it's contextually useful),
                     instead of being duplicated here too. */}

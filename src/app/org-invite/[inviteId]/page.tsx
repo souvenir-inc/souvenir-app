@@ -68,19 +68,19 @@ export default function InviteLandingPage() {
         alignItems: "center",
         justifyContent: "space-between",
         backgroundColor: BG,
-        padding: "40px 16px",
+        padding: "var(--space-8) var(--space-4)",
         boxSizing: "border-box",
       }}
     >
       <div style={{ width: "100%", maxWidth: 403, margin: "auto 0" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
           <SouvenirMark />
           <h1
             style={{
               fontFamily: "var(--font-title)",
-              fontWeight: 400,
-              fontSize: 24,
-              lineHeight: "32px",
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: 'var(--font-size-heading)',
+              lineHeight: "var(--line-height-heading)",
               color: "var(--neutral-800,#3b3632)",
               margin: 0,
             }}
@@ -89,14 +89,14 @@ export default function InviteLandingPage() {
           </h1>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-          <p style={{ margin: 0, fontFamily: "var(--font-body)", fontWeight: 600, fontSize: 15, lineHeight: "22px", color: "var(--neutral-800,#3b3632)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-5)' }}>
+          <p style={{ margin: 0, fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-body)", color: "var(--neutral-800,#3b3632)" }}>
             {valid
               ? <>You&apos;ve been invited to join a workspace on Souvenir.</>
               : "This invite link is incomplete or wrong. Ask the person who invited you to send it again."}
           </p>
 
-          {valid && <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {valid && <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-3)' }}>
             <Button size="sm" fluid onClick={() => { window.location.href = signUpUrl; }}>
               Sign up
             </Button>
@@ -107,9 +107,9 @@ export default function InviteLandingPage() {
         </div>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 'var(--space-2)' }}>
         <SouvenirMark size={32} />
-        <p style={{ margin: 0, fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 12, lineHeight: "16px", color: "var(--neutral-500,#827a74)" }}>
+        <p style={{ margin: 0, fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-small)', lineHeight: "var(--line-height-small)", color: "var(--neutral-500,#827a74)" }}>
           By continuing you agree to our <a href="/terms" style={{ color: "var(--blue-600,#0d6eb2)" }}>Terms</a> and{" "}
           <a href="/privacy" style={{ color: "var(--blue-600,#0d6eb2)" }}>Privacy Policy</a>.
         </p>

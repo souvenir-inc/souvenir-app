@@ -24,12 +24,12 @@ export function AgentsListLoading() {
         flex:         '1 1 0',
         minHeight:    0,
         overflow:     'hidden',
-        padding:      3,
+        padding:      'var(--space-0-5)',
       }}
     >
-      <div style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', paddingTop: 36, paddingBottom: 24, boxSizing: 'border-box' }}>
-        <div style={{ width: '100%', maxWidth: 991, padding: '0 12px', boxSizing: 'border-box', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 41 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', paddingTop: 'var(--space-7)', paddingBottom: 'var(--space-6)', boxSizing: 'border-box' }}>
+        <div style={{ width: '100%', maxWidth: 991, padding: '0 var(--space-3)', boxSizing: 'border-box', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 41 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             {/* Tabs: the My Agents / Super Links segmented control */}
             <Skeleton width={217} height={46} radius={14} />
 
@@ -44,7 +44,7 @@ export function AgentsListLoading() {
             {/* Toolbar: 450px search on the left, sort + filter on the right */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Skeleton width={450} height={36} radius={10} style={{ maxWidth: '100%' }} />
-              <div style={{ display: 'flex', gap: 8 }}>
+              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
                 <Skeleton width={132} height={36} radius={10} />
                 <Skeleton width={76} height={36} radius={10} />
               </div>

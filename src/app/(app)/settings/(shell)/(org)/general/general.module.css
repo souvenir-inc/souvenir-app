@@ -2,7 +2,7 @@
    AI instructions editor. */
 .card {
   border: 1px solid var(--border-default);
-  border-radius: 16px;
+  border-radius: var(--radius-2xl);
   box-shadow: 0px 2px 2.8px 0px rgba(82, 75, 71, 0.12);
   overflow: hidden;
 }
@@ -10,25 +10,25 @@
 .cardHead {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 16px 24px;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
   border-bottom: 1px solid var(--neutral-100);
 }
 
 .cardTitle {
   margin: 0;
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-body);
   color: var(--neutral-900);
 }
 
 .cardHint {
-  margin: 2px 0 0;
+  margin: var(--space-0-5) 0 0;
   font-family: var(--font-body);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body-sm);
   color: var(--neutral-600);
 }
 
@@ -40,7 +40,7 @@
   height: 64px;
   padding: 0;
   border: none;
-  border-radius: 16px;
+  border-radius: var(--radius-2xl);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -48,7 +48,7 @@
   background: var(--neutral-100);
   box-shadow: 0px 1.091px 1.09px 0px rgba(59, 54, 50, 0.05), 0px 1.455px 1px 0px rgba(38, 33, 30, 0.15), 0px 0px 0px 1px var(--neutral-100);
   font-family: var(--font-title);
-  font-size: 26px;
+  font-size: var(--font-size-heading);
   color: var(--neutral-500);
 }
 
@@ -71,10 +71,10 @@
   background: rgba(38, 33, 30, 0.55);
   color: #fff;
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-caption);
   opacity: 0;
-  transition: opacity 150ms ease;
+  transition: opacity var(--duration-fast) ease;
   pointer-events: none;
 }
 
@@ -85,7 +85,7 @@
 
 .actions {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
   flex: none;
 }
 
@@ -114,24 +114,24 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   font-family: var(--font-body);
-  font-size: 12px;
-  line-height: 16px;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
   color: var(--neutral-500);
 }
 
 .suggestion {
-  padding: 4px 10px;
+  padding: var(--space-1) var(--space-2-5);
   border: 1px solid var(--border-default);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--card-bg);
   font-family: var(--font-body);
-  font-size: 12px;
-  line-height: 16px;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
   color: var(--neutral-700);
   cursor: pointer;
-  transition: background 120ms ease;
+  transition: background var(--duration-fast) ease;
 }
 
 .suggestion:hover:not(:disabled) {
@@ -146,7 +146,7 @@
 .counter {
   flex: none;
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: var(--font-size-small);
   line-height: 18px;
   color: var(--neutral-500);
   font-variant-numeric: tabular-nums;
@@ -162,14 +162,14 @@
 
 .mono {
   font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 13px;
+  font-size: var(--font-size-body-sm);
   color: var(--neutral-700);
 }
 
 .slugField {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1-5);
   flex: 1;
   min-width: 0;
 }
@@ -177,7 +177,7 @@
 .slugPrefix {
   flex: none;
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: var(--font-size-body);
   color: var(--neutral-500);
   white-space: nowrap;
 }
@@ -186,8 +186,8 @@
 .hero {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 20px 24px;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
 }
 
 .heroText {
@@ -195,14 +195,14 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .heroName {
   margin: 0;
   font-family: var(--font-title);
-  font-size: 20px;
-  line-height: 28px;
+  font-size: var(--font-size-heading-md);
+  line-height: var(--line-height-heading-md);
   color: var(--neutral-900);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -212,43 +212,43 @@
 .heroLink {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1-5);
   min-width: 0;
   font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 22px;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-600);
 }
 
 .heroLogoActions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: var(--font-size-small);
   color: var(--neutral-500);
 }
 
 .editForm {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px 20px;
-  padding: 16px 24px 20px;
+  gap: var(--space-4) var(--space-5);
+  padding: var(--space-4) var(--space-6) var(--space-5);
   border-top: 1px solid var(--border-default);
 }
 
 .linkField {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-1);
   min-width: 0;
 }
 
 .linkFieldLabel {
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-700);
 }
 
@@ -262,14 +262,14 @@
 .slugField {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1-5);
   min-width: 0;
 }
 
 .slugPrefix {
   flex: none;
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: var(--font-size-body);
   color: var(--neutral-500);
   white-space: nowrap;
 }
@@ -277,13 +277,13 @@
 .idStrip {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 24px;
+  gap: var(--space-2-5);
+  padding: var(--space-2-5) var(--space-6);
   border-top: 1px solid var(--border-default);
   background: var(--neutral-50);
   font-family: var(--font-body);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body-sm);
 }
 
 .idLabel {
@@ -297,12 +297,12 @@
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 2px 10px;
-  border-radius: 999px;
+  gap: var(--space-1-5);
+  padding: var(--space-0-5) var(--space-2-5);
+  border-radius: var(--radius-full);
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-small);
   line-height: 18px;
 }
 
@@ -320,12 +320,12 @@
 .statusDot {
   width: 6px;
   height: 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: currentColor;
 }
 
 .editorWrap {
-  padding: 16px 24px 20px;
+  padding: var(--space-4) var(--space-6) var(--space-5);
 }
 
 /* One box: the text area on top, starters and the counter along its bottom edge. */
@@ -333,10 +333,10 @@
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border-default);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   background: var(--field-surface);
   overflow: hidden;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
+  transition: border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
 }
 
 .editorBox:focus-within {
@@ -349,13 +349,13 @@
   min-height: 140px;
   resize: vertical;
   box-sizing: border-box;
-  padding: 12px 14px;
+  padding: var(--space-3) var(--space-3);
   border: none;
   outline: none;
   background: transparent;
   font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 22px;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-900);
 }
 
@@ -363,8 +363,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 8px 10px;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2-5);
   border-top: 1px solid var(--border-default);
   background: var(--neutral-50);
 }
@@ -372,8 +372,8 @@
 .footer {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
   border-top: 1px solid var(--border-default);
 }
 
@@ -381,7 +381,7 @@
   flex: 1;
   min-width: 0;
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: var(--font-size-small);
   line-height: 18px;
   color: var(--neutral-500);
 }

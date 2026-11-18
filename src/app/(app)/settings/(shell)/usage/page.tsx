@@ -151,9 +151,9 @@ function Skeleton() {
     </div>
   )
   return (
-    <div className={`kaya-scrollbar ${styles.root}`} style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '64px 24px 48px' }}>
-      <div style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 12 }} aria-busy>
-        <div style={{ paddingLeft: 4, marginBottom: 4 }}>
+    <div className={`kaya-scrollbar ${styles.root}`} style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: 'var(--space-10) var(--space-6) var(--space-9)' }}>
+      <div style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }} aria-busy>
+        <div style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)' }}>
           {line(32, 24, 90)}
           {line(22, 14, 380)}
         </div>
@@ -224,9 +224,9 @@ export default function UsagePage() {
 
   if (!usage && usageQ.isError) {
     return (
-      <div style={{ flex: "1 0 0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, padding: 48, textAlign: "center" }}>
-        <p style={{ margin: 0, fontFamily: BODY, fontWeight: 500, fontSize: 16, lineHeight: "24px", color: "var(--neutral-900)" }}>Couldn&apos;t load your usage</p>
-        <p style={{ margin: 0, fontFamily: BODY, fontSize: 14, lineHeight: "22px", color: "var(--neutral-600)" }}>Check your connection and try again.</p>
+      <div style={{ flex: "1 0 0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 'var(--space-3)', padding: 'var(--space-9)', textAlign: "center" }}>
+        <p style={{ margin: 0, fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-lg)', lineHeight: "var(--line-height-heading-sm)", color: "var(--neutral-900)" }}>Couldn&apos;t load your usage</p>
+        <p style={{ margin: 0, fontFamily: BODY, fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-body)", color: "var(--neutral-600)" }}>Check your connection and try again.</p>
         <Button variant="default" size="sm" onClick={() => { void usageQ.refetch() }}>Try again</Button>
       </div>
     )
@@ -258,14 +258,14 @@ export default function UsagePage() {
   const lowBalance = !usage.isUnlimited && total > 0 && usage.remainingCredits / total < LOW_BALANCE_SHARE
 
   return (
-    <div className={`kaya-scrollbar ${styles.root}`} style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '64px 24px 48px' }}>
-      <div style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div className={`kaya-scrollbar ${styles.root}`} style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: 'var(--space-10) var(--space-6) var(--space-9)' }}>
+      <div style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
 
-        <div style={{ paddingLeft: 4, marginBottom: 4 }}>
-          <h1 style={{ fontFamily: TITLE, fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: 0 }}>
+        <div style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)' }}>
+          <h1 style={{ fontFamily: TITLE, fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0 }}>
             Usage
           </h1>
-          <p style={{ fontFamily: BODY, fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-600)', margin: 0 }}>
+          <p style={{ fontFamily: BODY, fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-600)', margin: 0 }}>
             Your spend this period, split by Slack, Automations, and Chat.
           </p>
         </div>
@@ -331,7 +331,7 @@ export default function UsagePage() {
                   aria-valuemin={0}
                   aria-valuemax={100}
                   aria-valuenow={Math.round(usedShare * 100)}
-                  style={{ marginTop: 8 }}
+                  style={{ marginTop: 'var(--space-2)' }}
                 >
                   <div className={styles.meterFill} style={{ width: `${usedShare * 100}%` }} />
                 </div>

@@ -33,22 +33,22 @@ export function RolesPermissionsModal({ open, onClose }: { open: boolean; onClos
         style={{
           width:      640,
           maxHeight:  'calc(100vh - 64px)',
-          borderRadius: 20,
+          borderRadius: 'var(--radius-2xl)',
           background: 'var(--legacy-f9f5f1)',
           border:     '1px solid var(--border-default)',
           boxShadow:  '0px 8px 32px color-mix(in srgb, var(--static-black) 12%, transparent)',
         }}
       >
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, padding: '24px 24px 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-3)', padding: 'var(--space-6) var(--space-6) var(--space-4)' }}>
           <div>
             <DialogTitle asChild>
-            <h2 style={{ fontFamily: 'var(--font-title)', fontWeight: 500, fontSize: 20, lineHeight: '28px', color: 'var(--neutral-900)', margin: 0 }}>
+            <h2 style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-heading-md)', lineHeight: 'var(--line-height-heading-md)', color: 'var(--neutral-900)', margin: 0 }}>
               Roles &amp; Permissions
             </h2>
             </DialogTitle>
             <DialogDescription asChild>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: '4px 0 0' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 'var(--space-1) 0 0' }}>
               Default behavior for new projects and chats across the workspace.
             </p>
             </DialogDescription>
@@ -64,7 +64,7 @@ export function RolesPermissionsModal({ open, onClose }: { open: boolean; onClos
             between two badges is a flex-grown div, so it always fills exactly
             the gap between them with no manual pixel math. */}
         <div className="kaya-scrollbar" style={{ overflowY: 'auto' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', padding: '4px 24px 24px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', padding: 'var(--space-1) var(--space-6) var(--space-6)' }}>
             {ROLES_INFO.map((item, i) => {
               const tokens = ROLE_TOKENS[item.role]
               const badgeSize = ROLE_STACK_BADGE_SIZE
@@ -72,7 +72,7 @@ export function RolesPermissionsModal({ open, onClose }: { open: boolean; onClos
               return (
                 <div
                   key={item.role}
-                  style={{ display: 'flex', gap: 14 }}
+                  style={{ display: 'flex', gap: 'var(--space-3)' }}
                 >
                   {/* Rail column — badge, then a connector filling the rest of this row's height */}
                   <div style={{ width: ROLE_STACK_RAIL_WIDTH, flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -91,18 +91,18 @@ export function RolesPermissionsModal({ open, onClose }: { open: boolean; onClos
                       <RoleGlyph role={item.role} size={Math.round(badgeSize * 0.5)} />
                     </div>
                     {!isLast && (
-                      <div aria-hidden style={{ width: 2, flex: '1 0 0', marginTop: 4, backgroundColor: 'var(--neutral-200)' }} />
+                      <div aria-hidden style={{ width: 2, flex: '1 0 0', marginTop: 'var(--space-1)', backgroundColor: 'var(--neutral-200)' }} />
                     )}
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', paddingTop: 'var(--space-1)', minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
                       <p style={{
                         margin:     0,
                         fontFamily: 'var(--font-title)',
-                        fontWeight: 400,
-                        fontSize:   20,
-                        lineHeight: '24px',
+                        fontWeight: 'var(--font-weight-regular)',
+                        fontSize:   'var(--font-size-heading-md)',
+                        lineHeight: 'var(--line-height-heading-sm)',
                         color:      tokens.text,
                       }}>
                         {ROLE_LABEL[item.role]}
@@ -110,7 +110,7 @@ export function RolesPermissionsModal({ open, onClose }: { open: boolean; onClos
                       {(i === 0 || isLast) && (
                         <span style={{
                           fontFamily: 'var(--font-body)',
-                          fontWeight: 500,
+                          fontWeight: 'var(--font-weight-medium)',
                           fontSize:   'var(--font-size-caption)',
                           color:      'var(--neutral-400)',
                         }}>
@@ -121,7 +121,7 @@ export function RolesPermissionsModal({ open, onClose }: { open: boolean; onClos
                     <p style={{
                       margin:     0,
                       fontFamily: 'var(--font-body)',
-                      fontWeight: 400,
+                      fontWeight: 'var(--font-weight-regular)',
                       fontSize:   'var(--font-size-body)',
                       lineHeight: 'var(--line-height-body)',
                       color:      'var(--neutral-600)',
@@ -141,7 +141,7 @@ export function RolesPermissionsModal({ open, onClose }: { open: boolean; onClos
         </div>
 
         {/* Footer */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '16px 24px 24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)', padding: 'var(--space-4) var(--space-6) var(--space-6)' }}>
           <Button variant="secondary" size="sm" onClick={() => setDetailOpen(true)}>
             View in detail
           </Button>
@@ -191,22 +191,22 @@ function RoleComparisonModal({ open, onClose }: { open: boolean; onClose: () => 
         style={{
           width:      720,
           maxHeight:  'calc(100vh - 64px)',
-          borderRadius: 20,
+          borderRadius: 'var(--radius-2xl)',
           background: 'var(--modal-bg)',
           border:     '1px solid var(--border-default)',
           boxShadow:  '0px 8px 32px color-mix(in srgb, var(--static-black) 12%, transparent)',
         }}
       >
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, padding: '24px 24px 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-3)', padding: 'var(--space-6) var(--space-6) var(--space-4)' }}>
           <div>
             <DialogTitle asChild>
-            <h2 style={{ fontFamily: 'var(--font-title)', fontWeight: 500, fontSize: 20, lineHeight: '28px', color: 'var(--neutral-900)', margin: 0 }}>
+            <h2 style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-heading-md)', lineHeight: 'var(--line-height-heading-md)', color: 'var(--neutral-900)', margin: 0 }}>
               Role comparison
             </h2>
             </DialogTitle>
             <DialogDescription asChild>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: '4px 0 0' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 'var(--space-1) 0 0' }}>
               What each role can do, side by side.
             </p>
             </DialogDescription>
@@ -217,23 +217,23 @@ function RoleComparisonModal({ open, onClose }: { open: boolean; onClose: () => 
         </div>
 
         {/* Table */}
-        <div className="kaya-scrollbar" style={{ overflowX: 'auto', overflowY: 'auto', paddingBottom: 24 }}>
+        <div className="kaya-scrollbar" style={{ overflowX: 'auto', overflowY: 'auto', paddingBottom: 'var(--space-6)' }}>
           {/* Horizontal padding lives on this inner wrapper, not the
               scrolling element above — keeps the scrollbar flush with the
               modal's edge. */}
-          <div style={{ padding: '0 24px' }}>
+          <div style={{ padding: '0 var(--space-6)' }}>
           <div style={{ minWidth: 640 }}>
             {/* Column header — role icon + name, same colors as the stack above */}
-            <div style={{ display: 'grid', gridTemplateColumns: ROLE_COMPARISON_GRID_COLUMNS, gap: 8, padding: '8px 0' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: ROLE_COMPARISON_GRID_COLUMNS, gap: 'var(--space-2)', padding: 'var(--space-2) 0' }}>
               <div />
               {ROLE_COMPARISON_COLUMNS.map(role => {
                 const tokens = ROLE_TOKENS[role]
                 return (
-                  <div key={role} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                  <div key={role} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-1)' }}>
                     <span style={{ display: 'inline-flex', color: tokens.text }}>
                       <RoleGlyph role={role} size={18} />
                     </span>
-                    <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 13, color: tokens.text }}>
+                    <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-sm)', color: tokens.text }}>
                       {ROLE_LABEL[role]}
                     </p>
                   </div>
@@ -250,20 +250,20 @@ function RoleComparisonModal({ open, onClose }: { open: boolean; onClose: () => 
                 style={{
                   display:             'grid',
                   gridTemplateColumns: ROLE_COMPARISON_GRID_COLUMNS,
-                  gap:                 8,
+                  gap:                 'var(--space-2)',
                   alignItems:          'center',
-                  padding:             '12px 0',
+                  padding:             'var(--space-3) 0',
                   borderBottom:        i < ROLE_CAPABILITIES.length - 1 ? '1px solid var(--neutral-100)' : 'none',
                 }}
               >
-                <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 13, lineHeight: '18px', color: 'var(--neutral-700)' }}>
+                <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px', color: 'var(--neutral-700)' }}>
                   {cap.label}
                 </p>
                 {ROLE_COMPARISON_COLUMNS.map(role => (
                   <div key={role} style={{ display: 'flex', justifyContent: 'center' }}>
                     {cap.grants[role]
                       ? <TickTwoIcon size={16} color="var(--green-600)" />
-                      : <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-300)' }}>–</span>}
+                      : <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-300)' }}>–</span>}
                   </div>
                 ))}
               </div>

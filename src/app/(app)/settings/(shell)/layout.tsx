@@ -15,7 +15,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
           height:          '100%',
           backgroundColor: 'var(--neutral-50)',
           display:         'flex',
-          padding:         '10px 10px 10px 0',
+          padding:         'var(--space-2-5) var(--space-2-5) var(--space-2-5) 0',
         }}
       >
         {/* Inner rounded card - mirrors the main app's center container */}

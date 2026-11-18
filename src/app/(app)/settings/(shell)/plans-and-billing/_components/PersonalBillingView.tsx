@@ -31,32 +31,32 @@ export function PersonalBillingView() {
   if (showSkeleton && loadError) return <BillingLoadError onRetry={retryLoad} retrying={retrying} />
   if (showSkeleton) {
     return (
-      <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '64px 24px 48px' }}>
+      <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: 'var(--space-10) var(--space-6) var(--space-9)' }}>
         <PersonalPlansSkeleton />
       </div>
     )
   }
 
   return (
-    <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '64px 24px 48px' }}>
-      <div style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: 'var(--space-10) var(--space-6) var(--space-9)' }}>
+      <div style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
 
-        <div style={{ paddingLeft: 4 }}>
-          <h1 style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: 0 }}>
+        <div style={{ paddingLeft: 'var(--space-1)' }}>
+          <h1 style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0 }}>
             Plan &amp; Billing
           </h1>
-          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
             Manage your plan, monitor credit consumption, and download invoices.
           </p>
         </div>
 
-        <p role="status" aria-live="polite" style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-700)', margin: 0, paddingLeft: 4, display: confirmState === 'idle' ? 'none' : undefined }}>
+        <p role="status" aria-live="polite" style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-700)', margin: 0, paddingLeft: 'var(--space-1)', display: confirmState === 'idle' ? 'none' : undefined }}>
           {confirmState === 'confirming' && 'Confirming your payment…'}
           {confirmState === 'confirmed' && 'Payment confirmed. Your plan is up to date.'}
           {confirmState === 'slow' && 'Your payment is still processing. It can take a few minutes to appear; refresh this page later.'}
         </p>
 
-        <div style={{ display: 'flex', gap: 12, alignItems: 'stretch', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'stretch', flexWrap: 'wrap' }}>
           {/* display:flex so the card fills the stretched row — without it this card sizes to its own
               content and ends short of "Credits remaining" beside it (same wrapper as OrgBillingView). */}
           <div style={{ flex: '1 0 0', minWidth: 280, display: 'flex' }}>
@@ -72,12 +72,12 @@ export function PersonalBillingView() {
               }
               headerDivider={false}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                 <div style={{ flex: '1 0 0', minWidth: 0 }}>
-                  <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 16, lineHeight: '22px', color: 'var(--neutral-900)', margin: 0 }}>
+                  <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', margin: 0 }}>
                     {hasPlan ? `${planName} Plan${planPrice > 0 ? ` · $${planPrice}/mo` : ''}` : 'Currently on Free Plan'}
                   </p>
-                  <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: '6px 0 0' }}>
+                  <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 'var(--space-1-5) 0 0' }}>
                     {isTrialUser
                       ? `${fmtNum(creditsRemaining)} of ${fmtNum(creditsTotal)} trial credits remaining`
                       : cancelAtPeriodEnd
@@ -87,12 +87,12 @@ export function PersonalBillingView() {
                           : 'Choose a plan to start using paid credits.'}
                   </p>
                   {planFeatures.length > 0 && (
-                    <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 13, lineHeight: '20px', color: 'var(--neutral-500)', margin: '4px 0 0' }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-500)', margin: 'var(--space-1) 0 0' }}>
                       {planFeatures.join(' · ')}
                     </p>
                   )}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexShrink: 0 }}>
                   {hasActiveSub && !cancelAtPeriodEnd && (
                     <Button variant="ghost" onClick={() => setShowCancelDialog(true)}>
                       Cancel plan
@@ -119,12 +119,12 @@ export function PersonalBillingView() {
           {/* display:flex for the same reason as the Plan card above: fill the stretched row. */}
           <div style={{ flex: '1 0 0', minWidth: 280, display: 'flex' }}>
             <SectionCard title="Credits remaining" titleColor="var(--neutral-700)" headerDivider={false} bodyAlign="space-between" bodyGap={12}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                  <p style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: 0, whiteSpace: 'nowrap' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
+                  <p style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0, whiteSpace: 'nowrap' }}>
                     {fmtNum(Math.max(0, creditsTotal - creditsUsed))}
                   </p>
-                  <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+                  <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
                     of {fmtNum(creditsTotal)} left
                   </p>
                 </div>
@@ -151,13 +151,13 @@ export function PersonalBillingView() {
         {billing && (
           <>
         <SectionCard title="Payment" subtitle="Manage your billing details.">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
             <CardBrandLogo brand={cardBrand} />
             <div style={{ flex: '1 0 0', minWidth: 0 }}>
-              <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 16, lineHeight: '22px', color: 'var(--neutral-900)', margin: 0 }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', margin: 0 }}>
                 {pm?.label ?? 'No payment method on file'}
               </p>
-              <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
                 {pm?.expiry ?? 'Add a card to continue.'}
               </p>
             </div>

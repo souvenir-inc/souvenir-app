@@ -34,15 +34,15 @@ export function AgentsToolbar({
   return (
     // The search shrinks (down to 200px) to keep Sort/Filter on its line; only narrower than that
     // (one card column) do they drop below it.
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: '1 1 200px', maxWidth: 450, minWidth: 0 }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flex: '1 1 200px', maxWidth: 450, minWidth: 0 }}>
         {/* Search */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 2,
-          padding: '7px 10px',
-          borderRadius: 10,
+          gap: 'var(--space-0-5)',
+          padding: 'var(--space-1-5) var(--space-2-5)',
+          borderRadius: 'var(--radius-lg)',
           background: 'var(--text-field-bg)',
           boxShadow: '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--text-field-ring)',
           width: '100%',
@@ -63,10 +63,10 @@ export function AgentsToolbar({
               background: 'transparent',
               fontFamily: 'var(--font-body)',
               fontWeight: 'var(--font-weight-regular)',
-              fontSize: 14,
-              lineHeight: '22px',
+              fontSize: 'var(--font-size-body)',
+              lineHeight: 'var(--line-height-body)',
               color: 'var(--neutral-600)',
-              padding: '0 2px',
+              padding: '0 var(--space-0-5)',
               minWidth: 0,
             }}
           />
@@ -81,11 +81,11 @@ export function AgentsToolbar({
                 justifyContent: 'center',
                 background: 'none',
                 border: 'none',
-                padding: 2,
+                padding: 'var(--space-0-5)',
                 cursor: 'pointer',
                 color: 'var(--neutral-400)',
                 flexShrink: 0,
-                borderRadius: 4,
+                borderRadius: 'var(--radius-xs)',
               }}
             >
               <CancelOneIcon size={12} />
@@ -94,7 +94,7 @@ export function AgentsToolbar({
         </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0 }}>
         {/* Sort dropdown */}
         <Dropdown.Float
           open={sortOpen}

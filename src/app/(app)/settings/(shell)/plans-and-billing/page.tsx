@@ -29,7 +29,7 @@ export default function PlansAndBillingPage() {
     // (no hero, no Payment/Invoice) is the closest neutral placeholder for
     // this brief, transient state.
     return (
-      <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '64px 24px 48px' }}>
+      <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: 'var(--space-10) var(--space-6) var(--space-9)' }}>
         <TeamsPlansSkeleton isAdmin={false} />
       </div>
     )

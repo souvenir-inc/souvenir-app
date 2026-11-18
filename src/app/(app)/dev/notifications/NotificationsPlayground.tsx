@@ -58,16 +58,16 @@ function Card({ title, description, children, actions }: {
   return (
     <section
       style={{
-        display: 'flex', flexDirection: 'column', gap: 16, padding: 20, borderRadius: 16,
+        display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-5)', borderRadius: 'var(--radius-2xl)',
         backgroundColor: 'var(--neutral-white)', boxShadow: '0px 1px 2px 0px var(--neutral-700-12), 0px 0px 0px 1px var(--neutral-100)',
       }}
     >
-      <header style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
-          <h2 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 18, lineHeight: '24px', color: 'var(--neutral-900)' }}>{title}</h2>
+      <header style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', minWidth: 0 }}>
+          <h2 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-sm)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-900)' }}>{title}</h2>
           {description && <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-500)' }}>{description}</p>}
         </div>
-        {actions && <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>{actions}</div>}
+        {actions && <div style={{ display: 'flex', gap: 'var(--space-2)', flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>{actions}</div>}
       </header>
       {children}
     </section>
@@ -95,7 +95,7 @@ function PanelPreview({ label, notifications, loading = false }: { label: string
   })
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
       <p style={{ ...captionText, fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-700)' }}>{label}</p>
       <div role="menu" aria-label={label}>
         <NotificationPanel
@@ -216,10 +216,10 @@ function PlaygroundContent() {
 
   return (
     <div style={{ height: '100%', overflowY: 'auto', backgroundColor: 'var(--neutral-50)' }} className="kaya-scrollbar">
-      <div style={{ maxWidth: 1180, margin: '0 auto', padding: '32px 24px 64px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ maxWidth: 1180, margin: '0 auto', padding: 'var(--space-7) var(--space-6) var(--space-10)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
           <span style={{ display: 'inline-flex', color: 'var(--neutral-700)' }}><BellRingIcon size={28} animated /></span>
-          <h1 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 28, lineHeight: '34px', color: 'var(--neutral-900)' }}>
+          <h1 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-xl)', lineHeight: '34px', color: 'var(--neutral-900)' }}>
             Notifications playground
           </h1>
           <Badge label="Dev only" color="Purple" />
@@ -241,16 +241,16 @@ function PlaygroundContent() {
             <Button size="sm" onClick={() => openNotificationsPanel()}>Open bell</Button>
           </>}
         >
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--space-2-5)' }}>
             {SCENARIOS.map(s => (
               <label
                 key={s}
                 style={{
-                  display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, padding: '10px 12px', borderRadius: 10, cursor: 'pointer',
+                  display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-3)', padding: 'var(--space-2-5) var(--space-3)', borderRadius: 'var(--radius-lg)', cursor: 'pointer',
                   boxShadow: '0px 0px 0px 1px var(--neutral-100)',
                 }}
               >
-                <span style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                <span style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', minWidth: 0 }}>
                   <span style={bodyText}>{SCENARIO_LABELS[s].title}</span>
                   <span style={captionText}>{SCENARIO_LABELS[s].detail}</span>
                 </span>
@@ -275,18 +275,18 @@ function PlaygroundContent() {
           ) : models.length === 0 ? (
             <p style={captionText}>No published agents with a model yet — create one on /agents to test this.</p>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
               {models.map(({ modelId, agents, name }) => {
                 const state: ModelUnavailableReason | 'ok' = overrides[modelId] ?? 'ok'
                 return (
-                  <div key={modelId} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '10px 12px', borderRadius: 10, boxShadow: '0px 0px 0px 1px var(--neutral-100)' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                  <div key={modelId} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', padding: 'var(--space-2-5) var(--space-3)', borderRadius: 'var(--radius-lg)', boxShadow: '0px 0px 0px 1px var(--neutral-100)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', minWidth: 0 }}>
                       <span style={bodyText}>{name}</span>
                       <span style={{ ...captionText, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         Used by {agents.map(a => a.name).join(', ')}
                       </span>
                     </div>
-                    <div role="group" aria-label={`Simulated state of ${name}`} style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                    <div role="group" aria-label={`Simulated state of ${name}`} style={{ display: 'flex', gap: 'var(--space-1-5)', flexShrink: 0 }}>
                       {(['ok', 'retired', 'blocked'] as const).map(option => (
                         <Button
                           key={option}
@@ -308,7 +308,7 @@ function PlaygroundContent() {
 
         {/* 3 ── Panel states ── */}
         <Card title="3 · Panel states" description="The real NotificationPanel with local state — hover rows for actions, press U / ⌫ on a focused row, switch tabs.">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: 24, alignItems: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: 'var(--space-6)', alignItems: 'start' }}>
             <PanelPreview label="Every type (actionable + grouped by day)" notifications={allRows} />
             <PanelPreview label="Many rows (scroll + edge fade)" notifications={manyRows} />
             <PanelPreview label="Empty — try the Unread tab too" notifications={[]} />
@@ -334,7 +334,7 @@ function PlaygroundContent() {
 
         {/* 5 ── Checklist ── */}
         <Card title="5 · What to check" description="Manual pass — each line is one behaviour.">
-          <ol style={{ ...bodyText, margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <ol style={{ ...bodyText, margin: 0, paddingLeft: 'var(--space-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
             <li>The bell sits right of the settings icon; collapsed sidebar → above the avatar. Hovering swings it.</li>
             <li>Clicking the bell never opens the account menu, and opening one closes the other.</li>
             <li>The panel opens to the right of the sidebar, bottom-aligned with the bell; Esc closes it; ↑/↓ move between rows.</li>

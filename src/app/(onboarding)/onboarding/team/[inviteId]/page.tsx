@@ -58,8 +58,8 @@ function MemberAvatar({ member }: { member: InvitedMember }) {
         backgroundColor: "var(--neutral-400,#9c938b)",
         color: "var(--static-white)",
         fontFamily: "var(--font-body)",
-        fontWeight: 500,
-        fontSize: 10,
+        fontWeight: 'var(--font-weight-medium)',
+        fontSize: 'var(--font-size-caption)',
         lineHeight: 1,
       }}
     >
@@ -90,22 +90,22 @@ function WorkspaceJoinCard({
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: 16,
+        gap: 'var(--space-4)',
         width: "100%",
-        padding: 16,
-        borderRadius: 12,
+        padding: 'var(--space-4)',
+        borderRadius: 'var(--radius-xl)',
         backgroundColor: "var(--neutral-white)",
         boxSizing: "border-box",
         boxShadow: "0px 0px 0px 1px var(--blue-600,#0d6eb2)",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 'var(--space-4)' }}>
         <p
           style={{
             margin: 0,
             fontFamily: "var(--font-body)",
-            fontWeight: 600,
-            fontSize: 20,
+            fontWeight: 'var(--font-weight-semibold)',
+            fontSize: 'var(--font-size-heading-md)',
             lineHeight: "normal",
             color: "var(--neutral-700,#524b47)",
             overflow: "hidden",
@@ -120,8 +120,8 @@ function WorkspaceJoinCard({
             margin: 0,
             flexShrink: 0,
             fontFamily: "var(--font-body)",
-            fontWeight: 400,
-            fontSize: 11,
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: 'var(--font-size-caption)',
             lineHeight: "12px",
             color: "var(--neutral-600,#6a625d)",
           }}
@@ -130,8 +130,8 @@ function WorkspaceJoinCard({
         </p>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 'var(--space-4)' }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)' }}>
           <div style={{ display: "flex", alignItems: "center" }}>
             {shown.map((member, i) => (
               <span key={member.userId || member.email || i} style={{ marginLeft: i === 0 ? 0 : -8 }}>
@@ -144,8 +144,8 @@ function WorkspaceJoinCard({
               style={{
                 margin: 0,
                 fontFamily: "var(--font-body)",
-                fontWeight: 400,
-                fontSize: 11,
+                fontWeight: 'var(--font-weight-regular)',
+                fontSize: 'var(--font-size-caption)',
                 lineHeight: "12px",
                 color: "var(--neutral-600,#6a625d)",
               }}

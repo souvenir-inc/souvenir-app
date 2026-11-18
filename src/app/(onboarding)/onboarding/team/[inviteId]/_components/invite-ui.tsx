@@ -28,7 +28,7 @@ export function InviteCanvas({ children }: { children: React.ReactNode }) {
         alignItems: "center",
         justifyContent: "center",
         background: CANVAS_GRADIENT,
-        padding: "40px 16px",
+        padding: "var(--space-8) var(--space-4)",
         boxSizing: "border-box",
       }}
     >
@@ -50,10 +50,10 @@ export function InviteCard({
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: 28,
+        gap: 'var(--space-6)',
         backgroundColor: "var(--neutral-white)",
-        borderRadius: 20,
-        padding: "32px 36px",
+        borderRadius: 'var(--radius-2xl)',
+        padding: "var(--space-7) var(--space-7)",
         width: "100%",
         maxWidth: width,
         boxShadow:
@@ -71,9 +71,9 @@ export function CardTitle({ children }: { children: React.ReactNode }) {
     <h1
       style={{
         fontFamily: "var(--font-title)",
-        fontWeight: 400,
-        fontSize: 40,
-        lineHeight: "48px",
+        fontWeight: 'var(--font-weight-regular)',
+        fontSize: 'var(--font-size-display)',
+        lineHeight: "var(--line-height-display)",
         color: "var(--legacy-1a1916)",
         margin: 0,
         letterSpacing: "-0.01em",
@@ -90,9 +90,9 @@ export function CardSubtitle({ children }: { children: React.ReactNode }) {
     <p
       style={{
         fontFamily: "var(--font-body)",
-        fontWeight: 400,
-        fontSize: 16,
-        lineHeight: "24px",
+        fontWeight: 'var(--font-weight-regular)',
+        fontSize: 'var(--font-size-body-lg)',
+        lineHeight: "var(--line-height-heading-sm)",
         color: "var(--neutral-500,#827a74)",
         margin: 0,
       }}
@@ -152,7 +152,7 @@ export function InviteStateScreen({
       <InviteCard width={620}>
         <CardTitle>{title}</CardTitle>
         <CardSubtitle>{body}</CardSubtitle>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 'var(--space-2-5)' }}>
           {status === "error" && onRetry && (
             <Button variant="outline" size="md" onClick={onRetry}>Try again</Button>
           )}

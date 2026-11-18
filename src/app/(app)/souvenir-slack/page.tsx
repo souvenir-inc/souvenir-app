@@ -114,10 +114,10 @@ export default function SouvenirSlackPage() {
       fluid
     >
       {!orgReady || statusLoading ? (
-        <div className="kaya-skeleton" style={{ width: '100%', height: 556, borderRadius: 16 }} />
+        <div className="kaya-skeleton" style={{ width: '100%', height: 556, borderRadius: 'var(--radius-2xl)' }} />
       ) : statusError && isAdmin ? (
-        <div role="alert" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12, padding: 24, borderRadius: 16, background: 'var(--neutral-white)', boxShadow: '0 0 0 1px var(--neutral-100)' }}>
-          <strong style={{ fontWeight: 500 }}>Couldn&apos;t check your Slack connection</strong>
+        <div role="alert" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--space-3)', padding: 'var(--space-6)', borderRadius: 'var(--radius-2xl)', background: 'var(--neutral-white)', boxShadow: '0 0 0 1px var(--neutral-100)' }}>
+          <strong style={{ fontWeight: 'var(--font-weight-medium)' }}>Couldn&apos;t check your Slack connection</strong>
           <span style={{ color: 'var(--color-text-muted)' }}>Slack may still be connected. Try again in a moment.</span>
           <Button variant="secondary" size="sm" onClick={loadStatus}>Retry</Button>
         </div>
@@ -135,7 +135,7 @@ export default function SouvenirSlackPage() {
                 </span>
                 <span style={{ minWidth: 0 }}>
                   <span className={styles.connectionTitle} style={{ display: 'block' }}>{teamName ?? 'Slack workspace'}</span>
-                  <span className={styles.connectionMeta} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span className={styles.connectionMeta} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
                     <CheckmarkCircleTwoIcon size={12} color="var(--green-600, #16a34a)" />
                     {workspace?.needsReinstall ? 'Connected · Permission update needed' : 'Connected'}
                   </span>
