@@ -121,7 +121,11 @@ describe('Select', () => {
     await render(<Select aria-label="Sort" value="name" onValueChange={() => {}} options={options} />)
     const button = $<HTMLButtonElement>('button')!
     expect(button.textContent).toContain('Name')
-    expect(button.getAttribute('aria-label')).toBe('Sort')
+    // The label joins the accessible name instead of replacing it, so the chosen value
+    // is announced too ("Sort: Name"), including when the Select is disabled.
+    expect(button.getAttribute('aria-label')).toBeNull()
+    expect(button.querySelector('.sr-only')?.textContent).toBe('Sort: ')
+    expect(button.textContent).toMatch(/Sort: .*Name/)
     await render(<Select aria-label="Sort" value={undefined} placeholder="Sort by" onValueChange={() => {}} options={options} />)
     expect($<HTMLButtonElement>('button')!.textContent).toContain('Sort by')
   })

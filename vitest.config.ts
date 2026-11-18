@@ -11,6 +11,7 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    // scripts/: the codemods, whose transforms are exported for exactly this.
+    include: ["src/**/*.{test,spec}.{ts,tsx}", "scripts/**/*.test.mjs"],
   },
 });

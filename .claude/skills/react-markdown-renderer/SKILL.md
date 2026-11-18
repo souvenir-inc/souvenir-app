@@ -184,8 +184,9 @@ function splitIntoBlocks(text: string): string[] {
   for (const line of text.split('\n')) {
     const marker = FENCE.exec(line)?.[1];
     if (fence) {
-      // Only a matching fence of at least the same length closes it.
-      if (marker && marker[0] === fence[0] && marker.length >= fence.length) fence = null;
+      // Only a matching fence of at least the same length closes it, and only with
+      // nothing but whitespace after it: a ```js line inside a block is content.
+      if (marker && marker[0] === fence[0] && marker.length >= fence.length && !line.trim().slice(marker.length).trim()) fence = null;
       current.push(line);
     } else if (marker) {
       fence = marker;
