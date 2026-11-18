@@ -354,7 +354,7 @@ export function createReasoningAccumulator(seed: ReasoningTimelineItem[] = []): 
   // Seeded ids keep the numbers they were minted with, which skip where reasoning
   // events merged into one item; counting from seed.length could mint one again.
   let sequence = seed.reduce((next, item) => {
-    const n = Number(/-(d+)$/.exec(item.id)?.[1])
+    const n = Number(/-(\d+)$/.exec(item.id)?.[1])
     return Number.isInteger(n) ? Math.max(next, n + 1) : next
   }, seed.length)
   const committed: ReasoningSection[] = []
