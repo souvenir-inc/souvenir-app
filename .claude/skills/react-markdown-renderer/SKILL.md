@@ -171,18 +171,28 @@ const MemoizedMarkdown = memo(
 // lines only outside a fence, and give every block the document's definitions.
 const FENCE = /^ {0,3}(`{3,}|~{3,})/;
 const DEFINITION = /^ {0,3}\[[^\]]+\]:\s*\S/;
+// A definition's title may sit on the next line on its own: "Title", 'Title' or (Title).
+const DEFINITION_TITLE = /^\s*("[^"]*"|'[^']*'|\([^)]*\))\s*$/;
 
 function splitIntoBlocks(text: string): string[] {
   const blocks: string[] = [];
   const definitions: string[] = [];
   let current: string[] = [];
   let fence: string | null = null;
+  let afterDefinition = false;
   const flush = () => {
     if (current.some((line) => line.trim())) blocks.push(current.join('\n'));
     current = [];
   };
   for (const line of text.split('\n')) {
     const marker = FENCE.exec(line)?.[1];
+    // A title line right after a definition belongs to it, not to the next block.
+    if (afterDefinition && DEFINITION_TITLE.test(line)) {
+      definitions[definitions.length - 1] += `\n${line}`;
+      afterDefinition = false;
+      continue;
+    }
+    afterDefinition = false;
     if (fence) {
       // Only a matching fence of at least the same length closes it, and only with
       // nothing but whitespace after it: a ```js line inside a block is content.
@@ -193,6 +203,7 @@ function splitIntoBlocks(text: string): string[] {
       current.push(line);
     } else if (DEFINITION.test(line)) {
       definitions.push(line);
+      afterDefinition = true;
     } else if (!line.trim()) {
       flush();
     } else {
