@@ -102,8 +102,8 @@ function buildScenarioRows(scenario: FixtureScenario, ctx: FixtureContext, now: 
   }
 }
 
-/** One brand-new run, finished just now — exercises the badge, the arrival
- *  toast, and the bell's swing. Unique id every call. */
+/** One brand-new run, finished just now — exercises the badge and the bell's
+ *  swing. Unique id every call. */
 export function buildLiveArrival(ctx: FixtureContext, now = Date.now()): AppNotification {
   const id = `fx-live-${now}`
   const row = scheduleRunNotifications({ id: ctx.scheduleId, name: ctx.scheduleName }, [
