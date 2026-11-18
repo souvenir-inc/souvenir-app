@@ -167,7 +167,7 @@
 .detailHint {
   font-family: var(--font-body);
   font-size: var(--font-size-small);
-  line-height: 18px;
+  line-height: var(--line-height-small);
   color: var(--neutral-500);
 }
 

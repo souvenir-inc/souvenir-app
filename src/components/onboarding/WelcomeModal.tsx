@@ -82,7 +82,7 @@ function ChoiceCard({
         textAlign: "center",
       }}
     >
-      <span style={{ fontSize: "var(--font-size-heading-xl)", lineHeight: 1 }}>{icon}</span>
+      <span style={{ fontSize: "var(--font-size-heading-xl)", lineHeight: 'var(--leading-none)' }}>{icon}</span>
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1-5)" }}>
         <p
           style={{
@@ -297,7 +297,7 @@ function SouvenirWordmark() {
           fontFamily: "var(--font-title)",
           fontWeight: 'var(--font-weight-regular)',
           fontSize: "34px",
-          lineHeight: 1,
+          lineHeight: 'var(--leading-none)',
           color: "var(--static-black)",
           letterSpacing: "0.34px",
         }}
@@ -571,7 +571,7 @@ function WelcomeModalImpl() {
                     width: "100%",
                   }}
                 >
-                  {/* <span style={{ fontSize: "var(--font-size-display)", lineHeight: 1 }}>🎉</span> */}
+                  {/* <span style={{ fontSize: "var(--font-size-display)", lineHeight: 'var(--leading-none)' }}>🎉</span> */}
 
                   <h2
                     style={{

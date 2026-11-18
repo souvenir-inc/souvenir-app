@@ -179,7 +179,7 @@ export function SlackConnectModal({ isOpen, onClose, orgId, onConnected }: Slack
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', padding: 'var(--space-6) var(--space-6) var(--space-5)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', padding: 'var(--space-5)', borderRadius: 'var(--radius-xl)', backgroundColor: 'var(--neutral-50)' }}>
               <p style={{
-                fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px',
+                fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)',
                 color: 'var(--neutral-700)', margin: 0,
               }}>
                 Souvenir will be able to:
@@ -190,7 +190,7 @@ export function SlackConnectModal({ isOpen, onClose, orgId, onConnected }: Slack
                     {p.icon}
                   </span>
                   <p style={{
-                    fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px',
+                    fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)',
                     color: 'var(--neutral-700)', margin: 0,
                   }}>
                     {p.text}

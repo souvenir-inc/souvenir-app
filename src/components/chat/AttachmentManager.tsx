@@ -334,7 +334,7 @@ export function AttachmentManager({
               fontSize: "var(--font-size-small)",
               fontWeight:  'var(--font-weight-medium)',
               color:       "var(--neutral-500)",
-              lineHeight:  1,
+              lineHeight:  'var(--leading-none)',
             }}
           >
             {attachments.length} file{attachments.length !== 1 ? "s" : ""} attached
@@ -447,7 +447,7 @@ export function AttachmentManager({
                       fontSize: "var(--font-size-small)",
                       fontFamily:      "var(--font-body)",
                       fontWeight:      'var(--font-weight-semibold)',
-                      lineHeight:      1,
+                      lineHeight:      'var(--leading-none)',
                       padding:         "var(--space-0-5) var(--space-0-5)",
                       borderRadius:    "var(--radius-xs)",
                       letterSpacing:   "0.02em",
@@ -504,7 +504,7 @@ export function AttachmentManager({
                   <FormatGlyph format={formatOfFile(attachment.file)} size="sm" />
                 </span>
 
-                <div style={{ flex: 1, minWidth: 0, lineHeight: 1.3 }}>
+                <div style={{ flex: 1, minWidth: 0, lineHeight: 'var(--leading-tight)' }}>
                   <p style={{ ...CARD_TEXT, fontSize: "var(--font-size-body)", fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-900)" }}>
                     {attachment.file.name}
                   </p>

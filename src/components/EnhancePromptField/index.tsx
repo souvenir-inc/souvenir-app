@@ -182,7 +182,7 @@ export function EnhancePromptField(
                 fontFamily: 'Inter, var(--font-body)',
                 fontWeight: 'var(--font-weight-regular)',
                 fontSize:   'var(--font-size-body)',
-                lineHeight: 1.29,
+                lineHeight: 'var(--leading-tight)',
                 color:      'var(--neutral-700)',
               }}
             />

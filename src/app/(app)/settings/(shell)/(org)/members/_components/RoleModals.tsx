@@ -256,7 +256,7 @@ function RoleComparisonModal({ open, onClose }: { open: boolean; onClose: () => 
                   borderBottom:        i < ROLE_CAPABILITIES.length - 1 ? '1px solid var(--neutral-100)' : 'none',
                 }}
               >
-                <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px', color: 'var(--neutral-700)' }}>
+                <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-700)' }}>
                   {cap.label}
                 </p>
                 {ROLE_COMPARISON_COLUMNS.map(role => (

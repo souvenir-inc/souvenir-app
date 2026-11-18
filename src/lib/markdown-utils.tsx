@@ -292,7 +292,7 @@ const BASE_COMPONENTS: Components = {
             minWidth: "540px",
             borderCollapse: "collapse",
             fontSize: "14px",
-            lineHeight: "22px",
+            lineHeight: 'var(--line-height-body)',
             fontFamily: "var(--font-body)",
             tableLayout: "auto",
           }}

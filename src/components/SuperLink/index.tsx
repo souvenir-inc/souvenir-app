@@ -180,7 +180,7 @@ export function SuperLink(
                   fontFamily:    'var(--font-body)',
                   fontSize:      'var(--font-size-body-lg)',  // 14px
                   fontWeight:    'var(--font-weight-medium)',
-                  lineHeight:    1.5,
+                  lineHeight:    'var(--leading-normal)',
                   letterSpacing: '0.07px',
                   color:         'var(--neutral-950)',
                   whiteSpace:    'nowrap',

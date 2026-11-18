@@ -56,7 +56,7 @@ export function AgentCreatedCard({ agent, published, inUse, onUse }: AgentCreate
         <AgentHero name={agent.name} agentId={agent.id} height={HERO} avatarSize={110} radius={RADIUS} />
 
         <div style={{ minHeight: DETAILS, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-0-5)', padding: 'var(--space-3) var(--space-4) 0', textAlign: 'center' }}>
-          <p style={{ margin: 0, maxWidth: '100%', fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-heading-md)', lineHeight: '26px', color: 'var(--neutral-900)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{agent.name}</p>
+          <p style={{ margin: 0, maxWidth: '100%', fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-heading-md)', lineHeight: 'var(--line-height-heading-md)', color: 'var(--neutral-900)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{agent.name}</p>
           <p style={{ ...HINT_STYLE, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)' }}>{agent.handle}</p>
           {agent.description && (
             <p style={{ ...HINT_STYLE, margin: 'var(--space-1-5) 0 0', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-600)' }}>{agent.description}</p>

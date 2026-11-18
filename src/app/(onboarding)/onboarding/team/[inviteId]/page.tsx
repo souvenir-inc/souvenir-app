@@ -60,7 +60,7 @@ function MemberAvatar({ member }: { member: InvitedMember }) {
         fontFamily: "var(--font-body)",
         fontWeight: 'var(--font-weight-medium)',
         fontSize: 'var(--font-size-caption)',
-        lineHeight: 1,
+        lineHeight: 'var(--leading-none)',
       }}
     >
       {initials.slice(0, 2)}
@@ -122,7 +122,7 @@ function WorkspaceJoinCard({
             fontFamily: "var(--font-body)",
             fontWeight: 'var(--font-weight-regular)',
             fontSize: 'var(--font-size-caption)',
-            lineHeight: "12px",
+            lineHeight: 'var(--line-height-caption)',
             color: "var(--neutral-600)",
           }}
         >
@@ -146,7 +146,7 @@ function WorkspaceJoinCard({
                 fontFamily: "var(--font-body)",
                 fontWeight: 'var(--font-weight-regular)',
                 fontSize: 'var(--font-size-caption)',
-                lineHeight: "12px",
+                lineHeight: 'var(--line-height-caption)',
                 color: "var(--neutral-600)",
               }}
             >

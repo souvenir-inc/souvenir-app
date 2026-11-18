@@ -18,7 +18,7 @@ const SECTION_LABEL_STYLE: React.CSSProperties = {
   fontFamily: 'var(--font-body)',
   fontWeight: 'var(--font-weight-medium)',
   fontSize:   'var(--font-size-body-sm)',
-  lineHeight: '18px',
+  lineHeight: 'var(--line-height-body-sm)',
   color:      'var(--neutral-600)',
 }
 
@@ -67,7 +67,7 @@ function InfoNote({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)', padding: 'var(--space-2-5) var(--space-3)', backgroundColor: 'var(--neutral-100)', borderRadius: 'var(--radius-lg)' }}>
       <InformationCircleIcon size={16} color="var(--neutral-500)" style={{ flexShrink: 0, marginTop: 'var(--space-0-5)' }} />
-      <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px', color: 'var(--neutral-700)', margin: 0 }}>
+      <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-700)', margin: 0 }}>
         {children}
       </p>
     </div>

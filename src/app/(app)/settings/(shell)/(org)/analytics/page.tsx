@@ -17,7 +17,7 @@ import { useOrgIdentity } from '@/context/org-context'
 // Data: use-org-usage.ts (lib/analytics/org-usage.ts derives every number).
 
 const kpiLabel: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 'var(--space-1)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-600)' }
-const kpiValue: React.CSSProperties = { fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: '34px', color: 'var(--neutral-900)', margin: 0, fontVariantNumeric: 'tabular-nums' }
+const kpiValue: React.CSSProperties = { fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0, fontVariantNumeric: 'tabular-nums' }
 const kpiHint: React.CSSProperties = { fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)', margin: 0 }
 const planPill: React.CSSProperties = { flexShrink: 0, padding: 'var(--space-0-5) var(--space-2)', borderRadius: 'var(--radius-full)', backgroundColor: 'var(--neutral-100)', boxShadow: 'inset 0 0 0 1px var(--border-default)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-700)', whiteSpace: 'nowrap' }
 const kpiTile: React.CSSProperties = { minWidth: 0, backgroundColor: 'var(--neutral-white)', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-surface-card)', padding: 'var(--space-3) var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }
@@ -110,7 +110,7 @@ export default function OrgUsageAnalyticsPage() {
               ))}
             </TabsList>
           </Tabs>
-          <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: '18px', color: 'var(--neutral-500)' }}>
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)' }}>
             Applies to the workspace chart below.
           </span>
         </div>

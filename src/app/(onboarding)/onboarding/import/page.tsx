@@ -168,7 +168,7 @@ export default function OnboardingImportPage() {
               fontFamily: "var(--font-body)",
               fontWeight: 'var(--font-weight-medium)',
               fontSize: "var(--font-size-body)",
-              lineHeight: "21px",
+              lineHeight: 'var(--line-height-body)',
               color: "var(--legacy-0a0a0a)",
               letterSpacing: "0.07px",
             }}
@@ -325,7 +325,7 @@ export default function OnboardingImportPage() {
               fontFamily: "var(--font-body)",
               fontWeight: 'var(--font-weight-medium)',
               fontSize: "var(--font-size-body)",
-              lineHeight: "21px",
+              lineHeight: 'var(--line-height-body)',
               color: "var(--legacy-0a0a0a)",
             }}
           >
@@ -336,7 +336,7 @@ export default function OnboardingImportPage() {
               fontFamily: "var(--font-body)",
               fontWeight: 'var(--font-weight-medium)',
               fontSize: "var(--font-size-body)",
-              lineHeight: "21px",
+              lineHeight: 'var(--line-height-body)',
               color: "var(--neutral-600)",
             }}
           >

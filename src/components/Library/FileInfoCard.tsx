@@ -141,7 +141,7 @@ export function FileInfoCard({ file, viewerId, onManageAccess, onRename, onClose
 
       <div className={`${styles.infoBody} kaya-scrollbar kaya-no-gutter`} data-info-scroll="">
       <div className={styles.block}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-lg)', lineHeight: 1.35, color: 'var(--neutral-900)' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--leading-snug)', color: 'var(--neutral-900)' }}>
           <span style={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere' }}>{file.name}</span>
           <Tooltip content={caps.rename ? 'Rename' : ONLY_OWNER_TIP}>
             <span>
@@ -150,7 +150,7 @@ export function FileInfoCard({ file, viewerId, onManageAccess, onRename, onClose
           </Tooltip>
         </div>
         <p style={{ margin: 'var(--space-0-5) 0 0', ...label }}>{path}</p>
-        <p style={{ margin: 'var(--space-2) 0 0', ...label, lineHeight: 1.55 }}>
+        <p style={{ margin: 'var(--space-2) 0 0', ...label, lineHeight: 'var(--leading-normal)' }}>
           <OriginLine file={file} viewerId={viewerId} />
         </p>
         {/* Every file Souvenir made (a chat output or a run output) carries the AI-generated badge. */}

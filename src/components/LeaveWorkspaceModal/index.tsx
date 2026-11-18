@@ -89,7 +89,7 @@ export function LeaveWorkspaceModal({ onClose }: LeaveWorkspaceModalProps) {
 
         {!membersLoading && isLastAdmin && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px', color: 'var(--neutral-700)', margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-700)', margin: 0 }}>
               New admin
             </p>
             <Dropdown.Float

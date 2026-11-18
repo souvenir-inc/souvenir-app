@@ -201,7 +201,7 @@ export function NotificationBell({ open, onOpenChange }: NotificationBellProps) 
                 borderRadius: 'var(--radius-full)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
                 backgroundColor: 'var(--red-500)', color: 'var(--static-white)',
                 boxShadow: '0 0 0 2px var(--neutral-50)',
-                fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', lineHeight: '14px',
+                fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >

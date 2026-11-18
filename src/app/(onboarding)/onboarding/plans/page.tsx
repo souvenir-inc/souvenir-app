@@ -460,7 +460,7 @@ function OnboardingPlansContent() {
                   <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-600)' }}>Team-exclusive</span>
                   <div>
                     <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-body)', color: 'var(--static-black)', margin: 0 }}>Souvenir Slack Manager</p>
-                    <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-caption)', lineHeight: '15px', color: 'var(--neutral-600)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Bot in Slack, by @-mention.</p>
+                    <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-600)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Bot in Slack, by @-mention.</p>
                   </div>
                 </div>
               </div>
@@ -495,7 +495,7 @@ function OnboardingPlansContent() {
                         style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-1)' }}
                       >
                         <span style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--static-black)' }}>{new TeamsTier(teamTier.planId, billing).credits.toLocaleString()}</span>
-                        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-caption)', lineHeight: '15px', color: 'var(--neutral-600)' }}>credits / month</span>
+                        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-600)' }}>credits / month</span>
                       </motion.div>
                     </AnimatePresence>
                   </div>
@@ -640,7 +640,7 @@ function OnboardingPlansContent() {
                         <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-body)', color: 'var(--static-black)', margin: 0, whiteSpace: 'nowrap' }}>
                           1,000 free credits
                         </p>
-                        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-caption)', lineHeight: '19px', color: 'var(--neutral-600)', margin: 0 }}>
+                        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-600)', margin: 0 }}>
                           No credit card required. Try every feature with real workloads before you pay.
                         </p>
                       </div>
@@ -673,7 +673,7 @@ function OnboardingPlansContent() {
                         style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-1)' }}
                       >
                         <span style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--static-black)' }}>{indTier.creditsLabel}</span>
-                        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-caption)', lineHeight: '15px', color: 'var(--neutral-600)' }}>credits / month</span>
+                        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-600)' }}>credits / month</span>
                       </motion.div>
                     </AnimatePresence>
                   </div>

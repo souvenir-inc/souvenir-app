@@ -97,7 +97,7 @@ export function ModelSwitchDialog({
                 fontFamily: "var(--font-body)",
                 fontSize: "var(--font-size-body-sm)",
                 color: "var(--neutral-600)",
-                lineHeight: 1.5,
+                lineHeight: 'var(--leading-normal)',
                 margin: "0 0 var(--space-5)",
               }}
             >

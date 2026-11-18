@@ -95,7 +95,7 @@ export function PillSelect<T extends string>({
           fontFamily:      'var(--font-body)',
           fontWeight:      500,
           fontSize:        14,
-          lineHeight:      '22px',
+          lineHeight:      'var(--line-height-body)',
           color:           'var(--neutral-700)',
         }}
       >

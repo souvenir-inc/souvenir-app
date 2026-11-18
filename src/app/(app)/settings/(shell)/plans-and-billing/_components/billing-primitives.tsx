@@ -82,7 +82,7 @@ export const SHADOW_INPUT   = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0p
 // pages' stat cards read consistently. SectionCard's own title already
 // renders at this size/weight, so no separate header style is needed here.
 export const statCardBigLineStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: '34px', color: 'var(--neutral-900)', margin: 0,
+  fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0,
 }
 export const statCardCaptionStyle: React.CSSProperties = {
   fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0,

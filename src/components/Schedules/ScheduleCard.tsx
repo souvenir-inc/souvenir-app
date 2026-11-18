@@ -162,7 +162,7 @@ export function ScheduleCard({
         fontFamily:      'var(--font-body)',
         fontWeight:      'var(--font-weight-regular)',
         fontSize:        'var(--font-size-body-sm)',
-        lineHeight:      '18px',
+        lineHeight:      'var(--line-height-body-sm)',
         color:           'var(--neutral-500)',
         overflow:        'hidden',
         textOverflow:    'ellipsis',
@@ -189,7 +189,7 @@ export function ScheduleCard({
             fontFamily:   'var(--font-body)',
             fontWeight:   'var(--font-weight-regular)',
             fontSize:     'var(--font-size-body-sm)',
-            lineHeight:   '18px',
+            lineHeight:   'var(--line-height-body-sm)',
             color:        'var(--neutral-500)',
             overflow:     'hidden',
             textOverflow: 'ellipsis',
@@ -222,7 +222,7 @@ export function ScheduleCard({
               <ConnectorGlyph key={connector.slug} slug={connector.slug} name={connector.name} logoUrl={connector.logoUrl} size={16} />
             ))}
             {connectors.length > MAX_CARD_CONNECTORS && (
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px', color: 'var(--neutral-500)' }}>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-500)' }}>
                 +{connectors.length - MAX_CARD_CONNECTORS}
               </span>
             )}

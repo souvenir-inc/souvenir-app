@@ -48,7 +48,7 @@
   font-family: var(--font-title);
   font-weight: var(--font-weight-regular);
   font-size: var(--font-size-heading-md);
-  line-height: 30px;
+  line-height: var(--line-height-heading-md);
   color: var(--neutral-900);
 }
 
@@ -115,7 +115,7 @@
 .wayText {
   font-family: var(--font-body);
   font-size: var(--font-size-small);
-  line-height: 18px;
+  line-height: var(--line-height-small);
   color: var(--neutral-600);
 }
 

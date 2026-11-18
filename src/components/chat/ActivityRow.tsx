@@ -292,7 +292,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
               style={{
                 marginLeft: 'var(--space-9)', marginTop: 'var(--space-1)', padding: "var(--space-2) var(--space-2-5)",
                 maxHeight: 240, overflowY: "auto",
-                fontSize: 'var(--font-size-body-sm)', lineHeight: 1.5, color: "var(--neutral-600)",
+                fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--leading-normal)', color: "var(--neutral-600)",
                 whiteSpace: "pre-wrap", wordBreak: "break-word",
                 background: "rgba(59,54,50,0.04)", borderRadius: 'var(--radius-md)',
               }}

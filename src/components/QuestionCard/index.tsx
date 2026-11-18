@@ -282,7 +282,7 @@ function InfoCardBody({ options, selected, onSelect }: {
               fontFamily: 'var(--font-body)',
               fontWeight: 'var(--font-weight-semibold)',
               fontSize:   'var(--font-size-body-sm)',
-              lineHeight: '18px',
+              lineHeight: 'var(--line-height-body-sm)',
               color:      'var(--blue-700)',
             }}>
               {opt?.label}
@@ -293,7 +293,7 @@ function InfoCardBody({ options, selected, onSelect }: {
               fontFamily: 'var(--font-body)',
               fontWeight: 'var(--font-weight-regular)',
               fontSize:   'var(--font-size-small)',
-              lineHeight: '17px',
+              lineHeight: 'var(--line-height-small)',
               color:      'var(--neutral-700)',
             }}>
               {opt.description}
@@ -571,7 +571,7 @@ export function QuestionCard(
                   <span style={{
                     fontFamily: 'var(--font-body)',
                     fontSize:   'var(--font-size-caption)',
-                    lineHeight: '14px',
+                    lineHeight: 'var(--line-height-caption)',
                     fontWeight: isCurrent ? 'var(--font-weight-semibold)' : 'var(--font-weight-regular)',
                     color:      isCurrent ? BLUE : isPast ? 'color-mix(in srgb, var(--blue-600) 70%, transparent)' : 'var(--neutral-400)',
                     textAlign:  'center',

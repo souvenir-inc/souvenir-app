@@ -217,7 +217,7 @@ function PricingConfirmationContent() {
             fontFamily: TITLE,
             fontWeight: 'var(--font-weight-regular)',
             fontSize: 'var(--font-size-heading-xl)',
-            lineHeight: '34px',
+            lineHeight: 'var(--line-height-heading-xl)',
             color: C.ink,
             margin: 0,
           }}>

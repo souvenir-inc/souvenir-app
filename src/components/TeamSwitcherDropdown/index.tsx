@@ -138,7 +138,7 @@ function TeamRow({
           fontFamily:     'var(--font-title)',
           fontWeight:     'var(--font-weight-medium)',
           fontSize:       'var(--font-size-body-lg)',
-          lineHeight:     1,
+          lineHeight:     'var(--leading-none)',
           color:          'var(--color-text-on-accent)',
           boxShadow:      'inset 0px 4px 4px color-mix(in srgb, var(--static-black) 25%, transparent), inset 0px -1px 0.4px rgba(18,60,95,0.65)',
         }}

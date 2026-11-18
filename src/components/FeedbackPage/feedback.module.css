@@ -224,7 +224,7 @@
   gap: var(--space-2-5);
   font-family: var(--font-body);
   font-size: var(--font-size-body-sm);
-  line-height: 18px;
+  line-height: var(--line-height-body-sm);
   color: var(--neutral-700);
 }
 

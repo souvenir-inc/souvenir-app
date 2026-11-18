@@ -15,7 +15,7 @@ import { bustConnectorCatalogCache, ConnectorCatalog, createCustomApi, initiateL
 import { Modal } from './SetupModal'
 
 const SPACE = { xs: 4, sm: 6, md: 8, lg: 12, xl: 16, xxl: 24 } as const
-const heading: React.CSSProperties = { margin: 0, color: 'var(--neutral-900)', fontFamily: 'var(--font-title)', fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-regular)', lineHeight: 1.2 }
+const heading: React.CSSProperties = { margin: 0, color: 'var(--neutral-900)', fontFamily: 'var(--font-title)', fontSize: 'var(--font-size-heading-md)', fontWeight: 'var(--font-weight-regular)', lineHeight: 'var(--leading-tight)' }
 const muted: React.CSSProperties = { margin: 0, color: 'var(--color-text-muted)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)' }
 const label: React.CSSProperties = { display: 'block', marginBottom: SPACE.sm, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--text-field-label)' }
 const SHADOW_TRIGGER = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--text-field-ring-hover)'

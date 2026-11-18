@@ -415,7 +415,7 @@ export function Chip(
               fontFamily: 'var(--font-body)',
               fontWeight: 'var(--font-weight-medium)',
               fontSize:   'var(--font-size-body)',
-              lineHeight: 1,
+              lineHeight: 'var(--leading-none)',
               color:      'var(--chip-text)',
               whiteSpace: 'nowrap',
             }}>

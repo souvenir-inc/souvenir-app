@@ -28,7 +28,7 @@ export function DiffLine({ ref, children, variant, className, style, ...props }:
       padding:       'var(--space-1) 0 var(--space-1) var(--space-2-5)',
       fontFamily:    'var(--font-body)',
       fontSize:      'var(--font-size-body)',
-      lineHeight:    1.5,
+      lineHeight:    'var(--leading-normal)',
       borderLeft:    '2px solid transparent',
       transition:    'background-color var(--duration-fast) ease, border-color var(--duration-fast) ease',
     }

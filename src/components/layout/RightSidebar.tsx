@@ -549,7 +549,7 @@ function RightSidebarImpl() {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-5) var(--space-5) var(--space-4)" }}>
-                <p style={{ margin: 0, fontFamily: "var(--font-title)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-sm)', lineHeight: "26px", color: "var(--neutral-900)" }}>
+                <p style={{ margin: 0, fontFamily: "var(--font-title)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-sm)', lineHeight: 'var(--line-height-heading-sm)', color: "var(--neutral-900)" }}>
                   Delete folder
                 </p>
                 <IconButton
@@ -623,7 +623,7 @@ function RightSidebarImpl() {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-5) var(--space-5) var(--space-4)" }}>
-                <p style={{ margin: 0, fontFamily: "var(--font-title)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-sm)', lineHeight: "26px", color: "var(--neutral-900)" }}>
+                <p style={{ margin: 0, fontFamily: "var(--font-title)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-sm)', lineHeight: 'var(--line-height-heading-sm)', color: "var(--neutral-900)" }}>
                   Rename folder
                 </p>
                 <IconButton
@@ -706,7 +706,7 @@ function RightSidebarImpl() {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-5) var(--space-5) var(--space-4)" }}>
-                <p style={{ margin: 0, fontFamily: "var(--font-title)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-sm)', lineHeight: "26px", color: "var(--neutral-900)" }}>
+                <p style={{ margin: 0, fontFamily: "var(--font-title)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-sm)', lineHeight: 'var(--line-height-heading-sm)', color: "var(--neutral-900)" }}>
                   New folder
                 </p>
                 <IconButton

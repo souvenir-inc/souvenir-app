@@ -240,7 +240,7 @@ function TabCount({ count, active, small }: { count: number | string; active: bo
           fontFamily:         'var(--font-body)',
           fontSize:           small ? 10 : 12,
           fontWeight:         small ? 500 : 600,
-          lineHeight:         1,
+          lineHeight:         'var(--leading-none)',
           fontVariantNumeric: 'tabular-nums',
           backgroundColor:    dark ? 'var(--neutral-900)' : 'var(--neutral-200)',
           color:              dark ? 'var(--neutral-50)' : 'var(--neutral-600)',

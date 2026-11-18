@@ -63,7 +63,7 @@ function AvatarStack({ members, count }: { members: InvitedMember[]; count: numb
                 // eslint-disable-next-line @next/next/no-img-element -- external member avatar, arbitrary host
                 <img src={m.image} alt={m.name || m.email} width={24} height={24} style={{ objectFit: "cover", display: "block" }} />
               ) : (
-                <span style={{ fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', color: "var(--static-white)", lineHeight: 1 }}>
+                <span style={{ fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', color: "var(--static-white)", lineHeight: 'var(--leading-none)' }}>
                   {initials.slice(0, 2)}
                 </span>
               )}

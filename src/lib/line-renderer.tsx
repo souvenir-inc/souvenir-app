@@ -476,7 +476,7 @@ function parseBlocks(content: string, sourceOffset = 0): Block[] {
 const TEXT: React.CSSProperties = {
   fontFamily: "var(--font-body)",
   fontSize: "16px",
-  lineHeight: "26px",
+  lineHeight: 'var(--line-height-heading-md)',
   color: "var(--neutral-800)",
   margin: 0,
   wordBreak: "break-word",
@@ -486,7 +486,7 @@ const TEXT: React.CSSProperties = {
 const REASONING_TEXT: React.CSSProperties = {
   ...TEXT,
   fontSize: "14px",
-  lineHeight: "22px",
+  lineHeight: 'var(--line-height-body)',
   color: "var(--neutral-700)",
 }
 
@@ -546,7 +546,7 @@ export function LineRenderer({ content, webCitations, highlights, sourceOffset =
               ...textStyle,
               fontWeight: 600,
               fontSize: HEADING_SIZE[block.level],
-              lineHeight: "30px",
+              lineHeight: 'var(--line-height-heading)',
               color: "var(--neutral-900)",
               margin: "8px 0 2px",
             }}
@@ -588,7 +588,7 @@ export function LineRenderer({ content, webCitations, highlights, sourceOffset =
                 width: "100%",
                 borderCollapse: "collapse",
                 fontSize: "14px",
-                lineHeight: "22px",
+                lineHeight: 'var(--line-height-body)',
                 fontFamily: "var(--font-body)",
               }}
             >

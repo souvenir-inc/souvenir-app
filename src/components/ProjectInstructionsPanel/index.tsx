@@ -74,7 +74,7 @@ export function ProjectInstructionsPanel({ value, editable, onOpenEditor, ref }:
 
       {/* Body — preview only; editing always happens in SystemInstructionsModal. */}
       {isEmpty ? (
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: '18px', color: 'var(--neutral-600)', margin: 0 }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-600)', margin: 0 }}>
           {editable
             ? 'Tell the agent how to work in this project: tone, format, what to focus on or avoid.'
             : 'No instructions yet.'}

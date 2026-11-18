@@ -289,7 +289,7 @@ export function ModelFeaturedCard({
               fontFamily:  'var(--font-title)',
               fontWeight:  'var(--font-weight-regular)',
               fontSize:    'var(--font-size-heading-xl)',
-              lineHeight:  '34px',
+              lineHeight:  'var(--line-height-heading-xl)',
               color:       titleColor,
               margin:      0,
               width:       '100%',

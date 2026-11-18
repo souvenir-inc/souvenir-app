@@ -68,7 +68,7 @@ export function ProjectCardBody({ title, description, tags, memberCount, updated
           fontFamily:      'var(--font-body)',
           fontWeight:      'var(--font-weight-regular)',
           fontSize:        'var(--font-size-small)',
-          lineHeight:      '17px',
+          lineHeight:      'var(--line-height-small)',
           color:           'var(--neutral-500)',
           overflow:        'hidden',
           textOverflow:    'ellipsis',

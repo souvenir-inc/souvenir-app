@@ -198,7 +198,7 @@ function PersonRow({ person, onPermissionChange, onRemove }: PersonRowProps) {
               fontSize:   'var(--font-size-body)',
               fontWeight: 'var(--font-weight-semibold)',
               color:      'var(--neutral-600)',
-              lineHeight: 1,
+              lineHeight: 'var(--leading-none)',
               userSelect: 'none',
             }}
           >

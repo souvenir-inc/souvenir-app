@@ -16,7 +16,7 @@
   color: var(--neutral-500);
   font-size: var(--font-size-small);
   font-weight: var(--font-weight-regular);
-  line-height: 18px;
+  line-height: var(--line-height-small);
 }
 
 .row {
@@ -49,7 +49,7 @@
 .date {
   color: var(--color-text-muted);
   font-size: var(--font-size-small);
-  line-height: 18px;
+  line-height: var(--line-height-small);
 }
 
 .visibility {
@@ -65,7 +65,7 @@
   background: var(--neutral-100);
   color: var(--neutral-600);
   font-size: var(--font-size-small);
-  line-height: 18px;
+  line-height: var(--line-height-small);
 }
 
 .pill[data-tone='shared'] {
@@ -79,7 +79,7 @@
   gap: var(--space-1);
   color: var(--neutral-600);
   font-size: var(--font-size-small);
-  line-height: 18px;
+  line-height: var(--line-height-small);
 }
 
 .permissionLabel[data-permission='blocked'] {
@@ -89,7 +89,7 @@
 .warning {
   color: var(--neutral-700);
   font-size: var(--font-size-small);
-  line-height: 18px;
+  line-height: var(--line-height-small);
 }
 
 .action {

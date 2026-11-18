@@ -8,7 +8,7 @@ export const LABEL_STYLE: CSSProperties = {
   fontFamily: 'var(--font-body)',
   fontWeight: 'var(--font-weight-medium)',
   fontSize:   14,
-  lineHeight: '20px',
+  lineHeight: 'var(--line-height-body-sm)',
   color:      'var(--neutral-800)',
 }
 
@@ -16,7 +16,7 @@ export const HINT_STYLE: CSSProperties = {
   margin:     0,
   fontFamily: 'var(--font-body)',
   fontSize:   12,
-  lineHeight: '16px',
+  lineHeight: 'var(--line-height-small)',
   color:      'var(--neutral-600)',
 }
 
@@ -30,7 +30,7 @@ export const INPUT_STYLE: CSSProperties = {
   width:      '100%',
   fontFamily: 'var(--font-body)',
   fontSize:   14,
-  lineHeight: '22px',
+  lineHeight: 'var(--line-height-body)',
   color:      'var(--neutral-900)',
   background: 'transparent',
   border:     'none',
@@ -42,6 +42,6 @@ export const SECTION_TITLE_STYLE: CSSProperties = {
   fontFamily: 'var(--font-title)',
   fontWeight: 400,
   fontSize:   18,
-  lineHeight: '24px',
+  lineHeight: 'var(--line-height-heading-sm)',
   color:      'var(--neutral-900)',
 }

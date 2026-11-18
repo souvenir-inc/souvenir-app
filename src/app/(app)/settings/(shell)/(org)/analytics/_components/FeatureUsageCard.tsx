@@ -157,7 +157,7 @@ function FeatureSplit({ values, total }: { values: Record<FeatureKey, number>; t
               {f.label}
             </span>
             <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 'var(--space-2)' }}>
-              <span style={{ fontFamily: 'var(--font-title)', fontSize: 'var(--font-size-heading-md)', lineHeight: '30px', color: 'var(--neutral-900)', fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontFamily: 'var(--font-title)', fontSize: 'var(--font-size-heading-md)', lineHeight: 'var(--line-height-heading-md)', color: 'var(--neutral-900)', fontVariantNumeric: 'tabular-nums' }}>
                 {values[f.key].toLocaleString()}
               </span>
               <span style={{ ...caption, fontVariantNumeric: 'tabular-nums' }}>{sharePct(values[f.key], total)}</span>
@@ -201,7 +201,7 @@ export function FeatureUsageCard({ orgId, orgTotal, range }: { orgId: string | n
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-5) var(--space-6)' }}>
         {/* The range, not the cycle — everything else in this card is the range, and the
             cycle total is the page's first figure above. */}
-        <p style={{ fontFamily: 'var(--font-title)', fontSize: 'var(--font-size-heading)', lineHeight: '34px', color: 'var(--neutral-900)', margin: 0, fontVariantNumeric: 'tabular-nums' }}>
+        <p style={{ fontFamily: 'var(--font-title)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0, fontVariantNumeric: 'tabular-nums' }}>
           {(breakdown ? orgRangeTotal : orgTotal).toLocaleString()}{' '}
           <span style={{ fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-500)' }}>
             {breakdown ? `credits over ${RANGE_CAPTION[range]}` : 'credits this cycle'}

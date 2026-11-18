@@ -44,7 +44,7 @@
   font-family: var(--font-body);
   font-weight: var(--font-weight-regular);
   font-size: var(--font-size-body-sm);
-  line-height: 1.4;
+  line-height: var(--leading-snug);
   color: var(--neutral-500);
 }
 
@@ -56,7 +56,7 @@
   margin: var(--space-1-5) 0 0;
   font-family: var(--font-body);
   font-size: var(--font-size-body-sm);
-  line-height: 1.4;
+  line-height: var(--leading-snug);
   color: var(--color-tag-Yellow-text);
 }
 
@@ -72,7 +72,7 @@
   margin: var(--space-4) 0 0;
   font-family: var(--font-body);
   font-size: var(--font-size-body-sm);
-  line-height: 1.4;
+  line-height: var(--leading-snug);
   color: var(--neutral-600);
 }
 

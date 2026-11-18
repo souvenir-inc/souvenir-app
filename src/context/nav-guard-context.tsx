@@ -214,7 +214,7 @@ export function NavGuardModal() {
       >
         <div>
           <DialogTitle>{message.title}</DialogTitle>
-          <DialogDescription style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: '8px 0 0' }}>
+          <DialogDescription style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: '8px 0 0' }}>
             {message.description}
           </DialogDescription>
         </div>

@@ -736,7 +736,22 @@ Result: z-index wired 21.7% → **94.5%** (3 left, all in the out-of-scope old `
 
 Checks: 21 screens × light/dark show no visual change; tsc clean; unit suite the same 13 pre-existing failures (one snapshot recorded the removed `var(--purple-500, #8b5cf6)` fallback and was updated). Modal shadows were not on screen in the screenshot set; open one or two dialogs to judge the snap.
 
-Left on purpose (needs a design call, not a token): focus halos (`0 0 0 3px` in projects/new, EditProjectModal, Slack); drawer edge shadows `4px 0 24px` (FlatSidebar, SettingsSidebar); danger ring `rgba(238,48,48,.22)`; the onboarding plan-card emboss/glow and `ModelFeaturedCard` gold glow; small `0 1px 2px` card shadows (Slack, GeneratedFilesList, EffortSlider) that would get visibly heavier on `--shadow-soft`. **Proposed exemption (like D7):** the `CodeBlock` syntax palette (light + One Dark) and `XmlWeather` illustration colours are content colours, not UI.
+Left on purpose (needs a design call, not a token): focus halos (`0 0 0 3px` in projects/new, EditProjectModal, Slack); drawer edge shadows `4px 0 24px` (FlatSidebar, SettingsSidebar); danger ring `rgba(238,48,48,.22)`; the onboarding plan-card emboss/glow and `ModelFeaturedCard` gold glow; small `0 1px 2px` card shadows (Slack, GeneratedFilesList, EffortSlider) that would get visibly heavier on `--shadow-soft`. **Exemption (approved 2026-11-18, like D7):** the `CodeBlock` syntax palette (light + One Dark) and `XmlWeather` illustration colours are content colours, not UI. `ds-scan` doesn't count their colours (`CONTENT_COLOUR_FILE`); their spacing and type still count. Hex 192 → 132.
+
+### Leftovers 3 — line heights: 2026-11-18 (branch `ds/phase-6-line-heights`)
+
+**New tokens:** a unitless `--leading-*` scale for text whose size is inherited or varies (`none` 1, `tight` 1.25, `snug` 1.375, `normal` 1.5, `loose` 2). These are Tailwind's own `leading-*` values, mapped in `@theme`, so the classes and inline styles agree.
+
+**Codemod** `scripts/codemods/line-heights.mjs` (any object, typed or not; skips chart geometry):
+
+| Pass | Rule | Values | Screens |
+|---|---|---|---|
+| 1 exact | on-scale px → `--line-height-*`; unitless 1 / 1.5 / 2 … → `--leading-*` | 48 | no change |
+| 2 `--snap` | off-scale px → the line height paired with the element's font-size token if within 4px (13px text at 18px → `--line-height-body-sm` 20px; 12px text at 18px → 16px); otherwise the nearest step within 2px, ties round up. Unitless within 0.08 → nearest `--leading-*` (1.3 → 1.25, 1.4 → 1.375) | 109 px + 18 unitless | 10 screens × light/dark shifted (agents 0.3%, connectors 5%): 1–2px per text row that adds up down a card (account settings ≈6px by the last row). Reviewed and accepted |
+
+`18px` was the main case (57 sites). It sits exactly between the 16 and 20 steps, so the earlier `--snap` passes left it; pairing with the font-size token settles it, matching the scale's own size/line-height pairs.
+
+Result: typography literals 503 → 345; total style values wired 89.9% → **91.1%**. tsc clean; unit suite the same 13 pre-existing failures (one assertion and one snapshot recorded `22px`, now `var(--line-height-body)`, the same value). What's left in typography is mostly line heights more than 2px from any step (11–12px badges, 26px, 0.9) and font-size/weight literals in skipped files.
 
 ---
 
