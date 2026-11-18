@@ -40,7 +40,24 @@ export type CardProps = React.HTMLAttributes<HTMLElement> &
 
 export function Card({ as = 'div', variant, padding, className, ref, ...props }: CardProps) {
   const Comp = as as React.ElementType
-  return <Comp ref={ref} className={cn(cardVariants({ variant, padding }), className)} {...props} />
+  // A clickable card looks like a control, so it must work like one: reachable with Tab
+  // and activated with Enter or Space, as a native button would be. Callers can still
+  // set their own role, tabIndex or key handling.
+  const actionable = variant === 'interactive' && props.onClick
+    ? {
+        role: props.role ?? 'button',
+        tabIndex: props.tabIndex ?? 0,
+        onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
+          props.onKeyDown?.(e)
+          if (e.defaultPrevented || e.target !== e.currentTarget) return
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            e.currentTarget.click()
+          }
+        },
+      }
+    : {}
+  return <Comp ref={ref} className={cn(cardVariants({ variant, padding }), className)} {...props} {...actionable} />
 }
 
 type SectionProps = React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }

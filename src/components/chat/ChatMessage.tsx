@@ -2,7 +2,7 @@
 
 import { LibraryCitationsProvider } from "@/components/Library/chat/library-citations";
 import { messageCopyText } from "@/lib/copy-text";
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { AnimatePresence, m, useReducedMotion } from "framer-motion";
 import { ReasoningBlock } from "./ReasoningBlock";
 import { BreathingDot } from "@/components/BreathingDot";
@@ -231,8 +231,8 @@ export function ChatMessage({
   // Work renders as reasoning blocks when the turn reasoned and reasoning is
   // shown; otherwise only its tool rows show, as the plain activities list.
   const tracesReasoning = showReasoning && Boolean(message.thinking);
-  // The stretch of answer still being revealed: completion waits on it.
-  const lastText = parts.findLast((part) => part.kind === "text")?.content ?? "";
+  // Every stretch of answer text: completion waits until each has been revealed.
+  const textParts = parts.filter((part) => part.kind === "text");
 
   // Whether the answer text reveals progressively. Decided while the message
   // is still empty so it can't flip part-way through a reveal.
@@ -243,9 +243,16 @@ export function ChatMessage({
   // The answer is complete on screen: the stream is over and the reveal has
   // caught up (or was frozen by Stop). Completion UI — actions, sources,
   // the error notice, aria-busy — waits for this rather than the stream.
-  const [caughtUpText, setCaughtUpText] = useState<string | null>(null);
+  // Tracked per stretch, by id, with the text it caught up to. One shared value let
+  // an earlier stretch that reported again (its text re-derived when the reply
+  // settled) overwrite the last stretch's report, leaving the reply "busy" for good.
+  const [caughtUp, setCaughtUp] = useState<Readonly<Record<string, string>>>({});
+  const reportCaughtUp = useCallback((partId: string, content: string) => {
+    setCaughtUp((prev) => (prev[partId] === content ? prev : { ...prev, [partId]: content }));
+  }, []);
   const revealSettled = !message.isLoading &&
-    (!animateText || Boolean(message.stoppedByUser) || !lastText || caughtUpText === lastText);
+    (!animateText || Boolean(message.stoppedByUser) ||
+      textParts.every((part) => !part.content || caughtUp[part.id] === part.content));
 
   const onRevealSettledRef = useRef(onRevealSettled);
   const revealReportedRef = useRef(false);
@@ -379,7 +386,7 @@ export function ChatMessage({
                   animate={animateText}
                   isLoading={isLastPart && !!message.isLoading}
                   stopped={!!message.stoppedByUser}
-                  onCaughtUp={setCaughtUpText}
+                  onCaughtUp={(content) => reportCaughtUp(part.id, content)}
                 />
               );
             }

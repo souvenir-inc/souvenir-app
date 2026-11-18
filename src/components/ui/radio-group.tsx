@@ -3,7 +3,7 @@
 import React from 'react'
 import { RadioGroup as RadioGroupPrimitive } from '@base-ui/react/radio-group'
 import { Radio } from '@base-ui/react/radio'
-import { cn } from '@/lib/utils'
+import { cn, cnState } from '@/lib/utils'
 
 // RadioGroup: pick exactly one. Base UI gives the radiogroup role, roving focus and arrow-key
 // selection. The dot uses the Checkbox tokens (16px, same on/off fills and shadows) so the two read
@@ -24,14 +24,16 @@ export type RadioGroupProps<T extends string> = Omit<React.ComponentPropsWithout
 export function RadioGroup<T extends string>({ orientation = 'vertical', className, onValueChange, ...props }: RadioGroupProps<T>) {
   return (
     <RadioGroupPrimitive
-      className={cn('flex', orientation === 'vertical' ? 'flex-col gap-3' : 'flex-row flex-wrap gap-4', className)}
+      className={cnState(cn('flex', orientation === 'vertical' ? 'flex-col gap-3' : 'flex-row flex-wrap gap-4'), className)}
       onValueChange={(v) => onValueChange?.(v as T)}
       {...props}
     />
   )
 }
 
-export interface RadioItemProps extends Omit<React.ComponentPropsWithoutRef<typeof Radio.Root>, 'children'> {
+export interface RadioItemProps extends Omit<React.ComponentPropsWithoutRef<typeof Radio.Root>, 'children' | 'className'> {
+  /** Classes for the row (the label around the radio and its text). */
+  className?: string
   value: string
   label: React.ReactNode
   /** Second line under the label. */

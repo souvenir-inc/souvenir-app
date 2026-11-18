@@ -4,7 +4,7 @@ import React from 'react'
 import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible'
 import { Accordion as AccordionPrimitive } from '@base-ui/react/accordion'
 import { ArrowDownOneIcon } from '@strange-huge/icons'
-import { cn } from '@/lib/utils'
+import { cn, cnState } from '@/lib/utils'
 
 // Collapsible: a section that opens and closes (show more, advanced options, a reasoning trace).
 // Accordion: a set of them where opening one can close the others. Base UI supplies aria-expanded,
@@ -33,7 +33,7 @@ export interface TriggerProps extends React.ComponentPropsWithoutRef<typeof Coll
 
 export function CollapsibleTrigger({ chevron = true, className, children, ...props }: TriggerProps) {
   return (
-    <CollapsiblePrimitive.Trigger className={cn(triggerClass, className)} {...props}>
+    <CollapsiblePrimitive.Trigger className={cnState(triggerClass, className)} {...props}>
       {children}
       {chevron && <ArrowDownOneIcon size={14} className={chevronClass} />}
     </CollapsiblePrimitive.Trigger>
@@ -43,11 +43,10 @@ export function CollapsibleTrigger({ chevron = true, className, children, ...pro
 export function CollapsiblePanel({ className, ...props }: React.ComponentPropsWithoutRef<typeof CollapsiblePrimitive.Panel>) {
   return (
     <CollapsiblePrimitive.Panel
-      className={cn(
+      className={cnState(cn(
         'overflow-hidden h-[var(--collapsible-panel-height)] transition-[height] duration-base ease-standard',
         'data-[starting-style]:h-0 data-[ending-style]:h-0',
-        className,
-      )}
+      ), className)}
       {...props}
     />
   )
@@ -59,7 +58,7 @@ export const AccordionItem = AccordionPrimitive.Item
 export function AccordionTrigger({ chevron = true, className, children, ...props }: React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> & { chevron?: boolean }) {
   return (
     <AccordionPrimitive.Header className="m-0">
-      <AccordionPrimitive.Trigger className={cn(triggerClass, 'w-full justify-between py-2', className)} {...props}>
+      <AccordionPrimitive.Trigger className={cnState(cn(triggerClass, 'w-full justify-between py-2'), className)} {...props}>
         {children}
         {chevron && <ArrowDownOneIcon size={14} className={chevronClass} />}
       </AccordionPrimitive.Trigger>
@@ -70,11 +69,10 @@ export function AccordionTrigger({ chevron = true, className, children, ...props
 export function AccordionPanel({ className, ...props }: React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Panel>) {
   return (
     <AccordionPrimitive.Panel
-      className={cn(
+      className={cnState(cn(
         'overflow-hidden h-[var(--accordion-panel-height)] transition-[height] duration-base ease-standard',
         'data-[starting-style]:h-0 data-[ending-style]:h-0',
-        className,
-      )}
+      ), className)}
       {...props}
     />
   )
