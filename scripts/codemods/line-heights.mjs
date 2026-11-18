@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * Line-height pass.
  *
@@ -16,6 +15,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const args = process.argv.slice(2);
@@ -75,7 +75,7 @@ function mapValue(raw, block, counter) {
 }
 
 const keep = (src, off) => { const e = src.indexOf("\n", off); return src.slice(off, e < 0 ? undefined : e).includes("ds-keep"); };
-function transform(src, isCss, counter) {
+export function transform(src, isCss, counter) {
   // A value ends where the next non-space character is `,` or `}`; a newline alone does not
   // end it, or `lineHeight: 1.5` followed by `* scale` on the next line would be split.
   const re = isCss ? /(line-height\s*:\s*)([^;{}]+)(;)/g : /(\blineHeight\s*:\s*)('[^']*'|"[^"]*"|-?[\d.]+)(?=\s*[,}])/g;
@@ -105,6 +105,7 @@ const SKIP = [
   /src\/components\/chat\/(AnimatedBarChart|XmlChart\w*|Sparkline)\.tsx$/,
   /UsageBarChart/,
 ];
+function main() {
 const files = [];
 const walk = (p) => {
   const norm = p.split(path.sep).join("/");
@@ -128,3 +129,7 @@ for (const file of files) {
   }
 }
 console.log(`${dry ? "[dry] " : ""}exact ${total.exact} · unitless→leading ${total.unitless} · snapped ${total.snapped}`);
+}
+
+// Run only when executed directly, so tests can import transform().
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
