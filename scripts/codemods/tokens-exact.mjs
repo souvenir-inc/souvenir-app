@@ -14,6 +14,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const SPACE = { 2: "--space-0-5", 4: "--space-1", 6: "--space-1-5", 8: "--space-2", 10: "--space-2-5", 12: "--space-3", 16: "--space-4", 20: "--space-5", 24: "--space-6", 32: "--space-7", 40: "--space-8", 48: "--space-9", 64: "--space-10" };
 const RADIUS = { 4: "--radius-xs", 6: "--radius-sm", 8: "--radius-md", 10: "--radius-lg", 12: "--radius-xl", 16: "--radius-2xl", 999: "--radius-full", 9999: "--radius-full" };
@@ -100,21 +101,51 @@ function replaceValue(prop, raw) {
   return null;
 }
 
+// ── Strings and comments ────────────────────────────────────────────────────
+
+/**
+ * 1 for every character inside a string or a comment, 0 for code. Text there can look like a
+ * declaration (`content: 'padding: 16'`, `// style={{`) and must never be rewritten.
+ * In TS/TSX a quote right after a letter or digit is JSX text (`Don't`), not a string; a
+ * misread only ever skips a conversion. '/" strings end at a newline, templates at their `.
+ */
+export function codeMask(src, { css = false } = {}) {
+  const mask = new Uint8Array(src.length);
+  for (let i = 0; i < src.length; i++) {
+    const c = src[i];
+    const n = src[i + 1];
+    let end = -1;
+    if (c === "/" && n === "*") {
+      end = src.indexOf("*/", i + 2);
+      end = end < 0 ? src.length - 1 : end + 1;
+    } else if (!css && c === "/" && n === "/") {
+      end = src.indexOf("\n", i);
+      end = end < 0 ? src.length - 1 : end - 1;
+    } else if (c === "'" || c === '"' || (!css && c === "`")) {
+      if (!css && c !== "`" && /[A-Za-z0-9]/.test(src[i - 1] ?? "")) continue;
+      let j = i + 1;
+      while (j < src.length && src[j] !== c && (c === "`" || src[j] !== "\n")) j += src[j] === "\\" ? 2 : 1;
+      end = Math.min(j, src.length - 1);
+    }
+    if (end >= i) {
+      mask.fill(1, i, end + 1);
+      i = end;
+    }
+  }
+  return mask;
+}
+
 // ── TSX ─────────────────────────────────────────────────────────────────────
 
 /** Brace depth at each index of `body` (which starts with the object's own `{`), strings skipped. */
 function depthMap(body) {
   const depth = new Array(body.length).fill(0);
+  const masked = codeMask(body);
   let d = 0;
   for (let j = 0; j < body.length; j++) {
+    // Inside a string or comment: never a property, and its braces do not count.
+    if (masked[j]) { depth[j] = -1; continue; }
     const c = body[j];
-    if (c === "'" || c === '"' || c === "`") {
-      const end = body.indexOf(c, j + 1);
-      const stop = end < 0 ? body.length - 1 : end;
-      for (let k = j; k <= stop; k++) depth[k] = d;
-      j = stop;
-      continue;
-    }
     if (c === "{") d++;
     depth[j] = d;
     if (c === "}") d--;
@@ -161,11 +192,13 @@ function matchBrace(s, i) {
   return -1;
 }
 
-function transformTsx(source, counter) {
+export function transformTsx(source, counter) {
+  const masked = codeMask(source);
   const starts = [];
-  for (const m of source.matchAll(/style=\{\{/g)) starts.push(m.index + "style={".length);
-  for (const m of source.matchAll(/:\s*(?:React\.)?CSSProperties\s*=\s*\{/g)) starts.push(m.index + m[0].length - 1);
-  for (const m of source.matchAll(/as (?:React\.)?CSSProperties/g)) {
+  for (const m of source.matchAll(/style=\{\{/g)) if (!masked[m.index]) starts.push(m.index + "style={".length);
+  for (const m of source.matchAll(/:\s*(?:React\.)?CSSProperties\s*=\s*\{/g)) if (!masked[m.index]) starts.push(m.index + m[0].length - 1);
+  for (const m of source.matchAll(/\bas (?:React\.)?CSSProperties\b/g)) {
+    if (masked[m.index]) continue;
     // `{ … } as React.CSSProperties`: walk back to the object's opening brace — but only
     // when an object literal is what is being cast. `style as CSSProperties` or a call
     // would otherwise send the walk back to some unrelated earlier object.
@@ -194,9 +227,10 @@ function transformTsx(source, counter) {
 
 // ── CSS ─────────────────────────────────────────────────────────────────────
 
-function transformCss(source, counter) {
-  return source.replace(/(^|[;{\s])([a-z-]+)(\s*:\s*)([^;{}]+)(;)/g, (whole, pre, prop, sep, val, semi) => {
-    if (prop.startsWith("--")) return whole;
+export function transformCss(source, counter) {
+  const masked = codeMask(source, { css: true });
+  return source.replace(/(^|[;{\s])([a-z-]+)(\s*:\s*)([^;{}]+)(;)/g, (whole, pre, prop, sep, val, semi, offset) => {
+    if (prop.startsWith("--") || masked[offset + pre.length]) return whole;
     const important = /\s*!important\s*$/.test(val) ? " !important" : "";
     const next = replaceValue(prop, val.replace(/\s*!important\s*$/, ""));
     if (!next) return whole;
@@ -207,6 +241,7 @@ function transformCss(source, counter) {
 
 // ── CLI ─────────────────────────────────────────────────────────────────────
 
+function main() {
 const args = process.argv.slice(2);
 const dry = args.includes("--dry");
 const files = [];
@@ -247,3 +282,6 @@ for (const file of files) {
   }
 }
 console.log(`${dry ? "[dry] " : ""}${total} values replaced in ${files.length} files scanned`);
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
