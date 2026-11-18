@@ -259,7 +259,7 @@ function PlaygroundContent() {
             ))}
           </div>
           <p style={captionText}>
-            “Send a live arrival” adds a run that finished just now: expect the bell to ring, the red badge to pop and count up, and a toast with <em>View</em>.
+            “Send a live arrival” adds a run that finished just now: expect the bell to ring and the red badge to pop and count up.
             Send two quickly to see them bundle into one row.
           </p>
         </Card>
@@ -344,7 +344,6 @@ function PlaygroundContent() {
             <li>Connector / credits / access requests → /connectors, Plans & billing, Members.</li>
             <li>Hover a row → mark read/unread and dismiss; “Mark all as read” and dismiss each offer Undo.</li>
             <li>Unread tab: reading a row dims it in place; it leaves when you switch tabs.</li>
-            <li>“Send a live arrival” with the panel closed → toast with View; with the panel open → no toast.</li>
             <li>Simulated outage → the card on /agents and in the chat Agents panel go grey with the reason.</li>
             <li>Dark mode, and a narrow window: the panel never runs off-screen.</li>
           </ol>
