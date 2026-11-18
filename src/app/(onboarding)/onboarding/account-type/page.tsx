@@ -70,11 +70,11 @@ function OptionCard({
         minHeight: 158,
         display: "flex",
         flexDirection: "column",
-        gap: 9,
+        gap: 'var(--space-2)',
         alignItems: "flex-start",
         textAlign: "left",
-        padding: 12,
-        borderRadius: 12,
+        padding: 'var(--space-3)',
+        borderRadius: 'var(--radius-xl)',
         backgroundColor: "var(--neutral-white)",
         border: "none",
         cursor: "pointer",
@@ -82,7 +82,7 @@ function OptionCard({
         boxShadow: selected
           ? "0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 2px var(--neutral-900,#26211e)"
           : "0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
-        transition: "box-shadow 120ms",
+        transition: "box-shadow var(--duration-fast)",
       }}
     >
       {/* Badge (top-right) */}
@@ -91,14 +91,14 @@ function OptionCard({
       )}
 
       {/* Header: icon + title */}
-      <div style={{ display: "flex", gap: 9, alignItems: "center" }}>
+      <div style={{ display: "flex", gap: 'var(--space-2)', alignItems: "center" }}>
         <span
           style={{
             position: "relative",
             width: 44,
             height: 44,
             flexShrink: 0,
-            borderRadius: 8,
+            borderRadius: 'var(--radius-md)',
             backgroundColor: config.iconBg,
             color: config.iconColor,
             display: "flex",
@@ -112,9 +112,9 @@ function OptionCard({
         <span
           style={{
             fontFamily: "var(--font-title)",
-            fontWeight: 400,
-            fontSize: 24,
-            lineHeight: "32px",
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: 'var(--font-size-heading)',
+            lineHeight: "var(--line-height-heading)",
             color: "var(--neutral-600,#6a625d)",
             whiteSpace: "nowrap",
           }}
@@ -127,9 +127,9 @@ function OptionCard({
       <span
         style={{
           fontFamily: "var(--font-body)",
-          fontWeight: 400,
-          fontSize: 14,
-          lineHeight: "22px",
+          fontWeight: 'var(--font-weight-regular)',
+          fontSize: 'var(--font-size-body)',
+          lineHeight: "var(--line-height-body)",
           color: "var(--neutral-600,#6a625d)",
         }}
       >
@@ -183,7 +183,7 @@ export default function OnboardingAccountTypePage() {
         />
       }
     >
-      <div style={{ display: "flex", gap: 20 }}>
+      <div style={{ display: "flex", gap: 'var(--space-5)' }}>
         {OPTIONS.map((opt) => (
           <OptionCard
             key={opt.value}

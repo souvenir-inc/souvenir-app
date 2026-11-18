@@ -28,9 +28,9 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
     <p
       style={{
         fontFamily: "var(--font-body)",
-        fontWeight: 400,
-        fontSize: 14,
-        lineHeight: "22px",
+        fontWeight: 'var(--font-weight-regular)',
+        fontSize: 'var(--font-size-body)',
+        lineHeight: "var(--line-height-body)",
         color: "var(--neutral-700,#524b47)",
         margin: 0,
       }}
@@ -63,10 +63,10 @@ function RoleSelect({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: 8,
+            gap: 'var(--space-2)',
             width: "100%",
-            padding: "7px 10px",
-            borderRadius: 10,
+            padding: "var(--space-1-5) var(--space-2-5)",
+            borderRadius: 'var(--radius-lg)',
             border: "none",
             backgroundColor: "var(--text-field-bg)",
             boxShadow:
@@ -78,9 +78,9 @@ function RoleSelect({
           <span
             style={{
               fontFamily: "var(--font-body)",
-              fontWeight: 400,
-              fontSize: 14,
-              lineHeight: "22px",
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: 'var(--font-size-body)',
+              lineHeight: "var(--line-height-body)",
               color: value ? "var(--text-field-text,#26211e)" : "var(--text-field-placeholder,#9c938b)",
             }}
           >
@@ -192,9 +192,9 @@ export default function OnboardingHelloPage() {
         />
       }
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-4)' }}>
         {/* Name row */}
-        <div style={{ display: "flex", gap: 16 }}>
+        <div style={{ display: "flex", gap: 'var(--space-4)' }}>
           <InputField label="First name" placeholder="First name" value={data.firstName} onChange={setFirstName} fluid />
           <InputField label="Last name" placeholder="Last name" value={data.lastName} onChange={setLastName} fluid />
         </div>
@@ -209,7 +209,7 @@ export default function OnboardingHelloPage() {
         />
 
         {/* Role */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)' }}>
           <FieldLabel>Let&apos;s understand your role so we can update you accordingly</FieldLabel>
           <RoleSelect value={data.role} onChange={setRole} />
         </div>

@@ -99,7 +99,7 @@ export function PillSelect<T extends string>({
           color:           'var(--neutral-700,#524b47)',
         }}
       >
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, overflow: 'hidden' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', minWidth: 0, overflow: 'hidden' }}>
           {icons?.[value]}
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value}</span>
         </span>
@@ -144,7 +144,7 @@ export function PillSelect<T extends string>({
               — a single, first-pass-then-stretch computation with no
               percentage-of-indeterminate-ancestor step, so the item's right
               edge lands exactly on the container's own edge. */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: OPTION_ROW_GAP, padding: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: OPTION_ROW_GAP, padding: 'var(--space-2)' }}>
             {options.map(option => (
               <Dropdown.Item
                 key={option}

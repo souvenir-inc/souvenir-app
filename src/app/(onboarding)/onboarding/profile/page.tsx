@@ -66,10 +66,10 @@ function RoleSelect({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: 8,
+            gap: 'var(--space-2)',
             width: "100%",
-            padding: "7px 10px",
-            borderRadius: 10,
+            padding: "var(--space-1-5) var(--space-2-5)",
+            borderRadius: 'var(--radius-lg)',
             border: "none",
             backgroundColor: "#ffffff",
             boxShadow: "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
@@ -80,9 +80,9 @@ function RoleSelect({
           <span
             style={{
               fontFamily: "var(--font-body)",
-              fontWeight: 400,
-              fontSize: 14,
-              lineHeight: "16px",
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: 'var(--font-size-body)',
+              lineHeight: "var(--line-height-small)",
               color: value ? "var(--neutral-900,#26211e)" : "var(--neutral-400,#9c938b)",
             }}
           >
@@ -143,10 +143,10 @@ function ToneSelect({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: 8,
+            gap: 'var(--space-2)',
             width: "100%",
-            padding: "7px 10px",
-            borderRadius: 10,
+            padding: "var(--space-1-5) var(--space-2-5)",
+            borderRadius: 'var(--radius-lg)',
             border: "none",
             backgroundColor: "#ffffff",
             boxShadow: "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
@@ -157,9 +157,9 @@ function ToneSelect({
           <span
             style={{
               fontFamily: "var(--font-body)",
-              fontWeight: 400,
-              fontSize: 14,
-              lineHeight: "16px",
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: 'var(--font-size-body)',
+              lineHeight: "var(--line-height-small)",
               color: value ? "var(--neutral-900,#26211e)" : "var(--neutral-400,#9c938b)",
             }}
           >
@@ -250,8 +250,8 @@ export default function OnboardingProfilePage() {
     <StepCanvas>
       <StepHeader total={3} activeIndex={1} title="Create your profile" />
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 20, width: "100%", padding: "24px 0 0" }}>
-        <div style={{ display: "flex", gap: 20 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-5)', width: "100%", padding: "var(--space-6) 0 0" }}>
+        <div style={{ display: "flex", gap: 'var(--space-5)' }}>
           <TextField
             label="First name"
             required
@@ -272,12 +272,12 @@ export default function OnboardingProfilePage() {
           />
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)' }}>
           <FieldLabel>Role</FieldLabel>
           <RoleSelect value={data.role} onChange={setRole} />
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)' }}>
           <FieldLabel>How should your AI sound?</FieldLabel>
           <ToneSelect value={data.tone} onChange={setTone} />
         </div>

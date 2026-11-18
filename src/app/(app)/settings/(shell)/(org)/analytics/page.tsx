@@ -16,11 +16,11 @@ import { useOrgIdentity } from '@/context/org-context'
 
 // Data: use-org-usage.ts (lib/analytics/org-usage.ts derives every number).
 
-const kpiLabel: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: '20px', color: 'var(--neutral-600)' }
-const kpiValue: React.CSSProperties = { fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 26, lineHeight: '34px', color: 'var(--neutral-900)', margin: 0, fontVariantNumeric: 'tabular-nums' }
-const kpiHint: React.CSSProperties = { fontFamily: 'var(--font-body)', fontSize: 12, lineHeight: '16px', color: 'var(--neutral-500)', margin: 0 }
-const planPill: React.CSSProperties = { flexShrink: 0, padding: '1px 8px', borderRadius: 999, backgroundColor: 'var(--neutral-100)', boxShadow: 'inset 0 0 0 1px var(--border-default)', fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 12, lineHeight: '20px', color: 'var(--neutral-700)', whiteSpace: 'nowrap' }
-const kpiTile: React.CSSProperties = { minWidth: 0, backgroundColor: 'var(--neutral-white)', borderRadius: 12, boxShadow: 'var(--shadow-surface-card)', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 6 }
+const kpiLabel: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 'var(--space-1)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-600)' }
+const kpiValue: React.CSSProperties = { fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: '34px', color: 'var(--neutral-900)', margin: 0, fontVariantNumeric: 'tabular-nums' }
+const kpiHint: React.CSSProperties = { fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)', margin: 0 }
+const planPill: React.CSSProperties = { flexShrink: 0, padding: 'var(--space-0-5) var(--space-2)', borderRadius: 'var(--radius-full)', backgroundColor: 'var(--neutral-100)', boxShadow: 'inset 0 0 0 1px var(--border-default)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-700)', whiteSpace: 'nowrap' }
+const kpiTile: React.CSSProperties = { minWidth: 0, backgroundColor: 'var(--neutral-white)', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-surface-card)', padding: 'var(--space-3) var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }
 
 export default function OrgUsageAnalyticsPage() {
   const router = useRouter()
@@ -47,7 +47,7 @@ export default function OrgUsageAnalyticsPage() {
   const cycleText = cycleRange && (
     <span>
       <span style={{ color: 'var(--neutral-500)' }}>{isEnterprise ? 'Billing cycle' : 'Cycle'}</span>{' '}
-      <span style={{ fontWeight: 500, color: 'var(--neutral-900)' }}>{cycleRange}</span>
+      <span style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-900)' }}>{cycleRange}</span>
       {cycleDay && (
         <span style={{ color: 'var(--neutral-500)', fontVariantNumeric: 'tabular-nums' }}>{' · '}Day {cycleDay} of {cycleDays}</span>
       )}
@@ -67,8 +67,8 @@ export default function OrgUsageAnalyticsPage() {
         display:        'flex',
         alignItems:     'flex-start',
         justifyContent: 'center',
-        paddingTop:     64,
-        paddingBottom:  48,
+        paddingTop:     'var(--space-10)',
+        paddingBottom:  'var(--space-9)',
       }}
     >
       <div
@@ -76,21 +76,21 @@ export default function OrgUsageAnalyticsPage() {
           flex:          '1 0 0',
           minWidth:      0,
           maxWidth:      908,
-          padding:       '0 24px',
+          padding:       '0 var(--space-6)',
           boxSizing:     'border-box',
           display:       'flex',
           flexDirection: 'column',
-          gap:           12,
+          gap:           'var(--space-3)',
         }}
       >
         {/* Header: title and description on the left (the cycle shows in the first card); Export at the right end. */}
-        <div style={{ paddingLeft: 4, marginBottom: 4, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
+        <div style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
           <div style={{ minWidth: 0 }}>
             <div>
-              <h1 style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: 0 }}>
+              <h1 style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0 }}>
                 Usage
               </h1>
-              <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-600)', margin: 0 }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-600)', margin: 0 }}>
                 How your workspace is using its credits.
               </p>
             </div>
@@ -102,7 +102,7 @@ export default function OrgUsageAnalyticsPage() {
 
         {/* The window the feature chart covers — GET /organizations/{id}/plan/usage takes
             the same four, and picks days or weeks per range. */}
-        <div style={{ paddingLeft: 4, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <div style={{ paddingLeft: 'var(--space-1)', display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', flexWrap: 'wrap' }}>
           <Tabs value={dateRange} onValueChange={value => setDateRange(value as DateRange)}>
             <TabsList size="small" aria-label="Usage date range">
               {DATE_RANGES.map(range => (
@@ -110,7 +110,7 @@ export default function OrgUsageAnalyticsPage() {
               ))}
             </TabsList>
           </Tabs>
-          <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, lineHeight: '18px', color: 'var(--neutral-500)' }}>
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: '18px', color: 'var(--neutral-500)' }}>
             Applies to the workspace chart below.
           </span>
         </div>
@@ -119,10 +119,10 @@ export default function OrgUsageAnalyticsPage() {
         <BlockErrorBoundary label="usage summary">
         {/* Four headline numbers, the plan meter spanning under the first two. */}
         <PageCard padding={12}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 'var(--space-2-5)' }}>
             <div style={{ ...kpiTile, gridColumn: 'span 2' }}>
               {/* Label on the left, the plan (price, or Unlimited / budget for enterprise) as a pill on the right. */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)' }}>
                 <span style={kpiLabel}>
                   {isEnterprise ? 'Spend this cycle' : 'Credits used this cycle'}
                   <Tooltip side="top" maxWidth={280} content="Your plan includes a fixed number of credits each billing cycle. This tracks how much of that your team has used; it resets at the start of the next cycle.">
@@ -134,9 +134,9 @@ export default function OrgUsageAnalyticsPage() {
                 </span>
               </div>
               {/* "46,767 / 108,696 credits": used, then the plan's allowance, smaller. */}
-              <p style={{ ...kpiValue, display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' }}>
+              <p style={{ ...kpiValue, display: 'flex', alignItems: 'baseline', gap: 'var(--space-1-5)', flexWrap: 'wrap' }}>
                 <span>{totalUsed.toLocaleString()}</span>
-                <span style={{ fontSize: 16, lineHeight: '24px', color: 'var(--neutral-500)' }}>
+                <span style={{ fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-500)' }}>
                   {isEnterprise ? 'credits' : `/ ${totalCredits.toLocaleString()} credits`}
                 </span>
               </p>
@@ -148,7 +148,7 @@ export default function OrgUsageAnalyticsPage() {
                   caption={cycleText || undefined}
                 />
               ) : cycleText && (
-                <p style={{ ...kpiHint, fontSize: 13, lineHeight: '20px' }}>{cycleText}</p>
+                <p style={{ ...kpiHint, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)' }}>{cycleText}</p>
               )}
             </div>
             <div style={kpiTile}>
@@ -169,8 +169,8 @@ export default function OrgUsageAnalyticsPage() {
               </p>
             </div>
           </div>
-          <p style={{ margin: '10px 4px 0', fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: '20px', color: 'var(--neutral-600)' }}>
-            <span style={{ fontWeight: 500, color: 'var(--neutral-900)', fontVariantNumeric: 'tabular-nums' }}>~{avgPerMember.toLocaleString()}</span> credits per active member this cycle
+          <p style={{ margin: 'var(--space-2-5) var(--space-1) 0', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-600)' }}>
+            <span style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-900)', fontVariantNumeric: 'tabular-nums' }}>~{avgPerMember.toLocaleString()}</span> credits per active member this cycle
           </p>
         </PageCard>
         </BlockErrorBoundary>

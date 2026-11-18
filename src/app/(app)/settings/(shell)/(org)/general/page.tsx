@@ -15,7 +15,7 @@ import { useWorkspaceIdentity } from './_components/use-workspace-identity'
 const SHOW_ALLOWED_DOMAINS = false
 const SHOW_WORKSPACE_DEFAULTS = false
 
-const scrollStyle: React.CSSProperties = { flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: 64, paddingBottom: 48 }
+const scrollStyle: React.CSSProperties = { flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: 'var(--space-10)', paddingBottom: 'var(--space-9)' }
 
 /** Workspace settings: identity (name, logo, link), the org AI instructions, and hidden cards. Parts in ./_components. */
 export default function OrgGeneralPage() {
@@ -30,14 +30,14 @@ export default function OrgGeneralPage() {
   return (
     <div className="kaya-scrollbar" style={scrollStyle}>
       {/* Horizontal padding is here, not on the scroller, so the scrollbar stays flush with the edge. */}
-      <div style={{ width: '100%', maxWidth: 908, padding: '0 24px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ width: '100%', maxWidth: 908, padding: '0 var(--space-6)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
         {/* ── Page header ── */}
-        <div style={{ paddingLeft: 4, marginBottom: 4 }}>
+        <div style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)' }}>
           <h1 style={{
             fontFamily:   'var(--font-title)',
-            fontWeight:   400,
-            fontSize:     24,
-            lineHeight:   '32px',
+            fontWeight:   'var(--font-weight-regular)',
+            fontSize:     'var(--font-size-heading)',
+            lineHeight:   'var(--line-height-heading)',
             color:        'var(--neutral-900)',
             margin:       0,
           }}>
@@ -45,9 +45,9 @@ export default function OrgGeneralPage() {
           </h1>
           <p style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 400,
-            fontSize:   14,
-            lineHeight: '22px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize:   'var(--font-size-body)',
+            lineHeight: 'var(--line-height-body)',
             color:      'var(--neutral-500)',
             margin:     0,
           }}>

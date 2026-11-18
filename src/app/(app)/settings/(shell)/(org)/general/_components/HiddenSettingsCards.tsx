@@ -16,18 +16,18 @@ export function AllowedDomainsCard({ settings }: { settings: OrgSettings }) {
     <Card>
       <div style={{
         borderBottom: '1px solid var(--neutral-100)',
-        padding:      '12px 24px',
+        padding:      'var(--space-3) var(--space-6)',
         display:      'flex',
         alignItems:   'center',
-        gap:          12,
+        gap:          'var(--space-3)',
       }}>
         <p style={{
           flex:       '1 0 0',
           minWidth:   0,
           fontFamily: 'var(--font-body)',
-          fontWeight: 500,
-          fontSize:   16,
-          lineHeight: '22px',
+          fontWeight: 'var(--font-weight-medium)',
+          fontSize:   'var(--font-size-body-lg)',
+          lineHeight: 'var(--line-height-body)',
           color:      'var(--neutral-900)',
           margin:     0,
         }}>
@@ -36,21 +36,21 @@ export function AllowedDomainsCard({ settings }: { settings: OrgSettings }) {
         <Button variant="default" size="sm" onClick={() => { setShowAddDomain(true); setAddDomainInput('') }}>+ Add domain</Button>
       </div>
 
-      <div style={{ padding: '12px 24px', display: 'flex', flexDirection: 'column', gap: 12, opacity: settingsLoading ? 0.6 : 1 }}>
+      <div style={{ padding: 'var(--space-3) var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', opacity: settingsLoading ? 0.6 : 1 }}>
         {allowedDomains.length === 0 && !showAddDomain ? (
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-400)', margin: 0 }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-400)', margin: 0 }}>
             No allowed domains configured.
           </p>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             {allowedDomains.map(domain => (
               <div key={domain} style={{
                 display:         'flex',
                 alignItems:      'center',
                 justifyContent:  'space-between',
-                gap:             8,
-                padding:         '10px 8px 10px 14px',
-                borderRadius:    10,
+                gap:             'var(--space-2)',
+                padding:         'var(--space-2-5) var(--space-2) var(--space-2-5) var(--space-3)',
+                borderRadius:    'var(--radius-lg)',
                 border:          '1px solid var(--border-default)',
                 backgroundColor: 'var(--neutral-white)',
               }}>
@@ -58,8 +58,8 @@ export function AllowedDomainsCard({ settings }: { settings: OrgSettings }) {
                   flex:         '1 0 0',
                   minWidth:     0,
                   fontFamily:   'var(--font-body)',
-                  fontWeight:   500,
-                  fontSize:     14,
+                  fontWeight:   'var(--font-weight-medium)',
+                  fontSize:     'var(--font-size-body)',
                   color:        'var(--neutral-900)',
                   overflow:     'hidden',
                   textOverflow: 'ellipsis',
@@ -79,7 +79,7 @@ export function AllowedDomainsCard({ settings }: { settings: OrgSettings }) {
           </div>
         )}
         {showAddDomain && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
             <TextInput
               value={addDomainInput}
               onChange={setAddDomainInput}
@@ -111,7 +111,7 @@ export function AllowedDomainsCard({ settings }: { settings: OrgSettings }) {
           </div>
         )}
         {allowedDomains.length > 0 && (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'var(--space-1)' }}>
             <Button
               variant="save"
               size="sm"
@@ -141,17 +141,17 @@ export function WorkspaceDefaultsCard({ settings }: { settings: OrgSettings }) {
       <div style={{
         display:      'flex',
         alignItems:   'center',
-        gap:          12,
-        padding:      '12px 24px',
+        gap:          'var(--space-3)',
+        padding:      'var(--space-3) var(--space-6)',
         borderBottom: '1px solid var(--neutral-100)',
         opacity:      settingsLoading ? 0.6 : 1,
       }}>
         <div style={{ flex: '1 0 0', minWidth: 0 }}>
           <p style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 500,
-            fontSize:   14,
-            lineHeight: '22px',
+            fontWeight: 'var(--font-weight-medium)',
+            fontSize:   'var(--font-size-body)',
+            lineHeight: 'var(--line-height-body)',
             color:      'var(--neutral-900)',
             margin:     0,
           }}>
@@ -159,9 +159,9 @@ export function WorkspaceDefaultsCard({ settings }: { settings: OrgSettings }) {
           </p>
           <p style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 400,
-            fontSize: 12,
-            lineHeight: '16px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: 'var(--font-size-small)',
+            lineHeight: 'var(--line-height-small)',
             color:      'var(--neutral-400)',
             margin:     0,
           }}>
@@ -179,16 +179,16 @@ export function WorkspaceDefaultsCard({ settings }: { settings: OrgSettings }) {
       <div style={{
         display:    'flex',
         alignItems: 'center',
-        gap:        12,
-        padding:    '12px 24px',
+        gap:        'var(--space-3)',
+        padding:    'var(--space-3) var(--space-6)',
         opacity:    settingsLoading ? 0.6 : 1,
       }}>
         <div style={{ flex: '1 0 0', minWidth: 0 }}>
           <p style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 500,
-            fontSize:   14,
-            lineHeight: '22px',
+            fontWeight: 'var(--font-weight-medium)',
+            fontSize:   'var(--font-size-body)',
+            lineHeight: 'var(--line-height-body)',
             color:      'var(--neutral-900)',
             margin:     0,
           }}>
@@ -196,9 +196,9 @@ export function WorkspaceDefaultsCard({ settings }: { settings: OrgSettings }) {
           </p>
           <p style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 400,
-            fontSize: 12,
-            lineHeight: '16px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: 'var(--font-size-small)',
+            lineHeight: 'var(--line-height-small)',
             color:      'var(--neutral-400)',
             margin:     0,
           }}>
@@ -212,7 +212,7 @@ export function WorkspaceDefaultsCard({ settings }: { settings: OrgSettings }) {
         />
       </div>
 
-      <div style={{ padding: '12px 24px', display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--neutral-100)' }}>
+      <div style={{ padding: 'var(--space-3) var(--space-6)', display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--neutral-100)' }}>
         <Button
           variant="save"
           size="sm"

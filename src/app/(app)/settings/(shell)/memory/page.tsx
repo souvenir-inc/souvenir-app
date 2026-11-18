@@ -11,20 +11,20 @@ export default function MemoryPage() {
   const { orgId, caps } = useOrg()
   const [query, setQuery] = useState('')
   return (
-    <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', display: 'flex', justifyContent: 'center', paddingTop: 64, paddingBottom: 48 }}>
-      <div style={{ width: '100%', maxWidth: 908, padding: '0 24px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <div style={{ paddingLeft: 4, marginBottom: 4 }}>
-          <h1 style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: 0 }}>Memory</h1>
-          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+    <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', display: 'flex', justifyContent: 'center', paddingTop: 'var(--space-10)', paddingBottom: 'var(--space-9)' }}>
+      <div style={{ width: '100%', maxWidth: 908, padding: '0 var(--space-6)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
+        <div style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)' }}>
+          <h1 style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0 }}>Memory</h1>
+          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
             What Souvenir remembers across your chats. Open any note to read it, and ask Souvenir to change or forget anything.
           </p>
         </div>
         <label style={{
           display:         'flex',
           alignItems:      'center',
-          gap:             8,
-          padding:         '7px 12px',
-          borderRadius:    10,
+          gap:             'var(--space-2)',
+          padding:         'var(--space-1-5) var(--space-3)',
+          borderRadius:    'var(--radius-lg)',
           backgroundColor: 'var(--field-surface)',
           boxShadow:       '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
           color:           'var(--neutral-400)',
@@ -35,7 +35,7 @@ export default function MemoryPage() {
             onChange={event => setQuery(event.target.value)}
             placeholder="Search memory"
             aria-label="Search memory"
-            style={{ flex: '1 0 0', minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)' }}
+            style={{ flex: '1 0 0', minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)' }}
           />
         </label>
         <MemorySection

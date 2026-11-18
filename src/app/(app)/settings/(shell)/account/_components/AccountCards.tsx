@@ -179,9 +179,9 @@ export function DangerZoneCard() {
       <CardSection divider padTop={6} padBottom={12}>
         <h2 style={{
           fontFamily:   'var(--font-body)',
-          fontWeight:   500,
-          fontSize:     16,
-          lineHeight:   '22px',
+          fontWeight:   'var(--font-weight-medium)',
+          fontSize:     'var(--font-size-body-lg)',
+          lineHeight:   'var(--line-height-body)',
           color:        'var(--red-400)',
           margin:       0,
           overflow:     'hidden',
@@ -192,9 +192,9 @@ export function DangerZoneCard() {
         </h2>
         <p style={{
           fontFamily: 'var(--font-body)',
-          fontWeight: 400,
-          fontSize:   14,
-          lineHeight: '22px',
+          fontWeight: 'var(--font-weight-regular)',
+          fontSize:   'var(--font-size-body)',
+          lineHeight: 'var(--line-height-body)',
           color:      'var(--neutral-500)',
           margin:     0,
         }}>
@@ -212,14 +212,14 @@ export function DangerZoneCard() {
           a real-looking enabled button to a no-op (or to nothing) would
           be actively worse than the 1:1 deviation. */}
       <CardSection padTop={20} padBottom={12}>
-        <div style={{ display: 'flex', gap: 24, alignItems: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-6)', alignItems: 'flex-end' }}>
           <div style={{ flex: '1 0 0', minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-0-5)' }}>
               <p style={{
                 fontFamily:   'var(--font-body)',
-                fontWeight:   500,
-                fontSize:     16,
-                lineHeight:   '22px',
+                fontWeight:   'var(--font-weight-medium)',
+                fontSize:     'var(--font-size-body-lg)',
+                lineHeight:   'var(--line-height-body)',
                 color:        'var(--neutral-900)',
                 margin:       0,
                 overflow:     'hidden',
@@ -232,9 +232,9 @@ export function DangerZoneCard() {
             </div>
             <p style={{
               fontFamily: 'var(--font-body)',
-              fontWeight: 400,
-              fontSize:   14,
-              lineHeight: '22px',
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize:   'var(--font-size-body)',
+              lineHeight: 'var(--line-height-body)',
               color:      'var(--neutral-500)',
               margin:     0,
             }}>
@@ -250,17 +250,17 @@ export function DangerZoneCard() {
               display:        'flex',
               alignItems:     'center',
               justifyContent: 'center',
-              padding:        '6px 10px 8px',
-              borderRadius:   10,
+              padding:        'var(--space-1-5) var(--space-2-5) var(--space-2)',
+              borderRadius:   'var(--radius-lg)',
               border:         'none',
               cursor:         'not-allowed',
               opacity:        0.45,
               backgroundColor:'var(--field-surface)',
               boxShadow:      '0px 1.091px 1.091px 0px rgba(24,2,2,0.05), 0px 1.455px 3.127px 0px rgba(24,2,2,0.15), 0px 0px 0px 1px var(--red-100)',
               fontFamily:     'var(--font-body)',
-              fontWeight:     500,
-              fontSize:       14,
-              lineHeight:     '22px',
+              fontWeight:     'var(--font-weight-medium)',
+              fontSize:       'var(--font-size-body)',
+              lineHeight:     'var(--line-height-body)',
               color:          'var(--red-700)',
               whiteSpace:     'nowrap',
               position:       'relative',

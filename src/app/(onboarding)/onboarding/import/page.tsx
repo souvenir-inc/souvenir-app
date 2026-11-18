@@ -115,7 +115,7 @@ export default function OnboardingImportPage() {
       }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- decorative background; Next Image doesn't support SVG patterns with embedded raster images */}
-      <img src="https://souvenirai-storage.s3.us-east-1.amazonaws.com/public/souvenir-onboarding-bg.svg" alt="Souvenir onboarding background" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0, pointerEvents: "none" }} />
+      <img src="https://souvenirai-storage.s3.us-east-1.amazonaws.com/public/souvenir-onboarding-bg.svg" alt="Souvenir onboarding background" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 'var(--z-base)', pointerEvents: "none" }} />
     <div
       style={{
         position: "relative",
@@ -123,20 +123,20 @@ export default function OnboardingImportPage() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "24px",
+        gap: "var(--space-6)",
         width: "100%",
         maxWidth: "920px",
-        padding: "40px 16px",
+        padding: "var(--space-8) var(--space-4)",
       }}
     >
       {/* Heading */}
-      <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
+      <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "var(--space-4)", width: "100%" }}>
         <h1
           style={{
             fontFamily: "var(--font-title)",
-            fontWeight: 400,
-            fontSize: "24px",
-            lineHeight: "32px",
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: "var(--font-size-heading)",
+            lineHeight: "var(--line-height-heading)",
             color: "var(--static-black)",
             margin: 0,
           }}
@@ -146,9 +146,9 @@ export default function OnboardingImportPage() {
         <p
           style={{
             fontFamily: "var(--font-body)",
-            fontWeight: 400,
-            fontSize: "14px",
-            lineHeight: "22px",
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: "var(--font-size-body)",
+            lineHeight: "var(--line-height-body)",
             color: "var(--neutral-700, #524b47)",
             margin: 0,
             maxWidth: "610px",
@@ -161,13 +161,13 @@ export default function OnboardingImportPage() {
       </div>
 
       {/* Universal prompt card */}
-      <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "8px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+      <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-1)" }}>
           <span
             style={{
               fontFamily: "var(--font-body)",
-              fontWeight: 500,
-              fontSize: "14px",
+              fontWeight: 'var(--font-weight-medium)',
+              fontSize: "var(--font-size-body)",
               lineHeight: "21px",
               color: "var(--legacy-0a0a0a)",
               letterSpacing: "0.07px",
@@ -181,26 +181,26 @@ export default function OnboardingImportPage() {
           style={{
             backgroundColor: "var(--neutral-white)",
             border: "1px solid var(--border-default)",
-            borderRadius: "18px",
-            padding: "12px",
+            borderRadius: "var(--radius-2xl)",
+            padding: "var(--space-3)",
             display: "flex",
             flexDirection: "column",
-            gap: "16px",
+            gap: "var(--space-4)",
             boxShadow: "0px 1px 1px color-mix(in srgb, var(--static-black) 5%, transparent)",
             width: "100%",
           }}
         >
           {/* Step chips */}
-          <div style={{ display: "flex", alignItems: "center", gap: "4px", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-1)", flexWrap: "wrap" }}>
             <button
               type="button"
               onClick={handleCopy}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: "4px",
-                padding: "2px 6px",
-                borderRadius: "6px",
+                gap: "var(--space-1)",
+                padding: "var(--space-0-5) var(--space-1-5)",
+                borderRadius: "var(--radius-sm)",
                 backgroundColor: "var(--blue-100)",
                 border: "1px solid var(--blue-600-50)",
                 cursor: "pointer",
@@ -211,9 +211,9 @@ export default function OnboardingImportPage() {
               <span
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontWeight: 500,
-                  fontSize: "12px",
-                  lineHeight: "16px",
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontSize: "var(--font-size-small)",
+                  lineHeight: "var(--line-height-small)",
                   color: "var(--blue-700)",
                 }}
               >
@@ -221,15 +221,15 @@ export default function OnboardingImportPage() {
               </span>
             </button>
 
-            <span style={{ color: "var(--neutral-500)", fontSize: "12px" }}>→</span>
+            <span style={{ color: "var(--neutral-500)", fontSize: "var(--font-size-small)" }}>→</span>
 
             <span
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: "4px",
-                padding: "2px 6px",
-                borderRadius: "6px",
+                gap: "var(--space-1)",
+                padding: "var(--space-0-5) var(--space-1-5)",
+                borderRadius: "var(--radius-sm)",
                 backgroundColor: "var(--blue-100)",
                 border: "1px solid var(--blue-600-50)",
                 boxShadow:
@@ -239,9 +239,9 @@ export default function OnboardingImportPage() {
               <span
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontWeight: 500,
-                  fontSize: "12px",
-                  lineHeight: "16px",
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontSize: "var(--font-size-small)",
+                  lineHeight: "var(--line-height-small)",
                   color: "var(--blue-700)",
                 }}
               >
@@ -249,15 +249,15 @@ export default function OnboardingImportPage() {
               </span>
             </span>
 
-            <span style={{ color: "var(--neutral-500)", fontSize: "12px" }}>→</span>
+            <span style={{ color: "var(--neutral-500)", fontSize: "var(--font-size-small)" }}>→</span>
 
             <span
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: "4px",
-                padding: "2px 6px",
-                borderRadius: "6px",
+                gap: "var(--space-1)",
+                padding: "var(--space-0-5) var(--space-1-5)",
+                borderRadius: "var(--radius-sm)",
                 backgroundColor: "var(--blue-100)",
                 border: "1px solid var(--blue-600-50)",
                 boxShadow:
@@ -267,9 +267,9 @@ export default function OnboardingImportPage() {
               <span
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontWeight: 500,
-                  fontSize: "12px",
-                  lineHeight: "16px",
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontSize: "var(--font-size-small)",
+                  lineHeight: "var(--line-height-small)",
                   color: "var(--blue-700)",
                 }}
               >
@@ -282,9 +282,9 @@ export default function OnboardingImportPage() {
           <p
             style={{
               fontFamily: "var(--font-body)",
-              fontWeight: 400,
-              fontSize: "14px",
-              lineHeight: "22px",
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: "var(--font-size-body)",
+              lineHeight: "var(--line-height-body)",
               color: "var(--legacy-1e1e1e)",
               margin: 0,
               whiteSpace: "pre-wrap",
@@ -297,9 +297,9 @@ export default function OnboardingImportPage() {
           <p
             style={{
               fontFamily: "var(--font-body)",
-              fontWeight: 400,
-              fontSize: "12px",
-              lineHeight: "16px",
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: "var(--font-size-small)",
+              lineHeight: "var(--line-height-small)",
               color: "var(--neutral-700, #524b47)",
               margin: 0,
             }}
@@ -318,13 +318,13 @@ export default function OnboardingImportPage() {
       </div>
 
       {/* Paste area */}
-      <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "8px" }}>
+      <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
         <div>
           <span
             style={{
               fontFamily: "var(--font-body)",
-              fontWeight: 500,
-              fontSize: "14px",
+              fontWeight: 'var(--font-weight-medium)',
+              fontSize: "var(--font-size-body)",
               lineHeight: "21px",
               color: "var(--legacy-0a0a0a)",
             }}
@@ -334,8 +334,8 @@ export default function OnboardingImportPage() {
           <span
             style={{
               fontFamily: "var(--font-body)",
-              fontWeight: 500,
-              fontSize: "14px",
+              fontWeight: 'var(--font-weight-medium)',
+              fontSize: "var(--font-size-body)",
               lineHeight: "21px",
               color: "var(--neutral-600)",
             }}
@@ -348,8 +348,8 @@ export default function OnboardingImportPage() {
           style={{
             backgroundColor: "var(--field-surface)",
             border: "1px solid var(--border-default)",
-            borderRadius: "18px",
-            padding: "12px",
+            borderRadius: "var(--radius-2xl)",
+            padding: "var(--space-3)",
             boxShadow: "0px 1px 1px color-mix(in srgb, var(--static-black) 5%, transparent)",
             width: "100%",
           }}
@@ -365,9 +365,9 @@ export default function OnboardingImportPage() {
               outline: "none",
               resize: "vertical",
               fontFamily: "var(--font-body)",
-              fontWeight: 400,
-              fontSize: "14px",
-              lineHeight: "22px",
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: "var(--font-size-body)",
+              lineHeight: "var(--line-height-body)",
               color: "var(--legacy-1e1e1e)",
               backgroundColor: "transparent",
               padding: 0,
@@ -378,7 +378,7 @@ export default function OnboardingImportPage() {
 
       {/* Action buttons */}
       {/* Action buttons */}
-      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+      <div style={{ display: "flex", gap: "var(--space-4)", alignItems: "center" }}>
         <Button
           variant="secondary"
           size="sm"

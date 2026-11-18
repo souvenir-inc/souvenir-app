@@ -179,7 +179,7 @@ export function SlackAppPanel({ orgId }: { orgId: string }) {
           rows={6}
         />
         {saveFailed && (
-          <p role="alert" className={styles.sectionDescription} style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, color: 'var(--red-600)' }}>
+          <p role="alert" className={styles.sectionDescription} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-2)', color: 'var(--red-600)' }}>
             Not saved. Your changes are only on this page.
             <Button variant="secondary" size="sm" onClick={() => setRetryCount(n => n + 1)}>Retry</Button>
           </p>

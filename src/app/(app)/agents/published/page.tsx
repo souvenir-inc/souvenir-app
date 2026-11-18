@@ -124,14 +124,14 @@ function PersonaPublishedContent() {
           borderRadius: 'var(--layout-radius)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 2,
+          gap: 'var(--space-0-5)',
           flex: '1 0 0',
           minHeight: 0,
           overflow: 'hidden',
-          paddingBottom: 12,
-          paddingTop: 10,
-          paddingLeft: 12,
-          paddingRight: 12,
+          paddingBottom: 'var(--space-3)',
+          paddingTop: 'var(--space-2-5)',
+          paddingLeft: 'var(--space-3)',
+          paddingRight: 'var(--space-3)',
           alignItems: 'center',
         }}
       >
@@ -155,7 +155,7 @@ function PersonaPublishedContent() {
               alignItems: 'center',
               gap: 76,
               position: 'relative',
-              paddingBottom: 48,
+              paddingBottom: 'var(--space-9)',
             }}
           >
             {/* Radial gradient blob */}
@@ -174,7 +174,7 @@ function PersonaPublishedContent() {
                 background:
                   'radial-gradient(ellipse at 50% 26%, color-mix(in srgb, var(--red-200) 21%, transparent) 14.4%, color-mix(in srgb, var(--brown-400) 45%, transparent) 38%, color-mix(in srgb, var(--neutral-500) 70%, transparent) 61.5%, color-mix(in srgb, var(--neutral-500) 70%, transparent) 100%)',
                 pointerEvents: 'none',
-                zIndex: 0,
+                zIndex: 'var(--z-base)',
               }}
             />
 
@@ -183,12 +183,12 @@ function PersonaPublishedContent() {
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 32,
+                gap: 'var(--space-7)',
                 alignItems: 'center',
                 width: 291,
                 position: 'relative',
                 zIndex: 1,
-                paddingTop: 20,
+                paddingTop: 'var(--space-5)',
               }}
             >
               {/* Persona image */}
@@ -216,13 +216,13 @@ function PersonaPublishedContent() {
               </div>
 
               {/* Title + description */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: '100%' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', alignItems: 'center', width: '100%' }}>
                 <p
                   style={{
                     fontFamily: 'var(--font-title)',
-                    fontWeight: 400,
-                    fontSize: 40,
-                    lineHeight: '48px',
+                    fontWeight: 'var(--font-weight-regular)',
+                    fontSize: 'var(--font-size-display)',
+                    lineHeight: 'var(--line-height-display)',
                     color: 'var(--neutral-900)',
                     margin: 0,
                     textAlign: 'center',
@@ -233,9 +233,9 @@ function PersonaPublishedContent() {
                 <p
                   style={{
                     fontFamily: 'var(--font-body)',
-                    fontWeight: 400,
-                    fontSize: 16,
-                    lineHeight: '22px',
+                    fontWeight: 'var(--font-weight-regular)',
+                    fontSize: 'var(--font-size-body-lg)',
+                    lineHeight: 'var(--line-height-body)',
                     color: 'var(--neutral-700)',
                     margin: 0,
                     textAlign: 'center',
@@ -272,19 +272,19 @@ function PersonaPublishedContent() {
                 style={{
                   display:         'flex',
                   flexDirection:   'column',
-                  gap:             14,
+                  gap:             'var(--space-3)',
                   alignItems:      'center',
                   backgroundColor: 'rgba(var(--surface-rgb), 0.5)',
                   border:          '1px solid var(--border-default)',
-                  borderRadius:    20,
-                  padding:         '24px 28px',
+                  borderRadius:    'var(--radius-2xl)',
+                  padding:         'var(--space-6) var(--space-6)',
                 }}
               >
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 20, lineHeight: '28px', color: 'var(--neutral-900)', margin: '0 0 4px' }}>
+                  <p style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-md)', lineHeight: 'var(--line-height-heading-md)', color: 'var(--neutral-900)', margin: '0 0 var(--space-1)' }}>
                     What&apos;s next?
                   </p>
-                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: '20px', color: 'var(--neutral-500)', margin: 0 }}>
+                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-500)', margin: 0 }}>
                     {linkShare
                       ? 'Share this link with anyone — no account needed to chat with your agent.'
                       : 'Generate a Super Link so anyone can chat with your agent — no account needed.'}
@@ -301,7 +301,7 @@ function PersonaPublishedContent() {
                   side, all three sharing the same secondary/sm Button styling,
                   each with an inline icon sized a bit above Button's usual
                   16px default for a bit more visual weight. */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', flexWrap: 'wrap', justifyContent: 'center' }}>
                 <Button
                   variant="secondary"
                   size="sm"
