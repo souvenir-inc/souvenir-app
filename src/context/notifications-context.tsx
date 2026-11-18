@@ -10,17 +10,11 @@
 //   • Agents whose model was retired or turned off — persistent until fixed.
 //   • Team requests (admins only) — no backend yet; fixtures only.
 //
-// Anything that arrives while the app is open also gets a toast (the way
-// Perplexity announces a finished scheduled task), unless the panel is open.
-//
-// Mounted once in the (app) layout, inside OrgProvider (role gating) and
-// NavGuardProvider (toast "View" navigation).
+// Mounted once in the (app) layout, inside OrgProvider (role gating).
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
-import { toast } from 'sonner'
 import { useAuth } from '@/context/auth-context'
 import { useOrg } from '@/context/org-context'
-import { useGuardedRouter } from '@/context/nav-guard-context'
 import { onPersonasInvalidated } from '@/lib/api/persona-cache'
 import {
   agentModelNotifications,
@@ -59,7 +53,7 @@ const POLL_MS = 60_000
 /** Returning to the tab refreshes immediately if the last poll is older than this. */
 const STALE_ON_FOCUS_MS = 20_000
 
-/** Dispatch on window to open the bell's panel from anywhere (e.g. a toast). */
+/** Dispatch on window to open the bell's panel from anywhere. */
 export const NOTIFICATIONS_OPEN_EVENT = 'notifications:open'
 
 /** Asks the sidebar bell to open its panel. False when no bell is mounted
@@ -112,7 +106,6 @@ export function useOptionalNotifications(): NotificationsContextValue | null {
 export function NotificationsProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth()
   const { orgId, orgRole, currentUserRole } = useOrg()
-  const { push } = useGuardedRouter()
   const identity = user?.email ?? null
   const userKey = identity ? notificationUserKey(identity) : null
   const isAdmin = currentUserRole === 'admin'
@@ -138,12 +131,8 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   const scheduleCacheRef = useRef(new Map<string, ScheduleCacheEntry>())
   const lastPollRef = useRef(0)
   const pollIdRef = useRef(0)
-  const panelOpenRef = useRef(false)
-  /** Every id already shown or announced; null until the first full load. */
-  const knownIdsRef = useRef<Set<string> | null>(null)
   useEffect(() => {
     scheduleCacheRef.current = new Map()
-    knownIdsRef.current = null
   }, [userKey])
 
   // ── Read state: localStorage-backed external store, synced across tabs ────
@@ -321,43 +310,10 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   }, [updateReadState])
 
   const setPanelOpen = useCallback((open: boolean) => {
-    panelOpenRef.current = open
     if (open) updateReadState(prev => withSeen(prev))
   }, [updateReadState])
 
   const refresh = useCallback(() => { void poll() }, [poll])
-
-  // ── Arrival toasts ─────────────────────────────────────────────────────────
-  // After the first full load, anything new and unread is announced once —
-  // one toast for a single item (with a direct "View"), one summary toast for
-  // several (opening the panel). Silent while the panel is already open.
-  useEffect(() => {
-    if (loading || !readState) return
-    const allIds = notifications.flatMap(notificationIds)
-    const known = knownIdsRef.current
-    if (!known) { knownIdsRef.current = new Set(allIds); return }
-    const fresh = notifications.filter(n => notificationIds(n).some(id => !known.has(id)) && isNotificationUnread(n, readState))
-    for (const id of allIds) known.add(id)
-    if (!fresh.length || panelOpenRef.current) return
-    if (fresh.length === 1) {
-      const n = fresh[0]!
-      const show = n.kind === 'schedule-failed' ? toast.error : n.actionable ? toast.warning : toast
-      show(n.title, {
-        id:          `notification-${n.id}`,
-        description: n.body,
-        action:      { label: 'View', onClick: () => { markRead(n); push(n.href) } },
-      })
-    } else {
-      const newest = fresh[0]!
-      toast(`${fresh.length} new notifications`, {
-        id:          'notifications-batch',
-        description: newest.title,
-        action:      { label: 'Open', onClick: () => { if (!openNotificationsPanel()) push(newest.href) } },
-      })
-    }
-  // readState deliberately omitted: a mark-read must never re-announce.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [notifications, loading])
 
   const value = useMemo<NotificationsContextValue>(() => ({
     notifications, unreadCount, unseenCount, attentionCount, isUnread, loading,
