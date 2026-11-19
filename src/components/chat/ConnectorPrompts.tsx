@@ -143,7 +143,9 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
       })
       .then((entry) => { if (entry) return finish() })
       .catch((err: unknown) => {
-        if (abortedRef.current || answeredRef.current) return
+        // Also while an answer is on its way: the app is connected (the "already
+        // connected" check found it), and a sign-in error now would be stale.
+        if (abortedRef.current || answeredRef.current || respondingRef.current) return
         setState('error')
         setErrorMsg(
           ended === 'cancelled' ? 'The sign-in was cancelled.'

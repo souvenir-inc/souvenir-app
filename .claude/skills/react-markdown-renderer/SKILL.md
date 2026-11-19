@@ -40,14 +40,19 @@ npm install remark-math rehype-katex rehype-raw
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
-import rehypeSanitize from 'rehype-sanitize';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import 'highlight.js/styles/github-dark.css'; // or any hljs theme
+
+// remark-gfm already prefixes footnote ids with `user-content-`; sanitize's default would
+// prefix them again, so footnote links point at ids that don't exist. Raw HTML isn't
+// rendered (no rehype-raw), so markdown-made ids are the only ones and keep their prefix.
+export const sanitize = [rehypeSanitize, { ...defaultSchema, clobberPrefix: '' }] as const;
 
 export function MessageRenderer({ content }: { content: string }) {
   return (
     <Markdown
       remarkPlugins={[remarkGfm]}
-      rehypePlugins={[rehypeSanitize, rehypeHighlight]}
+      rehypePlugins={[sanitize, rehypeHighlight]}
       components={markdownComponents}
     >
       {content}
@@ -109,7 +114,9 @@ export const markdownComponents: Components = {
   ol: ({ start, children }) => (
     <ol start={start} className="list-decimal list-outside pl-6 my-3 space-y-1">{children}</ol>
   ),
-  li: ({ children }) => <li className="leading-7">{children}</li>,
+  // Pass the rest on: a footnote's <li> carries the id its back-reference points at.
+  // (`node` is react-markdown's syntax-tree node, not a DOM attribute.)
+  li: ({ node, children, ...props }) => <li {...props} className="leading-7">{children}</li>,
 
   // Blockquote
   blockquote: ({ children }) => (
@@ -134,13 +141,19 @@ export const markdownComponents: Components = {
   ),
 
   // Links
-  // `title` carries a link's [text](url "title").
-  a: ({ href, title, children }) => (
-    <a href={href} title={title} target="_blank" rel="noopener noreferrer"
-       className="text-blue-600 dark:text-blue-400 underline underline-offset-2 hover:opacity-80">
-      {children}
-    </a>
-  ),
+  // The rest passes on: `title` from [text](url "title"), and a footnote reference's id,
+  // aria-describedby and data-footnote-* attributes. In-page links (#…, footnotes) stay in
+  // the tab; only links that leave the page open a new one.
+  a: ({ node, href, children, ...props }) => {
+    const external = !href?.startsWith('#');
+    return (
+      <a {...props} href={href}
+         {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+         className="text-blue-600 dark:text-blue-400 underline underline-offset-2 hover:opacity-80">
+        {children}
+      </a>
+    );
+  },
 
   // Horizontal rule
   hr: () => <hr className="my-6 border-zinc-200 dark:border-zinc-700" />,
@@ -157,14 +170,14 @@ When streaming token-by-token, naively re-rendering the whole message on every t
 import { memo, useMemo } from 'react';
 import Markdown, { Options } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import rehypeSanitize from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
+import { sanitize } from './MessageRenderer'; // the footnote-safe sanitize setting above
 
 // Memoized block — only re-renders when content changes. Same plugins as the basic
 // renderer above, so streamed code blocks are highlighted and HTML is sanitised too.
 const MemoizedMarkdown = memo(
   ({ content, ...props }: { content: string } & Options) => (
-    <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize, rehypeHighlight]} {...props}>{content}</Markdown>
+    <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[sanitize, rehypeHighlight]} {...props}>{content}</Markdown>
   ),
   (prev, next) => prev.content === next.content
 );
@@ -206,7 +219,9 @@ function splitIntoBlocks(text: string): string[] {
     } else if (marker) {
       fence = marker;
       current.push(line);
-    } else if (DEFINITION.test(line)) {
+    } else if (DEFINITION.test(line) && current.length === 0) {
+      // Only at the start of a block: a definition can't interrupt a paragraph, so a
+      // `[x]: …` line inside one is ordinary text and stays where it is.
       definitions.push(line);
       afterDefinition = true;
     } else if (!line.trim()) {
@@ -257,7 +272,7 @@ import 'katex/dist/katex.min.css';
 
 // Add to plugins:
 remarkPlugins={[remarkGfm, remarkMath]}
-rehypePlugins={[rehypeSanitize, rehypeKatex]}
+rehypePlugins={[sanitize, rehypeKatex]} // `sanitize` as in the basic setup (footnote-safe)
 ```
 
 ---

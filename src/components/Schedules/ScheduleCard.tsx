@@ -93,7 +93,10 @@ export function ScheduleCard({
       style={{
         display:         'flex',
         flexDirection:   'column',
-        height:          '240px',
+        // At least 240px, not exactly: a two-line name with a three-line description and
+        // run stats needs a little more, and a fixed height pushed the footer out of the
+        // card. The grid stretches the row, so the card beside it grows to match.
+        minHeight:       '240px',
         overflow:        'hidden',
         padding:         'var(--space-5)',
         boxSizing:       'border-box',
