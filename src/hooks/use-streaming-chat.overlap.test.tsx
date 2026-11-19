@@ -10,6 +10,7 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useStreamingChat } from '@/hooks/use-streaming-chat'
 import { isStreamActive } from '@/lib/stream-registry'
+import { resetStreamStore } from '@/lib/chat/stream-store'
 import type { UIMessage } from '@/types/chat'
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
@@ -57,11 +58,12 @@ let root: Root
 let messages: UIMessage[]
 let hook: ReturnType<typeof useStreamingChat>
 
-function Harness({ onReady }: { onReady: (api: ReturnType<typeof useStreamingChat>) => void }) {
+function Harness({ onReady, liveOverlay = false }: { onReady: (api: ReturnType<typeof useStreamingChat>) => void; liveOverlay?: boolean }) {
   const api = useStreamingChat({
     setMessages: (update) => {
       messages = typeof update === 'function' ? update(messages) : update
     },
+    liveOverlay,
   })
   useEffect(() => onReady(api))
   return null
@@ -84,6 +86,7 @@ beforeEach(() => {
 
 afterEach(() => {
   act(() => root.unmount())
+  resetStreamStore()
   vi.unstubAllGlobals()
   vi.restoreAllMocks()
 })
@@ -124,6 +127,32 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(reply('reply-B')).toMatchObject({ content: 'From B.', isLoading: false })
     // A was left as it was for its chat to follow again, not finished with B's text.
     expect(reply('reply-A').content).not.toContain('B.')
+  })
+
+  it('commits the old call\'s buffered text to its own reply, not the next one (live overlay)', async () => {
+    // ChatInterface runs with liveOverlay: streamed fields stay in a buffer until a commit.
+    act(() => root.render(<Harness liveOverlay onReady={(api) => { hook = api }} />))
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const xhrA = FakeXHR.all[0]
+    xhrA.start()
+    xhrA.push({ type: 'RUN_STARTED', ...runA }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'From A.' })
+    // The first stretch commits at once; this one stays in the buffer, uncommitted.
+    xhrA.push({ type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: ' Still A.' })
+
+    // B takes over before A's text was committed, and its turn ends with no text at all.
+    const doneB = hook.followStream('chat-B', 'reply-B')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+    const xhrB = FakeXHR.all[1]
+    xhrB.start()
+    xhrB.push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+    xhrB.end()
+    await act(async () => { await doneB })
+    xhrA.end()
+    await act(async () => { await doneA })
+
+    expect(JSON.stringify(reply('reply-B'))).not.toContain('Still A.')
+    expect(reply('reply-A').content).toContain('Still A.')
   })
 
   it('never drops a send the backend has not accepted; a follow waits for its run to start', async () => {

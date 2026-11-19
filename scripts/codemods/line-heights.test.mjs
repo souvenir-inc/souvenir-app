@@ -17,6 +17,18 @@ describe("line-heights on TSX", () => {
     expect(tsx(`<div style={{ fontSize: 14, lineHeight: '22px' }} />`)).toContain(`lineHeight: 'var(--line-height-body)'`);
   });
 
+  it("leaves look-alike text inside strings and comments alone", () => {
+    const src = [
+      `const doc = "lineHeight: 1.5, padding: 4"`,
+      `// lineHeight: 1.5,`,
+      `<div style={{ lineHeight: 1.5, margin: 0 }} />`,
+    ].join("\n");
+    const out = tsx(src);
+    expect(out).toContain(`"lineHeight: 1.5, padding: 4"`);
+    expect(out).toContain(`// lineHeight: 1.5,`);
+    expect(out).toContain(`lineHeight: 'var(--leading-normal)', margin: 0`);
+  });
+
   it("leaves a value that continues as an expression on the next line", () => {
     const src = `<div style={{ lineHeight: 1.5\n  * scale, padding: 4 }} />`;
     expect(tsx(src)).toBe(src);

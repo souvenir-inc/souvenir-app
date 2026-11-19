@@ -275,7 +275,14 @@ export function useStreamingChat({
         await holder.settled
         holder = activeCallRef.current
       }
-      holder?.drop()
+      if (holder) {
+        // The buffer is shared too: commit what the old call had streamed into its own
+        // reply while the refs still point there (as Stop does). Left behind, it would be
+        // merged into the next call's first update and committed as that call's reply.
+        stopFlushInterval()
+        flushPending()
+        holder.drop()
+      }
     }
     stopRequestedRef.current = false
     xhrRef.current = null

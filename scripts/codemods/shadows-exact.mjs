@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * Shadow pass: points hand-written box-shadows at tokens with exactly the same light-theme value.
  *
@@ -15,6 +14,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const TOKENS = path.join(ROOT, "src/styles/tokens");
@@ -44,15 +44,16 @@ const splitTop = (s) => {
   out.push(cur);
   return out.map((x) => x.trim()).filter(Boolean);
 };
-function parseLayer(layer) {
+export function parseLayer(layer) {
   const parts = layer.trim().match(/(?:[a-z-]+\([^()]*(?:\([^()]*\)[^()]*)*\)|[^\s]+)/gi) || [];
   let inset = false, colour = null; const lens = [];
   for (const p of parts) {
     if (p.toLowerCase() === "inset") inset = true;
     else if (/^-?[\d.]+(px)?$/.test(p)) lens.push(parseFloat(p));
-    // A length in any other unit (1rem, 0.5em) can't be compared with the px scale: the
-    // layer is left as it is, rather than that length being taken for its colour.
-    else if (/^-?[\d.]+[a-z%]+$/i.test(p)) return null;
+    // Anything else that is a length (1rem, +1rem, 0.5em) or computes one (calc(), min(),
+    // max(), clamp()) can't be compared with the px scale: the layer is left as it is,
+    // rather than that value being taken for its colour.
+    else if (/^[+-]?[\d.]/.test(p) || /^(calc|min|max|clamp)\(/i.test(p)) return null;
     else colour = p;
   }
   if (!colour || lens.length < 2 || lens.length > 4) return null;
@@ -134,6 +135,7 @@ const SKIP = [
   /src\/components\/layout\/ChatHistoryItem\.tsx$/,
   /src\/components\/layout\/sidebar\/(PersonaChatItem|ProjectChatItem|RecentsSection|StarredSection|ProjectsSection|PersonasSectionIndividual|RecentAgentChatsSection)\.tsx$/,
 ];
+function main() {
 const args = process.argv.slice(2);
 const dry = args.includes("--dry");
 const files = [];
@@ -158,3 +160,7 @@ for (const file of files) {
   }
 }
 console.log(`${dry ? "[dry] " : ""}${total} shadow values in ${files.length} files scanned`);
+}
+
+// Run only when executed directly, so tests can import parseLayer().
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
