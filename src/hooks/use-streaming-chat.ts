@@ -39,6 +39,9 @@ export type { TurnResume } from "@/lib/chat/stream/stream-request"
 /** How many times one turn re-attaches to its stream, and the pause before each. */
 const FOLLOW_ATTEMPTS = 5
 const FOLLOW_RETRY_MS = 1000
+// How long a follow waits for a send to be accepted (its run started) before taking
+// the send as stalled and dropping it.
+export const SEND_ACCEPT_WAIT_MS = 20_000
 
 /** How a follow of a running turn went: it reached the stream, the chat has no
  *  running turn any more (it ended while nobody was reading), or it could not connect. */
@@ -106,6 +109,16 @@ export function useStreamingChat({
   const stopRequestedRef = useRef(false)
   // Set by a follow of a running turn, read by whoever started it.
   const followResultRef = useRef<FollowResult>("attached")
+
+  // Whether a call's stream state belongs to the chat on screen. With no chat on screen
+  // (a new, unsaved chat) only a send is that view's own; a follow is always for a saved
+  // chat, so it belongs to a view showing exactly that chat. No ref at all: one view only.
+  const showsChat = (streamChatId: string | null, isFollow: boolean) => {
+    if (!currentChatIdRef) return true
+    const shown = currentChatIdRef.current
+    if (!shown) return !isFollow
+    return streamChatId === null || streamChatId === shown
+  }
 
   // Pending message field updates - flushed to React every FLUSH_INTERVAL_MS
   const pendingFieldsRef = useRef<Partial<UIMessage> | null>(null)
@@ -272,8 +285,16 @@ export function useStreamingChat({
       let holder = activeCallRef.current
       // A send the backend has not accepted yet is never dropped: wait until its run
       // starts (or it ends), then look again — another call may have taken over meanwhile.
+      // That wait is bounded: a send still unanswered after SEND_ACCEPT_WAIT_MS is taken
+      // as stalled and dropped like any other call, so a follow is never stuck behind it.
       while (holder && !holder.droppable()) {
-        await holder.settled
+        let timer: ReturnType<typeof setTimeout> | undefined
+        const waited = await Promise.race([
+          holder.settled.then(() => "settled" as const),
+          new Promise<"stalled">((resolve) => { timer = setTimeout(() => resolve("stalled"), SEND_ACCEPT_WAIT_MS) }),
+        ])
+        clearTimeout(timer)
+        if (waited === "stalled") break
         holder = activeCallRef.current
       }
       if (holder) {
@@ -339,11 +360,7 @@ export function useStreamingChat({
 
     // Returns true if this stream's chat is still the one the user is viewing.
     // Used to suppress setStreamState calls for background (unfocused) streams.
-    const isActiveStream = () => {
-      if (!currentChatIdRef?.current) return true
-      const streamId = resolvedChatIdRef.current
-      return streamId === null || streamId === currentChatIdRef.current
-    }
+    const isActiveStream = () => showsChat(resolvedChatIdRef.current, follow)
 
     // Like every other state change here: only for the chat being shown. A call that
     // waited for another to hand over may belong to a chat the user has since left.
@@ -479,7 +496,7 @@ export function useStreamingChat({
         completeStream(resolvedChatIdRef.current, outcome)
         // The backend saves the files this turn carried to Library; refresh what Library shows.
         if (options?.files?.length) notifyLibraryFilesChanged()
-        setStreamState?.("done")
+        if (isActiveStream()) setStreamState?.("done")
         onStreamDone?.()
         return outcome
       } catch (error) {
@@ -492,7 +509,7 @@ export function useStreamingChat({
 
         // User-initiated stop - not an error
         if (stopRequestedRef.current) {
-          setStreamState?.("aborted")
+          if (isActiveStream()) setStreamState?.("aborted")
           return "aborted"
         }
 
@@ -533,7 +550,7 @@ export function useStreamingChat({
             if (result === "attached") return outcome
             if (result === "gone") {
               completeStream(liveChatId, "done")
-              setStreamState?.("done")
+              if (showsChat(liveChatId, true)) setStreamState?.("done")
               onStreamLost?.(liveChatId)
               onStreamDone?.()
               return "done"
@@ -546,7 +563,7 @@ export function useStreamingChat({
         if (!(error instanceof FriendlyStreamError)) logger.error("[useStreamingChat] Error", error)
 
         if (error instanceof AuthExpiredError) {
-          setStreamState?.("error")
+          if (isActiveStream()) setStreamState?.("error")
           // Settle the reply (no cursor or busy state) while the sign-out runs.
           if (!turn.streamFinished) finishTurn(ctx, turn, "error", SESSION_EXPIRED_MESSAGE)
           dispatchSessionExpired()
@@ -561,13 +578,13 @@ export function useStreamingChat({
         // (e.g. a synchronous throw earlier in this function), so weren't
         // already classified as AuthExpiredError there.
         if (isAuthErrorText(lower) || lower.includes("401")) {
-          setStreamState?.("error")
+          if (isActiveStream()) setStreamState?.("error")
           if (!turn.streamFinished) finishTurn(ctx, turn, "error", SESSION_EXPIRED_MESSAGE)
           dispatchSessionExpired()
           return "error"
         }
 
-        setStreamState?.("error")
+        if (isActiveStream()) setStreamState?.("error")
         // A turn already finished by its done/error event keeps that outcome.
         if (!turn.streamFinished) {
           // Errors from the XHR paths are already translated by
@@ -612,7 +629,7 @@ export function useStreamingChat({
     followResultRef.current = "attached"
     if (result === "attached") return outcome
     completeStream(chatId, "done")
-    setStreamState?.("done")
+    if (showsChat(chatId, true)) setStreamState?.("done")
     onRefused?.()
     onStreamLost?.(chatId)
     return "done"

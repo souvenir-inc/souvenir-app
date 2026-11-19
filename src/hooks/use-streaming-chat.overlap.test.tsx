@@ -8,7 +8,7 @@
 import React, { act, useEffect } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { useStreamingChat } from '@/hooks/use-streaming-chat'
+import { SEND_ACCEPT_WAIT_MS, useStreamingChat } from '@/hooks/use-streaming-chat'
 import { detachStream, isStreamActive } from '@/lib/stream-registry'
 import { queueMessage, queuedChatsReadyForBackground, takeAllQueuedMessages } from '@/lib/message-queue'
 import { resetStreamStore } from '@/lib/chat/stream-store'
@@ -59,12 +59,14 @@ let root: Root
 let messages: UIMessage[]
 let hook: ReturnType<typeof useStreamingChat>
 
-function Harness({ onReady, liveOverlay = false }: { onReady: (api: ReturnType<typeof useStreamingChat>) => void; liveOverlay?: boolean }) {
+type View = { currentChatIdRef: React.RefObject<string | undefined>; setStreamState: (state: string) => void }
+function Harness({ onReady, liveOverlay = false, view }: { onReady: (api: ReturnType<typeof useStreamingChat>) => void; liveOverlay?: boolean; view?: View }) {
   const api = useStreamingChat({
     setMessages: (update) => {
       messages = typeof update === 'function' ? update(messages) : update
     },
     liveOverlay,
+    ...(view as object),
   })
   useEffect(() => onReady(api))
   return null
@@ -196,6 +198,68 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(reply('reply-B')).toMatchObject({ content: 'From B.', isLoading: false })
   })
 
+  it('drops a send the backend never answers once the follow has waited SEND_ACCEPT_WAIT_MS', async () => {
+    const doneA = hook.fetchAiResponse('hello', 'chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const send = FakeXHR.all[0]
+    send.start() // connected, but no RUN_STARTED ever arrives
+
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    const doneB = hook.followStream('chat-B', 'reply-B')
+    await act(async () => { await vi.advanceTimersByTimeAsync(SEND_ACCEPT_WAIT_MS - 100) })
+    expect(FakeXHR.all).toHaveLength(1)
+    await act(async () => { await vi.advanceTimersByTimeAsync(200) })
+    vi.useRealTimers()
+
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+    expect(send.aborted).toBe(true)
+    send.end()
+    await act(async () => { await doneA })
+    const xhrB = FakeXHR.all[1]
+    xhrB.start()
+    xhrB.push({ type: 'RUN_STARTED', ...runB }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'b', delta: 'From B.' }, { type: 'RUN_FINISHED', ...runB })
+    xhrB.end()
+    expect(await doneB).toBe('done')
+  })
+
+  it("keeps a follow's states off a new, unsaved chat's view; that view's own send still shows them", async () => {
+    const states: string[] = []
+    const view: View = { currentChatIdRef: { current: undefined }, setStreamState: (state) => { states.push(state) } }
+    act(() => root.render(<Harness view={view} onReady={(api) => { hook = api }} />))
+
+    const doneB = hook.followStream('chat-B', 'reply-B')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const xhrB = FakeXHR.all[0]
+    xhrB.start()
+    xhrB.push({ type: 'RUN_STARTED', ...runB }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'b', delta: 'B.' }, { type: 'RUN_FINISHED', ...runB })
+    xhrB.end()
+    await act(async () => { await doneB })
+    expect(states).toEqual([])
+
+    const doneNew = hook.fetchAiResponse('hello', null, 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+    const send = FakeXHR.all[1]
+    send.start()
+    send.push({ type: 'RUN_STARTED', ...runA }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'A.' }, { type: 'RUN_FINISHED', ...runA })
+    send.end()
+    await act(async () => { await doneNew })
+    expect(states[0]).toBe('waiting')
+    expect(states.at(-1)).toBe('done')
+  })
+
+  it("does not mark another chat's view done when a follow ends", async () => {
+    const states: string[] = []
+    const view: View = { currentChatIdRef: { current: 'chat-A' }, setStreamState: (state) => { states.push(state) } }
+    act(() => root.render(<Harness view={view} onReady={(api) => { hook = api }} />))
+    const doneB = hook.followStream('chat-B', 'reply-B')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+    FakeXHR.all[0].end()
+    await act(async () => { await doneB })
+    expect(states).toEqual([])
+  })
+
   it('lets a waiting call go once a dropped send has handed off to its recovery follow', async () => {
     // A send whose connection drops before its run starts: not droppable, so B waits.
     const doneA = hook.fetchAiResponse('hello', 'chat-A', 'reply-A')
@@ -232,9 +296,12 @@ describe('useStreamingChat with overlapping follows', () => {
     xhrA.start()
     xhrA.push({ type: 'RUN_STARTED', ...runA }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'From A.' })
     xhrA.status = 0
+    // Watch for A's retry timer, so B starts once A is in its wait (starting B before
+    // would detach A before it got there) and while the 1 s wait is still pending.
+    const timers = vi.spyOn(globalThis, 'setTimeout')
     xhrA.end() // dropped: A waits before retrying
-    // Let A reach its retry wait; starting B synchronously would detach A before it got there.
-    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 100)) })
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
 
     // Chat B opens inside A's wait and takes the hook's refs.
     const doneB = hook.followStream('chat-B', 'reply-B')

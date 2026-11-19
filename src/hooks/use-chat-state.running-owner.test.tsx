@@ -82,7 +82,9 @@ describe('runningMessageId across a chat switch', () => {
       await act(async () => { root.render(<Harness chatId={chatId} />); await Promise.resolve() })
       await act(async () => { await Promise.resolve() })
     }
-    expect(seen.filter((e) => e.chatId === 'b').every((e) => e.running === null)).toBe(true)
+    const onB = seen.filter((e) => e.chatId === 'b')
+    expect(onB.length).toBeGreaterThan(0)
+    expect(onB.every((e) => e.running === null)).toBe(true)
     expect(seen.at(-1)).toEqual({ chatId: 'a', running: 'turn-A' })
   })
 })

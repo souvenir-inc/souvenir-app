@@ -566,12 +566,31 @@ export async function getChatStreamId(chatId: string): Promise<string | null> {
  * when it can't tell (a failed request or a non-OK response) rather than answering "no":
  * for a caller about to send into the chat, "unknown" must not read as "idle".
  */
-export async function getChatRunState(chatId: string): Promise<"running" | "idle"> {
-  const response = await apiFetch(CHAT_ENDPOINT(chatId));
-  if (!response.ok) throw new Error(`Couldn't read the chat's run state (${response.status})`);
-  const chat = (await response.json()) as { streamId?: string | null };
-  return chat.streamId ? "running" : "idle";
+export async function getChatRunState(chatId: string, timeoutMs = RUN_STATE_TIMEOUT_MS): Promise<"running" | "idle"> {
+  // The whole lookup (token refresh, request, body) has a deadline: a request that
+  // never settles fails like any other, so a caller retrying it is never stuck.
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      reject(new Error("Timed out reading the chat's run state"));
+    }, timeoutMs);
+  });
+  const lookup = (async () => {
+    const response = await apiFetch(CHAT_ENDPOINT(chatId), { signal: controller.signal });
+    if (!response.ok) throw new Error(`Couldn't read the chat's run state (${response.status})`);
+    const chat = (await response.json()) as { streamId?: string | null };
+    return chat.streamId ? ("running" as const) : ("idle" as const);
+  })();
+  lookup.catch(() => {});
+  return Promise.race([lookup, deadline]).then(
+    (state) => { clearTimeout(timer); return state; },
+    (error: unknown) => { clearTimeout(timer); throw error; },
+  );
 }
+/** How long one run-state lookup may take before it counts as failed. */
+export const RUN_STATE_TIMEOUT_MS = 10_000;
 
 /** POST /chats/{chat_id}/stop — abort an in-flight stream. */
 export async function stopChat(chatId: string): Promise<void> {
