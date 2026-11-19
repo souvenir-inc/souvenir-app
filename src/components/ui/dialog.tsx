@@ -80,8 +80,9 @@ function FocusReturnCapture({ returnToRef }: { returnToRef: React.RefObject<HTML
 
 const WIDTHS = { sm: 400, md: 520, lg: 680 } as const
 
-// Below the dropdown layer (Dropdown.Float, 9998) and tooltips (9999): menus and tooltips opened
-// from inside a dialog portal to <body> and must paint above it. Toasts sit far above all three.
+// On the z-index scale (src/styles/tokens): the backdrop at --z-overlay, the dialog at --z-modal,
+// below dropdowns (--z-popover), toasts (--z-toast) and tooltips (--z-tooltip). Menus and tooltips
+// opened from inside a dialog portal to <body> and must paint above it.
 const DIALOG_Z = 'var(--z-modal)'
 const DIALOG_OVERLAY_Z = 'var(--z-overlay)'
 

@@ -116,8 +116,8 @@ DropdownRoot.displayName = 'Dropdown'
 //     (start = left edges aligned, end = right edges aligned).
 //   • left-* and right-* placements anchor to the PARENT dropdown panel when
 //     the trigger lives inside one (nested menus), otherwise to the trigger.
-//   • Dropdowns sit at z-index 9998 - exactly one layer below the
-//     tooltip layer (9999), per the KDS overlay-z hierarchy.
+//   • Dropdowns sit on the z-index scale at --z-popover: above dialogs
+//     (--z-modal) and below toasts and tooltips (--z-toast, --z-tooltip).
 // Positioning, dismissal, focus management and keyboard navigation are all
 // delegated to Radix DropdownMenu.
 

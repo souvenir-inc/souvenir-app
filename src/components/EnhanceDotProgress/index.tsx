@@ -53,7 +53,7 @@ export function EnhanceDotProgress({ ref, total, current, audit = false, classNa
                 display:         'inline-block',
                 width:           isCurrent ? 18 : 6,
                 height:          6,
-                borderRadius:    'var(--radius-xs)',
+                borderRadius:    3, // ds-keep: framer-motion's layout animation corrects px radii, not var()
                 backgroundColor: isUpcoming
                   ? 'var(--color-enhance-progress-inactive)'
                   : activeColor,

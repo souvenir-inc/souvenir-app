@@ -476,7 +476,8 @@ function parseBlocks(content: string, sourceOffset = 0): Block[] {
 const TEXT: React.CSSProperties = {
   fontFamily: "var(--font-body)",
   fontSize: "16px",
-  lineHeight: 'var(--line-height-heading-md)',
+  // Chat prose keeps its own ladder (--prose-*), not the UI scale (plan, Appendix B): 26px.
+  lineHeight: 'var(--prose-line-body)',
   color: "var(--neutral-800)",
   margin: 0,
   wordBreak: "break-word",
@@ -546,7 +547,7 @@ export function LineRenderer({ content, webCitations, highlights, sourceOffset =
               ...textStyle,
               fontWeight: 600,
               fontSize: HEADING_SIZE[block.level],
-              lineHeight: 'var(--line-height-heading)',
+              lineHeight: "30px", // ds-keep: chat prose headings, not the UI scale (no --prose-* step for 30px)
               color: "var(--neutral-900)",
               margin: "8px 0 2px",
             }}
