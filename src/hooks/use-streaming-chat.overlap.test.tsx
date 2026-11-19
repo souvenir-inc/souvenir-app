@@ -9,7 +9,8 @@ import React, { act, useEffect } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useStreamingChat } from '@/hooks/use-streaming-chat'
-import { isStreamActive } from '@/lib/stream-registry'
+import { detachStream, isStreamActive } from '@/lib/stream-registry'
+import { queueMessage, queuedChatsReadyForBackground, takeAllQueuedMessages } from '@/lib/message-queue'
 import { resetStreamStore } from '@/lib/chat/stream-store'
 import type { UIMessage } from '@/types/chat'
 
@@ -104,8 +105,18 @@ describe('useStreamingChat with overlapping follows', () => {
     await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
     const xhrB = FakeXHR.all[1]
     expect(xhrA.aborted).toBe(true)
-    // Dropped through the registry: chat A is not left looking busy, so it follows afresh.
+    // A's run is still going on the backend, so A must still look busy (or its message
+    // queue would send into that run). Reopening A clears the entry, as use-chat-state does,
+    // and the chat then follows its run afresh.
+    expect(isStreamActive('chat-A')).toBe(true)
+    // So a message queued for A is not sent in the background into A's running turn...
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true } })
+    expect(queuedChatsReadyForBackground()).not.toContain('chat-A')
+    expect(detachStream('chat-A')).toBe(true)
     expect(isStreamActive('chat-A')).toBe(false)
+    // ...and once A is reopened (and followed afresh), its queue is no longer held by it.
+    expect(queuedChatsReadyForBackground()).toContain('chat-A')
+    takeAllQueuedMessages('chat-A')
 
     xhrB.start()
     xhrB.push({ type: 'RUN_STARTED', ...runB }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'b', delta: 'From B.' })
@@ -168,12 +179,12 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(FakeXHR.all).toHaveLength(1)
     expect(send.aborted).toBe(false)
 
-    // The backend accepts the send: now B may take the hook, dropping A's connection
-    // (the run goes on server-side) and A's registry entry with it.
+    // The backend accepts the send: now B may take the hook, dropping A's connection.
+    // A's run goes on server-side, so A still looks busy until it is reopened.
     send.push({ type: 'RUN_STARTED', ...runA })
     await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
     expect(send.aborted).toBe(true)
-    expect(isStreamActive('chat-A')).toBe(false)
+    expect(isStreamActive('chat-A')).toBe(true)
     send.end()
     await act(async () => { await doneA })
 

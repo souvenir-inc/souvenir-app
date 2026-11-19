@@ -13,7 +13,7 @@ import { logger } from "@/lib/logger"
 import { friendlyModelError } from "@/lib/model-error"
 import { AguiSSEDecoder } from "@/lib/sse-decoder"
 import type { UIMessage } from "@/types/chat"
-import { registerStream, completeStream, detachStream, type StreamOutcome } from "@/lib/stream-registry"
+import { registerStream, completeStream, type StreamOutcome } from "@/lib/stream-registry"
 import { updateMessage } from "@/lib/chat/stream/message-patches"
 import {
   AuthExpiredError,
@@ -318,12 +318,11 @@ export function useStreamingChat({
       droppable: () => follow || runStarted,
       settled: new Promise<void>((resolve) => { markSettled = resolve }),
       settle: () => markSettled(),
-      // Through the registry, so the entry goes with the connection and the chat is
-      // not left looking busy; the direct detach covers a call the registry no longer holds.
-      drop: () => {
-        const heldChat = resolvedChatIdRef.current
-        if (!(heldChat && detachStream(heldChat))) detachThisCall()
-      },
+      // Closes the connection but keeps the registry entry: the chat's run is still going
+      // on the backend, so the chat must keep looking busy, or its message queue would send
+      // the next message into that run. Reopening the chat clears the entry
+      // (use-chat-state's detachStream) and follows the run afresh.
+      drop: () => detachThisCall(),
     }
     // A retry of a dropped call is that call's recovery follow taking the hook over: the
     // call it replaces has handed off, so anyone waiting on it can stop waiting now

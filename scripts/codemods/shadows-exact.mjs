@@ -15,6 +15,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// The same string/comment mask as tokens-exact, so the codemods agree on what is code.
+import { codeMask } from "./tokens-exact.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const TOKENS = path.join(ROOT, "src/styles/tokens");
@@ -119,10 +121,19 @@ const keep = (src, offset) => {
   const end = src.indexOf("\n", offset);
   return src.slice(offset, end < 0 ? undefined : end).includes("ds-keep");
 };
-const transformTsx = (src, c) => src.replace(/((?:boxShadow|SHADOW_\w*)\s*[:=]\s*)(['"`])([^'"`\n]*)\2/g,
-  (w, pre, q, v, off) => keep(src, off) ? w : `${pre}${q}${transformValue(v, c)}${q}`);
-const transformCss = (src, c) => src.replace(/(box-shadow\s*:\s*)([^;{}]+);/g,
-  (w, pre, v, off) => keep(src, off) ? w : `${pre}${transformValue(v.trim(), c)};`);
+// A match that starts inside a string or comment is look-alike text, not a declaration
+// (same mask as tokens-exact). The value's own quotes start after the match, so a real
+// `boxShadow: '…'` is still code where it begins.
+export const transformTsx = (src, c) => {
+  const masked = codeMask(src);
+  return src.replace(/((?:boxShadow|SHADOW_\w*)\s*[:=]\s*)(['"`])([^'"`\n]*)\2/g,
+    (w, pre, q, v, off) => masked[off] || keep(src, off) ? w : `${pre}${q}${transformValue(v, c)}${q}`);
+};
+export const transformCss = (src, c) => {
+  const masked = codeMask(src, { css: true });
+  return src.replace(/(box-shadow\s*:\s*)([^;{}]+);/g,
+    (w, pre, v, off) => masked[off] || keep(src, off) ? w : `${pre}${transformValue(v.trim(), c)};`);
+};
 
 // ── Files ───────────────────────────────────────────────────────────────────
 const SKIP = [
