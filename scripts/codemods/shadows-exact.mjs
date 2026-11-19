@@ -50,6 +50,9 @@ function parseLayer(layer) {
   for (const p of parts) {
     if (p.toLowerCase() === "inset") inset = true;
     else if (/^-?[\d.]+(px)?$/.test(p)) lens.push(parseFloat(p));
+    // A length in any other unit (1rem, 0.5em) can't be compared with the px scale: the
+    // layer is left as it is, rather than that length being taken for its colour.
+    else if (/^-?[\d.]+[a-z%]+$/i.test(p)) return null;
     else colour = p;
   }
   if (!colour || lens.length < 2 || lens.length > 4) return null;

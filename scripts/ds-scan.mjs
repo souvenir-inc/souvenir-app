@@ -123,7 +123,7 @@ function scan() {
       for (const [prop, value] of decls) {
         const category = Object.keys(CATEGORIES).find((c) => CATEGORIES[c].test(prop));
         // z-index -1…9 orders siblings inside one component; page layers (10+) must use the --z-* scale.
-        const local = category === "zIndex" && /^["'`]?-?\d["'`]?$/.test(value.trim());
+        const local = category === "zIndex" && /^["'`]?(-1|\d)["'`]?$/.test(value.trim());
         if (category === "color" && contentColour) continue;
         if (category) add(`${local ? "local" : classify(value, isCss)}.${category}`, file);
       }
