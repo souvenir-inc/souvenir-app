@@ -11,11 +11,12 @@ import {
   hasQueuedMessages,
   queuedChatsReadyForBackground,
   subscribeQueue,
+  restoreQueuedMessage,
   takeNextQueuedMessage,
   type QueuedMessage,
 } from "@/lib/message-queue";
 import { completeStream, registerStream } from "@/lib/stream-registry";
-import { getChatStreamId } from "@/lib/api/chat";
+import { getChatRunState } from "@/lib/api/chat";
 import { buildTurnOptions } from "@/lib/turn-options";
 import type { UIMessage } from "@/types/chat";
 
@@ -101,6 +102,8 @@ export function MessageQueueRunner() {
 const IGNORE_MESSAGES: React.Dispatch<React.SetStateAction<UIMessage[]>> = () => {};
 // How often a queued send asks whether the chat's previous run has ended.
 export const RUN_POLL_MS = 3000;
+// Failed checks in a row before a queued send stops trying and holds its message.
+export const RUN_CHECK_ATTEMPTS = 5;
 
 /** One queued message going out, on its own streaming hook (one stream each). */
 function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: () => void }) {
@@ -121,6 +124,14 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
   useEffect(() => {
     onDoneRef.current = onDone;
   });
+
+  // Whether this send is still mounted. Its own effect, so Strict Mode's mount, cleanup,
+  // mount leaves it true; only a real unmount (the app going away) clears it.
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
   // Strict Mode runs effects twice; the message goes out once.
   const startedRef = useRef(false);
@@ -149,18 +160,35 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
     // The registry is what this tab knows; the backend is the source of truth. A chat
     // can look idle here while its run is still going (left mid-reply, or left again
     // while it was being reopened), and a message sent into a running turn is lost to
-    // it. So the reservation is held and the backend asked until the run has ended. If
-    // the check itself fails, the send goes ahead, as before.
-    const waitForRunToEnd = async () => {
+    // it. So the reservation is held and the backend asked until the run has ended.
+    // "Can't tell" is not "idle": after RUN_CHECK_ATTEMPTS failed checks in a row the
+    // message is held rather than sent.
+    const waitForIdleRun = async (): Promise<"idle" | "unmounted" | "unknown"> => {
+      let failures = 0;
       for (;;) {
-        const running = await getChatStreamId(chatId).catch(() => null);
-        if (!running) return;
+        if (!mountedRef.current) return "unmounted";
+        try {
+          if ((await getChatRunState(chatId)) === "idle") return "idle";
+          failures = 0;
+        } catch {
+          failures += 1;
+          if (failures >= RUN_CHECK_ATTEMPTS) return "unknown";
+        }
         await new Promise((resolve) => setTimeout(resolve, RUN_POLL_MS));
       }
     };
 
-    waitForRunToEnd()
-      .then(() => fetchAiResponse(message.content, chatId, `queued-${message.id}`, modelId, options))
+    waitForIdleRun()
+      .then((state) => {
+        if (state === "idle" && mountedRef.current) {
+          return fetchAiResponse(message.content, chatId, `queued-${message.id}`, modelId, options);
+        }
+        // Not sent: the message goes back to the front of its queue, and the reservation
+        // ends without "done", which holds that queue (message-queue.ts) until the user
+        // sends again rather than letting the next pass try at once.
+        restoreQueuedMessage(chatId, message, 0);
+        completeStream(chatId, state === "unknown" ? "error" : "aborted");
+      })
       // fetchAiResponse settles every stream itself; this only frees the
       // reservation if it threw before getting that far.
       .catch(() => completeStream(chatId, "error"))
