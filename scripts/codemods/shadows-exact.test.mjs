@@ -68,4 +68,10 @@ describe("transformTsx", () => {
     expect(out[1]).toContain(shadow);
     expect(out[2]).toMatch(/boxShadow: 'var\(--shadow-[a-z0-9-]+\)'/);
   });
+
+  it("leaves a literal that an expression goes on to use", () => {
+    const src = `<div style={{ boxShadow: '0px 2px 2.8px rgba(82,75,71,0.12)'.replace('2.8px', '8px') }} />`;
+    expect(transformTsx(src, { n: 0 })).toBe(src);
+    expect(transformTsx(`const SHADOW_A = '0px 2px 2.8px rgba(82,75,71,0.12)'`, { n: 0 })).toMatch(/= 'var\(--shadow-/);
+  });
 });

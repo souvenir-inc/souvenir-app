@@ -128,10 +128,11 @@ const keep = (src, offset) => {
 };
 // A match that starts inside a string or comment is look-alike text, not a declaration
 // (same mask as tokens-exact). The value's own quotes start after the match, so a real
-// `boxShadow: '…'` is still code where it begins.
+// `boxShadow: '…'` is still code where it begins. Only a whole literal value is converted:
+// one that an expression goes on to use (`'…'.replace(…)`) is left alone.
 export const transformTsx = (src, c) => {
   const masked = codeMask(src);
-  return src.replace(/((?:boxShadow|SHADOW_\w*)\s*[:=]\s*)(['"`])([^'"`\n]*)\2/g,
+  return src.replace(/((?:boxShadow|SHADOW_\w*)\s*[:=]\s*)(['"`])([^'"`\n]*)\2(?=\s*(?:[,;}]|$))/gm,
     (w, pre, q, v, off) => masked[off] || keep(src, off) ? w : `${pre}${q}${transformValue(v, c)}${q}`);
 };
 export const transformCss = (src, c) => {

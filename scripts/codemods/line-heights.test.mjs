@@ -29,6 +29,12 @@ describe("line-heights on TSX", () => {
     expect(out).toContain(`lineHeight: 'var(--leading-normal)', margin: 0`);
   });
 
+  it("leaves a ternary branch named lineHeight, and still converts the property", () => {
+    const src = `const s = { padding: compact ? lineHeight : 1.5, }`;
+    expect(tsx(src)).toBe(src);
+    expect(tsx(`const s = { lineHeight: 1.5, }`)).toContain(`lineHeight: 'var(--leading-normal)'`);
+  });
+
   it("leaves a value that continues as an expression on the next line", () => {
     const src = `<div style={{ lineHeight: 1.5\n  * scale, padding: 4 }} />`;
     expect(tsx(src)).toBe(src);

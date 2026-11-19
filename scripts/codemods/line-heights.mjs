@@ -80,7 +80,8 @@ const keep = (src, off) => { const e = src.indexOf("\n", off); return src.slice(
 export function transform(src, isCss, counter) {
   // A value ends where the next non-space character is `,` or `}`; a newline alone does not
   // end it, or `lineHeight: 1.5` followed by `* scale` on the next line would be split.
-  const re = isCss ? /(line-height\s*:\s*)([^;{}]+)(;)/g : /(\blineHeight\s*:\s*)('[^']*'|"[^"]*"|-?[\d.]+)(?=\s*[,}])/g;
+  const re = isCss ? /(line-height\s*:\s*)([^;{}]+)(;)/g : /(?<=(?:^|[{,])\s*)(\blineHeight\s*:\s*)('[^']*'|"[^"]*"|-?[\d.]+)(?=\s*[,}])/gm;
+  // lineHeight must start an object property: in `a ? lineHeight : 1.5` it is a ternary branch.
   // Text inside a string or comment can look like a declaration (`"lineHeight: 1.5,"`).
   const masked = codeMask(src, { css: isCss });
   return src.replace(re, (w, pre, val, post = "", off) => {

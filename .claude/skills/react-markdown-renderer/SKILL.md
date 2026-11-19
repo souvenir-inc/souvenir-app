@@ -79,8 +79,10 @@ export const markdownComponents: Components = {
   h1: ({ children }) => (
     <h1 className="text-2xl font-bold mt-6 mb-3 tracking-tight">{children}</h1>
   ),
-  h2: ({ children }) => (
-    <h2 className="text-xl font-semibold mt-5 mb-2">{children}</h2>
+  // Forward the rest (minus `node`): GFM's footnote section uses an h2 with
+  // id="footnote-label" and className="sr-only", which footnote links point to.
+  h2: ({ node, className, children, ...props }) => (
+    <h2 {...props} className={`text-xl font-semibold mt-5 mb-2 ${className ?? ''}`}>{children}</h2>
   ),
   h3: ({ children }) => (
     <h3 className="text-lg font-semibold mt-4 mb-1">{children}</h3>
