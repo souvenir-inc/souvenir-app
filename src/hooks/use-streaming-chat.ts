@@ -322,203 +322,212 @@ export function useStreamingChat({
       saveToLibrary: undefined,
     }
 
-    try {
-      const target = resolveStreamTarget(chatId, endpoint, directEndpoints, options)
-      const directToken = target.useDirectBackend ? await ensureFreshToken() : null
-      const { fd, fileRefs } = buildStreamFormData(input, chatId, modelId, options, target)
-      ctx.saveToLibrary = fileRefs.saveToLibrary
-      // The sent message remembers its Library files, for the chat's Sources panel.
-      if (fileRefs.libraryFileIds.length > 0 && options?.userMessageId) {
-        const sentIds = fileRefs.libraryFileIds
-        // Each attachment that went as a Library file is marked, so Sources lists it once (as that file).
-        const sentFiles = options.files ?? []
-        setMessages(updateMessage(options.userMessageId, (msg) => ({
-          ...msg,
-          libraryFileIds: sentIds,
-          attachments: msg.attachments?.map((att, index) => {
-            const libraryFileId = sentFiles[index] ? libraryFileIdFor(sentFiles[index]) : undefined
-            return libraryFileId && !att.libraryFileId ? { ...att, libraryFileId } : att
-          }),
-        })))
-      }
+    // try/catch inside runCall, release after it: React Compiler cannot compile a
+    // `finally`, and bails out of the whole hook when it meets one. The release still
+    // runs on every path — after a return, and before an exception is passed on.
+    const runCall = async (): Promise<StreamOutcome> => {
+      try {
+        const target = resolveStreamTarget(chatId, endpoint, directEndpoints, options)
+        const directToken = target.useDirectBackend ? await ensureFreshToken() : null
+        const { fd, fileRefs } = buildStreamFormData(input, chatId, modelId, options, target)
+        ctx.saveToLibrary = fileRefs.saveToLibrary
+        // The sent message remembers its Library files, for the chat's Sources panel.
+        if (fileRefs.libraryFileIds.length > 0 && options?.userMessageId) {
+          const sentIds = fileRefs.libraryFileIds
+          // Each attachment that went as a Library file is marked, so Sources lists it once (as that file).
+          const sentFiles = options.files ?? []
+          setMessages(updateMessage(options.userMessageId, (msg) => ({
+            ...msg,
+            libraryFileIds: sentIds,
+            attachments: msg.attachments?.map((att, index) => {
+              const libraryFileId = sentFiles[index] ? libraryFileIdFor(sentFiles[index]) : undefined
+              return libraryFileId && !att.libraryFileId ? { ...att, libraryFileId } : att
+            }),
+          })))
+        }
 
-      const sseDecoder = new AguiSSEDecoder()
-      await sendStreamRequest({
-        target,
-        directToken,
-        fd,
-        chatId,
-        hasFiles: Boolean(options?.files?.length),
-        onUploadProgress: options?.onUploadProgress,
-        setXhr: (xhr) => {
-          callXhr = xhr
-          // Once detached, xhrRef is the replacing call's: clearing it would leave
-          // that call's Stop with nothing to abort.
-          if (!detached) xhrRef.current = xhr
-        },
-        onUploadEnd: () => {
-          if (detached) return
-          if (isActiveStream()) setStreamState?.("streaming")
-          startFlushInterval()
-        },
-        // Safety-net: start flush interval if upload.loadend didn't fire yet
-        // (e.g. when there are no files to upload).
-        onProgress: () => { if (!detached && !flushTimerRef.current) startFlushInterval() },
-        // Each new slice of the response stream, decoded and applied in order.
-        // A detached call reads nothing more: the reply and chat refs the events
-        // would write through now belong to the call that replaced it.
-        onText: (text, flush = false) => {
-          if (detached) return
-          const decodedEvents = sseDecoder.push(text)
-          if (flush) decodedEvents.push(...sseDecoder.flush())
-          processStreamEvents(ctx, turn, decodedEvents)
-        },
-        // Adopted like the stream's own chat-id events, so the new chat's
-        // stream is registered too — the message queue must not treat a
-        // chat whose first reply is still running as idle.
-        onHeaderChatId: (headerChatId) => {
-          if (detached) return
-          if (!chatId || chatId.startsWith("temp-")) adoptChatId(headerChatId)
-        },
-        isStopRequested: () => stopRequestedRef.current || detached,
-        onFollowAttached: () => {
-          if (detached) return
-          // The stream replays the stretch being worked on from its start, so the reply goes back
-          // to what it held before that stretch: nothing, or what earlier stretches of the run wrote.
-          attached = true
-          const replyId = loadingMessageIdRef.current
-          const prior = options?.prior
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === replyId
-                ? prior
-                  ? { ...prior, isLoading: true }
-                  : { id: msg.id, reactKey: msg.reactKey, role: msg.role, created_at: msg.created_at, chat_id: msg.chat_id, content: "", isLoading: true }
-                : msg,
-            ),
-          )
-        },
-        onFollowFailed: (status) => { failedStatus = status },
-      })
+        const sseDecoder = new AguiSSEDecoder()
+        await sendStreamRequest({
+          target,
+          directToken,
+          fd,
+          chatId,
+          hasFiles: Boolean(options?.files?.length),
+          onUploadProgress: options?.onUploadProgress,
+          setXhr: (xhr) => {
+            callXhr = xhr
+            // Once detached, xhrRef is the replacing call's: clearing it would leave
+            // that call's Stop with nothing to abort.
+            if (!detached) xhrRef.current = xhr
+          },
+          onUploadEnd: () => {
+            if (detached) return
+            if (isActiveStream()) setStreamState?.("streaming")
+            startFlushInterval()
+          },
+          // Safety-net: start flush interval if upload.loadend didn't fire yet
+          // (e.g. when there are no files to upload).
+          onProgress: () => { if (!detached && !flushTimerRef.current) startFlushInterval() },
+          // Each new slice of the response stream, decoded and applied in order.
+          // A detached call reads nothing more: the reply and chat refs the events
+          // would write through now belong to the call that replaced it.
+          onText: (text, flush = false) => {
+            if (detached) return
+            const decodedEvents = sseDecoder.push(text)
+            if (flush) decodedEvents.push(...sseDecoder.flush())
+            processStreamEvents(ctx, turn, decodedEvents)
+          },
+          // Adopted like the stream's own chat-id events, so the new chat's
+          // stream is registered too — the message queue must not treat a
+          // chat whose first reply is still running as idle.
+          onHeaderChatId: (headerChatId) => {
+            if (detached) return
+            if (!chatId || chatId.startsWith("temp-")) adoptChatId(headerChatId)
+          },
+          isStopRequested: () => stopRequestedRef.current || detached,
+          onFollowAttached: () => {
+            if (detached) return
+            // The stream replays the stretch being worked on from its start, so the reply goes back
+            // to what it held before that stretch: nothing, or what earlier stretches of the run wrote.
+            attached = true
+            const replyId = loadingMessageIdRef.current
+            const prior = options?.prior
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === replyId
+                  ? prior
+                    ? { ...prior, isLoading: true }
+                    : { id: msg.id, reactKey: msg.reactKey, role: msg.role, created_at: msg.created_at, chat_id: msg.chat_id, content: "", isLoading: true }
+                  : msg,
+              ),
+            )
+          },
+          onFollowFailed: (status) => { failedStatus = status },
+        })
 
-      // Checked first: the flush timer and buffer are shared, and now hold the
-      // replacing call's tokens. Stopping or flushing them here would freeze that
-      // call's stream and write its pending text from this call's unwinding.
-      if (detached) return "done"
-      stopFlushInterval()
-      flushPending()
-
-      // Stream ended without a done or error event - treat what was shown as
-      // the complete response. A user Stop already finalised the message.
-      if (!turn.streamFinished && !stopRequestedRef.current) finishTurn(ctx, turn, "ended")
-
-      const outcome: StreamOutcome = stopRequestedRef.current ? "aborted" : turn.turnFailed ? "error" : "done"
-      completeStream(resolvedChatIdRef.current, outcome)
-      // The backend saves the files this turn carried to Library; refresh what Library shows.
-      if (options?.files?.length) notifyLibraryFilesChanged()
-      setStreamState?.("done")
-      onStreamDone?.()
-      return outcome
-    } catch (error) {
-      if (detached) return "done"
-      stopFlushInterval()
-      flushPending()
-      completeStream(resolvedChatIdRef.current, stopRequestedRef.current ? "aborted" : "error")
-      // A turn that failed or was stopped part-way may still have saved its files.
-      if (options?.files?.length) notifyLibraryFilesChanged()
-
-      // User-initiated stop - not an error
-      if (stopRequestedRef.current) {
-        setStreamState?.("aborted")
-        return "aborted"
-      }
-
-      // A follow that never reached the stream leaves the reply to whoever started it.
-      if (!attached) {
-        followResultRef.current = failedStatus === 404 ? "gone" : "failed"
-        return "error"
-      }
-
-      // The connection dropped but the backend is still running the turn: read
-      // it again from its stream. A regular chat only; other endpoints have none.
-      const liveChatId = resolvedChatIdRef.current
-      const attempt = options?.followAttempt ?? 0
-      if (
-        error instanceof ConnectionDroppedError &&
-        endpoint === "/api/chat" && !directEndpoints &&
-        liveChatId && !liveChatId.startsWith("temp-") &&
-        !stopRequestedRef.current &&
-        attempt < FOLLOW_ATTEMPTS
-      ) {
-        // Read while this call still holds the refs: during the wait another chat's
-        // call can take them, and its reply id must not become this retry's.
-        const retryReplyId = loadingMessageIdRef.current ?? loadingMessageId
-        const retryUserMessageId = userMessageIdRef.current ?? undefined
-        await new Promise((resolve) => setTimeout(resolve, FOLLOW_RETRY_MS))
-        // Taken over during the wait: the newer call reset stopRequestedRef, so that
-        // alone would let this one start a second follow into the newer call's reply.
+        // Checked first: the flush timer and buffer are shared, and now hold the
+        // replacing call's tokens. Stopping or flushing them here would freeze that
+        // call's stream and write its pending text from this call's unwinding.
         if (detached) return "done"
-        if (!stopRequestedRef.current) {
-          const outcome = await fetchAiResponse("", liveChatId, retryReplyId, null, {
-            follow: true,
-            followAttempt: attempt + 1,
-            userMessageId: retryUserMessageId,
-            prior: options?.prior,
-          })
-          const result = followResultRef.current
-          followResultRef.current = "attached"
-          if (result === "attached") return outcome
-          if (result === "gone") {
-            completeStream(liveChatId, "done")
-            setStreamState?.("done")
-            onStreamLost?.(liveChatId)
-            onStreamDone?.()
-            return "done"
+        stopFlushInterval()
+        flushPending()
+
+        // Stream ended without a done or error event - treat what was shown as
+        // the complete response. A user Stop already finalised the message.
+        if (!turn.streamFinished && !stopRequestedRef.current) finishTurn(ctx, turn, "ended")
+
+        const outcome: StreamOutcome = stopRequestedRef.current ? "aborted" : turn.turnFailed ? "error" : "done"
+        completeStream(resolvedChatIdRef.current, outcome)
+        // The backend saves the files this turn carried to Library; refresh what Library shows.
+        if (options?.files?.length) notifyLibraryFilesChanged()
+        setStreamState?.("done")
+        onStreamDone?.()
+        return outcome
+      } catch (error) {
+        if (detached) return "done"
+        stopFlushInterval()
+        flushPending()
+        completeStream(resolvedChatIdRef.current, stopRequestedRef.current ? "aborted" : "error")
+        // A turn that failed or was stopped part-way may still have saved its files.
+        if (options?.files?.length) notifyLibraryFilesChanged()
+
+        // User-initiated stop - not an error
+        if (stopRequestedRef.current) {
+          setStreamState?.("aborted")
+          return "aborted"
+        }
+
+        // A follow that never reached the stream leaves the reply to whoever started it.
+        if (!attached) {
+          followResultRef.current = failedStatus === 404 ? "gone" : "failed"
+          return "error"
+        }
+
+        // The connection dropped but the backend is still running the turn: read
+        // it again from its stream. A regular chat only; other endpoints have none.
+        const liveChatId = resolvedChatIdRef.current
+        const attempt = options?.followAttempt ?? 0
+        if (
+          error instanceof ConnectionDroppedError &&
+          endpoint === "/api/chat" && !directEndpoints &&
+          liveChatId && !liveChatId.startsWith("temp-") &&
+          !stopRequestedRef.current &&
+          attempt < FOLLOW_ATTEMPTS
+        ) {
+          // Read while this call still holds the refs: during the wait another chat's
+          // call can take them, and its reply id must not become this retry's.
+          const retryReplyId = loadingMessageIdRef.current ?? loadingMessageId
+          const retryUserMessageId = userMessageIdRef.current ?? undefined
+          await new Promise((resolve) => setTimeout(resolve, FOLLOW_RETRY_MS))
+          // Taken over during the wait: the newer call reset stopRequestedRef, so that
+          // alone would let this one start a second follow into the newer call's reply.
+          if (detached) return "done"
+          if (!stopRequestedRef.current) {
+            const outcome = await fetchAiResponse("", liveChatId, retryReplyId, null, {
+              follow: true,
+              followAttempt: attempt + 1,
+              userMessageId: retryUserMessageId,
+              prior: options?.prior,
+            })
+            const result = followResultRef.current
+            followResultRef.current = "attached"
+            if (result === "attached") return outcome
+            if (result === "gone") {
+              completeStream(liveChatId, "done")
+              setStreamState?.("done")
+              onStreamLost?.(liveChatId)
+              onStreamDone?.()
+              return "done"
+            }
           }
         }
-      }
 
-      // A FriendlyStreamError was already logged where it was raised (status, endpoint,
-      // body); logging it again here only doubles the dev overlay's issue count.
-      if (!(error instanceof FriendlyStreamError)) logger.error("[useStreamingChat] Error", error)
+        // A FriendlyStreamError was already logged where it was raised (status, endpoint,
+        // body); logging it again here only doubles the dev overlay's issue count.
+        if (!(error instanceof FriendlyStreamError)) logger.error("[useStreamingChat] Error", error)
 
-      if (error instanceof AuthExpiredError) {
+        if (error instanceof AuthExpiredError) {
+          setStreamState?.("error")
+          // Settle the reply (no cursor or busy state) while the sign-out runs.
+          if (!turn.streamFinished) finishTurn(ctx, turn, "error", SESSION_EXPIRED_MESSAGE)
+          dispatchSessionExpired()
+          return "error"
+        }
+
+        const rawMsg =
+          error instanceof Error ? error.message : "Failed to connect to AI service"
+        const lower = rawMsg.toLowerCase()
+
+        // Fallback for errors that never passed through the XHR reject paths
+        // (e.g. a synchronous throw earlier in this function), so weren't
+        // already classified as AuthExpiredError there.
+        if (isAuthErrorText(lower) || lower.includes("401")) {
+          setStreamState?.("error")
+          if (!turn.streamFinished) finishTurn(ctx, turn, "error", SESSION_EXPIRED_MESSAGE)
+          dispatchSessionExpired()
+          return "error"
+        }
+
         setStreamState?.("error")
-        // Settle the reply (no cursor or busy state) while the sign-out runs.
-        if (!turn.streamFinished) finishTurn(ctx, turn, "error", SESSION_EXPIRED_MESSAGE)
-        dispatchSessionExpired()
+        // A turn already finished by its done/error event keeps that outcome.
+        if (!turn.streamFinished) {
+          // Errors from the XHR paths are already translated by
+          // friendlyModelError at the point of failure, when the real status
+          // code / raw backend text was still available. Re-running the
+          // translator on that already-friendly text would match no known
+          // pattern and flatten it into the generic fallback — so only
+          // translate genuinely-raw messages here.
+          finishTurn(ctx, turn, "error", error instanceof FriendlyStreamError ? rawMsg : friendlyModelError(rawMsg))
+        }
         return "error"
       }
-
-      const rawMsg =
-        error instanceof Error ? error.message : "Failed to connect to AI service"
-      const lower = rawMsg.toLowerCase()
-
-      // Fallback for errors that never passed through the XHR reject paths
-      // (e.g. a synchronous throw earlier in this function), so weren't
-      // already classified as AuthExpiredError there.
-      if (isAuthErrorText(lower) || lower.includes("401")) {
-        setStreamState?.("error")
-        if (!turn.streamFinished) finishTurn(ctx, turn, "error", SESSION_EXPIRED_MESSAGE)
-        dispatchSessionExpired()
-        return "error"
-      }
-
-      setStreamState?.("error")
-      // A turn already finished by its done/error event keeps that outcome.
-      if (!turn.streamFinished) {
-        // Errors from the XHR paths are already translated by
-        // friendlyModelError at the point of failure, when the real status
-        // code / raw backend text was still available. Re-running the
-        // translator on that already-friendly text would match no known
-        // pattern and flatten it into the generic fallback — so only
-        // translate genuinely-raw messages here.
-        finishTurn(ctx, turn, "error", error instanceof FriendlyStreamError ? rawMsg : friendlyModelError(rawMsg))
-      }
-      return "error"
-    } finally {
-      releaseThisCall()
     }
+    const outcome = await runCall().catch((error: unknown) => {
+      releaseThisCall()
+      throw error
+    })
+    releaseThisCall()
+    return outcome
   }
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
