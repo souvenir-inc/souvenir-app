@@ -22,8 +22,11 @@ vi.mock('@/context/chat-history-context', () => ({ useChatHistoryContext: () => 
 vi.mock('@/context/org-context', () => ({ useOrgPlan: () => ({ plan: null }) }))
 vi.mock('@/hooks/use-credit-status', () => ({ useCreditStatus: () => ({ blocked: creditsBlocked }) }))
 vi.mock('@/lib/analytics/events', () => ({ trackBrowserEvent: vi.fn() }))
+// Whether the backend still has a run going for the chat: none, unless a test says so.
+const getChatStreamId = vi.fn()
+vi.mock('@/lib/api/chat', () => ({ getChatStreamId: (...args: unknown[]) => getChatStreamId(...args) }))
 
-import { MessageQueueRunner } from './MessageQueueRunner'
+import { MessageQueueRunner, RUN_POLL_MS } from './MessageQueueRunner'
 import { getChatQueue, queueMessage, setQueueForeground, takeAllQueuedMessages } from '@/lib/message-queue'
 import { completeStream, isStreamActive, registerStream } from '@/lib/stream-registry'
 
@@ -37,6 +40,8 @@ const view = Symbol('view')
 
 beforeEach(async () => {
   creditsBlocked = false
+  getChatStreamId.mockReset()
+  getChatStreamId.mockResolvedValue(null)
   fetchAiResponse.mockReset()
   fetchAiResponse.mockImplementation((_input: string, chatId: string) => new Promise((resolve) => {
     finishSend = (outcome) => { completeStream(chatId, outcome as 'done'); resolve(outcome) }
@@ -116,6 +121,34 @@ describe('MessageQueueRunner', () => {
     await act(async () => completeStream('chat-1', 'error'))
     expect(fetchAiResponse).not.toHaveBeenCalled()
     expect(getChatQueue('chat-1')?.heldBy).toBe('error')
+  })
+
+  it('does not send into a run the backend still has going, though this tab thinks the chat is idle', async () => {
+    // The chat was left while its run was being recovered: nothing here marks it busy,
+    // but the backend's run has not ended yet.
+    vi.useFakeTimers({ toFake: ['setTimeout'] })
+    try {
+      getChatStreamId.mockResolvedValue('run-still-going')
+      await act(async () => {
+        queueMessage('chat-1', { content: 'and then this', attachments: [], mentionedPins: [] }, context)
+      })
+      await act(async () => { await Promise.resolve() })
+      expect(fetchAiResponse).not.toHaveBeenCalled()
+      expect(getChatStreamId).toHaveBeenCalledWith('chat-1')
+      // Held for the message the whole time, so nothing else sends to the chat either.
+      expect(isStreamActive('chat-1')).toBe(true)
+
+      // Still running at the next check; ended at the one after.
+      await act(async () => { await vi.advanceTimersByTimeAsync(RUN_POLL_MS) })
+      expect(fetchAiResponse).not.toHaveBeenCalled()
+      getChatStreamId.mockResolvedValue(null)
+      await act(async () => { await vi.advanceTimersByTimeAsync(RUN_POLL_MS) })
+      expect(fetchAiResponse).toHaveBeenCalledOnce()
+      expect(sentInputs()).toEqual(['and then this'])
+    } finally {
+      vi.useRealTimers()
+    }
+    await act(async () => finishSend('done'))
   })
 
   it('waits while out of credits', async () => {
