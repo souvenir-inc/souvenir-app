@@ -262,6 +262,9 @@ export function ChatInterface({
     let fired = false
     const timer = setTimeout(() => {
       fired = true
+      // Checked again when the wait ends: a stream may have started for this chat in
+      // the meantime (a message sent during the back-off), and that one owns the reply.
+      if (isStreamActive(chatId)) return
       void followStream(chatId, runningMessageId, messages.find((message) => message.id === runningMessageId))
     }, wait)
     return () => {

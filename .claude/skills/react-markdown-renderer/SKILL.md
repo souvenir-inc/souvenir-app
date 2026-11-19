@@ -105,8 +105,9 @@ export const markdownComponents: Components = {
   ul: ({ children }) => (
     <ul className="list-disc list-outside pl-6 my-3 space-y-1">{children}</ul>
   ),
-  ol: ({ children }) => (
-    <ol className="list-decimal list-outside pl-6 my-3 space-y-1">{children}</ol>
+  // `start` keeps a list that begins at 3 numbered from 3.
+  ol: ({ start, children }) => (
+    <ol start={start} className="list-decimal list-outside pl-6 my-3 space-y-1">{children}</ol>
   ),
   li: ({ children }) => <li className="leading-7">{children}</li>,
 
@@ -133,8 +134,9 @@ export const markdownComponents: Components = {
   ),
 
   // Links
-  a: ({ href, children }) => (
-    <a href={href} target="_blank" rel="noopener noreferrer"
+  // `title` carries a link's [text](url "title").
+  a: ({ href, title, children }) => (
+    <a href={href} title={title} target="_blank" rel="noopener noreferrer"
        className="text-blue-600 dark:text-blue-400 underline underline-offset-2 hover:opacity-80">
       {children}
     </a>
@@ -155,11 +157,14 @@ When streaming token-by-token, naively re-rendering the whole message on every t
 import { memo, useMemo } from 'react';
 import Markdown, { Options } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeSanitize from 'rehype-sanitize';
+import rehypeHighlight from 'rehype-highlight';
 
-// Memoized block — only re-renders when content changes
+// Memoized block — only re-renders when content changes. Same plugins as the basic
+// renderer above, so streamed code blocks are highlighted and HTML is sanitised too.
 const MemoizedMarkdown = memo(
   ({ content, ...props }: { content: string } & Options) => (
-    <Markdown remarkPlugins={[remarkGfm]} {...props}>{content}</Markdown>
+    <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize, rehypeHighlight]} {...props}>{content}</Markdown>
   ),
   (prev, next) => prev.content === next.content
 );

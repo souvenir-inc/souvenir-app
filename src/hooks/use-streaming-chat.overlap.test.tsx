@@ -101,6 +101,8 @@ describe('useStreamingChat with overlapping follows', () => {
     await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
     const xhrB = FakeXHR.all[1]
     expect(xhrA.aborted).toBe(true)
+    // Dropped through the registry: chat A is not left looking busy, so it follows afresh.
+    expect(isStreamActive('chat-A')).toBe(false)
 
     xhrB.start()
     xhrB.push({ type: 'RUN_STARTED', ...runB }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'b', delta: 'From B.' })
@@ -122,6 +124,36 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(reply('reply-B')).toMatchObject({ content: 'From B.', isLoading: false })
     // A was left as it was for its chat to follow again, not finished with B's text.
     expect(reply('reply-A').content).not.toContain('B.')
+  })
+
+  it('never drops a send the backend has not accepted; a follow waits for its run to start', async () => {
+    // A message sent in chat A, still waiting for the backend to start its run.
+    const doneA = hook.fetchAiResponse('hello', 'chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const send = FakeXHR.all[0]
+    send.start()
+
+    // Chat B, with a reply still running, is opened meanwhile.
+    const doneB = hook.followStream('chat-B', 'reply-B')
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 150)) })
+    expect(FakeXHR.all).toHaveLength(1)
+    expect(send.aborted).toBe(false)
+
+    // The backend accepts the send: now B may take the hook, dropping A's connection
+    // (the run goes on server-side) and A's registry entry with it.
+    send.push({ type: 'RUN_STARTED', ...runA })
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+    expect(send.aborted).toBe(true)
+    expect(isStreamActive('chat-A')).toBe(false)
+    send.end()
+    await act(async () => { await doneA })
+
+    const xhrB = FakeXHR.all[1]
+    xhrB.start()
+    xhrB.push({ type: 'RUN_STARTED', ...runB }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'b', delta: 'From B.' }, { type: 'RUN_FINISHED', ...runB })
+    xhrB.end()
+    expect(await doneB).toBe('done')
+    expect(reply('reply-B')).toMatchObject({ content: 'From B.', isLoading: false })
   })
 
   it('does not retry a dropped follow that another chat took over during the wait', async () => {

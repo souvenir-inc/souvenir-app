@@ -306,11 +306,24 @@ export function PresetModelSelectorDialog() {
       if (e.key === "Escape") close();
     };
 
+    // Focus landing outside (Tab away, or a modal opened from the keyboard, which takes
+    // focus) closes it too. The panel sits on the popover layer, above dialogs, so one
+    // left open would otherwise float over a modal that opened without a mouse press.
+    const handleFocusIn = (e: FocusEvent) => {
+      if (
+        dropdownRef.current?.contains(e.target as Node) ||
+        anchorEl?.contains(e.target as Node)
+      ) return;
+      close();
+    };
+
     document.addEventListener("mousedown", handleMouseDown);
     document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("focusin", handleFocusIn);
     return () => {
       document.removeEventListener("mousedown", handleMouseDown);
       document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("focusin", handleFocusIn);
     };
   }, [isOpen, anchorEl, close]);
 

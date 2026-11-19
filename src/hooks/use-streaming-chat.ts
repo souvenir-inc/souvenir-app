@@ -13,7 +13,7 @@ import { logger } from "@/lib/logger"
 import { friendlyModelError } from "@/lib/model-error"
 import { AguiSSEDecoder } from "@/lib/sse-decoder"
 import type { UIMessage } from "@/types/chat"
-import { registerStream, completeStream, type StreamOutcome } from "@/lib/stream-registry"
+import { registerStream, completeStream, detachStream, type StreamOutcome } from "@/lib/stream-registry"
 import { updateMessage } from "@/lib/chat/stream/message-patches"
 import {
   AuthExpiredError,
@@ -123,13 +123,21 @@ export function useStreamingChat({
   // Stops the current call's stream, and only that one — registered with the
   // stream registry so the stream can be stopped from wherever its chat is shown.
   const activeStopRef = useRef<(() => void) | null>(null)
-  // Detaches the call that currently owns this hook. loadingMessageIdRef,
-  // resolvedChatIdRef, the transport refs and the flush buffer are one set shared
-  // by every call, so two overlapping streams — chat A's recovery still reading
-  // while chat B's starts — would have the first finish onto the second's reply
-  // and clear its registry entry. A new call detaches the old one before taking
-  // the refs, which leaves the old reply untouched for its chat to follow again.
-  const activeDetachRef = useRef<(() => void) | null>(null)
+  // The call that currently owns this hook. loadingMessageIdRef, resolvedChatIdRef,
+  // the transport refs and the flush buffer are one set shared by every call, so
+  // two overlapping streams — chat A's recovery still reading while chat B's starts —
+  // would have the first finish onto the second's reply. A new call therefore takes
+  // the hook over: it drops the old one through the stream registry (the connection
+  // closes, the entry goes, and the old chat follows its turn afresh when shown) —
+  // but never a send the backend has not yet accepted, which it waits for instead,
+  // the same rule detachStream keeps: a turn whose run has not started is not dropped.
+  const activeCallRef = useRef<{
+    /** True once dropping it loses nothing: a follow, or a send whose run started. */
+    droppable: () => boolean
+    /** Settles when it becomes droppable or ends. */
+    settled: Promise<void>
+    drop: () => void
+  } | null>(null)
 
   // ── Flush helpers ───────────────────────────────────────────────────────────
 
@@ -256,10 +264,19 @@ export function useStreamingChat({
     modelId?: string | number | null,
     options?: StreamRequestOptions,
   ): Promise<StreamOutcome> => {
-    // Before any shared ref is written: whoever held them stops reading into them.
+    // Before any shared ref is written, take the hook over from whoever holds it.
     // A retry of the same follow (followAttempt > 0) is that call continuing, not a
     // rival for the refs, so it leaves its own parent alone.
-    if (!options?.followAttempt) activeDetachRef.current?.()
+    if (!options?.followAttempt) {
+      let holder = activeCallRef.current
+      // A send the backend has not accepted yet is never dropped: wait until its run
+      // starts (or it ends), then look again — another call may have taken over meanwhile.
+      while (holder && !holder.droppable()) {
+        await holder.settled
+        holder = activeCallRef.current
+      }
+      holder?.drop()
+    }
     stopRequestedRef.current = false
     xhrRef.current = null
     // A follow owns the reply only once its stream answers; until then the reply is left as it is.
@@ -276,7 +293,6 @@ export function useStreamingChat({
       if (activeStopRef.current === stopThisCall) handleStopGeneration()
     }
     activeStopRef.current = stopThisCall
-    registerStream(chatId, stopThisCall)
     // Set when the chat was reopened and follows this turn afresh: this call's
     // connection is dropped and it leaves the reply and the registry alone.
     let detached = false
@@ -285,11 +301,27 @@ export function useStreamingChat({
       detached = true
       callXhr?.abort()
     }
-    activeDetachRef.current = detachThisCall
-    // Only the call still holding the refs may clear the slot; a detached one has
-    // already been replaced by the call that detached it.
+    // A follow only reads a run that is already going, so it can be dropped from the
+    // start; a send registers its detach once its run has started (onRunStarted).
+    registerStream(chatId, stopThisCall, follow ? detachThisCall : undefined)
+    let runStarted = false
+    let markSettled = () => {}
+    const thisCall = {
+      droppable: () => follow || runStarted,
+      settled: new Promise<void>((resolve) => { markSettled = resolve }),
+      // Through the registry, so the entry goes with the connection and the chat is
+      // not left looking busy; the direct detach covers a call the registry no longer holds.
+      drop: () => {
+        const heldChat = resolvedChatIdRef.current
+        if (!(heldChat && detachStream(heldChat))) detachThisCall()
+      },
+    }
+    activeCallRef.current = thisCall
+    // Only the call still holding the hook may clear the slot; a dropped one has
+    // already been replaced by the call that dropped it.
     const releaseThisCall = () => {
-      if (activeDetachRef.current === detachThisCall) activeDetachRef.current = null
+      if (activeCallRef.current === thisCall) activeCallRef.current = null
+      markSettled()
     }
 
     // Returns true if this stream's chat is still the one the user is viewing.
@@ -314,6 +346,9 @@ export function useStreamingChat({
       chatId: () => resolvedChatIdRef.current,
       adoptChatId: (id) => adoptChatId(id),
       onRunStarted: () => {
+        // The backend has the turn: dropping this connection now loses nothing.
+        runStarted = true
+        markSettled()
         registerStream(resolvedChatIdRef.current, stopThisCall, detachThisCall)
         if (isActiveStream()) setStreamState?.("streaming")
       },

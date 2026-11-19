@@ -155,9 +155,10 @@ export function ScheduleCard({
         {name}
       </p>
 
-      {/* Description — 3 lines max, same clamp/height cap as ProjectCard's */}
+      {/* Description — 3 lines max, same clamp as ProjectCard's. The cap follows the line
+          height: a fixed 54px (3 × 18) clipped the third line once it became 20px. */}
       <p style={{
-        maxHeight:       '54px',
+        maxHeight:       'calc(var(--line-height-body-sm) * 3)',
         flexShrink:      0,
         fontFamily:      'var(--font-body)',
         fontWeight:      'var(--font-weight-regular)',
