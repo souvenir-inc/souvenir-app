@@ -561,6 +561,18 @@ export async function getChatStreamId(chatId: string): Promise<string | null> {
   return chat.streamId ?? null;
 }
 
+/**
+ * Whether the backend has a run going for the chat. Unlike getChatStreamId, it throws
+ * when it can't tell (a failed request or a non-OK response) rather than answering "no":
+ * for a caller about to send into the chat, "unknown" must not read as "idle".
+ */
+export async function getChatRunState(chatId: string): Promise<"running" | "idle"> {
+  const response = await apiFetch(CHAT_ENDPOINT(chatId));
+  if (!response.ok) throw new Error(`Couldn't read the chat's run state (${response.status})`);
+  const chat = (await response.json()) as { streamId?: string | null };
+  return chat.streamId ? "running" : "idle";
+}
+
 /** POST /chats/{chat_id}/stop — abort an in-flight stream. */
 export async function stopChat(chatId: string): Promise<void> {
   const response = await apiFetch(CHAT_STOP_ENDPOINT(chatId), { method: "POST" });

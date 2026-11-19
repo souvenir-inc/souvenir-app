@@ -23,10 +23,10 @@ vi.mock('@/context/org-context', () => ({ useOrgPlan: () => ({ plan: null }) }))
 vi.mock('@/hooks/use-credit-status', () => ({ useCreditStatus: () => ({ blocked: creditsBlocked }) }))
 vi.mock('@/lib/analytics/events', () => ({ trackBrowserEvent: vi.fn() }))
 // Whether the backend still has a run going for the chat: none, unless a test says so.
-const getChatStreamId = vi.fn()
-vi.mock('@/lib/api/chat', () => ({ getChatStreamId: (...args: unknown[]) => getChatStreamId(...args) }))
+const getChatRunState = vi.fn()
+vi.mock('@/lib/api/chat', () => ({ getChatRunState: (...args: unknown[]) => getChatRunState(...args) }))
 
-import { MessageQueueRunner, RUN_POLL_MS } from './MessageQueueRunner'
+import { MessageQueueRunner, RUN_CHECK_ATTEMPTS, RUN_POLL_MS } from './MessageQueueRunner'
 import { getChatQueue, queueMessage, setQueueForeground, takeAllQueuedMessages } from '@/lib/message-queue'
 import { completeStream, isStreamActive, registerStream } from '@/lib/stream-registry'
 
@@ -40,8 +40,8 @@ const view = Symbol('view')
 
 beforeEach(async () => {
   creditsBlocked = false
-  getChatStreamId.mockReset()
-  getChatStreamId.mockResolvedValue(null)
+  getChatRunState.mockReset()
+  getChatRunState.mockResolvedValue('idle')
   fetchAiResponse.mockReset()
   fetchAiResponse.mockImplementation((_input: string, chatId: string) => new Promise((resolve) => {
     finishSend = (outcome) => { completeStream(chatId, outcome as 'done'); resolve(outcome) }
@@ -128,23 +128,91 @@ describe('MessageQueueRunner', () => {
     // but the backend's run has not ended yet.
     vi.useFakeTimers({ toFake: ['setTimeout'] })
     try {
-      getChatStreamId.mockResolvedValue('run-still-going')
+      getChatRunState.mockResolvedValue('running')
       await act(async () => {
         queueMessage('chat-1', { content: 'and then this', attachments: [], mentionedPins: [] }, context)
       })
       await act(async () => { await Promise.resolve() })
       expect(fetchAiResponse).not.toHaveBeenCalled()
-      expect(getChatStreamId).toHaveBeenCalledWith('chat-1')
+      expect(getChatRunState).toHaveBeenCalledWith('chat-1')
       // Held for the message the whole time, so nothing else sends to the chat either.
       expect(isStreamActive('chat-1')).toBe(true)
 
       // Still running at the next check; ended at the one after.
       await act(async () => { await vi.advanceTimersByTimeAsync(RUN_POLL_MS) })
       expect(fetchAiResponse).not.toHaveBeenCalled()
-      getChatStreamId.mockResolvedValue(null)
+      getChatRunState.mockResolvedValue('idle')
       await act(async () => { await vi.advanceTimersByTimeAsync(RUN_POLL_MS) })
       expect(fetchAiResponse).toHaveBeenCalledOnce()
       expect(sentInputs()).toEqual(['and then this'])
+    } finally {
+      vi.useRealTimers()
+    }
+    await act(async () => finishSend('done'))
+  })
+
+  // A failed check is "can't tell", not "idle": rejected requests and non-OK responses
+  // (getChatRunState throws for both) keep the message waiting, then hold it.
+  for (const [label, failure] of [
+    ['a rejected request', () => Promise.reject(new TypeError('Failed to fetch'))],
+    ['a non-OK response', () => Promise.reject(new Error("Couldn't read the chat's run state (503)"))],
+  ] as const) {
+    it(`holds the message, unsent, when the run state can't be read (${label})`, async () => {
+      vi.useFakeTimers({ toFake: ['setTimeout'] })
+      try {
+        getChatRunState.mockImplementation(failure)
+        await act(async () => {
+          queueMessage('chat-1', { content: 'and then this', attachments: [], mentionedPins: [] }, context)
+        })
+        for (let i = 0; i < RUN_CHECK_ATTEMPTS; i++) {
+          await act(async () => { await vi.advanceTimersByTimeAsync(RUN_POLL_MS) })
+        }
+        expect(getChatRunState).toHaveBeenCalledTimes(RUN_CHECK_ATTEMPTS)
+        expect(fetchAiResponse).not.toHaveBeenCalled()
+        // Back in its queue, which is held; the reservation is released.
+        expect(getChatQueue('chat-1')).toMatchObject({ heldBy: 'error', messages: [{ content: 'and then this' }] })
+        expect(isStreamActive('chat-1')).toBe(false)
+      } finally {
+        vi.useRealTimers()
+      }
+    })
+  }
+
+  it('stops waiting, and sends nothing, once the runner unmounts', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout'] })
+    try {
+      getChatRunState.mockResolvedValue('running')
+      await act(async () => {
+        queueMessage('chat-1', { content: 'and then this', attachments: [], mentionedPins: [] }, context)
+      })
+      await act(async () => { await Promise.resolve() })
+      const checksBefore = getChatRunState.mock.calls.length
+      await act(async () => root.unmount())
+      getChatRunState.mockResolvedValue('idle')
+      await act(async () => { await vi.advanceTimersByTimeAsync(RUN_POLL_MS * 3) })
+      expect(fetchAiResponse).not.toHaveBeenCalled()
+      expect(getChatRunState.mock.calls.length).toBe(checksBefore)
+      // The message is back in its queue and the reservation is released.
+      expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['and then this'])
+      expect(isStreamActive('chat-1')).toBe(false)
+    } finally {
+      vi.useRealTimers()
+    }
+    // afterEach unmounts too; give it something to unmount.
+    root = createRoot(container)
+  })
+
+  it('keeps checking after a failed check and sends once the run is seen to have ended', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout'] })
+    try {
+      getChatRunState.mockRejectedValueOnce(new TypeError('Failed to fetch')).mockResolvedValue('idle')
+      await act(async () => {
+        queueMessage('chat-1', { content: 'and then this', attachments: [], mentionedPins: [] }, context)
+      })
+      await act(async () => { await Promise.resolve() })
+      expect(fetchAiResponse).not.toHaveBeenCalled()
+      await act(async () => { await vi.advanceTimersByTimeAsync(RUN_POLL_MS) })
+      expect(fetchAiResponse).toHaveBeenCalledOnce()
     } finally {
       vi.useRealTimers()
     }
