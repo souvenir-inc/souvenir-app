@@ -1,6 +1,6 @@
 // shadows-exact codemod: which shadow layers it can read, and which it must leave alone.
 import { describe, expect, it } from "vitest";
-import { parseLayer, transformValue } from "./shadows-exact.mjs";
+import { parseLayer, transformTsx, transformValue } from "./shadows-exact.mjs";
 
 describe("parseLayer", () => {
   it("reads px layers, with or without inset, colour first or last", () => {
@@ -39,5 +39,20 @@ describe("transformValue", () => {
     const counter = { n: 0 };
     expect(transformValue("0px 2px 2.8px rgba(82,75,71,0.12)", counter)).toMatch(/^var\(--shadow-[a-z0-9-]+\)$/);
     expect(counter.n).toBe(1);
+  });
+});
+
+describe("transformTsx", () => {
+  it("leaves look-alike text in strings and comments, and converts a real declaration", () => {
+    const shadow = "0px 2px 2.8px rgba(82,75,71,0.12)";
+    const src = [
+      `const doc = "boxShadow: '${shadow}'"`,
+      `// boxShadow: '${shadow}'`,
+      `<div style={{ boxShadow: '${shadow}' }} />`,
+    ].join("\n");
+    const out = transformTsx(src, { n: 0 }).split("\n");
+    expect(out[0]).toContain(shadow);
+    expect(out[1]).toContain(shadow);
+    expect(out[2]).toMatch(/boxShadow: 'var\(--shadow-[a-z0-9-]+\)'/);
   });
 });

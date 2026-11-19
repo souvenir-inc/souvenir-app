@@ -300,17 +300,24 @@ rehypePlugins={[sanitize, rehypeKatex]} // `sanitize` as in the basic setup (foo
 Shiki gives VS Code-quality highlighting but adds ~200KB. Use it when quality matters more than bundle size:
 
 ```tsx
+import { isValidElement, type ReactNode } from 'react';
 import { codeToHtml } from 'shiki';
 
-// Custom code component using Shiki
-const ShikiCode = async ({ children, className }: any) => {
-  const lang = className?.replace('language-', '') ?? 'text';
-  const html = await codeToHtml(String(children), {
+// The `pre` renderer, not `code`: react-markdown gives `pre` the fenced block's <code>
+// element, and Shiki returns its own <pre>, so replacing `pre` avoids a <pre> inside a
+// <pre>. Inline code never goes through `pre`, so it keeps the plain `code` renderer.
+// (Shiki escapes the code it highlights; its HTML is not the user's markup.)
+const ShikiPre = async ({ children }: { children?: ReactNode }) => {
+  const code = isValidElement<{ className?: string; children?: ReactNode }>(children) ? children : null;
+  const lang = code?.props.className?.replace('language-', '') ?? 'text';
+  const html = await codeToHtml(String(code?.props.children ?? '').replace(/\n$/, ''), {
     lang,
     theme: 'github-dark',
   });
   return <div dangerouslySetInnerHTML={{ __html: html }} />;
 };
+
+// components={{ ...markdownComponents, pre: ShikiPre }}
 ```
 
 > Note: Shiki is async — works best with React Server Components (Next.js App Router) or pre-rendering. For client-side streaming, stick with `rehype-highlight`.
