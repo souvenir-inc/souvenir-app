@@ -21,10 +21,11 @@ export const overlayButtonStyle: React.CSSProperties = {
   justifyContent: "center",
 };
 
+// No zIndex of its own: DialogContent puts it at --z-modal, above the dialog's (transparent)
+// overlay at --z-overlay. Set lower, the overlay covered the lightbox and took every click.
 const lightboxStyle: React.CSSProperties = {
   position: "fixed",
   inset: 0,
-  zIndex: 'var(--z-dropdown)',
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
