@@ -135,13 +135,15 @@ export const markdownComponents: Components = {
       <table className="w-full text-sm border-collapse">{children}</table>
     </div>
   ),
-  th: ({ children }) => (
-    <th className="border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-left font-semibold">
+  // remark-gfm's column alignment (`|:--|--:|`) arrives as style={{ textAlign }}: pass it
+  // on, and set no text-align class, so a right-aligned column renders right-aligned.
+  th: ({ node, children, ...props }) => (
+    <th {...props} className="border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 font-semibold">
       {children}
     </th>
   ),
-  td: ({ children }) => (
-    <td className="border border-zinc-200 dark:border-zinc-700 px-3 py-2">{children}</td>
+  td: ({ node, children, ...props }) => (
+    <td {...props} className="border border-zinc-200 dark:border-zinc-700 px-3 py-2">{children}</td>
   ),
 
   // Links

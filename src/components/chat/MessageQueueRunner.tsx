@@ -125,12 +125,33 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
     onDoneRef.current = onDone;
   });
 
-  // Whether this send is still mounted. Its own effect, so Strict Mode's mount, cleanup,
-  // mount leaves it true; only a real unmount (the app going away) clears it.
+  // Out of credits now? Checked again just before sending: credits can run out while a
+  // send waits for the chat's run to end.
+  const creditStatus = useCreditStatus();
+  const { plan } = useOrgPlan();
+  const blocked = creditStatus.blocked || plan?.poolStatus === "paused";
+  const blockedRef = useRef(blocked);
+  useEffect(() => {
+    blockedRef.current = blocked;
+  });
+
+  // Whether this send is still mounted, and a signal that fires on a real unmount so a
+  // wait in progress (a request or the pause between checks) stops at once. Strict Mode
+  // mounts, cleans up and mounts again: the cleanup only marks it unmounted, and the
+  // signal fires a microtask later if nothing has mounted it again by then.
   const mountedRef = useRef(true);
+  const unmountRef = useRef<{ fired: Promise<"unmounted">; fire: () => void } | null>(null);
   useEffect(() => {
     mountedRef.current = true;
-    return () => { mountedRef.current = false; };
+    if (!unmountRef.current) {
+      let fire = () => {};
+      const fired = new Promise<"unmounted">((resolve) => { fire = () => resolve("unmounted"); });
+      unmountRef.current = { fired, fire };
+    }
+    return () => {
+      mountedRef.current = false;
+      queueMicrotask(() => { if (!mountedRef.current) unmountRef.current?.fire(); });
+    };
   }, []);
 
   // Strict Mode runs effects twice; the message goes out once.
@@ -163,23 +184,39 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
     // it. So the reservation is held and the backend asked until the run has ended.
     // "Can't tell" is not "idle": after RUN_CHECK_ATTEMPTS failed checks in a row the
     // message is held rather than sent.
+    const unmounted = unmountRef.current!.fired;
     const waitForIdleRun = async (): Promise<"idle" | "unmounted" | "unknown"> => {
       let failures = 0;
       for (;;) {
         if (!mountedRef.current) return "unmounted";
         try {
-          if ((await getChatRunState(chatId)) === "idle") return "idle";
+          // Raced with the unmount signal: a request still out when the app goes away
+          // is not waited for.
+          const state = await Promise.race([getChatRunState(chatId), unmounted]);
+          if (state === "unmounted") return "unmounted";
+          if (state === "idle") return "idle";
           failures = 0;
         } catch {
           failures += 1;
           if (failures >= RUN_CHECK_ATTEMPTS) return "unknown";
         }
-        await new Promise((resolve) => setTimeout(resolve, RUN_POLL_MS));
+        const paused = await Promise.race([
+          new Promise<"waited">((resolve) => setTimeout(() => resolve("waited"), RUN_POLL_MS)),
+          unmounted,
+        ]);
+        if (paused === "unmounted") return "unmounted";
       }
     };
 
     waitForIdleRun()
       .then((state) => {
+        if (state === "idle" && mountedRef.current && blockedRef.current) {
+          // Out of credits meanwhile: the message stays queued, unsent, and the
+          // reservation ends as "done" (no hold), so the runner sends it once unblocked.
+          restoreQueuedMessage(chatId, message, 0);
+          completeStream(chatId, "done");
+          return;
+        }
         if (state === "idle" && mountedRef.current) {
           return fetchAiResponse(message.content, chatId, `queued-${message.id}`, modelId, options);
         }

@@ -202,6 +202,81 @@ describe('MessageQueueRunner', () => {
     root = createRoot(container)
   })
 
+  // Unmounting stops a wait at once: no timer has to run out, no request has to answer.
+  for (const [label, check] of [
+    ['during the pause between checks', () => Promise.resolve('running')],
+    ['while a check is still out', () => new Promise(() => {})],
+  ] as const) {
+    it(`stops at once when unmounted ${label}`, async () => {
+      vi.useFakeTimers({ toFake: ['setTimeout'] })
+      try {
+        getChatRunState.mockImplementation(check)
+        await act(async () => {
+          queueMessage('chat-1', { content: 'and then this', attachments: [], mentionedPins: [] }, context)
+        })
+        await act(async () => { await Promise.resolve() })
+        expect(isStreamActive('chat-1')).toBe(true)
+        await act(async () => root.unmount())
+        // No timers advanced: only microtasks run.
+        for (let i = 0; i < 5; i++) await act(async () => { await Promise.resolve() })
+        expect(fetchAiResponse).not.toHaveBeenCalled()
+        expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['and then this'])
+        expect(isStreamActive('chat-1')).toBe(false)
+      } finally {
+        vi.useRealTimers()
+      }
+      root = createRoot(container)
+    })
+  }
+
+  it('still sends exactly once under Strict Mode (mount, cleanup, mount is not an unmount)', async () => {
+    await act(async () => root.unmount())
+    root = createRoot(container)
+    vi.useFakeTimers({ toFake: ['setTimeout'] })
+    try {
+      await act(async () => root.render(<React.StrictMode><MessageQueueRunner /></React.StrictMode>))
+      // The run is still going at the first check, so the send has to wait through a
+      // pause: a Strict Mode cleanup taken for an unmount would cancel it there.
+      getChatRunState.mockResolvedValueOnce('running').mockResolvedValue('idle')
+      await queueBehindReply('and then this')
+      await act(async () => completeStream('chat-1', 'done'))
+      await act(async () => { await vi.advanceTimersByTimeAsync(RUN_POLL_MS) })
+      expect(sentInputs()).toEqual(['and then this'])
+    } finally {
+      vi.useRealTimers()
+    }
+    await act(async () => finishSend('done'))
+  })
+
+  it('keeps a message queued, unsent, if credits run out while it waits, and sends it once they are back', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout'] })
+    try {
+      getChatRunState.mockResolvedValue('running')
+      await act(async () => {
+        queueMessage('chat-1', { content: 'and then this', attachments: [], mentionedPins: [] }, context)
+      })
+      await act(async () => { await Promise.resolve() })
+      // Credits run out while it waits; then the run ends.
+      creditsBlocked = true
+      await act(async () => root.render(<MessageQueueRunner />))
+      getChatRunState.mockResolvedValue('idle')
+      await act(async () => { await vi.advanceTimersByTimeAsync(RUN_POLL_MS) })
+      expect(fetchAiResponse).not.toHaveBeenCalled()
+      // Still queued, not held, and the chat no longer reserved.
+      expect(getChatQueue('chat-1')).toMatchObject({ messages: [{ content: 'and then this' }] })
+      expect(getChatQueue('chat-1')?.heldBy).toBeUndefined()
+      expect(isStreamActive('chat-1')).toBe(false)
+      // Credits back: the runner sends it.
+      creditsBlocked = false
+      await act(async () => root.render(<MessageQueueRunner />))
+      await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+      expect(sentInputs()).toEqual(['and then this'])
+    } finally {
+      vi.useRealTimers()
+    }
+    await act(async () => finishSend('done'))
+  })
+
   it('keeps checking after a failed check and sends once the run is seen to have ended', async () => {
     vi.useFakeTimers({ toFake: ['setTimeout'] })
     try {
