@@ -22,8 +22,13 @@ const ROOT = path.resolve(import.meta.dirname, "../..");
 const TOKENS = path.join(ROOT, "src/styles/tokens");
 
 // ── Canonical form ──────────────────────────────────────────────────────────
+// Case doesn't matter in hex digits or function names, but custom-property names are
+// case-sensitive: var(--Brand) and var(--brand) are different properties. So everything
+// is lowercased except what's inside var().
+const lowerOutsideVar = (s) => s.split(/(var\([^)]*\))/).map((part, i) => (i % 2 ? part : part.toLowerCase())).join("");
+
 function canonColour(c) {
-  c = c.trim().toLowerCase();
+  c = lowerOutsideVar(c.trim());
   let m = c.match(/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/);
   if (m) {
     let h = m[1];
@@ -68,7 +73,7 @@ export function parseLayer(layer) {
 }
 const canonLayer = (l) => {
   const p = parseLayer(l);
-  return p ? `${p.inset ? "inset " : ""}${p.lens.join(" ")} ${canonColour(p.colour)}` : l.replace(/\s+/g, " ").trim().toLowerCase();
+  return p ? `${p.inset ? "inset " : ""}${p.lens.join(" ")} ${canonColour(p.colour)}` : lowerOutsideVar(l.replace(/\s+/g, " ").trim());
 };
 
 // ── Token tables (light values) ─────────────────────────────────────────────

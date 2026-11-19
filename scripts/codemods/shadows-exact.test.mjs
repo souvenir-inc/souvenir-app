@@ -35,6 +35,19 @@ describe("transformValue", () => {
     expect(counter.n).toBe(0);
   });
 
+  it("keeps differently cased custom properties apart, and still ignores case in hex", () => {
+    // --shadow-panel is --shadow-soft plus a ring in var(--neutral-200). The same shadow
+    // with var(--Neutral-200), a different property, must not be taken for it.
+    const soft = "0px 2px 2.8px rgba(82,75,71,0.12)";
+    expect(transformValue(`${soft}, 0px 0px 0px 1px var(--neutral-200)`, { n: 0 })).toBe("var(--shadow-panel)");
+    const other = `${soft}, 0px 0px 0px 1px var(--Neutral-200)`;
+    expect(transformValue(other, { n: 0 })).not.toBe("var(--shadow-panel)");
+    // Case outside var() is still ignored: RGBA() matches the same token as rgba().
+    const token = transformValue("0px 2px 2.8px rgba(82,75,71,0.12)", { n: 0 });
+    expect(token).toMatch(/^var\(--shadow-/);
+    expect(transformValue("0px 2px 2.8px RGBA(82,75,71,0.12)", { n: 0 })).toBe(token);
+  });
+
   it("still swaps the same shadow for its token when nothing is ambiguous", () => {
     const counter = { n: 0 };
     expect(transformValue("0px 2px 2.8px rgba(82,75,71,0.12)", counter)).toMatch(/^var\(--shadow-[a-z0-9-]+\)$/);
