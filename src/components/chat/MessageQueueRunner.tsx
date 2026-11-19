@@ -15,6 +15,7 @@ import {
   type QueuedMessage,
 } from "@/lib/message-queue";
 import { completeStream, registerStream } from "@/lib/stream-registry";
+import { getChatStreamId } from "@/lib/api/chat";
 import { buildTurnOptions } from "@/lib/turn-options";
 import type { UIMessage } from "@/types/chat";
 
@@ -98,6 +99,8 @@ export function MessageQueueRunner() {
 
 // Nothing on screen to update: the chat reloads from the API when opened.
 const IGNORE_MESSAGES: React.Dispatch<React.SetStateAction<UIMessage[]>> = () => {};
+// How often a queued send asks whether the chat's previous run has ended.
+export const RUN_POLL_MS = 3000;
 
 /** One queued message going out, on its own streaming hook (one stream each). */
 function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: () => void }) {
@@ -143,7 +146,21 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
       queued: true,
     });
 
-    fetchAiResponse(message.content, chatId, `queued-${message.id}`, modelId, options)
+    // The registry is what this tab knows; the backend is the source of truth. A chat
+    // can look idle here while its run is still going (left mid-reply, or left again
+    // while it was being reopened), and a message sent into a running turn is lost to
+    // it. So the reservation is held and the backend asked until the run has ended. If
+    // the check itself fails, the send goes ahead, as before.
+    const waitForRunToEnd = async () => {
+      for (;;) {
+        const running = await getChatStreamId(chatId).catch(() => null);
+        if (!running) return;
+        await new Promise((resolve) => setTimeout(resolve, RUN_POLL_MS));
+      }
+    };
+
+    waitForRunToEnd()
+      .then(() => fetchAiResponse(message.content, chatId, `queued-${message.id}`, modelId, options))
       // fetchAiResponse settles every stream itself; this only frees the
       // reservation if it threw before getting that far.
       .catch(() => completeStream(chatId, "error"))
