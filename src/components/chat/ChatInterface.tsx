@@ -246,33 +246,28 @@ export function ChatInterface({
   // A chat opened while its reply is still being generated (a reload, another
   // tab, coming back from another chat) reads the reply from the turn's stream,
   // into the turn's own message. Only the regular chat endpoint has one.
-  // Counted here, not in the effect, so it survives the historyLoadId reruns that a
-  // refused follow causes; a different reply is a fresh budget.
-  const followTriesRef = useRef<{ key: string; tries: number }>({ key: "", tries: 0 })
+  // Refusals are counted here, not in the effect, so the count survives the historyLoadId
+  // reruns a refusal causes; a different reply is a fresh budget. Only refusals count (the
+  // follow reports them before that reload): a follow that attaches spends nothing.
+  const followRefusedRef = useRef<{ key: string; refused: number }>({ key: "", refused: 0 })
   useEffect(() => {
     if (!chatId || endpoint || !runningMessageId || isStreamActive(chatId)) return
     const key = `${chatId}:${runningMessageId}`
-    const tally = followTriesRef.current
-    if (tally.key !== key) { tally.key = key; tally.tries = 0 }
-    if (tally.tries >= FOLLOW_REFUSED_ATTEMPTS) return
-    tally.tries += 1
+    const tally = followRefusedRef.current
+    if (tally.key !== key) { tally.key = key; tally.refused = 0 }
+    if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS) return
     // The first go is immediate; a repeat only happens because the last was refused,
     // so it backs off rather than returning at round-trip speed.
-    const wait = tally.tries === 1 ? 0 : FOLLOW_REFUSED_BACKOFF_MS * (tally.tries - 1)
-    let fired = false
+    const wait = FOLLOW_REFUSED_BACKOFF_MS * tally.refused
     const timer = setTimeout(() => {
-      fired = true
       // Checked again when the wait ends: a stream may have started for this chat in
       // the meantime (a message sent during the back-off), and that one owns the reply.
       if (isStreamActive(chatId)) return
-      void followStream(chatId, runningMessageId, messages.find((message) => message.id === runningMessageId))
+      void followStream(chatId, runningMessageId, messages.find((message) => message.id === runningMessageId), () => {
+        if (tally.key === key) tally.refused += 1
+      })
     }, wait)
-    return () => {
-      clearTimeout(timer)
-      // A try cancelled before it ran (a re-render, a chat switch) was never made:
-      // it gives its place in the budget back.
-      if (!fired && tally.key === key) tally.tries -= 1
-    }
+    return () => clearTimeout(timer)
   // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per history load that finds a running turn; followStream is fresh each render
   }, [chatId, runningMessageId, historyLoadId])
 

@@ -134,8 +134,9 @@ export function useStreamingChat({
   const activeCallRef = useRef<{
     /** True once dropping it loses nothing: a follow, or a send whose run started. */
     droppable: () => boolean
-    /** Settles when it becomes droppable or ends. */
+    /** Settles when it becomes droppable, hands the hook to its own retry, or ends. */
     settled: Promise<void>
+    settle: () => void
     drop: () => void
   } | null>(null)
 
@@ -316,6 +317,7 @@ export function useStreamingChat({
     const thisCall = {
       droppable: () => follow || runStarted,
       settled: new Promise<void>((resolve) => { markSettled = resolve }),
+      settle: () => markSettled(),
       // Through the registry, so the entry goes with the connection and the chat is
       // not left looking busy; the direct detach covers a call the registry no longer holds.
       drop: () => {
@@ -323,7 +325,12 @@ export function useStreamingChat({
         if (!(heldChat && detachStream(heldChat))) detachThisCall()
       },
     }
+    // A retry of a dropped call is that call's recovery follow taking the hook over: the
+    // call it replaces has handed off, so anyone waiting on it can stop waiting now
+    // rather than for the whole recovery to finish. (The follow itself can be dropped.)
+    const handedFrom = options?.followAttempt ? activeCallRef.current : null
     activeCallRef.current = thisCall
+    handedFrom?.settle()
     // Only the call still holding the hook may clear the slot; a dropped one has
     // already been replaced by the call that dropped it.
     const releaseThisCall = () => {
@@ -339,7 +346,9 @@ export function useStreamingChat({
       return streamId === null || streamId === currentChatIdRef.current
     }
 
-    setStreamState?.("waiting")
+    // Like every other state change here: only for the chat being shown. A call that
+    // waited for another to hand over may belong to a chat the user has since left.
+    if (isActiveStream()) setStreamState?.("waiting")
 
     const turn = createStreamTurn(options?.prior)
     // The event handlers' view of this call: its refs, batching and callbacks.
@@ -398,9 +407,18 @@ export function useStreamingChat({
           onUploadProgress: options?.onUploadProgress,
           setXhr: (xhr) => {
             callXhr = xhr
+            // Dropped before its connection existed (a takeover can land while this call
+            // was still getting a token): close the connection as soon as it is sent,
+            // rather than leave it open reading a stream nobody listens to. The transport
+            // hands the XHR over before open() and send(), which follow in the same task,
+            // and abort() before send() does nothing, hence the microtask.
+            if (detached) {
+              if (xhr) queueMicrotask(() => xhr.abort())
+              return
+            }
             // Once detached, xhrRef is the replacing call's: clearing it would leave
             // that call's Stop with nothing to abort.
-            if (!detached) xhrRef.current = xhr
+            xhrRef.current = xhr
           },
           onUploadEnd: () => {
             if (detached) return
@@ -587,13 +605,16 @@ export function useStreamingChat({
    * the turn's first event — for a chat opened while its reply is still being
    * generated. A turn that has ended by then is in the chat's history instead.
    */
-  const followStream = async (chatId: string, loadingMessageId: string, prior?: UIMessage): Promise<StreamOutcome> => {
+  /** `onRefused` runs when the follow never reached the turn's stream (not when it
+   *  attached and later ended), before the history reload that onStreamLost starts. */
+  const followStream = async (chatId: string, loadingMessageId: string, prior?: UIMessage, onRefused?: () => void): Promise<StreamOutcome> => {
     const outcome = await fetchAiResponse("", chatId, loadingMessageId, null, { follow: true, prior })
     const result = followResultRef.current
     followResultRef.current = "attached"
     if (result === "attached") return outcome
     completeStream(chatId, "done")
     setStreamState?.("done")
+    onRefused?.()
     onStreamLost?.(chatId)
     return "done"
   }

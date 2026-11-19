@@ -30,6 +30,8 @@ Build the same rendering stack used by Claude, ChatGPT, and other AI chat UIs: `
 npm install react-markdown remark-gfm rehype-highlight rehype-sanitize
 # optional extras:
 npm install remark-math rehype-katex rehype-raw
+# only for the Shiki example below (instead of rehype-highlight):
+npm install shiki
 ```
 
 ---
@@ -40,13 +42,15 @@ npm install remark-math rehype-katex rehype-raw
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
-import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
+import rehypeSanitize, { defaultSchema, type Options as SanitizeOptions } from 'rehype-sanitize';
 import 'highlight.js/styles/github-dark.css'; // or any hljs theme
 
 // remark-gfm already prefixes footnote ids with `user-content-`; sanitize's default would
 // prefix them again, so footnote links point at ids that don't exist. Raw HTML isn't
 // rendered (no rehype-raw), so markdown-made ids are the only ones and keep their prefix.
-export const sanitize = [rehypeSanitize, { ...defaultSchema, clobberPrefix: '' }] as const;
+// Typed as a mutable tuple: `as const` makes it readonly, which rehypePlugins rejects.
+// Only for setups without rehype-raw — see Security Notes.
+export const sanitize: [typeof rehypeSanitize, SanitizeOptions] = [rehypeSanitize, { ...defaultSchema, clobberPrefix: '' }];
 
 export function MessageRenderer({ content }: { content: string }) {
   return (
@@ -192,7 +196,12 @@ const DEFINITION = /^ {0,3}\[[^\]]+\]:\s*\S/;
 // A definition's title may sit on the next line on its own: "Title", 'Title' or (Title).
 const DEFINITION_TITLE = /^\s*("[^"]*"|'[^']*'|\([^)]*\))\s*$/;
 
+// Footnotes are numbered, and linked back, across the whole document; rendered block by
+// block they would restart at 1 and repeat ids. So a reply that uses them stays one block.
+const FOOTNOTE = /\[\^[^\]\s]+\]/;
+
 function splitIntoBlocks(text: string): string[] {
+  if (FOOTNOTE.test(text)) return [text];
   const blocks: string[] = [];
   const definitions: string[] = [];
   let current: string[] = [];
@@ -281,6 +290,7 @@ rehypePlugins={[sanitize, rehypeKatex]} // `sanitize` as in the basic setup (foo
 
 - **Always use `rehype-sanitize`** when rendering user-influenced AI output. It strips `<script>`, `onerror`, `javascript:` URLs, and other vectors.
 - If you need raw HTML passthrough, pair `rehype-raw` with `rehype-sanitize` — never use `rehype-raw` alone.
+- **With `rehype-raw`, use the default sanitize schema, not the footnote-safe `sanitize` above.** That setting turns off sanitize's id prefixing, which is only safe while the markdown itself makes every id. Once raw HTML can set `id`/`name`, unprefixed values can clobber globals (`<a id="config">` shadows `window.config`). The cost is that footnote back-links break, so either skip footnotes there or point their links at the prefixed ids in your own `a` renderer.
 - Never use `dangerouslySetInnerHTML` as a markdown approach; `react-markdown` avoids this by building a virtual DOM instead.
 
 ---

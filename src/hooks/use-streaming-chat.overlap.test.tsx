@@ -185,6 +185,35 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(reply('reply-B')).toMatchObject({ content: 'From B.', isLoading: false })
   })
 
+  it('lets a waiting call go once a dropped send has handed off to its recovery follow', async () => {
+    // A send whose connection drops before its run starts: not droppable, so B waits.
+    const doneA = hook.fetchAiResponse('hello', 'chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const send = FakeXHR.all[0]
+    send.start()
+    send.status = 0
+    send.end()
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 100)) })
+    const doneB = hook.followStream('chat-B', 'reply-B')
+
+    // After its retry wait, A's recovery follow takes the hook: A has handed off, so B goes
+    // now — dropping that follow — instead of waiting for the whole recovery to finish.
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(3), { timeout: 4000 })
+    const recovery = FakeXHR.all[1]
+    const xhrB = FakeXHR.all[2]
+    expect(recovery.url).toContain('chat-A')
+    expect(recovery.aborted).toBe(true)
+    expect(xhrB.url).toContain('chat-B')
+
+    xhrB.start()
+    xhrB.push({ type: 'RUN_STARTED', ...runB }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'b', delta: 'From B.' }, { type: 'RUN_FINISHED', ...runB })
+    xhrB.end()
+    expect(await doneB).toBe('done')
+    recovery.end()
+    await act(async () => { await doneA })
+    expect(reply('reply-B')).toMatchObject({ content: 'From B.', isLoading: false })
+  }, 10000)
+
   it('does not retry a dropped follow that another chat took over during the wait', async () => {
     const doneA = hook.followStream('chat-A', 'reply-A')
     await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
@@ -204,8 +233,9 @@ describe('useStreamingChat with overlapping follows', () => {
     xhrB.push({ type: 'RUN_STARTED', ...runB }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'b', delta: 'From B.' })
 
     // A's wait ends: it must stand down, not open a third request into B's reply.
+    // doneA settles only after A's retry wait has run out and A has decided, so once it
+    // has, no later request can come from A: no extra sleep is needed.
     await act(async () => { await doneA })
-    await new Promise((resolve) => setTimeout(resolve, 1500))
     expect(FakeXHR.all).toHaveLength(2)
     expect(isStreamActive('chat-B')).toBe(true)
 

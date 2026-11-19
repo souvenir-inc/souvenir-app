@@ -54,6 +54,10 @@ export function parseLayer(layer) {
     // max(), clamp()) can't be compared with the px scale: the layer is left as it is,
     // rather than that value being taken for its colour.
     else if (/^[+-]?[\d.]/.test(p) || /^(calc|min|max|clamp)\(/i.test(p)) return null;
+    // A layer has one colour. A second non-length token means one of them is something
+    // else (`var(--spread)` may be a length), and taking either as the colour would drop
+    // the other: the layer is ambiguous and left as it is. A single var() colour is fine.
+    else if (colour !== null) return null;
     else colour = p;
   }
   if (!colour || lens.length < 2 || lens.length > 4) return null;
@@ -93,7 +97,7 @@ for (const m of primCss.matchAll(/(--[a-z0-9-]+)\s*:\s*(#[0-9a-fA-F]{3,8}|rgba?\
 }
 
 // ── Transform ───────────────────────────────────────────────────────────────
-function transformValue(value, counter) {
+export function transformValue(value, counter) {
   if (value.includes("${") || /^\s*(none|inherit|initial|unset)\s*$/i.test(value)) return value;
   const layers = splitTop(value);
   const whole = shadowWhole.get(layers.map(canonLayer).join(", "));
