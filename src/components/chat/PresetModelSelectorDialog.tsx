@@ -290,6 +290,21 @@ export function PresetModelSelectorDialog() {
     setPreferLeftTooltips(left + DROPDOWN_WIDTH >= vw - 24);
   }, [isOpen, anchorEl]);
 
+  // On open, focus moves into the panel (the selected model, else the first one): the panel
+  // is mounted elsewhere in the page, so Tab from the trigger would leave it and close it.
+  useEffect(() => {
+    if (!isOpen) return;
+    const frame = requestAnimationFrame(() => {
+      const panel = dropdownRef.current;
+      if (!panel || panel.contains(document.activeElement)) return;
+      const target =
+        panel.querySelector<HTMLElement>('[aria-pressed="true"]') ??
+        panel.querySelector<HTMLElement>('input, button, [tabindex="0"]');
+      target?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isOpen]);
+
   // Close on outside click or Escape
   useEffect(() => {
     if (!isOpen) return;
@@ -303,7 +318,9 @@ export function PresetModelSelectorDialog() {
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+      if (e.key !== "Escape") return;
+      close();
+      anchorEl?.focus();
     };
 
     // Focus landing outside (Tab away, or a modal opened from the keyboard, which takes

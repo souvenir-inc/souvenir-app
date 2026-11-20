@@ -134,8 +134,10 @@ const keep = (src, offset) => {
 // one that an expression goes on to use (`'…'.replace(…)`) is left alone.
 export const transformTsx = (src, c) => {
   const masked = codeMask(src);
-  // Whole identifiers only: `rawboxShadow` or `MY_SHADOW_X` is some other name.
-  return src.replace(/((?<![\w$])(?:boxShadow|SHADOW_\w*)(?![\w$])\s*[:=]\s*)(['"`])([^'"`\n]*)\2(?=\s*(?:[,;}]|$))/gm,
+  // Whole identifiers only: `rawboxShadow` or `MY_SHADOW_X` is some other name. A `:` must
+  // start an object property (after `{`, `,` or a line start): in `a ? boxShadow : '…'` it is
+  // a ternary branch. An `=` must be an assignment, not `==`.
+  return src.replace(/((?:(?<=(?:^|[{,])\s*)(?:boxShadow|SHADOW_\w*)(?![\w$])\s*:|(?<![\w$.])(?:boxShadow|SHADOW_\w*)(?![\w$])\s*=(?!=))\s*)(['"`])([^'"`\n]*)\2(?=\s*(?:[,;}]|$))/gm,
     (w, pre, q, v, off) => masked[off] || keep(src, off) ? w : `${pre}${q}${transformValue(v, c)}${q}`);
 };
 export const transformCss = (src, c) => {

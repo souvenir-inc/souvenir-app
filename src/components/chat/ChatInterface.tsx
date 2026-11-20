@@ -47,14 +47,9 @@ import { useInitialPrompt } from "./hooks/use-initial-prompt";
 import { useAttachmentIntake } from "./hooks/use-attachment-intake";
 import { useComposerQueue, useQueuedSend } from "./hooks/use-composer-queue";
 import { useRevealSettle } from "./hooks/use-reveal-settle";
+import { useFollowRunningReply } from "./hooks/use-follow-running-reply";
 import { sendTurn as sendTurnWith, useMessageActions, useTurnGuards, type TurnKit } from "./hooks/use-chat-turns";
 
-// A follow that is refused outright (rather than dropping once attached) leaves the
-// reply where it was, and the refresh it triggers bumps historyLoadId, which runs the
-// follow effect again — unbounded and at network speed without these. The retries
-// inside useStreamingChat cover only an attached connection that later drops.
-const FOLLOW_REFUSED_ATTEMPTS = 3
-const FOLLOW_REFUSED_BACKOFF_MS = 2000
 
 // The container for a chat: message state, sending/queueing turns and the
 // composer. Each hook below is called in the order its effects must run.
@@ -243,38 +238,10 @@ export function ChatInterface({
     ...(onStopBackend ? { onStopBackend } : {}),
   });
 
-  // A chat opened while its reply is still being generated (a reload, another
-  // tab, coming back from another chat) reads the reply from the turn's stream,
-  // into the turn's own message. Only the regular chat endpoint has one.
-  // Refusals are counted here, not in the effect, so the count survives the historyLoadId
-  // reruns a refusal causes; a different reply is a fresh budget. Only refusals count (the
-  // follow reports them before that reload): a follow that attaches spends nothing.
-  const followRefusedRef = useRef<{ key: string; refused: number }>({ key: "", refused: 0 })
-  // Leaving the chat ends that visit's budget, even for a chat with no running reply:
-  // reopening it later starts afresh. (Declared first, so it runs before the follow below.)
-  useEffect(() => {
-    if (!followRefusedRef.current.key.startsWith(`${chatId}:`)) followRefusedRef.current = { key: "", refused: 0 }
-  }, [chatId])
-  useEffect(() => {
-    if (!chatId || endpoint || !runningMessageId || isStreamActive(chatId)) return
-    const key = `${chatId}:${runningMessageId}`
-    const tally = followRefusedRef.current
-    if (tally.key !== key) { tally.key = key; tally.refused = 0 }
-    if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS) return
-    // The first go is immediate; a repeat only happens because the last was refused,
-    // so it backs off rather than returning at round-trip speed.
-    const wait = FOLLOW_REFUSED_BACKOFF_MS * tally.refused
-    const timer = setTimeout(() => {
-      // Checked again when the wait ends: a stream may have started for this chat in
-      // the meantime (a message sent during the back-off), and that one owns the reply.
-      if (isStreamActive(chatId)) return
-      void followStream(chatId, runningMessageId, messages.find((message) => message.id === runningMessageId), () => {
-        if (tally.key === key) tally.refused += 1
-      })
-    }, wait)
-    return () => clearTimeout(timer)
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per history load that finds a running turn; followStream is fresh each render
-  }, [chatId, runningMessageId, historyLoadId])
+  // Follows a reply still being generated when the chat is opened (see the hook).
+  const resetFollowBudget = useFollowRunningReply({
+    chatId, enabled: !endpoint, runningMessageId, historyLoadId, messages, followStream,
+  })
 
   const isStreaming = streamState === "streaming" || streamState === "waiting";
   // This chat's reply is running — here, or still from before the user
@@ -496,7 +463,7 @@ export function ChatInterface({
   const handlePromptAnswered = () => {
     // The answer takes the run up again, often under the same reply id: refusals counted
     // before it say nothing about the resumed run, so it starts with a fresh budget.
-    followRefusedRef.current = { key: "", refused: 0 };
+    resetFollowBudget();
     if (chatId && !isStreamActive(chatId)) void refreshMessages();
   };
 

@@ -8,6 +8,17 @@
 import React, { act, useEffect } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+// The token wait before a direct send: held open by a test that needs to act during it.
+// Off localhost a new chat's send goes straight to the backend, after that wait.
+const token = vi.hoisted(() => ({ gate: null as Promise<string | null> | null, direct: false }))
+vi.mock('@/lib/config', async (orig) => {
+  const actual = await orig<typeof import('@/lib/config')>()
+  return { ...actual, shouldUseDirectBackend: () => token.direct || actual.shouldUseDirectBackend() }
+})
+vi.mock('@/lib/jwt-utils', async (orig) => {
+  const actual = await orig<typeof import('@/lib/jwt-utils')>()
+  return { ...actual, ensureFreshToken: () => token.gate ?? actual.ensureFreshToken() }
+})
 import { useStreamingChat } from '@/hooks/use-streaming-chat'
 import { detachStream, isStreamActive } from '@/lib/stream-registry'
 import { queueMessage, queuedChatsReadyForBackground, takeAllQueuedMessages } from '@/lib/message-queue'
@@ -334,8 +345,41 @@ describe('useStreamingChat with overlapping follows', () => {
       return refused.mock.calls.length
     }
     expect(await run(402)).toBe(1)
-    expect(await run(409)).toBe(0) // already sent: the backend has it
     expect(await run(500)).toBe(0) // may have taken it
+  })
+
+  it('tells a 409 "already sent" (the backend has it) from a 409 refusal (a paused agent)', async () => {
+    const run = async (body: string) => {
+      const refused = vi.fn()
+      const done = hook.fetchAiResponse('hi', 'chat-A', 'reply-A', null, { onSendRefused: refused })
+      await vi.waitFor(() => expect(FakeXHR.all.length).toBeGreaterThan(0))
+      const xhr = FakeXHR.all.at(-1)!
+      FakeXHR.all = []
+      xhr.status = 409
+      xhr.responseText = body
+      xhr.end()
+      await act(async () => { await done })
+      return refused.mock.calls.length
+    }
+    expect(await run('{"detail":{"code":"already_sent"}}')).toBe(0)
+    expect(await run('{"detail":"This agent is not published"}')).toBe(1)
+  })
+
+  it('sends nothing when Stop is pressed while the send is still getting its token', async () => {
+    let release!: (value: string) => void
+    token.gate = new Promise((resolve) => { release = resolve })
+    token.direct = true
+    try {
+      const done = hook.fetchAiResponse('hi', null, 'reply-A')
+      await act(async () => { await Promise.resolve() })
+      act(() => hook.handleStopGeneration())
+      release('tok')
+      expect(await done).toBe('aborted')
+      expect(FakeXHR.all).toHaveLength(0)
+    } finally {
+      token.gate = null
+      token.direct = false
+    }
   })
 
   it("keeps a saved chat's send off a new chat's composer opened before its run started", async () => {

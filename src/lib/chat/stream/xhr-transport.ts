@@ -29,9 +29,9 @@ export interface XhrStreamRequest {
   /** A follow's stream answered: it owns the reply from here, and replays the
    *  turn from its first event, so the reply starts over with it. */
   onFollowAttached?: () => void
-  /** A follow that never reached the stream, with the status that refused it
-   *  (404 = the turn ended while nobody was reading). */
-  onFollowFailed?: (status: number) => void
+  /** A request the backend answered with an error, with its status and body (for a follow,
+   *  404 = the turn ended while nobody was reading). */
+  onFollowFailed?: (status: number, body: string) => void
 }
 
 /**
@@ -146,7 +146,7 @@ export function sendStreamRequest(req: XhrStreamRequest): Promise<void> {
           reject(new ConnectionDroppedError())
         } else if (failed()) {
           const rawText = xhr.responseText || `Request failed with status ${xhr.status}`
-          req.onFollowFailed?.(xhr.status)
+          req.onFollowFailed?.(xhr.status, xhr.responseText)
           // A follow that finds no running turn is the turn having ended, not a failure.
           if (!(follow && xhr.status === 404)) {
             logger.error("[useStreamingChat] Stream request failed", {
