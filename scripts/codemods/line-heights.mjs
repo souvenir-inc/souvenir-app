@@ -34,14 +34,18 @@ const LEADING = [[1, "--leading-none"], [1.25, "--leading-tight"], [1.375, "--le
 const PAIR = { "heading-xl": 36, "heading-md": 28, "heading-sm": 24, "body-sm": 20, small: 16, display: 48, heading: 32, "body-lg": 22, body: 22, caption: 16, code: 16 };
 const PAIR_TOKEN = { "body-lg": "--line-height-body-lg", body: "--line-height-body", caption: "--line-height-caption", code: "--line-height-code" };
 
-function enclosing(src, at) {
+// The block around `at`. `masked` (the codeMask) marks string and comment text, whose braces
+// (`fontFamily: '{'`) are not block boundaries.
+function enclosing(src, at, masked) {
   let depth = 0, start = 0, end = src.length;
   for (let i = at; i >= 0; i--) {
+    if (masked?.[i]) continue;
     if (src[i] === "}") depth++;
     else if (src[i] === "{") { if (depth === 0) { start = i; break; } depth--; }
   }
   depth = 0;
   for (let i = at; i < src.length; i++) {
+    if (masked?.[i]) continue;
     if (src[i] === "{") depth++;
     else if (src[i] === "}") { if (depth === 0) { end = i; break; } depth--; }
   }
@@ -67,6 +71,8 @@ function mapValue(raw, block, counter) {
   // Only this scope's active fontSize pairs: not a commented-out one, and not one inside a
   // nested rule or object (`& .label { … }`), which styles something else.
   let scope = block.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/[^\n]*/g, "$1");
+  // Braces inside a string are text, not a nested block: blanked before nested blocks go.
+  scope = scope.replace(/(['"`])(?:\\.|(?!\1)[^\\\n])*\1/g, (str) => str.replace(/[{}]/g, " "));
   while (/\{[^{}]*\}/.test(scope)) scope = scope.replace(/\{[^{}]*\}/g, "");
   // The last declaration wins (CSS order, and a repeated object key): pair with that one,
   // and only when it is a font-size token; any other last value means no pairing.
@@ -99,7 +105,7 @@ export function transform(src, isCss, counter) {
     if (typeof post === "number") { off = post; post = ""; }
     if (masked[off]) return w;
     if (keep(src, off)) return w;
-    const out = mapValue(val, enclosing(src, off), counter);
+    const out = mapValue(val, enclosing(src, off, masked), counter);
     if (!out) return w;
     return isCss ? `${pre}${out}${post}` : `${pre}'${out}'${post}`;
   });

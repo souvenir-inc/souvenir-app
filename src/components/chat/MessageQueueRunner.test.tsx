@@ -146,8 +146,14 @@ describe('MessageQueueRunner', () => {
     await act(async () => { await new Promise((resolve) => setTimeout(resolve, 10)) })
     expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['first'])
     expect(getChatQueue('chat-1')?.heldBy).toBeUndefined()
+    // Past the next poll, with the run now over: the handed-over send stays stopped.
     getChatRunState.mockResolvedValue('idle')
-    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 10)) })
+    vi.useFakeTimers()
+    try {
+      await act(async () => { await vi.advanceTimersByTimeAsync(RUN_POLL_MS * 2) })
+    } finally {
+      vi.useRealTimers()
+    }
     expect(fetchAiResponse).not.toHaveBeenCalled() // the open chat sends it, not the runner
   })
 

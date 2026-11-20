@@ -81,6 +81,15 @@ describe("line-heights --snap", () => {
         "}",
       ].join("\n");
       expect(tsx(spread)).not.toContain("--line-height-small");
+      // A brace inside a string is not a block boundary: fontSize is still this object's.
+      const quoted = [
+        "const style = {",
+        "  fontSize: 'var(--font-size-small)',",
+        "  fontFamily: '{',",
+        "  lineHeight: '18px',",
+        "};",
+      ].join("\n");
+      expect(tsx(quoted)).toContain("lineHeight: 'var(--line-height-small)'");
     } finally {
       setSnap(false);
     }

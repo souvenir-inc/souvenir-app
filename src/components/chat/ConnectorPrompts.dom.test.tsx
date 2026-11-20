@@ -149,6 +149,22 @@ describe('ConnectPromptCard "Not now"', () => {
     open.mockRestore()
   })
 
+  it('keeps a failed "Not now" as the answer when a connection turns up afterwards', async () => {
+    // The connection lookup answers only after the person has said "Not now".
+    let lookup!: (value: unknown) => void
+    vi.mocked(getConnector).mockImplementationOnce(() => new Promise((resolve) => { lookup = resolve }) as ReturnType<typeof getConnector>)
+    respondToChatPrompt.mockRejectedValueOnce(new Error('Network error'))
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} />))
+    const notNow = [...container.querySelectorAll('button')].find((b) => b.textContent?.includes('Not now'))!
+    await act(async () => notNow.click())
+    await flush()
+    await act(async () => lookup({ ownedConnections: [{ connected: true, needsReconnect: false }], apiKeyFields: [] }))
+    await flush()
+    expect(respondToChatPrompt).toHaveBeenCalledTimes(1)
+    expect(respondToChatPrompt).toHaveBeenCalledWith('cancel', '/chats/c1/prompts/p1')
+    expect(tryAgain()).toBeDefined()
+  })
+
   it('stays gone on remount once a decision is recorded', async () => {
     await act(async () => root.render(<ConnectPromptCard prompt={{ ...prompt, decision: 'cancel' }} />))
     await flush()

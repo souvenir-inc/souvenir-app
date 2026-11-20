@@ -51,11 +51,16 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
   // The "already connected" check and the sign-in poll can both call finish; only
   // one answer may be in flight, or the backend gets it twice.
   const respondingRef = useRef(false)
+  // The person said "Not now": that stays the card's answer until the backend has it (a
+  // failed send keeps it for Try again). A connection found afterwards doesn't overrule it.
+  const declinedRef = useRef(false)
 
   // The turn that asked is waiting on this answer, or has left and takes its run back up on it.
   // "cancel" is "not now" for this one ask: the next request that needs the app asks again.
   const answer = useCallback(async (decision: ConnectDecision) => {
     if (answeredRef.current || abortedRef.current || respondingRef.current) return
+    if (decision === 'cancel') declinedRef.current = true
+    else if (declinedRef.current) return
     // The answer is only "given" once the backend has it. Marking it beforehand and
     // swallowing the failure left the run waiting for a reply that never came, with
     // this guard refusing every retry; so the flag is set after the POST resolves.
