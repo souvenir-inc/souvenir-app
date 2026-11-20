@@ -559,4 +559,74 @@ describe('useStreamingChat with overlapping follows', () => {
       takeAllQueuedMessages('chat-A')
     }
   }, 10000)
+
+  it("lifts the drop's hold when the reconnect finds the turn already over", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    try {
+      const done = hook.followStream('chat-A', 'reply-A')
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+      const xhr = FakeXHR.all[0]
+      xhr.start()
+      xhr.push({ type: 'RUN_STARTED', ...runA })
+      xhr.status = 0
+      xhr.end()
+      await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+      const retry = FakeXHR.all[1]
+      retry.status = 404 // the turn ended meanwhile
+      retry.responseText = '{"detail":"no stream"}'
+      retry.end()
+      expect(await done).toBe('done')
+      expect(getChatQueue('chat-A')?.heldBy).toBeUndefined()
+    } finally {
+      takeAllQueuedMessages('chat-A')
+    }
+  }, 10000)
+
+  it('keeps a prompt answer given while the follow was connecting', async () => {
+    const card = { request_id: 'p1', card: 'chat' } as never
+    const prior = { id: 'reply-A', role: 'assistant', content: 'earlier', created_at: '', chat_id: 'chat-A', chatPrompts: [card] } as UIMessage
+    messages = [{ ...prior, isLoading: true }]
+    const done = hook.followStream('chat-A', 'reply-A', prior)
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    // Answered before the stream answers.
+    messages = messages.map((m) => ({ ...m, chatPrompts: [{ ...(card as object), decision: 'yes' } as never] }))
+    const xhr = FakeXHR.all[0]
+    xhr.start() // attaches: the reply goes back to the prior
+    expect(messages[0].chatPrompts?.[0]).toMatchObject({ request_id: 'p1', decision: 'yes' })
+    xhr.push({ type: 'RUN_STARTED', ...runA }, { type: 'RUN_FINISHED', ...runA })
+    xhr.end()
+    await act(async () => { await done })
+  })
+
+  it("finishes a failed reconnect on its own reply, not on a newer call's", async () => {
+    let started = false
+    const unsubscribe = subscribeStreams((event) => {
+      // As the refused reconnect ends, another chat's follow takes the hook.
+      if (event.type === 'end' && event.chatId === 'chat-A' && FakeXHR.all.length === 2 && !started) {
+        started = true
+        void hook.followStream('chat-B', 'reply-B')
+      }
+    })
+    try {
+      const done = hook.followStream('chat-A', 'reply-A')
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+      const xhr = FakeXHR.all[0]
+      xhr.start()
+      xhr.push({ type: 'RUN_STARTED', ...runA }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'Part.' })
+      xhr.status = 0
+      xhr.end()
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+      const retry = FakeXHR.all[1]
+      retry.status = 500 // refused, not gone: this call finishes its reply as failed
+      retry.responseText = '{"detail":"boom"}'
+      retry.end()
+      await act(async () => { await done })
+      expect(reply('reply-B').errorNotice ?? reply('reply-B').error).toBeFalsy()
+      expect(reply('reply-B').isLoading).toBe(true)
+    } finally {
+      unsubscribe()
+      completeStream('chat-B')
+    }
+  }, 10000)
 })

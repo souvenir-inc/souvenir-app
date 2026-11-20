@@ -21,7 +21,7 @@ Choose a delivery mode before external mutations:
 - **Working tree (default):** leave unstaged local edits. Do not commit, push, or create GitHub artifacts.
 - **Pull request (PR) mode:** only when explicitly selected. This creates branches, commits, pushes, PRs, labels, and one tracking issue. Require authenticated `gh`, a clean base worktree, and an up-to-date default branch.
 
-In PR mode, resolve the target branch and base SHA before scanning. Run the initial scan from an isolated worktree at the branch head, comparing against that verified base SHA (scanning the base itself would show an empty diff). Use the same base for every bucket, manifest, permalink, and integration rescan.
+In PR mode, resolve the target branch and base SHA before scanning. Run the initial scan from an isolated worktree at the branch head, comparing against that verified base SHA (scanning the base itself would show an empty diff). That worktree holds committed work only: PR mode does not accept the uncommitted-files scope. If the user selected uncommitted edits, ask them to commit those edits first or to use working-tree mode. Use the same base for every bucket, manifest, permalink, and integration rescan.
 
 For cleanup within the code being edited, use `--scope contextual --blocking none` with the same verified base. It reports existing findings in modified functions, JSX elements, or files according to each rule's `diffScope`. Keep `--scope changed` when the task is limited to newly introduced findings.
 

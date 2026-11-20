@@ -41,6 +41,21 @@ export type { TurnResume } from "@/lib/chat/stream/stream-request"
 const FOLLOW_ATTEMPTS = 5
 const FOLLOW_RETRY_MS = 1000
 
+/** `next` with the prompt-card answers already recorded on `current` (the same reply). */
+function keepPromptDecisions(next: UIMessage, current: UIMessage): UIMessage {
+  const merge = <P extends { request_id: string; decision?: unknown }>(into?: P[], from?: P[]) => {
+    if (!into || !from) return into
+    const decided = new Map(from.filter((p) => p.decision !== undefined).map((p) => [p.request_id, p.decision]))
+    return decided.size ? into.map((p) => (decided.has(p.request_id) ? { ...p, decision: decided.get(p.request_id) } : p)) : into
+  }
+  return {
+    ...next,
+    connectorConnectPrompts: merge(next.connectorConnectPrompts, current.connectorConnectPrompts),
+    connectorPermissionPrompts: merge(next.connectorPermissionPrompts, current.connectorPermissionPrompts),
+    chatPrompts: merge(next.chatPrompts, current.chatPrompts),
+  }
+}
+
 /** A 409 that says the same send already reached the backend (the Idempotency-Key guard),
  *  as opposed to a 409 refusal (an unpublished, paused or disabled agent). */
 function isAlreadySent(status: number, body: string): boolean {
@@ -321,6 +336,9 @@ export function useStreamingChat({
     let failedStatus = 0
     let failedBody = ""
     loadingMessageIdRef.current = loadingMessageId
+    // This call's own reply id. The ref is the hook's, and another call can take it over
+    // while this one waits; finishing this call must still reach this call's reply.
+    let myReplyId: string | null = loadingMessageId
     userMessageIdRef.current = options?.userMessageId ?? null
     resolvedChatIdRef.current = chatId
     // The refs above belong to whichever call ran last, so stopping through
@@ -379,8 +397,8 @@ export function useStreamingChat({
       setMessages,
       queueUpdate,
       flushPending,
-      messageId: () => loadingMessageIdRef.current,
-      setMessageId: (id) => { loadingMessageIdRef.current = id },
+      messageId: () => myReplyId,
+      setMessageId: (id) => { myReplyId = id; loadingMessageIdRef.current = id },
       userMessageId: () => userMessageIdRef.current,
       chatId: () => resolvedChatIdRef.current,
       adoptChatId: (id) => adoptChatId(id),
@@ -478,14 +496,19 @@ export function useStreamingChat({
             // The stream replays the stretch being worked on from its start, so the reply goes back
             // to what it held before that stretch: nothing, or what earlier stretches of the run wrote.
             attached = true
-            const replyId = loadingMessageIdRef.current
+            const replyId = myReplyId
             const prior = options?.prior
+            // Answers given to the reply's prompt cards since the follow started stay: the
+            // reset only takes back the text the replayed stretch will write again.
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === replyId
-                  ? prior
-                    ? { ...prior, isLoading: true }
-                    : { id: msg.id, reactKey: msg.reactKey, role: msg.role, created_at: msg.created_at, chat_id: msg.chat_id, content: "", isLoading: true }
+                  ? keepPromptDecisions(
+                      prior
+                        ? { ...prior, isLoading: true }
+                        : { id: msg.id, reactKey: msg.reactKey, role: msg.role, created_at: msg.created_at, chat_id: msg.chat_id, content: "", isLoading: true },
+                      msg,
+                    )
                   : msg,
               ),
             )
@@ -557,7 +580,7 @@ export function useStreamingChat({
         ) {
           // Read while this call still holds the refs: during the wait another chat's
           // call can take them, and its reply id must not become this retry's.
-          const retryReplyId = loadingMessageIdRef.current ?? loadingMessageId
+          const retryReplyId = myReplyId ?? loadingMessageId
           const retryUserMessageId = userMessageIdRef.current ?? undefined
           await new Promise((resolve) => setTimeout(resolve, FOLLOW_RETRY_MS))
           // Taken over during the wait: the newer call reset stopRequestedRef, so that
@@ -590,6 +613,9 @@ export function useStreamingChat({
             if (showsChat(liveChatId, false)) setStreamState?.("done")
             onStreamLost?.(liveChatId)
             onStreamDone?.()
+            // The turn ended on the backend: the drop was no failure, so its hold goes (after
+            // the reload above has started, which the queue waits on).
+            if (!heldBefore) releaseErrorHold(liveChatId)
             return "done"
           }
         }
