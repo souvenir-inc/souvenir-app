@@ -8,6 +8,8 @@ import { useCreditStatus } from "@/hooks/use-credit-status";
 import { useStreamingChat } from "@/hooks/use-streaming-chat";
 import { trackBrowserEvent } from "@/lib/analytics/events";
 import {
+  beginHandOver,
+  endHandOver,
   hasQueuedMessages,
   queuedChatsReadyForBackground,
   subscribeQueue,
@@ -244,7 +246,12 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
     registerStream(chatId, undefined, () => {
       handedOff = true;
       fireUnmount();
-      setTimeout(() => restoreQueuedMessage(chatId, message, 0), 0);
+      // Until it is back, the queue's next message can't go out in the background ahead of it.
+      beginHandOver(chatId);
+      setTimeout(() => {
+        restoreQueuedMessage(chatId, message, 0);
+        endHandOver(chatId);
+      }, 0);
     });
 
     waitForIdleRun()

@@ -99,6 +99,10 @@ describe("line-heights --snap", () => {
         "}",
       ].join("\n");
       expect(transform(custom, true, { exact: 0, unitless: 0, snapped: 0 })).toContain("line-height: var(--line-height-small);");
+      // A custom property whose name ends in line-height is left alone; the real one converts.
+      const grid = [".grid {", "  --grid-line-height: 18px;", "  grid-auto-rows: var(--grid-line-height);", "}"].join("\n");
+      expect(transform(grid, true, { exact: 0, unitless: 0, snapped: 0 })).toBe(grid);
+      expect(transform(".a { font-size: var(--font-size-small); line-height: 18px; }", true, { exact: 0, unitless: 0, snapped: 0 })).toContain("line-height: var(--line-height-small);");
     } finally {
       setSnap(false);
     }
