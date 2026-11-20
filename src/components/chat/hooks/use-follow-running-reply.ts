@@ -29,7 +29,8 @@ type FollowStream = (
  * Refusals are counted here, outside the effect, so the count survives the history
  * reloads (historyLoadId) a refusal causes; a different reply is a fresh budget. Only
  * refusals count (the follow reports them before that reload): one that attaches spends
- * nothing. Returns a reset, for when the reply is known to have moved on (a prompt answered).
+ * nothing. Returns a reset of one chat's budget, for when its reply is known to have moved on
+ * (a prompt answered).
  */
 export function useFollowRunningReply({
   chatId,
@@ -45,9 +46,12 @@ export function useFollowRunningReply({
   historyLoadId: number
   messages: UIMessage[]
   followStream: FollowStream
-}): () => void {
+}): (chatId: string) => void {
   const tallyRef = useRef<{ key: string; refused: number }>({ key: "", refused: 0 })
-  const reset = () => { tallyRef.current = { key: "", refused: 0 } }
+  // Only the given chat's budget: the tally belongs to whichever chat it was counting.
+  const reset = (forChatId: string) => {
+    if (tallyRef.current.key.startsWith(`${forChatId}:`)) tallyRef.current = { key: "", refused: 0 }
+  }
 
   // Leaving the chat ends that visit's budget, even for a chat with no running reply:
   // reopening it later starts afresh. (Declared first, so it runs before the follow below.)
@@ -87,7 +91,8 @@ export function useFollowRunningReply({
     })
     return () => { clearTimeout(timer); unsubscribe() }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per history load that finds a running turn; followStream is fresh each render
-  }, [chatId, runningMessageId, historyLoadId])
+  // `enabled` too: turning it off cancels a waiting follow, and turning it on looks again.
+  }, [chatId, enabled, runningMessageId, historyLoadId])
 
   return reset
 }

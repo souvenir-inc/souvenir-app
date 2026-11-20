@@ -460,11 +460,12 @@ export function ChatInterface({
   // starts the next turn, so the answer is sent like any other message.
   // An answer given after the turn's run had left takes the run back up on the
   // backend: the history is read again, and the running reply is followed from it.
-  const handlePromptAnswered = () => {
+  const handlePromptAnswered = (answeredChatId: string) => {
     // The answer takes the run up again, often under the same reply id: refusals counted
-    // before it say nothing about the resumed run, so it starts with a fresh budget.
-    resetFollowBudget();
-    if (chatId && !isStreamActive(chatId)) void refreshMessages();
+    // before it say nothing about the resumed run, so it starts with a fresh budget. Only
+    // that chat's: the answer can land after the user has moved to another chat.
+    resetFollowBudget(answeredChatId);
+    if (answeredChatId === chatId && !isStreamActive(chatId)) void refreshMessages();
   };
 
   const { revealingMessage, isRevealing, handleRevealSettled } = useRevealSettle({

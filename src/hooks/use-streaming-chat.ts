@@ -557,23 +557,24 @@ export function useStreamingChat({
           // Taken over during the wait: the newer call reset stopRequestedRef, so that
           // alone would let this one start a second follow into the newer call's reply.
           if (detached) return "done"
-          if (!stopRequestedRef.current) {
-            const outcome = await fetchAiResponse("", liveChatId, retryReplyId, null, {
-              follow: true,
-              followAttempt: attempt + 1,
-              userMessageId: retryUserMessageId,
-              prior: options?.prior,
-            })
-            const result = followResultRef.current
-            followResultRef.current = "attached"
-            if (result === "attached") return outcome
-            if (result === "gone") {
-              completeStream(liveChatId, "done")
-              if (showsChat(liveChatId, false)) setStreamState?.("done")
-              onStreamLost?.(liveChatId)
-              onStreamDone?.()
-              return "done"
-            }
+          // Stopped during the wait: Stop has already settled the reply as stopped, and this
+          // turn ends that way too, not as the error that led to the wait.
+          if (stopRequestedRef.current) return "aborted"
+          const outcome = await fetchAiResponse("", liveChatId, retryReplyId, null, {
+            follow: true,
+            followAttempt: attempt + 1,
+            userMessageId: retryUserMessageId,
+            prior: options?.prior,
+          })
+          const result = followResultRef.current
+          followResultRef.current = "attached"
+          if (result === "attached") return outcome
+          if (result === "gone") {
+            completeStream(liveChatId, "done")
+            if (showsChat(liveChatId, false)) setStreamState?.("done")
+            onStreamLost?.(liveChatId)
+            onStreamDone?.()
+            return "done"
           }
         }
 

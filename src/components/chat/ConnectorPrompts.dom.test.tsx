@@ -129,6 +129,24 @@ describe('ConnectPromptCard "Not now"', () => {
     expect(container.textContent).toBe('')
   })
 
+  it('keeps Connect disabled while "Not now" is still being sent', async () => {
+    vi.mocked(getConnector).mockResolvedValueOnce({ ownedConnections: [], apiKeyFields: [] } as unknown as Awaited<ReturnType<typeof getConnector>>)
+    let release!: () => void
+    respondToChatPrompt.mockImplementationOnce(() => new Promise<void>((resolve) => { release = resolve }))
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} />))
+    await flush()
+    const button = (label: string) => [...container.querySelectorAll('button')].find((b) => b.textContent?.includes(label))
+    await act(async () => button('Not now')!.click())
+    await flush()
+    const connect = button('Connect')!
+    expect(connect.disabled).toBe(true)
+    const open = vi.spyOn(window, 'open').mockReturnValue(null)
+    await act(async () => connect.click())
+    expect(open).not.toHaveBeenCalled()
+    await act(async () => { release(); await Promise.resolve() })
+    open.mockRestore()
+  })
+
   it('stays gone on remount once a decision is recorded', async () => {
     await act(async () => root.render(<ConnectPromptCard prompt={{ ...prompt, decision: 'cancel' }} />))
     await flush()

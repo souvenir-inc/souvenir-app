@@ -3,7 +3,7 @@
 // useFollowRunningReply: a chat opened with a reply still running follows it, with a
 // bounded budget for refusals, and never follows a reply a newer run has superseded.
 
-import React, { act } from 'react'
+import React, { act, useEffect } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { FOLLOW_REFUSED_ATTEMPTS, FOLLOW_REFUSED_BACKOFF_MS, useFollowRunningReply } from './use-follow-running-reply'
@@ -11,7 +11,7 @@ import { completeStream, registerStream } from '@/lib/stream-registry'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
-type Props = { chatId: string | null; runningMessageId: string | null; historyLoadId: number }
+type Props = { chatId: string | null; runningMessageId: string | null; historyLoadId: number; enabled?: boolean }
 
 let root: Root
 let container: HTMLDivElement
@@ -21,11 +21,13 @@ const followStream = vi.fn(async (_chatId: string, _id: string, _prior?: unknown
   return 'done' as const
 })
 
-function Harness(props: Props) {
-  useFollowRunningReply({ ...props, enabled: true, messages: [], followStream })
+let reset: (chatId: string) => void
+function Harness({ enabled = true, onReset, ...props }: Props & { onReset: (fn: (chatId: string) => void) => void }) {
+  const resetBudget = useFollowRunningReply({ ...props, enabled, messages: [], followStream })
+  useEffect(() => onReset(resetBudget))
   return null
 }
-const render = (props: Props) => act(async () => { root.render(<Harness {...props} />) })
+const render = (props: Props) => act(async () => { root.render(<Harness {...props} onReset={(fn) => { reset = fn }} />) })
 
 beforeEach(() => {
   vi.useFakeTimers()
@@ -76,6 +78,27 @@ describe('useFollowRunningReply', () => {
     await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 2 })
     // During the back-off the user sends: a newer run starts, and ends before the wait does.
     await act(async () => { registerStream('chat-A'); completeStream('chat-A', 'done') })
+    await act(async () => { await vi.advanceTimersByTimeAsync(FOLLOW_REFUSED_BACKOFF_MS * 2) })
+    expect(followStream).toHaveBeenCalledTimes(1)
+  })
+
+  it('resets only the budget of the chat whose prompt was answered', async () => {
+    const load = await spendBudget('r1')
+    reset('chat-B') // answered in another chat: chat A's budget stands
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: load })
+    await act(async () => { await vi.advanceTimersByTimeAsync(60_000) })
+    expect(followStream).toHaveBeenCalledTimes(FOLLOW_REFUSED_ATTEMPTS)
+    reset('chat-A') // answered here: followed afresh on the next load
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: load + 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    expect(followStream).toHaveBeenCalledTimes(FOLLOW_REFUSED_ATTEMPTS + 1)
+  })
+
+  it('cancels a waiting follow when following is turned off', async () => {
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 2 }) // backing off
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 2, enabled: false })
     await act(async () => { await vi.advanceTimersByTimeAsync(FOLLOW_REFUSED_BACKOFF_MS * 2) })
     expect(followStream).toHaveBeenCalledTimes(1)
   })

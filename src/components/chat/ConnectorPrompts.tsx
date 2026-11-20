@@ -247,6 +247,9 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
         </div>
       )}
 
+      {/* While an answer is being sent (Not now, or the connected notice), the sign-in
+          actions wait: starting a sign-in then would race the answer. A failed answer
+          shows Try again instead, which stays available. */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
         {respondFailed !== 'connected' && (
           <Button size="sm" variant="outline" disabled={responding} onClick={() => void answer('cancel')}>
@@ -258,26 +261,26 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
             Try again
           </Button>
         ) : showCredentialForm && !showApiForm ? (
-          <Button size="sm" variant="approve" attention onClick={() => setShowApiForm(true)}>
+          <Button size="sm" variant="approve" attention={!responding} disabled={responding} onClick={() => setShowApiForm(true)}>
             Enter credentials
           </Button>
         ) : showCredentialForm ? (
           <>
-            <Button size="sm" variant="outline" disabled={busy} onClick={() => setShowApiForm(false)}>
+            <Button size="sm" variant="outline" disabled={busy || responding} onClick={() => setShowApiForm(false)}>
               Cancel
             </Button>
             <Button
               size="sm"
               variant="approve"
               loading={busy}
-              disabled={!allFilled}
+              disabled={!allFilled || responding}
               onClick={prompt.auth_mode === 'api_key' ? handleApiKey : () => handleOAuth(apiKeyFields)}
             >
               {connectLabel}
             </Button>
           </>
         ) : (
-          <Button size="sm" variant="approve" attention={!busy} loading={busy} onClick={() => handleOAuth()}>
+          <Button size="sm" variant="approve" attention={!busy && !responding} loading={busy} disabled={responding} onClick={() => handleOAuth()}>
             {connectLabel}
           </Button>
         )}
