@@ -75,7 +75,11 @@ export function useFollowRunningReply({
     // The first go is immediate; a repeat only happens because the last was refused,
     // so it backs off rather than returning at round-trip speed.
     const wait = FOLLOW_REFUSED_BACKOFF_MS * tally.refused
+    // Once this effect's follow is under way, a start for the chat is that follow's own
+    // stream, not a newer run: it neither cancels anything nor earns a restart.
+    let followed = false
     const follow = () => {
+      followed = true
       void followStream(chatId, runningMessageId, messages.find((message) => message.id === runningMessageId), () => {
         if (tally.key === key) tally.refused += 1
       })
@@ -95,6 +99,7 @@ export function useFollowRunningReply({
     let superseded = false
     const unsubscribe = subscribeStreams((event) => {
       if (event.chatId !== chatId) return
+      if (followed) return
       if (event.type === "start") {
         clearTimeout(timer)
         superseded = true

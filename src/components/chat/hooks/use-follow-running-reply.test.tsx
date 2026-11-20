@@ -112,4 +112,17 @@ describe('useFollowRunningReply', () => {
     expect(followStream).toHaveBeenCalledTimes(2)
     expect(followStream.mock.calls[1][1]).toBe('r1')
   })
+
+  it("does not restart on the end of its own follow's stream", async () => {
+    // This follow registers its own stream (as the real one does) and then fails.
+    followStream.mockImplementationOnce(async () => {
+      registerStream('chat-A')
+      completeStream('chat-A', 'error')
+      return 'error' as const
+    })
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    await act(async () => { await vi.advanceTimersByTimeAsync(10_000) })
+    expect(followStream).toHaveBeenCalledTimes(1)
+  })
 })
