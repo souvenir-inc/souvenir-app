@@ -15,7 +15,7 @@ import {
   takeNextQueuedMessage,
   type QueuedMessage,
 } from "@/lib/message-queue";
-import { completeStream, registerStream } from "@/lib/stream-registry";
+import { completeStream, registerStream, setStreamDetach } from "@/lib/stream-registry";
 import { getChatRunState } from "@/lib/api/chat";
 import { buildTurnOptions } from "@/lib/turn-options";
 import type { UIMessage } from "@/types/chat";
@@ -230,8 +230,23 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
       }
     };
 
+    // Opening the chat while this waits hands the message over to it: the wait stops, the
+    // reservation goes at once (so the chat loads its history rather than waiting on it),
+    // and the message returns to the front of the chat's queue for the chat itself to send.
+    // It returns a tick later, once the opening chat has marked its queue as on screen, so
+    // the background runner doesn't take it straight back. Removed just before sending:
+    // a send under way is never handed over (it could then go out twice).
+    let handedOff = false;
+    registerStream(chatId, undefined, () => {
+      handedOff = true;
+      fireUnmount();
+      setTimeout(() => restoreQueuedMessage(chatId, message, 0), 0);
+    });
+
     waitForIdleRun()
       .then((state) => {
+        if (handedOff) return;
+        setStreamDetach(chatId, undefined);
         if (state === "idle" && mountedRef.current && blockedRef.current) {
           // Out of credits meanwhile: the message stays queued, unsent, and the
           // reservation ends as "done" (no hold), so the runner sends it once unblocked.
@@ -260,7 +275,7 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
       })
       // fetchAiResponse settles every stream itself; this only frees the
       // reservation if it threw before getting that far.
-      .catch(() => completeStream(chatId, "error"))
+      .catch(() => { if (!handedOff) completeStream(chatId, "error"); })
       .finally(() => onDoneRef.current());
   // eslint-disable-next-line react-hooks/exhaustive-deps -- sends once, on mount
   }, []);

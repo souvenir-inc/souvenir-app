@@ -28,7 +28,7 @@ vi.mock('@/lib/api/chat', () => ({ getChatRunState: (...args: unknown[]) => getC
 
 import { MessageQueueRunner, RUN_CHECK_ATTEMPTS, RUN_POLL_MS } from './MessageQueueRunner'
 import { getChatQueue, queueMessage, setQueueForeground, takeAllQueuedMessages } from '@/lib/message-queue'
-import { completeStream, isStreamActive, registerStream } from '@/lib/stream-registry'
+import { completeStream, detachStream, isStreamActive, registerStream } from '@/lib/stream-registry'
 
 let container: HTMLDivElement
 let root: Root
@@ -130,6 +130,34 @@ describe('MessageQueueRunner', () => {
     await act(async () => completeStream('chat-1', 'done'))
     await act(async () => finishSend('error'))
     expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['second'])
+  })
+
+  it('hands a waiting message over to the chat when it is opened, without making it wait', async () => {
+    getChatRunState.mockResolvedValue('running') // the previous run is still going
+    await queueBehindReply('first')
+    await act(async () => completeStream('chat-1', 'done'))
+    expect(isStreamActive('chat-1')).toBe(true) // reserved while it waits
+    // The chat opens: its view marks the queue as on screen and frees the chat.
+    await act(async () => {
+      setQueueForeground(view, 'chat-1')
+      expect(detachStream('chat-1')).toBe(true)
+    })
+    expect(isStreamActive('chat-1')).toBe(false)
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 10)) })
+    expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['first'])
+    expect(getChatQueue('chat-1')?.heldBy).toBeUndefined()
+    getChatRunState.mockResolvedValue('idle')
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 10)) })
+    expect(fetchAiResponse).not.toHaveBeenCalled() // the open chat sends it, not the runner
+  })
+
+  it('does not hand over a message once it is being sent', async () => {
+    await queueBehindReply('first')
+    await act(async () => completeStream('chat-1', 'done'))
+    expect(fetchAiResponse).toHaveBeenCalledOnce()
+    expect(detachStream('chat-1')).toBe(false)
+    expect(getChatQueue('chat-1')).toBeUndefined()
+    await act(async () => finishSend('done'))
   })
 
   it('leaves a chat on screen to its own view', async () => {

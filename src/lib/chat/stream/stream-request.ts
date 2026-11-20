@@ -40,9 +40,10 @@ export interface StreamRequestOptions {
   /** A follow of a run from the chat's history: the reply as it was loaded. The stream replays only the
    *  stretch the agent is working on now, so what earlier stretches wrote stays and the replay adds to it. */
   prior?: UIMessage
-  /** Called when the backend refused the send outright (a 4xx other than 409, before any run):
-   *  it never took the message, so the caller may offer it again. Not called for a dropped
-   *  connection or a 5xx, where the backend may have taken it: re-sending could repeat it. */
+  /** Called when the backend refused the send outright (a 4xx before any run, including a
+   *  409 refusal such as a paused or unpublished agent): it never took the message, so the
+   *  caller may offer it again. Not called for `409 already_sent` (the backend has it), nor for
+   *  a dropped connection or a 5xx, where it may have taken it: re-sending could repeat it. */
   onSendRefused?: () => void
   /** A follow that waited its turn and found the user had left its chat: it stands down,
    *  without starting, and this is called. */

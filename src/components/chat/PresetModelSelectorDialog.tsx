@@ -290,7 +290,8 @@ export function PresetModelSelectorDialog() {
     setPreferLeftTooltips(left + DROPDOWN_WIDTH >= vw - 24);
   }, [isOpen, anchorEl]);
 
-  // On open, focus moves into the panel (the selected model, else the first one): the panel
+  // On open (or once the models arrive), focus moves into the panel (the selected model,
+  // else the first one): the panel
   // is mounted elsewhere in the page, so Tab from the trigger would leave it and close it.
   useEffect(() => {
     if (!isOpen) return;
@@ -303,7 +304,8 @@ export function PresetModelSelectorDialog() {
       target?.focus();
     });
     return () => cancelAnimationFrame(frame);
-  }, [isOpen]);
+    // models too: opened before the list loaded, focus moves in once it arrives.
+  }, [isOpen, models.length]);
 
   // Close on outside click or Escape
   useEffect(() => {
@@ -399,7 +401,11 @@ export function PresetModelSelectorDialog() {
             <PresetModelSelectorContent
               models={models}
               selectedModel={selectedModel}
-              onSelect={selectModel}
+              onSelect={(model) => {
+                selectModel(model);
+                // The chosen row goes with the panel: focus returns to the trigger.
+                anchorEl?.focus();
+              }}
               preferLeftTooltips={preferLeftTooltips}
             />
           </Popover>
