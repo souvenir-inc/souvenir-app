@@ -20,7 +20,7 @@ vi.mock('@/lib/jwt-utils', async (orig) => {
   return { ...actual, ensureFreshToken: () => token.gate ?? actual.ensureFreshToken() }
 })
 import { useStreamingChat } from '@/hooks/use-streaming-chat'
-import { completeStream, detachStream, isStreamActive, registerStream } from '@/lib/stream-registry'
+import { completeStream, detachStream, isStreamActive, registerStream, subscribeStreams } from '@/lib/stream-registry'
 import { queueMessage, queuedChatsReadyForBackground, takeAllQueuedMessages } from '@/lib/message-queue'
 import { resetStreamStore } from '@/lib/chat/stream-store'
 import type { UIMessage } from '@/types/chat'
@@ -501,5 +501,21 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(FakeXHR.all).toHaveLength(1)
     expect(isStreamActive('chat-A')).toBe(true) // still that reader's
     completeStream('chat-A')
+  })
+
+  it("ends a refused follow without failing it, so the chat's queue is not held", async () => {
+    const ends: string[] = []
+    const unsubscribe = subscribeStreams((event) => { if (event.type === 'end' && event.chatId === 'chat-A') ends.push(event.outcome) })
+    const refused = vi.fn()
+    const done = hook.followStream('chat-A', 'reply-A', undefined, refused)
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const xhr = FakeXHR.all[0]
+    xhr.status = 404 // the turn has ended
+    xhr.responseText = '{"detail":"no stream"}'
+    xhr.end()
+    expect(await done).toBe('done')
+    unsubscribe()
+    expect(ends).toEqual(['done'])
+    expect(refused).toHaveBeenCalledTimes(1) // its own result reached its caller
   })
 })

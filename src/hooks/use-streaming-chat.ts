@@ -110,8 +110,6 @@ export function useStreamingChat({
 }: UseStreamingChatParams) {
   const xhrRef = useRef<XMLHttpRequest | null>(null)
   const stopRequestedRef = useRef(false)
-  // Set by a follow of a running turn, read by whoever started it.
-  const followResultRef = useRef<FollowResult>("attached")
 
   // Whether a call's stream state belongs to the chat on screen. With no chat on screen
   // (a new, unsaved chat) only a send made from that composer is its own: not a follow,
@@ -321,7 +319,6 @@ export function useStreamingChat({
     let attached = !follow
     let failedStatus = 0
     let failedBody = ""
-    followResultRef.current = "attached"
     loadingMessageIdRef.current = loadingMessageId
     userMessageIdRef.current = options?.userMessageId ?? null
     resolvedChatIdRef.current = chatId
@@ -524,7 +521,10 @@ export function useStreamingChat({
         if (!follow && !runStarted && failedStatus >= 400 && failedStatus < 500 && !isAlreadySent(failedStatus, failedBody)) {
           options?.onSendRefused?.()
         }
-        completeStream(resolvedChatIdRef.current, stopRequestedRef.current ? "aborted" : "error")
+        // A follow that never reached the stream did not end a turn: the run it looked for has
+        // ended or can't be read, which its caller settles (the history reloads). Ending it as
+        // an error would hold the chat's queue although nothing failed.
+        completeStream(resolvedChatIdRef.current, stopRequestedRef.current ? "aborted" : follow && !attached ? "done" : "error")
         // A turn that failed or was stopped part-way may still have saved its files.
         if (options?.files?.length) notifyLibraryFilesChanged()
 
@@ -536,7 +536,7 @@ export function useStreamingChat({
 
         // A follow that never reached the stream leaves the reply to whoever started it.
         if (!attached) {
-          followResultRef.current = failedStatus === 404 ? "gone" : "failed"
+          options?.onFollowResult?.(failedStatus === 404 ? "gone" : "failed")
           return "error"
         }
 
@@ -565,14 +565,16 @@ export function useStreamingChat({
           // Stopped during the wait: Stop has already settled the reply as stopped, and this
           // turn ends that way too, not as the error that led to the wait.
           if (stopRequestedRef.current) return "aborted"
+          // This retry's own result, not a value shared by the hook: another call in this
+          // hook could overwrite one before this one reads it.
+          let result: FollowResult = "attached"
           const outcome = await fetchAiResponse("", liveChatId, retryReplyId, null, {
             follow: true,
             followAttempt: attempt + 1,
             userMessageId: retryUserMessageId,
             prior: options?.prior,
+            onFollowResult: (r) => { result = r },
           })
-          const result = followResultRef.current
-          followResultRef.current = "attached"
           if (result === "attached") return outcome
           if (result === "gone") {
             completeStream(liveChatId, "done")
@@ -658,14 +660,15 @@ export function useStreamingChat({
    *  attached and later ended), before the history reload that onStreamLost starts. */
   const followStream = async (chatId: string, loadingMessageId: string, prior?: UIMessage, onRefused?: () => void): Promise<StreamOutcome> => {
     let leftBeforeStart = false
+    let result: FollowResult = "attached"
     const outcome = await fetchAiResponse("", chatId, loadingMessageId, null, {
-      follow: true, prior, onLeftBeforeStart: () => { leftBeforeStart = true },
+      follow: true, prior,
+      onLeftBeforeStart: () => { leftBeforeStart = true },
+      onFollowResult: (r) => { result = r },
     })
-    // Never started (the user left the chat while it waited): nothing to settle, and the
-    // shared result belongs to whichever call ran last. Reopening the chat follows afresh.
+    // Never started (the user left the chat while it waited): nothing to settle. Reopening
+    // the chat follows afresh.
     if (leftBeforeStart) return "done"
-    const result = followResultRef.current
-    followResultRef.current = "attached"
     if (result === "attached") return outcome
     completeStream(chatId, "done")
     if (showsChat(chatId, false)) setStreamState?.("done")

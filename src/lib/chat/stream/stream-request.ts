@@ -48,6 +48,9 @@ export interface StreamRequestOptions {
   /** A follow that waited its turn and found the user had left its chat: it stands down,
    *  without starting, and this is called. */
   onLeftBeforeStart?: () => void
+  /** A follow that never reached the turn's stream: "gone" (the turn has ended) or "failed".
+   *  Per call, so one call's result can't be read as another's. */
+  onFollowResult?: (result: "gone" | "failed") => void
 }
 
 export interface StreamTarget {

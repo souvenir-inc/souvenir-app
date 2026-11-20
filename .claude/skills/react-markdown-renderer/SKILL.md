@@ -180,6 +180,7 @@ import Markdown, { Options } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import { sanitize } from './MessageRenderer'; // the footnote-safe sanitize setting above
+import { markdownComponents } from './markdownComponents'; // the custom components above
 
 // Memoized block — only re-renders when content changes. Same plugins as the basic
 // renderer above, so streamed code blocks are highlighted and HTML is sanitised too.
