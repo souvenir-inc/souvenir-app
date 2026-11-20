@@ -72,6 +72,15 @@ describe("line-heights --snap", () => {
         "}",
       ].join("\n");
       expect(transform(twice, true, { exact: 0, unitless: 0, snapped: 0 })).toContain("line-height: var(--line-height-body-sm);");
+      // A spread can override fontSize: no pairing with the small size it would hide.
+      const spread = [
+        "const s = {",
+        "  fontSize: 'var(--font-size-small)',",
+        "  ...{ fontSize: 'var(--font-size-body-sm)' },",
+        "  lineHeight: '18px',",
+        "}",
+      ].join("\n");
+      expect(tsx(spread)).not.toContain("--line-height-small");
     } finally {
       setSnap(false);
     }

@@ -420,6 +420,8 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
     library_citations: raw.libraryCitations ?? raw.library_citations ?? undefined,
     file_attachments: fileAttachments.length > 0 ? fileAttachments : undefined,
     image_links: imageLinks && imageLinks.length > 0 ? imageLinks : undefined,
+    // As in the paired format: a stopped turn's run is what marks it "Generation stopped".
+    ...(role === "assistant" ? { run: parseRun(raw.run) } : {}),
   }];
 }
 

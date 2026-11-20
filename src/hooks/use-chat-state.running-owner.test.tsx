@@ -9,6 +9,7 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useChatState } from '@/hooks/use-chat-state'
 import { clearChatHistories } from '@/lib/chat/chat-message-cache'
+import { completeStream, registerStream } from '@/lib/stream-registry'
 import type { Message } from '@/types/chat'
 
 const getChatMessages = vi.hoisted(() => vi.fn())
@@ -86,5 +87,21 @@ describe('runningMessageId across a chat switch', () => {
     expect(onB.length).toBeGreaterThan(0)
     expect(onB.every((e) => e.running === null)).toBe(true)
     expect(seen.at(-1)).toEqual({ chatId: 'a', running: 'turn-A' })
+  })
+
+  it('stops naming the running reply once a stream for the chat has ended', async () => {
+    getChatStreamId.mockResolvedValue('turn-A')
+    getChatMessages.mockResolvedValue({
+      messages: [msg('m1', 'a'), msg('turn-A', 'a', { role: 'assistant', content: '', run } as Partial<Message>)],
+      has_more: false, next_cursor: null,
+    })
+    await act(async () => { root.render(<Harness chatId="a" />); await Promise.resolve() })
+    await act(async () => { await Promise.resolve() })
+    expect(seen.at(-1)?.running).toBe('turn-A')
+    // The follow that read the reply ends (another chat's end changes nothing).
+    await act(async () => { registerStream('other'); completeStream('other', 'done') })
+    expect(seen.at(-1)?.running).toBe('turn-A')
+    await act(async () => { registerStream('a'); completeStream('a', 'done') })
+    expect(seen.at(-1)?.running).toBeNull()
   })
 })

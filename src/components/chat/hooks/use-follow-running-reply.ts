@@ -75,19 +75,33 @@ export function useFollowRunningReply({
     // The first go is immediate; a repeat only happens because the last was refused,
     // so it backs off rather than returning at round-trip speed.
     const wait = FOLLOW_REFUSED_BACKOFF_MS * tally.refused
+    const follow = () => {
+      void followStream(chatId, runningMessageId, messages.find((message) => message.id === runningMessageId), () => {
+        if (tally.key === key) tally.refused += 1
+      })
+    }
     const timer = setTimeout(() => {
       // Checked again when the wait ends: a stream may have started for this chat in
       // the meantime (a message sent during the back-off), and that one owns the reply.
       if (isStreamActive(chatId)) return
-      void followStream(chatId, runningMessageId, messages.find((message) => message.id === runningMessageId), () => {
-        if (tally.key === key) tally.refused += 1
-      })
+      follow()
     }, wait)
     // A stream that starts for this chat before the wait ends (a send) is a newer run, and
     // owns the chat from here: this follow, scheduled for the earlier reply, is dropped, even
     // if that newer stream has already ended again by the time the wait would have run out.
+    // Unless it ended without a finished turn (a send that failed or was stopped, possibly
+    // before its run started): then nothing newer owns the chat, and the earlier reply is
+    // followed after all (one already over comes back as gone, and the history reloads).
+    let superseded = false
     const unsubscribe = subscribeStreams((event) => {
-      if (event.type === "start" && event.chatId === chatId) clearTimeout(timer)
+      if (event.chatId !== chatId) return
+      if (event.type === "start") {
+        clearTimeout(timer)
+        superseded = true
+      } else if (event.type === "end" && superseded && event.outcome !== "done") {
+        superseded = false
+        if (!isStreamActive(chatId)) follow()
+      }
     })
     return () => { clearTimeout(timer); unsubscribe() }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per history load that finds a running turn; followStream is fresh each render

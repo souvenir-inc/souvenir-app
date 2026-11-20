@@ -479,7 +479,10 @@ export function ChatInterface({
   // settled (see useQueuedSend).
   const queueReady =
     queuedMessages.length > 0 && !queueHeldBy &&
-    !replyInFlight && !hookBusy && !askingSave &&
+    // runningMessageId: the history shows a reply still running that no stream here has
+    // followed to its end yet (just opened, before the follow starts): a message sent now
+    // would go into that run.
+    !replyInFlight && !runningMessageId && !hookBusy && !askingSave &&
     (!isRevealing || pageHidden) &&
     !isLoadingMessages && !isSettling &&
     !queuePausedReason && !readOnly && !archived;
