@@ -374,8 +374,9 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
         role: "assistant",
         content: "",
         thinking: raw.reasoning ?? raw.thinking_content ?? undefined,
-        // A turn still being worked on, or waiting on its card, is not empty; one whose run failed was cut off.
-        errorNotice: run?.status === "running" || prompts.length > 0 ? undefined
+        // A turn still being worked on, waiting on its card, or stopped by the person is not empty
+        // (a stopped one says "Generation stopped"); one whose run failed was cut off.
+        errorNotice: run?.status === "running" || run?.status === "stopped" || prompts.length > 0 ? undefined
           : run?.status === "failed" ? INTERRUPTED_MESSAGE
           : EMPTY_TURN_MESSAGE,
         prompts: prompts.length > 0 ? prompts : undefined,
