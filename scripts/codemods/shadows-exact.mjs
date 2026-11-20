@@ -16,7 +16,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 // The same string/comment mask as tokens-exact, so the codemods agree on what is code.
-import { codeMask } from "./tokens-exact.mjs";
+import { codeMask, insideRepo } from "./tokens-exact.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const TOKENS = path.join(ROOT, "src/styles/tokens");
@@ -166,6 +166,7 @@ const args = process.argv.slice(2);
 const dry = args.includes("--dry");
 const files = [];
 const walk = (p) => {
+  if (!insideRepo(p)) { console.warn(`skipped (outside the repository): ${p}`); return; }
   const norm = p.split(path.sep).join("/");
   if (SKIP.some((re) => re.test(norm))) return;
   const st = fs.statSync(p);
