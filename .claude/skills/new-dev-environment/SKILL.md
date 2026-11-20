@@ -55,7 +55,7 @@ hex values in components — that's what breaks dark mode later.
 ## 4. Initialize shadcn/ui for the component layer
 
 Do **not** reach for a packaged UI library (Hero UI, MUI, Chakra, etc.) here — see
-the archived tech-stack doc §4 for why. Instead:
+the archived tech-stack doc §3 for why. Instead:
 
 ```bash
 npx shadcn@latest init
@@ -81,7 +81,7 @@ clobber your logic.
 
 ## 5. Wire up secrets (don't commit real env values)
 
-Follow the two-file split from the archived tech-stack doc §8:
+Follow the two-file split from the archived tech-stack doc §6:
 
 1. `.env.local` (gitignored) — bootstrap-only creds (e.g. AWS access key/secret,
    region, secret name), never the real app secrets.

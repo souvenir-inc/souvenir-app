@@ -370,6 +370,7 @@ export function useStreamingChat({
         // The backend has the turn: dropping this connection now loses nothing.
         runStarted = true
         markSettled()
+        options?.onRunStarted?.()
         registerStream(resolvedChatIdRef.current, stopThisCall, detachThisCall)
         if (isActiveStream()) setStreamState?.("streaming")
       },

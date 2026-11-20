@@ -40,6 +40,9 @@ export interface StreamRequestOptions {
   /** A follow of a run from the chat's history: the reply as it was loaded. The stream replays only the
    *  stretch the agent is working on now, so what earlier stretches wrote stays and the replay adds to it. */
   prior?: UIMessage
+  /** Called once the backend has accepted the turn (its run has started). A caller that must
+   *  not lose or repeat a message uses it: before this, a failed send never reached the backend. */
+  onRunStarted?: () => void
 }
 
 export interface StreamTarget {

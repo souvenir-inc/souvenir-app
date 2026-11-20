@@ -87,8 +87,10 @@ for (const m of lightCss.matchAll(/(--[a-zA-Z0-9-]+)\s*:\s*([^;]+);/g)) if (!def
 const expand = (v, depth = 0) => depth > 6 ? v : v.replace(/var\((--shadow-[a-z0-9-]+)\)/g, (w, n) => defs.has(n) ? expand(defs.get(n), depth + 1) : w);
 
 const shadowWhole = new Map(), shadowLayer = new Map();
-// Scale names first, so `--shadow-1` wins over the semantic name it aliases.
-const shadowNames = [...defs.keys()].filter((n) => n.startsWith("--shadow-") && !/-(inner|outer|text|emboss)|sidebar|button|switch|checkbox|tab-|dropdown-item|model-|preset-/.test(n))
+// Scale names first, so `--shadow-1` wins over the generic name it aliases.
+// Generic elevation tokens only: a component-named token (--shadow-chat-input…) is never
+// borrowed, or the value would pick up that component's dark override.
+const shadowNames = [...defs.keys()].filter((n) => /^--shadow-([1-4]|soft|panel|tile)$/.test(n))
   .sort((a, b) => (/^--shadow-([1-4]|soft|panel|tile)$/.test(b) ? 1 : 0) - (/^--shadow-([1-4]|soft|panel|tile)$/.test(a) ? 1 : 0));
 for (const n of shadowNames) {
   const layers = splitTop(expand(defs.get(n))).map(canonLayer);

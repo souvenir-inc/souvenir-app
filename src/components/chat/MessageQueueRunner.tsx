@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/auth-context";
 import { useChatHistoryContext } from "@/context/chat-history-context";
 import { useOrgPlan } from "@/context/org-context";
@@ -131,7 +131,8 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
   const { plan } = useOrgPlan();
   const blocked = creditStatus.blocked || plan?.poolStatus === "paused";
   const blockedRef = useRef(blocked);
-  useEffect(() => {
+  // During commit, so a check that resolves right after a credit change already sees it.
+  useLayoutEffect(() => {
     blockedRef.current = blocked;
   });
 
@@ -223,7 +224,17 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
           return;
         }
         if (state === "idle" && mountedRef.current) {
-          return fetchAiResponse(message.content, chatId, `queued-${message.id}`, modelId, options);
+          // The message left the queue to be sent. If the send fails before the backend
+          // accepted it, it goes back to the front (the failed stream already holds the
+          // queue). Once accepted it is the chat's, and a failure shows in the chat.
+          let accepted = false;
+          return fetchAiResponse(message.content, chatId, `queued-${message.id}`, modelId, {
+            ...options,
+            onRunStarted: () => { accepted = true; },
+          }).then(
+            (outcome) => { if (outcome !== "done" && !accepted) restoreQueuedMessage(chatId, message, 0); },
+            (error: unknown) => { if (!accepted) restoreQueuedMessage(chatId, message, 0); throw error; },
+          );
         }
         // Not sent: the message goes back to the front of its queue, and the reservation
         // ends without "done", which holds that queue (message-queue.ts) until the user

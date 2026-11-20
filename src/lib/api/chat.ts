@@ -580,8 +580,8 @@ export async function getChatRunState(chatId: string, timeoutMs = RUN_STATE_TIME
   const lookup = (async () => {
     const response = await apiFetch(CHAT_ENDPOINT(chatId), { signal: controller.signal });
     if (!response.ok) throw new Error(`Couldn't read the chat's run state (${response.status})`);
-    // Only an explicit answer counts: a body without a streamId of string or null is
-    // "can't tell", not "idle".
+    // Contract: GET /chats/{id} always sends streamId, null when idle (checked live
+    // 2026-11-20). Anything else is "can't tell", not "idle".
     const chat: unknown = await response.json();
     const streamId = chat && typeof chat === "object" ? (chat as { streamId?: unknown }).streamId : undefined;
     if (streamId === null) return "idle" as const;

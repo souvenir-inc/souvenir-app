@@ -60,7 +60,7 @@ export interface TooltipProps {
    */
   portal?: boolean
   /**
-   * Stacking order for the floating content. Defaults to 9999 (above nearly
+   * Stacking order for the floating content. Defaults to var(--z-tooltip) (above nearly
    * everything) — appropriate when `portal` is true. When `portal` is false,
    * pass a value that makes sense within the local stacking context instead.
    */

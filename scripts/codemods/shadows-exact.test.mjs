@@ -75,3 +75,14 @@ describe("transformTsx", () => {
     expect(transformTsx(`const SHADOW_A = '0px 2px 2.8px rgba(82,75,71,0.12)'`, { n: 0 })).toMatch(/= 'var\(--shadow-/);
   });
 });
+
+describe("token choice", () => {
+  it("never borrows a component-named token, even for an exact match", async () => {
+    const fs = await import("node:fs");
+    const css = fs.readFileSync(new URL("../../src/styles/tokens/semantic.css", import.meta.url), "utf8")
+      + fs.readFileSync(new URL("../../src/styles/tokens/theme.css", import.meta.url), "utf8");
+    const value = css.match(/--shadow-chat-input\s*:\s*([^;]+);/)?.[1].replace(/\s+/g, " ").trim();
+    expect(value).toBeTruthy();
+    expect(transformValue(value, { n: 0 })).not.toContain("--shadow-chat-input");
+  });
+});
