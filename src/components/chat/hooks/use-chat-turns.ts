@@ -151,6 +151,32 @@ export async function sendTurn(
  * function would be frozen at whatever settings and messages it closed over
  * when the button appeared.
  */
+/**
+ * Records a prompt card's answer on its message. The card is found by its request id as
+ * well as the message id: an answer that lands after the message_saved id swap still
+ * carries the message's old id, and would otherwise be lost (the card then shows as
+ * unanswered once its row remounts).
+ */
+export function applyPromptDecision(messages: UIMessage[], messageId: string, requestId: string, decision: string): UIMessage[] {
+  const hasPrompt = (prompts?: readonly { request_id: string }[]) => !!prompts?.some((p) => p.request_id === requestId)
+  return messages.map((msg) =>
+    msg.id === messageId || hasPrompt(msg.connectorConnectPrompts) || hasPrompt(msg.connectorPermissionPrompts) || hasPrompt(msg.chatPrompts)
+      ? {
+          ...msg,
+          connectorConnectPrompts: msg.connectorConnectPrompts?.map((p) =>
+            p.request_id === requestId ? { ...p, decision } : p,
+          ),
+          connectorPermissionPrompts: msg.connectorPermissionPrompts?.map((p) =>
+            p.request_id === requestId ? { ...p, decision } : p,
+          ),
+          chatPrompts: msg.chatPrompts?.map((p) =>
+            p.request_id === requestId ? { ...p, decision } : p,
+          ),
+        }
+      : msg,
+  )
+}
+
 export function useMessageActions(kit: TurnKit, {
   isStreaming,
   isSendingRef,
@@ -208,24 +234,10 @@ export function useMessageActions(kit: TurnKit, {
 
   // Permission-prompt answers live on the message, not in card-local state —
   // otherwise the message_saved id swap remounts the row and resurrects
-  // already-answered cards.
+  // already-answered cards. The card is found by its request id, not only the message id:
+  // an answer that lands after that swap still carries the message's old id.
   const handlePromptDecided = useCallback((messageId: string, requestId: string, decision: string) => {
-    setMessages((prev) => prev.map((msg) =>
-      msg.id === messageId
-        ? {
-            ...msg,
-            connectorConnectPrompts: msg.connectorConnectPrompts?.map((p) =>
-              p.request_id === requestId ? { ...p, decision } : p,
-            ),
-            connectorPermissionPrompts: msg.connectorPermissionPrompts?.map((p) =>
-              p.request_id === requestId ? { ...p, decision } : p,
-            ),
-            chatPrompts: msg.chatPrompts?.map((p) =>
-              p.request_id === requestId ? { ...p, decision } : p,
-            ),
-          }
-        : msg,
-    ));
+    setMessages((prev) => applyPromptDecision(prev, messageId, requestId, decision));
   }, [setMessages]);
 
   // A prompt answered at `/chats/{id}/resume` continues the turn as a new

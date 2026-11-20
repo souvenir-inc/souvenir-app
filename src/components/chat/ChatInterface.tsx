@@ -465,7 +465,9 @@ export function ChatInterface({
     // before it say nothing about the resumed run, so it starts with a fresh budget. Only
     // that chat's: the answer can land after the user has moved to another chat.
     resetFollowBudget(answeredChatId);
-    if (answeredChatId === chatId && !isStreamActive(chatId)) void refreshMessages();
+    // The chat on screen now, not when this callback was made: the answer can land after
+    // the user has opened another chat, whose history must not be replaced with this one's.
+    if (answeredChatId === currentChatIdRef.current && !isStreamActive(answeredChatId)) void refreshMessages();
   };
 
   const { revealingMessage, isRevealing, handleRevealSettled } = useRevealSettle({
