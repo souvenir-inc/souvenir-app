@@ -111,6 +111,16 @@ function replaceValue(prop, raw) {
  * starts. '/" strings end at a newline, templates at their `.
  */
 const OPERAND_KEYWORDS = new Set(["typeof", "case", "return", "in", "of", "instanceof", "void", "delete", "await", "yield", "new", "throw", "else", "do", "from", "extends"]);
+// Scripts never write outside the repository. A target is checked by its real path, so a
+// path that leaves it (`../other-app`) or a symlink that points out of it is refused.
+const REPO_ROOT = fs.realpathSync(path.resolve(import.meta.dirname, "../.."));
+export function insideRepo(p) {
+  let real;
+  try { real = fs.realpathSync(p); } catch { return false; }
+  const rel = path.relative(REPO_ROOT, real);
+  return rel === "" || (!rel.startsWith("..") && !path.isAbsolute(rel));
+}
+
 export function codeMask(src, { css = false } = {}) {
   const mask = new Uint8Array(src.length);
   for (let i = 0; i < src.length; i++) {
@@ -272,6 +282,7 @@ const SKIP = [
   /src\/components\/layout\/sidebar\/(PersonaChatItem|ProjectChatItem|RecentsSection|StarredSection|ProjectsSection|PersonasSectionIndividual|RecentAgentChatsSection)\.tsx$/,
 ];
 const walk = (p) => {
+  if (!insideRepo(p)) { console.warn(`skipped (outside the repository): ${p}`); return; }
   const st = fs.statSync(p);
   const norm = p.split(path.sep).join("/");
   if (SKIP.some((re) => re.test(norm))) return;

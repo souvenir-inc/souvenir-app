@@ -85,3 +85,15 @@ describe("tokens-exact on CSS", () => {
     expect(out).toContain(`margin: var(--space-2);`);
   });
 });
+
+describe("insideRepo", () => {
+  it("accepts paths in the repository and refuses ones outside it", async () => {
+    const { insideRepo } = await import("./tokens-exact.mjs");
+    const path = await import("node:path");
+    const root = path.resolve(import.meta.dirname, "../..");
+    expect(insideRepo(path.join(root, "src"))).toBe(true);
+    expect(insideRepo(path.join(root, "package.json"))).toBe(true);
+    expect(insideRepo(path.join(root, ".."))).toBe(false);
+    expect(insideRepo(path.join(root, "no-such-file.tsx"))).toBe(false);
+  });
+});

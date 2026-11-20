@@ -79,11 +79,15 @@ export function useFollowRunningReply({
     const freshLoad = seenHistoryLoadRef.current !== historyLoadId
     seenHistoryLoadRef.current = historyLoadId
     if (freshLoad && !runningMessageId) tallyRef.current = { key: "", refused: 0 }
-    if (!chatId || !enabled || !runningMessageId || isStreamActive(chatId)) return
+    if (!chatId || !enabled || !runningMessageId) return
+    // A stream already going for the chat (a send made as the history loaded) owns it for
+    // now: nothing is scheduled, but it is listened to below, so that if it ends without a
+    // finished turn the earlier reply is followed after all.
+    const activeAtLoad = isStreamActive(chatId)
     const key = `${chatId}:${runningMessageId}`
     const tally = tallyRef.current
     if (tally.key !== key) { tally.key = key; tally.refused = 0 }
-    if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS) {
+    if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS && !activeAtLoad) {
       // Out of attempts, the reply may still end on the backend with nothing here to see it.
       // Ask until it has (a lookup that fails is "can't tell": keep waiting), then reload.
       // The asking goes on until a reload shows no running reply (this effect then ends):
@@ -110,7 +114,7 @@ export function useFollowRunningReply({
         if (tally.key === key) tally.refused += 1
       })
     }
-    const timer = setTimeout(() => {
+    const timer = activeAtLoad || tally.refused >= FOLLOW_REFUSED_ATTEMPTS ? undefined : setTimeout(() => {
       // Checked again when the wait ends: a stream may have started for this chat in
       // the meantime (a message sent during the back-off), and that one owns the reply.
       if (isStreamActive(chatId)) return
@@ -122,7 +126,7 @@ export function useFollowRunningReply({
     // Unless it ended without a finished turn (a send that failed or was stopped, possibly
     // before its run started): then nothing newer owns the chat, and the earlier reply is
     // followed after all (one already over comes back as gone, and the history reloads).
-    let superseded = false
+    let superseded = activeAtLoad
     const unsubscribe = subscribeStreams((event) => {
       if (event.chatId !== chatId) return
       if (followed) return

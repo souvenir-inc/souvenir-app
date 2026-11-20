@@ -171,4 +171,22 @@ describe('useFollowRunningReply', () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS * 2) })
     expect(onRunEnded).not.toHaveBeenCalled()
   })
+
+  it('follows the earlier reply if a stream already going at load ends without finishing', async () => {
+    registerStream('chat-A') // a send made as the history loaded
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(FOLLOW_REFUSED_BACKOFF_MS * 2) })
+    expect(followStream).not.toHaveBeenCalled() // that stream owns the chat for now
+    await act(async () => { completeStream('chat-A', 'error') })
+    expect(followStream).toHaveBeenCalledTimes(1)
+    expect(followStream.mock.calls[0][1]).toBe('r1')
+  })
+
+  it('leaves the earlier reply when a stream already going at load finishes its turn', async () => {
+    registerStream('chat-A')
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { completeStream('chat-A', 'done') })
+    await act(async () => { await vi.advanceTimersByTimeAsync(FOLLOW_REFUSED_BACKOFF_MS * 2) })
+    expect(followStream).not.toHaveBeenCalled()
+  })
 })
