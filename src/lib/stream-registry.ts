@@ -100,6 +100,15 @@ export function stopStream(chatId: string): boolean {
 }
 
 /**
+ * Sets (or, with undefined, removes) what detachStream does for `chatId`'s stream. For a
+ * reservation whose owner can hand the chat over at one stage and not at a later one.
+ */
+export function setStreamDetach(chatId: string, detach: (() => void) | undefined): void {
+  const entry = registry.get(chatId)
+  if (entry) entry.detach = detach
+}
+
+/**
  * Drops the connection reading `chatId`'s turn without ending the turn, so the
  * chat can follow it afresh from the turn's stream. No end is announced: the
  * turn is still running. Returns false when there is nothing to drop yet (no

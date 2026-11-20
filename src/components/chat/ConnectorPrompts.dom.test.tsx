@@ -16,6 +16,8 @@ vi.mock('@/lib/api/connectors', async (orig) => ({
   ...(await orig<typeof import('@/lib/api/connectors')>()),
   // Already connected (from Connectors, or another tab): the card answers at once.
   getConnector: vi.fn(async () => ({ ownedConnections: [{ connected: true, needsReconnect: false }], apiKeyFields: [] })),
+  // A sign-in that is under way: the server has not answered yet.
+  initiateLink: vi.fn(() => new Promise(() => {})),
 }))
 
 import { ConnectPromptCard } from '@/components/chat/ConnectorPrompts'
@@ -151,5 +153,20 @@ describe('ConnectPromptCard "Not now"', () => {
     await act(async () => root.render(<ConnectPromptCard prompt={{ ...prompt, decision: 'cancel' }} />))
     await flush()
     expect(container.textContent).toBe('')
+  })
+
+  it('keeps "Not now" disabled while a sign-in is under way', async () => {
+    vi.mocked(getConnector).mockResolvedValueOnce({ ownedConnections: [], apiKeyFields: [] } as unknown as Awaited<ReturnType<typeof getConnector>>)
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} />))
+    await flush()
+    const button = (label: string) => [...container.querySelectorAll('button')].find((b) => b.textContent?.includes(label))!
+    expect(button('Not now').disabled).toBe(false)
+    const open = vi.spyOn(window, 'open').mockReturnValue(null)
+    await act(async () => button('Connect').click())
+    await flush()
+    expect(button('Not now').disabled).toBe(true)
+    await act(async () => button('Not now').click())
+    expect(respondToChatPrompt).not.toHaveBeenCalled()
+    open.mockRestore()
   })
 })

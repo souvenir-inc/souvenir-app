@@ -439,4 +439,19 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(states.at(-1)).toBe('aborted')
     expect(reply('reply-A')).toMatchObject({ isLoading: false, stoppedByUser: true })
   })
+
+  it("keeps a new chat's send, still without an id, off a saved chat opened meanwhile", async () => {
+    const states: string[] = []
+    const view: View = { currentChatIdRef: { current: undefined }, setStreamState: (state) => { states.push(state) } }
+    act(() => root.render(<Harness view={view} onReady={(api) => { hook = api }} />))
+    const done = hook.fetchAiResponse('hi', null, 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    expect(states).toEqual(['waiting'])
+    view.currentChatIdRef.current = 'chat-C' // a saved chat opens before the new chat's id arrives
+    const send = FakeXHR.all[0]
+    send.status = 0
+    send.end() // the upload ends there
+    await act(async () => { await done })
+    expect(states).toEqual(['waiting'])
+  })
 })

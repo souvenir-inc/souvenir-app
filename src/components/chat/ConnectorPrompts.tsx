@@ -249,10 +249,11 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
 
       {/* While an answer is being sent (Not now, or the connected notice), the sign-in
           actions wait: starting a sign-in then would race the answer. A failed answer
-          shows Try again instead, which stays available. */}
+          shows Try again instead, which stays available. And while a sign-in is under way,
+          Not now waits: declining then would leave the sign-in window going. */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
         {respondFailed !== 'connected' && (
-          <Button size="sm" variant="outline" disabled={responding} onClick={() => void answer('cancel')}>
+          <Button size="sm" variant="outline" disabled={responding || busy} onClick={() => void answer('cancel')}>
             Not now
           </Button>
         )}

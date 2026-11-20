@@ -120,7 +120,9 @@ export function useStreamingChat({
     if (!currentChatIdRef) return true
     const shown = currentChatIdRef.current
     if (!shown) return sentFromNewChat
-    return streamChatId === null || streamChatId === shown
+    // A saved chat on screen shows only its own stream: not a send still waiting for its
+    // new chat's id (null), which belongs to the composer it was sent from.
+    return streamChatId === shown
   }
 
   // Pending message field updates - flushed to React every FLUSH_INTERVAL_MS
