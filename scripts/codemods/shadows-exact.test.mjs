@@ -86,3 +86,13 @@ describe("token choice", () => {
     expect(transformValue(value, { n: 0 })).not.toContain("--shadow-chat-input");
   });
 });
+
+describe("identifiers", () => {
+  it("only matches whole boxShadow / SHADOW_ names", () => {
+    const shadow = "0px 2px 2.8px rgba(82,75,71,0.12)";
+    for (const src of [`const rawboxShadow = '${shadow}';`, `const MY_SHADOW_X = '${shadow}';`]) {
+      expect(transformTsx(src, { n: 0 })).toBe(src);
+    }
+    expect(transformTsx(`const SHADOW_X = '${shadow}';`, { n: 0 })).toMatch(/'var\(--shadow-/);
+  });
+});

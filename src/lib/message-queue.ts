@@ -201,11 +201,19 @@ export function takeAllQueuedMessages(key: string): ChatQueue | undefined {
   return queue
 }
 
-/** Puts a removed message back where it was (Undo). */
-export function restoreQueuedMessage(key: string, message: QueuedMessage, index: number): void {
-  const messages = [...(queues.get(key)?.messages ?? [])].filter((m) => m.id !== message.id)
+/** Puts a removed message back where it was (Undo). With `hold`, the queue is held in the
+ *  same step (an existing hold stays), so no one hears of the message before the hold. */
+export function restoreQueuedMessage(
+  key: string,
+  message: QueuedMessage,
+  index: number,
+  hold?: Exclude<StreamOutcome, "done">,
+): void {
+  const queue = queues.get(key)
+  const messages = [...(queue?.messages ?? [])].filter((m) => m.id !== message.id)
   messages.splice(Math.min(index, messages.length), 0, message)
-  setQueue(key, { ...queues.get(key), messages })
+  const heldBy = queue?.heldBy ?? hold
+  setQueue(key, { ...queue, messages, ...(heldBy ? { heldBy } : {}) })
   notify()
 }
 

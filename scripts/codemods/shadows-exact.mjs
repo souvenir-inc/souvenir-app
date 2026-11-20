@@ -134,7 +134,8 @@ const keep = (src, offset) => {
 // one that an expression goes on to use (`'…'.replace(…)`) is left alone.
 export const transformTsx = (src, c) => {
   const masked = codeMask(src);
-  return src.replace(/((?:boxShadow|SHADOW_\w*)\s*[:=]\s*)(['"`])([^'"`\n]*)\2(?=\s*(?:[,;}]|$))/gm,
+  // Whole identifiers only: `rawboxShadow` or `MY_SHADOW_X` is some other name.
+  return src.replace(/((?<![\w$])(?:boxShadow|SHADOW_\w*)(?![\w$])\s*[:=]\s*)(['"`])([^'"`\n]*)\2(?=\s*(?:[,;}]|$))/gm,
     (w, pre, q, v, off) => masked[off] || keep(src, off) ? w : `${pre}${q}${transformValue(v, c)}${q}`);
 };
 export const transformCss = (src, c) => {
