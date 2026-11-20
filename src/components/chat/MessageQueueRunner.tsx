@@ -209,6 +209,10 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
     // "Can't tell" is not "idle": after RUN_CHECK_ATTEMPTS failed checks in a row the
     // message is held rather than sent.
     const waitForIdleRun = async (): Promise<"idle" | "unmounted" | "unknown"> => {
+      // A turn for a chat's own endpoint (an agent chat, say) has no run state on the chat
+      // API this asks: it would read another run, or none. For those the registry stays
+      // the gate, as it was: the reply this message waited on has ended here.
+      if (endpoint) return "idle";
       let failures = 0;
       for (;;) {
         if (!mountedRef.current) return "unmounted";

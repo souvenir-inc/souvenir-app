@@ -6,12 +6,16 @@
 import React, { act, useEffect } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { FOLLOW_REFUSED_ATTEMPTS, FOLLOW_REFUSED_BACKOFF_MS, useFollowRunningReply } from './use-follow-running-reply'
+const getChatRunState = vi.hoisted(() => vi.fn())
+vi.mock('@/lib/api/chat', () => ({ getChatRunState }))
+import { FOLLOW_REFUSED_ATTEMPTS, FOLLOW_REFUSED_BACKOFF_MS, RUN_ENDED_POLL_MS, useFollowRunningReply } from './use-follow-running-reply'
+import type { UIMessage } from '@/types/chat'
 import { completeStream, registerStream } from '@/lib/stream-registry'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
-type Props = { chatId: string | null; runningMessageId: string | null; historyLoadId: number; enabled?: boolean }
+type Props = { chatId: string | null; runningMessageId: string | null; historyLoadId: number; enabled?: boolean; messages?: UIMessage[] }
+const onRunEnded = vi.fn()
 
 let root: Root
 let container: HTMLDivElement
@@ -22,8 +26,8 @@ const followStream = vi.fn(async (_chatId: string, _id: string, _prior?: unknown
 })
 
 let reset: (chatId: string) => void
-function Harness({ enabled = true, onReset, ...props }: Props & { onReset: (fn: (chatId: string) => void) => void }) {
-  const resetBudget = useFollowRunningReply({ ...props, enabled, messages: [], followStream })
+function Harness({ enabled = true, messages = [], onReset, ...props }: Props & { onReset: (fn: (chatId: string) => void) => void }) {
+  const resetBudget = useFollowRunningReply({ ...props, enabled, messages, followStream, onRunEnded })
   useEffect(() => onReset(resetBudget))
   return null
 }
@@ -32,6 +36,9 @@ const render = (props: Props) => act(async () => { root.render(<Harness {...prop
 beforeEach(() => {
   vi.useFakeTimers()
   followStream.mockClear()
+  onRunEnded.mockClear()
+  getChatRunState.mockReset()
+  getChatRunState.mockResolvedValue("running")
   container = document.createElement('div')
   root = createRoot(container)
 })
@@ -124,5 +131,29 @@ describe('useFollowRunningReply', () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(0) })
     await act(async () => { await vi.advanceTimersByTimeAsync(10_000) })
     expect(followStream).toHaveBeenCalledTimes(1)
+  })
+
+  it('follows with the reply as it is when the follow starts, not when it was scheduled', async () => {
+    const unanswered = { id: 'r1', role: 'assistant', content: '', created_at: '', chat_id: 'chat-A' } as UIMessage
+    const answered = { ...unanswered, content: 'answered meanwhile' } as UIMessage
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1, messages: [unanswered] })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 2, messages: [unanswered] }) // backing off
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 2, messages: [answered] }) // answered during it
+    await act(async () => { await vi.advanceTimersByTimeAsync(FOLLOW_REFUSED_BACKOFF_MS) })
+    expect(followStream).toHaveBeenCalledTimes(2)
+    expect(followStream.mock.calls[1][2]).toBe(answered)
+  })
+
+  it('once the attempts are spent, asks the backend until the run has ended, then reloads', async () => {
+    const load = await spendBudget('r1')
+    getChatRunState.mockResolvedValueOnce('running').mockResolvedValue('idle')
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: load })
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS) })
+    expect(onRunEnded).not.toHaveBeenCalled() // still running
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS) })
+    expect(onRunEnded).toHaveBeenCalledTimes(1)
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS * 3) })
+    expect(onRunEnded).toHaveBeenCalledTimes(1)
   })
 })

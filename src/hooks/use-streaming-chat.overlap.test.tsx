@@ -454,4 +454,22 @@ describe('useStreamingChat with overlapping follows', () => {
     await act(async () => { await done })
     expect(states).toEqual(['waiting'])
   })
+
+  it('gives a new chat’s reply and message its chat id once the chat has one', async () => {
+    messages = [
+      { id: 'user-new', role: 'user', content: 'hi', created_at: '', chat_id: '' },
+      { id: 'reply-new', role: 'assistant', content: '', created_at: '', chat_id: '', isLoading: true },
+      { id: 'other', role: 'assistant', content: '', created_at: '', chat_id: '' },
+    ]
+    const done = hook.fetchAiResponse('hi', null, 'reply-new', null, { userMessageId: 'user-new' })
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const send = FakeXHR.all[0]
+    send.start()
+    send.push({ type: 'RUN_STARTED', threadId: 'chat-N', runId: 'run-N' }, { type: 'RUN_FINISHED', threadId: 'chat-N', runId: 'run-N' })
+    send.end()
+    await act(async () => { await done })
+    expect(messages.find((m) => m.id === 'user-new')?.chat_id).toBe('chat-N')
+    expect(messages.find((m) => m.id === 'reply-new')?.chat_id).toBe('chat-N')
+    expect(messages.find((m) => m.id === 'other')?.chat_id).toBe('')
+  })
 })
