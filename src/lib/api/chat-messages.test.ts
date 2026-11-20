@@ -13,12 +13,14 @@ vi.mock("./client", async (orig) => ({
     { id: "t2", input: "connect shopify", output: "", created_at: "2026-10-26T00:01:00Z", run: run("t2", "waiting"), prompts: [question] },
     { id: "t3", input: "summarise it", output: "", created_at: "2026-10-26T00:02:00Z", run: run("t3", "failed") },
     { id: "t4", input: "and now?", output: "", created_at: "2026-10-26T00:03:00Z", run: run("t4", "running") },
+    { id: "t5", input: "write a plugin", output: "", created_at: "2026-10-26T00:04:00Z", run: run("t5", "stopped") },
   ] }), { status: 200 })),
 }));
 
 import { getChatMessages } from "./chat";
 import { EMPTY_TURN_MESSAGE } from "@/lib/model-error";
 import { INTERRUPTED_MESSAGE } from "@/lib/turn-outcome";
+import { toUIMessage } from "@/lib/normalizers/message-transformer";
 
 describe("getChatMessages", () => {
   it("keeps a turn saved with no answer as an assistant placeholder that says so", async () => {
@@ -39,5 +41,12 @@ describe("getChatMessages", () => {
     expect(messages[5]).toMatchObject({ id: "t3", run: { status: "failed" }, errorNotice: INTERRUPTED_MESSAGE });
     expect(messages[7]).toMatchObject({ id: "t4", run: { status: "running" } });
     expect(messages[7].errorNotice).toBeUndefined();
+  });
+
+  it("does not call a turn the person stopped empty", async () => {
+    const { messages } = await getChatMessages("c1");
+    expect(messages[9]).toMatchObject({ id: "t5", run: { status: "stopped" } });
+    expect(messages[9].errorNotice).toBeUndefined();
+    expect(toUIMessage(messages[9]).stoppedByUser).toBe(true);
   });
 });

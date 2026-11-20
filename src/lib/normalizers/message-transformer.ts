@@ -205,6 +205,7 @@ export function toUIMessage(raw: Message): UIMessage {
     ...(connectPrompts.length > 0 ? { connectorConnectPrompts: connectPrompts } : {}),
     ...(permissionPrompts.length > 0 ? { connectorPermissionPrompts: permissionPrompts } : {}),
     ...(chatPrompts.length > 0 ? { chatPrompts } : {}),
+    ...(raw.run?.status === "stopped" ? { stoppedByUser: true } : {}),
   }
 }
 
