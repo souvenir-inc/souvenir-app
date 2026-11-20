@@ -133,28 +133,45 @@ describe('MessageQueueRunner', () => {
   })
 
   it('hands a waiting message over to the chat when it is opened, without making it wait', async () => {
-    getChatRunState.mockResolvedValue('running') // the previous run is still going
-    await queueBehindReply('first')
-    await act(async () => completeStream('chat-1', 'done'))
-    expect(isStreamActive('chat-1')).toBe(true) // reserved while it waits
-    // The chat opens: its view marks the queue as on screen and frees the chat.
-    await act(async () => {
-      setQueueForeground(view, 'chat-1')
-      expect(detachStream('chat-1')).toBe(true)
-    })
-    expect(isStreamActive('chat-1')).toBe(false)
-    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 10)) })
-    expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['first'])
-    expect(getChatQueue('chat-1')?.heldBy).toBeUndefined()
-    // Past the next poll, with the run now over: the handed-over send stays stopped.
-    getChatRunState.mockResolvedValue('idle')
+    // The clock is fake from the start, so the runner's own polls run on it.
     vi.useFakeTimers()
     try {
-      await act(async () => { await vi.advanceTimersByTimeAsync(RUN_POLL_MS * 2) })
+      getChatRunState.mockResolvedValue('running') // the previous run is still going
+      await queueBehindReply('first')
+      await act(async () => completeStream('chat-1', 'done'))
+      await act(async () => { await vi.advanceTimersByTimeAsync(RUN_POLL_MS) })
+      expect(getChatRunState.mock.calls.length).toBeGreaterThanOrEqual(2) // it is polling
+      expect(isStreamActive('chat-1')).toBe(true) // reserved while it waits
+      // The chat opens: its view marks the queue as on screen and frees the chat.
+      await act(async () => {
+        setQueueForeground(view, 'chat-1')
+        expect(detachStream('chat-1')).toBe(true)
+      })
+      expect(isStreamActive('chat-1')).toBe(false)
+      await act(async () => { await vi.advanceTimersByTimeAsync(10) })
+      expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['first'])
+      expect(getChatQueue('chat-1')?.heldBy).toBeUndefined()
+      // Through several more poll intervals, now with the run over: no further checks, no send.
+      const checks = getChatRunState.mock.calls.length
+      getChatRunState.mockResolvedValue('idle')
+      await act(async () => { await vi.advanceTimersByTimeAsync(RUN_POLL_MS * 3) })
+      expect(getChatRunState.mock.calls.length).toBe(checks)
+      expect(fetchAiResponse).not.toHaveBeenCalled() // the open chat sends it, not the runner
     } finally {
       vi.useRealTimers()
     }
-    expect(fetchAiResponse).not.toHaveBeenCalled() // the open chat sends it, not the runner
+  })
+
+  it("sends a turn for a chat's own endpoint without asking the chat API about its run", async () => {
+    getChatRunState.mockResolvedValue('running') // would hold it, if it were asked
+    await act(async () => {
+      registerStream('chat-1')
+      queueMessage('chat-1', { content: 'agent', attachments: [], mentionedPins: [] }, { ...context, endpoint: '/api/agents/a1/chat' })
+    })
+    await act(async () => completeStream('chat-1', 'done'))
+    expect(getChatRunState).not.toHaveBeenCalled()
+    expect(sentInputs()).toEqual(['agent'])
+    await act(async () => finishSend('done'))
   })
 
   it('does not hand over a message once it is being sent', async () => {

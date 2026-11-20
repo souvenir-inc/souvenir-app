@@ -229,7 +229,9 @@ export function ChatInterface({
     onChatMoveToTop: (id) => moveToTop(id),
     setStreamState,
     onStreamDone: refreshUser,
-    onStreamLost: () => void refreshMessages(),
+    // Only the chat on screen reloads: a stream lost after the user moved to another chat
+    // must not install its chat's history over that one.
+    onStreamLost: (lostChatId) => { if (lostChatId === currentChatIdRef.current) void refreshMessages() },
     currentChatIdRef,
     // Streamed tokens go to lib/chat/stream-store and re-render only the
     // streaming row (LiveChatMessage), not this whole tree.
@@ -241,6 +243,7 @@ export function ChatInterface({
   // Follows a reply still being generated when the chat is opened (see the hook).
   const resetFollowBudget = useFollowRunningReply({
     chatId, enabled: !endpoint, runningMessageId, historyLoadId, messages, followStream,
+    onRunEnded: () => void refreshMessages(),
   })
 
   const isStreaming = streamState === "streaming" || streamState === "waiting";

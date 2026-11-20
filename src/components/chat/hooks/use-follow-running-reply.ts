@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react"
 import { isStreamActive, subscribeStreams } from "@/lib/stream-registry"
+import { getChatRunState } from "@/lib/api/chat"
+import { useLatestCallback } from "@/hooks/use-latest-callback"
 import type { StreamOutcome } from "@/lib/stream-registry"
 import type { UIMessage } from "@/types/chat"
 
@@ -13,6 +15,8 @@ import type { UIMessage } from "@/types/chat"
 export const FOLLOW_REFUSED_ATTEMPTS = 3
 /** Back-off per refusal so far, before the next attempt. */
 export const FOLLOW_REFUSED_BACKOFF_MS = 2000
+/** Once the attempts are spent: how often the backend is asked whether the run has ended. */
+export const RUN_ENDED_POLL_MS = 5000
 
 type FollowStream = (
   chatId: string,
@@ -39,6 +43,7 @@ export function useFollowRunningReply({
   historyLoadId,
   messages,
   followStream,
+  onRunEnded,
 }: {
   chatId: string | null | undefined
   enabled: boolean
@@ -46,7 +51,14 @@ export function useFollowRunningReply({
   historyLoadId: number
   messages: UIMessage[]
   followStream: FollowStream
+  /** The run the history showed as running has ended with no stream here to say so (the
+   *  follow attempts were spent): reload, so the chat (and its queue) stop waiting on it. */
+  onRunEnded?: () => void
 }): (chatId: string) => void {
+  // The reply as it is when a follow starts, not when it was scheduled: a prompt answered
+  // during the back-off is part of it, and would be lost if an older copy were followed into.
+  const currentReply = useLatestCallback((id: string) => messages.find((message) => message.id === id))
+  const runEnded = useLatestCallback(() => onRunEnded?.())
   const tallyRef = useRef<{ key: string; refused: number }>({ key: "", refused: 0 })
   // Only the given chat's budget: the tally belongs to whichever chat it was counting.
   const reset = (forChatId: string) => {
@@ -71,7 +83,20 @@ export function useFollowRunningReply({
     const key = `${chatId}:${runningMessageId}`
     const tally = tallyRef.current
     if (tally.key !== key) { tally.key = key; tally.refused = 0 }
-    if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS) return
+    if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS) {
+      // Out of attempts, the reply may still end on the backend with nothing here to see it.
+      // Ask until it has (a lookup that fails is "can't tell": keep waiting), then reload.
+      let stopped = false
+      const poll = setInterval(() => {
+        void getChatRunState(chatId).then((state) => {
+          if (stopped || state !== "idle") return
+          stopped = true
+          clearInterval(poll)
+          runEnded()
+        }, () => {})
+      }, RUN_ENDED_POLL_MS)
+      return () => { stopped = true; clearInterval(poll) }
+    }
     // The first go is immediate; a repeat only happens because the last was refused,
     // so it backs off rather than returning at round-trip speed.
     const wait = FOLLOW_REFUSED_BACKOFF_MS * tally.refused
@@ -80,7 +105,7 @@ export function useFollowRunningReply({
     let followed = false
     const follow = () => {
       followed = true
-      void followStream(chatId, runningMessageId, messages.find((message) => message.id === runningMessageId), () => {
+      void followStream(chatId, runningMessageId, currentReply(runningMessageId), () => {
         if (tally.key === key) tally.refused += 1
       })
     }

@@ -634,6 +634,12 @@ export function useStreamingChat({
     if (resolvedChatIdRef.current === chatId) return
     if (resolvedChatIdRef.current && !resolvedChatIdRef.current.startsWith("temp-")) return
     resolvedChatIdRef.current = chatId
+    // The reply and the message it answers were made before the chat had an id: they get
+    // it now, so what hangs off them (a prompt's answer) knows which chat it belongs to.
+    const ownIds = new Set([loadingMessageIdRef.current, userMessageIdRef.current])
+    setMessages((prev) => prev.some((m) => ownIds.has(m.id) && !m.chat_id)
+      ? prev.map((m) => (ownIds.has(m.id) && !m.chat_id ? { ...m, chat_id: chatId } : m))
+      : prev)
     registerStream(chatId, activeStopRef.current ?? undefined)
     onChatCreated?.(chatId)
   }

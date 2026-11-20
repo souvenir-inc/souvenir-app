@@ -90,6 +90,15 @@ describe("line-heights --snap", () => {
         "};",
       ].join("\n");
       expect(tsx(quoted)).toContain("lineHeight: 'var(--line-height-small)'");
+      // --font-size is a custom property, not font-size: the pair stays with font-size.
+      const custom = [
+        ".card {",
+        "  font-size: var(--font-size-small);",
+        "  --font-size: var(--font-size-body-sm);",
+        "  line-height: 18px;",
+        "}",
+      ].join("\n");
+      expect(transform(custom, true, { exact: 0, unitless: 0, snapped: 0 })).toContain("line-height: var(--line-height-small);");
     } finally {
       setSnap(false);
     }
