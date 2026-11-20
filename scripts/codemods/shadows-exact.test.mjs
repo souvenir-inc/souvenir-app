@@ -96,6 +96,17 @@ describe("identifiers", () => {
     expect(transformTsx(`const SHADOW_X = '${shadow}';`, { n: 0 })).toMatch(/'var\(--shadow-/);
   });
 
+  it("leaves literal types in type and interface bodies alone", () => {
+    const shadow = "0px 2px 2.8px rgba(82,75,71,0.12)";
+    for (const src of [
+      `type Fixed = { boxShadow: '${shadow}' };`,
+      `interface Fixed { boxShadow: '${shadow}' }`,
+      `type Nested = { card: { boxShadow: '${shadow}' } };`,
+    ]) expect(transformTsx(src, { n: 0 })).toBe(src);
+    // A runtime object is still converted.
+    expect(transformTsx(`const style = { boxShadow: '${shadow}' };`, { n: 0 })).toMatch(/'var\(--shadow-/);
+  });
+
   it("leaves a ternary branch alone, and still converts a property", () => {
     const shadow = "0px 2px 2.8px rgba(82,75,71,0.12)";
     const src = `const raw = compact ? boxShadow : '${shadow}';`;

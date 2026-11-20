@@ -189,4 +189,13 @@ describe('useFollowRunningReply', () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(FOLLOW_REFUSED_BACKOFF_MS * 2) })
     expect(followStream).not.toHaveBeenCalled()
   })
+
+  it('follows again at once when a prompt answer resets a spent budget', async () => {
+    const load = await spendBudget('r1')
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: load }) // only polling now
+    expect(followStream).toHaveBeenCalledTimes(FOLLOW_REFUSED_ATTEMPTS)
+    await act(async () => { reset('chat-A') }) // the reply's prompt was answered
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    expect(followStream).toHaveBeenCalledTimes(FOLLOW_REFUSED_ATTEMPTS + 1)
+  })
 })

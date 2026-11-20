@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { isStreamActive, subscribeStreams } from "@/lib/stream-registry"
 import { getChatRunState } from "@/lib/api/chat"
 import { useLatestCallback } from "@/hooks/use-latest-callback"
@@ -60,9 +60,14 @@ export function useFollowRunningReply({
   const currentReply = useLatestCallback((id: string) => messages.find((message) => message.id === id))
   const runEnded = useLatestCallback(() => onRunEnded?.())
   const tallyRef = useRef<{ key: string; refused: number }>({ key: "", refused: 0 })
-  // Only the given chat's budget: the tally belongs to whichever chat it was counting.
+  // Only the given chat's budget: the tally belongs to whichever chat it was counting. The
+  // follow effect then runs again, so a spent budget (only polling for the end) goes back to
+  // following the reply, which may be running again under the same id.
+  const [resetCount, setResetCount] = useState(0)
   const reset = (forChatId: string) => {
-    if (tallyRef.current.key.startsWith(`${forChatId}:`)) tallyRef.current = { key: "", refused: 0 }
+    if (!tallyRef.current.key.startsWith(`${forChatId}:`)) return
+    tallyRef.current = { key: "", refused: 0 }
+    setResetCount((n) => n + 1)
   }
 
   // Leaving the chat ends that visit's budget, even for a chat with no running reply:
@@ -141,7 +146,7 @@ export function useFollowRunningReply({
     return () => { clearTimeout(timer); unsubscribe() }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per history load that finds a running turn; followStream is fresh each render
   // `enabled` too: turning it off cancels a waiting follow, and turning it on looks again.
-  }, [chatId, enabled, runningMessageId, historyLoadId])
+  }, [chatId, enabled, runningMessageId, historyLoadId, resetCount])
 
   return reset
 }
