@@ -214,6 +214,9 @@ export function useMessageActions(kit: TurnKit, {
       msg.id === messageId
         ? {
             ...msg,
+            connectorConnectPrompts: msg.connectorConnectPrompts?.map((p) =>
+              p.request_id === requestId ? { ...p, decision } : p,
+            ),
             connectorPermissionPrompts: msg.connectorPermissionPrompts?.map((p) =>
               p.request_id === requestId ? { ...p, decision } : p,
             ),

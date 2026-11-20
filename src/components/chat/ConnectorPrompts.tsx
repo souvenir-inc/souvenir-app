@@ -4,7 +4,6 @@ import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import type { ConnectorConnectPrompt } from '@/types/chat'
 import { ConnectorPromptShell } from '@/components/shared/ConnectorHeading'
-import { ConnectorStatusBadge } from '@/components/ConnectorStatusBadge'
 import { Button } from '@/components/ui/button'
 import {
   getConnector,
@@ -22,13 +21,19 @@ import { isApiProviderConnector, isZapierProviderConnector, onLinkResult, waitFo
 
 const SIGN_IN_WAIT_MS = 300_000
 
+type ConnectDecision = 'connected' | 'cancel'
+
 interface ConnectPromptCardProps {
-  prompt:        ConnectorConnectPrompt
-  onConnected?:  () => void
+  prompt:       ConnectorConnectPrompt
+  /** Records the answer in message state, so the card stays gone across remounts. */
+  onDecided?:   (decision: ConnectDecision) => void
+  /** The answer reached the backend: the turn's run may have been taken back up. */
+  onAnswered?:  () => void
 }
 
-export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProps) {
-  const [state,        setState]        = useState<'idle' | 'connecting' | 'polling' | 'connected' | 'error'>('idle')
+export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectPromptCardProps) {
+  const [state,        setState]        = useState<'idle' | 'connecting' | 'polling' | 'error'>('idle')
+  const [decided,      setDecided]      = useState(false)
   const [errorMsg,     setErrorMsg]     = useState('')
   // api_key flow
   const [apiKeyFields, setApiKeyFields] = useState<Record<string, string>>({})
@@ -40,18 +45,21 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
   const answeredRef = useRef(false)
 
   // The turn that asked is waiting on this answer, or has left and takes its run back up on it.
-  const finish = useCallback(async () => {
+  // "cancel" is "not now" for this one ask: the next request that needs the app asks again.
+  const answer = useCallback(async (decision: ConnectDecision) => {
     if (answeredRef.current || abortedRef.current) return
     answeredRef.current = true
-    await respondToChatPrompt('connected', prompt.respond_url).catch(() => {})
-    if (abortedRef.current) return
-    setState('connected')
-    toast.success(`${prompt.connector.name} connected — continuing your request.`)
-    onConnected?.()
-  }, [prompt.respond_url, prompt.connector.name, onConnected])
+    await respondToChatPrompt(decision, prompt.respond_url).catch(() => {})
+    if (decision === 'connected') toast.success(`${prompt.connector.name} connected — continuing your request.`)
+    onDecided?.(decision)
+    onAnswered?.()
+    if (!abortedRef.current) setDecided(true)
+  }, [prompt.respond_url, prompt.connector.name, onDecided, onAnswered])
+  const finish = useCallback(() => answer('connected'), [answer])
 
   // The app may already be connected (from Connectors, or another tab) by the time this card shows.
   useEffect(() => {
+    if (prompt.decision) return
     getConnector(prompt.connector.slug)
       .then((entry) => {
         if (entry.ownedConnections.some((row) => row.connected && !row.needsReconnect)) void finish()
@@ -139,8 +147,9 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
   const showCredentialForm = !isZapierProviderConnector(prompt.provider)
     && (prompt.auth_mode === 'api_key' || needsInitFields)
 
+  if (decided || prompt.decision) return null
+
   const busy = state === 'connecting' || state === 'polling'
-  const done = state === 'connected'
   const fields = fieldDefs ?? [DEFAULT_API_KEY_FIELD]
   const allFilled = fields.filter((field) => field.required).every((field) => (apiKeyFields[field.name] ?? '').trim())
   const connectLabel = state === 'polling' ? 'Waiting for connection…' : `Connect ${prompt.connector.name}`
@@ -166,7 +175,7 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
         </span>
       )}
 
-      {showCredentialForm && showApiForm && !done && (
+      {showCredentialForm && showApiForm && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {fields.map((field) => (
             <div key={field.name} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -202,9 +211,10 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
       )}
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8 }}>
-        {done ? (
-          <ConnectorStatusBadge status="connected" />
-        ) : showCredentialForm && !showApiForm ? (
+        <Button size="sm" variant="outline" onClick={() => void answer('cancel')}>
+          Not now
+        </Button>
+        {showCredentialForm && !showApiForm ? (
           <Button size="sm" variant="approve" attention onClick={() => setShowApiForm(true)}>
             Enter credentials
           </Button>
