@@ -71,7 +71,9 @@ function mapValue(raw, block, counter) {
   // The last declaration wins (CSS order, and a repeated object key): pair with that one,
   // and only when it is a font-size token; any other last value means no pairing.
   const lastFont = [...scope.matchAll(/font-?[sS]ize\s*:\s*([^;,}\n]+)/g)].at(-1)?.[1].trim().replace(/^['"]|['"]$/g, "");
-  const font = lastFont?.match(/^var\(--font-size-([a-z0-9-]+)\)$/);
+  // A spread (`...other`, `...{ fontSize }`) can override any key, so with one there is no
+  // telling which fontSize wins: no pairing.
+  const font = /\.\.\./.test(scope) ? null : lastFont?.match(/^var\(--font-size-([a-z0-9-]+)\)$/);
   if (font && PAIR[font[1]] && Math.abs(PAIR[font[1]] - px) <= 4) {
     counter.snapped++;
     return `var(${PAIR_TOKEN[font[1]] || PX[PAIR[font[1]]]})`;

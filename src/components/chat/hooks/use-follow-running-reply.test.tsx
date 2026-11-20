@@ -102,4 +102,14 @@ describe('useFollowRunningReply', () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(FOLLOW_REFUSED_BACKOFF_MS * 2) })
     expect(followStream).toHaveBeenCalledTimes(1)
   })
+
+  it('follows the earlier reply after all when the send that cancelled it fails', async () => {
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 2 }) // backing off
+    await act(async () => { registerStream('chat-A') }) // a send starts: the follow is cancelled
+    await act(async () => { completeStream('chat-A', 'error') }) // and fails before its run
+    expect(followStream).toHaveBeenCalledTimes(2)
+    expect(followStream.mock.calls[1][1]).toBe('r1')
+  })
 })
