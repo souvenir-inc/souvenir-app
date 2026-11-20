@@ -40,6 +40,12 @@ export type { TurnResume } from "@/lib/chat/stream/stream-request"
 const FOLLOW_ATTEMPTS = 5
 const FOLLOW_RETRY_MS = 1000
 
+/** A 409 that says the same send already reached the backend (the Idempotency-Key guard),
+ *  as opposed to a 409 refusal (an unpublished, paused or disabled agent). */
+function isAlreadySent(status: number, body: string): boolean {
+  return status === 409 && body.includes("already_sent")
+}
+
 /** How a follow of a running turn went: it reached the stream, the chat has no
  *  running turn any more (it ended while nobody was reading), or it could not connect. */
 type FollowResult = "attached" | "gone" | "failed"
@@ -312,6 +318,7 @@ export function useStreamingChat({
     const follow = options?.follow === true
     let attached = !follow
     let failedStatus = 0
+    let failedBody = ""
     followResultRef.current = "attached"
     loadingMessageIdRef.current = loadingMessageId
     userMessageIdRef.current = options?.userMessageId ?? null
@@ -416,6 +423,8 @@ export function useStreamingChat({
         // Dropped while getting ready (the token wait above): the request never goes out.
         // The transport sends synchronously, so a later abort would be too late.
         if (detached) return "done"
+        // Stopped while getting ready: Stop has already settled the reply and the registry.
+        if (stopRequestedRef.current) return "aborted"
         const sseDecoder = new AguiSSEDecoder()
         await sendStreamRequest({
           target,
@@ -481,7 +490,7 @@ export function useStreamingChat({
               ),
             )
           },
-          onFollowFailed: (status) => { failedStatus = status },
+          onFollowFailed: (status, body) => { failedStatus = status; failedBody = body },
         })
 
         // Checked first: the flush timer and buffer are shared, and now hold the
@@ -507,9 +516,10 @@ export function useStreamingChat({
         stopFlushInterval()
         flushPending()
         // The backend answered the send with a refusal (4xx) before any run: it never took
-        // the message. 409 is "already sent", the opposite. Anything else (a dropped
+        // the message. A 409 "already_sent" is the opposite (other 409s, such as a paused
+        // agent, are refusals). Anything else (a dropped
         // connection, a 5xx) can't rule out that it did, so it is not reported.
-        if (!follow && !runStarted && failedStatus >= 400 && failedStatus < 500 && failedStatus !== 409) {
+        if (!follow && !runStarted && failedStatus >= 400 && failedStatus < 500 && !isAlreadySent(failedStatus, failedBody)) {
           options?.onSendRefused?.()
         }
         completeStream(resolvedChatIdRef.current, stopRequestedRef.current ? "aborted" : "error")

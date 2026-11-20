@@ -141,22 +141,40 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
   // mounts, cleans up and mounts again: the cleanup only marks it unmounted, and the
   // signal fires a microtask later if nothing has mounted it again by then.
   const mountedRef = useRef(true);
-  const unmountRef = useRef<{ fired: Promise<"unmounted">; fire: () => void } | null>(null);
+  const unmountRef = useRef<{ fired: boolean; listeners: Set<() => void> } | null>(null);
   // Created by whichever effect runs first (the send's effect reads it too), so it never depends on effect order.
   const unmountSignal = () => {
-    if (!unmountRef.current) {
-      let fire = () => {};
-      const fired = new Promise<"unmounted">((resolve) => { fire = () => resolve("unmounted"); });
-      unmountRef.current = { fired, fire };
-    }
+    unmountRef.current ??= { fired: false, listeners: new Set() };
     return unmountRef.current;
+  };
+  const fireUnmount = () => {
+    const signal = unmountSignal();
+    signal.fired = true;
+    for (const listener of signal.listeners) listener();
+    signal.listeners.clear();
+  };
+  // `step`, or "unmounted" as soon as the send unmounts. Each step's listener is removed
+  // when the step settles, so a long wait doesn't pile them up.
+  const untilUnmount = <T,>(step: Promise<T>): Promise<T | "unmounted"> => {
+    const signal = unmountSignal();
+    if (signal.fired) return Promise.resolve("unmounted");
+    let listener = () => {};
+    const unmounted = new Promise<"unmounted">((resolve) => {
+      listener = () => resolve("unmounted");
+      signal.listeners.add(listener);
+    });
+    const done = () => { signal.listeners.delete(listener); };
+    return Promise.race([step, unmounted]).then(
+      (value) => { done(); return value; },
+      (error: unknown) => { done(); throw error; },
+    );
   };
   useEffect(() => {
     mountedRef.current = true;
     unmountSignal();
     return () => {
       mountedRef.current = false;
-      queueMicrotask(() => { if (!mountedRef.current) unmountRef.current?.fire(); });
+      queueMicrotask(() => { if (!mountedRef.current) fireUnmount(); });
     };
   }, []);
 
@@ -190,7 +208,6 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
     // it. So the reservation is held and the backend asked until the run has ended.
     // "Can't tell" is not "idle": after RUN_CHECK_ATTEMPTS failed checks in a row the
     // message is held rather than sent.
-    const unmounted = unmountSignal().fired;
     const waitForIdleRun = async (): Promise<"idle" | "unmounted" | "unknown"> => {
       let failures = 0;
       for (;;) {
@@ -198,7 +215,7 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
         try {
           // Raced with the unmount signal: a request still out when the app goes away
           // is not waited for.
-          const state = await Promise.race([getChatRunState(chatId), unmounted]);
+          const state = await untilUnmount(getChatRunState(chatId));
           if (state === "unmounted") return "unmounted";
           if (state === "idle") return "idle";
           failures = 0;
@@ -206,10 +223,9 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
           failures += 1;
           if (failures >= RUN_CHECK_ATTEMPTS) return "unknown";
         }
-        const paused = await Promise.race([
+        const paused = await untilUnmount(
           new Promise<"waited">((resolve) => setTimeout(() => resolve("waited"), RUN_POLL_MS)),
-          unmounted,
-        ]);
+        );
         if (paused === "unmounted") return "unmounted";
       }
     };

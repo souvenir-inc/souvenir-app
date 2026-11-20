@@ -95,4 +95,11 @@ describe("identifiers", () => {
     }
     expect(transformTsx(`const SHADOW_X = '${shadow}';`, { n: 0 })).toMatch(/'var\(--shadow-/);
   });
+
+  it("leaves a ternary branch alone, and still converts a property", () => {
+    const shadow = "0px 2px 2.8px rgba(82,75,71,0.12)";
+    const src = `const raw = compact ? boxShadow : '${shadow}';`;
+    expect(transformTsx(src, { n: 0 })).toBe(src);
+    expect(transformTsx(`const s = {\n  boxShadow: '${shadow}',\n}`, { n: 0 })).toMatch(/boxShadow: 'var\(--shadow-/);
+  });
 });
