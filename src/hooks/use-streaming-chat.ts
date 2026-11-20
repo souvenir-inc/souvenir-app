@@ -108,12 +108,12 @@ export function useStreamingChat({
   const followResultRef = useRef<FollowResult>("attached")
 
   // Whether a call's stream state belongs to the chat on screen. With no chat on screen
-  // (a new, unsaved chat) only a send is that view's own; a follow is always for a saved
-  // chat, so it belongs to a view showing exactly that chat. No ref at all: one view only.
-  const showsChat = (streamChatId: string | null, isFollow: boolean) => {
+  // (a new, unsaved chat) only a send made from that composer is its own: not a follow,
+  // and not a send from a saved chat the user has since left. No ref at all: one view only.
+  const showsChat = (streamChatId: string | null, sentFromNewChat: boolean) => {
     if (!currentChatIdRef) return true
     const shown = currentChatIdRef.current
-    if (!shown) return !isFollow
+    if (!shown) return sentFromNewChat
     return streamChatId === null || streamChatId === shown
   }
 
@@ -278,13 +278,24 @@ export function useStreamingChat({
     // Before any shared ref is written, take the hook over from whoever holds it.
     // A retry of the same follow (followAttempt > 0) is that call continuing, not a
     // rival for the refs, so it leaves its own parent alone.
+    // A send made from a new, unsaved chat's composer: that view's own, until the new
+    // chat id reaches it. Read now, before any wait: it is where the user sent from.
+    const sentFromNewChat = options?.follow !== true && !!currentChatIdRef && !currentChatIdRef.current
     if (!options?.followAttempt) {
       let holder = activeCallRef.current
+      let waited = false
       // A send the backend has not accepted yet is never dropped: wait until its run
       // starts (or it ends), then look again — another call may have taken over meanwhile.
       while (holder && !holder.droppable()) {
+        waited = true
         await holder.settled
         holder = activeCallRef.current
+      }
+      // A follow that had to wait: the user may have left its chat meanwhile, even gone
+      // back to the chat it waited on. It stands down rather than cut that chat's stream.
+      if (waited && options?.follow && currentChatIdRef && currentChatIdRef.current !== chatId) {
+        options.onLeftBeforeStart?.()
+        return "done"
       }
       if (holder) {
         // The buffer is shared too: commit what the old call had streamed into its own
@@ -349,7 +360,7 @@ export function useStreamingChat({
 
     // Returns true if this stream's chat is still the one the user is viewing.
     // Used to suppress setStreamState calls for background (unfocused) streams.
-    const isActiveStream = () => showsChat(resolvedChatIdRef.current, follow)
+    const isActiveStream = () => showsChat(resolvedChatIdRef.current, sentFromNewChat)
 
     // Like every other state change here: only for the chat being shown. A call that
     // waited for another to hand over may belong to a chat the user has since left.
@@ -370,7 +381,6 @@ export function useStreamingChat({
         // The backend has the turn: dropping this connection now loses nothing.
         runStarted = true
         markSettled()
-        options?.onRunStarted?.()
         registerStream(resolvedChatIdRef.current, stopThisCall, detachThisCall)
         if (isActiveStream()) setStreamState?.("streaming")
       },
@@ -496,6 +506,12 @@ export function useStreamingChat({
         if (detached) return "done"
         stopFlushInterval()
         flushPending()
+        // The backend answered the send with a refusal (4xx) before any run: it never took
+        // the message. 409 is "already sent", the opposite. Anything else (a dropped
+        // connection, a 5xx) can't rule out that it did, so it is not reported.
+        if (!follow && !runStarted && failedStatus >= 400 && failedStatus < 500 && failedStatus !== 409) {
+          options?.onSendRefused?.()
+        }
         completeStream(resolvedChatIdRef.current, stopRequestedRef.current ? "aborted" : "error")
         // A turn that failed or was stopped part-way may still have saved its files.
         if (options?.files?.length) notifyLibraryFilesChanged()
@@ -543,7 +559,7 @@ export function useStreamingChat({
             if (result === "attached") return outcome
             if (result === "gone") {
               completeStream(liveChatId, "done")
-              if (showsChat(liveChatId, true)) setStreamState?.("done")
+              if (showsChat(liveChatId, false)) setStreamState?.("done")
               onStreamLost?.(liveChatId)
               onStreamDone?.()
               return "done"
@@ -617,12 +633,18 @@ export function useStreamingChat({
   /** `onRefused` runs when the follow never reached the turn's stream (not when it
    *  attached and later ended), before the history reload that onStreamLost starts. */
   const followStream = async (chatId: string, loadingMessageId: string, prior?: UIMessage, onRefused?: () => void): Promise<StreamOutcome> => {
-    const outcome = await fetchAiResponse("", chatId, loadingMessageId, null, { follow: true, prior })
+    let leftBeforeStart = false
+    const outcome = await fetchAiResponse("", chatId, loadingMessageId, null, {
+      follow: true, prior, onLeftBeforeStart: () => { leftBeforeStart = true },
+    })
+    // Never started (the user left the chat while it waited): nothing to settle, and the
+    // shared result belongs to whichever call ran last. Reopening the chat follows afresh.
+    if (leftBeforeStart) return "done"
     const result = followResultRef.current
     followResultRef.current = "attached"
     if (result === "attached") return outcome
     completeStream(chatId, "done")
-    if (showsChat(chatId, true)) setStreamState?.("done")
+    if (showsChat(chatId, false)) setStreamState?.("done")
     onRefused?.()
     onStreamLost?.(chatId)
     return "done"

@@ -319,4 +319,59 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(reply('reply-A')).toMatchObject({ isLoading: false })
     expect(reply('reply-A').content).toContain('Part two.')
   })
+
+  it('reports a send the backend refused outright, and only that', async () => {
+    const run = async (status: number) => {
+      const refused = vi.fn()
+      const done = hook.fetchAiResponse('hi', 'chat-A', 'reply-A', null, { onSendRefused: refused })
+      await vi.waitFor(() => expect(FakeXHR.all.length).toBeGreaterThan(0))
+      const xhr = FakeXHR.all.at(-1)!
+      FakeXHR.all = []
+      xhr.status = status
+      xhr.responseText = status ? '{"detail":"no"}' : ''
+      xhr.end()
+      await act(async () => { await done })
+      return refused.mock.calls.length
+    }
+    expect(await run(402)).toBe(1)
+    expect(await run(409)).toBe(0) // already sent: the backend has it
+    expect(await run(500)).toBe(0) // may have taken it
+  })
+
+  it("keeps a saved chat's send off a new chat's composer opened before its run started", async () => {
+    const states: string[] = []
+    const view: View = { currentChatIdRef: { current: 'chat-A' }, setStreamState: (state) => { states.push(state) } }
+    act(() => root.render(<Harness view={view} onReady={(api) => { hook = api }} />))
+    const done = hook.fetchAiResponse('hi', 'chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const send = FakeXHR.all[0]
+    send.start()
+    expect(states).toEqual(['waiting'])
+    view.currentChatIdRef.current = undefined // the user opens a new chat
+    send.push({ type: 'RUN_STARTED', ...runA }, { type: 'RUN_FINISHED', ...runA })
+    send.end()
+    await act(async () => { await done })
+    expect(states).toEqual(['waiting'])
+  })
+
+  it('does not cut the stream of a chat the user went back to while a follow waited', async () => {
+    const view: View = { currentChatIdRef: { current: 'chat-A' }, setStreamState: () => {} }
+    act(() => root.render(<Harness view={view} onReady={(api) => { hook = api }} />))
+    const doneA = hook.fetchAiResponse('hi', 'chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const send = FakeXHR.all[0]
+    send.start()
+    view.currentChatIdRef.current = 'chat-B' // B opens; its follow waits for A's run to start
+    const doneB = hook.followStream('chat-B', 'reply-B')
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 50)) })
+    view.currentChatIdRef.current = 'chat-A' // and the user goes back to A
+    send.push({ type: 'RUN_STARTED', ...runA })
+    expect(await doneB).toBe('done')
+    expect(send.aborted).toBe(false)
+    expect(FakeXHR.all).toHaveLength(1)
+    send.push({ type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'From A.' }, { type: 'RUN_FINISHED', ...runA })
+    send.end()
+    await act(async () => { await doneA })
+    expect(reply('reply-A')).toMatchObject({ content: 'From A.', isLoading: false })
+  })
 })

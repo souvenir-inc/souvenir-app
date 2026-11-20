@@ -54,6 +54,15 @@ describe("line-heights --snap", () => {
         "};",
       ].join("\n");
       expect(tsx(src)).toContain("lineHeight: 'var(--line-height-body-sm)'");
+      // Nor a nested rule's: it styles something else.
+      const css = [
+        ".card {",
+        "  & .label { font-size: var(--font-size-small); }",
+        "  font-size: var(--font-size-body-sm);",
+        "  line-height: 18px;",
+        "}",
+      ].join("\n");
+      expect(transform(css, true, { exact: 0, unitless: 0, snapped: 0 })).toContain("line-height: var(--line-height-body-sm);");
     } finally {
       setSnap(false);
     }

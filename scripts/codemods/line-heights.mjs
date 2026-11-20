@@ -64,8 +64,11 @@ function mapValue(raw, block, counter) {
   const px = parseFloat(m[1]);
   if (PX[px]) { counter.exact++; return `var(${PX[px]})`; }
   if (!SNAP) return null;
-  // Commented-out declarations don't count: only the active fontSize pairs.
-  const font = block.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/[^\n]*/g, "$1").match(/font-?[sS]ize\s*:\s*['"]?var\(--font-size-([a-z0-9-]+)\)/);
+  // Only this scope's active fontSize pairs: not a commented-out one, and not one inside a
+  // nested rule or object (`& .label { … }`), which styles something else.
+  let scope = block.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/[^\n]*/g, "$1");
+  while (/\{[^{}]*\}/.test(scope)) scope = scope.replace(/\{[^{}]*\}/g, "");
+  const font = scope.match(/font-?[sS]ize\s*:\s*['"]?var\(--font-size-([a-z0-9-]+)\)/);
   if (font && PAIR[font[1]] && Math.abs(PAIR[font[1]] - px) <= 4) {
     counter.snapped++;
     return `var(${PAIR_TOKEN[font[1]] || PX[PAIR[font[1]]]})`;

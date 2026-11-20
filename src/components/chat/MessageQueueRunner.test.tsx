@@ -105,19 +105,30 @@ describe('MessageQueueRunner', () => {
     expect(getChatQueue('chat-1')).toMatchObject({ heldBy: 'error' })
   })
 
-  it('puts a message back at the front if its send fails before the backend accepted it', async () => {
+  it('puts a refused message back at the front of its queue, held', async () => {
     await queueBehindReply('first', 'second')
     await act(async () => completeStream('chat-1', 'done'))
-    await act(async () => finishSend('error'))
+    const options = fetchAiResponse.mock.calls[0][4] as { onSendRefused?: () => void }
+    await act(async () => { options.onSendRefused?.(); finishSend('error') })
     expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['first', 'second'])
     expect(getChatQueue('chat-1')).toMatchObject({ heldBy: 'error' })
   })
 
-  it('does not put back a message the backend accepted before the send failed', async () => {
+  it('holds a refused message that was the last in its queue, rather than sending it again', async () => {
+    await queueBehindReply('only')
+    await act(async () => completeStream('chat-1', 'done'))
+    const options = fetchAiResponse.mock.calls[0][4] as { onSendRefused?: () => void }
+    await act(async () => { options.onSendRefused?.(); finishSend('error') })
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 20)) })
+    expect(fetchAiResponse).toHaveBeenCalledOnce()
+    expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['only'])
+    expect(getChatQueue('chat-1')).toMatchObject({ heldBy: 'error' })
+  })
+
+  it('does not put back a message whose send failed in a way the backend may have taken it', async () => {
     await queueBehindReply('first', 'second')
     await act(async () => completeStream('chat-1', 'done'))
-    const options = fetchAiResponse.mock.calls[0][4] as { onRunStarted?: () => void }
-    await act(async () => { options.onRunStarted?.(); finishSend('error') })
+    await act(async () => finishSend('error'))
     expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['second'])
   })
 

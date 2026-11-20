@@ -224,17 +224,17 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
           return;
         }
         if (state === "idle" && mountedRef.current) {
-          // The message left the queue to be sent. If the send fails before the backend
-          // accepted it, it goes back to the front (the failed stream already holds the
-          // queue). Once accepted it is the chat's, and a failure shows in the chat.
-          let accepted = false;
+          // The message left the queue to be sent. Only if the backend refused it outright
+          // (it never took it) does it go back, to the front and held, so it waits for the
+          // user rather than going straight out again. Any other failure may have reached
+          // the backend: re-sending could repeat it, so it stays with the chat's failed turn.
+          let refused = false;
           return fetchAiResponse(message.content, chatId, `queued-${message.id}`, modelId, {
             ...options,
-            onRunStarted: () => { accepted = true; },
-          }).then(
-            (outcome) => { if (outcome !== "done" && !accepted) restoreQueuedMessage(chatId, message, 0); },
-            (error: unknown) => { if (!accepted) restoreQueuedMessage(chatId, message, 0); throw error; },
-          );
+            onSendRefused: () => { refused = true; },
+          }).then(() => {
+            if (refused) restoreQueuedMessage(chatId, message, 0, "error");
+          });
         }
         // Not sent: the message goes back to the front of its queue, and the reservation
         // ends without "done", which holds that queue (message-queue.ts) until the user
