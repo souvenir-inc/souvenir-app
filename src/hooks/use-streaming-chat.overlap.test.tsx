@@ -518,4 +518,22 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(ends).toEqual(['done'])
     expect(refused).toHaveBeenCalledTimes(1) // its own result reached its caller
   })
+
+  it("does not end a reservation made right after a refused follow ended", async () => {
+    // As the refused follow ends, the chat's next queued message reserves the chat (once).
+    let reserved = false
+    const unsubscribe = subscribeStreams((event) => {
+      if (event.type === 'end' && event.chatId === 'chat-A' && !reserved) { reserved = true; registerStream('chat-A') }
+    })
+    const done = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const xhr = FakeXHR.all[0]
+    xhr.status = 404
+    xhr.responseText = '{"detail":"no stream"}'
+    xhr.end()
+    await done
+    unsubscribe()
+    expect(isStreamActive('chat-A')).toBe(true) // the reservation stands
+    completeStream('chat-A')
+  })
 })

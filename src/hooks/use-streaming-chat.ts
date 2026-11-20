@@ -577,7 +577,8 @@ export function useStreamingChat({
           })
           if (result === "attached") return outcome
           if (result === "gone") {
-            completeStream(liveChatId, "done")
+            // The retry's own failed follow already ended the registry entry (as done). Ending
+            // it again here could remove a reservation someone made in between.
             if (showsChat(liveChatId, false)) setStreamState?.("done")
             onStreamLost?.(liveChatId)
             onStreamDone?.()
@@ -670,7 +671,8 @@ export function useStreamingChat({
     // the chat follows afresh.
     if (leftBeforeStart) return "done"
     if (result === "attached") return outcome
-    completeStream(chatId, "done")
+    // Already ended (as done) by the follow itself: no second completeStream, which could
+    // remove a reservation made for the chat's next queued message in between.
     if (showsChat(chatId, false)) setStreamState?.("done")
     onRefused?.()
     onStreamLost?.(chatId)
