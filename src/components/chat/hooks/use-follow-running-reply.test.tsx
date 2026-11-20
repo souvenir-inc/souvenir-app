@@ -198,4 +198,15 @@ describe('useFollowRunningReply', () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(0) })
     expect(followStream).toHaveBeenCalledTimes(FOLLOW_REFUSED_ATTEMPTS + 1)
   })
+
+  it('with its budget spent, a failed stream from load sends it back to polling, not following', async () => {
+    const load = await spendBudget('r1')
+    registerStream('chat-A') // a send going as the next history load lands
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: load })
+    getChatRunState.mockResolvedValue('idle')
+    await act(async () => { completeStream('chat-A', 'error') })
+    expect(followStream).toHaveBeenCalledTimes(FOLLOW_REFUSED_ATTEMPTS) // no fourth follow
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS) })
+    expect(onRunEnded).toHaveBeenCalledTimes(1) // polling for the end instead
+  })
 })

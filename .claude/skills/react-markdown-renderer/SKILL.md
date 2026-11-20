@@ -44,6 +44,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeSanitize, { defaultSchema, type Options as SanitizeOptions } from 'rehype-sanitize';
 import 'highlight.js/styles/github-dark.css'; // or any hljs theme
+import { markdownComponents } from './markdownComponents'; // the custom components below
 
 // remark-gfm already prefixes footnote ids with `user-content-`; sanitize's default would
 // prefix them again, so footnote links point at ids that don't exist. Raw HTML isn't

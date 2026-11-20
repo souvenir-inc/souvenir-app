@@ -92,20 +92,25 @@ export function useFollowRunningReply({
     const key = `${chatId}:${runningMessageId}`
     const tally = tallyRef.current
     if (tally.key !== key) { tally.key = key; tally.refused = 0 }
-    if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS && !activeAtLoad) {
-      // Out of attempts, the reply may still end on the backend with nothing here to see it.
-      // Ask until it has (a lookup that fails is "can't tell": keep waiting), then reload.
-      // The asking goes on until a reload shows no running reply (this effect then ends):
-      // a reload that fails is tried again at the next check. Not while a stream for the chat
-      // is going (a send just made): a reload then would drop its turn from the list.
-      let stopped = false
-      const poll = setInterval(() => {
+    // Out of attempts, the reply may still end on the backend with nothing here to see it.
+    // Ask until it has (a lookup that fails is "can't tell": keep waiting), then reload.
+    // The asking goes on until a reload shows no running reply (this effect then ends):
+    // a reload that fails is tried again at the next check. Not while a stream for the chat
+    // is going (a send just made): a reload then would drop its turn from the list.
+    let stopped = false
+    let poll: ReturnType<typeof setInterval> | undefined
+    const pollForRunEnd = () => {
+      poll ??= setInterval(() => {
         void getChatRunState(chatId).then((state) => {
           if (stopped || state !== "idle" || isStreamActive(chatId)) return
           runEnded()
         }, () => {})
       }, RUN_ENDED_POLL_MS)
-      return () => { stopped = true; clearInterval(poll) }
+    }
+    const stopPolling = () => { stopped = true; if (poll) clearInterval(poll) }
+    if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS && !activeAtLoad) {
+      pollForRunEnd()
+      return stopPolling
     }
     // The first go is immediate; a repeat only happens because the last was refused,
     // so it backs off rather than returning at round-trip speed.
@@ -140,10 +145,14 @@ export function useFollowRunningReply({
         superseded = true
       } else if (event.type === "end" && superseded && event.outcome !== "done") {
         superseded = false
-        if (!isStreamActive(chatId)) follow()
+        // Within the budget: follow now. With it spent: back to asking whether the run ended.
+        if (!isStreamActive(chatId)) {
+          if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS) pollForRunEnd()
+          else follow()
+        }
       }
     })
-    return () => { clearTimeout(timer); unsubscribe() }
+    return () => { clearTimeout(timer); unsubscribe(); stopPolling() }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per history load that finds a running turn; followStream is fresh each render
   // `enabled` too: turning it off cancels a waiting follow, and turning it on looks again.
   }, [chatId, enabled, runningMessageId, historyLoadId, resetCount])
