@@ -88,6 +88,8 @@ describe('PresetModelSelectorDialog', () => {
   it('returns focus to the trigger once a model is chosen', async () => {
     models = [{ id: 'm1', modelId: 1, modelName: 'Model One', companyName: 'Acme', modelType: 'chat' }]
     await renderOpen()
+    // Let the panel take focus first (its open frame), as it does before anyone can click.
+    await act(async () => { await new Promise((resolve) => requestAnimationFrame(() => resolve(null))) })
     const row = [...document.querySelectorAll('[aria-label="Select model"] [role="button"]')].find((e) => e.textContent?.includes('Model One')) as HTMLElement
     await act(async () => row.click())
     expect(selectModel).toHaveBeenCalled()

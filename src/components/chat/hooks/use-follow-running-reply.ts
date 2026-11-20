@@ -143,6 +143,12 @@ export function useFollowRunningReply({
       if (event.type === "start") {
         clearTimeout(timer)
         superseded = true
+      } else if (event.type === "end" && superseded && event.outcome === "done" && activeAtLoad) {
+        // A stream from before the load (a background send) finished the reply this view
+        // loaded as running: nothing here read it, so the view reloads to show it whole. A send
+        // made from this view after the load updates its own reply, and is left alone.
+        superseded = false
+        runEnded()
       } else if (event.type === "end" && superseded && event.outcome !== "done") {
         superseded = false
         // Within the budget: follow now. With it spent: back to asking whether the run ended.

@@ -209,4 +209,21 @@ describe('useFollowRunningReply', () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS) })
     expect(onRunEnded).toHaveBeenCalledTimes(1) // polling for the end instead
   })
+
+  it('reloads when a stream from before the load finishes the reply it was showing as running', async () => {
+    registerStream('chat-A') // a background send, going as the history loaded
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { completeStream('chat-A', 'done') })
+    expect(onRunEnded).toHaveBeenCalledTimes(1)
+    expect(followStream).not.toHaveBeenCalled()
+  })
+
+  it('does not reload after a send made from the view itself finishes', async () => {
+    getChatRunState.mockResolvedValue('running')
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    followStream.mockClear()
+    await act(async () => { registerStream('chat-A') }) // the view sends after the load
+    await act(async () => { completeStream('chat-A', 'done') })
+    expect(onRunEnded).not.toHaveBeenCalled()
+  })
 })

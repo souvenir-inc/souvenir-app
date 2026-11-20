@@ -228,6 +228,15 @@ export function holdQueue(key: string, reason: Exclude<StreamOutcome, "done">): 
   notify()
 }
 
+/** Lifts `key`'s "error" hold: the failure that set it was recovered after all (a dropped
+ *  connection whose reconnect read the turn to its end). Any other hold stays. */
+export function releaseErrorHold(key: string): void {
+  const queue = queues.get(key)
+  if (!queue || queue.heldBy !== "error") return
+  queues.set(key, { messages: queue.messages })
+  notify()
+}
+
 /**
  * Keeps the settings a background send would use in step with the composer.
  * Updated in place: they aren't shown, so nothing needs to re-render.

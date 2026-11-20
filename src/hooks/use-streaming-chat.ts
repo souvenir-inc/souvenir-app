@@ -14,6 +14,7 @@ import { friendlyModelError } from "@/lib/model-error"
 import { AguiSSEDecoder } from "@/lib/sse-decoder"
 import type { UIMessage } from "@/types/chat"
 import { registerStream, completeStream, isStreamActive, type StreamOutcome } from "@/lib/stream-registry"
+import { getChatQueue, releaseErrorHold } from "@/lib/message-queue"
 import { updateMessage } from "@/lib/chat/stream/message-patches"
 import {
   AuthExpiredError,
@@ -524,6 +525,9 @@ export function useStreamingChat({
         // A follow that never reached the stream did not end a turn: the run it looked for has
         // ended or can't be read, which its caller settles (the history reloads). Ending it as
         // an error would hold the chat's queue although nothing failed.
+        // Whether the chat's queue was already held: an error hold this end sets is lifted again
+        // if a reconnect below reads the turn to its end, one that was already there is not.
+        const heldBefore = !!getChatQueue(resolvedChatIdRef.current)?.heldBy
         completeStream(resolvedChatIdRef.current, stopRequestedRef.current ? "aborted" : follow && !attached ? "done" : "error")
         // A turn that failed or was stopped part-way may still have saved its files.
         if (options?.files?.length) notifyLibraryFilesChanged()
@@ -575,7 +579,11 @@ export function useStreamingChat({
             prior: options?.prior,
             onFollowResult: (r) => { result = r },
           })
-          if (result === "attached") return outcome
+          if (result === "attached") {
+            // Recovered: the drop that held the queue was not a failure after all.
+            if (outcome === "done" && !heldBefore) releaseErrorHold(liveChatId)
+            return outcome
+          }
           if (result === "gone") {
             // The retry's own failed follow already ended the registry entry (as done). Ending
             // it again here could remove a reservation someone made in between.

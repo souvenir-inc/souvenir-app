@@ -21,7 +21,7 @@ vi.mock('@/lib/jwt-utils', async (orig) => {
 })
 import { useStreamingChat } from '@/hooks/use-streaming-chat'
 import { completeStream, detachStream, isStreamActive, registerStream, subscribeStreams } from '@/lib/stream-registry'
-import { queueMessage, queuedChatsReadyForBackground, takeAllQueuedMessages } from '@/lib/message-queue'
+import { getChatQueue, queueMessage, queuedChatsReadyForBackground, takeAllQueuedMessages } from '@/lib/message-queue'
 import { resetStreamStore } from '@/lib/chat/stream-store'
 import type { UIMessage } from '@/types/chat'
 
@@ -536,4 +536,27 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(isStreamActive('chat-A')).toBe(true) // the reservation stands
     completeStream('chat-A')
   })
+
+  it("lifts the queue's hold once a dropped connection is recovered to the turn's end", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    try {
+      const done = hook.followStream('chat-A', 'reply-A')
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+      const xhr = FakeXHR.all[0]
+      xhr.start()
+      xhr.push({ type: 'RUN_STARTED', ...runA })
+      xhr.status = 0
+      xhr.end() // dropped: held as an error for now, and a reconnect follows
+      await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+      const retry = FakeXHR.all[1]
+      retry.start()
+      retry.push({ type: 'RUN_STARTED', ...runA }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'Whole.' }, { type: 'RUN_FINISHED', ...runA })
+      retry.end()
+      expect(await done).toBe('done')
+      expect(getChatQueue('chat-A')?.heldBy).toBeUndefined()
+    } finally {
+      takeAllQueuedMessages('chat-A')
+    }
+  }, 10000)
 })
