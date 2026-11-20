@@ -3,6 +3,7 @@
 // The connect card answers its turn with a POST to the prompt's respond URL. If that
 // POST fails the run is still waiting, so the card must not count itself answered:
 // it says so, and "Try again" resends the answer alone — once, however often it's clicked.
+// Once answered (connected, or "Not now") the card is gone.
 
 import React, { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
@@ -18,6 +19,7 @@ vi.mock('@/lib/api/connectors', async (orig) => ({
 }))
 
 import { ConnectPromptCard } from '@/components/chat/ConnectorPrompts'
+import { getConnector } from '@/lib/api/connectors'
 import { parsePrompt } from '@/lib/api/prompts'
 import type { ConnectorConnectPrompt } from '@/types/chat'
 
@@ -50,31 +52,31 @@ describe('ConnectPromptCard under StrictMode', () => {
   // never answers its turn, even for an app that is already connected.
   it('still answers an already-connected app after the double mount', async () => {
     respondToChatPrompt.mockResolvedValue(undefined)
-    const onConnected = vi.fn()
-    await act(async () => root.render(<React.StrictMode><ConnectPromptCard prompt={prompt} onConnected={onConnected} /></React.StrictMode>))
+    const onDecided = vi.fn()
+    await act(async () => root.render(<React.StrictMode><ConnectPromptCard prompt={prompt} onDecided={onDecided} /></React.StrictMode>))
     await flush()
     expect(respondToChatPrompt).toHaveBeenCalledTimes(1)
-    expect(onConnected).toHaveBeenCalledTimes(1)
+    expect(onDecided).toHaveBeenCalledExactlyOnceWith('connected')
   })
 })
 
 describe('ConnectPromptCard when the answer does not reach the backend', () => {
   it('does not report connected, shows the error, and offers a retry', async () => {
     respondToChatPrompt.mockRejectedValueOnce(new Error('Network error'))
-    const onConnected = vi.fn()
-    await act(async () => root.render(<ConnectPromptCard prompt={prompt} onConnected={onConnected} />))
+    const onDecided = vi.fn()
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} onDecided={onDecided} />))
     await flush()
 
     expect(respondToChatPrompt).toHaveBeenCalledTimes(1)
-    expect(onConnected).not.toHaveBeenCalled()
+    expect(onDecided).not.toHaveBeenCalled()
     expect(container.querySelector('[role="alert"]')?.textContent).toContain('Network error')
     expect(tryAgain()).toBeDefined()
   })
 
   it('"Try again" resends the answer and then reports connected', async () => {
     respondToChatPrompt.mockRejectedValueOnce(new Error('Network error')).mockResolvedValueOnce(undefined)
-    const onConnected = vi.fn()
-    await act(async () => root.render(<ConnectPromptCard prompt={prompt} onConnected={onConnected} />))
+    const onDecided = vi.fn()
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} onDecided={onDecided} />))
     await flush()
 
     await act(async () => tryAgain()!.click())
@@ -82,9 +84,8 @@ describe('ConnectPromptCard when the answer does not reach the backend', () => {
 
     expect(respondToChatPrompt).toHaveBeenCalledTimes(2)
     expect(respondToChatPrompt).toHaveBeenLastCalledWith('connected', '/chats/c1/prompts/p1')
-    expect(onConnected).toHaveBeenCalledTimes(1)
-    expect(container.querySelector('[role="alert"]')).toBeNull()
-    expect(tryAgain()).toBeUndefined()
+    expect(onDecided).toHaveBeenCalledExactlyOnceWith('connected')
+    expect(container.textContent).toBe('')
   })
 
   it('sends one answer while one is in flight, however often retry is clicked', async () => {
@@ -92,8 +93,8 @@ describe('ConnectPromptCard when the answer does not reach the backend', () => {
     respondToChatPrompt
       .mockRejectedValueOnce(new Error('Network error'))
       .mockImplementationOnce(() => new Promise<void>((resolve) => { release = resolve }))
-    const onConnected = vi.fn()
-    await act(async () => root.render(<ConnectPromptCard prompt={prompt} onConnected={onConnected} />))
+    const onDecided = vi.fn()
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} onDecided={onDecided} />))
     await flush()
 
     const button = tryAgain()!
@@ -106,6 +107,31 @@ describe('ConnectPromptCard when the answer does not reach the backend', () => {
 
     await act(async () => release())
     await flush()
-    expect(onConnected).toHaveBeenCalledTimes(1)
+    expect(onDecided).toHaveBeenCalledExactlyOnceWith('connected')
+  })
+})
+
+describe('ConnectPromptCard "Not now"', () => {
+  it('declines this ask only and the card goes away', async () => {
+    vi.mocked(getConnector).mockResolvedValueOnce({ ownedConnections: [], apiKeyFields: [] } as unknown as Awaited<ReturnType<typeof getConnector>>)
+    respondToChatPrompt.mockResolvedValue(undefined)
+    const onDecided = vi.fn()
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} onDecided={onDecided} />))
+    await flush()
+    expect(respondToChatPrompt).not.toHaveBeenCalled()
+
+    const notNow = [...container.querySelectorAll('button')].find((b) => b.textContent?.includes('Not now'))!
+    await act(async () => notNow.click())
+    await flush()
+
+    expect(respondToChatPrompt).toHaveBeenCalledExactlyOnceWith('cancel', '/chats/c1/prompts/p1')
+    expect(onDecided).toHaveBeenCalledExactlyOnceWith('cancel')
+    expect(container.textContent).toBe('')
+  })
+
+  it('stays gone on remount once a decision is recorded', async () => {
+    await act(async () => root.render(<ConnectPromptCard prompt={{ ...prompt, decision: 'cancel' }} />))
+    await flush()
+    expect(container.textContent).toBe('')
   })
 })

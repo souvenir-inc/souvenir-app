@@ -26,7 +26,12 @@ export function AssistantPrompts({
       {message.connectorConnectPrompts && message.connectorConnectPrompts.length > 0 && (
         <div style={stackStyle}>
           {message.connectorConnectPrompts.map((prompt) => (
-            <ConnectPromptCard key={prompt.request_id} prompt={prompt} onConnected={onPromptAnswered} />
+            <ConnectPromptCard
+              key={prompt.request_id}
+              prompt={prompt}
+              onDecided={(decision) => onPromptDecided?.(message.id, prompt.request_id, decision)}
+              onAnswered={onPromptAnswered}
+            />
           ))}
         </div>
       )}

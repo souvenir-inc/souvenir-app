@@ -171,7 +171,8 @@ function chatPrompt(
 }
 
 export type PromptEventName           = keyof typeof promptSchemas
-export type ConnectorConnectPrompt    = z.infer<typeof promptSchemas.tool_connect_prompt>
+/** `decision` is client-side only: "connected" or "cancel" (not now, for this ask only). */
+export type ConnectorConnectPrompt    = z.infer<typeof promptSchemas.tool_connect_prompt> & { decision?: string }
 /** `decision` is client-side only: the person's answer ("allow" | "allow_once" | "block"). */
 export type ConnectorPermissionPrompt = z.infer<typeof promptSchemas.permission_prompt> & { decision?: string }
 export type PermissionPromptOption    = ConnectorPermissionPrompt['options'][number]
