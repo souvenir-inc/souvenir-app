@@ -250,6 +250,11 @@ export function ChatInterface({
   // reruns a refusal causes; a different reply is a fresh budget. Only refusals count (the
   // follow reports them before that reload): a follow that attaches spends nothing.
   const followRefusedRef = useRef<{ key: string; refused: number }>({ key: "", refused: 0 })
+  // Leaving the chat ends that visit's budget, even for a chat with no running reply:
+  // reopening it later starts afresh. (Declared first, so it runs before the follow below.)
+  useEffect(() => {
+    if (!followRefusedRef.current.key.startsWith(`${chatId}:`)) followRefusedRef.current = { key: "", refused: 0 }
+  }, [chatId])
   useEffect(() => {
     if (!chatId || endpoint || !runningMessageId || isStreamActive(chatId)) return
     const key = `${chatId}:${runningMessageId}`

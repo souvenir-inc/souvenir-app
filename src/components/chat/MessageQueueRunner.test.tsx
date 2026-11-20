@@ -105,6 +105,22 @@ describe('MessageQueueRunner', () => {
     expect(getChatQueue('chat-1')).toMatchObject({ heldBy: 'error' })
   })
 
+  it('puts a message back at the front if its send fails before the backend accepted it', async () => {
+    await queueBehindReply('first', 'second')
+    await act(async () => completeStream('chat-1', 'done'))
+    await act(async () => finishSend('error'))
+    expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['first', 'second'])
+    expect(getChatQueue('chat-1')).toMatchObject({ heldBy: 'error' })
+  })
+
+  it('does not put back a message the backend accepted before the send failed', async () => {
+    await queueBehindReply('first', 'second')
+    await act(async () => completeStream('chat-1', 'done'))
+    const options = fetchAiResponse.mock.calls[0][4] as { onRunStarted?: () => void }
+    await act(async () => { options.onRunStarted?.(); finishSend('error') })
+    expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['second'])
+  })
+
   it('leaves a chat on screen to its own view', async () => {
     await act(async () => setQueueForeground(view, 'chat-1'))
     await queueBehindReply('and then this')

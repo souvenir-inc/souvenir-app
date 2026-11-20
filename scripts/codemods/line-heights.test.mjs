@@ -40,3 +40,22 @@ describe("line-heights on TSX", () => {
     expect(tsx(src)).toBe(src);
   });
 });
+
+describe("line-heights --snap", () => {
+  it("pairs with the active fontSize, not a commented-out one", async () => {
+    const { setSnap } = await import("./line-heights.mjs");
+    setSnap(true);
+    try {
+      const src = [
+        "const style = {",
+        "  // fontSize: 'var(--font-size-small)',",
+        "  fontSize: 'var(--font-size-body-sm)',",
+        "  lineHeight: '18px',",
+        "};",
+      ].join("\n");
+      expect(tsx(src)).toContain("lineHeight: 'var(--line-height-body-sm)'");
+    } finally {
+      setSnap(false);
+    }
+  });
+});

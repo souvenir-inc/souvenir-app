@@ -21,7 +21,9 @@ import { codeMask } from "./tokens-exact.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const args = process.argv.slice(2);
-const SNAP = args.includes("--snap");
+let SNAP = args.includes("--snap");
+/** For tests: turn --snap on or off without the CLI. */
+export const setSnap = (on) => { SNAP = on; };
 const dry = args.includes("--dry");
 
 // One token per px value; when two share a value, the scale name first.
@@ -62,7 +64,8 @@ function mapValue(raw, block, counter) {
   const px = parseFloat(m[1]);
   if (PX[px]) { counter.exact++; return `var(${PX[px]})`; }
   if (!SNAP) return null;
-  const font = block.match(/font-?[sS]ize\s*:\s*['"]?var\(--font-size-([a-z0-9-]+)\)/);
+  // Commented-out declarations don't count: only the active fontSize pairs.
+  const font = block.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/[^\n]*/g, "$1").match(/font-?[sS]ize\s*:\s*['"]?var\(--font-size-([a-z0-9-]+)\)/);
   if (font && PAIR[font[1]] && Math.abs(PAIR[font[1]] - px) <= 4) {
     counter.snapped++;
     return `var(${PAIR_TOKEN[font[1]] || PX[PAIR[font[1]]]})`;
