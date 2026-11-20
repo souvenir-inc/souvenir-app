@@ -418,4 +418,25 @@ describe('useStreamingChat with overlapping follows', () => {
     await act(async () => { await doneA })
     expect(reply('reply-A')).toMatchObject({ content: 'From A.', isLoading: false })
   })
+
+  it('ends as stopped, not as an error, when Stop is pressed during the reconnect pause', async () => {
+    const states: string[] = []
+    const view: View = { currentChatIdRef: { current: 'chat-A' }, setStreamState: (state) => { states.push(state) } }
+    act(() => root.render(<Harness view={view} onReady={(api) => { hook = api }} />))
+    const done = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const xhr = FakeXHR.all[0]
+    xhr.start()
+    xhr.push({ type: 'RUN_STARTED', ...runA }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'Part.' })
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    xhr.status = 0
+    xhr.end() // dropped: the reconnect waits a moment first
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
+    act(() => hook.handleStopGeneration())
+    expect(await done).toBe('aborted')
+    expect(FakeXHR.all).toHaveLength(1)
+    expect(states.at(-1)).toBe('aborted')
+    expect(reply('reply-A')).toMatchObject({ isLoading: false, stoppedByUser: true })
+  })
 })

@@ -130,7 +130,8 @@ interface ChatMessageProps {
   onPromptDecided?: (messageId: string, requestId: string, decision: string) => void;
   /** Continues a turn parked on a prompt whose respond_url is `/chats/{id}/resume`.
    *  The memo comparator ignores it, so pass a stable function. */
-  onPromptAnswered?: () => void;
+  /** A prompt in this message was answered; called with the message's chat. */
+  onPromptAnswered?: (chatId: string) => void;
   /** Called once per message when it has stopped loading and its text reveal
    *  has finished (straight away for a message that isn't animated). The memo
    *  comparator only tracks whether it is set, so pass a stable function. */

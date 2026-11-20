@@ -63,6 +63,15 @@ describe("line-heights --snap", () => {
         "}",
       ].join("\n");
       expect(transform(css, true, { exact: 0, unitless: 0, snapped: 0 })).toContain("line-height: var(--line-height-body-sm);");
+      // Two font-sizes in one rule: the last one wins, so that is the pair.
+      const twice = [
+        ".card {",
+        "  font-size: var(--font-size-small);",
+        "  font-size: var(--font-size-body-sm);",
+        "  line-height: 18px;",
+        "}",
+      ].join("\n");
+      expect(transform(twice, true, { exact: 0, unitless: 0, snapped: 0 })).toContain("line-height: var(--line-height-body-sm);");
     } finally {
       setSnap(false);
     }

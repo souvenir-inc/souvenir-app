@@ -245,7 +245,9 @@ function splitIntoBlocks(text: string): string[] {
   }
   flush(); // an unclosed fence (still streaming) stays one block
   const defs = definitions.join('\n');
-  return defs ? blocks.map((block) => `${block}\n\n${defs}`) : blocks;
+  // Definitions go before the block, not after: after a code fence that is still open
+  // (streaming, or never closed) they would be read as part of the code.
+  return defs ? blocks.map((block) => `${defs}\n\n${block}`) : blocks;
 }
 
 export function StreamingMessage({

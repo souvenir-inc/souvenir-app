@@ -18,7 +18,7 @@ export function AssistantPrompts({
 }: {
   message: UIMessage;
   onPromptDecided?: (messageId: string, requestId: string, decision: string) => void;
-  onPromptAnswered?: () => void;
+  onPromptAnswered?: (chatId: string) => void;
 }) {
   return (
     <>
@@ -30,7 +30,7 @@ export function AssistantPrompts({
               key={prompt.request_id}
               prompt={prompt}
               onDecided={(decision) => onPromptDecided?.(message.id, prompt.request_id, decision)}
-              onAnswered={onPromptAnswered}
+              onAnswered={() => onPromptAnswered?.(message.chat_id)}
             />
           ))}
         </div>
@@ -45,7 +45,7 @@ export function AssistantPrompts({
               prompt={prompt}
               onDecided={(policy) => {
                 respondToChatPrompt(policy, prompt.respond_url)
-                  .then(() => onPromptAnswered?.())
+                  .then(() => onPromptAnswered?.(message.chat_id))
                   .catch(() => {})
                 onPromptDecided?.(message.id, prompt.request_id, policy)
               }}
@@ -61,7 +61,7 @@ export function AssistantPrompts({
               key={prompt.request_id}
               prompt={prompt}
               onDecided={(decision) => onPromptDecided?.(message.id, prompt.request_id, decision)}
-              onAnswered={onPromptAnswered}
+              onAnswered={() => onPromptAnswered?.(message.chat_id)}
             />
           ))}
         </div>
