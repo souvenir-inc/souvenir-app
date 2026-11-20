@@ -20,7 +20,7 @@ vi.mock('@/lib/jwt-utils', async (orig) => {
   return { ...actual, ensureFreshToken: () => token.gate ?? actual.ensureFreshToken() }
 })
 import { useStreamingChat } from '@/hooks/use-streaming-chat'
-import { detachStream, isStreamActive } from '@/lib/stream-registry'
+import { completeStream, detachStream, isStreamActive, registerStream } from '@/lib/stream-registry'
 import { queueMessage, queuedChatsReadyForBackground, takeAllQueuedMessages } from '@/lib/message-queue'
 import { resetStreamStore } from '@/lib/chat/stream-store'
 import type { UIMessage } from '@/types/chat'
@@ -471,5 +471,35 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(messages.find((m) => m.id === 'user-new')?.chat_id).toBe('chat-N')
     expect(messages.find((m) => m.id === 'reply-new')?.chat_id).toBe('chat-N')
     expect(messages.find((m) => m.id === 'other')?.chat_id).toBe('')
+  })
+
+  it('gives a reply made under a temp- chat id the real one too', async () => {
+    messages = [{ id: 'reply-t', role: 'assistant', content: '', created_at: '', chat_id: 'temp-1', isLoading: true }]
+    const done = hook.fetchAiResponse('hi', 'temp-1', 'reply-t')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const send = FakeXHR.all[0]
+    send.start()
+    send.push({ type: 'RUN_STARTED', threadId: 'chat-T', runId: 'run-T' }, { type: 'RUN_FINISHED', threadId: 'chat-T', runId: 'run-T' })
+    send.end()
+    await act(async () => { await done })
+    expect(messages.find((m) => m.id === 'reply-t')?.chat_id).toBe('chat-T')
+  })
+
+  it('does not retry into a chat another reader took during the reconnect pause', async () => {
+    const done = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const xhr = FakeXHR.all[0]
+    xhr.start()
+    xhr.push({ type: 'RUN_STARTED', ...runA })
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    xhr.status = 0
+    xhr.end() // dropped: the reconnect waits a moment first
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
+    registerStream('chat-A') // the chat's own view, another hook, follows it meanwhile
+    expect(await done).toBe('done')
+    expect(FakeXHR.all).toHaveLength(1)
+    expect(isStreamActive('chat-A')).toBe(true) // still that reader's
+    completeStream('chat-A')
   })
 })
