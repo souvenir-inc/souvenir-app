@@ -581,8 +581,13 @@ export async function getChatRunState(chatId: string, timeoutMs = RUN_STATE_TIME
   const lookup = (async () => {
     const response = await apiFetch(CHAT_ENDPOINT(chatId), { signal: controller.signal });
     if (!response.ok) throw new Error(`Couldn't read the chat's run state (${response.status})`);
-    const chat = (await response.json()) as { streamId?: string | null };
-    return chat.streamId ? ("running" as const) : ("idle" as const);
+    // Only an explicit answer counts: a body without a streamId of string or null is
+    // "can't tell", not "idle".
+    const chat: unknown = await response.json();
+    const streamId = chat && typeof chat === "object" ? (chat as { streamId?: unknown }).streamId : undefined;
+    if (streamId === null) return "idle" as const;
+    if (typeof streamId === "string" && streamId) return "running" as const;
+    throw new Error("Malformed run state from the backend");
   })();
   lookup.catch(() => {});
   return Promise.race([lookup, deadline]).then(

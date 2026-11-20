@@ -39,9 +39,6 @@ export type { TurnResume } from "@/lib/chat/stream/stream-request"
 /** How many times one turn re-attaches to its stream, and the pause before each. */
 const FOLLOW_ATTEMPTS = 5
 const FOLLOW_RETRY_MS = 1000
-// How long a follow waits for a send to be accepted (its run started) before taking
-// the send as stalled and dropping it.
-export const SEND_ACCEPT_WAIT_MS = 20_000
 
 /** How a follow of a running turn went: it reached the stream, the chat has no
  *  running turn any more (it ended while nobody was reading), or it could not connect. */
@@ -285,16 +282,8 @@ export function useStreamingChat({
       let holder = activeCallRef.current
       // A send the backend has not accepted yet is never dropped: wait until its run
       // starts (or it ends), then look again — another call may have taken over meanwhile.
-      // That wait is bounded: a send still unanswered after SEND_ACCEPT_WAIT_MS is taken
-      // as stalled and dropped like any other call, so a follow is never stuck behind it.
       while (holder && !holder.droppable()) {
-        let timer: ReturnType<typeof setTimeout> | undefined
-        const waited = await Promise.race([
-          holder.settled.then(() => "settled" as const),
-          new Promise<"stalled">((resolve) => { timer = setTimeout(() => resolve("stalled"), SEND_ACCEPT_WAIT_MS) }),
-        ])
-        clearTimeout(timer)
-        if (waited === "stalled") break
+        await holder.settled
         holder = activeCallRef.current
       }
       if (holder) {
@@ -413,6 +402,9 @@ export function useStreamingChat({
           })))
         }
 
+        // Dropped while getting ready (the token wait above): the request never goes out.
+        // The transport sends synchronously, so a later abort would be too late.
+        if (detached) return "done"
         const sseDecoder = new AguiSSEDecoder()
         await sendStreamRequest({
           target,

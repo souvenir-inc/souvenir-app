@@ -28,15 +28,25 @@ describe("getChatRunState", () => {
     await expect(getChatRunState("c1")).rejects.toThrow("Failed to fetch");
   });
 
+  it("throws, rather than answering idle, when the body has no usable streamId", async () => {
+    for (const body of [{}, { streamId: 42 }, { streamId: "" }, null]) {
+      apiFetch.mockResolvedValueOnce(json(body));
+      await expect(getChatRunState("c1")).rejects.toThrow(/Malformed/);
+    }
+  });
+
   it("fails, and aborts the request, when the lookup never settles", async () => {
     vi.useFakeTimers();
-    let signal: AbortSignal | undefined;
-    apiFetch.mockImplementationOnce((_path: string, opts: { signal: AbortSignal }) => { signal = opts.signal; return new Promise(() => {}); });
-    const state = getChatRunState("c1", 5000);
-    const check = expect(state).rejects.toThrow(/Timed out/);
-    await vi.advanceTimersByTimeAsync(5000);
-    await check;
-    expect(signal?.aborted).toBe(true);
-    vi.useRealTimers();
+    try {
+      let signal: AbortSignal | undefined;
+      apiFetch.mockImplementationOnce((_path: string, opts: { signal: AbortSignal }) => { signal = opts.signal; return new Promise(() => {}); });
+      const state = getChatRunState("c1", 5000);
+      const check = expect(state).rejects.toThrow(/Timed out/);
+      await vi.advanceTimersByTimeAsync(5000);
+      await check;
+      expect(signal?.aborted).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

@@ -141,13 +141,18 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
   // signal fires a microtask later if nothing has mounted it again by then.
   const mountedRef = useRef(true);
   const unmountRef = useRef<{ fired: Promise<"unmounted">; fire: () => void } | null>(null);
-  useEffect(() => {
-    mountedRef.current = true;
+  // Created by whichever effect runs first (the send's effect reads it too), so it never depends on effect order.
+  const unmountSignal = () => {
     if (!unmountRef.current) {
       let fire = () => {};
       const fired = new Promise<"unmounted">((resolve) => { fire = () => resolve("unmounted"); });
       unmountRef.current = { fired, fire };
     }
+    return unmountRef.current;
+  };
+  useEffect(() => {
+    mountedRef.current = true;
+    unmountSignal();
     return () => {
       mountedRef.current = false;
       queueMicrotask(() => { if (!mountedRef.current) unmountRef.current?.fire(); });
@@ -184,7 +189,7 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
     // it. So the reservation is held and the backend asked until the run has ended.
     // "Can't tell" is not "idle": after RUN_CHECK_ATTEMPTS failed checks in a row the
     // message is held rather than sent.
-    const unmounted = unmountRef.current!.fired;
+    const unmounted = unmountSignal().fired;
     const waitForIdleRun = async (): Promise<"idle" | "unmounted" | "unknown"> => {
       let failures = 0;
       for (;;) {

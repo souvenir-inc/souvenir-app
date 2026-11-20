@@ -8,7 +8,7 @@
 import React, { act, useEffect } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { SEND_ACCEPT_WAIT_MS, useStreamingChat } from '@/hooks/use-streaming-chat'
+import { useStreamingChat } from '@/hooks/use-streaming-chat'
 import { detachStream, isStreamActive } from '@/lib/stream-registry'
 import { queueMessage, queuedChatsReadyForBackground, takeAllQueuedMessages } from '@/lib/message-queue'
 import { resetStreamStore } from '@/lib/chat/stream-store'
@@ -198,30 +198,6 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(reply('reply-B')).toMatchObject({ content: 'From B.', isLoading: false })
   })
 
-  it('drops a send the backend never answers once the follow has waited SEND_ACCEPT_WAIT_MS', async () => {
-    const doneA = hook.fetchAiResponse('hello', 'chat-A', 'reply-A')
-    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
-    const send = FakeXHR.all[0]
-    send.start() // connected, but no RUN_STARTED ever arrives
-
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
-    const doneB = hook.followStream('chat-B', 'reply-B')
-    await act(async () => { await vi.advanceTimersByTimeAsync(SEND_ACCEPT_WAIT_MS - 100) })
-    expect(FakeXHR.all).toHaveLength(1)
-    await act(async () => { await vi.advanceTimersByTimeAsync(200) })
-    vi.useRealTimers()
-
-    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
-    expect(send.aborted).toBe(true)
-    send.end()
-    await act(async () => { await doneA })
-    const xhrB = FakeXHR.all[1]
-    xhrB.start()
-    xhrB.push({ type: 'RUN_STARTED', ...runB }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'b', delta: 'From B.' }, { type: 'RUN_FINISHED', ...runB })
-    xhrB.end()
-    expect(await doneB).toBe('done')
-  })
-
   it("keeps a follow's states off a new, unsaved chat's view; that view's own send still shows them", async () => {
     const states: string[] = []
     const view: View = { currentChatIdRef: { current: undefined }, setStreamState: (state) => { states.push(state) } }
@@ -273,19 +249,17 @@ describe('useStreamingChat with overlapping follows', () => {
 
     // After its retry wait, A's recovery follow takes the hook: A has handed off, so B goes
     // now — dropping that follow — instead of waiting for the whole recovery to finish.
-    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(3), { timeout: 4000 })
-    const recovery = FakeXHR.all[1]
-    const xhrB = FakeXHR.all[2]
-    expect(recovery.url).toContain('chat-A')
-    expect(recovery.aborted).toBe(true)
+    // The follow is dropped before its request goes out, so it never opens one.
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 4000 })
+    const xhrB = FakeXHR.all[1]
     expect(xhrB.url).toContain('chat-B')
 
     xhrB.start()
     xhrB.push({ type: 'RUN_STARTED', ...runB }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'b', delta: 'From B.' }, { type: 'RUN_FINISHED', ...runB })
     xhrB.end()
     expect(await doneB).toBe('done')
-    recovery.end()
     await act(async () => { await doneA })
+    expect(FakeXHR.all).toHaveLength(2)
     expect(reply('reply-B')).toMatchObject({ content: 'From B.', isLoading: false })
   }, 10000)
 
