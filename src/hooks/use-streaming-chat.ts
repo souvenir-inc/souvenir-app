@@ -13,7 +13,7 @@ import { logger } from "@/lib/logger"
 import { friendlyModelError } from "@/lib/model-error"
 import { AguiSSEDecoder } from "@/lib/sse-decoder"
 import type { UIMessage } from "@/types/chat"
-import { registerStream, completeStream, type StreamOutcome } from "@/lib/stream-registry"
+import { registerStream, completeStream, isStreamActive, type StreamOutcome } from "@/lib/stream-registry"
 import { updateMessage } from "@/lib/chat/stream/message-patches"
 import {
   AuthExpiredError,
@@ -559,6 +559,9 @@ export function useStreamingChat({
           // Taken over during the wait: the newer call reset stopRequestedRef, so that
           // alone would let this one start a second follow into the newer call's reply.
           if (detached) return "done"
+          // Another reader holds the chat now (its own view following it, from another hook):
+          // that one reads the turn, and this retry must not take over its registry entry.
+          if (isStreamActive(liveChatId)) return "done"
           // Stopped during the wait: Stop has already settled the reply as stopped, and this
           // turn ends that way too, not as the error that led to the wait.
           if (stopRequestedRef.current) return "aborted"
@@ -637,8 +640,10 @@ export function useStreamingChat({
     // The reply and the message it answers were made before the chat had an id: they get
     // it now, so what hangs off them (a prompt's answer) knows which chat it belongs to.
     const ownIds = new Set([loadingMessageIdRef.current, userMessageIdRef.current])
-    setMessages((prev) => prev.some((m) => ownIds.has(m.id) && !m.chat_id)
-      ? prev.map((m) => (ownIds.has(m.id) && !m.chat_id ? { ...m, chat_id: chatId } : m))
+    // A `temp-` chat id is a stand-in too: it is replaced the same way.
+    const needsId = (m: UIMessage) => ownIds.has(m.id) && (!m.chat_id || m.chat_id.startsWith("temp-"))
+    setMessages((prev) => prev.some(needsId)
+      ? prev.map((m) => (needsId(m) ? { ...m, chat_id: chatId } : m))
       : prev)
     registerStream(chatId, activeStopRef.current ?? undefined)
     onChatCreated?.(chatId)

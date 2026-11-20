@@ -10,6 +10,7 @@ const getChatRunState = vi.hoisted(() => vi.fn())
 vi.mock('@/lib/api/chat', () => ({ getChatRunState }))
 import { FOLLOW_REFUSED_ATTEMPTS, FOLLOW_REFUSED_BACKOFF_MS, RUN_ENDED_POLL_MS, useFollowRunningReply } from './use-follow-running-reply'
 import type { UIMessage } from '@/types/chat'
+import type { StreamOutcome } from '@/lib/stream-registry'
 import { completeStream, registerStream } from '@/lib/stream-registry'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
@@ -20,9 +21,9 @@ const onRunEnded = vi.fn()
 let root: Root
 let container: HTMLDivElement
 // Each follow is refused (it never reaches the stream) unless a test says otherwise.
-const followStream = vi.fn(async (_chatId: string, _id: string, _prior?: unknown, onRefused?: () => void) => {
+const followStream = vi.fn(async (_chatId: string, _id: string, _prior?: unknown, onRefused?: () => void): Promise<StreamOutcome> => {
   onRefused?.()
-  return 'done' as const
+  return 'done'
 })
 
 let reset: (chatId: string) => void
@@ -125,7 +126,7 @@ describe('useFollowRunningReply', () => {
     followStream.mockImplementationOnce(async () => {
       registerStream('chat-A')
       completeStream('chat-A', 'error')
-      return 'error' as const
+      return 'error'
     })
     await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
     await act(async () => { await vi.advanceTimersByTimeAsync(0) })

@@ -25,7 +25,10 @@ import type { UIMessage } from "@/types/chat";
 interface BackgroundSend {
   chatId:  string;
   message: QueuedMessage;
+  /** One per reservation: a message handed back and taken again gets a fresh worker. */
+  key:     number;
 }
+let nextSendKey = 0;
 
 /**
  * Sends the next queued message of a chat that isn't on screen once the reply it
@@ -64,7 +67,7 @@ export function MessageQueueRunner() {
             // Reserved now, ahead of the request: the chat counts as busy (one
             // message per reply), and opening it meanwhile waits for this reply.
             registerStream(chatId);
-            setSends((prev) => [...prev, { chatId, message }]);
+            setSends((prev) => [...prev, { chatId, message, key: ++nextSendKey }]);
           }
         } while (again);
       } finally {
@@ -91,7 +94,7 @@ export function MessageQueueRunner() {
     <>
       {sends.map((send) => (
         <BackgroundSendTurn
-          key={send.message.id}
+          key={send.key}
           send={send}
           onDone={() => setSends((prev) => prev.filter((s) => s !== send))}
         />

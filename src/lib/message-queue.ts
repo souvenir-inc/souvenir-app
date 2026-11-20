@@ -173,6 +173,9 @@ export function queueMessage(
 
 /** Removes and returns the message due next — whoever takes it sends it. */
 export function takeNextQueuedMessage(key: string): QueuedMessage | undefined {
+  // Its front message is on its way back (a hand-over): nothing goes out ahead of it, from
+  // the background or from the chat itself.
+  if (handingOver.has(key)) return undefined
   const queue = queues.get(key)
   const next = queue?.messages[0]
   if (!queue || !next) return undefined
