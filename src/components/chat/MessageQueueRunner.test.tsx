@@ -174,6 +174,22 @@ describe('MessageQueueRunner', () => {
     await act(async () => finishSend('done'))
   })
 
+  it('keeps the next message from overtaking a handed-over one while it is on its way back', async () => {
+    getChatRunState.mockResolvedValue('running')
+    await queueBehindReply('first', 'second')
+    await act(async () => completeStream('chat-1', 'done'))
+    // The chat opens and hands the first message back, then is left again at once.
+    await act(async () => {
+      setQueueForeground(view, 'chat-1')
+      expect(detachStream('chat-1')).toBe(true)
+      setQueueForeground(view, null)
+    })
+    expect(fetchAiResponse).not.toHaveBeenCalled() // the second did not go out in the gap
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 10)) })
+    // Back at the front, so the background takes the first again: the second still waits.
+    expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['second'])
+  })
+
   it('does not hand over a message once it is being sent', async () => {
     await queueBehindReply('first')
     await act(async () => completeStream('chat-1', 'done'))

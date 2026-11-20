@@ -258,6 +258,21 @@ export function setQueueForeground(token: symbol, key: string | null): void {
   notify()
 }
 
+// Chats whose front message is on its way back to the queue (a background send handed it
+// over to the chat as it opened): none of their messages goes out in the background until
+// it is back, or the next one would overtake it.
+const handingOver = new Set<string>()
+
+/** `key`'s front message is being handed back: its queue waits for it. */
+export function beginHandOver(key: string): void {
+  handingOver.add(key)
+}
+
+/** The handed-back message is in place (restore it first): the queue goes on as usual. */
+export function endHandOver(key: string): void {
+  if (handingOver.delete(key)) notify()
+}
+
 export function isQueueForeground(key: string): boolean {
   for (const k of foreground.values()) if (k === key) return true
   return false
@@ -270,7 +285,7 @@ export function isQueueForeground(key: string): boolean {
 export function queuedChatsReadyForBackground(): string[] {
   const ready: string[] = []
   for (const [key, queue] of queues) {
-    if (queue.heldBy || isNewChatQueueKey(key) || isQueueForeground(key) || isStreamActive(key)) continue
+    if (queue.heldBy || isNewChatQueueKey(key) || isQueueForeground(key) || isStreamActive(key) || handingOver.has(key)) continue
     ready.push(key)
   }
   return ready

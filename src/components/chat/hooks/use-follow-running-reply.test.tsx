@@ -153,7 +153,21 @@ describe('useFollowRunningReply', () => {
     expect(onRunEnded).not.toHaveBeenCalled() // still running
     await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS) })
     expect(onRunEnded).toHaveBeenCalledTimes(1)
+    // That reload failed: the history still names the reply. The next check reloads again.
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS) })
+    expect(onRunEnded).toHaveBeenCalledTimes(2)
+    // A reload succeeds and shows nothing running: the checks stop.
+    await render({ chatId: 'chat-A', runningMessageId: null, historyLoadId: load + 1 })
     await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS * 3) })
-    expect(onRunEnded).toHaveBeenCalledTimes(1)
+    expect(onRunEnded).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not reload over a stream that has started in the chat', async () => {
+    const load = await spendBudget('r1')
+    getChatRunState.mockResolvedValue('idle')
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: load })
+    await act(async () => { registerStream('chat-A') }) // a send is under way
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS * 2) })
+    expect(onRunEnded).not.toHaveBeenCalled()
   })
 })

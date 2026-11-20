@@ -285,9 +285,9 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 
-// Add to plugins:
+// The full plugin lists with math added (keep everything from the basic setup):
 remarkPlugins={[remarkGfm, remarkMath]}
-rehypePlugins={[sanitize, rehypeKatex]} // `sanitize` as in the basic setup (footnote-safe)
+rehypePlugins={[sanitize, rehypeKatex, rehypeHighlight]} // `sanitize` as in the basic setup (footnote-safe)
 ```
 
 ---

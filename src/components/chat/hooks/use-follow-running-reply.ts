@@ -86,12 +86,13 @@ export function useFollowRunningReply({
     if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS) {
       // Out of attempts, the reply may still end on the backend with nothing here to see it.
       // Ask until it has (a lookup that fails is "can't tell": keep waiting), then reload.
+      // The asking goes on until a reload shows no running reply (this effect then ends):
+      // a reload that fails is tried again at the next check. Not while a stream for the chat
+      // is going (a send just made): a reload then would drop its turn from the list.
       let stopped = false
       const poll = setInterval(() => {
         void getChatRunState(chatId).then((state) => {
-          if (stopped || state !== "idle") return
-          stopped = true
-          clearInterval(poll)
+          if (stopped || state !== "idle" || isStreamActive(chatId)) return
           runEnded()
         }, () => {})
       }, RUN_ENDED_POLL_MS)
