@@ -120,7 +120,9 @@ export function useFollowRunningReply({
     const wait = FOLLOW_REFUSED_BACKOFF_MS * tally.refused
     // Once this effect's follow is under way, a start for the chat is that follow's own
     // stream, not a newer run: it neither cancels anything nor earns a restart.
-    let followed = false
+    // This effect's own follow, while it is going: its stream's start and end are its own and
+    // are ignored. Once it has ended (a refusal, say), other streams' ends count again.
+    let ownFollowGoing = false
     // At most one recovery waiting at a time (cleared by the cleanup, and by a newer stream).
     let deferredFollow: ReturnType<typeof setTimeout> | undefined
     // The next attempt, within the budget (else back to asking whether the run ended).
@@ -133,7 +135,7 @@ export function useFollowRunningReply({
       }, delay)
     }
     const follow = () => {
-      followed = true
+      ownFollowGoing = true
       // stillWanted: if this follow has to wait its turn, it goes ahead only while this effect
       // (this chat, this running reply) is still the current one.
       void followLatest(chatId, runningMessageId, currentReply(runningMessageId), () => {
@@ -142,7 +144,7 @@ export function useFollowRunningReply({
         // cleanup cancels this). If it fails, nothing would: so the next attempt is scheduled
         // here too, backing off as usual.
         recoverAfter(FOLLOW_REFUSED_BACKOFF_MS * tally.refused)
-      }, () => !stopped)
+      }, () => !stopped).then(() => { ownFollowGoing = false }, () => { ownFollowGoing = false })
     }
     // Nothing is scheduled while a stream from before the load owns the chat, or with the
     // budget spent; the timer is still made (and cleared by the cleanup) either way.
@@ -162,7 +164,7 @@ export function useFollowRunningReply({
     let superseded = activeAtLoad
     const unsubscribe = subscribeStreams((event) => {
       if (event.chatId !== chatId) return
-      if (followed) return
+      if (ownFollowGoing) return
       if (event.type === "start") {
         clearTimeout(timer)
         clearTimeout(deferredFollow) // a newer stream owns the chat; if it fails, its end schedules again

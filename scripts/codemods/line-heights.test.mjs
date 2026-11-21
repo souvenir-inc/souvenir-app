@@ -126,3 +126,17 @@ describe("type bodies", () => {
     expect(tsx("const s = { lineHeight: 1.5, }")).toContain("lineHeight: 'var(--leading-normal)'");
   });
 });
+
+describe("quoted keys", () => {
+  it("pairs with a quoted fontSize key", async () => {
+    const { setSnap } = await import("./line-heights.mjs");
+    setSnap(true);
+    try {
+      const src = `const s = { "fontSize": "var(--font-size-small)", lineHeight: "18px" }`;
+      expect(tsx(src)).toContain("lineHeight: 'var(--line-height-small)'");
+      expect(tsx(`const s = { fontSize: 'var(--font-size-small)', lineHeight: '18px' }`)).toContain("lineHeight: 'var(--line-height-small)'");
+    } finally {
+      setSnap(false);
+    }
+  });
+});

@@ -309,4 +309,16 @@ describe('useFollowRunningReply', () => {
     expect(onRunEnded).not.toHaveBeenCalled()
     expect(followStream).toHaveBeenCalledTimes(1)
   })
+
+  it('resumes recovery when a send that interrupted the retry after a refusal fails', async () => {
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) }) // refused; its reload fails
+    expect(followStream).toHaveBeenCalledTimes(1)
+    await act(async () => { registerStream('chat-A') }) // a send is going when the retry comes due
+    await act(async () => { await vi.advanceTimersByTimeAsync(FOLLOW_REFUSED_BACKOFF_MS) })
+    expect(followStream).toHaveBeenCalledTimes(1) // the retry stood aside for it
+    await act(async () => { completeStream('chat-A', 'error', { inconclusive: true }) }) // the send fails before its run
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    expect(followStream).toHaveBeenCalledTimes(2) // recovery resumed
+  })
 })

@@ -162,7 +162,8 @@ export function applyPromptDecision(messages: UIMessage[], messageId: string, re
   const holdsCard = (msg: UIMessage) => hasPrompt(msg.connectorConnectPrompts) || hasPrompt(msg.connectorPermissionPrompts) || hasPrompt(msg.chatPrompts)
   // The card's own message: by its id, or (after the id swap) the one message holding that
   // request id. Never every message that does: another may hold a card with the same id.
-  const owner = messages.find((msg) => msg.id === messageId && holdsCard(msg)) ?? messages.find(holdsCard)
+  // `reactKey` keeps the id a reply had before the swap, so it still names the card's message.
+  const owner = messages.find((msg) => (msg.id === messageId || msg.reactKey === messageId) && holdsCard(msg)) ?? messages.find(holdsCard)
   return messages.map((msg) =>
     msg === owner
       ? {

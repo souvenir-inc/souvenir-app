@@ -54,6 +54,8 @@ export interface StreamRequestOptions {
   /** For a follow that may wait its turn: asked once the wait is over, before it takes the
    *  hook. False (the reply is no longer the one to follow) and it stands down unstarted. */
   stillWanted?: () => boolean
+  /** The user stopped this call (or a reconnect of it): passed up to whoever owns its turn. */
+  onStopped?: () => void
   /** A follow that never reached the turn's stream: "gone" (the turn has ended) or "failed".
    *  Per call, so one call's result can't be read as another's. */
   onFollowResult?: (result: "gone" | "failed") => void

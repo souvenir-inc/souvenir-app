@@ -31,6 +31,10 @@ interface ConnectPromptCardProps {
   onAnswered?:  () => void
 }
 
+// Prompts whose answer is on its way to the backend. Module-level: it outlives a card that
+// leaves the virtual list and remounts, which would otherwise send the answer twice.
+const answersInFlight = new Set<string>()
+
 export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectPromptCardProps) {
   const [state,        setState]        = useState<'idle' | 'connecting' | 'polling' | 'error'>('idle')
   const [decided,      setDecided]      = useState(false)
@@ -59,12 +63,16 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
   // "cancel" is "not now" for this one ask: the next request that needs the app asks again.
   const answer = useCallback(async (decision: ConnectDecision) => {
     if (answeredRef.current || abortedRef.current || respondingRef.current) return
+    // Kept outside the card: a card that left the screen and came back mid-answer is a new
+    // instance with empty refs, and must not send the same answer again.
+    if (answersInFlight.has(prompt.request_id)) return
     if (decision === 'cancel') declinedRef.current = true
     else if (declinedRef.current) return
     // The answer is only "given" once the backend has it. Marking it beforehand and
     // swallowing the failure left the run waiting for a reply that never came, with
     // this guard refusing every retry; so the flag is set after the POST resolves.
     respondingRef.current = true
+    answersInFlight.add(prompt.request_id)
     setResponding(true)
     // The outcome as a value rather than try/catch/finally: React Compiler cannot
     // compile a `finally`, and leaves the whole component unoptimised when it meets one.
@@ -73,6 +81,7 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
       (err: unknown) => (err instanceof Error ? err : new Error('Could not tell the chat your answer.')),
     )
     respondingRef.current = false
+    answersInFlight.delete(prompt.request_id)
     setResponding(false)
     if (failure) {
       if (abortedRef.current) return
@@ -90,7 +99,7 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
     onDecided?.(decision)
     onAnswered?.()
     if (!abortedRef.current) setDecided(true)
-  }, [prompt.respond_url, prompt.connector.name, onDecided, onAnswered])
+  }, [prompt.respond_url, prompt.request_id, prompt.connector.name, onDecided, onAnswered])
   const finish = useCallback(() => answer('connected'), [answer])
 
   // The app may already be connected (from Connectors, or another tab) by the time this card shows.

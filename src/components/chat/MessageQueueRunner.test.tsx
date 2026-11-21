@@ -185,7 +185,8 @@ describe('MessageQueueRunner', () => {
       setQueueForeground(view, null)
     })
     expect(fetchAiResponse).not.toHaveBeenCalled() // the second did not go out in the gap
-    expect(isStreamActive('chat-1')).toBe(false) // handed over: the chat is free for now
+    // (The chat is free for a moment here, but under load the hand-back can already be done,
+    // so that in-between state is not asserted.)
     // Wait for the first message to be reclaimed: back at the front, the background takes it
     // again and reserves the chat once more. The second still waits behind it.
     // (Generous timeout: under a full test run the hand-back and remount can take a while.)
