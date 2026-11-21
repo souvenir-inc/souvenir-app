@@ -491,7 +491,10 @@ export function useStreamingChat({
           // chat whose first reply is still running as idle.
           onHeaderChatId: (headerChatId) => {
             if (detached) return
-            if (!chatId || chatId.startsWith("temp-")) adoptChatId(headerChatId)
+            if (!chatId || chatId.startsWith("temp-")) {
+              adoptChatId(headerChatId)
+              myChatId = resolvedChatIdRef.current
+            }
           },
           isStopRequested: () => stopRequestedRef.current || detached,
           onFollowAttached: () => {
@@ -509,7 +512,13 @@ export function useStreamingChat({
                   ? keepPromptDecisions(
                       prior
                         ? { ...prior, isLoading: true }
-                        : { id: msg.id, reactKey: msg.reactKey, role: msg.role, created_at: msg.created_at, chat_id: msg.chat_id, content: "", isLoading: true },
+                        : {
+                            id: msg.id, reactKey: msg.reactKey, role: msg.role, created_at: msg.created_at, chat_id: msg.chat_id, content: "", isLoading: true,
+                            // The cards stay (with their answers): only the text is taken back.
+                            connectorConnectPrompts: msg.connectorConnectPrompts,
+                            connectorPermissionPrompts: msg.connectorPermissionPrompts,
+                            chatPrompts: msg.chatPrompts,
+                          },
                       msg,
                     )
                   : msg,

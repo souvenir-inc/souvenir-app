@@ -44,7 +44,8 @@ class FakeXHR {
   url = ''
   open(_method: string, url: string) { this.url = url }
   setRequestHeader() {}
-  getResponseHeader() { return null }
+  headers: Record<string, string> = {}
+  getResponseHeader(name: string) { return this.headers[name] ?? null }
   abort() { this.aborted = true }
   send() { FakeXHR.all.push(this) }
   start() {
@@ -645,4 +646,33 @@ describe('useStreamingChat with overlapping follows', () => {
       completeStream('chat-B')
     }
   }, 10000)
+
+  it("finishes a new chat's composer when its id came only from the response header", async () => {
+    const states: string[] = []
+    const view: View = { currentChatIdRef: { current: undefined }, setStreamState: (state) => { states.push(state) } }
+    act(() => root.render(<Harness view={view} onReady={(api) => { hook = api }} />))
+    const done = hook.fetchAiResponse('hi', null, 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const send = FakeXHR.all[0]
+    send.headers['X-Chat-Id'] = 'chat-H'
+    send.start() // the header names the new chat
+    view.currentChatIdRef.current = 'chat-H' // and the view moves to it
+    send.end() // ended with no event carrying the id
+    await act(async () => { await done })
+    expect(states.at(-1)).toBe('done')
+  })
+
+  it('keeps prompt cards and their answers when a follow without a prior attaches', async () => {
+    messages = [{ id: 'reply-A', role: 'assistant', content: 'old', created_at: '', chat_id: 'chat-A', isLoading: true,
+      chatPrompts: [{ request_id: 'p1', card: 'chat', decision: 'yes' } as never] }]
+    const done = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const xhr = FakeXHR.all[0]
+    xhr.start() // attaches without a prior: the text is reset
+    expect(messages[0].content).toBe('')
+    expect(messages[0].chatPrompts?.[0]).toMatchObject({ request_id: 'p1', decision: 'yes' })
+    xhr.push({ type: 'RUN_STARTED', ...runA }, { type: 'RUN_FINISHED', ...runA })
+    xhr.end()
+    await act(async () => { await done })
+  })
 })
