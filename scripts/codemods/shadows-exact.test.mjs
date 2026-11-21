@@ -114,3 +114,13 @@ describe("identifiers", () => {
     expect(transformTsx(`const s = {\n  boxShadow: '${shadow}',\n}`, { n: 0 })).toMatch(/boxShadow: 'var\(--shadow-/);
   });
 });
+
+describe("transformCss", () => {
+  it("converts box-shadow but not a custom property whose name ends in it", async () => {
+    const { transformCss } = await import("./shadows-exact.mjs");
+    const shadow = "0px 2px 2.8px rgba(82,75,71,0.12)";
+    const custom = `.icon { --icon-box-shadow: ${shadow}; filter: drop-shadow(var(--icon-box-shadow)); }`;
+    expect(transformCss(custom, { n: 0 })).toBe(custom);
+    expect(transformCss(`.card { box-shadow: ${shadow}; }`, { n: 0 })).toMatch(/box-shadow: var\(--shadow-/);
+  });
+});

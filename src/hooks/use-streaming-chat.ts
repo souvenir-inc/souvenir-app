@@ -341,6 +341,9 @@ export function useStreamingChat({
     let myReplyId: string | null = loadingMessageId
     userMessageIdRef.current = options?.userMessageId ?? null
     resolvedChatIdRef.current = chatId
+    // This call's own chat id, as with its reply id: the ref is the hook's, and after a wait
+    // it may hold another call's chat, whose composer this call must not publish to.
+    let myChatId: string | null = chatId
     // The refs above belong to whichever call ran last, so stopping through
     // the registry is a no-op once a newer call has taken over this hook.
     const stopThisCall = () => {
@@ -385,7 +388,7 @@ export function useStreamingChat({
 
     // Returns true if this stream's chat is still the one the user is viewing.
     // Used to suppress setStreamState calls for background (unfocused) streams.
-    const isActiveStream = () => showsChat(resolvedChatIdRef.current, sentFromNewChat)
+    const isActiveStream = () => showsChat(myChatId, sentFromNewChat)
 
     // Like every other state change here: only for the chat being shown. A call that
     // waited for another to hand over may belong to a chat the user has since left.
@@ -401,7 +404,7 @@ export function useStreamingChat({
       setMessageId: (id) => { myReplyId = id; loadingMessageIdRef.current = id },
       userMessageId: () => userMessageIdRef.current,
       chatId: () => resolvedChatIdRef.current,
-      adoptChatId: (id) => adoptChatId(id),
+      adoptChatId: (id) => { adoptChatId(id); myChatId = resolvedChatIdRef.current },
       onRunStarted: () => {
         // The backend has the turn: dropping this connection now loses nothing.
         runStarted = true
