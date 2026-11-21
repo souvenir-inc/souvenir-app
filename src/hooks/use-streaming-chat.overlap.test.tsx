@@ -15,11 +15,17 @@ vi.mock('@/lib/config', async (orig) => {
   const actual = await orig<typeof import('@/lib/config')>()
   return { ...actual, shouldUseDirectBackend: () => token.direct || actual.shouldUseDirectBackend() }
 })
+// Whether the backend still runs a chat's turn (a dropped call asks): running, unless a test says.
+const runState = vi.hoisted(() => ({ get: (_chatId: string): Promise<'running' | 'idle'> => Promise.resolve('running') }))
+vi.mock('@/lib/api/chat', async (orig) => ({
+  ...(await orig<typeof import('@/lib/api/chat')>()),
+  getChatRunState: (chatId: string) => runState.get(chatId),
+}))
 vi.mock('@/lib/jwt-utils', async (orig) => {
   const actual = await orig<typeof import('@/lib/jwt-utils')>()
   return { ...actual, ensureFreshToken: () => token.gate ?? actual.ensureFreshToken() }
 })
-import { useStreamingChat } from '@/hooks/use-streaming-chat'
+import { DROPPED_RUN_POLL_MS, useStreamingChat } from '@/hooks/use-streaming-chat'
 import { completeStream, detachStream, isStreamActive, registerStream, subscribeStreams } from '@/lib/stream-registry'
 import { getChatQueue, queueMessage, queuedChatsReadyForBackground, takeAllQueuedMessages } from '@/lib/message-queue'
 import { resetStreamStore } from '@/lib/chat/stream-store'
@@ -99,8 +105,13 @@ beforeEach(() => {
   act(() => root.render(<Harness onReady={(api) => { hook = api }} />))
 })
 
+// Every chat and queue the tests use, cleared whatever a test left behind (a failed
+// assertion included), so no test's busy-state check can pass on another's entry.
+const FIXTURE_CHATS = ['chat-A', 'chat-B', 'chat-C', 'chat-N', 'chat-T', 'chat-H', 'temp-1']
 afterEach(() => {
   act(() => root.unmount())
+  for (const id of FIXTURE_CHATS) { completeStream(id); takeAllQueuedMessages(id) }
+  runState.get = () => Promise.resolve('running')
   resetStreamStore()
   vi.unstubAllGlobals()
   vi.restoreAllMocks()
@@ -674,5 +685,72 @@ describe('useStreamingChat with overlapping follows', () => {
     xhr.push({ type: 'RUN_STARTED', ...runA }, { type: 'RUN_FINISHED', ...runA })
     xhr.end()
     await act(async () => { await done })
+  })
+
+  it("does not let a send keep the detach of the follow it replaced", async () => {
+    const doneA = hook.followStream('chat-A', 'reply-A') // a follow: droppable, with a detach
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    const send = hook.fetchAiResponse('hi', 'chat-A', 'reply-B') // a send takes over before its run starts
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+    expect(detachStream('chat-A')).toBe(false) // reopening waits for the send, as for any unstarted send
+    expect(isStreamActive('chat-A')).toBe(true)
+    const xhr = FakeXHR.all[1]
+    xhr.start()
+    xhr.push({ type: 'RUN_STARTED', ...runA }, { type: 'RUN_FINISHED', ...runA })
+    xhr.end()
+    FakeXHR.all[0].end() // the dropped follow's connection closes
+    await act(async () => { await send; await doneA })
+  })
+
+  it("commits a call's buffered text to its own reply when it is detached from outside (live overlay)", async () => {
+    act(() => root.render(<Harness liveOverlay onReady={(api) => { hook = api }} />))
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const xhrA = FakeXHR.all[0]
+    xhrA.start()
+    xhrA.push({ type: 'RUN_STARTED', ...runA }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'From A.' })
+    xhrA.push({ type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: ' Still A.' }) // buffered, uncommitted
+    // The chat reopens: A is detached from outside, not by a takeover.
+    expect(detachStream('chat-A')).toBe(true)
+    xhrA.end()
+    await act(async () => { await doneA })
+    // Another call then has the hook, and its turn ends with no text at all.
+    const doneB = hook.followStream('chat-B', 'reply-B')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+    const xhrB = FakeXHR.all[1]
+    xhrB.start()
+    xhrB.push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+    xhrB.end()
+    await act(async () => { await doneB })
+    expect(JSON.stringify(reply('reply-B'))).not.toContain('Still A.')
+    expect(reply('reply-A').content).toContain('Still A.')
+  })
+
+  it("frees a dropped chat once its run ends, so its queue can go on", async () => {
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
+    try {
+      const doneA = hook.followStream('chat-A', 'reply-A')
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+      FakeXHR.all[0].start()
+      FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+      const doneB = hook.followStream('chat-B', 'reply-B') // B takes the hook: A is dropped, still busy
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+      expect(isStreamActive('chat-A')).toBe(true)
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS) })
+      expect(isStreamActive('chat-A')).toBe(true) // still running on the backend
+      runState.get = () => Promise.resolve('idle')
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS) })
+      expect(isStreamActive('chat-A')).toBe(false) // its run ended: the chat is free
+      FakeXHR.all[0].end()
+      const xhrB = FakeXHR.all[1]
+      xhrB.start()
+      xhrB.push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+      xhrB.end()
+      await act(async () => { await doneA; await doneB })
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

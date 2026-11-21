@@ -560,7 +560,8 @@ export async function deleteMessage(messageId: string): Promise<void> {
 export async function getChatStreamId(chatId: string): Promise<string | null> {
   const response = await apiFetch(CHAT_ENDPOINT(chatId));
   if (!response.ok) return null;
-  const chat = (await response.json()) as { streamId?: string | null };
+  // GET /chats/{id} always sends streamId, null when idle (checked live 2026-11-20); see getChatRunState.
+  const chat = (await response.json()) as { streamId: string | null };
   return chat.streamId ?? null;
 }
 

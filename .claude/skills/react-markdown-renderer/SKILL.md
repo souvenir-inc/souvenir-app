@@ -39,6 +39,7 @@ npm install shiki
 ## Basic Setup (non-streaming)
 
 ```tsx
+import { useId } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
@@ -46,17 +47,21 @@ import rehypeSanitize, { defaultSchema, type Options as SanitizeOptions } from '
 import 'highlight.js/styles/github-dark.css'; // or any hljs theme
 import { markdownComponents } from './markdownComponents'; // the custom components below
 
-// remark-gfm already prefixes footnote ids with `user-content-`; sanitize's default would
+// Footnote ids already carry a prefix (the per-message one below); sanitize's default would
 // prefix them again, so footnote links point at ids that don't exist. Raw HTML isn't
 // rendered (no rehype-raw), so markdown-made ids are the only ones and keep their prefix.
 // Typed as a mutable tuple: `as const` makes it readonly, which rehypePlugins rejects.
 // Only for setups without rehype-raw — see Security Notes.
 export const sanitize: [typeof rehypeSanitize, SanitizeOptions] = [rehypeSanitize, { ...defaultSchema, clobberPrefix: '' }];
 
+// Each message gets its own footnote prefix: with the shared default, two messages that
+// both use [^1] render the same ids, and a link in one jumps to the other's footnote.
 export function MessageRenderer({ content }: { content: string }) {
+  const footnotePrefix = `fn${useId().replace(/:/g, '')}-`;
   return (
     <Markdown
       remarkPlugins={[remarkGfm]}
+      remarkRehypeOptions={{ clobberPrefix: footnotePrefix }}
       rehypePlugins={[sanitize, rehypeHighlight]}
       components={markdownComponents}
     >
@@ -309,7 +314,7 @@ Shiki gives VS Code-quality highlighting but adds ~200KB. Use it when quality ma
 
 ```tsx
 import { isValidElement, type ReactNode } from 'react';
-import { codeToHtml } from 'shiki';
+import { bundledLanguages, codeToHtml } from 'shiki';
 
 // The `pre` renderer, not `code`: react-markdown gives `pre` the fenced block's <code>
 // element, and Shiki returns its own <pre>, so replacing `pre` avoids a <pre> inside a
@@ -317,7 +322,10 @@ import { codeToHtml } from 'shiki';
 // (Shiki escapes the code it highlights; its HTML is not the user's markup.)
 const ShikiPre = async ({ children }: { children?: ReactNode }) => {
   const code = isValidElement<{ className?: string; children?: ReactNode }>(children) ? children : null;
-  const lang = code?.props.className?.replace('language-', '') ?? 'text';
+  // A fence in a language Shiki doesn't know would make codeToHtml reject (and the message
+  // fail to render): those fall back to plain text.
+  const requested = code?.props.className?.replace('language-', '') ?? 'text';
+  const lang = requested in bundledLanguages ? requested : 'text';
   const html = await codeToHtml(String(code?.props.children ?? '').replace(/\n$/, ''), {
     lang,
     theme: 'github-dark',

@@ -2,7 +2,8 @@
 
 import React from 'react'
 import { cn } from '@/lib/utils'
-import { Meter, meterToneFor } from '@/components/ui/meter'
+import { Meter } from '@/components/ui/meter'
+import { meterToneFor } from '@/components/ui/meter-tone'
 
 export type TokenBudgetBarSize = 'sm' | 'lg'
 

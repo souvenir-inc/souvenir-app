@@ -13,7 +13,8 @@ import { logger } from "@/lib/logger"
 import { friendlyModelError } from "@/lib/model-error"
 import { AguiSSEDecoder } from "@/lib/sse-decoder"
 import type { UIMessage } from "@/types/chat"
-import { registerStream, completeStream, isStreamActive, type StreamOutcome } from "@/lib/stream-registry"
+import { registerStream, completeStream, isStreamActive, isStreamOwnedBy, setStreamDetach, type StreamOutcome } from "@/lib/stream-registry"
+import { getChatRunState } from "@/lib/api/chat"
 import { getChatQueue, releaseErrorHold } from "@/lib/message-queue"
 import { updateMessage } from "@/lib/chat/stream/message-patches"
 import {
@@ -40,6 +41,8 @@ export type { TurnResume } from "@/lib/chat/stream/stream-request"
 /** How many times one turn re-attaches to its stream, and the pause before each. */
 const FOLLOW_ATTEMPTS = 5
 const FOLLOW_RETRY_MS = 1000
+// How often a dropped call asks whether its chat's run has ended, to free the chat.
+export const DROPPED_RUN_POLL_MS = 5000
 
 /** `next` with the prompt-card answers already recorded on `current` (the same reply). */
 function keepPromptDecisions(next: UIMessage, current: UIMessage): UIMessage {
@@ -159,8 +162,9 @@ export function useStreamingChat({
   // the transport refs and the flush buffer are one set shared by every call, so
   // two overlapping streams — chat A's recovery still reading while chat B's starts —
   // would have the first finish onto the second's reply. A new call therefore takes
-  // the hook over: it drops the old one through the stream registry (the connection
-  // closes, the entry goes, and the old chat follows its turn afresh when shown) —
+  // the hook over: it drops the old one (the connection closes, but the registry entry
+  // stays, so the old chat still counts as busy and its queue waits; reopening the chat
+  // clears the entry and follows its turn afresh, as does the end of its run) —
   // but never a send the backend has not yet accepted, which it waits for instead,
   // the same rule detachStream keeps: a turn whose run has not started is not dropped.
   const activeCallRef = useRef<{
@@ -354,13 +358,38 @@ export function useStreamingChat({
     // connection is dropped and it leaves the reply and the registry alone.
     let detached = false
     let callXhr: XMLHttpRequest | null = null
+    // A dropped call's registry entry stays, so the chat counts as busy while its run goes on.
+    // Nothing reads that run any more, so nothing would end the entry when the run ends: this
+    // asks until it has, then ends it — if the entry is still this call's (reopening the chat,
+    // or another reader, takes it over first). Its queue then goes on.
+    const releaseWhenRunEnds = () => {
+      const id = myChatId
+      if (!id || id.startsWith("temp-")) return
+      const poll = setInterval(() => {
+        if (!isStreamOwnedBy(id, stopThisCall)) { clearInterval(poll); return }
+        void getChatRunState(id).then((state) => {
+          if (state !== "idle" || !isStreamOwnedBy(id, stopThisCall)) return
+          clearInterval(poll)
+          completeStream(id, "done")
+        }, () => {})
+      }, DROPPED_RUN_POLL_MS)
+    }
     const detachThisCall = () => {
+      // Detached from outside (the chat reopened) while it still holds the hook: what it
+      // has buffered goes to its own reply now, or the next call would write it into its own.
+      if (!detached && activeCallRef.current === thisCall) {
+        stopFlushInterval()
+        flushPending()
+      }
       detached = true
       callXhr?.abort()
     }
     // A follow only reads a run that is already going, so it can be dropped from the
     // start; a send registers its detach once its run has started (onRunStarted).
     registerStream(chatId, stopThisCall, follow ? detachThisCall : undefined)
+    // A send takes the entry over from whatever had it (a follow it replaced, say) and must
+    // not keep that one's detach: until its run starts, reopening the chat waits for it.
+    if (!follow && chatId) setStreamDetach(chatId, undefined)
     let runStarted = false
     let markSettled = () => {}
     const thisCall = {
@@ -371,7 +400,10 @@ export function useStreamingChat({
       // on the backend, so the chat must keep looking busy, or its message queue would send
       // the next message into that run. Reopening the chat clears the entry
       // (use-chat-state's detachStream) and follows the run afresh.
-      drop: () => detachThisCall(),
+      drop: () => {
+        detachThisCall()
+        releaseWhenRunEnds()
+      },
     }
     // A retry of a dropped call is that call's recovery follow taking the hook over: the
     // call it replaces has handed off, so anyone waiting on it can stop waiting now
