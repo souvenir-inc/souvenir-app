@@ -599,13 +599,16 @@ describe('useStreamingChat with overlapping follows', () => {
     await act(async () => { await done })
   })
 
-  it("finishes a failed reconnect on its own reply, not on a newer call's", async () => {
-    let started = false
+  it("finishes a failed reconnect on its own reply and composer, not on a newer call's", async () => {
+    const states: string[] = []
+    const view: View = { currentChatIdRef: { current: 'chat-A' }, setStreamState: (state) => { states.push(state) } }
+    act(() => root.render(<Harness view={view} onReady={(api) => { hook = api }} />))
+    let doneB: Promise<unknown> | undefined
     const unsubscribe = subscribeStreams((event) => {
-      // As the refused reconnect ends, another chat's follow takes the hook.
-      if (event.type === 'end' && event.chatId === 'chat-A' && FakeXHR.all.length === 2 && !started) {
-        started = true
-        void hook.followStream('chat-B', 'reply-B')
+      // As the refused reconnect ends, the user is on chat B, whose follow takes the hook.
+      if (event.type === 'end' && event.chatId === 'chat-A' && FakeXHR.all.length === 2 && !doneB) {
+        view.currentChatIdRef.current = 'chat-B'
+        doneB = hook.followStream('chat-B', 'reply-B')
       }
     })
     try {
@@ -622,8 +625,21 @@ describe('useStreamingChat with overlapping follows', () => {
       retry.responseText = '{"detail":"boom"}'
       retry.end()
       await act(async () => { await done })
-      expect(reply('reply-B').errorNotice ?? reply('reply-B').error).toBeFalsy()
+      // B's follow really started, and took nothing of A's failure.
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(3))
+      expect(FakeXHR.all[2].url).toContain('chat-B')
+      expect(reply('reply-A').errorNotice).toBeTruthy()
+      expect(reply('reply-B').errorNotice).toBeFalsy()
       expect(reply('reply-B').isLoading).toBe(true)
+      const afterSwitch = states.slice(states.lastIndexOf('waiting'))
+      expect(afterSwitch).not.toContain('error')
+      // And B runs to its end.
+      const xhrB = FakeXHR.all[2]
+      xhrB.start()
+      xhrB.push({ type: 'RUN_STARTED', ...runB }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'b', delta: 'From B.' }, { type: 'RUN_FINISHED', ...runB })
+      xhrB.end()
+      expect(await doneB).toBe('done')
+      expect(reply('reply-B')).toMatchObject({ content: 'From B.', isLoading: false })
     } finally {
       unsubscribe()
       completeStream('chat-B')

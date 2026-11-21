@@ -159,7 +159,9 @@ export const transformTsx = (src, c) => {
 };
 export const transformCss = (src, c) => {
   const masked = codeMask(src, { css: true });
-  return src.replace(/(box-shadow\s*:\s*)([^;{}]+);/g,
+  // The whole property name: `--icon-box-shadow` is a custom property (it may feed a
+  // drop-shadow(), which takes fewer lengths than a box-shadow token has).
+  return src.replace(/(?<![\w-])(box-shadow\s*:\s*)([^;{}]+);/g,
     (w, pre, v, off) => masked[off] || keep(src, off) ? w : `${pre}${transformValue(v.trim(), c)};`);
 };
 
