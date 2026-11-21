@@ -25,6 +25,7 @@ describe('SheetContent stacking', () => {
     const overlay = document.querySelector('[data-testid="sheet-overlay"]') as HTMLElement
     const content = document.querySelector('[role="dialog"]') as HTMLElement
     expect(content.style.zIndex).toBe('10')
-    expect(overlay.style.zIndex).toBe('calc(9)')
+    // The overlay is one under the sheet, however the style layer spells it (calc kept or worked out).
+    expect(['calc(9)', '9', 'calc(10 - 1)']).toContain(overlay.style.zIndex)
   })
 })

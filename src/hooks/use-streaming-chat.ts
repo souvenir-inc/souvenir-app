@@ -13,7 +13,7 @@ import { logger } from "@/lib/logger"
 import { friendlyModelError } from "@/lib/model-error"
 import { AguiSSEDecoder } from "@/lib/sse-decoder"
 import type { UIMessage } from "@/types/chat"
-import { registerStream, completeStream, isStreamActive, isStreamOwnedBy, setStreamDetach, type StreamOutcome } from "@/lib/stream-registry"
+import { registerStream, completeStream, isStreamActive, isStreamOwnedBy, setStreamDetach, subscribeStreams, type StreamOutcome } from "@/lib/stream-registry"
 import { getChatRunState } from "@/lib/api/chat"
 import { getChatQueue, releaseErrorHold } from "@/lib/message-queue"
 import { updateMessage } from "@/lib/chat/stream/message-patches"
@@ -632,7 +632,18 @@ export function useStreamingChat({
           if (detached) return "done"
           // Another reader holds the chat now (its own view following it, from another hook):
           // that one reads the turn, and this retry must not take over its registry entry.
-          if (isStreamActive(liveChatId)) return "done"
+          // If that reader reads the turn to its end, the drop's hold (set above, not one
+          // that was already there) goes; if it fails, the hold stays.
+          if (isStreamActive(liveChatId)) {
+            if (!heldBefore) {
+              const stopWatching = subscribeStreams((event) => {
+                if (event.type !== "end" || event.chatId !== liveChatId) return
+                stopWatching()
+                if (event.outcome === "done") releaseErrorHold(liveChatId)
+              })
+            }
+            return "done"
+          }
           // Stopped during the wait: Stop has already settled the reply as stopped, and this
           // turn ends that way too, not as the error that led to the wait.
           if (stopRequestedRef.current) return "aborted"
