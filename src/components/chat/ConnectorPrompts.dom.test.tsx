@@ -181,6 +181,23 @@ describe('ConnectPromptCard "Not now"', () => {
     await act(async () => { release(); await Promise.resolve() })
   })
 
+  it('tells the view it is on when an answer it took over goes through', async () => {
+    let release!: () => void
+    respondToChatPrompt.mockImplementationOnce(() => new Promise<void>((resolve) => { release = resolve }))
+    const leftView = vi.fn()
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} onAnswered={leftView} />)) // answers on mount
+    await flush()
+    await act(async () => root.unmount()) // the row leaves mid-answer…
+    root = createRoot(container)
+    const shownView = vi.fn()
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} onAnswered={shownView} />)) // …and comes back
+    await flush()
+    await act(async () => { release(); await Promise.resolve() })
+    await flush()
+    expect(shownView).toHaveBeenCalledOnce() // the view on screen refreshes
+    expect(respondToChatPrompt).toHaveBeenCalledTimes(1)
+  })
+
   it('shows a failed answer, with Try again, on the card that remounted while it was being sent', async () => {
     let fail!: (e: Error) => void
     respondToChatPrompt.mockImplementationOnce(() => new Promise<void>((_, reject) => { fail = reject }))

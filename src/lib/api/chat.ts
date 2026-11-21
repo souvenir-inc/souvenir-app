@@ -360,7 +360,7 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
         // the single ID for the AI response.
         id: baseId,
         role: "assistant",
-        ...splitPersistedAnswer(aiText ?? "", raw.reasoning ?? raw.thinking_content),
+        ...splitPersistedAnswer(aiText ?? "", raw.reasoning ?? raw.thinking_content, run?.status === "stopped"),
         created_at: createdAt,
         chat_id: chatId,
         steps: parseSteps(raw.steps),
@@ -406,11 +406,12 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
     ? (raw.image_links.filter((u): u is string => typeof u === "string" && u.length > 0))
     : undefined;
 
+  const run = role === "assistant" ? parseRun(raw.run) : undefined;
   return [{
     id: baseId,
     role,
     ...(role === "assistant"
-      ? splitPersistedAnswer(content, raw.reasoning ?? raw.thinking_content)
+      ? splitPersistedAnswer(content, raw.reasoning ?? raw.thinking_content, run?.status === "stopped")
       : { content, thinking: raw.reasoning ?? raw.thinking_content ?? undefined }),
     created_at: createdAt,
     chat_id: chatId,
@@ -421,7 +422,7 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
     file_attachments: fileAttachments.length > 0 ? fileAttachments : undefined,
     image_links: imageLinks && imageLinks.length > 0 ? imageLinks : undefined,
     // As in the paired format: a stopped turn's run is what marks it "Generation stopped".
-    ...(role === "assistant" ? { run: parseRun(raw.run) } : {}),
+    ...(role === "assistant" ? { run } : {}),
   }];
 }
 
@@ -433,12 +434,15 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
 function splitPersistedAnswer(
   text: string,
   persistedThinking: string | null | undefined,
+  // Stopped by the person: an unfinished answer is what Stop leaves, not a failure, and the
+  // turn already says "Generation stopped".
+  stopped = false,
 ): Pick<Message, "content" | "thinking" | "errorNotice"> {
   const { visibleText, thinkingText, thinkingOpen } = extractThinkingContent(text);
   return {
     content: visibleText,
     thinking: persistedThinking || thinkingText || undefined,
-    errorNotice: thinkingOpen ? INCOMPLETE_ANSWER_MESSAGE : undefined,
+    errorNotice: thinkingOpen && !stopped ? INCOMPLETE_ANSWER_MESSAGE : undefined,
   };
 }
 

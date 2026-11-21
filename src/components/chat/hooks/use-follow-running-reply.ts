@@ -25,6 +25,7 @@ type FollowStream = (
   onRefused?: () => void,
   stillWanted?: () => boolean,
   onRunGone?: () => void,
+  onIncomplete?: () => void,
 ) => Promise<StreamOutcome>
 
 /**
@@ -84,6 +85,10 @@ export function useFollowRunningReply({
   // also clears the running reply, so the follow effect below no longer runs for it: if the
   // reload fails, this keeps asking until a history load lands (or the chat changes).
   const reloadPendingRef = useRef(false)
+  // Which visit to a chat this is (opening a chat starts a new one): a late result from an
+  // earlier visit must not mark a reload pending for the chat now open.
+  const visitRef = useRef(0)
+  useEffect(() => { visitRef.current += 1 }, [chatId])
   useEffect(() => { reloadPendingRef.current = false }, [historyLoadId])
   useEffect(() => {
     // Not while a stream for the chat is going (a send made since): a reload then could drop
@@ -149,21 +154,24 @@ export function useFollowRunningReply({
         else follow()
       }, delay)
     }
+    const visit = visitRef.current
     const follow = () => {
       ownFollowGoing = true
+      // Refused, or read only in part (the stream closed with no end event): the next attempt,
+      // backing off, within the same budget.
+      const tryAgain = () => {
+        if (tally.key === key) tally.refused += 1
+        recoverAfter(FOLLOW_REFUSED_BACKOFF_MS * tally.refused)
+      }
       // stillWanted: if this follow has to wait its turn, it goes ahead only while this effect
       // (this chat, this running reply) is still the current one.
-      void followLatest(chatId, runningMessageId, currentReply(runningMessageId), () => {
-        if (tally.key === key) tally.refused += 1
-        // Refused: the history reload that follows reruns this effect if it succeeds (its
-        // cleanup cancels this). If it fails, nothing would: so the next attempt is scheduled
-        // here too, backing off as usual.
-        recoverAfter(FOLLOW_REFUSED_BACKOFF_MS * tally.refused)
-      }, () => !stopped, () => {
+      // Refused: the history reload that follows reruns this effect if it succeeds (its cleanup
+      // cancels this). If it fails, nothing would: so the next attempt is scheduled here too.
+      void followLatest(chatId, runningMessageId, currentReply(runningMessageId), tryAgain, () => !stopped, () => {
         // Attached, dropped, and the reconnect found the run over: its history reload may
-        // fail, so it is asked for again until a history load lands.
-        reloadPendingRef.current = true
-      }).then(() => { ownFollowGoing = false }, () => { ownFollowGoing = false })
+        // fail, so it is asked for again until a history load lands. Only for this visit.
+        if (visitRef.current === visit) reloadPendingRef.current = true
+      }, () => { if (!stopped) tryAgain() }).then(() => { ownFollowGoing = false }, () => { ownFollowGoing = false })
     }
     // Nothing is scheduled while a stream from before the load owns the chat, or with the
     // budget spent; the timer is still made (and cleared by the cleanup) either way.

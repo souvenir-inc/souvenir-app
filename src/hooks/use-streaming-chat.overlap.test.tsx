@@ -1170,6 +1170,25 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(ends).toEqual([{ outcome: 'error', inconclusive: true }])
   })
 
+  it("tells the follow's caller when its stream closes with no end event, not when the run finished", async () => {
+    const incomplete = vi.fn()
+    const first = hook.followStream('chat-A', 'reply-A', undefined, undefined, undefined, undefined, incomplete)
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'Part.' })
+    FakeXHR.all[0].end() // closed, no end event
+    await act(async () => { await first })
+    expect(incomplete).toHaveBeenCalledOnce()
+    const finished = vi.fn()
+    const second = hook.followStream('chat-B', 'reply-B', undefined, undefined, undefined, undefined, finished)
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+    FakeXHR.all[1].start()
+    FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runB }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'b', delta: 'All.' }, { type: 'RUN_FINISHED', ...runB })
+    FakeXHR.all[1].end()
+    await act(async () => { await second })
+    expect(finished).not.toHaveBeenCalled()
+  })
+
   it('records a run that finished as a conclusive end', async () => {
     const ends: { outcome: string; inconclusive?: boolean }[] = []
     const off = subscribeStreams((e) => { if (e.type === 'end' && e.chatId === 'chat-A') ends.push({ outcome: e.outcome, inconclusive: e.inconclusive }) })

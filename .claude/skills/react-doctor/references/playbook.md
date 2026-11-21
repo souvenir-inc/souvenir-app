@@ -160,7 +160,7 @@ Leave changes unstaged. Summarize:
 
 ### PR mode
 
-Use one isolated worktree per file-disjoint bucket. Include machine-readable ownership, bucket, base-SHA, and diagnostic-manifest markers in each PR body. Carry a prior PR forward only when its open state, exact head, base SHA, ownership marker, bucket marker, and diagnostic manifest match.
+Use one isolated worktree per file-disjoint bucket, each started from the verified base SHA (never from the scanned branch head, which already carries the whole branch's commits). Before pushing a bucket branch, require its committed diff against the verified base SHA (`git diff --name-only <base-sha>..<bucket-branch>`) to match that bucket's diagnostic and collateral manifest; stop on any unexplained file. Include machine-readable ownership, bucket, base-SHA, and diagnostic-manifest markers in each PR body. Carry a prior PR forward only when its open state, exact head, base SHA, ownership marker, bucket marker, and diagnostic manifest match.
 
 Create missing labels without `--force`; never overwrite an existing label's metadata. Mutate only PRs and issues carrying this workflow's ownership marker. If multiple owned tracking issues exist, report the conflict.
 
