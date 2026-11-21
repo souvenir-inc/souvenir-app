@@ -899,4 +899,40 @@ describe('useStreamingChat with overlapping follows', () => {
       vi.useRealTimers()
     }
   }, 10000)
+
+  it("leaves a newer failure's hold alone when the older drop's run ends", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const xhr = FakeXHR.all[0]
+    xhr.start()
+    xhr.push({ type: 'RUN_STARTED', ...runA })
+    xhr.status = 0
+    xhr.end() // dropped: hold #1
+    await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
+    try {
+      const doneB = hook.followStream('chat-B', 'reply-B') // the reconnect is taken over: it waits for the run's end
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+      await doneA
+      // Meanwhile the user queues again (hold #1 lifted) and a newer reply fails: hold #2.
+      takeAllQueuedMessages('chat-A')
+      queueMessage('chat-A', { content: 'later', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+      registerStream('chat-A')
+      completeStream('chat-A', 'error')
+      expect(getChatQueue('chat-A')?.heldBy).toBe('error')
+      runState.get = (id) => Promise.resolve(id === 'chat-A' ? 'idle' : 'running')
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS * 2) })
+      expect(getChatQueue('chat-A')?.heldBy).toBe('error') // hold #2 stays
+      FakeXHR.all[1].start()
+      FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+      FakeXHR.all[1].end()
+      await act(async () => { await doneB })
+    } finally {
+      vi.useRealTimers()
+    }
+  }, 10000)
 })

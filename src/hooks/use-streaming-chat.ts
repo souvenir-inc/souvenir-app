@@ -15,7 +15,7 @@ import { AguiSSEDecoder } from "@/lib/sse-decoder"
 import type { UIMessage } from "@/types/chat"
 import { registerStream, completeStream, isStreamActive, isStreamOwnedBy, setStreamDetach, subscribeStreams, type StreamOutcome } from "@/lib/stream-registry"
 import { getChatRunState } from "@/lib/api/chat"
-import { getChatQueue, releaseErrorHold } from "@/lib/message-queue"
+import { currentHoldId, getChatQueue, releaseErrorHold } from "@/lib/message-queue"
 import { updateMessage } from "@/lib/chat/stream/message-patches"
 import {
   AuthExpiredError,
@@ -343,6 +343,8 @@ export function useStreamingChat({
     // This call's own reply id. The ref is the hook's, and another call can take it over
     // while this one waits; finishing this call must still reach this call's reply.
     let myReplyId: string | null = loadingMessageId
+    // The queue hold this call's drop set, if any (see the catch below).
+    let dropHoldId: number | undefined
     userMessageIdRef.current = options?.userMessageId ?? null
     resolvedChatIdRef.current = chatId
     // This call's own chat id, as with its reply id: the ref is the hook's, and after a wait
@@ -368,13 +370,17 @@ export function useStreamingChat({
     // Once the backend says the chat's run has ended, lifts the error hold this call's drop
     // set on its queue (one that was already there stays). For a reconnect that was taken
     // over during its wait: nothing else would ever lift that hold.
+    // Only the hold this drop set (its id): if the user queued again (lifting it) or a newer
+    // failure set another, the lookup stops and leaves that one alone.
     const releaseHoldWhenRunEnds = (id: string) => {
-      if (!runStateReadable) return
+      if (!runStateReadable || dropHoldId === undefined) return
+      const holdId = dropHoldId
       const poll = setInterval(() => {
+        if (currentHoldId(id) !== holdId) { clearInterval(poll); return }
         void getChatRunState(id).then((state) => {
           if (state !== "idle") return
           clearInterval(poll)
-          releaseErrorHold(id)
+          releaseErrorHold(id, holdId)
         }, () => {})
       }, DROPPED_RUN_POLL_MS)
     }
@@ -612,6 +618,8 @@ export function useStreamingChat({
         // if a reconnect below reads the turn to its end, one that was already there is not.
         const heldBefore = !!getChatQueue(resolvedChatIdRef.current)?.heldBy
         completeStream(resolvedChatIdRef.current, stopRequestedRef.current ? "aborted" : follow && !attached ? "done" : "error")
+        // The hold this end just set (if it set one): what a later recovery may lift.
+        dropHoldId = heldBefore ? undefined : currentHoldId(resolvedChatIdRef.current)
         // A turn that failed or was stopped part-way may still have saved its files.
         if (options?.files?.length) notifyLibraryFilesChanged()
 
@@ -680,7 +688,7 @@ export function useStreamingChat({
           })
           if (result === "attached") {
             // Recovered: the drop that held the queue was not a failure after all.
-            if (outcome === "done" && !heldBefore) releaseErrorHold(liveChatId)
+            if (outcome === "done" && !heldBefore) releaseErrorHold(liveChatId, dropHoldId)
             return outcome
           }
           if (result === "gone") {
@@ -691,7 +699,7 @@ export function useStreamingChat({
             onStreamDone?.()
             // The turn ended on the backend: the drop was no failure, so its hold goes (after
             // the reload above has started, which the queue waits on).
-            if (!heldBefore) releaseErrorHold(liveChatId)
+            if (!heldBefore) releaseErrorHold(liveChatId, dropHoldId)
             return "done"
           }
         }
