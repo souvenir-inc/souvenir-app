@@ -214,7 +214,8 @@ function matchBrace(s, i, masked) {
 export function transformTsx(source, counter) {
   const masked = codeMask(source);
   const starts = [];
-  for (const m of source.matchAll(/style=\{\{/g)) if (!masked[m.index]) starts.push(m.index + "style={".length);
+  // The whole attribute name: `tickstyle={{…}}` is some other prop, typed by its component.
+  for (const m of source.matchAll(/(?<![\w$-])style=\{\{/g)) if (!masked[m.index]) starts.push(m.index + "style={".length);
   for (const m of source.matchAll(/:\s*(?:React\.)?CSSProperties\s*=\s*\{/g)) if (!masked[m.index]) starts.push(m.index + m[0].length - 1);
   // Identifier-aware on both sides: `$` continues a name, so \b alone let CSSProperties$Config match.
   for (const m of source.matchAll(/(?<![\w$.])as (?:React\.)?CSSProperties(?![\w$])/g)) {
@@ -249,13 +250,15 @@ export function transformTsx(source, counter) {
 
 export function transformCss(source, counter) {
   const masked = codeMask(source, { css: true });
-  return source.replace(/(^|[;{\s])([a-z-]+)(\s*:\s*)([^;{}]+)(;)/g, (whole, pre, prop, sep, val, semi, offset) => {
-    if (prop.startsWith("--") || masked[offset + pre.length]) return whole;
+  // The boundary before a declaration and its closing `;` are looked at, not consumed: in
+  // `.a{color:red;padding:16px;}` the `;` that ends one declaration is where the next begins.
+  return source.replace(/(?<=^|[;{\s])([a-z-]+)(\s*:\s*)([^;{}]+)(?=;)/g, (whole, prop, sep, val, offset) => {
+    if (prop.startsWith("--") || masked[offset]) return whole;
     const important = /\s*!important\s*$/.test(val) ? " !important" : "";
     const next = replaceValue(prop, val.replace(/\s*!important\s*$/, ""));
     if (!next) return whole;
     counter.n++;
-    return `${pre}${prop}${sep}${next}${important}${semi}`;
+    return `${prop}${sep}${next}${important}`;
   });
 }
 

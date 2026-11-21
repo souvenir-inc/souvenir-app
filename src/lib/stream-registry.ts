@@ -92,6 +92,11 @@ export function completeStream(chatId: string | null, outcome: StreamOutcome = "
 
 /** Stops the active stream for `chatId`, wherever it was started. Returns
  *  false when there is none, or it can't be stopped from here. */
+/** Whether `chatId`'s entry still belongs to the stream `stop` was registered for. */
+export function isStreamOwnedBy(chatId: string, stop: () => void): boolean {
+  return registry.get(chatId)?.stop === stop
+}
+
 export function stopStream(chatId: string): boolean {
   const stop = registry.get(chatId)?.stop
   if (!stop) return false

@@ -509,6 +509,9 @@ const PROJECT_OVERRIDES = [
   ['--popover-bg', 'var(--color-surface-default)'],
   ['--modal-bg', 'var(--color-surface-default)'],
   ['--card-bg', 'var(--color-surface-default)'],
+  // Dialogs and sheets (--shadow-4): the light value in scales.css is a fixed literal, so dark
+  // sets its own, built on the dark popover shadow and ring as it was before.
+  ['--shadow-4', 'var(--shadow-popover), 0px 16px 32px -8px rgba(38, 33, 30, 0.18)'],
   // Layout / card hairline border (AppLayout content card, agent cards): the original dark-grey value.
   ['--border-default', 'var(--neutral-200)'],
   ['--toast-bg', DARK_SURFACE_HEX],
