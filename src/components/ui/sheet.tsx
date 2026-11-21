@@ -34,15 +34,15 @@ export interface SheetContentProps extends React.ComponentPropsWithoutRef<typeof
   title?: string
   /** Scrim colour behind the sheet. */
   overlayColor?: string
-  /** z-index of the sheet; the overlay sits one below. */
-  zIndex?: number
+  /** z-index of the sheet (a token by default); the overlay sits one below. */
+  zIndex?: number | string
 }
 
 export function SheetContent({
   side = 'left',
   title,
   overlayColor = 'rgba(0, 0, 0, 0.32)',
-  zIndex = 50,
+  zIndex = 'var(--z-modal)',
   style,
   children,
   onInteractOutside,
@@ -50,15 +50,18 @@ export function SheetContent({
   ...props
 }: SheetContentProps) {
   const { capture, handleCloseAutoFocus } = useFocusReturn(onCloseAutoFocus)
+  // One stacking value for both layers: a zIndex given through `style` wins on the sheet,
+  // so the overlay sits just under that, not under the default.
+  const contentZIndex = style?.zIndex ?? zIndex
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay
         data-testid="sheet-overlay"
-        style={{ position: 'fixed', inset: 0, zIndex: zIndex - 1, backgroundColor: overlayColor }}
+        style={{ position: 'fixed', inset: 0, zIndex: `calc(${contentZIndex} - 1)`, backgroundColor: overlayColor }}
       />
       <DialogPrimitive.Content
         aria-describedby={undefined}
-        style={{ position: 'fixed', zIndex, outline: 'none', ...SIDE_STYLE[side], ...style }}
+        style={{ position: 'fixed', outline: 'none', ...SIDE_STYLE[side], ...style, zIndex: contentZIndex }}
         // A click on a toast (its Undo, say) isn't a click outside: the sheet stays open.
         onInteractOutside={(event) => {
           if (event.target instanceof Element && event.target.closest('[data-sonner-toaster]')) event.preventDefault()

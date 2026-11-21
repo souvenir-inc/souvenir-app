@@ -71,11 +71,11 @@ const sectionItemVariants = {
 // happens once, atomically, rather than assembling section by section.
 function SettingsNavSkeleton() {
   const section = (labelWidth: number, rows: number) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <div style={{ padding: '5px 6px' }}>
-        <div className="kaya-skeleton" style={{ width: labelWidth, height: 14, borderRadius: 4 }} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+      <div style={{ padding: 'var(--space-1) var(--space-1-5)' }}>
+        <div className="kaya-skeleton" style={{ width: labelWidth, height: 14, borderRadius: 'var(--radius-xs)' }} />
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
         {Array.from({ length: rows }).map((_, i) => (
           <SidebarMenuSkeleton key={i} index={i} fluid showIcon />
         ))}
@@ -85,9 +85,9 @@ function SettingsNavSkeleton() {
   return (
     <>
       {section(64, 2)}
-      <Divider decorative style={{ margin: '8px 0' }} />
+      <Divider decorative style={{ margin: 'var(--space-2) 0' }} />
       {section(90, 3)}
-      <Divider decorative style={{ margin: '8px 0' }} />
+      <Divider decorative style={{ margin: 'var(--space-2) 0' }} />
       {section(120, 3)}
     </>
   )
@@ -277,7 +277,7 @@ export function SettingsSidebar() {
     {/* Narrow screens: a 48px rail with a menu button; the full nav opens as an
         overlay drawer (same pattern as the app LeftSidebar). */}
     {isNarrow && (
-      <div style={{ width: 48, flexShrink: 0, height: '100%', backgroundColor: 'var(--neutral-50)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, paddingTop: 24 }}>
+      <div style={{ width: 48, flexShrink: 0, height: '100%', backgroundColor: 'var(--neutral-50)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-1)', paddingTop: 'var(--space-6)' }}>
         <IconButton variant="ghost" size="sm" aria-label="Go back" icon={<ArrowLeftOneIcon size={20} />} onClick={() => safeNavigate(CHAT_ROUTE)} />
         <IconButton variant="ghost" size="sm" aria-label="Open settings menu" aria-haspopup="dialog" aria-expanded={drawerOpen} icon={<SidebarLeftIcon size={20} variant="open" />} onClick={() => setDrawerOpen(true)} />
       </div>
@@ -300,9 +300,9 @@ export function SettingsSidebar() {
       <div style={{
         flexShrink:  0,
         display:     'flex',
-        gap:         4,
+        gap:         'var(--space-1)',
         alignItems:  'center',
-        padding:     '24px 16px 8px',
+        padding:     'var(--space-6) var(--space-4) var(--space-2)',
       }}>
         <IconButton
           variant="ghost"
@@ -313,9 +313,9 @@ export function SettingsSidebar() {
         />
         <p style={{
           fontFamily:   'var(--font-title)',
-          fontWeight:   400,
-          fontSize:     24,
-          lineHeight:   '32px',
+          fontWeight:   'var(--font-weight-regular)',
+          fontSize:     'var(--font-size-heading)',
+          lineHeight:   'var(--line-height-heading)',
           color:        'var(--neutral-900)',
           overflow:     'hidden',
           textOverflow: 'ellipsis',
@@ -338,24 +338,24 @@ export function SettingsSidebar() {
           minHeight:     0,
           overflowY:     'auto',
           overflowX:     'hidden',
-          paddingTop:    8,
-          paddingBottom: 16,
+          paddingTop:    'var(--space-2)',
+          paddingBottom: 'var(--space-4)',
         }}
       >
         {/* Horizontal padding lives on this inner wrapper, not the scrolling
             element above — keeps the scrollbar flush with the sidebar's edge. */}
-        <div style={{ display: 'flex', flexDirection: 'column', padding: '0 16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', padding: '0 var(--space-4)' }}>
 
         {!orgReady ? <SettingsNavSkeleton /> : (
         <>
         {/* PERSONAL — node 18:27786 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <div style={{ padding: '5px 6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+          <div style={{ padding: 'var(--space-1) var(--space-1-5)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)' }}>
             <p style={{
               fontFamily: 'var(--font-body)',
-              fontWeight: 500,
-              fontSize:   14,
-              lineHeight: '22px',
+              fontWeight: 'var(--font-weight-medium)',
+              fontSize:   'var(--font-size-body)',
+              lineHeight: 'var(--line-height-body)',
               color:      'var(--neutral-600)',
               margin:     0,
               whiteSpace: 'nowrap',
@@ -367,7 +367,7 @@ export function SettingsSidebar() {
             animate="open"
             initial="closed"
             variants={sectionStaggerVariants}
-            style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
+            style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}
           >
             {PERSONAL_ITEMS.map(item => (
               <m.div key={item.id} variants={sectionItemVariants}>
@@ -384,18 +384,18 @@ export function SettingsSidebar() {
           </m.div>
         </div>
 
-        <Divider decorative style={{ margin: '8px 0' }} />
+        <Divider decorative style={{ margin: 'var(--space-2) 0' }} />
 
         {/* WORKSPACE — node 18:27793 (admin only; former /org/* admin pages) */}
         {orgId && orgRole === 'admin' && (
           <>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <div style={{ padding: '5px 6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+            <div style={{ padding: 'var(--space-1) var(--space-1-5)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)' }}>
               <p style={{
                 fontFamily: 'var(--font-body)',
-                fontWeight: 500,
-                fontSize:   14,
-                lineHeight: '22px',
+                fontWeight: 'var(--font-weight-medium)',
+                fontSize:   'var(--font-size-body)',
+                lineHeight: 'var(--line-height-body)',
                 color:      'var(--neutral-600)',
                 margin:     0,
                 whiteSpace: 'nowrap',
@@ -408,7 +408,7 @@ export function SettingsSidebar() {
               animate="open"
               initial="closed"
               variants={sectionStaggerVariants}
-              style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
+              style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}
             >
               {WORKSPACE_ITEMS.map(item => (
                 <m.div key={item.id} variants={sectionItemVariants}>
@@ -426,18 +426,18 @@ export function SettingsSidebar() {
             </m.div>
           </div>
 
-          <Divider decorative style={{ margin: '8px 0' }} />
+          <Divider decorative style={{ margin: 'var(--space-2) 0' }} />
           </>
         )}
 
         {/* HELP & SUPPORT — node 18:27804 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <div style={{ padding: '5px 6px', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+          <div style={{ padding: 'var(--space-1) var(--space-1-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
             <p style={{
               fontFamily: 'var(--font-body)',
-              fontWeight: 500,
-              fontSize:   14,
-              lineHeight: '22px',
+              fontWeight: 'var(--font-weight-medium)',
+              fontSize:   'var(--font-size-body)',
+              lineHeight: 'var(--line-height-body)',
               color:      'var(--neutral-600)',
               margin:     0,
               whiteSpace: 'nowrap',
@@ -449,7 +449,7 @@ export function SettingsSidebar() {
             animate="open"
             initial="closed"
             variants={sectionStaggerVariants}
-            style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
+            style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}
           >
             {HELP_ITEMS.map(item => (
               <m.div key={item.id} variants={sectionItemVariants}>
@@ -483,7 +483,7 @@ export function SettingsSidebar() {
                 onClick={() => safeNavigate(SETTINGS_FEATURE_REQUEST_ROUTE)}
               />
             </m.div>
-            <Divider decorative style={{ margin: '4px 0' }} />
+            <Divider decorative style={{ margin: 'var(--space-1) 0' }} />
             <m.div variants={sectionItemVariants}>
               <SidebarMenuItem
                 fluid
@@ -508,18 +508,18 @@ export function SettingsSidebar() {
       <div style={{
         flexShrink:      0,
         backgroundColor: 'var(--neutral-50)',
-        paddingLeft:     10,
-        paddingRight:    10,
-        paddingTop:      12,
-        paddingBottom:   12,
+        paddingLeft:     'var(--space-2-5)',
+        paddingRight:    'var(--space-2-5)',
+        paddingTop:      'var(--space-3)',
+        paddingBottom:   'var(--space-3)',
         boxShadow:       '0px -34px 33.5px 0px var(--neutral-50)',
       }}>
         {!user ? (
-          <div style={{ padding: '8px 6px', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div className="kaya-skeleton" style={{ width: 36, height: 36, borderRadius: 8, flexShrink: 0 }} />
-            <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 5 }}>
-              <div className="kaya-skeleton" style={{ height: 14, width: '60%', borderRadius: 4 }} />
-              <div className="kaya-skeleton" style={{ height: 11, width: '42%', borderRadius: 4 }} />
+          <div style={{ padding: 'var(--space-2) var(--space-1-5)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            <div className="kaya-skeleton" style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)', flexShrink: 0 }} />
+            <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+              <div className="kaya-skeleton" style={{ height: 14, width: '60%', borderRadius: 'var(--radius-xs)' }} />
+              <div className="kaya-skeleton" style={{ height: 11, width: '42%', borderRadius: 'var(--radius-xs)' }} />
             </div>
           </div>
         ) : (

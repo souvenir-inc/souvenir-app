@@ -31,9 +31,9 @@ export interface ProjectMembersPanelProps {
 const ROW_CARD_STYLE: React.CSSProperties = {
   display:         'flex',
   alignItems:      'center',
-  gap:             12,
-  borderRadius:    16,
-  padding:         12,
+  gap:             'var(--space-3)',
+  borderRadius:    'var(--radius-2xl)',
+  padding:         'var(--space-3)',
   backgroundColor: 'var(--card-bg)',
   boxShadow:       '0px 2px 2.8px 0px var(--neutral-700-12), 0px 0px 0px 1px var(--neutral-100)',
 }
@@ -42,9 +42,9 @@ function MemberRowSkeleton() {
   return (
     <div aria-hidden style={ROW_CARD_STYLE}>
       <div className="kaya-skeleton" style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0 }} />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
-        <div className="kaya-skeleton" style={{ height: 14, width: '45%', borderRadius: 6 }} />
-        <div className="kaya-skeleton" style={{ height: 11, width: '65%', borderRadius: 6 }} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', flex: 1 }}>
+        <div className="kaya-skeleton" style={{ height: 14, width: '45%', borderRadius: 'var(--radius-sm)' }} />
+        <div className="kaya-skeleton" style={{ height: 11, width: '65%', borderRadius: 'var(--radius-sm)' }} />
       </div>
     </div>
   )
@@ -52,11 +52,11 @@ function MemberRowSkeleton() {
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '32px 16px', textAlign: 'center' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-7) var(--space-4)', textAlign: 'center' }}>
       <div
         aria-hidden
         style={{
-          width: 48, height: 48, borderRadius: 12,
+          width: 48, height: 48, borderRadius: 'var(--radius-xl)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           backgroundColor: 'var(--neutral-100)',
         }}
@@ -87,8 +87,8 @@ export function ProjectMembersPanel({ projectId, ownerUserId, canManage, onAddMe
       {/* Scrollable member list — same flush region + kaya-scrollbar treatment
           the sibling Agents panel uses for its own list. */}
       <div style={{ position: 'relative', flex: '1 1 0', minHeight: 0 }}>
-        <div className="kaya-scrollbar" style={{ position: 'absolute', inset: -3, overflowY: 'auto', overflowX: 'hidden', padding: 3 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div className="kaya-scrollbar" style={{ position: 'absolute', inset: -3, overflowY: 'auto', overflowX: 'hidden', padding: 'var(--space-0-5)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             {loading ? (
               Array.from({ length: 3 }).map((_, i) => <MemberRowSkeleton key={i} />)
             ) : members.length === 0 ? (
@@ -100,17 +100,17 @@ export function ProjectMembersPanel({ projectId, ownerUserId, canManage, onAddMe
                   <div key={m.userId} style={ROW_CARD_STYLE}>
                     <Avatar name={m.name || m.email || m.userId} size="sm" />
                     <div style={{ minWidth: 0, flex: '1 0 0' }}>
-                      <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {m.name ?? m.userId}
                       </p>
                       {m.email && (
-                        <p style={{ fontFamily: 'var(--font-body)', fontSize: 11, lineHeight: '16px', color: 'var(--neutral-500)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {m.email}
                         </p>
                       )}
                     </div>
                     {isOwner ? (
-                      <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--neutral-500)', flexShrink: 0 }}>Owner</span>
+                      <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-500)', flexShrink: 0 }}>Owner</span>
                     ) : canManage ? (
                       <Button
                         variant="danger"
@@ -132,7 +132,7 @@ export function ProjectMembersPanel({ projectId, ownerUserId, canManage, onAddMe
           instead of a separate inline picker here, so there's one add-member
           flow instead of two independently-maintained ones. */}
       {canManage && (
-        <div style={{ paddingTop: 12, flexShrink: 0 }}>
+        <div style={{ paddingTop: 'var(--space-3)', flexShrink: 0 }}>
           <Button variant="secondary" size="md" fluid leftIcon={<PlusSignIcon size={16} />} onClick={onAddMember}>
             Add member
           </Button>

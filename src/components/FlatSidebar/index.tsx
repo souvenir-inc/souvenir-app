@@ -28,7 +28,7 @@ function SouvenirWordmark() {
       style={{
         display: "flex",
         alignItems: "center",
-        gap: 8,
+        gap: 'var(--space-2)',
         flexShrink: 0,
       }}
     >
@@ -36,9 +36,9 @@ function SouvenirWordmark() {
       <span
         style={{
           fontFamily: "var(--font-title)",
-          fontSize: 24,
-          fontWeight: 400,
-          lineHeight: "24px",
+          fontSize: 'var(--font-size-heading)',
+          fontWeight: 'var(--font-weight-regular)',
+          lineHeight: "var(--line-height-heading-sm)",
           color: "var(--neutral-700)",
           whiteSpace: "nowrap",
         }}
@@ -188,7 +188,9 @@ export const FlatSidebar = React.forwardRef<HTMLDivElement, FlatSidebarProps>(
 
     return (
       <>
-      {overlay && <div aria-hidden data-testid="sidebar-scrim" onClick={closeDrawer} style={{ position: 'fixed', inset: 0, zIndex: 49, backgroundColor: 'rgba(0, 0, 0, 0.32)' }} />}
+      {/* The open drawer sits one step above its own scrim, so the scrim dims the page
+          behind it without covering (and swallowing taps on) the navigation. */}
+      {overlay && <div aria-hidden data-testid="sidebar-scrim" onClick={closeDrawer} style={{ position: 'fixed', inset: 0, zIndex: 'var(--z-overlay)', backgroundColor: 'rgba(0, 0, 0, 0.32)' }} />}
       <div
         ref={ref}
         role="navigation"
@@ -198,8 +200,8 @@ export const FlatSidebar = React.forwardRef<HTMLDivElement, FlatSidebarProps>(
           position: 'relative', display: 'flex', flexDirection: 'column',
           width: effectiveCollapsed || isNarrow ? '48px' : '294px', height: '100%',
           backgroundColor: 'var(--neutral-50)', overflowX: overlay ? 'visible' : 'hidden', flexShrink: 0, isolation: 'isolate',
-          zIndex: overlay ? 50 : undefined,
-          transition: 'width 320ms cubic-bezier(0.16, 1, 0.3, 1)',
+          zIndex: overlay ? 'calc(var(--z-overlay) + 1)' : undefined,
+          transition: 'width var(--duration-slow) cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
         {/* `inset: 0` exactly reproduces the root's box so every child's
@@ -209,10 +211,10 @@ export const FlatSidebar = React.forwardRef<HTMLDivElement, FlatSidebarProps>(
           ? { position: 'fixed', top: 0, bottom: 0, left: 0, width: '294px', backgroundColor: 'var(--neutral-50)', boxShadow: '4px 0 24px rgba(0, 0, 0, 0.16)' }
           : { position: 'absolute', inset: 0 }}>
         {/* ── Header ── */}
-        <div ref={headerRef} style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, backgroundColor: 'var(--neutral-50)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div ref={headerRef} style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 'var(--z-raised)', backgroundColor: 'var(--neutral-50)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: effectiveCollapsed ? 'center' : 'space-between', padding: effectiveCollapsed ? '19px 8px 8px' : '19px 8px 8px 16px' }}>
             {!effectiveCollapsed && <SouvenirWordmark />}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
               {!effectiveCollapsed && (
                 <Tooltip content="Search" side="right" delayDuration={300}>
                   <div>
@@ -244,7 +246,7 @@ export const FlatSidebar = React.forwardRef<HTMLDivElement, FlatSidebarProps>(
           </div>
           {effectiveCollapsed && (
             <Tooltip content="Search" side="right" delayDuration={300}>
-              <div style={{ display: 'flex', justifyContent: 'center', padding: '0 8px 4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '0 var(--space-2) var(--space-1)' }}>
                 <IconButton variant="ghost" size="sm" aria-label="Search" icon={<SearchOneIcon size={20} />} onClick={onSearch} />
               </div>
             </Tooltip>
@@ -252,7 +254,7 @@ export const FlatSidebar = React.forwardRef<HTMLDivElement, FlatSidebarProps>(
 
           {/* ── Destinations — fixed, part of the header, not the scroll area ── */}
           {destinationsItems && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: effectiveCollapsed ? 'center' : 'stretch', gap: 4, padding: effectiveCollapsed ? '0 6px 8px' : '0 8px 8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: effectiveCollapsed ? 'center' : 'stretch', gap: 'var(--space-1)', padding: effectiveCollapsed ? '0 6px 8px' : '0 8px 8px' }}>
               {destinationsItems(effectiveCollapsed)}
             </div>
           )}
@@ -266,35 +268,35 @@ export const FlatSidebar = React.forwardRef<HTMLDivElement, FlatSidebarProps>(
           style={{
             position: 'absolute', top: headerH, bottom: '62px', left: 0, right: 0,
             overflowY: effectiveCollapsed ? 'hidden' : 'auto', overflowX: 'hidden', overscrollBehaviorY: 'contain',
-            display: 'flex', flexDirection: 'column', gap: 16, padding: '8px 8px 20px',
+            display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-2) var(--space-2) var(--space-5)',
           }}
         >
           <motion.div
             animate={{ opacity: effectiveCollapsed ? 0 : 1, filter: effectiveCollapsed ? 'blur(4px)' : 'blur(0px)', transitionEnd: effectiveCollapsed ? {} : { filter: 'none' } }}
             initial={false}
             transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-            style={{ display: 'flex', flexDirection: 'column', gap: 16, pointerEvents: effectiveCollapsed ? 'none' : 'auto' }}
+            style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', pointerEvents: effectiveCollapsed ? 'none' : 'auto' }}
           >
-            {projectItems && <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>{projectItems}</div>}
-            {recentItems && <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>{recentItems}</div>}
+            {projectItems && <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>{projectItems}</div>}
+            {recentItems && <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>{recentItems}</div>}
           </motion.div>
         </div>
 
         {/* ── Top/bottom scroll fades ── */}
         {scrollFadeLayers.map(({ height, blur }) => (
-          <div key={`top-${blur}`} aria-hidden style={{ position: 'absolute', top: headerH, left: 0, right: 0, height: `${height}px`, backdropFilter: `blur(${blur}px)`, WebkitBackdropFilter: `blur(${blur}px)`, maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)', pointerEvents: 'none', zIndex: 5, opacity: atScrollTop ? 0 : 1, transition: 'opacity 150ms ease' }} />
+          <div key={`top-${blur}`} aria-hidden style={{ position: 'absolute', top: headerH, left: 0, right: 0, height: `${height}px`, backdropFilter: `blur(${blur}px)`, WebkitBackdropFilter: `blur(${blur}px)`, maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)', pointerEvents: 'none', zIndex: 5, opacity: atScrollTop ? 0 : 1, transition: 'opacity var(--duration-fast) ease' }} />
         ))}
-        <div aria-hidden style={{ position: 'absolute', top: headerH, left: 0, right: 0, height: '40px', background: 'linear-gradient(to bottom, var(--neutral-50) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 6, opacity: atScrollTop ? 0 : 1, transition: 'opacity 150ms ease' }} />
+        <div aria-hidden style={{ position: 'absolute', top: headerH, left: 0, right: 0, height: '40px', background: 'linear-gradient(to bottom, var(--neutral-50) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 6, opacity: atScrollTop ? 0 : 1, transition: 'opacity var(--duration-fast) ease' }} />
         {scrollFadeLayers.map(({ height, blur }) => (
-          <div key={`bottom-${blur}`} aria-hidden style={{ position: 'absolute', bottom: '62px', left: 0, right: 0, height: `${height}px`, backdropFilter: `blur(${blur}px)`, WebkitBackdropFilter: `blur(${blur}px)`, maskImage: 'linear-gradient(to top, black 0%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 100%)', pointerEvents: 'none', zIndex: 5, opacity: atScrollBottom ? 0 : 1, transition: 'opacity 150ms ease' }} />
+          <div key={`bottom-${blur}`} aria-hidden style={{ position: 'absolute', bottom: '62px', left: 0, right: 0, height: `${height}px`, backdropFilter: `blur(${blur}px)`, WebkitBackdropFilter: `blur(${blur}px)`, maskImage: 'linear-gradient(to top, black 0%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 100%)', pointerEvents: 'none', zIndex: 5, opacity: atScrollBottom ? 0 : 1, transition: 'opacity var(--duration-fast) ease' }} />
         ))}
-        <div aria-hidden style={{ position: 'absolute', bottom: '62px', left: 0, right: 0, height: '40px', background: 'linear-gradient(to top, var(--neutral-50) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 6, opacity: atScrollBottom ? 0 : 1, transition: 'opacity 150ms ease' }} />
+        <div aria-hidden style={{ position: 'absolute', bottom: '62px', left: 0, right: 0, height: '40px', background: 'linear-gradient(to top, var(--neutral-50) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 6, opacity: atScrollBottom ? 0 : 1, transition: 'opacity var(--duration-fast) ease' }} />
 
         {/* ── Footer: Profile row ── */}
         <div style={{
           position: 'absolute', bottom: 0, left: effectiveCollapsed ? '50%' : 0, right: effectiveCollapsed ? 'auto' : 0,
           transform: effectiveCollapsed ? 'translateX(-50%)' : undefined, width: effectiveCollapsed ? '52px' : undefined,
-          zIndex: 10, backgroundColor: 'var(--neutral-50)', padding: effectiveCollapsed ? '10px 4px' : '10px', boxSizing: 'border-box',
+          zIndex: 'var(--z-raised)', backgroundColor: 'var(--neutral-50)', padding: effectiveCollapsed ? '10px 4px' : '10px', boxSizing: 'border-box',
         }}>
           {accountMenu?.(effectiveCollapsed)}
         </div>

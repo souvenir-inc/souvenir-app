@@ -47,8 +47,8 @@ export function chipLabel<T extends string>(picked: T[], labels: Record<T, strin
 type Chip = { key: string; label: string; remove: () => void }
 
 const resetStyle: React.CSSProperties = {
-  marginLeft: 'auto', padding: '0 4px', border: 'none', background: 'transparent', cursor: 'pointer', borderRadius: 6,
-  fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 13, lineHeight: '20px', color: 'var(--neutral-600)',
+  marginLeft: 'auto', padding: '0 var(--space-1)', border: 'none', background: 'transparent', cursor: 'pointer', borderRadius: 'var(--radius-sm)',
+  fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-600)',
 }
 
 /**
@@ -66,13 +66,13 @@ export function FilterPanel({ query, setQuery }: { query: LibraryQuery; setQuery
   if (query.type.length) chips.push({ key: 'type', label: chipLabel(query.type, FORMAT_GROUP_LABELS), remove: () => setQuery({ type: [] }) })
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
       {chips.map((chip) => (
         <span
           key={chip.key}
           style={{
-            display: 'inline-flex', alignItems: 'center', gap: 4, height: 32, padding: '0 6px 0 12px', borderRadius: 999, border: '1px solid var(--border-default)', boxSizing: 'border-box',
-            background: 'var(--color-surface-container)', fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 13, lineHeight: '20px', color: 'var(--neutral-900)', whiteSpace: 'nowrap',
+            display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', height: 32, padding: '0 var(--space-1-5) 0 var(--space-3)', borderRadius: 'var(--radius-full)', border: '1px solid var(--border-default)', boxSizing: 'border-box',
+            background: 'var(--color-surface-container)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-900)', whiteSpace: 'nowrap',
           }}
         >
           {chip.label}
@@ -80,7 +80,7 @@ export function FilterPanel({ query, setQuery }: { query: LibraryQuery; setQuery
             type="button"
             onClick={chip.remove}
             aria-label={`Remove ${chip.label}`}
-            style={{ display: 'inline-grid', placeItems: 'center', width: 20, height: 20, padding: 0, border: 'none', borderRadius: 999, background: 'transparent', cursor: 'pointer', color: 'var(--neutral-600)' }}
+            style={{ display: 'inline-grid', placeItems: 'center', width: 20, height: 20, padding: 0, border: 'none', borderRadius: 'var(--radius-full)', background: 'transparent', cursor: 'pointer', color: 'var(--neutral-600)' }}
           >
             <CancelOneIcon size={12} />
           </button>

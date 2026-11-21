@@ -60,21 +60,21 @@ export function MessageActionBar({
       transition={{ duration: 0.15 }}
       style={{
         display: "flex",
-        gap: 2,
-        marginTop: 4,
+        gap: 'var(--space-0-5)',
+        marginTop: 'var(--space-1)',
         pointerEvents: revealSettled ? "auto" : "none",
       }}
     >
       {PINS_ENABLED && canUseContentActions && showPin && (
         <ActionIconButton
-          icon={<PinIcon size={18} color={pinned ? "var(--brown-700, #683D1B)" : "var(--neutral-400)"} />}
+          icon={<PinIcon size={18} color={pinned ? "var(--brown-700)" : "var(--neutral-400)"} />}
           label={pinned ? "Unpin" : "Pin"}
           onClick={onPin}
         />
       )}
       {canUseContentActions && (
         <ActionIconButton
-          icon={copied ? <TickTwoIcon size={18} color="var(--success-600, #80B707)" /> : <CopyOneIcon size={18} color="var(--neutral-400)" />}
+          icon={copied ? <TickTwoIcon size={18} color="var(--success-600)" /> : <CopyOneIcon size={18} color="var(--neutral-400)" />}
           label={copied ? "Copied" : "Copy"}
           onClick={onCopy}
         />

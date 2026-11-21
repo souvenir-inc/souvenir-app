@@ -182,7 +182,7 @@ export function FloatingMenuItem(
             fontWeight:  'var(--font-weight-medium)',
             fontSize:    'var(--font-size-body)',
             lineHeight:  'var(--line-height-body)',
-            paddingRight: '6px',
+            paddingRight: 'var(--space-1-5)',
           }}
         >
           {label}
@@ -225,7 +225,7 @@ export function FloatingMenuItem(
                 position:    'relative',
                 overflow:    'hidden',
                 display:     'inline-block',
-                paddingRight: '6px',
+                paddingRight: 'var(--space-1-5)',
                 boxSizing:   'border-box',
               }}
             >

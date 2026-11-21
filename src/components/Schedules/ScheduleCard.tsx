@@ -93,30 +93,33 @@ export function ScheduleCard({
       style={{
         display:         'flex',
         flexDirection:   'column',
-        height:          '240px',
+        // At least 240px, not exactly: a two-line name with a three-line description and
+        // run stats needs a little more, and a fixed height pushed the footer out of the
+        // card. The grid stretches the row, so the card beside it grows to match.
+        minHeight:       '240px',
         overflow:        'hidden',
-        padding:         '20px',
+        padding:         'var(--space-5)',
         boxSizing:       'border-box',
-        borderRadius:    '12px',
+        borderRadius:    'var(--radius-xl)',
         backgroundColor,
         boxShadow,
         cursor:          'pointer',
         textAlign:       'left',
-        transition:      'background-color 120ms ease, box-shadow 120ms ease',
+        transition:      'background-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease',
         outline:         'none',
         width:           '100%',
       }}
     >
       {/* Top row — "Created on" (left), status badge (right) — same slots as
           ProjectCard's "Created by" + visibility badge. */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)', flexShrink: 0 }}>
         <div style={{ minWidth: 0 }}>
           {(ownerName || createdAt) && (
             <span style={{
               fontFamily:   'var(--font-body)',
-              fontWeight:   400,
-              fontSize:     '12px',
-              lineHeight:   '16px',
+              fontWeight:   'var(--font-weight-regular)',
+              fontSize:     'var(--font-size-small)',
+              lineHeight:   'var(--line-height-small)',
               color:        'var(--neutral-500)',
               overflow:     'hidden',
               textOverflow: 'ellipsis',
@@ -126,7 +129,7 @@ export function ScheduleCard({
             </span>
           )}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexShrink: 0 }}>
           {drift && (
             <Tooltip content="This schedule's last edit may not have fully synced"><span>
               <AlertTwoIcon size={14} color="var(--yellow-600)" />
@@ -141,28 +144,29 @@ export function ScheduleCard({
       <p style={{
         fontFamily:      'var(--font-title)',
         fontWeight:      'var(--font-weight-medium)',
-        fontSize:        '18px',
-        lineHeight:      '24px',
+        fontSize:        'var(--font-size-heading-sm)',
+        lineHeight:      'var(--line-height-heading-sm)',
         color:           'var(--neutral-900)',
         overflow:        'hidden',
         display:         '-webkit-box',
         WebkitLineClamp: 2,
         WebkitBoxOrient: 'vertical',
         margin:          0,
-        marginTop:       '8px',
+        marginTop:       'var(--space-2)',
         flexShrink:      0,
       }}>
         {name}
       </p>
 
-      {/* Description — 3 lines max, same clamp/height cap as ProjectCard's */}
+      {/* Description — 3 lines max, same clamp as ProjectCard's. The cap follows the line
+          height: a fixed 54px (3 × 18) clipped the third line once it became 20px. */}
       <p style={{
-        maxHeight:       '54px',
+        maxHeight:       'calc(var(--line-height-body-sm) * 3)',
         flexShrink:      0,
         fontFamily:      'var(--font-body)',
         fontWeight:      'var(--font-weight-regular)',
-        fontSize:        '13px',
-        lineHeight:      '18px',
+        fontSize:        'var(--font-size-body-sm)',
+        lineHeight:      'var(--line-height-body-sm)',
         color:           'var(--neutral-500)',
         overflow:        'hidden',
         textOverflow:    'ellipsis',
@@ -170,7 +174,7 @@ export function ScheduleCard({
         WebkitLineClamp: 3,
         WebkitBoxOrient: 'vertical',
         margin:          0,
-        marginTop:       '10px',
+        marginTop:       'var(--space-2-5)',
       }}>
         {description ?? ''}
       </p>
@@ -182,14 +186,14 @@ export function ScheduleCard({
       <div style={{ height: 1, width: '100%', backgroundColor: 'var(--divider-color)', flexShrink: 0 }} />
 
       {/* Footer — frequency, icon + text (same meta-row style as ProjectCard's member/chat counts) */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 0, flexShrink: 0, marginTop: '10px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--neutral-400)', minWidth: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 0, flexShrink: 0, marginTop: 'var(--space-2-5)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', color: 'var(--neutral-400)', minWidth: 0 }}>
           <CalendarThreeIcon size={14} />
           <span style={{
             fontFamily:   'var(--font-body)',
-            fontWeight:   400,
-            fontSize:     '13px',
-            lineHeight:   '18px',
+            fontWeight:   'var(--font-weight-regular)',
+            fontSize:     'var(--font-size-body-sm)',
+            lineHeight:   'var(--line-height-body-sm)',
             color:        'var(--neutral-500)',
             overflow:     'hidden',
             textOverflow: 'ellipsis',
@@ -199,11 +203,11 @@ export function ScheduleCard({
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, marginTop: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', minWidth: 0, marginTop: 'var(--space-1)' }}>
         {/* Run stats — omitted entirely until the schedule has actually fired
             at least once, rather than showing a misleading "0 runs". */}
         {!!runCount && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', minWidth: 0 }}>
             <Badge color="Neutral" label={`${runCount} ${runCount === 1 ? 'run' : 'runs'}`} />
             {successRate != null && (
               <Badge
@@ -216,13 +220,13 @@ export function ScheduleCard({
 
         {connectors.length > 0 && (
           <Tooltip content={connectors.map(connector => connector.name).join(', ')} maxWidth={280}><div
-            style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 'auto', flexShrink: 0 }}
+            style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', marginLeft: 'auto', flexShrink: 0 }}
           >
             {connectors.slice(0, MAX_CARD_CONNECTORS).map(connector => (
               <ConnectorGlyph key={connector.slug} slug={connector.slug} name={connector.name} logoUrl={connector.logoUrl} size={16} />
             ))}
             {connectors.length > MAX_CARD_CONNECTORS && (
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px', color: 'var(--neutral-500)' }}>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-500)' }}>
                 +{connectors.length - MAX_CARD_CONNECTORS}
               </span>
             )}

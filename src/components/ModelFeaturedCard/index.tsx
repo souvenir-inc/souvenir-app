@@ -150,15 +150,15 @@ export function ModelFeaturedCard({
         data-selected={isSelected ? 'true' : 'false'}
         style={{
           position:        'relative',
-          borderRadius:    '12px',
+          borderRadius:    'var(--radius-xl)',
           overflow:        'clip',
-          padding:         '12px',
+          padding:         'var(--space-3)',
           width:           '100%',
           flexShrink:      0,
           backgroundColor: baseBg,
           boxShadow:       outerShadow,
           cursor:          'pointer',
-          transition:      'background-color 150ms ease, box-shadow 150ms ease',
+          transition:      'background-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease',
           ...style,
         }}
         onClick={handleModelSelect}
@@ -265,7 +265,7 @@ export function ModelFeaturedCard({
             position:      'relative',
             display:       'flex',
             flexDirection: 'column',
-            gap:           '4px',
+            gap:           'var(--space-1)',
             textShadow:    isSelected ? TEXT_SHADOW_SELECTED : 'none',
           }}
         >
@@ -273,9 +273,9 @@ export function ModelFeaturedCard({
             <p
               style={{
                 fontFamily:    'var(--font-title)',
-                fontWeight:    400,
-                fontSize:      '13px',
-                lineHeight:    '16px',
+                fontWeight:    'var(--font-weight-regular)',
+                fontSize:      'var(--font-size-body-sm)',
+                lineHeight:    'var(--line-height-small)',
                 color:         descColor,
                 margin:        0,
                 width:         '100%',
@@ -287,9 +287,9 @@ export function ModelFeaturedCard({
           <p
             style={{
               fontFamily:  'var(--font-title)',
-              fontWeight:  400,
-              fontSize:    '28px',
-              lineHeight:  '34px',
+              fontWeight:  'var(--font-weight-regular)',
+              fontSize:    'var(--font-size-heading-xl)',
+              lineHeight:  'var(--line-height-heading-xl)',
               color:       titleColor,
               margin:      0,
               width:       '100%',
@@ -301,9 +301,9 @@ export function ModelFeaturedCard({
           <p
             style={{
               fontFamily:    'var(--font-body)',
-              fontWeight:    400,
-              fontSize: '12px',
-              lineHeight:    '16px',
+              fontWeight:    'var(--font-weight-regular)',
+              fontSize: 'var(--font-size-small)',
+              lineHeight:    'var(--line-height-small)',
               color:         descColor,
               margin:        0,
               overflow:      'hidden',

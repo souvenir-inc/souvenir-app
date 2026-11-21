@@ -105,18 +105,18 @@ function TeamRow({
         display:         'flex',
         alignItems:      'stretch',
         overflow:        'hidden',
-        borderRadius:    '6px',
+        borderRadius:    'var(--radius-sm)',
         width:           '100%',
-        paddingLeft:     '6px',
-        paddingRight:    '6px',
-        paddingTop:      '5px',
-        paddingBottom:   '5px',
-        gap:             '8px',
+        paddingLeft:     'var(--space-1-5)',
+        paddingRight:    'var(--space-1-5)',
+        paddingTop:      'var(--space-1)',
+        paddingBottom:   'var(--space-1)',
+        gap:             'var(--space-2)',
         backgroundColor: isActive ? 'var(--dropdown-menu-item-hover-bg)' : 'transparent',
         boxShadow:       isActive ? 'var(--shadow-dropdown-item-hover)' : undefined,
         cursor:          'pointer',
         userSelect:      'none',
-        transition:      'background-color 150ms, box-shadow 150ms',
+        transition:      'background-color var(--duration-fast), box-shadow var(--duration-fast)',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -130,15 +130,15 @@ function TeamRow({
           width:          'calc(var(--line-height-body) + var(--line-height-caption))',
           height:         'calc(var(--line-height-body) + var(--line-height-caption))',
           flexShrink:     0,
-          borderRadius:   '3px',
+          borderRadius:   'var(--radius-xs)',
           background:     getGradient(team.name),
           display:        'flex',
           alignItems:     'center',
           justifyContent: 'center',
           fontFamily:     'var(--font-title)',
-          fontWeight:     500,
-          fontSize:       '16px',
-          lineHeight:     1,
+          fontWeight:     'var(--font-weight-medium)',
+          fontSize:       'var(--font-size-body-lg)',
+          lineHeight:     'var(--leading-none)',
           color:          'var(--color-text-on-accent)',
           boxShadow:      'inset 0px 4px 4px color-mix(in srgb, var(--static-black) 25%, transparent), inset 0px -1px 0.4px rgba(18,60,95,0.65)',
         }}
@@ -177,7 +177,7 @@ function TeamRow({
       </div>
 
       {/* Role badge + submenu chevron */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexShrink: 0 }}>
         <RoleBadge role={team.userRole} showLabel={isOpen} mode={roleMode} />
         {hasActions && isOpen && (
           <span aria-hidden style={{ display: 'inline-flex', alignItems: 'center', color: 'var(--neutral-500)' }}>
@@ -295,7 +295,7 @@ export const TeamSwitcherDropdown = React.forwardRef<HTMLDivElement, TeamSwitche
 
               if (!needsOverflow) {
                 return (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                     {teamRows}
                   </div>
                 )
@@ -313,10 +313,10 @@ export const TeamSwitcherDropdown = React.forwardRef<HTMLDivElement, TeamSwitche
                     style={{
                       overflowY:           'auto',
                       maxHeight:           '210px',
-                      padding:             '3px',
+                      padding:             'var(--space-0-5)',
                       display:             'flex',
                       flexDirection:       'column',
-                      gap:                 '4px',
+                      gap:                 'var(--space-1)',
                       overscrollBehaviorY: 'contain',
                     }}
                   >
@@ -339,9 +339,9 @@ export const TeamSwitcherDropdown = React.forwardRef<HTMLDivElement, TeamSwitche
                       maskImage:            'linear-gradient(to bottom, black 0%, transparent 100%)',
                       WebkitMaskImage:      'linear-gradient(to bottom, black 0%, transparent 100%)',
                       pointerEvents:        'none',
-                      zIndex:               10,
+                      zIndex:               'var(--z-raised)',
                       opacity:              atTop ? 0 : 1,
-                      transition:           'opacity 150ms ease',
+                      transition:           'opacity var(--duration-fast) ease',
                     }} />
                   ))}
                   <div aria-hidden style={{
@@ -350,9 +350,9 @@ export const TeamSwitcherDropdown = React.forwardRef<HTMLDivElement, TeamSwitche
                     height:        '40px',
                     background:    'linear-gradient(to bottom, var(--popover-bg) 0%, transparent 100%)',
                     pointerEvents: 'none',
-                    zIndex:        11,
+                    zIndex:        'calc(var(--z-raised) + 1)',
                     opacity:       atTop ? 0 : 1,
-                    transition:    'opacity 150ms ease',
+                    transition:    'opacity var(--duration-fast) ease',
                   }} />
 
                   {/* Bottom progressive blur */}
@@ -371,9 +371,9 @@ export const TeamSwitcherDropdown = React.forwardRef<HTMLDivElement, TeamSwitche
                       maskImage:            'linear-gradient(to top, black 0%, transparent 100%)',
                       WebkitMaskImage:      'linear-gradient(to top, black 0%, transparent 100%)',
                       pointerEvents:        'none',
-                      zIndex:               10,
+                      zIndex:               'var(--z-raised)',
                       opacity:              atBottom ? 0 : 1,
-                      transition:           'opacity 150ms ease',
+                      transition:           'opacity var(--duration-fast) ease',
                     }} />
                   ))}
                   <div aria-hidden style={{
@@ -382,9 +382,9 @@ export const TeamSwitcherDropdown = React.forwardRef<HTMLDivElement, TeamSwitche
                     height:        '40px',
                     background:    'linear-gradient(to top, var(--popover-bg) 0%, transparent 100%)',
                     pointerEvents: 'none',
-                    zIndex:        11,
+                    zIndex:        'calc(var(--z-raised) + 1)',
                     opacity:       atBottom ? 0 : 1,
-                    transition:    'opacity 150ms ease',
+                    transition:    'opacity var(--duration-fast) ease',
                   }} />
                 </div>
               )

@@ -27,10 +27,10 @@ export function CitationChip({ n, citation }: { n: number; citation?: WebCitatio
         data-missing-citation="true"
         style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          verticalAlign: 'text-bottom', width: 18, height: 18, borderRadius: '999px',
+          verticalAlign: 'text-bottom', width: 18, height: 18, borderRadius: 'var(--radius-full)',
           backgroundColor: 'transparent', fontFamily: 'var(--font-body)',
-          fontWeight: 600, fontSize: 10, lineHeight: 1, color: 'var(--neutral-600)',
-          marginLeft: 2, flexShrink: 0, border: '1px dashed var(--neutral-300)',
+          fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--leading-none)', color: 'var(--neutral-600)',
+          marginLeft: 'var(--space-0-5)', flexShrink: 0, border: '1px dashed var(--neutral-300)',
         }}
       >
         ?

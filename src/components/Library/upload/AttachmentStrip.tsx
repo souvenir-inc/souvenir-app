@@ -15,10 +15,10 @@ export function AttachmentStrip({ uploads }: { uploads: DraftUploads }) {
   const visible = items.filter((item) => item.status !== 'failed' && item.status !== 'cancelled')
   if (items.length === 0) return null
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
       <UploadNotices items={items} onDismiss={forget} />
       {visible.length > 0 && (
-        <div role="list" aria-label="Attachments" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div role="list" aria-label="Attachments" style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
           {visible.map((item) => (
             <div role="listitem" key={item.id}>
               <AttachmentCard item={item} onCancel={cancel} />

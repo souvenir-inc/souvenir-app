@@ -40,6 +40,31 @@ export interface StreamRequestOptions {
   /** A follow of a run from the chat's history: the reply as it was loaded. The stream replays only the
    *  stretch the agent is working on now, so what earlier stretches wrote stays and the replay adds to it. */
   prior?: UIMessage
+  /** Called when the backend refused the send outright (a 4xx before any run, including a
+   *  409 refusal such as a paused or unpublished agent): it never took the message, so the
+   *  caller may offer it again. Not called for `409 already_sent` (the backend has it), nor for
+   *  a dropped connection or a 5xx, where it may have taken it: re-sending could repeat it. */
+  onSendRefused?: () => void
+  /** A follow that waited its turn and found the user had left its chat: it stands down,
+   *  without starting, and this is called. */
+  onLeftBeforeStart?: () => void
+  /** The call was detached (another call took the hook, or the chat reopened) and ended
+   *  without reading its turn to the end: its "done" is not a finished turn. */
+  onDetached?: () => void
+  /** For a follow that may wait its turn: asked once the wait is over, before it takes the
+   *  hook. False (the reply is no longer the one to follow) and it stands down unstarted. */
+  stillWanted?: () => boolean
+  /** The user stopped this call (or a reconnect of it): passed up to whoever owns its turn. */
+  onStopped?: () => void
+  /** A follow that never reached the turn's stream: "gone" (the turn has ended) or "failed".
+   *  Per call, so one call's result can't be read as another's. */
+  onFollowResult?: (result: "gone" | "failed") => void
+  /** A reconnect after a drop found the run already ended (404): the turn is over on the
+   *  backend, and only a history reload (which may fail) shows it. Passed up nested retries. */
+  onRunGone?: () => void
+  /** A follow that attached, but whose stream closed with no terminal event: the run may
+   *  still be going, and nothing here read it to its end. Not for a Stop or a reported error. */
+  onIncomplete?: () => void
 }
 
 export interface StreamTarget {

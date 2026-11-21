@@ -71,9 +71,9 @@ export function fmtNum(n: number | null | undefined): string {
 
 // ── Shared style constants (exact Figma values) ───────────────────────────────
 
-export const SHADOW_CARD    = '0px 2px 2.8px 0px rgba(82,75,71,0.12)'                                   // bordered section card
-export const SHADOW_TILE     = '0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)' // white inner tile
-export const SHADOW_MODAL   = '0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rgba(130,122,116,0.1)'
+export const SHADOW_CARD    = 'var(--shadow-soft)'                                   // bordered section card
+export const SHADOW_TILE     = 'var(--shadow-tile)' // white inner tile
+export const SHADOW_MODAL   = 'var(--shadow-4)'
 export const SHADOW_INPUT   = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)'
 
 // Same "big number" / secondary-text convention as the Monthly Limits /
@@ -82,10 +82,10 @@ export const SHADOW_INPUT   = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0p
 // pages' stat cards read consistently. SectionCard's own title already
 // renders at this size/weight, so no separate header style is needed here.
 export const statCardBigLineStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 26, lineHeight: '34px', color: 'var(--neutral-900)', margin: 0,
+  fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0,
 }
 export const statCardCaptionStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0,
+  fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0,
 }
 
 // ── Small primitives ───────────────────────────────────────────────────────────
@@ -116,15 +116,15 @@ export function Badge({ label, tone }: { label: string; tone: 'blue' | 'yellow' 
     <span style={{
       display:        'inline-flex',
       alignItems:     'center',
-      padding:        '2px 4px',
-      borderRadius:   6,
+      padding:        'var(--space-0-5) var(--space-1)',
+      borderRadius:   'var(--radius-sm)',
       background:     map.bg,
       color:          map.fg,
       boxShadow:      `0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px ${map.ring}`,
       fontFamily:     'var(--font-body)',
-      fontWeight:     500,
-      fontSize:       11,
-      lineHeight:     '16px',
+      fontWeight:     'var(--font-weight-medium)',
+      fontSize:       'var(--font-size-caption)',
+      lineHeight:     'var(--line-height-small)',
       whiteSpace:     'nowrap',
     }}>
       {label}
@@ -174,13 +174,13 @@ export function SectionCard({
   return (
     <div style={{
       border:        '1px solid var(--border-default)',
-      borderRadius:  16,
+      borderRadius:  'var(--radius-2xl)',
       boxShadow:     SHADOW_CARD,
       display:       'flex',
       flexDirection: 'column',
-      gap:           12,
-      paddingTop:    18,
-      paddingBottom: 12,
+      gap:           'var(--space-3)',
+      paddingTop:    'var(--space-4)',
+      paddingBottom: 'var(--space-3)',
       overflow:      'hidden',
       width:         '100%',
       background,
@@ -190,14 +190,14 @@ export function SectionCard({
         padding:      headerDivider ? '0 24px 24px' : '0 24px',
         display:      'flex',
         alignItems:   'center',
-        gap:          12,
+        gap:          'var(--space-3)',
       }}>
-        <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 16, lineHeight: '22px', color: titleColor, margin: 0 }}>
+        <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-body)', color: titleColor, margin: 0 }}>
             {title}
           </p>
           {subtitle && (
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
               {subtitle}
             </p>
           )}

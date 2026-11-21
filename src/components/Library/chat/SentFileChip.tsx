@@ -24,7 +24,7 @@ export function SentFileChip({ fileId, fileRef, onOpen }: SentFileChipProps) {
   const view = sentFileView(fileRef)
   if (view.kind === 'locked') {
     return (
-      <span className={styles.chip} style={{ paddingLeft: 10 }}>
+      <span className={styles.chip} style={{ paddingLeft: 'var(--space-2-5)' }}>
         <LockGlyph size={14} />
         <span>{view.label}</span>
       </span>

@@ -16,8 +16,8 @@ export function withDividers(rows: React.ReactNode[]): React.ReactNode[] {
 // in, and no "No chats yet" flash for a project that genuinely has chats.
 function TeamChatRowSkeleton({ w }: { w: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', width: '100%', boxSizing: 'border-box' }}>
-      <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-3) var(--space-4)', width: '100%', boxSizing: 'border-box' }}>
+      <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
         <Skeleton width={w} height={14} />
         <Skeleton width="30%" height={12} />
       </div>

@@ -275,7 +275,7 @@ export function AppLayout({
               display:         "flex",
               flexDirection:   "column",
               alignItems:      "flex-start",
-              gap:             "2px",
+              gap:             "var(--space-0-5)",
               padding:         usesTightCard ? "3px" : "12px",
               borderRadius:    "var(--layout-radius)",
               border:          "1px solid var(--border-default)",

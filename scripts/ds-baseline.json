@@ -1,0 +1,23 @@
+{
+  "updated": "2026-11-18",
+  "counts": {
+    "literal.color": 126,
+    "literal.spacing": 385,
+    "literal.radius": 95,
+    "literal.typography": 346,
+    "literal.shadow": 134,
+    "literal.border": 23,
+    "literal.motion": 87,
+    "literal.zIndex": 3,
+    "colorLiteral.hex": 132,
+    "colorLiteral.rgb": 416,
+    "raw.button": 212,
+    "raw.input": 62,
+    "raw.textarea": 23,
+    "raw.select": 1,
+    "raw.label": 39,
+    "pattern.roleDialog": 6,
+    "pattern.radixOutsideUi": 4,
+    "twArbitrary": 42
+  }
+}

@@ -38,21 +38,21 @@ export function AiModelsView() {
         display:        'flex',
         alignItems:     'flex-start',
         justifyContent: 'center',
-        paddingTop:     64,
-        paddingBottom:  48,
+        paddingTop:     'var(--space-10)',
+        paddingBottom:  'var(--space-9)',
       }}
     >
       {/* Horizontal padding lives here, not on the scrolling element above —
           keeps the scrollbar flush with the container's edge. */}
-      <div style={{ width: '100%', maxWidth: 908, padding: '0 24px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ width: '100%', maxWidth: 908, padding: '0 var(--space-6)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
 
         {/* ── Header ── */}
-        <div style={{ paddingLeft: 4, marginBottom: 4 }}>
+        <div style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)' }}>
           <h1 style={{
             fontFamily:   'var(--font-title)',
-            fontWeight:   400,
-            fontSize:     24,
-            lineHeight:   '32px',
+            fontWeight:   'var(--font-weight-regular)',
+            fontSize:     'var(--font-size-heading)',
+            lineHeight:   'var(--line-height-heading)',
             color:        'var(--neutral-900)',
             margin:       0,
             overflow:     'hidden',
@@ -63,9 +63,9 @@ export function AiModelsView() {
           </h1>
           <p style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 400,
-            fontSize:   14,
-            lineHeight: '22px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize:   'var(--font-size-body)',
+            lineHeight: 'var(--line-height-body)',
             color:      'var(--neutral-500)',
             margin:     0,
           }}>
@@ -76,22 +76,22 @@ export function AiModelsView() {
         {/* ── Search + filter ── */}
         <div style={{
           border:        '1px solid var(--border-default)',
-          borderRadius:  16,
-          boxShadow:     '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+          borderRadius:  'var(--radius-2xl)',
+          boxShadow:     'var(--shadow-soft)',
           overflow:      'hidden',
-          padding:       '12px 24px',
+          padding:       'var(--space-3) var(--space-6)',
           display:       'flex',
           alignItems:    'center',
-          gap:           24,
+          gap:           'var(--space-6)',
         }}>
           <div style={{
             flex:            '1 0 0',
             minWidth:        0,
             display:         'flex',
             alignItems:      'center',
-            gap:             2,
-            padding:         '7px 10px',
-            borderRadius:    10,
+            gap:             'var(--space-0-5)',
+            padding:         'var(--space-1-5) var(--space-2-5)',
+            borderRadius:    'var(--radius-lg)',
             backgroundColor: 'var(--text-field-bg)',
             boxShadow:       '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--text-field-ring)',
           }}>
@@ -108,11 +108,11 @@ export function AiModelsView() {
                 outline:         'none',
                 backgroundColor: 'transparent',
                 fontFamily:      'var(--font-body)',
-                fontWeight:      400,
-                fontSize:        14,
-                lineHeight:      '22px',
+                fontWeight:      'var(--font-weight-regular)',
+                fontSize:        'var(--font-size-body)',
+                lineHeight:      'var(--line-height-body)',
                 color:           'var(--neutral-900)',
-                padding:         '0 2px',
+                padding:         '0 var(--space-0-5)',
               }}
             />
           </div>
@@ -128,26 +128,26 @@ export function AiModelsView() {
         {/* ── Models card ── */}
         <div style={{
           border:        '1px solid var(--border-default)',
-          borderRadius:  16,
-          boxShadow:     '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+          borderRadius:  'var(--radius-2xl)',
+          boxShadow:     'var(--shadow-soft)',
           overflow:      'hidden',
-          paddingTop:    12,
-          paddingBottom: 12,
+          paddingTop:    'var(--space-3)',
+          paddingBottom: 'var(--space-3)',
         }}>
           {/* Card header */}
           <div style={{
             display:      'flex',
             alignItems:   'center',
-            gap:          4,
-            padding:      '12px 24px 24px',
+            gap:          'var(--space-1)',
+            padding:      'var(--space-3) var(--space-6) var(--space-6)',
             borderBottom: '1px solid var(--neutral-100)',
           }}>
-            <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', gap: 12, alignItems: 'center' }}>
+            <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
               <p style={{
                 fontFamily: 'var(--font-body)',
-                fontWeight: 500,
-                fontSize:   16,
-                lineHeight: '22px',
+                fontWeight: 'var(--font-weight-medium)',
+                fontSize:   'var(--font-size-body-lg)',
+                lineHeight: 'var(--line-height-body)',
                 color:      'var(--neutral-900)',
                 margin:     0,
                 whiteSpace: 'nowrap',
@@ -168,19 +168,19 @@ export function AiModelsView() {
               <SkeletonSection cardCount={2} />
             </>
           ) : loadFailed && models.length === 0 ? (
-            <div role="alert" style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-600)', margin: 0 }}>
+            <div role="alert" style={{ padding: 'var(--space-7) var(--space-6)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)' }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-600)', margin: 0 }}>
                 Couldn&apos;t load your models.
               </p>
               <Button size="sm" onClick={retryLoad}>Try again</Button>
             </div>
           ) : visibleProviders.length === 0 ? (
-            <div style={{ padding: '32px 24px', textAlign: 'center' }}>
+            <div style={{ padding: 'var(--space-7) var(--space-6)', textAlign: 'center' }}>
               <p style={{
                 fontFamily: 'var(--font-body)',
-                fontWeight: 400,
-                fontSize:   14,
-                lineHeight: '22px',
+                fontWeight: 'var(--font-weight-regular)',
+                fontSize:   'var(--font-size-body)',
+                lineHeight: 'var(--line-height-body)',
                 color:      'var(--neutral-400)',
                 margin:     0,
               }}>
@@ -205,27 +205,27 @@ export function AiModelsView() {
         {/* ── Info card ── */}
         <div style={{
           border:          '1px solid var(--border-default)',
-          borderRadius:    16,
-          boxShadow:       '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+          borderRadius:    'var(--radius-2xl)',
+          boxShadow:       'var(--shadow-soft)',
           overflow:        'hidden',
-          padding:         '12px 24px',
+          padding:         'var(--space-3) var(--space-6)',
           backgroundColor: 'var(--neutral-50)',
         }}>
           <p style={{
             fontFamily:   'var(--font-body)',
-            fontWeight:   500,
-            fontSize:     16,
-            lineHeight:   '22px',
+            fontWeight:   'var(--font-weight-medium)',
+            fontSize:     'var(--font-size-body-lg)',
+            lineHeight:   'var(--line-height-body)',
             color:        'var(--neutral-900)',
-            margin:       '0 0 2px',
+            margin:       '0 0 var(--space-0-5)',
           }}>
             Disabled models are excluded from auto-routing and per-task assignment
           </p>
           <p style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 400,
-            fontSize:   14,
-            lineHeight: '22px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize:   'var(--font-size-body)',
+            lineHeight: 'var(--line-height-body)',
             color:      'var(--neutral-500)',
             margin:     0,
           }}>

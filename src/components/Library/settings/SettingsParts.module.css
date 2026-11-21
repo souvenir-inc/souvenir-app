@@ -1,19 +1,19 @@
 /* Settings pages, laid out like the prototype: a section heading, then a bordered card of rows. */
 .card {
-  margin-top: 12px;
+  margin-top: var(--space-3);
   border: 1px solid var(--border-default);
-  border-radius: 16px;
+  border-radius: var(--radius-2xl);
   background: var(--card-bg);
-  box-shadow: 0px 2px 2.8px 0px rgba(82, 75, 71, 0.12);
+  box-shadow: var(--shadow-soft);
   overflow: hidden;
 }
 
 .row {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: var(--space-6);
   min-height: 64px;
-  padding: 14px 16px;
+  padding: var(--space-3) var(--space-4);
   box-sizing: border-box;
 }
 
@@ -29,22 +29,22 @@
 .title {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1-5);
   margin: 0;
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-900);
 }
 
 .hint {
   display: block;
-  margin: 2px 0 0;
+  margin: var(--space-0-5) 0 0;
   font-family: var(--font-body);
-  font-weight: 400;
-  font-size: 13px;
-  line-height: 1.4;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-snug);
   color: var(--neutral-500);
 }
 
@@ -52,46 +52,46 @@
 .why {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 6px 0 0;
+  gap: var(--space-1-5);
+  margin: var(--space-1-5) 0 0;
   font-family: var(--font-body);
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-snug);
   color: var(--color-tag-Yellow-text);
 }
 
 .value {
   font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 22px;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-600);
   white-space: nowrap;
 }
 
 .quiet {
-  margin: 16px 0 0;
+  margin: var(--space-4) 0 0;
   font-family: var(--font-body);
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-snug);
   color: var(--neutral-600);
 }
 
 .storageTitle {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 12px 0 0;
+  gap: var(--space-1-5);
+  margin: var(--space-3) 0 0;
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-900);
 }
 
 .bar {
   height: 8px;
-  margin: 12px 0 20px;
-  border-radius: 999px;
+  margin: var(--space-3) 0 var(--space-5);
+  border-radius: var(--radius-full);
   background: var(--neutral-100);
   overflow: hidden;
 }
@@ -100,20 +100,20 @@
   display: block;
   height: 100%;
   min-width: 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--neutral-900);
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 1px 8px;
+  padding: var(--space-0-5) var(--space-2);
   border: 1px solid var(--neutral-300);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 12px;
-  line-height: 16px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
   color: var(--neutral-600);
   white-space: nowrap;
 }
@@ -121,20 +121,20 @@
 .pickerGrid {
   list-style: none;
   margin: 0;
-  padding: 4px 16px 16px;
+  padding: var(--space-1) var(--space-4) var(--space-4);
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 /* One read-only tile per file type group. */
 .tile {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
+  gap: var(--space-3);
+  padding: var(--space-2-5) var(--space-3);
   border: 1px solid var(--border-default);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   background: var(--card-bg);
 }
 
@@ -147,29 +147,29 @@
 
 .tileText b {
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-900);
 }
 
 .tileText small {
   font-family: var(--font-body);
-  font-size: 12px;
-  line-height: 16px;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
   color: var(--neutral-500);
 }
 
 /* A static Phase 2 page: one centred line in a dashed box (prototype .phase-page). */
 .phasePage {
-  margin-top: 24px;
+  margin-top: var(--space-6);
   border: 1px dashed var(--neutral-300);
-  border-radius: 16px;
-  padding: 32px;
+  border-radius: var(--radius-2xl);
+  padding: var(--space-7);
   text-align: center;
   font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 22px;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-600);
 }
 

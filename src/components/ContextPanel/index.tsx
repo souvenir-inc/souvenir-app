@@ -31,7 +31,7 @@ export function ContextPanelContent({ inProject = false, agentsDisabled = false 
   return (
     // Full panel height, so Agents (which sizes its own scrolling list to its box) gets the space
     // under the tab bar; Context and Browser just flow and let the panel scroll.
-    <Tabs value={tab} onValueChange={value => setChatPanelTab(value as ChatPanelTab)} style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%' }}>
+    <Tabs value={tab} onValueChange={value => setChatPanelTab(value as ChatPanelTab)} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', height: '100%' }}>
       <TabsList fluid size="small" aria-label="Chat panel views">
         <TabsTrigger value="context">Context</TabsTrigger>
         <TabsTrigger value="browser">
@@ -40,7 +40,7 @@ export function ContextPanelContent({ inProject = false, agentsDisabled = false 
             <>
               <span
                 aria-hidden
-                style={{ position: 'absolute', top: 1, right: -6, width: 6, height: 6, borderRadius: 999, backgroundColor: session.status === 'live' ? 'var(--green-500)' : 'var(--blue-500)' }}
+                style={{ position: 'absolute', top: 1, right: -6, width: 6, height: 6, borderRadius: 'var(--radius-full)', backgroundColor: session.status === 'live' ? 'var(--green-500)' : 'var(--blue-500)' }}
               />
               <span style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }}>
                 {session.status === 'live' ? ', live' : ', connecting'}
@@ -84,12 +84,12 @@ function BrowserTab({ session }: { session: BrowserSession }) {
   const dot = session.status === 'live' ? 'var(--green-500)' : session.status === 'connecting' ? 'var(--blue-500)' : 'var(--neutral-300)'
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <BrowserScreen session={session} expanded={expanded} onExpandedChange={setExpanded} />
         {session.status !== 'idle' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, padding: '2px 6px' }}>
-            <span aria-hidden style={{ width: 8, height: 8, borderRadius: 999, flexShrink: 0, backgroundColor: dot, boxShadow: session.status === 'live' ? '0 0 0 3px color-mix(in srgb, var(--green-500) 20%, transparent)' : undefined }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', minWidth: 0, padding: 'var(--space-0-5) var(--space-1-5)' }}>
+            <span aria-hidden style={{ width: 8, height: 8, borderRadius: 'var(--radius-full)', flexShrink: 0, backgroundColor: dot, boxShadow: session.status === 'live' ? '0 0 0 3px color-mix(in srgb, var(--green-500) 20%, transparent)' : undefined }} />
             <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: '1 1 0' }}>
               <p style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-800)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {label}
@@ -99,7 +99,7 @@ function BrowserTab({ session }: { session: BrowserSession }) {
               )}
             </div>
             {host && (
-              <span style={{ flexShrink: 1, minWidth: 0, maxWidth: '45%', padding: '2px 8px', borderRadius: 999, backgroundColor: 'var(--neutral-100)', boxShadow: 'inset 0 0 0 1px var(--border-default)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-600)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <span style={{ flexShrink: 1, minWidth: 0, maxWidth: '45%', padding: 'var(--space-0-5) var(--space-2)', borderRadius: 'var(--radius-full)', backgroundColor: 'var(--neutral-100)', boxShadow: 'inset 0 0 0 1px var(--border-default)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-600)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {host}
               </span>
             )}

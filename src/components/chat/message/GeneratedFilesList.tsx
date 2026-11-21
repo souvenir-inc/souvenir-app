@@ -17,18 +17,18 @@ import type { GeneratedFile } from "@/types/chat";
 const listStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  gap: 8,
-  marginTop: 12,
+  gap: 'var(--space-2)',
+  marginTop: 'var(--space-3)',
 };
 
 const cardStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: 12,
+  gap: 'var(--space-3)',
   width: "100%",
   maxWidth: 315,
-  padding: "8px 8px 8px 8px",
-  borderRadius: 14,
+  padding: "var(--space-2) var(--space-2) var(--space-2) var(--space-2)",
+  borderRadius: 'var(--radius-xl)',
   backgroundColor: "var(--card-bg)",
   border: "1px solid var(--neutral-200)",
   boxShadow: "0 1px 2px rgba(0, 0, 0, 0.04)",
@@ -172,7 +172,7 @@ export function GeneratedFilesList({ files }: { files: GeneratedFile[] }) {
               <p style={typeStyle}>{typeLine(format, ext)}</p>
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)', flexShrink: 0 }}>
               {file.documentId ? (
                 <LibraryViewButton fileId={file.documentId} filename={file.filename} />
               ) : canView(file, ext) && (

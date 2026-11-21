@@ -1,14 +1,13 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { CancelOneIcon } from '@strange-huge/icons'
 import { Button, IconButton } from '@/components/ui/button'
 import { InputField } from '@/components/InputField'
 import { TimeField } from '@/components/TimeField'
 import Tabs from '@/components/Tabs'
 import { trackFeature } from '@/lib/analytics/events'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { useZodForm } from '@/hooks/use-zod-form'
 import {
   initialFormValues,
@@ -90,24 +89,24 @@ export function ScheduleEditModal({ isOpen, schedule, onSave, onClose }: Schedul
           maxHeight: 'calc(100vh - 48px)',
           minHeight: 600,
           background: 'var(--modal-bg)',
-          boxShadow: '0 8px 40px color-mix(in srgb, var(--static-black) 12%, transparent)',
+          boxShadow: 'var(--shadow-4)',
         }}
       >
         {/* Header */}
         <div className="flex shrink-0 items-start gap-3 px-6 pt-6">
           <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-            <DialogPrimitive.Title asChild>
+            <DialogTitle asChild>
             <span className="font-[family-name:var(--font-title)] text-[length:var(--font-size-heading)] leading-[var(--line-height-heading)] text-[var(--neutral-900)]">
               {isCreate ? 'New schedule' : 'Edit schedule'}
             </span>
-            </DialogPrimitive.Title>
-            <DialogPrimitive.Description asChild>
+            </DialogTitle>
+            <DialogDescription asChild>
             <span className="text-[length:var(--font-size-caption)] leading-[var(--line-height-caption)] text-[var(--neutral-500)]">
               {isCreate
                 ? 'Schedules are created via Task — review the details below, then send to create it.'
                 : 'Changes are applied via Task — review the details below, then send to update it.'}
             </span>
-            </DialogPrimitive.Description>
+            </DialogDescription>
           </div>
           <IconButton variant="ghost" size="xs" icon={<CancelOneIcon />} aria-label="Close" onClick={onClose} />
         </div>

@@ -10,7 +10,7 @@ import styles from './dialog.module.css'
 // app's tokens so it matches ConfirmModal's surface (white card, 16px radius, same shadow, same overlay).
 // There was no shared dialog primitive before; ConfirmModal stays for plain confirm/cancel prompts.
 
-const SHADOW_MODAL = '0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rgba(130,122,116,0.1)'
+const SHADOW_MODAL = 'var(--shadow-4)'
 
 export const Dialog = DialogPrimitive.Root
 export const DialogTrigger = DialogPrimitive.Trigger
@@ -80,28 +80,40 @@ function FocusReturnCapture({ returnToRef }: { returnToRef: React.RefObject<HTML
 
 const WIDTHS = { sm: 400, md: 520, lg: 680 } as const
 
-// Below the dropdown layer (Dropdown.Float, 9998) and tooltips (9999): menus and tooltips opened
-// from inside a dialog portal to <body> and must paint above it. Toasts sit far above all three.
-const DIALOG_Z = 9997
+// On the z-index scale (src/styles/tokens): the backdrop at --z-overlay, the dialog at --z-modal,
+// below dropdowns (--z-popover), toasts (--z-toast) and tooltips (--z-tooltip). Menus and tooltips
+// opened from inside a dialog portal to <body> and must paint above it.
+const DIALOG_Z = 'var(--z-modal)'
+const DIALOG_OVERLAY_Z = 'var(--z-overlay)'
 
 export interface DialogContentProps extends Omit<React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>, 'title'> {
   /** sm = confirm prompts, md = forms and sharing, lg = the file picker. */
   size?: keyof typeof WIDTHS
   /** Hide the corner close button (the footer offers Cancel/Done instead). */
   hideClose?: boolean
+  /** Drop the card styling (width, background, radius, shadow, centring) so a bespoke shell can
+   *  style the content itself; focus handling, layering and the overlay stay. Implies hideClose. */
+  bare?: boolean
+  /** Render the dimmed backdrop. Off for full-screen content that paints its own (the image lightbox). */
+  overlay?: boolean
 }
 
-export function DialogContent({ size = 'md', hideClose = false, className, style, children, onInteractOutside, onCloseAutoFocus, ...props }: DialogContentProps) {
+export function DialogContent({ size = 'md', hideClose = false, bare = false, overlay = true, className, style, children, onInteractOutside, onCloseAutoFocus, ...props }: DialogContentProps) {
   const { capture, handleCloseAutoFocus } = useFocusReturn(onCloseAutoFocus)
   return (
     <DialogPrimitive.Portal>
+      {/* Always rendered: Radix locks background scrolling from the overlay. overlay={false}
+          only makes it invisible, for content that paints its own backdrop. */}
       <DialogPrimitive.Overlay
-        className={styles.overlay}
-        style={{ position: 'fixed', inset: 0, zIndex: DIALOG_Z - 1, background: 'var(--overlay-bg)', backdropFilter: 'blur(2px)' }}
+        className={overlay ? styles.overlay : undefined}
+        style={{
+          position: 'fixed', inset: 0, zIndex: DIALOG_OVERLAY_Z,
+          ...(overlay ? { background: 'var(--overlay-bg)', backdropFilter: 'blur(2px)' } : { background: 'transparent' }),
+        }}
       />
       <DialogPrimitive.Content
-        className={cn(styles.content, className)}
-        style={{
+        className={bare ? className : cn(styles.content, className)}
+        style={bare ? { zIndex: DIALOG_Z, outline: 'none', ...style } : {
           position: 'fixed',
           top: '50%',
           left: '50%',
@@ -129,7 +141,7 @@ export function DialogContent({ size = 'md', hideClose = false, className, style
       >
         {capture}
         {children}
-        {!hideClose && (
+        {!hideClose && !bare && (
           <DialogPrimitive.Close
             aria-label="Close"
             style={{
@@ -154,10 +166,17 @@ export function DialogHeader({ children, className, ...props }: React.HTMLAttrib
   )
 }
 
-export function DialogTitle({ children, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>) {
+const SR_ONLY: React.CSSProperties = {
+  position: 'absolute', width: 1, height: 1, padding: 0, margin: -1,
+  overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0,
+}
+
+// With asChild the child element owns its look, so the default text style is left off.
+// visuallyHidden keeps the title for screen readers when the dialog shows no visible heading.
+export function DialogTitle({ children, visuallyHidden = false, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title> & { visuallyHidden?: boolean }) {
   return (
     <DialogPrimitive.Title
-      style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 16, lineHeight: '24px', color: 'var(--neutral-900)' }}
+      style={visuallyHidden ? SR_ONLY : props.asChild ? undefined : { margin: 0, fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 16, lineHeight: '24px', color: 'var(--neutral-900)' }}
       {...props}
     >
       {children}
@@ -168,7 +187,7 @@ export function DialogTitle({ children, ...props }: React.ComponentPropsWithoutR
 export function DialogDescription({ children, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
-      style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)' }}
+      style={props.asChild ? undefined : { margin: 0, fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)' }}
       {...props}
     >
       {children}

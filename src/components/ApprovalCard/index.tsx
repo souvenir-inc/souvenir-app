@@ -89,11 +89,11 @@ function DenyReasonChip({ label, onClick }: DenyReasonChipProps) {
         display:         'inline-flex',
         alignItems:      'center',
         justifyContent:  'center',
-        padding:         '5px 12px',
-        borderRadius:    8,
+        padding:         'var(--space-1) var(--space-3)',
+        borderRadius:    'var(--radius-md)',
         border:          'none',
         cursor:          'pointer',
-        backgroundColor: hovered ? 'var(--neutral-100, #F5F5F5)' : 'var(--neutral-white, white)',
+        backgroundColor: hovered ? 'var(--neutral-100)' : 'var(--neutral-white, white)',
         boxShadow:       hovered
           ? '0px 0px 0px 1px rgba(59,54,50,0.4)'
           : '0px 0px 0px 1px rgba(59,54,50,0.2)',
@@ -101,10 +101,10 @@ function DenyReasonChip({ label, onClick }: DenyReasonChipProps) {
         fontWeight:      'var(--font-weight-medium)',
         fontSize:        'var(--font-size-body)',
         lineHeight:      'var(--line-height-body)',
-        color:           'var(--neutral-700, #524b47)',
+        color:           'var(--neutral-700)',
         whiteSpace:      'nowrap',
         flexShrink:      0,
-        transition:      'background-color 120ms ease, box-shadow 120ms ease',
+        transition:      'background-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease',
         outline:         'none',
       }}
       className="kds-approval-deny-chip"
@@ -128,7 +128,7 @@ function ReversibilitySignal({
       style={{
         display:    'flex',
         alignItems: 'flex-start',
-        gap:        6,
+        gap:        'var(--space-1-5)',
       }}
     >
       {/* Colored status dot — more reliable cross-platform than emoji */}
@@ -143,7 +143,7 @@ function ReversibilitySignal({
             ? 'var(--color-tag-Yellow-text)'
             : 'var(--color-tag-Red-text)',
           flexShrink:      0,
-          marginTop:       7, // optical alignment with 14px cap-height
+          marginTop:       'var(--space-1-5)', // optical alignment with 14px cap-height
         }}
       />
       <span
@@ -226,11 +226,11 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
           style={{
             position:        'relative',
             width:           '100%',
-            borderRadius:    12,
+            borderRadius:    'var(--radius-xl)',
             backgroundColor: resolvedBg ?? 'var(--neutral-white, white)',
             boxShadow:       SHADOW_CARD,
             overflow:        'hidden',
-            transition:      'background-color 200ms ease',
+            transition:      'background-color var(--duration-base) ease',
             ...style,
           }}
           {...props}
@@ -246,7 +246,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 bottom:          0,
                 width:           3,
                 backgroundColor: 'var(--color-tag-Green-text)',
-                borderRadius:    '0 2px 2px 0',
+                borderRadius:    '0 var(--radius-xs) var(--radius-xs) 0',
               }}
             />
           )}
@@ -268,11 +268,11 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
           <div
             style={{
               position:      'relative',
-              zIndex:        0,
+              zIndex:        'var(--z-base)',
               display:       'flex',
               flexDirection: 'column',
-              gap:           12,
-              padding:       16,
+              gap:           'var(--space-3)',
+              padding:       'var(--space-4)',
             }}
           >
             {/* ── Row 1: Action badge + connector name ── */}
@@ -280,7 +280,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
               style={{
                 display:    'flex',
                 alignItems: 'center',
-                gap:        8,
+                gap:        'var(--space-2)',
               }}
             >
               <Badge color={action.color} label={action.label} />
@@ -290,7 +290,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   fontWeight:   'var(--font-weight-medium)',
                   fontSize:     'var(--font-size-caption)',
                   lineHeight:   'var(--line-height-caption)',
-                  color:        'var(--neutral-500, #827a74)',
+                  color:        'var(--neutral-500)',
                   overflow:     'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace:   'nowrap',
@@ -307,7 +307,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 fontWeight:   'var(--font-weight-semibold, 600)',
                 fontSize:     'var(--font-size-body-lg, 16px)',
                 lineHeight:   'var(--line-height-body-lg, 24px)',
-                color:        'var(--neutral-900, #26211e)',
+                color:        'var(--neutral-900)',
                 margin:       0,
                 overflow:     'hidden',
                 textOverflow: 'ellipsis',
@@ -324,7 +324,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 fontWeight: 'var(--font-weight-regular)',
                 fontSize:   'var(--font-size-body)',
                 lineHeight: 'var(--line-height-body)',
-                color:      'var(--neutral-700, #524b47)',
+                color:      'var(--neutral-700)',
                 margin:     0,
               }}
             >
@@ -347,7 +347,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   exit={{    opacity: 0, transition: { duration: 0.08, ease: 'easeIn'  } }}
                   style={{
                     display: 'flex',
-                    gap:     8,
+                    gap:     'var(--space-2)',
                     // Full width side-by-side — binary trust decision, both options equal weight
                   }}
                 >
@@ -396,8 +396,8 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                     style={{
                       display:    'flex',
                       flexWrap:   'wrap',
-                      gap:        8,
-                      paddingTop: 4,
+                      gap:        'var(--space-2)',
+                      paddingTop: 'var(--space-1)',
                     }}
                   >
                     {DENY_REASONS.map((reason) => (
@@ -420,7 +420,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   style={{
                     display:    'flex',
                     alignItems: 'center',
-                    gap:        6,
+                    gap:        'var(--space-1-5)',
                   }}
                 >
                   <span
@@ -463,7 +463,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   style={{
                     display:    'flex',
                     alignItems: 'center',
-                    gap:        4,
+                    gap:        'var(--space-1)',
                   }}
                 >
                   <span
@@ -472,7 +472,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                       fontWeight: 'var(--font-weight-medium)',
                       fontSize:   'var(--font-size-body)',
                       lineHeight: 'var(--line-height-body)',
-                      color:      'var(--neutral-500, #827a74)',
+                      color:      'var(--neutral-500)',
                     }}
                   >
                     Denied
@@ -484,7 +484,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                         fontWeight: 'var(--font-weight-regular)',
                         fontSize:   'var(--font-size-body)',
                         lineHeight: 'var(--line-height-body)',
-                        color:      'var(--neutral-400, #a09890)',
+                        color:      'var(--neutral-400)',
                       }}
                     >
                       · {localDenyReason}

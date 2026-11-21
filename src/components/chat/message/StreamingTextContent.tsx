@@ -11,7 +11,7 @@ import type { WebCitation } from "@/types/chat";
 // formatting quality during streaming — code blocks, math, GFM tables all
 // render properly while the stream is active.
 
-const cursorStyle: React.CSSProperties = { marginLeft: 4, backgroundColor: "var(--neutral-500)" };
+const cursorStyle: React.CSSProperties = { marginLeft: 'var(--space-1)', backgroundColor: "var(--neutral-500)" };
 
 export function StreamingTextContent({
   content,

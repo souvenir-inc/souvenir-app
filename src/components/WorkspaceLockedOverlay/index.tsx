@@ -10,13 +10,14 @@ export interface WorkspaceLockedOverlayProps {
 export function WorkspaceLockedOverlay({ isAdmin, onAdminAction }: WorkspaceLockedOverlayProps) {
   return (
     <div
+      // eslint-disable-next-line no-restricted-syntax -- ds-allow: covers one panel (position: absolute), not the page, so it can't be a portalled modal Dialog
       role="dialog"
       aria-modal="true"
       aria-label="Workspace locked"
       style={{
         position:             'absolute',
         inset:                0,
-        zIndex:               50,
+        zIndex:               'var(--z-overlay)',
         display:              'flex',
         alignItems:           'center',
         justifyContent:       'center',
@@ -31,9 +32,9 @@ export function WorkspaceLockedOverlay({ isAdmin, onAdminAction }: WorkspaceLock
           display:         'flex',
           flexDirection:   'column',
           alignItems:      'center',
-          gap:             12,
-          padding:         '32px 40px',
-          borderRadius:    20,
+          gap:             'var(--space-3)',
+          padding:         'var(--space-7) var(--space-8)',
+          borderRadius:    'var(--radius-2xl)',
           backgroundColor: 'var(--modal-bg)',
           border:          '1px solid var(--border-default)',
           boxShadow:       '0px 4px 20px color-mix(in srgb, var(--static-black) 8%, transparent)',
@@ -65,9 +66,9 @@ export function WorkspaceLockedOverlay({ isAdmin, onAdminAction }: WorkspaceLock
         <div>
           <p style={{
             fontFamily: 'var(--font-title)',
-            fontWeight: 500,
-            fontSize:   18,
-            lineHeight: '26px',
+            fontWeight: 'var(--font-weight-medium)',
+            fontSize:   'var(--font-size-heading-sm)',
+            lineHeight: 'var(--line-height-heading-sm)',
             color:      'var(--neutral-900)',
             margin:     0,
           }}>
@@ -75,11 +76,11 @@ export function WorkspaceLockedOverlay({ isAdmin, onAdminAction }: WorkspaceLock
           </p>
           <p style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 400,
-            fontSize:   14,
-            lineHeight: '22px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize:   'var(--font-size-body)',
+            lineHeight: 'var(--line-height-body)',
             color:      'var(--neutral-500)',
-            margin:     '4px 0 0',
+            margin:     'var(--space-1) 0 0',
           }}>
             {isAdmin
               ? 'Credits are exhausted. Add credits to restore access for your team.'
@@ -93,14 +94,14 @@ export function WorkspaceLockedOverlay({ isAdmin, onAdminAction }: WorkspaceLock
             onClick={onAdminAction}
             style={{
               height:          36,
-              padding:         '0 20px',
-              borderRadius:    8,
+              padding:         '0 var(--space-5)',
+              borderRadius:    'var(--radius-md)',
               border:          'none',
               backgroundColor: 'var(--neutral-900)',
               color:           'var(--neutral-white)',
               fontFamily:      'var(--font-body)',
-              fontWeight:      500,
-              fontSize:        14,
+              fontWeight:      'var(--font-weight-medium)',
+              fontSize:        'var(--font-size-body)',
               cursor:          'pointer',
             }}
           >

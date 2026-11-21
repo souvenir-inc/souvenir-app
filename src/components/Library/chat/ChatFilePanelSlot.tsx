@@ -12,7 +12,7 @@ export function ChatFilePanelSlot({ chatId }: { chatId: string | undefined }) {
   useEffect(() => closeChatFilePanel, [chatId])
   if (!fileId) return null
   return (
-    <div style={{ position: 'absolute', top: 52, right: 12, bottom: 12, zIndex: 30, display: 'flex', borderRadius: 16, overflow: 'hidden', boxShadow: 'var(--shadow-card-deep)' }}>
+    <div style={{ position: 'absolute', top: 52, right: 12, bottom: 12, zIndex: 'var(--z-sticky)', display: 'flex', borderRadius: 'var(--radius-2xl)', overflow: 'hidden', boxShadow: 'var(--shadow-card-deep)' }}>
       <ChatFilePanel fileId={fileId} onClose={closeChatFilePanel} />
     </div>
   )

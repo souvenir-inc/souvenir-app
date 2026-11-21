@@ -13,8 +13,8 @@ export const INLINE_CODE_STYLE: React.CSSProperties = {
   fontSize: "var(--prose-size-code)",
   background: "var(--neutral-800-10)",
   color: "var(--prose-heading)",
-  borderRadius: 4,
-  padding: "1px 5px",
+  borderRadius: 'var(--radius-xs)',
+  padding: "var(--space-0-5) var(--space-1)",
   border: "1px solid var(--neutral-700-12)",
   whiteSpace: "pre",
 };
@@ -22,18 +22,18 @@ export const INLINE_CODE_STYLE: React.CSSProperties = {
 
 // Inline markdown for non-citation content (reasoning steps, callout bodies)
 function renderInlineMd(text: string): React.ReactNode[] {
-  // eslint-disable-next-line react/no-array-index-as-key
+  // eslint-disable-next-line react/no-array-index-key
   return text.split(/(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\(https?:\/\/[^)]+\))/).map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**"))
-      // eslint-disable-next-line react/no-array-index-as-key
-      return <strong key={i} style={{ fontWeight: 600, color: "var(--neutral-900)" }}>{part.slice(2, -2)}</strong>;
+      // eslint-disable-next-line react/no-array-index-key
+      return <strong key={i} style={{ fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)" }}>{part.slice(2, -2)}</strong>;
     if (part.startsWith("`") && part.endsWith("`"))
-      // eslint-disable-next-line react/no-array-index-as-key
+      // eslint-disable-next-line react/no-array-index-key
       return <code key={i} style={INLINE_CODE_STYLE}>{part.slice(1, -1)}</code>;
     const lm = part.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/);
-    // eslint-disable-next-line react/no-array-index-as-key
+    // eslint-disable-next-line react/no-array-index-key
     if (lm) return <a key={i} href={lm[2]} target="_blank" rel="noopener noreferrer" style={{ color: "var(--brown-600)", textDecoration: "underline", textUnderlineOffset: 2 }}>{lm[1]}</a>;
-    // eslint-disable-next-line react/no-array-index-as-key
+    // eslint-disable-next-line react/no-array-index-key
     return <span key={i}>{part}</span>;
   });
 }

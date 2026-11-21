@@ -5,7 +5,7 @@ import { FAILURE_NOTICE_MS, MESSAGES, uploadFailureMessage } from '@/lib/library
 import type { UploadItem } from '@/lib/library/upload/machine'
 
 const noticeStyle: React.CSSProperties = {
-  margin: 0, padding: '8px 12px', borderRadius: 10, background: 'var(--neutral-100)', fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-700)',
+  margin: 0, padding: 'var(--space-2) var(--space-3)', borderRadius: 'var(--radius-lg)', background: 'var(--neutral-100)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-700)',
 }
 
 /**
@@ -52,7 +52,7 @@ export function UploadNotices({ items, onDismiss }: { items: readonly UploadItem
   if (failed.length === 0 && !paused && !slow) return null
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
       {failed.map((item) => (
         <p key={item.id} role="alert" style={noticeStyle}>{item.failure ? uploadFailureMessage(item.failure) : MESSAGES.genericFailure}</p>
       ))}

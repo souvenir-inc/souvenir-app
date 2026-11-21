@@ -16,9 +16,9 @@ import { useLibraryViewer } from '@/lib/library/viewer'
 const TRASH_DAYS = 30
 
 const rowStyle: React.CSSProperties = {
-  display: 'flex', alignItems: 'center', gap: 10, minHeight: 40, fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)',
+  display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', minHeight: 40, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)',
 }
-const detailStyle: React.CSSProperties = { minWidth: 0, maxWidth: '60%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, color: 'var(--neutral-600)' }
+const detailStyle: React.CSSProperties = { minWidth: 0, maxWidth: '60%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 'var(--font-size-small)', color: 'var(--neutral-600)' }
 
 function joinNames(names: string[]): string {
   if (names.length <= 1) return names.join('')
@@ -74,9 +74,9 @@ export function DeleteFileDialog({ file, onClose, onDeleted }: { file: LibraryFi
         <DialogHeader>
           <DialogTitle>Move {name} to Trash?</DialogTitle>
         </DialogHeader>
-        <DialogBody style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <DialogBody style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
           {usage.isPending ? (
-            <div aria-busy="true" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div aria-busy="true" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
               <Skeleton height={20} />
               <Skeleton height={20} />
             </div>
@@ -94,7 +94,7 @@ export function DeleteFileDialog({ file, onClose, onDeleted }: { file: LibraryFi
               <UsageRow icon={<UserIcon size={16} />} label="Shared with" detail={shares.length ? joinNames(shares) : 'No one'} />
             </div>
           )}
-          <DialogDescription style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 12, lineHeight: '16px', color: 'var(--neutral-500)' }}>
+          <DialogDescription style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)' }}>
             {FILE_MESSAGES.trashQuiet(TRASH_DAYS)}
           </DialogDescription>
         </DialogBody>

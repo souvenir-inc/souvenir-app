@@ -98,11 +98,11 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
         position:        'relative',
         width:           34,
         height:          20,
-        borderRadius:    999,
+        borderRadius:    'var(--radius-full)',
         border:          'none',
         cursor:          'pointer',
         backgroundColor: checked ? 'var(--neutral-800)' : 'var(--neutral-300)',
-        transition:      'background-color 0.15s ease',
+        transition:      'background-color var(--duration-fast) ease',
         flexShrink:      0,
         padding:         0,
       }}
@@ -115,7 +115,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
         height:          14,
         borderRadius:    '50%',
         backgroundColor: 'var(--card-bg)',
-        transition:      'left 0.15s ease',
+        transition:      'left var(--duration-fast) ease',
       }} />
     </button>
   )
@@ -156,7 +156,7 @@ export function ScheduleDetailView({
       : { label: isActive ? 'Next run' : 'Last run', value: '—' }
 
   const cardStyle: React.CSSProperties = {
-    borderRadius:    12,
+    borderRadius:    'var(--radius-xl)',
     border:          '1px solid var(--border-default)',
     backgroundColor: 'var(--card-bg)',
     overflow:        'hidden',
@@ -171,8 +171,8 @@ export function ScheduleDetailView({
   }
   const labelStyle: React.CSSProperties = {
     fontFamily: 'var(--font-body)',
-    fontSize:   '12px',
-    lineHeight: '16px',
+    fontSize:   'var(--font-size-small)',
+    lineHeight: 'var(--line-height-small)',
     color:      'var(--neutral-500)',
   }
   const valueStyle: React.CSSProperties = {
@@ -190,7 +190,7 @@ export function ScheduleDetailView({
     rows.push({
       key: 'status', label: 'Status',
       node: (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)' }}>
           <span style={valueStyle}>{isActive ? 'Active' : 'Paused'}</span>
           <Toggle checked={isActive} onChange={handleToggle} />
         </span>
@@ -205,9 +205,9 @@ export function ScheduleDetailView({
     rows.push({
       key: 'connectors', label: 'Connectors',
       node: (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 'var(--space-1-5)' }}>
           {schedule.connectors.map(connector => (
-            <span key={connector.slug} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span key={connector.slug} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1-5)' }}>
               <ConnectorGlyph slug={connector.slug} name={connector.name} logoUrl={connector.logoUrl} size={16} />
               <span style={valueStyle}>{connector.name}</span>
             </span>
@@ -228,7 +228,7 @@ export function ScheduleDetailView({
           type="button"
           onClick={() => onOpenChat(chatId)}
           style={{
-            display: 'inline-flex', alignItems: 'center', gap: 4,
+            display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)',
             border: 'none', background: 'transparent', padding: 0, cursor: 'pointer',
             ...valueStyle, textDecoration: 'underline',
           }}
@@ -241,14 +241,14 @@ export function ScheduleDetailView({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, padding: '24px 0 32px', width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', padding: 'var(--space-6) 0 var(--space-7)', width: '100%' }}>
 
       {/* ── Back + actions ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
         <Button variant="ghost" size="sm" leftIcon={<ArrowLeftOneIcon />} onClick={onBack}>
           Schedules
         </Button>
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexShrink: 0 }}>
           {readOnly ? (
             <Button variant="default" size="sm" leftIcon={<CopyOneIcon />} loading={copying} disabled={copying} onClick={onCopy}>
               Copy
@@ -266,19 +266,19 @@ export function ScheduleDetailView({
       </div>
 
       {/* ── Title block ── */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
         <h1 style={{
           margin:       0,
           fontFamily:   'var(--font-title)',
-          fontSize:     '28px',
+          fontSize:     'var(--font-size-heading-xl)',
           fontWeight:   'var(--font-weight-medium)',
-          lineHeight:   '36px',
+          lineHeight:   'var(--line-height-heading-xl)',
           color:        'var(--neutral-900)',
           overflowWrap: 'anywhere',
         }}>
           {schedule.name}
         </h1>
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-2-5)' }}>
           <Badge color={isActive ? 'Green' : 'Neutral'} label={isActive ? 'Active' : 'Paused'} />
           {/* Announced when a run starts or finishes. */}
           <span aria-live="polite" style={{ display: 'contents' }}>
@@ -293,7 +293,7 @@ export function ScheduleDetailView({
               label={`${Math.round(schedule.successRate * 100)}% success`}
             />
           )}
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, ...valueStyle, color: 'var(--neutral-600)' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1-5)', ...valueStyle, color: 'var(--neutral-600)' }}>
             <CalendarThreeIcon size={14} color="var(--neutral-500)" />
             {schedule.frequency}
           </span>
@@ -307,23 +307,23 @@ export function ScheduleDetailView({
         <div style={{
           display:         'flex',
           alignItems:      'flex-start',
-          gap:             8,
-          padding:         '10px 12px',
-          borderRadius:    10,
+          gap:             'var(--space-2)',
+          padding:         'var(--space-2-5) var(--space-3)',
+          borderRadius:    'var(--radius-lg)',
           backgroundColor: 'var(--yellow-50)',
-          boxShadow:       '0px 0px 0px 1px var(--yellow-200, #fef08a)',
+          boxShadow:       '0px 0px 0px 1px var(--yellow-200)',
         }}>
-          <AlertTwoIcon size={16} color="var(--yellow-600)" style={{ flexShrink: 0, marginTop: 2 }} />
-          <p style={{ margin: 0, ...valueStyle, fontSize: '13px', lineHeight: '20px', color: 'var(--neutral-700)' }}>
+          <AlertTwoIcon size={16} color="var(--yellow-600)" style={{ flexShrink: 0, marginTop: 'var(--space-0-5)' }} />
+          <p style={{ margin: 0, ...valueStyle, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-700)' }}>
             This schedule's last change may not have fully synced — the timer that's actually running could still be on the old cadence. Try editing and saving it again.
           </p>
         </div>
       )}
 
       {/* ── Stat tiles ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-3)' }}>
         {stats.map(stat => (
-          <div key={stat.label} style={{ ...cardStyle, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div key={stat.label} style={{ ...cardStyle, padding: 'var(--space-3) var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
             <span style={labelStyle}>{stat.label}</span>
             <span style={{ ...valueStyle, fontSize: 'var(--font-size-body-lg)', fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-900)' }}>
               {stat.value}
@@ -333,12 +333,12 @@ export function ScheduleDetailView({
       </div>
 
       {/* ── Two columns: what it does + history | details ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'minmax(0, 1fr)' : 'minmax(0, 1fr) 280px', gap: 24, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'minmax(0, 1fr)' : 'minmax(0, 1fr) 280px', gap: 'var(--space-6)', alignItems: 'start' }}>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, minWidth: 0 }}>
-          <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', minWidth: 0 }}>
+          <section style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             <h2 style={sectionTitle}>What it does</h2>
-            <div style={{ ...cardStyle, padding: 16 }}>
+            <div style={{ ...cardStyle, padding: 'var(--space-4)' }}>
               {/* MarkdownRenderer so URLs in the AI-written summary are real
                   links; --prose-* keep it at this card's body size/colour. */}
               <div style={{
@@ -354,11 +354,11 @@ export function ScheduleDetailView({
 
           {/* Run outputs — every run's files live in All files under Source: Generated */}
           {!readOnly && (
-            <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }} aria-label={CHAT_MESSAGES.runOutputs}>
+            <section style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }} aria-label={CHAT_MESSAGES.runOutputs}>
               <h2 style={sectionTitle}>{CHAT_MESSAGES.runOutputs}</h2>
               <Link
                 href={RUN_OUTPUTS_HREF}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, alignSelf: 'flex-start', fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 500, color: 'var(--neutral-900)', textDecoration: 'none' }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1-5)', alignSelf: 'flex-start', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-900)', textDecoration: 'none' }}
               >
                 {CHAT_MESSAGES.allRunOutputs}
                 <ArrowRightOneIcon size={14} />
@@ -368,20 +368,20 @@ export function ScheduleDetailView({
 
           {/* Run history — the owner's alone; its answers can hold their data */}
           {!readOnly && (
-            <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <section style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                 <h2 style={sectionTitle}>Run history</h2>
                 {history.length > 0 && <Badge color="Neutral" label={String(history.length)} />}
               </div>
 
               {history.length === 0 ? (
-                <div style={{ ...cardStyle, padding: '32px 24px', textAlign: 'center', ...valueStyle, color: 'var(--neutral-500)' }}>
+                <div style={{ ...cardStyle, padding: 'var(--space-7) var(--space-6)', textAlign: 'center', ...valueStyle, color: 'var(--neutral-500)' }}>
                   No runs yet
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                   {history.map(run => (
-                    <div key={run.id} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div key={run.id} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                       <LoopHistoryCard
                         steps={run.steps}
                         completedAt={run.completedAt}
@@ -398,16 +398,16 @@ export function ScheduleDetailView({
                           style={{
                             display:    'inline-flex',
                             alignItems: 'center',
-                            gap:        3,
+                            gap:        'var(--space-0-5)',
                             alignSelf:  'flex-end',
                             background: 'none',
                             border:     'none',
-                            padding:    '2px 4px',
+                            padding:    'var(--space-0-5) var(--space-1)',
                             cursor:     'pointer',
                             fontFamily: 'var(--font-body)',
-                            fontSize:   '13px',
+                            fontSize:   'var(--font-size-body-sm)',
                             fontWeight: 'var(--font-weight-medium)',
-                            lineHeight: '20px',
+                            lineHeight: 'var(--line-height-body-sm)',
                             color:      'var(--neutral-500)',
                           }}
                         >
@@ -424,16 +424,16 @@ export function ScheduleDetailView({
         </div>
 
         {/* Details */}
-        <aside style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
+        <aside style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', minWidth: 0 }}>
           <h2 style={sectionTitle}>Details</h2>
-          <div style={{ ...cardStyle, padding: '4px 16px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ ...cardStyle, padding: 'var(--space-1) var(--space-4)', display: 'flex', flexDirection: 'column' }}>
             {rows.map((row, i) => (
               <div key={row.key} style={{
                 display:        'flex',
                 justifyContent: 'space-between',
                 alignItems:     'center',
-                gap:            16,
-                padding:        '12px 0',
+                gap:            'var(--space-4)',
+                padding:        'var(--space-3) 0',
                 borderTop:      i === 0 ? 'none' : '1px solid var(--neutral-100)',
               }}>
                 <span style={labelStyle}>{row.label}</span>

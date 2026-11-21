@@ -75,7 +75,7 @@ const TOOLTIP_EMPTY_TEXT_STYLE: React.CSSProperties = {
 
 function modelInfoSection(header: string, emptyText: string, content: React.ReactNode | null): React.ReactNode {
   return (
-    <span style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+    <span style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)' }}>
       <span style={TOOLTIP_SECTION_HEADER_STYLE}>{header}</span>
       {content ?? <span style={TOOLTIP_EMPTY_TEXT_STYLE}>{emptyText}</span>}
     </span>
@@ -89,7 +89,7 @@ function modelInfoContent(model: AIModel): React.ReactNode {
     "Tags",
     "No tags for this model yet.",
     hasTags ? (
-      <span style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
+      <span style={{ display: "flex", flexWrap: "wrap", gap: 'var(--space-0-5)' }}>
         {model.tags!.map((tag) => (
           <Badge key={tag} label={tag} color={tagColor(tag)} />
         ))}
@@ -136,13 +136,13 @@ function PresetModelSelectorContent({
   const filtered = sortModels(models);
 
   return (
-    <div ref={containerRef} style={{ padding: "8px" }}>
+    <div ref={containerRef} style={{ padding: "var(--space-2)" }}>
       {/* Inner container */}
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "16px",
+          gap: "var(--space-4)",
           // No fixed height — the dialog now sizes to its actual content
           // (however many rows match), instead of always reserving the same
           // tall block regardless of result count. The scroll cap lives on
@@ -154,7 +154,7 @@ function PresetModelSelectorContent({
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "8px",
+            gap: "var(--space-2)",
             width: "100%",
           }}
         >
@@ -169,14 +169,14 @@ function PresetModelSelectorContent({
                   maxHeight: `${MODEL_LIST_MAX_HEIGHT}px`,
                   overflowY: "auto",
                   overscrollBehaviorY: "contain",
-                  padding: "2px",
+                  padding: "var(--space-0-5)",
                 }}
               >
                 <div
                   style={{
                     display: "flex",
                     flexDirection: "column",
-                    gap: "4px",
+                    gap: "var(--space-1)",
                   }}
                 >
                   {filtered.map((model) => {
@@ -290,6 +290,23 @@ export function PresetModelSelectorDialog() {
     setPreferLeftTooltips(left + DROPDOWN_WIDTH >= vw - 24);
   }, [isOpen, anchorEl]);
 
+  // On open (or once the models arrive), focus moves into the panel (the selected model,
+  // else the first one): the panel
+  // is mounted elsewhere in the page, so Tab from the trigger would leave it and close it.
+  useEffect(() => {
+    if (!isOpen) return;
+    const frame = requestAnimationFrame(() => {
+      const panel = dropdownRef.current;
+      if (!panel || panel.contains(document.activeElement)) return;
+      const target =
+        panel.querySelector<HTMLElement>('[aria-pressed="true"]') ??
+        panel.querySelector<HTMLElement>('input, button, [tabindex="0"]');
+      target?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
+    // models too: opened before the list loaded, focus moves in once it arrives.
+  }, [isOpen, models.length]);
+
   // Close on outside click or Escape
   useEffect(() => {
     if (!isOpen) return;
@@ -303,14 +320,29 @@ export function PresetModelSelectorDialog() {
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+      if (e.key !== "Escape") return;
+      close();
+      anchorEl?.focus();
+    };
+
+    // Focus landing outside (Tab away, or a modal opened from the keyboard, which takes
+    // focus) closes it too. The panel sits on the popover layer, above dialogs, so one
+    // left open would otherwise float over a modal that opened without a mouse press.
+    const handleFocusIn = (e: FocusEvent) => {
+      if (
+        dropdownRef.current?.contains(e.target as Node) ||
+        anchorEl?.contains(e.target as Node)
+      ) return;
+      close();
     };
 
     document.addEventListener("mousedown", handleMouseDown);
     document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("focusin", handleFocusIn);
     return () => {
       document.removeEventListener("mousedown", handleMouseDown);
       document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("focusin", handleFocusIn);
     };
   }, [isOpen, anchorEl, close]);
 
@@ -342,6 +374,7 @@ export function PresetModelSelectorDialog() {
       {isOpen && (
         <m.div
           key="dropdown"
+          // eslint-disable-next-line no-restricted-syntax -- ds-allow: anchored non-modal panel (see note above); moves to ui Popover with a virtual anchor later
           role="dialog"
           aria-modal
           aria-label="Select model"
@@ -351,7 +384,7 @@ export function PresetModelSelectorDialog() {
           transition={{ type: "spring", stiffness: 400, damping: 30 }}
           style={{
             position: "fixed",
-            zIndex: 51,
+            zIndex: 'var(--z-popover)',
             ...style,
           }}
         >
@@ -368,7 +401,11 @@ export function PresetModelSelectorDialog() {
             <PresetModelSelectorContent
               models={models}
               selectedModel={selectedModel}
-              onSelect={selectModel}
+              onSelect={(model) => {
+                selectModel(model);
+                // The chosen row goes with the panel: focus returns to the trigger.
+                anchorEl?.focus();
+              }}
               preferLeftTooltips={preferLeftTooltips}
             />
           </Popover>

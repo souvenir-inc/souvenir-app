@@ -99,7 +99,7 @@ export interface PopoverProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 // ── Scroll-edge fade ──────────────────────────────────────────────────────────
-// Vertical fade implementation per `specs/patterns/scroll-edge-fade.md`:
+// Vertical fade:
 //   • 4 progressive backdrop-blur layers (40 / 28 / 18 / 10 px depth,
 //     2 / 3 / 5 / 6 px blur radii)
 //   • 1 surface-colour gradient (40 px depth, popover-bg → transparent)
@@ -292,7 +292,7 @@ export function PopoverContent(
       align={align}
       collisionPadding={collisionPadding}
       asChild
-      style={{ zIndex: 50, outline: 'none', ...style }}
+      style={{ zIndex: 'var(--z-popover)', outline: 'none', ...style }}
       {...contentProps}
     >
       <Popover size={size} variant={variant} maxHeight={maxHeight} header={header}>

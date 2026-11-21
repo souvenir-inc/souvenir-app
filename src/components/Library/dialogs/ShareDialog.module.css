@@ -3,25 +3,25 @@
 .sectionLabel {
   margin: 0;
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-700);
 }
 
 .name {
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-900);
 }
 
 .quiet {
   margin: 0;
   font-family: var(--font-body);
-  font-size: 12px;
-  line-height: 16px;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
   color: var(--neutral-500);
 }
 
@@ -41,7 +41,7 @@
 .confirmBody {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 /* ── Title ────────────────────────────────────────────────────────────────── */
@@ -49,7 +49,7 @@
 .title {
   display: flex;
   min-width: 0;
-  padding-right: 28px;
+  padding-right: var(--space-6);
 }
 
 .titlePrefix {
@@ -65,7 +65,7 @@
 .mainBody {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--space-3);
 }
 
 .picker {
@@ -76,18 +76,18 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1-5);
   min-height: 40px;
   box-sizing: border-box;
-  padding: 0 12px;
-  border-radius: 10px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-lg);
   background: var(--text-field-bg);
   cursor: text;
   box-shadow: 0px 1px 1.5px 0px rgba(82, 75, 71, 0.12), 0px 0px 0px 1px var(--text-field-ring);
 }
 
 .field[data-has-chips='true'] {
-  padding: 5px 8px;
+  padding: var(--space-1) var(--space-2);
 }
 
 .input {
@@ -99,24 +99,24 @@
   outline: none;
   background: transparent;
   font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 22px;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-900);
 }
 
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1-5);
   height: 28px;
-  padding: 0 4px 0 3px;
-  border-radius: 999px;
+  padding: 0 var(--space-1) 0 var(--space-0-5);
+  border-radius: var(--radius-full);
   background: var(--neutral-100);
   max-width: 100%;
 }
 
 .chipLabel {
-  font-size: 13px;
+  font-size: var(--font-size-body-sm);
 }
 
 .listbox {
@@ -127,28 +127,28 @@
   right: 0;
   max-height: 260px;
   overflow: auto;
-  padding: 6px;
-  border-radius: 12px;
+  padding: var(--space-1-5);
+  border-radius: var(--radius-xl);
   background: var(--card-bg);
   box-shadow: var(--shadow-card-default);
 }
 
 .noMatch {
-  padding: 10px 8px;
-  font-size: 13px;
+  padding: var(--space-2-5) var(--space-2);
+  font-size: var(--font-size-body-sm);
 }
 
 .row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-2-5);
   min-height: 44px;
 }
 
 .option {
   min-height: 40px;
-  padding: 0 8px;
-  border-radius: 8px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-md);
   cursor: pointer;
   background: transparent;
 }
@@ -162,14 +162,14 @@
 .accessSection {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-1);
   min-height: 240px;
 }
 
 .loadingList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .linkButton {
@@ -192,7 +192,7 @@
 }
 
 .entry {
-  padding: 0 8px;
+  padding: 0 var(--space-2);
 }
 
 .entryText {
@@ -206,15 +206,15 @@
 .empty {
   flex: 1;
   min-height: 140px;
-  margin-top: 8px;
+  margin-top: var(--space-2);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 16px;
+  gap: var(--space-1);
+  padding: var(--space-4);
   border: 1px dashed var(--neutral-200);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   text-align: center;
 }
 
@@ -224,14 +224,14 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  margin-bottom: 4px;
-  border-radius: 999px;
+  margin-bottom: var(--space-1);
+  border-radius: var(--radius-full);
   background: var(--neutral-100);
   color: var(--neutral-600);
 }
 
 .emptyHint {
-  font-size: 13px;
-  line-height: 18px;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body-sm);
 }
 

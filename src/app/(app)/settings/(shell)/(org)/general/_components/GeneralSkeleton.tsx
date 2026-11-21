@@ -32,9 +32,9 @@ function SkeletonBlock({
 function SkeletonCard({ children, danger }: { children: React.ReactNode; danger?: boolean }) {
   return (
     <div style={{
-      border:       `1px solid ${danger ? 'var(--red-400, #f87171)' : 'var(--border-default)'}`,
-      borderRadius: 16,
-      boxShadow:    '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+      border:       `1px solid ${danger ? 'var(--red-400)' : 'var(--border-default)'}`,
+      borderRadius: 'var(--radius-2xl)',
+      boxShadow:    'var(--shadow-soft)',
       overflow:     'hidden',
     }}>
       {children}
@@ -45,11 +45,11 @@ function SkeletonCard({ children, danger }: { children: React.ReactNode; danger?
 function SkeletonRow({ children, border = true }: { children: React.ReactNode; border?: boolean }) {
   return (
     <div style={{
-      padding:      '12px 24px',
+      padding:      'var(--space-3) var(--space-6)',
       borderBottom: border ? '1px solid var(--neutral-100)' : undefined,
       display:      'flex',
       alignItems:   'center',
-      gap:          12,
+      gap:          'var(--space-3)',
     }}>
       {children}
     </div>
@@ -63,29 +63,29 @@ function Line({ lh, width, height, radius = 4 }: { lh: number; width: number | s
 
 export function GeneralPageSkeleton() {
   return (
-    <div style={{ width: '100%', maxWidth: 908, padding: '0 24px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 10 }}>
+    <div style={{ width: '100%', maxWidth: 908, padding: '0 var(--space-6)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
       <style>{`@keyframes generalSkeletonShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
 
       {/* Page header: h1 (32px line) + subtitle (22px line) */}
-      <div style={{ paddingLeft: 4, marginBottom: 4, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)', display: 'flex', flexDirection: 'column' }}>
         <Line lh={32} width={90} height={26} radius={6} />
         <Line lh={22} width={530} height={14} />
       </div>
 
       {/* Workspace: hero (logo, name, link, Edit workspace) + Workspace ID strip */}
       <SkeletonCard>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '20px 24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', padding: 'var(--space-5) var(--space-6)' }}>
           <SkeletonBlock width={64} height={64} radius={16} />
-          <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
             <Line lh={28} width={164} height={20} radius={6} />
-            <div style={{ height: 22, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ height: 22, display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)' }}>
               <SkeletonBlock width={361} height={14} radius={4} />
               <SkeletonBlock width={16} height={16} radius={4} />
             </div>
           </div>
           <SkeletonBlock width={125} height={32} radius={8} />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 24px', borderTop: '1px solid var(--border-default)', background: 'var(--neutral-50)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', padding: 'var(--space-2-5) var(--space-6)', borderTop: '1px solid var(--border-default)', background: 'var(--neutral-50)' }}>
           <Line lh={20} width={82} height={12} />
           <SkeletonBlock width={143} height={12} radius={4} />
           <SkeletonBlock width={16} height={16} radius={4} />
@@ -95,27 +95,27 @@ export function GeneralPageSkeleton() {
 
       {/* AI instructions: head + status pill, editor box (textarea, starters + counter), footer */}
       <SkeletonCard>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '16px 24px', borderBottom: '1px solid var(--neutral-100)' }}>
-          <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', padding: 'var(--space-4) var(--space-6)', borderBottom: '1px solid var(--neutral-100)' }}>
+          <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)' }}>
             <Line lh={22} width={108} height={15} />
             <Line lh={20} width={494} height={12} />
           </div>
           <SkeletonBlock width={73} height={22} radius={999} />
         </div>
-        <div style={{ padding: '16px 24px 20px' }}>
-          <div style={{ border: '1px solid var(--border-default)', borderRadius: 12, background: 'var(--field-surface)', overflow: 'hidden' }}>
-            <div style={{ height: 140, padding: '15px 14px', boxSizing: 'border-box' }}>
+        <div style={{ padding: 'var(--space-4) var(--space-6) var(--space-5)' }}>
+          <div style={{ border: '1px solid var(--border-default)', borderRadius: 'var(--radius-xl)', background: 'var(--field-surface)', overflow: 'hidden' }}>
+            <div style={{ height: 140, padding: 'var(--space-4) var(--space-3)', boxSizing: 'border-box' }}>
               <SkeletonBlock width={630} height={14} radius={4} />
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '8px 10px', borderTop: '1px solid var(--border-default)', background: 'var(--neutral-50)' }}>
-              <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', padding: 'var(--space-2) var(--space-2-5)', borderTop: '1px solid var(--border-default)', background: 'var(--neutral-50)' }}>
+              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
                 {[140, 206, 168].map(w => <SkeletonBlock key={w} width={w} height={26} radius={999} />)}
               </div>
               <SkeletonBlock width={50} height={12} radius={4} />
             </div>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px', borderTop: '1px solid var(--border-default)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-3) var(--space-6)', borderTop: '1px solid var(--border-default)' }}>
           <div style={{ flex: '1 0 0', minWidth: 0 }}><SkeletonBlock width={235} height={12} radius={4} /></div>
           <SkeletonBlock width={61} height={32} radius={8} />
           <SkeletonBlock width={137} height={32} radius={8} />
@@ -125,21 +125,21 @@ export function GeneralPageSkeleton() {
       {/* Danger Zone */}
       {SHOW_DANGER_ZONE && (
       <SkeletonCard danger>
-        <div style={{ borderBottom: '1px solid var(--neutral-100)', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ borderBottom: '1px solid var(--neutral-100)', padding: 'var(--space-5) var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
           <SkeletonBlock width={110} height={16} radius={5} />
           <SkeletonBlock width={310} height={13} radius={4} />
         </div>
         <SkeletonRow>
-          <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
             <SkeletonBlock width={150} height={14} radius={5} />
             <SkeletonBlock width={280} height={13} radius={4} />
           </div>
           <SkeletonBlock width={80} height={32} radius={8} />
         </SkeletonRow>
-        <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 8, borderBottom: undefined }}>
+        <div style={{ padding: 'var(--space-5) var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', borderBottom: undefined }}>
           <SkeletonBlock width={160} height={14} radius={5} />
           <SkeletonBlock width={250} height={13} radius={4} />
-          <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
+          <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-1)' }}>
             <SkeletonBlock width={280} height={36} radius={10} />
             <SkeletonBlock width={150} height={36} radius={8} />
           </div>

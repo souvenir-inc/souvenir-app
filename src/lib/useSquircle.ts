@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useLayoutEffect, useState, useCallback } from 'react'
+import { useLayoutEffect, useState, useCallback } from 'react'
 import { getSvgPath } from 'figma-squircle'
 
 // Module-level cache: most buttons share identical dimensions and radius, so
@@ -16,14 +16,22 @@ function getCachedPath(width: number, height: number, cornerRadius: number, smoo
   return d
 }
 
-export function useSquircle(cornerRadius: number, smoothing = 0.6, strokeWidth = 0) {
-  const ref = useRef<HTMLButtonElement>(null)
+/** `ref` is a callback ref: hand it to the element, or call it from a ref that
+ *  merges several. It is deliberately not a ref object — a caller that merges
+ *  refs would have to write to `.current`, and React Compiler (correctly) treats
+ *  a hook's return value as something the caller may not mutate. Keeping the node
+ *  in state also means the observer below re-attaches when the node changes,
+ *  which a one-shot read of `ref.current` in the effect never did. */
+export function useSquircle<T extends HTMLElement = HTMLButtonElement>(
+  cornerRadius: number,
+  smoothing = 0.6,
+  strokeWidth = 0,
+) {
+  const [node, setNode] = useState<T | null>(null)
   const [clipPath, setClipPath] = useState('')
   const [strokeClipPath, setStrokeClipPath] = useState('')
 
-  const compute = useCallback(() => {
-    const el = ref.current
-    if (!el) return
+  const compute = useCallback((el: T) => {
     // Use offsetWidth/offsetHeight (layout box) rather than getBoundingClientRect
     // which includes ancestor transforms and gives wrong sizes when mounted inside
     // animating parents (e.g. PinboardExpanded inside Pinboard's scale animation).
@@ -42,11 +50,13 @@ export function useSquircle(cornerRadius: number, smoothing = 0.6, strokeWidth =
   }, [cornerRadius, smoothing, strokeWidth])
 
   useLayoutEffect(() => {
-    compute()
-    const ro = new ResizeObserver(compute)
-    if (ref.current) ro.observe(ref.current)
+    if (!node) return
+    // observe() delivers one callback with the current size straight away, in the
+    // same frame and before paint, so there is no separate first measurement.
+    const ro = new ResizeObserver(() => compute(node))
+    ro.observe(node)
     return () => ro.disconnect()
-  }, [compute])
+  }, [node, compute])
 
-  return { ref, clipPath, strokeClipPath }
+  return { ref: setNode, clipPath, strokeClipPath }
 }

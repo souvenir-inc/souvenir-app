@@ -41,14 +41,34 @@ export type { FlatSidebarProjectGroupProps } from "@/components/FlatSidebarProje
 export { FlatSidebarSlackConnector } from "@/components/FlatSidebarSlackConnector";
 export { FlatSidebarProfileRow } from "@/components/FlatSidebarProfileRow";
 
-export * from "@/components/Button";
+// The one Button / IconButton (plan decision D2).
+export * from "@/components/ui/button";
 
 export * from "@/components/Badge";
 
-// ── Radix Primitives ──────────────────────────────────────────────────────────
-// Re-exported for use throughout the app without direct Radix imports.
 
-export * as Dialog from "@radix-ui/react-dialog";
-export * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-export * as ScrollArea from "@radix-ui/react-scroll-area";
-export * as Tooltip from "@radix-ui/react-tooltip";
+// ── Layout and type (plan Phase 3) ────────────────────────────────────────────
+export * from "@/components/ui/text";
+export * from "@/components/ui/layout";
+export * from "@/components/ui/card";
+export { Divider as Separator } from "@/components/Divider";
+export type { DividerProps as SeparatorProps } from "@/components/Divider";
+
+// ── Forms (plan Phase 4) ──────────────────────────────────────────────────────
+export * from "@/components/ui/field";
+export * from "@/components/ui/input";
+export * from "@/components/ui/textarea";
+export * from "@/components/ui/radio-group";
+export * from "@/components/ui/segmented-control";
+export * from "@/components/ui/select";
+
+// ── Feedback and display (plan Phase 5) ───────────────────────────────────────
+export * from "@/components/ui/alert";
+export * from "@/components/ui/meter";
+export * from "@/components/ui/empty-state";
+export * from "@/components/ui/table";
+export * from "@/components/ui/collapsible";
+export * from "@/components/ui/kbd";
+export * from "@/components/ui/link";
+export * from "@/components/ui/icon";
+export * from "@/components/ui/scroll-area";

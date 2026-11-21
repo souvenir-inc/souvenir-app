@@ -37,13 +37,13 @@ export function SessionRow({ num, time, messages, tokens, status, className, sty
           display:        'flex',
           alignItems:     'center',
           justifyContent: 'space-between',
-          gap:            12,
-          padding:        '12px 0',
+          gap:            'var(--space-3)',
+          padding:        'var(--space-3) 0',
           ...style,
         }}
         {...props}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', minWidth: 0 }}>
           <span
             aria-hidden
             style={{
@@ -65,7 +65,7 @@ export function SessionRow({ num, time, messages, tokens, status, className, sty
           >
             {num}
           </span>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', minWidth: 0 }}>
             <span
               style={{
                 fontFamily: 'var(--font-body)',

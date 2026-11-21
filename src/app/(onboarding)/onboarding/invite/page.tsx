@@ -249,7 +249,7 @@ export default function OnboardingInvitePage() {
     <StepCanvas>
       <StepHeader total={3} activeIndex={2} title="Invite your team members" />
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 4, width: "100%", padding: "24px 0 0" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)', width: "100%", padding: "var(--space-6) 0 0" }}>
         <FieldLabel>Enter their email ids</FieldLabel>
         <div
           onClick={(e) => { if (e.target === e.currentTarget) (e.currentTarget.querySelector("input") as HTMLInputElement | null)?.focus(); }}
@@ -262,21 +262,21 @@ export default function OnboardingInvitePage() {
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
-            gap: 6,
+            gap: 'var(--space-1-5)',
             width: "100%",
             minHeight: 122,
             maxHeight: 260,
             overflowY: "auto",
             overscrollBehaviorY: "contain",
-            padding: "7px 10px",
-            borderRadius: 10,
+            padding: "var(--space-1-5) var(--space-2-5)",
+            borderRadius: 'var(--radius-lg)',
             backgroundColor: "#FFFFFF",
             boxShadow: problem?.kind === "invalid"
               ? "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--red-500)"
               : problem?.kind === "suggest"
                 ? "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--yellow-500)"
-                : "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
-            transition: "box-shadow 150ms ease",
+                : "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)",
+            transition: "box-shadow var(--duration-fast) ease",
             boxSizing: "border-box",
             alignContent: "flex-start",
             cursor: "text",
@@ -290,7 +290,7 @@ export default function OnboardingInvitePage() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.85 }}
                 transition={{ duration: 0.12 }}
-                style={{ display: "flex", alignItems: "center", gap: 2 }}
+                style={{ display: "flex", alignItems: "center", gap: 'var(--space-0-5)' }}
               >
                 <Badge label={email} color={CHIP_COLORS[i % CHIP_COLORS.length]} />
                 <button
@@ -354,17 +354,17 @@ export default function OnboardingInvitePage() {
               outline: "none",
               background: "transparent",
               fontFamily: "var(--font-body)",
-              fontSize: 14,
-              lineHeight: "22px",
+              fontSize: 'var(--font-size-body)',
+              lineHeight: "var(--line-height-body)",
               color: "var(--neutral-900)",
             }}
           />
         </div>
         {/* What's wrong with what's typed, or the usual how-to when nothing is. */}
-        <div id="invite-email-help" aria-live="polite" style={{ minHeight: 20, fontFamily: "var(--font-body)", fontSize: 12, lineHeight: "20px", color: "var(--neutral-500)" }}>
+        <div id="invite-email-help" aria-live="polite" style={{ minHeight: 20, fontFamily: "var(--font-body)", fontSize: 'var(--font-size-small)', lineHeight: "var(--line-height-body-sm)", color: "var(--neutral-500)" }}>
           {problem?.kind === "suggest" ? (
-            <span style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", color: "var(--neutral-700)" }}>
-              Did you mean <strong style={{ fontWeight: 500, color: "var(--neutral-900)" }}>{problem.suggestion}</strong>?
+            <span style={{ display: "flex", alignItems: "center", gap: 'var(--space-1-5)', flexWrap: "wrap", color: "var(--neutral-700)" }}>
+              Did you mean <strong style={{ fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-900)" }}>{problem.suggestion}</strong>?
               <Button variant="outline" size="xs" onClick={() => resolveSuggestion("suggestion")}>Use it</Button>
               <Button variant="ghost" size="xs" onClick={() => resolveSuggestion("typed")}>Keep {problem.typed}</Button>
             </span>

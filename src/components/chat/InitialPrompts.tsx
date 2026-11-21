@@ -65,10 +65,10 @@ export function GreetingHeading({ greeting, compact, animateLogo = false }: {
       style={{
         fontFamily: "var(--font-title)", // Google Sans
         fontSize:   compact ? "28px" : "34px",
-        fontWeight: 400,
+        fontWeight: 'var(--font-weight-regular)',
         color:      "var(--neutral-800)",
         margin:     0,
-        lineHeight: 1.25,
+        lineHeight: 'var(--leading-tight)',
         textAlign:  "center",
         textWrap:   "balance",
       }}

@@ -178,7 +178,9 @@ export type ConnectorPermissionPrompt = z.infer<typeof promptSchemas.permission_
 export type PermissionPromptOption    = ConnectorPermissionPrompt['options'][number]
 export type Prompt                    = ConnectorConnectPrompt | ConnectorPermissionPrompt | ChatPrompt
 
-export const isPromptEvent = (name: string): name is PromptEventName => name in promptSchemas
+// Own keys only: `in` also matches inherited names ("constructor", "toString"), which
+// would pass this guard and then crash parsePrompt on a value that is not a schema.
+export const isPromptEvent = (name: string): name is PromptEventName => Object.hasOwn(promptSchemas, name)
 
 /** The card for a prompt event, or null (logged) when the payload does not match its schema. */
 export function parsePrompt(name: PromptEventName, raw: unknown): Prompt | null {

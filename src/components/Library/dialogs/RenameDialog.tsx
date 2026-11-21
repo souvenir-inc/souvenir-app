@@ -43,7 +43,7 @@ export function RenameDialog({ file, onClose }: { file: LibraryFile; onClose: ()
             <DialogTitle>Rename file</DialogTitle>
           </DialogHeader>
           <DialogBody>
-            <label htmlFor={`${errorId}-input`} style={{ display: 'block', fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-700)', marginBottom: 6 }}>
+            <label htmlFor={`${errorId}-input`} style={{ display: 'block', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-700)', marginBottom: 'var(--space-1-5)' }}>
               Name
             </label>
             <input
@@ -56,17 +56,17 @@ export function RenameDialog({ file, onClose }: { file: LibraryFile; onClose: ()
               autoComplete="off"
               spellCheck={false}
               style={{
-                width: '100%', boxSizing: 'border-box', padding: '8px 10px', borderRadius: 10, border: 'none', outline: 'none',
-                background: 'var(--text-field-bg)', color: 'var(--neutral-900)', fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px',
+                width: '100%', boxSizing: 'border-box', padding: 'var(--space-2) var(--space-2-5)', borderRadius: 'var(--radius-lg)', border: 'none', outline: 'none',
+                background: 'var(--text-field-bg)', color: 'var(--neutral-900)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)',
                 boxShadow: error ? '0 0 0 1.5px var(--color-tag-Red-text)' : '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--text-field-ring)',
               }}
             />
             {error && (
-              <p id={errorId} role="alert" style={{ margin: '6px 0 0', fontFamily: 'var(--font-body)', fontSize: 12, lineHeight: '16px', color: 'var(--color-tag-Red-text)' }}>
+              <p id={errorId} role="alert" style={{ margin: 'var(--space-1-5) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--color-tag-Red-text)' }}>
                 {error}
               </p>
             )}
-            <p style={{ margin: '8px 0 0', fontFamily: 'var(--font-body)', fontSize: 12, lineHeight: '18px', color: 'var(--neutral-500)' }}>
+            <p style={{ margin: 'var(--space-2) 0 0', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)' }}>
               Currently &ldquo;{sanitizeDisplayText(file.title)}&rdquo;. The file type stays .{file.extension || 'as is'}. Slashes are saved as dashes.
             </p>
           </DialogBody>

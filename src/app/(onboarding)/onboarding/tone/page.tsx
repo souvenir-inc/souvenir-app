@@ -36,8 +36,8 @@ function ToneCard({
       style={{
         display: "flex",
         alignItems: "flex-start",
-        padding: "12px",
-        borderRadius: "16px",
+        padding: "var(--space-3)",
+        borderRadius: "var(--radius-2xl)",
         backgroundColor: "var(--neutral-white)",
         boxShadow: selected
           ? "0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 2px var(--neutral-900)"
@@ -47,8 +47,8 @@ function ToneCard({
         textAlign: "left",
         width: "100%",
         outline: "none",
-        transition: "box-shadow 120ms",
-        gap: "12px",
+        transition: "box-shadow var(--duration-fast)",
+        gap: "var(--space-3)",
       }}
     >
       {/* Icon placeholder */}
@@ -56,7 +56,7 @@ function ToneCard({
         style={{
           width: 65,
           height: 65,
-          borderRadius: "8px",
+          borderRadius: "var(--radius-md)",
           backgroundColor: "var(--brown-200)",
           flexShrink: 0,
           display: "flex",
@@ -69,8 +69,8 @@ function ToneCard({
         <span
           style={{
             fontFamily: "var(--font-title)",
-            fontWeight: 400,
-            fontSize: "18px",
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: "var(--font-size-heading-sm)",
             color: "var(--neutral-white-90)",
             letterSpacing: "0.5px",
           }}
@@ -80,14 +80,14 @@ function ToneCard({
       </div>
 
       {/* Text */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "4px", justifyContent: "center", flex: 1 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)", justifyContent: "center", flex: 1 }}>
         <p
           style={{
             fontFamily: "var(--font-body)",
-            fontWeight: 400,
-            fontSize: "16px",
-            lineHeight: "22px",
-            color: "var(--neutral-900, #26211e)",
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: "var(--font-size-body-lg)",
+            lineHeight: "var(--line-height-body)",
+            color: "var(--neutral-900)",
             margin: 0,
           }}
         >
@@ -96,9 +96,9 @@ function ToneCard({
         <p
           style={{
             fontFamily: "var(--font-body)",
-            fontWeight: 400,
-            fontSize: "14px",
-            lineHeight: "22px",
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: "var(--font-size-body)",
+            lineHeight: "var(--line-height-body)",
             color: "var(--neutral-500)",
             margin: 0,
             overflow: "hidden",
@@ -175,7 +175,7 @@ export default function OnboardingTonePage() {
       }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- decorative background; Next Image doesn't support SVG patterns with embedded raster images */}
-      <img src="https://souvenirai-storage.s3.us-east-1.amazonaws.com/public/souvenir-onboarding-bg.svg" alt="Souvenir onboarding background" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0, pointerEvents: "none" }} />
+      <img src="https://souvenirai-storage.s3.us-east-1.amazonaws.com/public/souvenir-onboarding-bg.svg" alt="Souvenir onboarding background" aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 'var(--z-base)', pointerEvents: "none" }} />
     <div
       style={{
         position: "relative",
@@ -183,20 +183,20 @@ export default function OnboardingTonePage() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "24px",
+        gap: "var(--space-6)",
         width: "100%",
         maxWidth: "420px",
-        padding: "40px 16px",
+        padding: "var(--space-8) var(--space-4)",
       }}
     >
       {/* Heading */}
-      <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
+      <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "var(--space-4)", width: "100%" }}>
         <h1
           style={{
             fontFamily: "var(--font-title)",
-            fontWeight: 400,
-            fontSize: "24px",
-            lineHeight: "32px",
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: "var(--font-size-heading)",
+            lineHeight: "var(--line-height-heading)",
             color: "var(--static-black)",
             margin: 0,
           }}
@@ -206,10 +206,10 @@ export default function OnboardingTonePage() {
         <p
           style={{
             fontFamily: "var(--font-body)",
-            fontWeight: 400,
-            fontSize: "14px",
-            lineHeight: "22px",
-            color: "var(--neutral-700, #524b47)",
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: "var(--font-size-body)",
+            lineHeight: "var(--line-height-body)",
+            color: "var(--neutral-700)",
             margin: 0,
           }}
         >
@@ -218,7 +218,7 @@ export default function OnboardingTonePage() {
       </div>
 
       {/* Tone cards */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)", width: "100%" }}>
         {TONES.map((t) => (
           <ToneCard
             key={t.id}
@@ -232,7 +232,7 @@ export default function OnboardingTonePage() {
       </div>
 
       {/* Nav buttons */}
-      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+      <div style={{ display: "flex", gap: "var(--space-4)", alignItems: "center" }}>
         <Button variant="secondary" size="sm" onClick={() => push(ONBOARDING_ACCOUNT_TYPE_ROUTE)}>
           Back
         </Button>

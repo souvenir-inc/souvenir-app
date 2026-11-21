@@ -37,7 +37,7 @@ export function OrgBillingView() {
   if (loadError) return <BillingLoadError onRetry={retryLoad} retrying={retrying} />
   if (billingLoading) {
     return (
-      <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '64px 24px 48px' }}>
+      <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: 'var(--space-10) var(--space-6) var(--space-9)' }}>
         {isEnterprise ? <EnterprisePlansSkeleton isAdmin={isAdmin} /> : <TeamsPlansSkeleton isAdmin={isAdmin} />}
       </div>
     )
@@ -56,17 +56,17 @@ export function OrgBillingView() {
         display:        'flex',
         alignItems:     'flex-start',
         justifyContent: 'center',
-        padding:        '64px 24px 48px',
+        padding:        'var(--space-10) var(--space-6) var(--space-9)',
       }}
     >
-      <div style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
 
         {/* Page header */}
-        <div style={{ paddingLeft: 4 }}>
-          <h1 style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: 0 }}>
+        <div style={{ paddingLeft: 'var(--space-1)' }}>
+          <h1 style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0 }}>
             Plan &amp; Billing
           </h1>
-          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
             Manage your plan, billing details, and usage.
           </p>
         </div>
@@ -82,13 +82,13 @@ export function OrgBillingView() {
             <div style={{
               width:           '100%',
               border:          '1px solid var(--border-default)',
-              borderRadius:    16,
+              borderRadius:    'var(--radius-2xl)',
               boxShadow:       SHADOW_CARD,
               overflow:        'hidden',
               backgroundColor: 'var(--neutral-50)',
-              padding:         12,
+              padding:         'var(--space-3)',
             }}>
-              <div style={{ display: 'flex', gap: 12, alignItems: 'stretch', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'stretch', flexWrap: 'wrap' }}>
                 <div style={{ flex: '1 0 0', minWidth: 280, display: 'flex' }}>
                   <SectionCard
                     title="Plan"
@@ -98,12 +98,12 @@ export function OrgBillingView() {
                     background="linear-gradient(135deg, var(--neutral-white) 0%, var(--neutral-200) 100%)"
                     bodyAlign="flex-start"
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                       <div style={{ flex: '1 0 0', minWidth: 0 }}>
                         <p style={statCardBigLineStyle}>
                           {plan?.title ?? 'Enterprise · pay for usage'}
                         </p>
-                        <p style={{ ...statCardCaptionStyle, margin: '6px 0 0' }}>
+                        <p style={{ ...statCardCaptionStyle, margin: 'var(--space-1-5) 0 0' }}>
                           {plan?.paymentDueLabel
                             ? `Payment for the last cycle is due ${plan.paymentDueLabel}`
                             : `Next billing date: ${nextBilling}`}
@@ -116,7 +116,7 @@ export function OrgBillingView() {
                 <div style={{ flex: '1 0 0', minWidth: 280, display: 'flex' }}>
                   <SectionCard title="Charges this cycle" titleColor="var(--neutral-700)" headerDivider={false} background="var(--neutral-white)" bodyAlign="space-between" bodyGap={8}>
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
                         <p style={{ ...statCardBigLineStyle, whiteSpace: 'nowrap' }}>
                           {plan?.chargesThisCycleLabel ?? fmtUsd(0)}
                         </p>
@@ -124,7 +124,7 @@ export function OrgBillingView() {
                           before applicable tax
                         </p>
                       </div>
-                      <p style={{ ...statCardCaptionStyle, margin: '6px 0 0' }}>
+                      <p style={{ ...statCardCaptionStyle, margin: 'var(--space-1-5) 0 0' }}>
                         {`Cycle ${plan?.cycleLabel ?? '—'}`}
                       </p>
                     </div>
@@ -155,13 +155,13 @@ export function OrgBillingView() {
           <div style={{
             width:           '100%',
             border:          '1px solid var(--border-default)',
-            borderRadius:    16,
+            borderRadius:    'var(--radius-2xl)',
             boxShadow:       SHADOW_CARD,
             overflow:        'hidden',
             backgroundColor: 'var(--neutral-50)',
-            padding:         12,
+            padding:         'var(--space-3)',
           }}>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'stretch', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'stretch', flexWrap: 'wrap' }}>
               <div style={{ flex: '1 0 0', minWidth: 280, display: 'flex' }}>
               <SectionCard
                 title="Plan"
@@ -190,11 +190,11 @@ export function OrgBillingView() {
                       <p style={statCardBigLineStyle}>
                         {plan?.title ?? 'Core Plan'}
                       </p>
-                      <p style={{ ...statCardCaptionStyle, margin: '6px 0 0' }}>
+                      <p style={{ ...statCardCaptionStyle, margin: 'var(--space-1-5) 0 0' }}>
                         {cancelAtPeriodEnd ? `Access ends ${nextBilling}` : `Next billing date: ${nextBilling}`}
                       </p>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
                       {isAdmin ? (
                         <>
                           {/* Not in Figma's static frame, but cancel/resume needs to stay
@@ -221,7 +221,7 @@ export function OrgBillingView() {
                       <p style={statCardBigLineStyle}>
                         Currently on Free Plan
                       </p>
-                      <p style={{ ...statCardCaptionStyle, margin: '6px 0 0' }}>
+                      <p style={{ ...statCardCaptionStyle, margin: 'var(--space-1-5) 0 0' }}>
                         Choose a plan to start using paid credits.
                       </p>
                     </div>
@@ -239,8 +239,8 @@ export function OrgBillingView() {
 
               <div style={{ flex: '1 0 0', minWidth: 280, display: 'flex' }}>
               <SectionCard title="Credits remaining" titleColor="var(--neutral-700)" headerDivider={false} background="var(--neutral-white)" bodyAlign="space-between" bodyGap={12}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
                     <p style={{ ...statCardBigLineStyle, whiteSpace: 'nowrap' }}>
                       {Math.max(0, totalCredits - usedCredits).toLocaleString()}
                     </p>
@@ -270,13 +270,13 @@ export function OrgBillingView() {
             title="Payment"
             subtitle={isEnterprise ? 'Usage is billed after each monthly cycle.' : 'Manage your billing details.'}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
               <CardBrandLogo brand={cardBrand} />
               <div style={{ flex: '1 0 0', minWidth: 0 }}>
-                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 16, lineHeight: '22px', color: 'var(--neutral-900)', margin: 0 }}>
+                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', margin: 0 }}>
                   {billingLoading ? 'Loading…' : pm?.label ?? 'No payment method on file'}
                 </p>
-                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
                   {pm?.expiry ?? (pm ? 'Charged automatically after each cycle.' : 'Add a card to continue.')}
                 </p>
               </div>

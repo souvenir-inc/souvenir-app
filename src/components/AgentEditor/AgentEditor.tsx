@@ -63,9 +63,9 @@ function RegenerateButton({ label, onClick, disabled, loading }: { label: string
 
 function FieldHeader({ label, htmlFor, action, counter }: { label: string; htmlFor?: string; action?: React.ReactNode; counter?: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, minHeight: 24 }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)', minHeight: 24 }}>
       <label htmlFor={htmlFor} style={LABEL_STYLE}>{label}</label>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
         {counter && <span style={HINT_STYLE}>{counter}</span>}
         {action}
       </div>
@@ -85,23 +85,23 @@ export function AgentEditor({
 }: AgentEditorProps) {
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_280px]" style={{ width: '100%', alignItems: 'start' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 28, minWidth: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', minWidth: 0 }}>
 
         {/* ── Profile ─────────────────────────────────────────────── */}
-        <section aria-labelledby="agent-editor-profile" style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <section aria-labelledby="agent-editor-profile" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <h2 id="agent-editor-profile" style={SECTION_TITLE_STYLE}>Profile</h2>
 
           <AvatarField name={draft.name} value={avatarChoice} onChange={onAvatarChoice} disabled={disabled} />
 
           {/* Name and model side by side (stacked when the column is narrow). */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, alignItems: 'start' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-4)', alignItems: 'start' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
               <FieldHeader
                 label="Name"
                 htmlFor="agent-editor-name"
                 action={onRegenerateName && <RegenerateButton label="Suggest another name" onClick={onRegenerateName} disabled={disabled} />}
               />
-              <div className="kaya-field" style={{ ...BOX_STYLE, padding: '8px 10px' }}>
+              <div className="kaya-field" style={{ ...BOX_STYLE, padding: 'var(--space-2) var(--space-2-5)' }}>
                 <input
                   id="agent-editor-name"
                   type="text"
@@ -128,14 +128,14 @@ export function AgentEditor({
             />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
             <FieldHeader
               label="Description"
               htmlFor="agent-editor-description"
               counter={`${draft.description.length}/${DESCRIPTION_MAX}`}
               action={onRegenerateDescription && <RegenerateButton label="Rewrite from the purpose" onClick={onRegenerateDescription} disabled={disabled} />}
             />
-            <div className="kaya-field" style={{ ...BOX_STYLE, padding: '8px 10px' }}>
+            <div className="kaya-field" style={{ ...BOX_STYLE, padding: 'var(--space-2) var(--space-2-5)' }}>
               <textarea
                 id="agent-editor-description"
                 value={draft.description}
@@ -152,10 +152,10 @@ export function AgentEditor({
         <hr aria-hidden style={DIVIDER_STYLE} />
 
         {/* ── Behaviour ───────────────────────────────────────────── */}
-        <section aria-labelledby="agent-editor-behaviour" style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <section aria-labelledby="agent-editor-behaviour" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <h2 id="agent-editor-behaviour" style={SECTION_TITLE_STYLE}>Behaviour</h2>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
             <FieldHeader
               label="Instructions"
               action={
@@ -186,7 +186,7 @@ export function AgentEditor({
         {below}
       </div>
 
-      <aside style={{ display: 'flex', flexDirection: 'column', gap: 20, position: 'sticky', top: STICKY_TOP, minWidth: 0 }}>
+      <aside style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)', position: 'sticky', top: STICKY_TOP, minWidth: 0 }}>
         <AgentPreviewCard
           name={draft.name}
           handle={handle}

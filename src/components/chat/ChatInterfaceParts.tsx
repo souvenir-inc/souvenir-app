@@ -48,13 +48,13 @@ export function ChatLoadError({ error, onRetry }: { error: string; onRetry: () =
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: 12,
-        padding: "32px 16px",
+        gap: 'var(--space-3)',
+        padding: "var(--space-7) var(--space-4)",
         textAlign: "center",
         fontFamily: "var(--font-body)",
       }}
     >
-      <p style={{ margin: 0, fontSize: 14, color: "var(--neutral-500)" }}>
+      <p style={{ margin: 0, fontSize: 'var(--font-size-body)', color: "var(--neutral-500)" }}>
         Couldn&apos;t load this conversation. {error}
       </p>
       <button
@@ -62,13 +62,13 @@ export function ChatLoadError({ error, onRetry }: { error: string; onRetry: () =
         onClick={onRetry}
         style={{
           fontFamily: "var(--font-body)",
-          fontSize: 13,
-          fontWeight: 500,
+          fontSize: 'var(--font-size-body-sm)',
+          fontWeight: 'var(--font-weight-medium)',
           color: "var(--static-white)",
           background: "var(--neutral-900)",
           border: "none",
-          borderRadius: 999,
-          padding: "7px 16px",
+          borderRadius: 'var(--radius-full)',
+          padding: "var(--space-1-5) var(--space-4)",
           cursor: "pointer",
         }}
       >
@@ -94,7 +94,7 @@ export function ScrollToBottomButton({ visible, onClick }: { visible: boolean; o
             bottom: 16,
             left: '50%',
             x: '-50%',
-            zIndex: 10,
+            zIndex: 'var(--z-raised)',
           }}
         >
           <IconButton
@@ -121,8 +121,8 @@ export function ArchivedChatNotice() {
       style={{
         display:         "flex",
         alignItems:      "center",
-        gap:             10,
-        padding:         "12px 16px",
+        gap:             'var(--space-2-5)',
+        padding:         "var(--space-3) var(--space-4)",
         borderRadius:    "var(--toast-radius, 12px)",
         backgroundColor: "var(--neutral-100)",
         boxShadow:       "inset 0 0 0 1px var(--neutral-200)",
@@ -162,7 +162,7 @@ export function ComposerAttachmentsSlot({
   onAttachmentsChange: (attachments: PendingAttachment[]) => void;
 }) {
   return showPins && mentionedPins.length > 0 ? (
-    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
       <PinChipStrip>
         {mentionedPins.map((mp) => (
           <MentionChip

@@ -2,7 +2,7 @@
 
 import { LibraryCitationsProvider } from "@/components/Library/chat/library-citations";
 import { messageCopyText } from "@/lib/copy-text";
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { AnimatePresence, m, useReducedMotion } from "framer-motion";
 import { ReasoningBlock } from "./ReasoningBlock";
 import { BreathingDot } from "@/components/BreathingDot";
@@ -38,20 +38,20 @@ export { StreamingTextContent };
 // frame, so they shouldn't be allocated again each time.
 const assistantColumnStyle: React.CSSProperties = { width: "100%", minWidth: 0 };
 
-const waitingDotStyle: React.CSSProperties = { marginLeft: 4, marginTop: 2, backgroundColor: "var(--neutral-500)" };
+const waitingDotStyle: React.CSSProperties = { marginLeft: 'var(--space-1)', marginTop: 'var(--space-0-5)', backgroundColor: "var(--neutral-500)" };
 
 const imagesRowStyle: React.CSSProperties = {
   display: "flex",
   flexWrap: "wrap",
-  gap: "8px",
-  marginTop: "12px",
+  gap: "var(--space-2)",
+  marginTop: "var(--space-3)",
 };
 
 const stoppedStyle: React.CSSProperties = {
   display: "inline-block",
-  marginTop: "8px",
+  marginTop: "var(--space-2)",
   fontFamily: "var(--font-body)",
-  fontSize: "12px",
+  fontSize: "var(--font-size-small)",
   color: "var(--neutral-500)",
   fontStyle: "italic",
 };
@@ -130,7 +130,8 @@ interface ChatMessageProps {
   onPromptDecided?: (messageId: string, requestId: string, decision: string) => void;
   /** Continues a turn parked on a prompt whose respond_url is `/chats/{id}/resume`.
    *  The memo comparator ignores it, so pass a stable function. */
-  onPromptAnswered?: () => void;
+  /** A prompt in this message was answered; called with the message's chat. */
+  onPromptAnswered?: (chatId: string) => void;
   /** Called once per message when it has stopped loading and its text reveal
    *  has finished (straight away for a message that isn't animated). The memo
    *  comparator only tracks whether it is set, so pass a stable function. */
@@ -231,8 +232,8 @@ export function ChatMessage({
   // Work renders as reasoning blocks when the turn reasoned and reasoning is
   // shown; otherwise only its tool rows show, as the plain activities list.
   const tracesReasoning = showReasoning && Boolean(message.thinking);
-  // The stretch of answer still being revealed: completion waits on it.
-  const lastText = parts.findLast((part) => part.kind === "text")?.content ?? "";
+  // Every stretch of answer text: completion waits until each has been revealed.
+  const textParts = parts.filter((part) => part.kind === "text");
 
   // Whether the answer text reveals progressively. Decided while the message
   // is still empty so it can't flip part-way through a reveal.
@@ -243,9 +244,16 @@ export function ChatMessage({
   // The answer is complete on screen: the stream is over and the reveal has
   // caught up (or was frozen by Stop). Completion UI — actions, sources,
   // the error notice, aria-busy — waits for this rather than the stream.
-  const [caughtUpText, setCaughtUpText] = useState<string | null>(null);
+  // Tracked per stretch, by id, with the text it caught up to. One shared value let
+  // an earlier stretch that reported again (its text re-derived when the reply
+  // settled) overwrite the last stretch's report, leaving the reply "busy" for good.
+  const [caughtUp, setCaughtUp] = useState<Readonly<Record<string, string>>>({});
+  const reportCaughtUp = useCallback((partId: string, content: string) => {
+    setCaughtUp((prev) => (prev[partId] === content ? prev : { ...prev, [partId]: content }));
+  }, []);
   const revealSettled = !message.isLoading &&
-    (!animateText || Boolean(message.stoppedByUser) || !lastText || caughtUpText === lastText);
+    (!animateText || Boolean(message.stoppedByUser) ||
+      textParts.every((part) => !part.content || caughtUp[part.id] === part.content));
 
   const onRevealSettledRef = useRef(onRevealSettled);
   const revealReportedRef = useRef(false);
@@ -333,7 +341,7 @@ export function ChatMessage({
         display: "flex",
         flexDirection: "column",
         alignItems: isUser ? "flex-end" : "flex-start",
-        padding: "12px 0",
+        padding: "var(--space-3) 0",
         width: "100%",
       }}
     >
@@ -379,7 +387,7 @@ export function ChatMessage({
                   animate={animateText}
                   isLoading={isLastPart && !!message.isLoading}
                   stopped={!!message.stoppedByUser}
-                  onCaughtUp={setCaughtUpText}
+                  onCaughtUp={(content) => reportCaughtUp(part.id, content)}
                 />
               );
             }

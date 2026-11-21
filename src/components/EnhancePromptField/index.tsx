@@ -110,7 +110,7 @@ export function EnhancePromptField(
         style={{
           display:       'flex',
           flexDirection: 'column',
-          gap:           8,
+          gap:           'var(--space-2)',
           width:         '100%',
           ...style,
         }}
@@ -136,11 +136,11 @@ export function EnhancePromptField(
           style={{
             position:        'relative',
             width:           '100%',
-            borderRadius:    18,
+            borderRadius:    'var(--radius-2xl)',
             borderStyle:     'solid',
             overflow:        'hidden',
             ...(isOpen ? { height: 534 } : { minHeight: 120 }),
-            transition:      'background-color 200ms ease, border-color 200ms ease, border-width 200ms ease',
+            transition:      'background-color var(--duration-base) ease, border-color var(--duration-base) ease, border-width var(--duration-base) ease',
             ...containerStateStyle,
           }}
           {...props}
@@ -159,7 +159,7 @@ export function EnhancePromptField(
               display:       'flex',
               flexDirection: 'column',
               gap:           25,
-              padding:       12,
+              padding:       'var(--space-3)',
               boxSizing:     'border-box',
             }}
           >
@@ -180,9 +180,9 @@ export function EnhancePromptField(
                 overflow:   'hidden',
                 outline:    'none',
                 fontFamily: 'Inter, var(--font-body)',
-                fontWeight: 400,
-                fontSize:   14,
-                lineHeight: 1.29,
+                fontWeight: 'var(--font-weight-regular)',
+                fontSize:   'var(--font-size-body)',
+                lineHeight: 'var(--leading-tight)',
                 color:      'var(--neutral-700)',
               }}
             />
@@ -192,7 +192,7 @@ export function EnhancePromptField(
                 display:        'flex',
                 alignItems:     'center',
                 justifyContent: 'space-between',
-                gap:            8,
+                gap:            'var(--space-2)',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -216,8 +216,8 @@ export function EnhancePromptField(
           label="enhance panel"
           resetKey={flow.state.phase}
           fallback={
-            <div role="alert" style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 20 }}>
-              <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-700)', textAlign: 'center' }}>
+            <div role="alert" style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-3)', padding: 'var(--space-5)' }}>
+              <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-700)', textAlign: 'center' }}>
                 Enhance hit a problem. Your prompt is unchanged.
               </p>
               <Button size="md" variant="secondary" onClick={flow.close}>Back to editing</Button>
@@ -235,12 +235,12 @@ export function EnhancePromptField(
               style={{
                 position:      'absolute',
                 inset:         0,
-                padding:       '20px 20px 16px',
+                padding:       'var(--space-5) var(--space-5) var(--space-4)',
                 display:       'flex',
                 flexDirection: 'column',
-                gap:           16,
+                gap:           'var(--space-4)',
                 minHeight:     0,
-                borderRadius:  18,
+                borderRadius:  'var(--radius-2xl)',
               }}
             >
               <EnhancePanel flow={flow} value={value} />

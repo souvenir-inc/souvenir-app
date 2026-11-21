@@ -15,7 +15,7 @@ import { ROOT_ROUTE } from "@/lib/routes";
 
 // Matches the onboarding shell gradient (Figma 5795:41421).
 const CANVAS_GRADIENT =
-  "linear-gradient(180deg, var(--neutral-50) 3.76%, var(--neutral-100,#F5F5F5) 75%, var(--neutral-200,#E5E5E5) 116.79%)";
+  "linear-gradient(180deg, var(--neutral-50) 3.76%, var(--neutral-100) 75%, var(--neutral-200) 116.79%)";
 
 /** Full-screen gradient canvas that centres a single card. */
 export function InviteCanvas({ children }: { children: React.ReactNode }) {
@@ -28,7 +28,7 @@ export function InviteCanvas({ children }: { children: React.ReactNode }) {
         alignItems: "center",
         justifyContent: "center",
         background: CANVAS_GRADIENT,
-        padding: "40px 16px",
+        padding: "var(--space-8) var(--space-4)",
         boxSizing: "border-box",
       }}
     >
@@ -50,14 +50,14 @@ export function InviteCard({
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: 28,
+        gap: 'var(--space-6)',
         backgroundColor: "var(--neutral-white)",
-        borderRadius: 20,
-        padding: "32px 36px",
+        borderRadius: 'var(--radius-2xl)',
+        padding: "var(--space-7) var(--space-7)",
         width: "100%",
         maxWidth: width,
         boxShadow:
-          "0px 12px 16px -4px var(--neutral-500-12), 0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+          "0px 12px 16px -4px var(--neutral-500-12), var(--shadow-soft), 0px 0px 0px 1px var(--neutral-100)",
       }}
     >
       {children}
@@ -71,9 +71,9 @@ export function CardTitle({ children }: { children: React.ReactNode }) {
     <h1
       style={{
         fontFamily: "var(--font-title)",
-        fontWeight: 400,
-        fontSize: 40,
-        lineHeight: "48px",
+        fontWeight: 'var(--font-weight-regular)',
+        fontSize: 'var(--font-size-display)',
+        lineHeight: "var(--line-height-display)",
         color: "var(--legacy-1a1916)",
         margin: 0,
         letterSpacing: "-0.01em",
@@ -90,10 +90,10 @@ export function CardSubtitle({ children }: { children: React.ReactNode }) {
     <p
       style={{
         fontFamily: "var(--font-body)",
-        fontWeight: 400,
-        fontSize: 16,
-        lineHeight: "24px",
-        color: "var(--neutral-500,#827a74)",
+        fontWeight: 'var(--font-weight-regular)',
+        fontSize: 'var(--font-size-body-lg)',
+        lineHeight: "var(--line-height-heading-sm)",
+        color: "var(--neutral-500)",
         margin: 0,
       }}
     >
@@ -152,7 +152,7 @@ export function InviteStateScreen({
       <InviteCard width={620}>
         <CardTitle>{title}</CardTitle>
         <CardSubtitle>{body}</CardSubtitle>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 'var(--space-2-5)' }}>
           {status === "error" && onRetry && (
             <Button variant="outline" size="md" onClick={onRetry}>Try again</Button>
           )}

@@ -40,14 +40,14 @@ export function TextInput({
       style={{
         height:          36,
         backgroundColor: readOnly ? 'var(--neutral-50)' : 'var(--field-surface)',
-        borderRadius:    10,
+        borderRadius:    'var(--radius-lg)',
         boxShadow:       '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
         border:          'none',
-        padding:         '7px 10px',
+        padding:         'var(--space-1-5) var(--space-2-5)',
         fontFamily:      'var(--font-body)',
-        fontWeight:      400,
-        fontSize:        14,
-        lineHeight:      '22px',
+        fontWeight:      'var(--font-weight-regular)',
+        fontSize:        'var(--font-size-body)',
+        lineHeight:      'var(--line-height-body)',
         color:           readOnly ? 'var(--neutral-400)' : 'var(--neutral-900)',
         boxSizing:       'border-box',
         outline:         'none',
@@ -74,8 +74,8 @@ export function Card({ children, danger }: { children: React.ReactNode; danger?:
   return (
     <div style={{
       border:       `1px solid ${danger ? 'var(--red-400)' : 'var(--border-default)'}`,
-      borderRadius: 16,
-      boxShadow:    '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+      borderRadius: 'var(--radius-2xl)',
+      boxShadow:    'var(--shadow-soft)',
       overflow:     'hidden',
     }}>
       {children}
@@ -105,11 +105,11 @@ export function CardHeader({
       <div style={{ flex: '1 0 0', minWidth: 0 }}>
         <p style={{
           fontFamily:   'var(--font-body)',
-          fontWeight:   500,
-          fontSize:     16,
-          lineHeight:   '22px',
+          fontWeight:   'var(--font-weight-medium)',
+          fontSize:     'var(--font-size-body-lg)',
+          lineHeight:   'var(--line-height-body)',
           color:        'var(--neutral-900)',
-          margin:       '0 0 6px',
+          margin:       '0 0 var(--space-1-5)',
           overflow:     'hidden',
           textOverflow: 'ellipsis',
           whiteSpace:   'nowrap',
@@ -119,9 +119,9 @@ export function CardHeader({
         {subtitle && (
           <p style={{
             fontFamily:   'var(--font-body)',
-            fontWeight:   400,
-            fontSize:     14,
-            lineHeight:   '22px',
+            fontWeight:   'var(--font-weight-regular)',
+            fontSize:     'var(--font-size-body)',
+            lineHeight:   'var(--line-height-body)',
             color:        'var(--neutral-500)',
             margin:       0,
           }}>
@@ -169,11 +169,11 @@ export function VisibilitySelect({
             display:         'flex',
             alignItems:      'center',
             justifyContent:  'space-between',
-            gap:             8,
+            gap:             'var(--space-2)',
             width:           327,
             height:          36,
-            padding:         '0 10px',
-            borderRadius:    10,
+            padding:         '0 var(--space-2-5)',
+            borderRadius:    'var(--radius-lg)',
             border:          'none',
             backgroundColor: 'var(--neutral-50)',
             boxShadow:       '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)',
@@ -185,9 +185,9 @@ export function VisibilitySelect({
         >
           <span style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 400,
-            fontSize:   14,
-            lineHeight: '22px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize:   'var(--font-size-body)',
+            lineHeight: 'var(--line-height-body)',
             color:      'var(--neutral-700)',
           }}>
             {label}

@@ -95,14 +95,14 @@ export function SuperLinksTab({
   const topAgentConvos = topShare?.recipients?.length ?? 0
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
 
       {/* ── Stat tiles (2x2) on the left, chart on the right — "my"
           outgoing usage summary. Hidden entirely when there are no
           outgoing links yet, regardless of which sub-tab below is
           selected. ── */}
       {!isEmpty && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, alignItems: 'stretch' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)', alignItems: 'stretch' }}>
           {/* Left — one bordered box ditto /org/analytics' Credit
               Pool/Used/Members row (neutral-200 border, SHADOW_CARD,
               neutral-50 background, 12px padding), containing BOTH
@@ -111,8 +111,8 @@ export function SuperLinksTab({
               whole box match the chart card's height — the agent
               tile grows (flex: 1) to absorb the difference instead
               of the StatTiles themselves being distorted taller. */}
-          <div style={{ border: '1px solid var(--border-default)', borderRadius: 16, boxShadow: SHADOW_CARD, overflow: 'hidden', backgroundColor: 'var(--neutral-50)', padding: 12, display: 'flex', flexDirection: 'column', gap: 9 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 9, flexShrink: 0 }}>
+          <div style={{ border: '1px solid var(--border-default)', borderRadius: 'var(--radius-2xl)', boxShadow: SHADOW_CARD, overflow: 'hidden', backgroundColor: 'var(--neutral-50)', padding: 'var(--space-3)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 'var(--space-2)', flexShrink: 0 }}>
               <StatTile
                 label="Credits this month"
                 value={fmtK(creditsMonth)}
@@ -140,26 +140,26 @@ export function SuperLinksTab({
             </div>
 
             {sharesLoading ? (
-              <div style={{ backgroundColor: 'var(--card-bg)', borderRadius: 8, padding: 12, boxShadow: SHADOW_TILE, display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
+              <div style={{ backgroundColor: 'var(--card-bg)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', boxShadow: SHADOW_TILE, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', flex: 1 }}>
                 <Skeleton width={110} height={14} radius={4} />
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', minWidth: 0 }}>
                   <Skeleton width={24} height={24} radius="50%" />
                   <Skeleton width={100} height={16} radius={4} />
                 </div>
                 <Skeleton width={160} height={14} radius={4} />
               </div>
             ) : topShare && (
-              <div style={{ backgroundColor: 'var(--card-bg)', borderRadius: 8, padding: 12, boxShadow: SHADOW_TILE, display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
-                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)', margin: 0 }}>
+              <div style={{ backgroundColor: 'var(--card-bg)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', boxShadow: SHADOW_TILE, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', flex: 1 }}>
+                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', margin: 0 }}>
                   Most active agent
                 </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', minWidth: 0 }}>
                   <MentionAvatar agent={{ id: topAgentInfo?.repoId ?? topShare.persona_repo_id, name: topAgentName ?? 'Agent' }} />
-                  <p style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 16, lineHeight: '22px', color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <p style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {topAgentName}
                   </p>
                 </div>
-                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
                   {topAgentConvos} conversation{topAgentConvos === 1 ? '' : 's'} · {fmtK(topShare.credit_used)} credits
                 </p>
               </div>
@@ -173,7 +173,7 @@ export function SuperLinksTab({
             bodyPadding="0 24px 12px"
             bodyGap={12}
             action={
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                 <DateRangePill label={slDateRangeLabel} />
                 <Tabs value={slRange} onValueChange={(v) => setSlRange(v as '7d' | '30d' | '90d')}>
                   <Tabs.List size="small">
@@ -212,7 +212,7 @@ export function SuperLinksTab({
           side-by-side two-column layout with a single switchable
           table. "Shared Superlinks" stays fully independent of
           whether you have any outgoing links yourself. ── */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
         <Tabs value={superLinksView} onValueChange={(v) => setSuperLinksView(v as 'mine' | 'shared')}>
           <Tabs.List size="small">
             <Tabs.Trigger value="mine">My Superlinks</Tabs.Trigger>
@@ -280,13 +280,13 @@ export function SuperLinksTab({
                 {sharesLoading && [0, 1, 2].map(i => (
                   <SettingsTableRow key={i} minHeight={64}>
                     <SettingsTableCell>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, opacity: 1 - i * 0.25 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', opacity: 1 - i * 0.25 }}>
                         <div className="kaya-skeleton" style={{ width: 28, height: 28, borderRadius: '50%' }} />
-                        <div className="kaya-skeleton" style={{ width: 120, height: 14, borderRadius: 4 }} />
+                        <div className="kaya-skeleton" style={{ width: 120, height: 14, borderRadius: 'var(--radius-xs)' }} />
                       </div>
                     </SettingsTableCell>
                     {[0, 1, 2, 3, 4].map(ci => (
-                      <SettingsTableCell key={ci}><div className="kaya-skeleton" style={{ width: 70, height: 14, borderRadius: 4, opacity: 1 - i * 0.25 }} /></SettingsTableCell>
+                      <SettingsTableCell key={ci}><div className="kaya-skeleton" style={{ width: 70, height: 14, borderRadius: 'var(--radius-xs)', opacity: 1 - i * 0.25 }} /></SettingsTableCell>
                     ))}
                   </SettingsTableRow>
                 ))}
@@ -294,7 +294,7 @@ export function SuperLinksTab({
                 {!sharesLoading && shares.length === 0 && (
                   <SettingsTableRow divider={false} minHeight={80}>
                     <SettingsTableCell style={{ gridColumn: '1 / -1' }}>
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-500)', margin: 0 }}>
+                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-500)', margin: 0 }}>
                         No Super Links yet — generate one from the button above.
                       </p>
                     </SettingsTableCell>
@@ -319,14 +319,14 @@ export function SuperLinksTab({
                       onClick={() => setSelectedShareId(prev => prev === share.id ? null : share.id)}
                     >
                       <SettingsTableCell>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', minWidth: 0 }}>
                           <MentionAvatar agent={{ id: repoId || share.persona_repo_id, name }} />
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
-                            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, lineHeight: '20px', color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', minWidth: 0 }}>
+                            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {name}
                             </p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0 }}>
-                              <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--neutral-500)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', minWidth: 0 }}>
+                              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-500)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {url}
                               </p>
                               <CopyUrlButton url={url} />
@@ -338,25 +338,25 @@ export function SuperLinksTab({
                         <Badge color={badge.color} label={badge.label} />
                       </SettingsTableCell>
                       <SettingsTableCell>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
-                          <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--neutral-500)' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', width: '100%' }}>
+                          <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-500)' }}>
                             {pctUsed !== null ? `${pctUsed}% used` : `${share.credit_used.toLocaleString()} credits`}
                           </span>
                           <TokenBudgetBar used={share.credit_used} limit={share.credit_limit ?? 0} size="sm" />
                         </div>
                       </SettingsTableCell>
                       <SettingsTableCell>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0, width: '100%' }}>
-                          <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--neutral-700)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', minWidth: 0, width: '100%' }}>
+                          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', color: 'var(--neutral-700)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {recipients.length} conversation{recipients.length === 1 ? '' : 's'} · {uniqueUsers} user{uniqueUsers === 1 ? '' : 's'}
                           </p>
-                          <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--neutral-400)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-400)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {recipients.length > 0 ? `Last used ${fmtRelative(share.updated_at ?? share.created_at)}` : `Created ${fmtRelative(share.created_at)}`}
                           </p>
                         </div>
                       </SettingsTableCell>
                       <SettingsTableCell>
-                        <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--neutral-500)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', color: 'var(--neutral-500)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {fmtExpiry(share.expires_at)}
                         </p>
                       </SettingsTableCell>
@@ -398,13 +398,13 @@ export function SuperLinksTab({
               {receivedLoading && [0, 1, 2].map(i => (
                 <SettingsTableRow key={i} minHeight={64}>
                   <SettingsTableCell>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, opacity: 1 - i * 0.25 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', opacity: 1 - i * 0.25 }}>
                       <div className="kaya-skeleton" style={{ width: 28, height: 28, borderRadius: '50%' }} />
-                      <div className="kaya-skeleton" style={{ width: 120, height: 14, borderRadius: 4 }} />
+                      <div className="kaya-skeleton" style={{ width: 120, height: 14, borderRadius: 'var(--radius-xs)' }} />
                     </div>
                   </SettingsTableCell>
                   {[0, 1, 2, 3, 4].map(ci => (
-                    <SettingsTableCell key={ci}><div className="kaya-skeleton" style={{ width: 70, height: 14, borderRadius: 4, opacity: 1 - i * 0.25 }} /></SettingsTableCell>
+                    <SettingsTableCell key={ci}><div className="kaya-skeleton" style={{ width: 70, height: 14, borderRadius: 'var(--radius-xs)', opacity: 1 - i * 0.25 }} /></SettingsTableCell>
                   ))}
                 </SettingsTableRow>
               ))}
@@ -412,7 +412,7 @@ export function SuperLinksTab({
               {!receivedLoading && receivedShares.length === 0 && (
                 <SettingsTableRow divider={false} minHeight={80}>
                   <SettingsTableCell style={{ gridColumn: '1 / -1' }}>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-500)', margin: 0 }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-500)', margin: 0 }}>
                       When someone shares a Super Link and you accept it, their agent appears here.
                     </p>
                   </SettingsTableCell>
@@ -428,15 +428,15 @@ export function SuperLinksTab({
                 return (
                   <SettingsTableRow key={share.share_id} minHeight={64}>
                     <SettingsTableCell>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', minWidth: 0 }}>
                         <MentionAvatar agent={{ id: persona?.id ?? share.persona_repo_id, name: share.name }} />
-                        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, lineHeight: '20px', color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {share.name}
                         </p>
                       </div>
                     </SettingsTableCell>
                     <SettingsTableCell>
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--neutral-500)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', color: 'var(--neutral-500)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {share.shared_by_name}
                       </p>
                     </SettingsTableCell>
@@ -444,20 +444,20 @@ export function SuperLinksTab({
                       <Badge color={badge.color} label={badge.label} />
                     </SettingsTableCell>
                     <SettingsTableCell>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
-                        <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--neutral-500)' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', width: '100%' }}>
+                        <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-500)' }}>
                           {pctUsed !== null ? `${pctUsed}% used` : `${share.credit_used.toLocaleString()} credits`}
                         </span>
                         <TokenBudgetBar used={share.credit_used} limit={share.credit_limit ?? 0} size="sm" />
                       </div>
                     </SettingsTableCell>
                     <SettingsTableCell>
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--neutral-500)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', color: 'var(--neutral-500)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {fmtExpiry(share.expires_at)}
                       </p>
                     </SettingsTableCell>
                     <SettingsTableCell align="end">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
                         {/* Only a live link can be used. There is no "remove from my list" call yet, so no Remove button: it used to open Delete agent for the viewer's own copy. */}
                         <Button size="sm" variant="secondary" disabled={status !== 'active'} onClick={() => void onUseReceivedShareInChat(share)}>
                           Use in chat

@@ -3,7 +3,6 @@
 // The account's per-tool permissions tab (part of AccountDetailView).
 
 import React, { useEffect, useRef, useState } from 'react'
-import { m } from 'framer-motion'
 import { toast } from 'sonner'
 import {
   AlertTwoIcon,
@@ -14,6 +13,7 @@ import {
   SearchOneIcon,
 } from '@strange-huge/icons'
 import { Dropdown } from '@/components/Dropdown'
+import { SegmentedControl } from '@/components/ui/segmented-control'
 import { InputField } from '@/components/InputField'
 import { rankByTitle } from '@/lib/search/text-match'
 import { Tooltip } from '@/components/Tooltip'
@@ -54,29 +54,11 @@ function groupTools(tools: AccountTool[]) {
   ].filter(g => g.tools.length > 0)
 }
 
-function PermissionControl({ id, value, label: name, change, disabled }: { id: string; value: PermissionMode; label: string; change: (value: PermissionMode) => void; disabled?: boolean }) {
+const PERMISSION_OPTIONS = PERMISSION_MODES.map(mode => ({ value: mode, label: PERMISSION_SHORT[mode], 'aria-label': PERMISSION_LABELS[mode] }))
+
+function PermissionControl({ value, label: name, change, disabled }: { id: string; value: PermissionMode; label: string; change: (value: PermissionMode) => void; disabled?: boolean }) {
   return (
-    <div role="radiogroup" aria-label={name} className={styles.segmented} data-disabled={disabled || undefined}>
-      {PERMISSION_MODES.map(mode => {
-        const checked = mode === value
-        return (
-          <button
-            key={mode}
-            type="button"
-            role="radio"
-            aria-checked={checked}
-            aria-label={PERMISSION_LABELS[mode]}
-            disabled={disabled}
-            className={styles.segment}
-            data-checked={checked || undefined}
-            onClick={() => !checked && change(mode)}
-          >
-            {checked && <m.span layoutId={`permission-${id}`} className={styles.segmentPill} transition={{ type: 'spring', stiffness: 520, damping: 40 }} />}
-            <span className={styles.segmentLabel}>{PERMISSION_SHORT[mode]}</span>
-          </button>
-        )
-      })}
-    </div>
+    <SegmentedControl aria-label={name} options={PERMISSION_OPTIONS} value={value} onValueChange={change} disabled={disabled} />
   )
 }
 
@@ -105,11 +87,11 @@ function GroupPermissionDropdown({ value, label: name, change, disabled }: { val
 function PermissionsTabSkeleton() {
   return (
     <div aria-hidden style={{ display: 'flex', flexDirection: 'column' }}>
-      <span className="kaya-skeleton" style={{ display: 'block', height: 40, borderRadius: 8 }} />
+      <span className="kaya-skeleton" style={{ display: 'block', height: 40, borderRadius: 'var(--radius-md)' }} />
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0 10px 8px', borderTop: i === 0 ? undefined : '1px solid var(--neutral-100)' }}>
-          <span className="kaya-skeleton" style={{ display: 'block', width: 160, height: 14, borderRadius: 4 }} />
-          <span className="kaya-skeleton" style={{ display: 'block', width: 132, height: 32, borderRadius: 8 }} />
+        <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--space-2-5) 0 var(--space-2-5) var(--space-2)', borderTop: i === 0 ? undefined : '1px solid var(--neutral-100)' }}>
+          <span className="kaya-skeleton" style={{ display: 'block', width: 160, height: 14, borderRadius: 'var(--radius-xs)' }} />
+          <span className="kaya-skeleton" style={{ display: 'block', width: 132, height: 32, borderRadius: 'var(--radius-md)' }} />
         </div>
       ))}
     </div>
@@ -252,7 +234,7 @@ export function PermissionsTab({
                       <ArrowDownOneIcon size={16} />
                     </span>
                     {group.name}
-                    <span style={{ color: 'var(--neutral-400)', fontWeight: 400 }}>{group.tools.length}</span>
+                    <span style={{ color: 'var(--neutral-400)', fontWeight: 'var(--font-weight-regular)' }}>{group.tools.length}</span>
                   </button>
                   <GroupPermissionDropdown value={groupMode(group.tools)} label={`Set all ${group.name.toLowerCase()}`} disabled={readOnly || saving === '__group__'} change={mode => void changeGroup(group.tools, mode)} />
                 </div>

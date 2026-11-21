@@ -280,7 +280,7 @@ function ChannelSettingsCard({ orgId, channelId }: { orgId: string; channelId: s
         onChange={event => setSettings({ ...settings, instructions: event.target.value })}
         placeholder="Instructions for this channel, added after workspace defaults"
         rows={5}
-        style={{ marginTop: 12 }}
+        style={{ marginTop: 'var(--space-3)' }}
       />
       <div className={styles.actions}>
         <Button variant="save" size="sm" loading={saving} onClick={() => void save({ instructions: settings.instructions })}>
@@ -317,7 +317,7 @@ function ChannelSummaryCard({ orgId, channelId }: { orgId: string; channelId: st
         </div>
       </div>
       {loading
-        ? <div className="kaya-skeleton" style={{ width: '100%', height: 72, borderRadius: 8, marginTop: 12 }} />
+        ? <div className="kaya-skeleton" style={{ width: '100%', height: 72, borderRadius: 'var(--radius-md)', marginTop: 'var(--space-3)' }} />
         : summary && (
           <>
             {summary.messageCount === 0

@@ -6,11 +6,11 @@ import { PhaseBadge, PhasePlaceholder } from './SettingsParts'
 export function PhaseTwoPage({ title, text }: { title: string; text: string }) {
   return (
     <SettingsPageShell
-      title={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>{title}<PhaseBadge /></span>}
+      title={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2-5)' }}>{title}<PhaseBadge /></span>}
       description=""
       maxWidth={860}
     >
-      <div style={{ marginTop: 14 }}>
+      <div style={{ marginTop: 'var(--space-3)' }}>
         <PhasePlaceholder>{text}</PhasePlaceholder>
       </div>
     </SettingsPageShell>

@@ -54,14 +54,14 @@ export const TeamChip = React.forwardRef<HTMLSpanElement, TeamChipProps>(
             justifyContent: 'center',
             width:        isSmall ? 12 : 16,
             height:       isSmall ? 12 : 16,
-            borderRadius: 3,
+            borderRadius: 'var(--radius-xs)',
             background:   gradient,
             flexShrink:   0,
             fontFamily:   'var(--font-title)',
-            fontWeight:   500,
+            fontWeight:   'var(--font-weight-medium)',
             fontSize:     isSmall ? 7 : 9,
             color:        'var(--color-text-on-accent)',
-            lineHeight:   1,
+            lineHeight:   'var(--leading-none)',
             userSelect:   'none',
           }}
         >
@@ -86,7 +86,7 @@ export const TeamChip = React.forwardRef<HTMLSpanElement, TeamChipProps>(
             <span
               style={{
                 fontFamily:  'var(--font-body)',
-                fontWeight:  400,
+                fontWeight:  'var(--font-weight-regular)',
                 fontSize:    'var(--font-size-caption)',
                 lineHeight:  'var(--line-height-caption)',
                 color:       'var(--neutral-400)',

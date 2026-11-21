@@ -23,9 +23,9 @@ export function DateRangePill({ ref, label, dotColor, className, style, ...props
         style={{
           display:         'inline-flex',
           alignItems:      'center',
-          gap:             8,
-          padding:         '6px 12px',
-          borderRadius:    8,
+          gap:             'var(--space-2)',
+          padding:         'var(--space-1-5) var(--space-3)',
+          borderRadius:    'var(--radius-md)',
           backgroundColor: 'var(--neutral-white)',
           border:          '1px solid var(--neutral-100)',
           boxShadow:       'var(--shadow-surface-card)',
@@ -35,7 +35,7 @@ export function DateRangePill({ ref, label, dotColor, className, style, ...props
           lineHeight:      'var(--line-height-caption)',
           fontWeight:      'var(--font-weight-medium)',
           cursor:          'pointer',
-          transition:      'border-color 150ms ease, color 150ms ease',
+          transition:      'border-color var(--duration-fast) ease, color var(--duration-fast) ease',
           outline:         'none',
           ...style,
         }}

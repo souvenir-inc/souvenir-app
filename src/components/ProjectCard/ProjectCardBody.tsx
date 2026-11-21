@@ -37,15 +37,15 @@ export function ProjectCardBody({ title, description, tags, memberCount, updated
         style={{
           fontFamily:      'var(--font-title)',
           fontWeight:      'var(--font-weight-medium)',
-          fontSize:        '18px',
-          lineHeight:      '24px',
+          fontSize:        'var(--font-size-heading-sm)',
+          lineHeight:      'var(--line-height-heading-sm)',
           color:           'var(--neutral-900)',
           overflow:        'hidden',
           display:         '-webkit-box',
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
           margin:          0,
-          marginTop:       '8px',
+          marginTop:       'var(--space-2)',
           flexShrink:      0,
         }}
       >
@@ -67,8 +67,8 @@ export function ProjectCardBody({ title, description, tags, memberCount, updated
           flexShrink:      0,
           fontFamily:      'var(--font-body)',
           fontWeight:      'var(--font-weight-regular)',
-          fontSize:        '12px',
-          lineHeight:      '17px',
+          fontSize:        'var(--font-size-small)',
+          lineHeight:      'var(--line-height-small)',
           color:           'var(--neutral-500)',
           overflow:        'hidden',
           textOverflow:    'ellipsis',
@@ -76,7 +76,7 @@ export function ProjectCardBody({ title, description, tags, memberCount, updated
           WebkitLineClamp: 3,
           WebkitBoxOrient: 'vertical',
           margin:          0,
-          marginTop:       '10px',
+          marginTop:       'var(--space-2-5)',
         }}
       >
         {description ?? ''}
@@ -94,13 +94,13 @@ export function ProjectCardBody({ title, description, tags, memberCount, updated
       <div style={{ height: 1, width: '100%', backgroundColor: 'var(--divider-color)', flexShrink: 0 }} />
 
       {/* Footer — updated time (left), member + chat counts (right) */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexShrink: 0, marginTop: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)', flexShrink: 0, marginTop: 'var(--space-2-5)' }}>
         <span
           style={{
             fontFamily:   'var(--font-body)',
-            fontWeight:   400,
-            fontSize:     '12px',
-            lineHeight:   '16px',
+            fontWeight:   'var(--font-weight-regular)',
+            fontSize:     'var(--font-size-small)',
+            lineHeight:   'var(--line-height-small)',
             color:        'var(--neutral-500)',
             overflow:     'hidden',
             textOverflow: 'ellipsis',
@@ -110,16 +110,16 @@ export function ProjectCardBody({ title, description, tags, memberCount, updated
           {updatedAt}
         </span>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--neutral-400)', whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', color: 'var(--neutral-400)', whiteSpace: 'nowrap' }}>
             <UserIcon size={14} />
-            <span style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: '12px', lineHeight: '16px', color: 'var(--neutral-500)' }}>
+            <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)' }}>
               {memberCount} {memberCount === 1 ? 'member' : 'members'}
             </span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--neutral-400)', whiteSpace: 'nowrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', color: 'var(--neutral-400)', whiteSpace: 'nowrap' }}>
             <BubbleChatAddIcon size={14} />
-            <span style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: '12px', lineHeight: '16px', color: 'var(--neutral-500)' }}>
+            <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)' }}>
               {chatCount} {chatCount === 1 ? 'chat' : 'chats'}
             </span>
           </div>

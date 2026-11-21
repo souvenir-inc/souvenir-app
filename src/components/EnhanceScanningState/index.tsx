@@ -48,8 +48,8 @@ export function EnhanceScanningState({ ref, rotateMs = 900, messages, className,
           flexDirection:  'column',
           alignItems:     'center',
           justifyContent: 'center',
-          gap:            16,
-          padding:        '40px 24px',
+          gap:            'var(--space-4)',
+          padding:        'var(--space-8) var(--space-6)',
           ...style,
         }}
         {...props}
@@ -70,7 +70,7 @@ export function EnhanceScanningState({ ref, rotateMs = 900, messages, className,
           }}
         >
           <AnimatePresence mode="popLayout" initial={false}>
-            {/* eslint-disable-next-line react/no-array-index-as-key -- cycling text segments; positionally stable */}
+            {/* eslint-disable-next-line react/no-array-index-key -- cycling text segments; positionally stable */}
             <m.span key={idx}
               initial={{ scale: 0.85, opacity: 0, filter: 'blur(4px)' }}
               animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
@@ -91,7 +91,7 @@ export function EnhanceScanningState({ ref, rotateMs = 900, messages, className,
             width:           '100%',
             maxWidth:        320,
             height:          4,
-            borderRadius:    999,
+            borderRadius:    'var(--radius-full)',
             backgroundColor: 'var(--color-enhance-progress-inactive)',
             overflow:        'hidden',
           }}
@@ -106,7 +106,7 @@ export function EnhanceScanningState({ ref, rotateMs = 900, messages, className,
               width:           '30%',
               top:             0,
               bottom:           0,
-              borderRadius:    999,
+              borderRadius:    'var(--radius-full)',
               backgroundColor: 'var(--color-enhance-primary)',
             }}
           />

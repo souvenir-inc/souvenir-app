@@ -847,7 +847,7 @@ function ChatPageInner({ leftChatId }: { leftChatId?: string }) {
   const handleNewChatSend = (value: string) => {
     if (!value.trim() && newChatAttachments.length === 0) return;
     // Hard-stop backstop: an exhausted credit/topup user cannot send. The input is
-    // already disabled and the CreditStatusBanner explains why, so block silently.
+    // already disabled and the credit banner (ExhaustionBanner) explains why, so block silently.
     if (creditStatus.blocked) return;
     if (selectedProjectId && !getProject(selectedProjectId)?.canEdit) {
       setNewChatInput(value);
@@ -978,7 +978,7 @@ function ChatPageInner({ leftChatId }: { leftChatId?: string }) {
                       disabled={creditStatus.blocked}
                       attachmentsSlot={
                         PINS_ENABLED && newChatMentionedPins.length > 0 ? (
-                          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
                             <PinChipStrip>
                               {newChatMentionedPins.map((mp) => (
                                 <MentionChip
@@ -1023,7 +1023,7 @@ function ChatPageInner({ leftChatId }: { leftChatId?: string }) {
                   {/* ── Starter cards ───────────────────────────────────────── */}
                   {/* Generated per user by /recommendations; absent until it lands. */}
                   {(recommendations || recommendationsLoading) && (
-                    <div style={{ marginTop: "20px", textAlign: "left" }}>
+                    <div style={{ marginTop: "var(--space-5)", textAlign: "left" }}>
                       {recommendations
                         ? <StarterList cards={recommendations.cards} onSelect={(card) => handleNewChatSend(card.prompt)} />
                         : <StarterListSkeleton />}

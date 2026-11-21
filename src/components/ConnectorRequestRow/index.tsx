@@ -9,7 +9,7 @@ import { springs } from '@/lib/springs'
 import { cn } from '@/lib/utils'
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
-const SHADOW_CARD  = '0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)'
+const SHADOW_CARD  = 'var(--shadow-tile)'
 const SHADOW_INNER = 'inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 50%, transparent), inset 0px -1px 0px 0px rgba(82,75,71,0.05)'
 const SHADOW_ICON  = '0px 0px 0px 1px var(--neutral-100)'
 
@@ -45,11 +45,11 @@ export interface ConnectorRequestRowProps extends React.HTMLAttributes<HTMLDivEl
 
 function ConnectorIcon({ iconUrl, iconAlt, name }: { iconUrl?: string; iconAlt?: string; name: string }) {
   return (
-    <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: 'var(--neutral-white)', boxShadow: SHADOW_ICON, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+    <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', backgroundColor: 'var(--neutral-white)', boxShadow: SHADOW_ICON, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
       {iconUrl ? (
         <img src={iconUrl} alt={iconAlt ?? name} style={{ width: 26, height: 26, objectFit: 'contain', display: 'block' }} />
       ) : (
-        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 12, color: 'var(--neutral-500)' }}>{name.slice(0, 2).toUpperCase()}</span>
+        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-500)' }}>{name.slice(0, 2).toUpperCase()}</span>
       )}
     </div>
   )
@@ -81,9 +81,9 @@ export const ConnectorRequestRow = React.forwardRef<HTMLDivElement, ConnectorReq
             position:        'relative',
             display:         'flex',
             alignItems:      'flex-start',
-            gap:             12,
-            padding:         '12px 14px',
-            borderRadius:    12,
+            gap:             'var(--space-3)',
+            padding:         'var(--space-3) var(--space-3)',
+            borderRadius:    'var(--radius-xl)',
             backgroundColor: 'var(--neutral-white)',
             boxShadow:       SHADOW_CARD,
             ...style,
@@ -97,9 +97,9 @@ export const ConnectorRequestRow = React.forwardRef<HTMLDivElement, ConnectorReq
           <ConnectorIcon iconUrl={iconUrl} iconAlt={iconAlt} name={connectorName} />
 
           {/* Main content */}
-          <div style={{ flex: '1 0 0', minWidth: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{ flex: '1 0 0', minWidth: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
             {/* Name + status badge */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
               <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-900)' }}>
                 {connectorName}
               </span>
@@ -107,7 +107,7 @@ export const ConnectorRequestRow = React.forwardRef<HTMLDivElement, ConnectorReq
             </div>
 
             {/* Requested by + upvote count */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexWrap: 'wrap' }}>
               <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', color: 'var(--neutral-500)' }}>
                 Requested by <strong style={{ color: 'var(--neutral-700)' }}>{requestedBy}</strong>
                 {requestedAgo && <span style={{ color: 'var(--neutral-400)' }}> · {requestedAgo}</span>}
@@ -115,7 +115,7 @@ export const ConnectorRequestRow = React.forwardRef<HTMLDivElement, ConnectorReq
               {upvotedByCount != null && upvotedByCount > 0 && (
                 <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', color: 'var(--neutral-500)' }}>
                   — also upvoted by{' '}
-                  <span style={{ fontWeight: 500, color: 'var(--neutral-700)' }}>{upvotedByCount} others</span>
+                  <span style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-700)' }}>{upvotedByCount} others</span>
                 </span>
               )}
             </div>
@@ -129,7 +129,7 @@ export const ConnectorRequestRow = React.forwardRef<HTMLDivElement, ConnectorReq
           </div>
 
           {/* Actions — right aligned */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, alignSelf: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0, alignSelf: 'center' }}>
             {status === 'pending' && (
               <>
                 <Button variant="reject" size="sm" onClick={onDecline}>Decline</Button>

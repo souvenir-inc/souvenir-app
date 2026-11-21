@@ -77,7 +77,7 @@ export function RemoveButton({
           initial={{ opacity: 0, filter: 'blur(4px)' }}
           animate={{ opacity: 1, filter: 'blur(0px)', transition: REVEAL }}
           exit={{    opacity: 0, filter: 'blur(4px)', transition: REVEAL }}
-          style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}
+          style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', flexShrink: 0 }}
         >
           <Button variant="ghost" size="sm" onClick={() => setConfirming(false)} disabled={busy} style={{ flexShrink: 0 }}>
             Cancel
@@ -128,18 +128,18 @@ function RoleDropdownTrigger({ label, disabled }: { label: string; disabled?: bo
         display:         'flex',
         alignItems:      'center',
         justifyContent:  'space-between',
-        gap:             8,
-        padding:         '5px 8px',
-        borderRadius:    8,
+        gap:             'var(--space-2)',
+        padding:         'var(--space-1) var(--space-2)',
+        borderRadius:    'var(--radius-md)',
         border:          'none',
         backgroundColor: 'var(--neutral-white)',
         boxShadow:       '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)',
         cursor:          disabled ? 'not-allowed' : 'pointer',
         opacity:         disabled ? 0.6 : 1,
         fontFamily:      'var(--font-body)',
-        fontWeight:      500,
-        fontSize:        14,
-        lineHeight:      '22px',
+        fontWeight:      'var(--font-weight-medium)',
+        fontSize:        'var(--font-size-body)',
+        lineHeight:      'var(--line-height-body)',
         color:           'var(--neutral-700)',
         whiteSpace:      'nowrap',
       }}
@@ -214,7 +214,7 @@ export function RoleDropdown({
             — without it they sit flush against the popover's edges, with
             no matching margin top/bottom/left/right. */}
         <Dropdown style={{ width: 240 }} maxHeight={false}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', padding: 'var(--space-2)' }}>
             {ROLES_INFO.map(o => (
               <DropdownMenuItem
                 key={o.role}
@@ -275,17 +275,17 @@ function ConfirmModal({
         size="sm"
         hideClose
         role="alertdialog"
-        style={{ borderRadius: 20, backgroundColor: 'var(--modal-bg)', border: '1px solid var(--border-default)', boxShadow: '0px 8px 32px color-mix(in srgb, var(--static-black) 12%, transparent)' }}
+        style={{ borderRadius: 'var(--radius-2xl)', backgroundColor: 'var(--modal-bg)', border: '1px solid var(--border-default)', boxShadow: 'var(--shadow-4)' }}
       >
-        <div style={{ padding: '24px 24px 16px' }}>
-          <DialogTitle style={{ fontFamily: 'var(--font-title)', fontWeight: 500, fontSize: 20, lineHeight: '28px', color: 'var(--neutral-900)', margin: 0 }}>
+        <div style={{ padding: 'var(--space-6) var(--space-6) var(--space-4)' }}>
+          <DialogTitle style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-heading-md)', lineHeight: 'var(--line-height-heading-md)', color: 'var(--neutral-900)', margin: 0 }}>
             {title}
           </DialogTitle>
-          <DialogDescription style={{ fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: '4px 0 0' }}>
+          <DialogDescription style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 'var(--space-1) 0 0' }}>
             {description}
           </DialogDescription>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '20px 24px 24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)', padding: 'var(--space-5) var(--space-6) var(--space-6)' }}>
           <Button variant="ghost" size="sm" onClick={onCancel}>Cancel</Button>
           <Button variant="danger" size="sm" onClick={onConfirm}>{confirmLabel}</Button>
         </div>

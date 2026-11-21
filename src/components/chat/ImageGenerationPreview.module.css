@@ -10,12 +10,12 @@
   --paint-ms: 30s;
   position: relative;
   max-width: 100%;
-  margin-top: 12px;
-  border-radius: 16px;
+  margin-top: var(--space-3);
+  border-radius: var(--radius-2xl);
   overflow: hidden;
   isolation: isolate;
-  background: var(--neutral-100, #f4f4f5);
-  border: 1px solid color-mix(in srgb, var(--neutral-500, #71717a) 16%, transparent);
+  background: var(--neutral-100);
+  border: 1px solid color-mix(in srgb, var(--neutral-500) 16%, transparent);
   animation: igp-reveal var(--paint-ms) cubic-bezier(0.12, 0.65, 0.3, 1) forwards;
   transition: --c1 2.5s ease, --c2 2.5s ease, --c3 2.5s ease, --c4 2.5s ease;
 }
@@ -25,7 +25,7 @@
   position: absolute;
   inset: 0;
   background-image: radial-gradient(
-    color-mix(in srgb, var(--neutral-500, #71717a) 22%, transparent) 1px,
+    color-mix(in srgb, var(--neutral-500) 22%, transparent) 1px,
     transparent 1.5px
   );
   background-size: 14px 14px;
@@ -86,7 +86,7 @@
   background: linear-gradient(
     115deg,
     transparent 35%,
-    color-mix(in srgb, var(--neutral-white, #fff) 35%, transparent) 50%,
+    color-mix(in srgb, var(--neutral-white) 35%, transparent) 50%,
     transparent 65%
   );
   background-size: 300% 100%;
@@ -104,7 +104,7 @@
   pointer-events: none;
   background: radial-gradient(
     50% 50% at 50% 50%,
-    color-mix(in srgb, var(--neutral-white, #fff) 65%, transparent),
+    color-mix(in srgb, var(--neutral-white) 65%, transparent),
     transparent
   );
   filter: blur(8px);
@@ -118,16 +118,16 @@
   bottom: 10px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   max-width: calc(100% - 20px);
-  padding: 6px 12px 6px 10px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--static-black, #000) 45%, transparent);
+  padding: var(--space-1-5) var(--space-3) var(--space-1-5) var(--space-2-5);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--static-black) 45%, transparent);
   backdrop-filter: blur(8px);
-  color: var(--static-white, #fff);
+  color: var(--static-white);
   font-size: 12.5px;
-  font-weight: 500;
-  line-height: 16px;
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-small);
   overflow: hidden;
 }
 .caption { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
@@ -136,7 +136,7 @@
   height: 7px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: var(--static-white, #fff);
+  background: var(--static-white);
   animation: igp-pulse 1.2s ease-in-out infinite;
 }
 
@@ -172,7 +172,7 @@
 }
 
 :global(.dark) .card,
-:global([data-theme="dark"]) .card { background: var(--neutral-900, #18181b); }
+:global([data-theme="dark"]) .card { background: var(--neutral-900); }
 
 @media (prefers-reduced-motion: reduce) {
   .card { animation: none; --reveal: 100%; }

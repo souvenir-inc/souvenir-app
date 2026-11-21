@@ -37,14 +37,14 @@ const modalCardStyle: React.CSSProperties = {
   maxHeight: "calc(100dvh - 64px)",
   zIndex: MODAL_Z,
   backgroundColor: "var(--neutral-white)",
-  borderRadius: "18px",
-  padding: "32px",
+  borderRadius: "var(--radius-2xl)",
+  padding: "var(--space-7)",
   boxShadow:
-    "0px 8px 32px 0px rgba(82,75,71,0.18), 0px 0px 0px 1px var(--neutral-100, #F5F5F5)",
+    "0px 8px 32px 0px rgba(82,75,71,0.18), 0px 0px 0px 1px var(--neutral-100)",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  gap: "24px",
+  gap: "var(--space-6)",
 };
 
 // ── Choice option card ─────────────────────────────────────────────────────────
@@ -72,25 +72,25 @@ function ChoiceCard({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "16px",
-        padding: "24px 20px",
-        borderRadius: "14px",
-        border: "1px solid var(--neutral-200, #e2d9d1)",
+        gap: "var(--space-4)",
+        padding: "var(--space-6) var(--space-5)",
+        borderRadius: "var(--radius-xl)",
+        border: "1px solid var(--neutral-200)",
         backgroundColor: "var(--neutral-50)",
         flex: "1 1 0",
         minWidth: "180px",
         textAlign: "center",
       }}
     >
-      <span style={{ fontSize: "28px", lineHeight: 1 }}>{icon}</span>
-      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+      <span style={{ fontSize: "var(--font-size-heading-xl)", lineHeight: 'var(--leading-none)' }}>{icon}</span>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-1-5)" }}>
         <p
           style={{
             fontFamily: "var(--font-body)",
-            fontWeight: 600,
-            fontSize: "16px",
-            lineHeight: "22px",
-            color: "var(--neutral-900, #26211e)",
+            fontWeight: 'var(--font-weight-semibold)',
+            fontSize: "var(--font-size-body-lg)",
+            lineHeight: "var(--line-height-body)",
+            color: "var(--neutral-900)",
             margin: 0,
           }}
         >
@@ -99,10 +99,10 @@ function ChoiceCard({
         <p
           style={{
             fontFamily: "var(--font-body)",
-            fontWeight: 400,
-            fontSize: "14px",
-            lineHeight: "20px",
-            color: "var(--neutral-500, #6a625d)",
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: "var(--font-size-body)",
+            lineHeight: "var(--line-height-body-sm)",
+            color: "var(--neutral-500)",
             margin: 0,
           }}
         >
@@ -131,17 +131,17 @@ function TeamsWorkspacePreview() {
       style={{
         width: "100%",
         backgroundColor: "var(--neutral-50)",
-        borderRadius: "16px",
-        paddingRight: "8px",
-        paddingTop: "8px",
+        borderRadius: "var(--radius-2xl)",
+        paddingRight: "var(--space-2)",
+        paddingTop: "var(--space-2)",
       }}
     >
       <div
         style={{
           backgroundColor: "rgba(var(--surface-rgb), 0.2)",
-          border: "1px solid var(--neutral-200, #E5E5E5)",
-          borderRadius: "16px",
-          padding: "10px",
+          border: "1px solid var(--neutral-200)",
+          borderRadius: "var(--radius-2xl)",
+          padding: "var(--space-2-5)",
           height: "172px",
           position: "relative",
           overflow: "hidden",
@@ -155,9 +155,9 @@ function TeamsWorkspacePreview() {
               position: "relative",
               display: "inline-flex",
               alignItems: "center",
-              gap: "4px",
-              padding: "5px 8px 7px",
-              borderRadius: "8px",
+              gap: "var(--space-1)",
+              padding: "var(--space-1) var(--space-2) var(--space-1-5)",
+              borderRadius: "var(--radius-md)",
               background: "linear-gradient(180deg, var(--neutral-700) 0%, var(--neutral-900) 100%)",
               boxShadow:
                 "0px 0px 0px 1px black, 0px 1px 1px rgba(59,54,50,0.1), 0px 1.5px 3px rgba(59,54,50,0.4)",
@@ -175,8 +175,8 @@ function TeamsWorkspacePreview() {
             <span
               style={{
                 color: "var(--neutral-50)",
-                fontSize: "11px",
-                fontWeight: 500,
+                fontSize: "var(--font-size-caption)",
+                fontWeight: 'var(--font-weight-medium)',
                 fontFamily: "var(--font-body)",
                 whiteSpace: "nowrap",
                 textShadow:
@@ -209,7 +209,7 @@ function TeamsWorkspacePreview() {
           </div>
 
           {/* Teams / grid icon */}
-          <div style={{ padding: "6px", borderRadius: "8px" }}>
+          <div style={{ padding: "var(--space-1-5)", borderRadius: "var(--radius-md)" }}>
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden>
               <rect x="2.5" y="2.5" width="6.5" height="6.5" rx="1.5" stroke="var(--neutral-200)" strokeWidth="1.25" />
               <rect x="11"   y="2.5" width="6.5" height="6.5" rx="1.5" stroke="var(--neutral-200)" strokeWidth="1.25" />
@@ -227,18 +227,18 @@ function TeamsWorkspacePreview() {
             top: "50%",
             transform: "translateY(-50%)",
             backgroundColor: "var(--neutral-white)",
-            border: "1px solid var(--neutral-200, #E5E5E5)",
-            borderRadius: "10px",
-            padding: "4px",
+            border: "1px solid var(--neutral-200)",
+            borderRadius: "var(--radius-lg)",
+            padding: "var(--space-1)",
             display: "flex",
             flexDirection: "column",
-            gap: "4px",
+            gap: "var(--space-1)",
             boxShadow:
-              "0px 1px 1px rgba(59,54,50,0.05), 0px 1.5px 3px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-200,#E5E5E5)",
+              "0px 1px 1px rgba(59,54,50,0.05), 0px 1.5px 3px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-200)",
           }}
         >
           {/* Pin icon */}
-          <div style={{ padding: "5px", borderRadius: "6px" }}>
+          <div style={{ padding: "var(--space-1)", borderRadius: "var(--radius-sm)" }}>
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden>
               <path
                 d="M11.5 3.5l5 5-2.5 2.5-1.5-1.5-3 3v2l-1.5 1.5-3.5-3.5 1.5-1.5h2l3-3-1.5-1.5 2.5-2.5z"
@@ -250,14 +250,14 @@ function TeamsWorkspacePreview() {
             </svg>
           </div>
           {/* Target/circle icon */}
-          <div style={{ padding: "5px", borderRadius: "6px" }}>
+          <div style={{ padding: "var(--space-1)", borderRadius: "var(--radius-sm)" }}>
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden>
               <circle cx="10" cy="10" r="6.5" stroke="var(--neutral-200)" strokeWidth="1.25" />
               <circle cx="10" cy="10" r="2.5" stroke="var(--neutral-200)" strokeWidth="1.25" />
             </svg>
           </div>
           {/* Quill/pen icon */}
-          <div style={{ padding: "5px", borderRadius: "6px" }}>
+          <div style={{ padding: "var(--space-1)", borderRadius: "var(--radius-sm)" }}>
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden>
               <path
                 d="M16 4C14 2 11 4 9 6L6 9l-2.5 5.5 5.5-2.5 3-3c2-2 4-5 4-5z"
@@ -277,7 +277,7 @@ function TeamsWorkspacePreview() {
               inset: 0,
               borderRadius: "inherit",
               pointerEvents: "none",
-              boxShadow: "inset 0px -2px 0.4px var(--neutral-100,#F5F5F5)",
+              boxShadow: "inset 0px -2px 0.4px var(--neutral-100)",
             }}
           />
         </div>
@@ -295,9 +295,9 @@ function SouvenirWordmark() {
       <span
         style={{
           fontFamily: "var(--font-title)",
-          fontWeight: 400,
+          fontWeight: 'var(--font-weight-regular)',
           fontSize: "34px",
-          lineHeight: 1,
+          lineHeight: 'var(--leading-none)',
           color: "var(--static-black)",
           letterSpacing: "0.34px",
         }}
@@ -411,6 +411,7 @@ function WelcomeModalImpl() {
           {/* Modal card */}
           <m.div
             key="modal"
+            // eslint-disable-next-line no-restricted-syntax -- ds-allow: framer-motion exit animation; moves to ui/dialog once it has a motion variant (plan Phase 2 follow-up)
             role="dialog"
             aria-modal="true"
             initial={{ opacity: 0, scale: 0.96, y: 8 }}
@@ -431,7 +432,7 @@ function WelcomeModalImpl() {
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    gap: "20px",
+                    gap: "var(--space-5)",
                     width: "100%",
                   }}
                 >
@@ -440,10 +441,10 @@ function WelcomeModalImpl() {
                   <h2
                     style={{
                       fontFamily: "var(--font-title)",
-                      fontWeight: 400,
-                      fontSize: "24px",
-                      lineHeight: "32px",
-                      color: "var(--neutral-900, #26211e)",
+                      fontWeight: 'var(--font-weight-regular)',
+                      fontSize: "var(--font-size-heading)",
+                      lineHeight: "var(--line-height-heading)",
+                      color: "var(--neutral-900)",
                       margin: 0,
                       textAlign: "center",
                     }}
@@ -454,10 +455,10 @@ function WelcomeModalImpl() {
                   <p
                     style={{
                       fontFamily: "var(--font-body)",
-                      fontWeight: 400,
-                      fontSize: "16px",
-                      lineHeight: "22px",
-                      color: "var(--neutral-500, #6a625d)",
+                      fontWeight: 'var(--font-weight-regular)',
+                      fontSize: "var(--font-size-body-lg)",
+                      lineHeight: "var(--line-height-body)",
+                      color: "var(--neutral-500)",
                       margin: 0,
                       textAlign: "center",
                     }}
@@ -469,7 +470,7 @@ function WelcomeModalImpl() {
 
                   <Button
                     size="sm"
-                    rightIcon={<span style={{ fontSize: 12 }}>→</span>}
+                    rightIcon={<span style={{ fontSize: 'var(--font-size-small)' }}>→</span>}
                     onClick={handleClose}
                   >
                     Start exploring
@@ -488,7 +489,7 @@ function WelcomeModalImpl() {
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    gap: "20px",
+                    gap: "var(--space-5)",
                     width: "100%",
                   }}
                 >
@@ -497,10 +498,10 @@ function WelcomeModalImpl() {
                   <h2
                     style={{
                       fontFamily: "var(--font-title)",
-                      fontWeight: 400,
-                      fontSize: "24px",
-                      lineHeight: "32px",
-                      color: "var(--neutral-900, #26211e)",
+                      fontWeight: 'var(--font-weight-regular)',
+                      fontSize: "var(--font-size-heading)",
+                      lineHeight: "var(--line-height-heading)",
+                      color: "var(--neutral-900)",
                       margin: 0,
                       textAlign: "center",
                     }}
@@ -511,10 +512,10 @@ function WelcomeModalImpl() {
                   <p
                     style={{
                       fontFamily: "var(--font-body)",
-                      fontWeight: 400,
-                      fontSize: "16px",
-                      lineHeight: "22px",
-                      color: "var(--neutral-500, #6a625d)",
+                      fontWeight: 'var(--font-weight-regular)',
+                      fontSize: "var(--font-size-body-lg)",
+                      lineHeight: "var(--line-height-body)",
+                      color: "var(--neutral-500)",
                       margin: 0,
                       textAlign: "center",
                     }}
@@ -525,7 +526,7 @@ function WelcomeModalImpl() {
                   <div
                     style={{
                       display: "flex",
-                      gap: "16px",
+                      gap: "var(--space-4)",
                       width: "100%",
                       flexWrap: "wrap",
                     }}
@@ -566,19 +567,19 @@ function WelcomeModalImpl() {
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    gap: "20px",
+                    gap: "var(--space-5)",
                     width: "100%",
                   }}
                 >
-                  {/* <span style={{ fontSize: "40px", lineHeight: 1 }}>🎉</span> */}
+                  {/* <span style={{ fontSize: "var(--font-size-display)", lineHeight: 'var(--leading-none)' }}>🎉</span> */}
 
                   <h2
                     style={{
                       fontFamily: "var(--font-title)",
-                      fontWeight: 400,
-                      fontSize: "22px",
-                      lineHeight: "28px",
-                      color: "var(--neutral-900, #26211e)",
+                      fontWeight: 'var(--font-weight-regular)',
+                      fontSize: "var(--font-size-heading-md)",
+                      lineHeight: "var(--line-height-heading-md)",
+                      color: "var(--neutral-900)",
                       margin: 0,
                       textAlign: "center",
                     }}
@@ -589,10 +590,10 @@ function WelcomeModalImpl() {
                   <p
                     style={{
                       fontFamily: "var(--font-body)",
-                      fontWeight: 400,
-                      fontSize: "14px",
-                      lineHeight: "20px",
-                      color: "var(--neutral-500, #6a625d)",
+                      fontWeight: 'var(--font-weight-regular)',
+                      fontSize: "var(--font-size-body)",
+                      lineHeight: "var(--line-height-body-sm)",
+                      color: "var(--neutral-500)",
                       margin: 0,
                       textAlign: "center",
                     }}
@@ -602,7 +603,7 @@ function WelcomeModalImpl() {
 
                   <Button
                     size="sm"
-                    rightIcon={<span style={{ fontSize: 12 }}>→</span>}
+                    rightIcon={<span style={{ fontSize: 'var(--font-size-small)' }}>→</span>}
                     onClick={handleClose}
                   >
                     Start exploring

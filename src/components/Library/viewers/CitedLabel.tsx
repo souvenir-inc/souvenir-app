@@ -6,7 +6,7 @@ import React from 'react'
 export const CITED_MARK: React.CSSProperties = {
   background: 'var(--color-tag-Yellow-bg)',
   boxShadow: '0 0 0 2px var(--color-tag-Yellow-text)',
-  borderRadius: 3,
+  borderRadius: 'var(--radius-xs)',
   color: 'inherit',
 }
 
@@ -15,9 +15,9 @@ export function CitedLabel({ children }: { children: React.ReactNode }) {
   return (
     <span
       style={{
-        display: 'inline-flex', alignItems: 'center', gap: 4, marginLeft: 8, padding: '0 6px', height: 20, borderRadius: 6,
-        background: 'var(--neutral-900)', color: 'var(--card-bg)', fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600,
-        lineHeight: '20px', verticalAlign: 2, whiteSpace: 'nowrap', flexShrink: 0,
+        display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', marginLeft: 'var(--space-2)', padding: '0 var(--space-1-5)', height: 20, borderRadius: 'var(--radius-sm)',
+        background: 'var(--neutral-900)', color: 'var(--card-bg)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', fontWeight: 'var(--font-weight-semibold)',
+        lineHeight: 'var(--line-height-body-sm)', verticalAlign: 2, whiteSpace: 'nowrap', flexShrink: 0,
       }}
     >
       <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

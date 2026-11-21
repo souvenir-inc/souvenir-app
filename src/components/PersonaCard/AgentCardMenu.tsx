@@ -87,7 +87,7 @@ export function AgentCardMenu({
               style={{
                 position: 'fixed',
                 inset:    0,
-                zIndex:   10,
+                zIndex:   'var(--z-raised)',
               }}
               onMouseDown={() => onOpenChange(false)}
             />
@@ -99,7 +99,7 @@ export function AgentCardMenu({
                 position: 'absolute',
                 ...(dropUp ? { bottom: 28, top: 'auto' } : { top: 28 }),
                 right:    0,
-                zIndex:   20,
+                zIndex:   'var(--z-dropdown)',
               }}
             >
               <Dropdown size="sm" maxHeight={false}>

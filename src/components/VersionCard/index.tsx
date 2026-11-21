@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
 
-const SHADOW_CARD   = '0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)'
+const SHADOW_CARD   = 'var(--shadow-tile)'
 const SHADOW_AVATAR = '0px 1.091px 1.09px 0px rgba(59,54,50,0.05), 0px 1.455px 1px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)'
 
 const EMPTY_VERSION_CHANGES: VersionCardChange[] = []
@@ -79,9 +79,9 @@ export function VersionCard({
         style={{
           display:         'flex',
           flexDirection:   'column',
-          gap:             9,
-          padding:         12,
-          borderRadius:    16,
+          gap:             'var(--space-2)',
+          padding:         'var(--space-3)',
+          borderRadius:    'var(--radius-2xl)',
           width:           '100%',
           boxSizing:       'border-box' as const,
           backgroundColor: isCurrent ? 'var(--neutral-white)' : 'var(--neutral-50)',
@@ -98,7 +98,7 @@ export function VersionCard({
         <div
           style={{
             display:    'flex',
-            gap:        12,
+            gap:        'var(--space-3)',
             alignItems: 'flex-start',
             width:      '100%',
           }}
@@ -112,7 +112,7 @@ export function VersionCard({
               height={37}
               unoptimized
               style={{
-                borderRadius: 8,
+                borderRadius: 'var(--radius-md)',
                 objectFit:    'cover',
                 flexShrink:   0,
                 boxShadow:    SHADOW_AVATAR,
@@ -125,7 +125,7 @@ export function VersionCard({
               style={{
                 width:           37,
                 height:          37,
-                borderRadius:    8,
+                borderRadius:    'var(--radius-md)',
                 flexShrink:      0,
                 backgroundColor: 'var(--neutral-100)',
                 boxShadow:       SHADOW_AVATAR,
@@ -139,7 +139,7 @@ export function VersionCard({
               display:       'flex',
               flexDirection: 'column',
               flex:          '1 0 0',
-              gap:           8,
+              gap:           'var(--space-2)',
               alignItems:    'flex-start',
               minWidth:      0,
             }}
@@ -151,7 +151,7 @@ export function VersionCard({
                 alignItems:     'flex-start',
                 justifyContent: 'space-between',
                 width:          '100%',
-                gap:            8,
+                gap:            'var(--space-2)',
               }}
             >
               <span
@@ -213,7 +213,7 @@ export function VersionCard({
           style={{
             display:    'flex',
             alignItems: 'flex-end',
-            gap:        8,
+            gap:        'var(--space-2)',
             width:      '100%',
           }}
         >
@@ -225,7 +225,7 @@ export function VersionCard({
               flexDirection: 'column',
               flex:          '1 1 0',
               minWidth:      0,
-              gap:           6,
+              gap:           'var(--space-1-5)',
               alignItems:    'flex-start',
             }}
           >
@@ -247,14 +247,14 @@ export function VersionCard({
                 <div
                   style={{
                     width:              '100%',
-                    padding:            '2px',
+                    padding:            'var(--space-0-5)',
                     boxSizing:          'border-box' as const,
                     overflow:           'hidden',
                     WebkitMaskImage:    'linear-gradient(to right, black calc(100% - 40px), transparent 100%)',
                     maskImage:          'linear-gradient(to right, black calc(100% - 40px), transparent 100%)',
                   }}
                 >
-                  <div style={{ display: 'flex', gap: 9, alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
                     {changes.map((change) => (
                       <Badge key={change.label} label={change.label} color={badgeColor} />
                     ))}

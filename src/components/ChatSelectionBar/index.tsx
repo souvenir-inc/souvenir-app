@@ -31,9 +31,9 @@ export function ChipButton({ children, danger = false, ghost = false, disabled =
       style={{
         display:         'inline-flex',
         alignItems:      'center',
-        gap:             6,
-        padding:         '5px 10px',
-        borderRadius:    8,
+        gap:             'var(--space-1-5)',
+        padding:         'var(--space-1) var(--space-2-5)',
+        borderRadius:    'var(--radius-md)',
         border:          'none',
         backgroundColor: hovered && !disabled
           ? danger ? 'color-mix(in srgb, var(--red-400) 5%, transparent)' : 'var(--neutral-800-05)'
@@ -43,12 +43,12 @@ export function ChipButton({ children, danger = false, ghost = false, disabled =
           : danger ? CHIP_RING_DANGER : CHIP_RING,
         fontFamily:      'var(--font-body)',
         fontSize:        'var(--font-size-body)',
-        fontWeight:      500,
+        fontWeight:      'var(--font-weight-medium)',
         lineHeight:      'var(--line-height-body)',
-        color:           danger ? 'var(--red-500, #dc2626)' : 'var(--neutral-700)',
+        color:           danger ? 'var(--red-500)' : 'var(--neutral-700)',
         opacity:         disabled ? 0.38 : 1,
         cursor:          disabled ? 'not-allowed' : 'pointer',
-        transition:      'background-color 120ms',
+        transition:      'background-color var(--duration-fast)',
         flexShrink:      0,
         whiteSpace:      'nowrap',
       }}
@@ -99,7 +99,7 @@ export function ChatSelectionBar({
       style={{
         display:    'flex',
         alignItems: 'center',
-        gap:        6,
+        gap:        'var(--space-1-5)',
         ...style,
       }}
     >
@@ -108,12 +108,12 @@ export function ChatSelectionBar({
         style={{
           fontFamily: 'var(--font-body)',
           fontSize:   'var(--font-size-body)',
-          fontWeight: 400,
+          fontWeight: 'var(--font-weight-regular)',
           lineHeight: 'var(--line-height-body)',
           color:      noneSelected ? 'var(--neutral-400)' : 'var(--neutral-600)',
           whiteSpace: 'nowrap',
           flexShrink: 0,
-          paddingRight: 2,
+          paddingRight: 'var(--space-0-5)',
         }}
       >
         {selectedCount} selected
@@ -139,7 +139,7 @@ export function ChatSelectionBar({
           height:          18,
           backgroundColor: 'var(--neutral-200)',
           flexShrink:      0,
-          margin:          '0 2px',
+          margin:          '0 var(--space-0-5)',
         }}
       />
 

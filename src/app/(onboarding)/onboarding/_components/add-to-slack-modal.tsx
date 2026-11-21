@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { CancelOneIcon } from "@strange-huge/icons";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { getSlackInstallUrl } from "@/lib/api/slack";
 
 // ── A1 screen 5 / A2 screen 3 — "Into the app" + "Add Souvenir to Slack" modal ──
@@ -19,9 +20,9 @@ function SlackPreviewIllustration() {
     <div
       style={{
         width: "100%",
-        borderRadius: 10,
+        borderRadius: 'var(--radius-lg)',
         backgroundColor: "var(--neutral-50)",
-        padding: 12,
+        padding: 'var(--space-3)',
         boxSizing: "border-box",
       }}
     >
@@ -29,7 +30,7 @@ function SlackPreviewIllustration() {
       <img
         src="/onboarding/slack-preview.png"
         alt=""
-        style={{ display: "block", width: "100%", height: "auto", borderRadius: 6 }}
+        style={{ display: "block", width: "100%", height: "auto", borderRadius: 'var(--radius-sm)' }}
       />
     </div>
   );
@@ -53,49 +54,33 @@ export function AddSouvenirToSlackModal({ isOpen, onClose }: { isOpen: boolean; 
   };
 
   return (
-    <div
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 1100,
-        backgroundColor: "var(--overlay-bg)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 24,
-      }}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="Add Souvenir to Slack"
+    <Dialog open onOpenChange={(next) => { if (!next) onClose(); }}>
+      <DialogContent
+        hideClose
         style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 20,
+          gap: 'var(--space-5)',
           width: 412,
-          maxWidth: "100%",
-          borderRadius: 18,
+          maxWidth: "calc(100vw - 48px)",
+          borderRadius: 'var(--radius-2xl)',
           backgroundColor: "var(--modal-bg)",
-          padding: 16,
+          padding: 'var(--space-4)',
           boxSizing: "border-box",
-          boxShadow: "0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rgba(130,122,116,0.1)",
+          overflow: "visible",
         }}
       >
-        <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
-            <p style={{ fontFamily: "var(--font-body)", fontWeight: 600, fontSize: 20, lineHeight: "24px", color: "var(--neutral-700,#524b47)", margin: 0 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 'var(--space-2)' }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 'var(--space-1)' }}>
+            <DialogTitle style={{ fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-heading-md)', lineHeight: "var(--line-height-heading-sm)", color: "var(--neutral-700)", margin: 0 }}>
               Add Souvenir to Slack
-            </p>
-            <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 14, lineHeight: "16px", color: "var(--neutral-600,#6a625d)", margin: 0 }}>
+            </DialogTitle>
+            <DialogDescription style={{ fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-small)", color: "var(--neutral-600)", margin: 0 }}>
               Bring Souvenir right into your workspace, ready for your workspace to use.
-            </p>
+            </DialogDescription>
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            style={{ background: "none", border: "none", cursor: "pointer", padding: 3, borderRadius: 6, display: "flex", color: "var(--neutral-700,#524b47)", flexShrink: 0 }}
+            style={{ background: "none", border: "none", cursor: "pointer", padding: 'var(--space-0-5)', borderRadius: 'var(--radius-sm)', display: "flex", color: "var(--neutral-700)", flexShrink: 0 }}
           >
             <CancelOneIcon size={18} />
           </button>
@@ -106,7 +91,7 @@ export function AddSouvenirToSlackModal({ isOpen, onClose }: { isOpen: boolean; 
         <Button fluid size="sm" loading={connecting} onClick={() => void handleAddToSlack()}>
           Add Souvenir to Slack
         </Button>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

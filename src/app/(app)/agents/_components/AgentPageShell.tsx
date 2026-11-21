@@ -25,8 +25,8 @@ export function AgentPageShell({
         display:        'flex',
         flexDirection:  'column',
         alignItems:     'center',
-        paddingTop:     32,
-        paddingBottom:  32,
+        paddingTop:     'var(--space-7)',
+        paddingBottom:  'var(--space-7)',
         minHeight:      0,
         overflowY:      'auto',
       }}
@@ -36,7 +36,7 @@ export function AgentPageShell({
       <div
         style={{
           width: '100%', maxWidth: maxWidth + 96, boxSizing: 'border-box',
-          paddingLeft: 48, paddingRight: 48,
+          paddingLeft: 'var(--space-9)', paddingRight: 'var(--space-9)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1 0 auto',
         }}
       >
@@ -67,13 +67,13 @@ export function AgentPageHeader({
       {actions && (
         <div
           style={{
-            position: 'sticky', top: 16, zIndex: 20, height: 0, width: '100%',
+            position: 'sticky', top: 16, zIndex: 'var(--z-sticky)', height: 0, width: '100%',
             display: 'flex', justifyContent: 'flex-end', pointerEvents: 'none',
           }}
         >
           <div
             style={{
-              pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: 8, padding: 4, borderRadius: 14,
+              pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-1)', borderRadius: 'var(--radius-xl)',
               backgroundColor: 'color-mix(in srgb, var(--neutral-50) 88%, transparent)',
               backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
             }}
@@ -84,21 +84,21 @@ export function AgentPageHeader({
       )}
       <div
         style={{
-          display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0,
-          width: '100%', marginBottom: 28, flexShrink: 0,
+          display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', minWidth: 0,
+          width: '100%', marginBottom: 'var(--space-6)', flexShrink: 0,
           // Leave the top-right corner free for the sticky buttons.
           paddingRight: actions ? 'min(340px, 45%)' : 0, boxSizing: 'border-box',
         }}
       >
         <h1
           style={{
-            margin: 0, fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)',
+            margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)',
           }}
         >
           {title}
         </h1>
         {subtitle && (
-          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-600)' }}>
+          <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-600)' }}>
             {subtitle}
           </p>
         )}

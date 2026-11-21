@@ -168,7 +168,7 @@ function ChevronDown({ isOpen }: { isOpen: boolean }) {
     >
       <path
         d="M3 5.5 L7 9.5 L11 5.5"
-        stroke="var(--neutral-400, #9C938B)"
+        stroke="var(--neutral-400)"
         strokeWidth="1.7"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -183,7 +183,7 @@ function WorkingPulse() {
     <m.div
       animate={shouldReduceMotion ? undefined : { opacity: [0.3, 0.8, 0.3] }}
       transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
-      style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 14, color: "var(--thinking-text-faint)" }}
+      style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)', fontSize: 'var(--font-size-body)', color: "var(--thinking-text-faint)" }}
     >
       <HugeiconsIcon icon={AiBrain01Icon} size={16} color="var(--thinking-icon-strong)" strokeWidth={1.5} />
       <span>Working…</span>
@@ -238,8 +238,8 @@ function ThinkingTrigger({ open, onToggle, controls, label, summary, live }: { o
         aria-controls={controls}
         onClick={onToggle}
         style={{
-          position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 6,
-          padding: "4px 0", border: 0, borderRadius: 8, background: "transparent",
+          position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 'var(--space-1-5)',
+          padding: "var(--space-1) 0", border: 0, borderRadius: 'var(--radius-md)', background: "transparent",
           cursor: "pointer", fontFamily: "var(--font-body)", userSelect: "none", maxWidth: "100%",
         }}
       >
@@ -248,12 +248,12 @@ function ThinkingTrigger({ open, onToggle, controls, label, summary, live }: { o
           // globals.css — see kaya-shimmer) only while live; the settled
           // "Thought for Ns" label is plain static text.
           className={live ? "kaya-shimmer" : undefined}
-          style={{ flexShrink: 0, color: "var(--thinking-text)", fontSize: 14, fontWeight: 500, lineHeight: "22px", whiteSpace: "nowrap" }}
+          style={{ flexShrink: 0, color: "var(--thinking-text)", fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-medium)', lineHeight: "var(--line-height-body)", whiteSpace: "nowrap" }}
         >
           {label}
         </span>
         {summary && (
-          <span style={{ display: "flex", minWidth: 0, flex: 1, color: "var(--thinking-text)", fontSize: 14, lineHeight: "22px", textAlign: "left" }}>
+          <span style={{ display: "flex", minWidth: 0, flex: 1, color: "var(--thinking-text)", fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-body)", textAlign: "left" }}>
             <ResearchTitle text={summary} />
           </span>
         )}
@@ -281,14 +281,14 @@ function ThinkingCollapse({ open, id, children }: { open: boolean; id: string; c
       transition={{ type: "spring", stiffness: springs.moderate.stiffness, damping: 35 }}
       style={{ overflow: "hidden" }}
     >
-      <div style={{ padding: "12px 0 10px", fontFamily: "var(--font-body)", fontSize: 14, color: "var(--neutral-700)" }}>
+      <div style={{ padding: "var(--space-3) 0 var(--space-2-5)", fontFamily: "var(--font-body)", fontSize: 'var(--font-size-body)', color: "var(--neutral-700)" }}>
         {children}
       </div>
     </m.div>
   );
 }
 
-// ── Structured reasoning sections (from backend reasoning_sections[]) ────────
+// ── Reasoning steps (sections split out of the turn's reasoning text) ───────
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const REASONING_ICON_MAP: Array<{ pattern: RegExp; icon: any }> = [
@@ -364,14 +364,14 @@ function ReasoningStep({
                   flex: 1,
                   width: 1,
                   minHeight: 12,
-                  background: "var(--neutral-200, #F5F5F5)",
+                  background: "var(--neutral-200)",
                   transformOrigin: "top",
                 }}
               />
             )}
           </div>
 
-          <div style={{ display: "flex", minWidth: 0, flex: 1, flexDirection: "column", paddingLeft: 10 }}>
+          <div style={{ display: "flex", minWidth: 0, flex: 1, flexDirection: "column", paddingLeft: 'var(--space-2-5)' }}>
             <button
               type="button"
               disabled={isActive || !hasBody}
@@ -379,18 +379,18 @@ function ReasoningStep({
               aria-controls={!isActive && hasBody ? bodyId : undefined}
               onClick={() => setToggled(!expanded)}
               style={{
-                display: "flex", alignItems: "center", gap: 8, width: "100%",
-                padding: "3px 0", border: 0, background: "transparent",
+                display: "flex", alignItems: "center", gap: 'var(--space-2)', width: "100%",
+                padding: "var(--space-0-5) 0", border: 0, background: "transparent",
                 cursor: !isActive && hasBody ? "pointer" : "default", textAlign: "left",
                 fontFamily: "var(--font-body)",
               }}
             >
-              <span style={{ minWidth: 0, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "var(--neutral-700)", fontSize: 14, lineHeight: "22px" }}>
+              <span style={{ minWidth: 0, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "var(--neutral-700)", fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-body)" }}>
                 {/* No trailing "…" while active: the shimmer already says so,
                     and on the verb alone it read "Clarifying… the topic". */}
                 <strong
                   className={isActive ? "kaya-thinking-step-shimmer" : undefined}
-                  style={{ color: "var(--neutral-900)", fontWeight: 600 }}
+                  style={{ color: "var(--neutral-900)", fontWeight: 'var(--font-weight-semibold)' }}
                 >
                   {verb}
                 </strong>
@@ -409,7 +409,7 @@ function ReasoningStep({
                   transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                   style={{ overflow: "hidden" }}
                 >
-                  <div style={{ margin: "8px 0 6px", paddingLeft: 10, borderLeft: "2px solid var(--thinking-rule)" }}>
+                  <div style={{ margin: "var(--space-2) 0 var(--space-1-5)", paddingLeft: 'var(--space-2-5)', borderLeft: "2px solid var(--thinking-rule)" }}>
                     <LineRenderer content={section.body} variant="reasoning" />
                   </div>
                 </m.div>
@@ -437,25 +437,25 @@ function ActivityGroup({ activities }: { activities: ActivityItem[] }) {
   const verbs = [...new Set(activities.map(activityVerb))].join(", ");
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-2)' }}>
       <button
         type="button"
         aria-expanded={open}
         aria-controls={bodyId}
         onClick={() => setOpen((value) => !value)}
         style={{
-          display: "flex", alignItems: "center", gap: 6, width: "100%",
-          padding: "1px 0", border: 0, background: "transparent",
+          display: "flex", alignItems: "center", gap: 'var(--space-1-5)', width: "100%",
+          padding: "var(--space-0-5) 0", border: 0, background: "transparent",
           cursor: "pointer", textAlign: "left", fontFamily: "var(--font-body)",
         }}
       >
         <span style={{ display: "flex", lineHeight: 0, flexShrink: 0 }}>
           <HugeiconsIcon icon={Checkmark} size={16} color="var(--green-600)" strokeWidth={2.5} />
         </span>
-        <span style={{ fontSize: 14, fontWeight: 600, color: "var(--neutral-700)", flexShrink: 0 }}>
+        <span style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-700)", flexShrink: 0 }}>
           Ran {activities.length} actions
         </span>
-        <span style={{ fontSize: 14, color: "var(--thinking-text)", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <span style={{ fontSize: 'var(--font-size-body)', color: "var(--thinking-text)", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           — {verbs}
         </span>
         <ChevronDown isOpen={open} />
@@ -471,7 +471,7 @@ function ActivityGroup({ activities }: { activities: ActivityItem[] }) {
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             style={{ overflow: "hidden" }}
           >
-            <div style={{ paddingLeft: 8 }}>
+            <div style={{ paddingLeft: 'var(--space-2)' }}>
               <ActivitiesSection activities={activities} />
             </div>
           </m.div>
@@ -498,14 +498,14 @@ function TimelineReasoningStep({ content, active, expandSole }: { content: strin
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.24, delay: 0.08, ease: "easeOut" }}
-          style={{ display: "flex", gap: 10 }}
+          style={{ display: "flex", gap: 'var(--space-2-5)' }}
         >
           <span style={{ display: "flex", width: 20, height: 22, alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--thinking-text-faint)" }} />
+            <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-full)', background: "var(--thinking-text-faint)" }} />
           </span>
           <div
             className={active ? "kaya-thinking-step-shimmer" : undefined}
-            style={{ minWidth: 0, flex: 1, color: "var(--neutral-700)", fontFamily: "var(--font-body)", fontSize: 14, lineHeight: "22px" }}
+            style={{ minWidth: 0, flex: 1, color: "var(--neutral-700)", fontFamily: "var(--font-body)", fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-body)" }}
           >
             <LineRenderer content={content} variant="reasoning" />
           </div>
@@ -583,7 +583,7 @@ export function ReasoningContent({
     };
 
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-4)' }}>
         {groups.map((group, index) => {
           const divider = index > 0 && <StepDivider />;
 
@@ -640,7 +640,7 @@ export function ReasoningContent({
   if (!steps) return hasActivities ? <ActivityGroup activities={activities!} /> : null;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-4)' }}>
       {steps}
       {hasActivities && (
         <>
@@ -726,7 +726,7 @@ export function ReasoningBlock({
   if (!thinkingContent && !reasoningTimeline?.length && !activities?.length && !isThinkingInProgress) return null;
 
   return (
-    <div style={{ width: "100%", margin: "4px 0 10px", fontFamily: "var(--font-body)" }}>
+    <div style={{ width: "100%", margin: "var(--space-1) 0 var(--space-2-5)", fontFamily: "var(--font-body)" }}>
 
       {/* ── Outer header ────────────────────────────────────────────────────── */}
       <ThinkingTrigger

@@ -19,12 +19,12 @@ function ShortcutChip({ children }: { children: React.ReactNode }) {
         alignItems: "center",
         justifyContent: "center",
         height: 20,
-        padding: 2,
-        borderRadius: 4,
+        padding: 'var(--space-0-5)',
+        borderRadius: 'var(--radius-xs)',
         background:
           "linear-gradient(180deg, var(--neutral-white) 0%, var(--neutral-50) 100%)",
         boxShadow:
-          "0px 1px 1.5px 0px var(--neutral-700-12), 0px 0px 0px 1px var(--neutral-300-40)",
+          "var(--shadow-surface-card-hover)",
         flexShrink: 0,
       }}
     >
@@ -157,7 +157,7 @@ export function PinMentionDropdown({
             zIndex: 60,
             maxHeight: computedMaxH,
             backgroundColor: "var(--popover-bg)",
-            borderRadius: "12px",
+            borderRadius: "var(--radius-xl)",
             boxShadow:
               "0 8px 24px color-mix(in srgb, var(--static-black) 8%, transparent), 0 0 0 1px var(--neutral-100)",
             overflow: "hidden",
@@ -169,7 +169,7 @@ export function PinMentionDropdown({
           {/* Header - matches KDS design exactly (Figma 3208:33092) */}
           <div
             style={{
-              padding: "8px 16px",
+              padding: "var(--space-2) var(--space-4)",
               borderBottom: "1px solid var(--neutral-100)",
               flexShrink: 0,
               display: "flex",
@@ -178,7 +178,7 @@ export function PinMentionDropdown({
             }}
           >
             {/* Left: "Your pins" / "Search results" + count badge */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-2)' }}>
               <span
                 style={{
                   fontFamily: "var(--font-body)",
@@ -198,7 +198,7 @@ export function PinMentionDropdown({
             </div>
 
             {/* Right: "Navigate" + arrow key hints */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-2)' }}>
               <span
                 style={{
                   fontFamily: "var(--font-body)",
@@ -233,10 +233,10 @@ export function PinMentionDropdown({
               flex: 1,
               overflowY: "auto",
               scrollbarGutter: "auto", // no phantom gutter when the list does not scroll
-              padding: "4px",
+              padding: "var(--space-1)",
               display: "flex",
               flexDirection: "column",
-              gap: "4px",
+              gap: "var(--space-1)",
               minHeight: 0, // Ensure flex child respects overflow
               ...(listMaxH !== undefined && { maxHeight: listMaxH }),
             }}
@@ -244,7 +244,7 @@ export function PinMentionDropdown({
             {pins.length === 0 ? (
               <div
                 style={{
-                  padding: "24px 16px",
+                  padding: "var(--space-6) var(--space-4)",
                   textAlign: "center",
                   fontFamily: "var(--font-body)",
                   fontSize: "var(--font-size-body)",

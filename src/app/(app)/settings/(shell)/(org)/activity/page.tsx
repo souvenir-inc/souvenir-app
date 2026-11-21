@@ -81,31 +81,31 @@ function ActivityPageSkeleton() {
   return (
     <>
       <style>{`@keyframes activitySkeletonShimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }`}</style>
-      <div style={{ width: '100%', maxWidth: 908, padding: '0 24px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ width: '100%', maxWidth: 908, padding: '0 var(--space-6)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
           <SkeletonBlock width={140} height={28} radius={6} />
           <SkeletonBlock width={300} height={14} radius={4} />
         </div>
-        <div style={{ border: '1px solid var(--border-default)', borderRadius: 16, boxShadow: '0px 2px 2.8px 0px rgba(82,75,71,0.12)', background: 'var(--neutral-50)', overflow: 'hidden', padding: '12px 0' }}>
+        <div style={{ border: '1px solid var(--border-default)', borderRadius: 'var(--radius-2xl)', boxShadow: 'var(--shadow-soft)', background: 'var(--neutral-50)', overflow: 'hidden', padding: 'var(--space-3) 0' }}>
           {/* Toolbar — title left, search field + filter dropdown button right */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, padding: '12px 24px 24px', borderBottom: '1px solid var(--neutral-100)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-3)', padding: 'var(--space-3) var(--space-6) var(--space-6)', borderBottom: '1px solid var(--neutral-100)' }}>
             <SkeletonBlock width={110} height={18} radius={6} />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
               <SkeletonBlock width={220} height={34} radius={10} />
               <SkeletonBlock width={110} height={32} radius={10} />
             </div>
           </div>
           {/* Column headers — When / Actor / Action / Target (ACTIVITY_COLUMNS) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', padding: 'var(--space-3) var(--space-6)' }}>
             <div style={{ width: 120 }}><SkeletonBlock width={40} height={12} radius={4} /></div>
             <div style={{ flex: '1.3 0 0', minWidth: 220 }}><SkeletonBlock width={45} height={12} radius={4} /></div>
             <div style={{ width: 200 }}><SkeletonBlock width={50} height={12} radius={4} /></div>
             <div style={{ flex: '1.2 0 0', minWidth: 200 }}><SkeletonBlock width={45} height={12} radius={4} /></div>
           </div>
           {[0, 1, 2, 3, 4, 5].map(i => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '0 24px', minHeight: 72, borderBottom: '1px solid var(--neutral-100)' }}>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', padding: '0 var(--space-6)', minHeight: 72, borderBottom: '1px solid var(--neutral-100)' }}>
               <div style={{ width: 120 }}><SkeletonBlock width={60} height={12} radius={4} /></div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: '1.3 0 0', minWidth: 220 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', flex: '1.3 0 0', minWidth: 220 }}>
                 <SkeletonBlock width={32} height={32} radius={16} />
                 <SkeletonBlock width={130} height={12} radius={4} />
               </div>
@@ -114,7 +114,7 @@ function ActivityPageSkeleton() {
             </div>
           ))}
           {/* Footer — "Retains 90 days…" */}
-          <div style={{ padding: '12px 24px', borderTop: '1px solid var(--neutral-100)' }}>
+          <div style={{ padding: 'var(--space-3) var(--space-6)', borderTop: '1px solid var(--neutral-100)' }}>
             <SkeletonBlock width={260} height={12} radius={4} />
           </div>
         </div>
@@ -170,7 +170,7 @@ export default function OrgActivityPage() {
 
   if (loading) {
     return (
-      <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: 64, paddingBottom: 48 }}>
+      <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: 'var(--space-10)', paddingBottom: 'var(--space-9)' }}>
         <ActivityPageSkeleton />
       </div>
     )
@@ -179,23 +179,23 @@ export default function OrgActivityPage() {
   return (
     <div
       className="kaya-scrollbar"
-      style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: 64, paddingBottom: 48 }}
+      style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: 'var(--space-10)', paddingBottom: 'var(--space-9)' }}
     >
       {/* Horizontal padding lives here, not on the scrolling element above —
           keeps the scrollbar flush with the container's edge. */}
-      <div style={{ width: '100%', maxWidth: 908, padding: '0 24px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ width: '100%', maxWidth: 908, padding: '0 var(--space-6)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
         <div>
-          <h1 style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 28, lineHeight: '36px', color: 'var(--neutral-900)', margin: 0 }}>
+          <h1 style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-xl)', lineHeight: 'var(--line-height-heading-xl)', color: 'var(--neutral-900)', margin: 0 }}>
             Activity Log
           </h1>
-          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: '4px 0 0' }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 'var(--space-1) 0 0' }}>
             {isAdmin ? 'All workspace actions across all members.' : 'Your activity in this workspace.'}
           </p>
         </div>
 
         <SettingsTable columns={ACTIVITY_COLUMNS} columnGap={24}>
           <SettingsTableToolbar title="Recent activity" style={{ flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 12, maxWidth: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 'var(--space-3)', maxWidth: '100%' }}>
               <div style={{ width: 220, maxWidth: '100%', flexShrink: 1 }}>
                 <InputField
                   label="Search activity"
@@ -246,8 +246,8 @@ export default function OrgActivityPage() {
               </SettingsTableHeader>
 
               {filtered.length === 0 ? (
-                <div style={{ padding: '32px 24px', textAlign: 'center' }}>
-                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-400)', margin: 0 }}>
+                <div style={{ padding: 'var(--space-7) var(--space-6)', textAlign: 'center' }}>
+                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-400)', margin: 0 }}>
                     {scopedEntries.length === 0 ? (isAdmin ? 'No activity recorded yet in this workspace' : 'No activity recorded yet for you in this workspace') : 'No activity matches your filters'}
                   </p>
                 </div>
@@ -256,19 +256,19 @@ export default function OrgActivityPage() {
                 return (
                   <SettingsTableRow key={entry.id} minHeight={72}>
                     <SettingsTableCell>
-                      <Tooltip content={formatServerDateTime(entry.createdAt, entry.createdAt)}><span style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--neutral-500)', cursor: 'default' }}>
+                      <Tooltip content={formatServerDateTime(entry.createdAt, entry.createdAt)}><span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', color: 'var(--neutral-500)', cursor: 'default' }}>
                         {relativeTime(entry.createdAt)}
                       </span></Tooltip>
                     </SettingsTableCell>
                     <SettingsTableCell>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', minWidth: 0 }}>
                         <Avatar name={actor} size="md" />
                         <div style={{ minWidth: 0 }}>
-                          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {actor}
                           </p>
                           {entry.actorEmail && entry.actorName && (
-                            <p style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--neutral-500)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', color: 'var(--neutral-500)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {entry.actorEmail}
                             </p>
                           )}
@@ -281,17 +281,17 @@ export default function OrgActivityPage() {
                     <SettingsTableCell>
                       {entry.targetName || entry.targetType ? (
                         <div style={{ minWidth: 0 }}>
-                          <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {entry.targetName || '—'}
                           </p>
                           {entry.targetType && (
-                            <p style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--neutral-500)', margin: 0, textTransform: 'capitalize' }}>
+                            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', color: 'var(--neutral-500)', margin: 0, textTransform: 'capitalize' }}>
                               {entry.targetType}
                             </p>
                           )}
                         </div>
                       ) : (
-                        <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-400)' }}>—</span>
+                        <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-400)' }}>—</span>
                       )}
                     </SettingsTableCell>
                   </SettingsTableRow>
@@ -299,7 +299,7 @@ export default function OrgActivityPage() {
               })}
 
               <SettingsTableFooter style={{ borderTop: '1px solid var(--neutral-100)' }}>
-                <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--neutral-500)' }}>
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-500)' }}>
                   Retains 90 days of history · showing {filtered.length} of {scopedEntries.length} entr{scopedEntries.length === 1 ? 'y' : 'ies'}
                 </span>
               </SettingsTableFooter>

@@ -13,9 +13,9 @@ const TITLE = 'var(--font-title)'
 const BODY  = 'var(--font-body)'
 
 const C = {
-  ink:        'var(--neutral-900, #26211e)',
-  sub:        'var(--neutral-700, #524b47)',
-  muted:      'var(--neutral-500, #827a74)',
+  ink:        'var(--neutral-900)',
+  sub:        'var(--neutral-700)',
+  muted:      'var(--neutral-500)',
   bg:         'var(--neutral-50)',
   white:      'var(--neutral-white)',
   green:      'var(--success-600)',
@@ -57,10 +57,10 @@ function Shell({ children }: { children: React.ReactNode }) {
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: C.bg,
-      padding: '40px 16px',
+      padding: 'var(--space-8) var(--space-4)',
     }}>
       {/* eslint-disable-next-line @next/next/no-img-element -- decorative background; Next Image doesn't support SVG patterns with embedded raster images */}
-      <img src="https://souvenirai-storage.s3.us-east-1.amazonaws.com/public/souvenir-onboarding-bg.svg" alt="Souvenir onboarding background" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0, pointerEvents: 'none' }} />
+      <img src="https://souvenirai-storage.s3.us-east-1.amazonaws.com/public/souvenir-onboarding-bg.svg" alt="Souvenir onboarding background" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 'var(--z-base)', pointerEvents: 'none' }} />
       <div style={{ position: 'relative', zIndex: 1, width: '100%', display: 'flex', justifyContent: 'center' }}>
         {children}
       </div>
@@ -73,7 +73,7 @@ export default function PricingConfirmationPage() {
   return (
     <Suspense fallback={
       <Shell>
-        <p style={{ fontFamily: BODY, fontSize: '14px', color: C.muted }}>Loading…</p>
+        <p style={{ fontFamily: BODY, fontSize: 'var(--font-size-body)', color: C.muted }}>Loading…</p>
       </Shell>
     }>
       <PricingConfirmationContent />
@@ -171,7 +171,7 @@ function PricingConfirmationContent() {
   if (!isHydrated || isSimpleUpgrade) {
     return (
       <Shell>
-        <p style={{ fontFamily: BODY, fontSize: '14px', color: C.muted }}>Loading…</p>
+        <p style={{ fontFamily: BODY, fontSize: 'var(--font-size-body)', color: C.muted }}>Loading…</p>
       </Shell>
     )
   }
@@ -192,7 +192,7 @@ function PricingConfirmationContent() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '24px',
+        gap: 'var(--space-6)',
         maxWidth: '440px',
         width: '100%',
         textAlign: 'center',
@@ -212,12 +212,12 @@ function PricingConfirmationContent() {
         </div>
 
         {/* Heading + description */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
           <h1 style={{
             fontFamily: TITLE,
-            fontWeight: 400,
-            fontSize: '28px',
-            lineHeight: '34px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: 'var(--font-size-heading-xl)',
+            lineHeight: 'var(--line-height-heading-xl)',
             color: C.ink,
             margin: 0,
           }}>
@@ -225,8 +225,8 @@ function PricingConfirmationContent() {
           </h1>
           <p style={{
             fontFamily: BODY,
-            fontSize: '15px',
-            lineHeight: '22px',
+            fontSize: 'var(--font-size-body)',
+            lineHeight: 'var(--line-height-body)',
             color: C.sub,
             margin: 0,
           }}>
@@ -236,7 +236,7 @@ function PricingConfirmationContent() {
 
         {/* CTAs */}
         {isFailed ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', width: '100%' }}>
             <button
               type="button"
               onClick={() => router.back()}
@@ -252,7 +252,7 @@ function PricingConfirmationContent() {
             </a>
           </div>
         ) : isTeamPlan ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', width: '100%' }}>
             <button
               type="button"
               onClick={() => router.push(ONBOARDING_WORKSPACE_ROUTE)}
@@ -262,7 +262,7 @@ function PricingConfirmationContent() {
             </button>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', width: '100%' }}>
             <button
               type="button"
               onClick={() => router.push(ONBOARDING_IMPORT_ROUTE)}
@@ -283,21 +283,21 @@ function PricingConfirmationContent() {
 // ── Shared button styles ───────────────────────────────────────────────────────
 const primaryBtn: React.CSSProperties = {
   fontFamily: BODY,
-  fontSize: '15px',
-  fontWeight: 500,
+  fontSize: 'var(--font-size-body)',
+  fontWeight: 'var(--font-weight-medium)',
   color: C.white,
   backgroundColor: C.ink,
   border: 'none',
-  borderRadius: '8px',
-  padding: '12px 32px',
+  borderRadius: 'var(--radius-md)',
+  padding: 'var(--space-3) var(--space-7)',
   cursor: 'pointer',
-  transition: 'opacity 0.15s',
+  transition: 'opacity var(--duration-fast)',
   width: '100%',
 }
 
 const ghostBtn: React.CSSProperties = {
   fontFamily: BODY,
-  fontSize: '13px',
+  fontSize: 'var(--font-size-body-sm)',
   color: C.muted,
   background: 'none',
   border: 'none',
@@ -308,7 +308,7 @@ const ghostBtn: React.CSSProperties = {
 
 const secondaryLink: React.CSSProperties = {
   fontFamily: BODY,
-  fontSize: '13px',
+  fontSize: 'var(--font-size-body-sm)',
   color: C.muted,
   textDecoration: 'underline',
 }

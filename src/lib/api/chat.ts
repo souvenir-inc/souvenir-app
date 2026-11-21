@@ -340,8 +340,14 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
     const imageLinks = Array.isArray(raw.image_links)
       ? (raw.image_links.filter((u): u is string => typeof u === "string" && u.length > 0))
       : undefined;
-    const prompts = (raw.prompts ?? []).flatMap((entry) => {
-      const prompt = isPromptEvent(entry.event) ? parsePrompt(entry.event, entry) : null;
+    // History is boundary data: `prompts` has been seen as a non-array, and an entry
+    // as null. Either would throw here and reject the whole page of history, losing
+    // every message on it, so both are checked before the shape is relied on.
+    const prompts = (Array.isArray(raw.prompts) ? raw.prompts : []).flatMap((entry) => {
+      if (typeof entry !== "object" || entry === null) return [];
+      const event: unknown = (entry as { event?: unknown }).event;
+      if (typeof event !== "string" || !isPromptEvent(event)) return [];
+      const prompt = parsePrompt(event, entry);
       return prompt ? [prompt] : [];
     });
     const run = parseRun(raw.run);
@@ -354,7 +360,7 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
         // the single ID for the AI response.
         id: baseId,
         role: "assistant",
-        ...splitPersistedAnswer(aiText ?? "", raw.reasoning ?? raw.thinking_content),
+        ...splitPersistedAnswer(aiText ?? "", raw.reasoning ?? raw.thinking_content, run?.status === "stopped"),
         created_at: createdAt,
         chat_id: chatId,
         steps: parseSteps(raw.steps),
@@ -400,11 +406,12 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
     ? (raw.image_links.filter((u): u is string => typeof u === "string" && u.length > 0))
     : undefined;
 
+  const run = role === "assistant" ? parseRun(raw.run) : undefined;
   return [{
     id: baseId,
     role,
     ...(role === "assistant"
-      ? splitPersistedAnswer(content, raw.reasoning ?? raw.thinking_content)
+      ? splitPersistedAnswer(content, raw.reasoning ?? raw.thinking_content, run?.status === "stopped")
       : { content, thinking: raw.reasoning ?? raw.thinking_content ?? undefined }),
     created_at: createdAt,
     chat_id: chatId,
@@ -414,6 +421,8 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
     library_citations: raw.libraryCitations ?? raw.library_citations ?? undefined,
     file_attachments: fileAttachments.length > 0 ? fileAttachments : undefined,
     image_links: imageLinks && imageLinks.length > 0 ? imageLinks : undefined,
+    // As in the paired format: a stopped turn's run is what marks it "Generation stopped".
+    ...(role === "assistant" ? { run } : {}),
   }];
 }
 
@@ -425,12 +434,15 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
 function splitPersistedAnswer(
   text: string,
   persistedThinking: string | null | undefined,
+  // Stopped by the person: an unfinished answer is what Stop leaves, not a failure, and the
+  // turn already says "Generation stopped".
+  stopped = false,
 ): Pick<Message, "content" | "thinking" | "errorNotice"> {
   const { visibleText, thinkingText, thinkingOpen } = extractThinkingContent(text);
   return {
     content: visibleText,
     thinking: persistedThinking || thinkingText || undefined,
-    errorNotice: thinkingOpen ? INCOMPLETE_ANSWER_MESSAGE : undefined,
+    errorNotice: thinkingOpen && !stopped ? INCOMPLETE_ANSWER_MESSAGE : undefined,
   };
 }
 
@@ -552,9 +564,46 @@ export async function deleteMessage(messageId: string): Promise<void> {
 export async function getChatStreamId(chatId: string): Promise<string | null> {
   const response = await apiFetch(CHAT_ENDPOINT(chatId));
   if (!response.ok) return null;
-  const chat = (await response.json()) as { streamId?: string | null };
+  // GET /chats/{id} always sends streamId, null when idle (checked live 2026-11-20); see getChatRunState.
+  const chat = (await response.json()) as { streamId: string | null };
   return chat.streamId ?? null;
 }
+
+/**
+ * Whether the backend has a run going for the chat. Unlike getChatStreamId, it throws
+ * when it can't tell (a failed request or a non-OK response) rather than answering "no":
+ * for a caller about to send into the chat, "unknown" must not read as "idle".
+ */
+export async function getChatRunState(chatId: string, timeoutMs = RUN_STATE_TIMEOUT_MS): Promise<"running" | "idle"> {
+  // The whole lookup (token refresh, request, body) has a deadline: a request that
+  // never settles fails like any other, so a caller retrying it is never stuck.
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      reject(new Error("Timed out reading the chat's run state"));
+    }, timeoutMs);
+  });
+  const lookup = (async () => {
+    const response = await apiFetch(CHAT_ENDPOINT(chatId), { signal: controller.signal });
+    if (!response.ok) throw new Error(`Couldn't read the chat's run state (${response.status})`);
+    // Contract: GET /chats/{id} always sends streamId, null when idle (checked live
+    // 2026-11-20). Anything else is "can't tell", not "idle".
+    const chat: unknown = await response.json();
+    const streamId = chat && typeof chat === "object" ? (chat as { streamId?: unknown }).streamId : undefined;
+    if (streamId === null) return "idle" as const;
+    if (typeof streamId === "string" && streamId) return "running" as const;
+    throw new Error("Malformed run state from the backend");
+  })();
+  lookup.catch(() => {});
+  return Promise.race([lookup, deadline]).then(
+    (state) => { clearTimeout(timer); return state; },
+    (error: unknown) => { clearTimeout(timer); throw error; },
+  );
+}
+/** How long one run-state lookup may take before it counts as failed. */
+export const RUN_STATE_TIMEOUT_MS = 10_000;
 
 /** POST /chats/{chat_id}/stop — abort an in-flight stream. */
 export async function stopChat(chatId: string): Promise<void> {

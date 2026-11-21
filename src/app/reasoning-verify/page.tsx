@@ -109,8 +109,8 @@ export default function ReasoningVerify() {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--neutral-100)', fontFamily: 'var(--font-body)' }}>
-      <div style={{ flex: 1, padding: '48px 40px', minWidth: 0 }}>
-        <div style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--neutral-200)', marginBottom: 28 }}>
+      <div style={{ flex: 1, padding: 'var(--space-9) var(--space-8)', minWidth: 0 }}>
+        <div style={{ fontSize: 'var(--font-size-caption)', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--neutral-200)', marginBottom: 'var(--space-6)' }}>
           Reasoning verify — {STATES[active].label}
         </div>
         <div style={{ maxWidth: 720 }} data-testid="reasoning-host">
@@ -119,8 +119,8 @@ export default function ReasoningVerify() {
         </div>
       </div>
 
-      <div style={{ width: 260, flexShrink: 0, borderLeft: '1px solid var(--neutral-100)', padding: '48px 20px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <div style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--neutral-200)', marginBottom: 8 }}>
+      <div style={{ width: 260, flexShrink: 0, borderLeft: '1px solid var(--neutral-100)', padding: 'var(--space-9) var(--space-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
+        <div style={{ fontSize: 'var(--font-size-caption)', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--neutral-200)', marginBottom: 'var(--space-2)' }}>
           State
         </div>
         {(Object.keys(STATES) as StateKey[]).map((key) => (
@@ -129,8 +129,8 @@ export default function ReasoningVerify() {
             type="button"
             onClick={() => setActive(key)}
             style={{
-              padding: '8px 10px', borderRadius: 7, border: 0, cursor: 'pointer', textAlign: 'left',
-              fontSize: 12, fontFamily: 'var(--font-body)',
+              padding: 'var(--space-2) var(--space-2-5)', borderRadius: 'var(--radius-md)', border: 0, cursor: 'pointer', textAlign: 'left',
+              fontSize: 'var(--font-size-small)', fontFamily: 'var(--font-body)',
               background: active === key ? 'color-mix(in srgb, var(--brown-700) 12%, transparent)' : 'var(--neutral-800-05)',
               color: active === key ? 'var(--brown-700)' : 'var(--neutral-700)',
               fontWeight: active === key ? 600 : 400,

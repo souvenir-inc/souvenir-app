@@ -33,7 +33,7 @@ export function ExhaustionBanner({ children }: { children?: React.ReactNode }) {
         borderRadius:    28,
         backgroundColor: 'color-mix(in srgb, var(--warning-600) 10%, transparent)',
         border:          '1px solid color-mix(in srgb, var(--warning-600) 18%, transparent)',
-        padding:         '0 4px 4px',
+        padding:         '0 var(--space-1) var(--space-1)',
         boxSizing:       'border-box',
       }}
     >
@@ -43,20 +43,20 @@ export function ExhaustionBanner({ children }: { children?: React.ReactNode }) {
           display:        'flex',
           alignItems:     'center',
           justifyContent: 'space-between',
-          gap:            8,
+          gap:            'var(--space-2)',
           padding:        '4px 4% 8px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)' }}>
           <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
             <TokenCircleIcon size={14} animated color="var(--color-tag-Red-text)" />
           </span>
           <span
             style={{
               fontFamily: 'var(--font-body)',
-              fontWeight: 500,
-              fontSize:   14,
-              lineHeight: '14px',
+              fontWeight: 'var(--font-weight-medium)',
+              fontSize:   'var(--font-size-body)',
+              lineHeight: 'var(--line-height-small)',
               color:      'var(--color-tag-Red-text)',
             }}
           >
@@ -64,7 +64,7 @@ export function ExhaustionBanner({ children }: { children?: React.ReactNode }) {
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)' }}>
           <Button
             size="sm"
             variant={level === 'normal' ? 'outline' : 'default'}

@@ -12,11 +12,11 @@ export function ConnectorHeading({ connector, title, children }: {
   children?: React.ReactNode
 }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-      <span style={{ flexShrink: 0, marginTop: 1 }}>
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
+      <span style={{ flexShrink: 0, marginTop: 'var(--space-0-5)' }}>
         <ConnectorLogo connector={connector} size={32} />
       </span>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: '1 0 0', minWidth: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', flex: '1 0 0', minWidth: 0 }}>
         <span style={{
           fontFamily: 'var(--font-body)',
           fontSize:   'var(--font-size-body)',
@@ -55,9 +55,9 @@ export function ConnectorPromptShell({ connector, title, caption, children }: {
     <div style={{
       display:         'flex',
       flexDirection:   'column',
-      gap:             12,
-      padding:         '16px',
-      borderRadius:    16,
+      gap:             'var(--space-3)',
+      padding:         'var(--space-4)',
+      borderRadius:    'var(--radius-2xl)',
       border:          '1px solid var(--border-default)',
       backgroundColor: 'var(--color-surface-glass)',
       boxShadow:       'var(--shadow-card-default)',

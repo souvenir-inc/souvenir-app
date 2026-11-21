@@ -5,6 +5,7 @@ import { TickTwoIcon, ArrowRightOneIcon, InformationCircleIcon } from '@strange-
 import { Dropdown } from '@/components/Dropdown'
 import { Tooltip } from '@/components/Tooltip'
 import { POPOVER_WIDTHS } from '@/components/Popover'
+// eslint-disable-next-line no-restricted-syntax -- ds-allow: bespoke effort slider; moves onto components/Slider in Phase 4
 import * as SliderPrimitive from '@radix-ui/react-slider'
 import styles from './EffortSlider.module.css'
 import { useModelSelectorContext, type ModelAlgorithm } from '@/context/model-selector-context'
@@ -40,12 +41,12 @@ function AutoSelectInfo() {
             Souvenir reads each message and sends it to the model that fits it: a quick
             question to a fast model, a long or difficult one to a stronger model.
           </span>
-          <span style={{ display: 'block', marginTop: 8 }}>
+          <span style={{ display: 'block', marginTop: 'var(--space-2)' }}>
             {[
               ['Souvenir Standard', 'the quicker, cheaper models'],
               ['Souvenir Pro', 'the strongest models when the work calls for it'],
             ].map(([tier, detail]) => (
-              <span key={tier} style={{ display: 'flex', gap: 6, marginTop: 2 }}>
+              <span key={tier} style={{ display: 'flex', gap: 'var(--space-1-5)', marginTop: 'var(--space-0-5)' }}>
                 <span aria-hidden style={{ opacity: 0.5 }}>•</span>
                 <span>
                   <strong style={{ fontWeight: 'var(--font-weight-semibold)' }}>{tier}</strong>
@@ -55,7 +56,7 @@ function AutoSelectInfo() {
               </span>
             ))}
           </span>
-          <span style={{ display: 'block', marginTop: 8, opacity: 0.75 }}>
+          <span style={{ display: 'block', marginTop: 'var(--space-2)', opacity: 0.75 }}>
             Picking a model yourself turns auto selection off until you choose a tier again.
           </span>
         </span>
@@ -140,9 +141,9 @@ function EffortSlider({ options, value, onChange }: {
       // Dropdown's roving focus would otherwise steal the arrow keys the
       // slider thumb uses to step.
       onKeyDown={(e) => { if (e.key.startsWith('Arrow') || e.key === 'Home' || e.key === 'End') e.stopPropagation() }}
-      style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '4px 10px 8px', '--effort-color': color } as React.CSSProperties}
+      style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', padding: 'var(--space-1) var(--space-2-5) var(--space-2)', '--effort-color': color } as React.CSSProperties}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, lineHeight: '18px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)' }}>
         <span style={{ color: 'var(--neutral-700)' }}>Effort</span>
         <span key={index} className={styles.value}>{effortLabel(steps[index])}</span>
       </div>

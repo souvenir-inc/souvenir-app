@@ -128,7 +128,7 @@ function CustomCard({ onClick, disabled }: { onClick: () => void; disabled?: boo
       style={{
         background: hovered ? 'var(--neutral-50)' : 'var(--neutral-white)',
         border: `1px dashed ${hovered ? 'var(--neutral-400)' : 'var(--neutral-300)'}`,
-        borderRadius: 16,
+        borderRadius: 'var(--radius-2xl)',
         padding: '16px 17px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         width: GRID_WIDTH,
@@ -138,29 +138,29 @@ function CustomCard({ onClick, disabled }: { onClick: () => void; disabled?: boo
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.6 : 1,
         transform: hovered ? 'translateY(-1px)' : 'none',
-        transition: 'background-color 150ms, border-color 150ms, box-shadow 150ms, transform 150ms, opacity 150ms',
+        transition: 'background-color var(--duration-fast), border-color var(--duration-fast), box-shadow var(--duration-fast), transform var(--duration-fast), opacity var(--duration-fast)',
         textAlign: 'left',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
         <div style={{
-          width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+          width: 44, height: 44, borderRadius: 'var(--radius-xl)', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: 'var(--color-tag-Neutral-bg)',
           transform: hovered ? 'scale(1.06)' : 'scale(1)',
-          transition: 'transform 150ms',
+          transition: 'transform var(--duration-fast)',
         }}>
           <PlusSignIcon size={20} color="var(--color-tag-Neutral-text)" />
         </div>
         <div>
           <p style={{
             fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)',
-            fontSize: 15, lineHeight: '20px', color: 'var(--neutral-950)', margin: 0,
+            fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-950)', margin: 0,
           }}>
             Custom
           </p>
           <p style={{
-            fontFamily: 'var(--font-body)', fontWeight: 400,
+            fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)',
             fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)',
             color: 'var(--neutral-500)', margin: 0,
           }}>
@@ -172,11 +172,11 @@ function CustomCard({ onClick, disabled }: { onClick: () => void; disabled?: boo
         aria-hidden
         style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          padding: '6px 12px', borderRadius: 8,
+          padding: 'var(--space-1-5) var(--space-3)', borderRadius: 'var(--radius-md)',
           border: `1px solid ${hovered ? 'var(--neutral-400)' : 'var(--neutral-300)'}`,
           fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)',
-          fontSize: 13, lineHeight: '18px', color: 'var(--neutral-700)',
-          transition: 'border-color 150ms',
+          fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-700)',
+          transition: 'border-color var(--duration-fast)',
         }}
       >
         Start blank
@@ -201,9 +201,9 @@ function RecommendedGrid({
   if (!recommendation) {
     return (
       // Same shape as the loaded state: the 22px hint line over the card grid.
-      <div role="status" aria-live="polite" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div role="status" aria-live="polite" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
         <div style={{ height: 22, display: 'flex', alignItems: 'center' }}>
-          <div className="kaya-skeleton" style={{ width: 'min(100%, 620px)', height: 14, borderRadius: 4 }} />
+          <div className="kaya-skeleton" style={{ width: 'min(100%, 620px)', height: 14, borderRadius: 'var(--radius-xs)' }} />
         </div>
         <div style={GRID_STYLE}>
           {[0, 1, 2, 3, 4, 5].map(i => <div key={i} className="kaya-skeleton" style={{ width: CARD_WIDTH, height: CARD_HEIGHT, borderRadius: 15 }} />)}
@@ -213,14 +213,14 @@ function RecommendedGrid({
   }
   const { items, personalized } = recommendation
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+      <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)' }}>
         {personalized
           ? 'Picked from the apps you’ve connected.'
           : 'Connect apps to get suggestions that fit how you work. Until then, here are popular starting points.'}
       </p>
       {items.length === 0 ? (
-        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-600)' }}>
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-600)' }}>
           You already have an agent for each of our suggestions.{' '}
           <button type="button" onClick={onBrowseAll} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline', color: 'inherit', font: 'inherit' }}>
             Browse all templates
@@ -229,7 +229,7 @@ function RecommendedGrid({
       ) : (
         <div style={GRID_STYLE}>
           {items.map(item => (
-            <div key={item.name} style={{ display: 'flex', flexDirection: 'column', gap: 6, width: CARD_WIDTH }}>
+            <div key={item.name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', width: CARD_WIDTH }}>
               <TemplateCard name={item.name} onClick={() => onPick(item.name)} disabled={disabled} />
               {item.because.length > 0 && (
                 <Tooltip content={`Works with ${item.because.join(', ')}`} maxWidth={280}><span
@@ -302,26 +302,26 @@ export default function PersonaTemplatesPage() {
 
   return (
     <AgentPageShell maxWidth={GRID_WIDTH}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 36, alignItems: 'center', width: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-7)', alignItems: 'center', width: '100%' }}>
 
         {/* Heading */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', textAlign: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', alignItems: 'center', textAlign: 'center' }}>
           <p style={{
-            fontFamily: 'var(--font-title)', fontWeight: 400,
-            fontSize: 24, lineHeight: '32px', color: 'var(--legacy-1a1916)', margin: 0,
+            fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)',
+            fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--legacy-1a1916)', margin: 0,
           }}>
             Choose a starting point
           </p>
           <p style={{
-            fontFamily: 'var(--font-body)', fontWeight: 400,
-            fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0,
+            fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)',
+            fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0,
           }}>
             Start with a template or build from scratch
           </p>
         </div>
 
         {/* Grid area */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
 
           {/* Custom / start blank row */}
           <CustomCard onClick={() => push(AGENTS_NEW_ROUTE)} disabled={!hydrated} />
@@ -334,7 +334,7 @@ export default function PersonaTemplatesPage() {
           </Tabs>
 
           {tab === 'general' ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               <div style={GRID_STYLE}>
                 {TEMPLATE_NAMES.map(name => (
                   <TemplateCard key={name} name={name} onClick={() => startFromTemplate(name)} disabled={!hydrated} />
@@ -354,7 +354,7 @@ export default function PersonaTemplatesPage() {
         {/* Footer */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          width: GRID_WIDTH, paddingTop: 64,
+          width: GRID_WIDTH, paddingTop: 'var(--space-10)',
         }}>
           <Button
             variant="outline"

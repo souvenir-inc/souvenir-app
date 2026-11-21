@@ -75,21 +75,21 @@ function Scoreboard({ runs, steps }: { runs: Record<Side, Run>; steps: Record<Si
       : `${newValue < oldValue ? "Jev" : "Old"} ${ratio < 10 ? ratio.toFixed(1) : ratio.toFixed(0)}× ${unit}`;
     return (
       <div key={label} style={{
-        display: "flex", flexDirection: "column", gap: 10, padding: "16px 18px", borderRadius: 16,
+        display: "flex", flexDirection: "column", gap: 'var(--space-2-5)', padding: "var(--space-4) var(--space-4)", borderRadius: 'var(--radius-2xl)',
         backgroundColor: "var(--neutral-white)", border: "1px solid var(--neutral-100)", boxShadow: "var(--shadow-surface-card)",
       }}>
-        <span style={{ fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--neutral-500)", fontWeight: 500 }}>{label}</span>
-        <span style={{ fontFamily: "var(--font-title)", fontSize: 22, lineHeight: "28px", color: "var(--neutral-900)" }}>{verdict}</span>
+        <span style={{ fontSize: 'var(--font-size-caption)', letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--neutral-500)", fontWeight: 'var(--font-weight-medium)' }}>{label}</span>
+        <span style={{ fontFamily: "var(--font-title)", fontSize: 'var(--font-size-heading-md)', lineHeight: "var(--line-height-heading-md)", color: "var(--neutral-900)" }}>{verdict}</span>
         {SIDES.map(({ side, name, color }) => {
           const value = side === "old" ? oldValue : newValue;
           const wins = value < (side === "old" ? newValue : oldValue);
           return (
-            <div key={side} style={{ display: "grid", gridTemplateColumns: "88px minmax(0,1fr) 72px", gap: 10, alignItems: "center", fontSize: 13, color: "var(--neutral-700)" }}>
+            <div key={side} style={{ display: "grid", gridTemplateColumns: "88px minmax(0,1fr) 72px", gap: 'var(--space-2-5)', alignItems: "center", fontSize: 'var(--font-size-body-sm)', color: "var(--neutral-700)" }}>
               <span>{name}</span>
-              <span style={{ height: 8, borderRadius: "0 4px 4px 0", backgroundColor: "var(--neutral-100)", overflow: "hidden" }}>
-                <span style={{ display: "block", height: "100%", width: `${(value / max) * 100}%`, backgroundColor: color, borderRadius: "0 4px 4px 0" }} />
+              <span style={{ height: 8, borderRadius: "0 var(--radius-xs) var(--radius-xs) 0", backgroundColor: "var(--neutral-100)", overflow: "hidden" }}>
+                <span style={{ display: "block", height: "100%", width: `${(value / max) * 100}%`, backgroundColor: color, borderRadius: "0 var(--radius-xs) var(--radius-xs) 0" }} />
               </span>
-              <span style={{ textAlign: "right", fontFamily: "var(--font-code)", fontSize: 13, fontWeight: wins ? 600 : 400, color: wins ? "var(--green-700)" : "var(--neutral-900)" }}>{format(value)}</span>
+              <span style={{ textAlign: "right", fontFamily: "var(--font-code)", fontSize: 'var(--font-size-body-sm)', fontWeight: wins ? 600 : 400, color: wins ? "var(--green-700)" : "var(--neutral-900)" }}>{format(value)}</span>
             </div>
           );
         })}
@@ -98,7 +98,7 @@ function Scoreboard({ runs, steps }: { runs: Record<Side, Run>; steps: Record<Si
   };
   const total = (run: Run) => run.routeCost + (run.runCost ?? 0);
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 'var(--space-3)' }}>
       {tile("Time to finish", runs.old.finishedMs ?? 0, runs.new.finishedMs ?? 0, (v) => fmtMs(v), "faster")}
       {tile("Total cost", total(runs.old), total(runs.new), (v) => fmtUsd(v), "cheaper")}
       {tile("Steps taken", steps.old, steps.new, (v) => String(v), "fewer steps")}
@@ -175,36 +175,36 @@ export function CompareLab() {
     <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", position: "relative" }}>
       <div
         className="kaya-scrollbar"
-        style={{ flex: 1, overflowY: "auto", paddingTop: 24, paddingBottom: 24, paddingRight: 2, display: "flex", flexDirection: "column", alignItems: "center" }}
+        style={{ flex: 1, overflowY: "auto", paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)', paddingRight: 'var(--space-0-5)', display: "flex", flexDirection: "column", alignItems: "center" }}
       >
-        <div style={{ width: "100%", maxWidth: 1240, padding: "0 20px", boxSizing: "border-box", display: "flex", flexDirection: "column", gap: 20 }}>
+        <div style={{ width: "100%", maxWidth: 1240, padding: "0 var(--space-5)", boxSizing: "border-box", display: "flex", flexDirection: "column", gap: 'var(--space-5)' }}>
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--neutral-600)", cursor: "pointer" }}>
+            <label style={{ display: "inline-flex", alignItems: "center", gap: 'var(--space-2)', fontSize: 'var(--font-size-body-sm)', color: "var(--neutral-600)", cursor: "pointer" }}>
               <Switch checked={reveal} onCheckedChange={setReveal} aria-label="Show models" />
               Show models
             </label>
           </div>
 
           {!task && (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 28, paddingTop: "8vh" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 'var(--space-6)', paddingTop: "8vh" }}>
               <InitialPrompts />
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 10, width: "100%", maxWidth: 900 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 'var(--space-2-5)', width: "100%", maxWidth: 900 }}>
                 {FLOWS.map((flow) => (
                   <button
                     key={flow.title}
                     type="button"
                     onClick={() => setInput(flow.task)}
                     style={{
-                      textAlign: "left", border: "1px solid var(--neutral-100)", borderRadius: 16, padding: "14px 16px", cursor: "pointer",
-                      backgroundColor: "var(--neutral-white)", boxShadow: "var(--shadow-surface-card)", display: "flex", flexDirection: "column", gap: 8,
+                      textAlign: "left", border: "1px solid var(--neutral-100)", borderRadius: 'var(--radius-2xl)', padding: "var(--space-3) var(--space-4)", cursor: "pointer",
+                      backgroundColor: "var(--neutral-white)", boxShadow: "var(--shadow-surface-card)", display: "flex", flexDirection: "column", gap: 'var(--space-2)',
                       fontFamily: "var(--font-body)",
                     }}
                   >
-                    <span style={{ fontSize: 14, fontWeight: 500, color: "var(--neutral-900)" }}>{flow.title}</span>
-                    <span style={{ fontSize: 13, lineHeight: "19px", color: "var(--neutral-500)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{flow.task}</span>
-                    <span style={{ display: "flex", gap: 4 }}>
+                    <span style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-900)" }}>{flow.title}</span>
+                    <span style={{ fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: "var(--neutral-500)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{flow.task}</span>
+                    <span style={{ display: "flex", gap: 'var(--space-1)' }}>
                       {flow.apps.map((app) => (
-                        <span key={app} style={{ fontSize: 11, lineHeight: "16px", padding: "1px 7px", borderRadius: 6, backgroundColor: "var(--neutral-100)", color: "var(--neutral-700)" }}>{app}</span>
+                        <span key={app} style={{ fontSize: 'var(--font-size-caption)', lineHeight: "var(--line-height-small)", padding: "var(--space-0-5) var(--space-1-5)", borderRadius: 'var(--radius-sm)', backgroundColor: "var(--neutral-100)", color: "var(--neutral-700)" }}>{app}</span>
                       ))}
                     </span>
                   </button>
@@ -222,26 +222,26 @@ export function CompareLab() {
           {bothDone && <Scoreboard runs={runs} steps={steps} />}
 
           {task && (
-            <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 20, alignItems: "start" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 'var(--space-5)', alignItems: "start" }}>
               {SIDES.map(({ side, name, color }) => {
                 const run = runs[side];
                 const status = run.error ? "Failed" : run.done ? `Done in ${fmtMs(run.finishedMs)}` : run.model ? "Working…" : "Choosing a model…";
                 return (
                   <section key={side} style={{
-                    minWidth: 0, borderRadius: 20, backgroundColor: "var(--neutral-white)", border: "1px solid var(--neutral-100)",
+                    minWidth: 0, borderRadius: 'var(--radius-2xl)', backgroundColor: "var(--neutral-white)", border: "1px solid var(--neutral-100)",
                     boxShadow: "var(--shadow-surface-card)", overflow: "hidden",
                   }}>
-                    <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "12px 18px", borderBottom: "1px solid var(--neutral-100)" }}>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 500, color: "var(--neutral-900)" }}>
+                    <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 'var(--space-2)', padding: "var(--space-3) var(--space-4)", borderBottom: "1px solid var(--neutral-100)" }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 'var(--space-2)', fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-900)" }}>
                         <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: color }} />
                         {name}
                         {reveal && run.model && (
-                          <span style={{ fontFamily: "var(--font-code)", fontSize: 11, fontWeight: 400, color: "var(--neutral-600)", backgroundColor: "var(--neutral-50)", border: "1px solid var(--neutral-100)", padding: "1px 7px", borderRadius: 6 }}>{run.model}</span>
+                          <span style={{ fontFamily: "var(--font-code)", fontSize: 'var(--font-size-caption)', fontWeight: 'var(--font-weight-regular)', color: "var(--neutral-600)", backgroundColor: "var(--neutral-50)", border: "1px solid var(--neutral-100)", padding: "var(--space-0-5) var(--space-1-5)", borderRadius: 'var(--radius-sm)' }}>{run.model}</span>
                         )}
                       </span>
-                      <span style={{ fontSize: 12, color: run.error ? "var(--red-600)" : "var(--neutral-500)" }}>{status}</span>
+                      <span style={{ fontSize: 'var(--font-size-small)', color: run.error ? "var(--red-600)" : "var(--neutral-500)" }}>{status}</span>
                     </header>
-                    <div style={{ padding: "8px 18px 4px" }}>
+                    <div style={{ padding: "var(--space-2) var(--space-4) var(--space-1)" }}>
                       {messagesFor[side].map((message, idx) => (
                         <ChatMessage
                           key={message.reactKey ?? message.id}
@@ -253,17 +253,17 @@ export function CompareLab() {
                           disableHighlight
                         />
                       ))}
-                      {run.error && <p style={{ color: "var(--red-600)", fontSize: 13 }}>{run.error}</p>}
+                      {run.error && <p style={{ color: "var(--red-600)", fontSize: 'var(--font-size-body-sm)' }}>{run.error}</p>}
                     </div>
-                    <footer style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0,1fr))", gap: 8, padding: "12px 18px", borderTop: "1px solid var(--neutral-100)", backgroundColor: "var(--neutral-50)" }}>
+                    <footer style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0,1fr))", gap: 'var(--space-2)', padding: "var(--space-3) var(--space-4)", borderTop: "1px solid var(--neutral-100)", backgroundColor: "var(--neutral-50)" }}>
                       {[
                         ["Picked a model in", fmtMs(run.routeMs)],
                         ["Finished in", run.done && !run.error ? fmtMs(run.finishedMs) : "—"],
                         ["Cost", run.done ? fmtUsd(run.routeCost + (run.runCost ?? 0)) : "—"],
                       ].map(([label, value]) => (
-                        <div key={label} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                          <span style={{ fontSize: 11, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--neutral-500)", fontWeight: 500 }}>{label}</span>
-                          <span style={{ fontFamily: "var(--font-code)", fontSize: 13, color: "var(--neutral-900)" }}>{value}</span>
+                        <div key={label} style={{ display: "flex", flexDirection: "column", gap: 'var(--space-0-5)' }}>
+                          <span style={{ fontSize: 'var(--font-size-caption)', letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--neutral-500)", fontWeight: 'var(--font-weight-medium)' }}>{label}</span>
+                          <span style={{ fontFamily: "var(--font-code)", fontSize: 'var(--font-size-body-sm)', color: "var(--neutral-900)" }}>{value}</span>
                         </div>
                       ))}
                     </footer>
@@ -275,7 +275,7 @@ export function CompareLab() {
         </div>
       </div>
 
-      <div style={{ display: "flex", justifyContent: "center", padding: "0 16px 16px" }}>
+      <div style={{ display: "flex", justifyContent: "center", padding: "0 var(--space-4) var(--space-4)" }}>
         <div style={{ width: "100%", maxWidth: 754 }}>
           <ChatInput
             value={input}

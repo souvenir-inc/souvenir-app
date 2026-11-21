@@ -74,13 +74,13 @@ function RoleSelect({ value, onChange }: { value: OnboardingRole | null; onChang
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: 8,
+            gap: 'var(--space-2)',
             width: "100%",
-            padding: "7px 10px",
-            borderRadius: 10,
+            padding: "var(--space-1-5) var(--space-2-5)",
+            borderRadius: 'var(--radius-lg)',
             border: "none",
             backgroundColor: "var(--neutral-white)",
-            boxShadow: "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+            boxShadow: "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)",
             cursor: "pointer",
             outline: "none",
           }}
@@ -88,10 +88,10 @@ function RoleSelect({ value, onChange }: { value: OnboardingRole | null; onChang
           <span
             style={{
               fontFamily: "var(--font-body)",
-              fontWeight: 400,
-              fontSize: 14,
-              lineHeight: "16px",
-              color: value ? "var(--neutral-900,#26211e)" : "var(--neutral-400,#9c938b)",
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: 'var(--font-size-body)',
+              lineHeight: "var(--line-height-small)",
+              color: value ? "var(--neutral-900)" : "var(--neutral-400)",
             }}
           >
             {value ?? "Designer"}
@@ -99,7 +99,7 @@ function RoleSelect({ value, onChange }: { value: OnboardingRole | null; onChang
           <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden>
             <path
               d="M5 8l5 5 5-5"
-              stroke="var(--neutral-400,#9c938b)"
+              stroke="var(--neutral-400)"
               strokeWidth="1.4"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -147,13 +147,13 @@ function ToneSelect({ value, onChange }: { value: OnboardingTone; onChange: (v: 
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: 8,
+            gap: 'var(--space-2)',
             width: "100%",
-            padding: "7px 10px",
-            borderRadius: 10,
+            padding: "var(--space-1-5) var(--space-2-5)",
+            borderRadius: 'var(--radius-lg)',
             border: "none",
             backgroundColor: "var(--neutral-white)",
-            boxShadow: "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+            boxShadow: "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)",
             cursor: "pointer",
             outline: "none",
           }}
@@ -161,10 +161,10 @@ function ToneSelect({ value, onChange }: { value: OnboardingTone; onChange: (v: 
           <span
             style={{
               fontFamily: "var(--font-body)",
-              fontWeight: 400,
-              fontSize: 14,
-              lineHeight: "16px",
-              color: "var(--neutral-900,#26211e)",
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: 'var(--font-size-body)',
+              lineHeight: "var(--line-height-small)",
+              color: "var(--neutral-900)",
             }}
           >
             {value}
@@ -172,7 +172,7 @@ function ToneSelect({ value, onChange }: { value: OnboardingTone; onChange: (v: 
           <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden>
             <path
               d="M5 8l5 5 5-5"
-              stroke="var(--neutral-400,#9c938b)"
+              stroke="var(--neutral-400)"
               strokeWidth="1.4"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -295,8 +295,8 @@ export default function TeamInviteProfilePage() {
     <StepCanvas>
       <StepHeader total={2} activeIndex={1} title="Create your profile" />
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 20, width: "100%" }}>
-        <div style={{ display: "flex", gap: 20 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-5)', width: "100%" }}>
+        <div style={{ display: "flex", gap: 'var(--space-5)' }}>
           <TextField
             label="First name"
             required
@@ -317,12 +317,12 @@ export default function TeamInviteProfilePage() {
           />
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)' }}>
           <FieldLabel>Role</FieldLabel>
           <RoleSelect value={role} onChange={setRole} />
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)' }}>
           <FieldLabel>Style</FieldLabel>
           <ToneSelect value={tone} onChange={setTone} />
         </div>

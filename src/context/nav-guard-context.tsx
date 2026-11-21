@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 
 /**
  * App-wide "you have unsaved changes" guard — bridges dirty state from a
@@ -196,41 +197,26 @@ export function NavGuardModal() {
 
   const message = guardMessage ?? DEFAULT_MESSAGE
 
+  // Escape and a click outside mean "Stay", except while a save is running.
   return (
-    <div
-      role="presentation"
-      onClick={() => { if (!isSaving) cancelLeave() }}
-      style={{
-        position: 'fixed', inset: 0, zIndex: 9999,
-        backgroundColor: 'var(--overlay-bg)', backdropFilter: 'blur(2px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}
-    >
-      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={message.title}
-        onClick={(e) => e.stopPropagation()}
+    <Dialog open onOpenChange={(next) => { if (!next && !isSaving) cancelLeave() }}>
+      <DialogContent
+        size="sm"
+        hideClose
+        onEscapeKeyDown={(e) => { if (isSaving) e.preventDefault() }}
+        onInteractOutside={(e) => { if (isSaving) e.preventDefault() }}
         style={{
           backgroundColor: 'var(--modal-bg)',
-          borderRadius: 16,
           padding: 24,
-          width: 400,
-          maxWidth: 'calc(100vw - 32px)',
-          display: 'flex',
-          flexDirection: 'column',
           gap: 20,
-          boxShadow: '0px 8px 32px 0px rgba(82,75,71,0.18), 0px 0px 0px 1px var(--neutral-100)',
+          boxShadow: 'var(--shadow-4)',
         }}
       >
         <div>
-          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 16, lineHeight: '24px', color: 'var(--neutral-900)', margin: 0 }}>
-            {message.title}
-          </p>
-          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: '8px 0 0' }}>
+          <DialogTitle>{message.title}</DialogTitle>
+          <DialogDescription style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: '8px 0 0' }}>
             {message.description}
-          </p>
+          </DialogDescription>
         </div>
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
           <Button variant="secondary" size="sm" disabled={isSaving} onClick={cancelLeave}>
@@ -251,7 +237,7 @@ export function NavGuardModal() {
             </Button>
           )}
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

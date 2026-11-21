@@ -37,6 +37,7 @@ is still true. Every file is in exactly one of three states:
 | [`docs/ui/`](ui) | 2026-10-03 | Renderer contract — seven chat components link to `frontend-rendering.md` |
 | [`docs/perf/`](perf) | 2026-10-11 | Bundle budget and baseline; the rules here are enforced by ESLint |
 | [`docs/design-tokens-*.md`](.) | 2026-10-03 | Token audit, mapping and primitives used by the redesign |
+| [`docs/design-system-primitives-plan.md`](design-system-primitives-plan.md) | 2026-11-17 | Plan to standardise primitives and tokens on ds-dev (scan results, 8 phases, targets) |
 
 ## Reference — look up, rarely edit
 

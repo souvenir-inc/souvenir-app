@@ -57,20 +57,20 @@ function StepStatusIcon({ status }: { status: AgentStep['status'] }) {
 
 function StepRow({ step }: { step: AgentStep }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-      <div style={{ flexShrink: 0, paddingTop: 2, lineHeight: 0 }}>
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
+      <div style={{ flexShrink: 0, paddingTop: 'var(--space-0-5)', lineHeight: 0 }}>
         <StepStatusIcon status={step.status} />
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', minWidth: 0 }}>
         <span style={{
           fontFamily: 'var(--font-body)',
-          fontSize:   '14px',
+          fontSize:   'var(--font-size-body)',
           color:      step.status === 'failed'
             ? 'var(--color-tag-Red-text)'
             : step.status === 'skipped'
               ? 'var(--neutral-400)'
               : 'var(--neutral-700)',
-          lineHeight: '22px',
+          lineHeight: 'var(--line-height-body)',
           textDecoration: step.status === 'skipped' ? 'line-through' : 'none',
         }}>
           {step.label}
@@ -130,8 +130,8 @@ export function LoopHistoryCard({
   return (
     <div style={{
       backgroundColor: 'var(--card-bg)',
-      borderRadius:    12,
-      padding:         '14px 16px',
+      borderRadius:    'var(--radius-xl)',
+      padding:         'var(--space-3) var(--space-4)',
       boxShadow:       CARD_SHADOW,
       maxWidth:        '100%',
       display:         'flex',
@@ -149,38 +149,38 @@ export function LoopHistoryCard({
         style={{
           display:         'flex',
           alignItems:      'center',
-          gap:             8,
+          gap:             'var(--space-2)',
           background:      headerHovered ? 'var(--neutral-50)' : 'none',
           border:          'none',
-          padding:         '4px 6px',
+          padding:         'var(--space-1) var(--space-1-5)',
           margin:          '-4px -6px',
-          borderRadius:    8,
+          borderRadius:    'var(--radius-md)',
           cursor:          'pointer',
           width:           'calc(100% + 12px)',
           textAlign:       'left',
-          transition:      'background-color 150ms ease',
+          transition:      'background-color var(--duration-fast) ease',
         }}
       >
         {status ? <StepStatusIcon status={status} /> : <PlayListIcon size={14} color="var(--neutral-400)" />}
 
         <span style={{
           fontFamily: 'var(--font-body)',
-          fontSize:   '14px',
+          fontSize:   'var(--font-size-body)',
           fontWeight: 'var(--font-weight-medium)',
           color:      (status && TITLE_COLOR[status]) ?? 'var(--neutral-500)',
-          lineHeight: '22px',
+          lineHeight: 'var(--line-height-body)',
         }}>
           {title}
         </span>
 
         {/* Step count summary — a card with no steps has nothing to count. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', marginLeft: 'var(--space-1)' }}>
           {steps.length > 0 && (
             <span style={{
               fontFamily: 'var(--font-body)',
-              fontSize:   '14px',
+              fontSize:   'var(--font-size-body)',
               color:      'var(--color-tag-Green-text)',
-              lineHeight: '22px',
+              lineHeight: 'var(--line-height-body)',
             }}>
               {completedCount} done
             </span>
@@ -188,9 +188,9 @@ export function LoopHistoryCard({
           {skippedCount > 0 && (
             <span style={{
               fontFamily: 'var(--font-body)',
-              fontSize:   '14px',
+              fontSize:   'var(--font-size-body)',
               color:      'var(--neutral-400)',
-              lineHeight: '22px',
+              lineHeight: 'var(--line-height-body)',
             }}>
               · {skippedCount} skipped
             </span>
@@ -198,9 +198,9 @@ export function LoopHistoryCard({
           {failedCount > 0 && (
             <span style={{
               fontFamily: 'var(--font-body)',
-              fontSize:   '14px',
+              fontSize:   'var(--font-size-body)',
               color:      'var(--color-tag-Red-text)',
-              lineHeight: '22px',
+              lineHeight: 'var(--line-height-body)',
             }}>
               · {failedCount} failed
             </span>
@@ -212,9 +212,9 @@ export function LoopHistoryCard({
         {timeLabel && (
           <span style={{
             fontFamily: 'var(--font-body)',
-            fontSize:   '14px',
+            fontSize:   'var(--font-size-body)',
             color:      'var(--neutral-300)',
-            lineHeight: '22px',
+            lineHeight: 'var(--line-height-body)',
             flexShrink: 0,
           }}>
             {timeLabel}
@@ -242,11 +242,11 @@ export function LoopHistoryCard({
             <div style={{
               display:       'flex',
               flexDirection: 'column',
-              gap:           8,
-              paddingTop:    14,
+              gap:           'var(--space-2)',
+              paddingTop:    'var(--space-3)',
             }}>
               {/* Divider */}
-              <div style={{ height: 1, backgroundColor: 'var(--neutral-100)', marginBottom: 6 }} />
+              <div style={{ height: 1, backgroundColor: 'var(--neutral-100)', marginBottom: 'var(--space-1-5)' }} />
 
               {/* Plan goal, or what the run had to say — through the same
                   MarkdownRenderer every chat message uses, instead of a raw
@@ -258,7 +258,7 @@ export function LoopHistoryCard({
               {summary && (
                 <div
                   style={{
-                    marginBottom:      4,
+                    marginBottom:      'var(--space-1)',
                     overflowWrap:      'anywhere',
                     '--prose-size-body': '12px',
                     '--prose-line-body': '18px',
@@ -271,7 +271,7 @@ export function LoopHistoryCard({
               )}
 
               {detail && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 4 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', marginBottom: 'var(--space-1)' }}>
                   <button
                     type="button"
                     onClick={() => setDetailOpen(v => !v)}
@@ -282,9 +282,9 @@ export function LoopHistoryCard({
                       padding:     0,
                       cursor:      'pointer',
                       fontFamily:  'var(--font-body)',
-                      fontSize:    '14px',
+                      fontSize:    'var(--font-size-body)',
                       fontWeight:  'var(--font-weight-medium)',
-                      lineHeight:  '22px',
+                      lineHeight:  'var(--line-height-body)',
                       color:       'var(--neutral-400)',
                     }}
                   >
@@ -293,14 +293,14 @@ export function LoopHistoryCard({
                   {detailOpen && (
                     <pre style={{
                       margin:          0,
-                      padding:         '10px 12px',
+                      padding:         'var(--space-2-5) var(--space-3)',
                       maxHeight:       220,
                       overflow:        'auto',
-                      borderRadius:    8,
+                      borderRadius:    'var(--radius-md)',
                       backgroundColor: 'var(--neutral-50)',
                       fontFamily:      'var(--font-mono, ui-monospace, monospace)',
-                      fontSize:        13,
-                      lineHeight:      1.5,
+                      fontSize:        'var(--font-size-body-sm)',
+                      lineHeight:      'var(--leading-normal)',
                       color:           'var(--neutral-600)',
                       whiteSpace:      'pre-wrap',
                       overflowWrap:    'anywhere',

@@ -7,17 +7,17 @@
 
 .card {
   border: 1px solid var(--border-default);
-  border-radius: 16px;
+  border-radius: var(--radius-2xl);
   background: var(--surface-cream);
-  box-shadow: 0px 2px 2.8px 0px rgba(82, 75, 71, 0.12);
+  box-shadow: var(--shadow-soft);
   overflow: hidden;
 }
 
 .cardHead {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 24px;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
   border-bottom: 1px solid var(--neutral-100);
 }
 
@@ -26,17 +26,17 @@
   min-width: 0;
   margin: 0;
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-body);
   color: var(--neutral-900);
 }
 
 .cardMeta {
   margin: 0;
   font-family: var(--font-body);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body-sm);
   color: var(--neutral-600);
   white-space: nowrap;
 }
@@ -46,8 +46,8 @@
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
   align-items: center;
-  gap: 32px;
-  padding: 24px;
+  gap: var(--space-7);
+  padding: var(--space-6);
 }
 
 @media (max-width: 720px) {
@@ -76,20 +76,20 @@
 
 .donutValue {
   font-family: var(--font-title);
-  font-size: 28px;
-  line-height: 34px;
+  font-size: var(--font-size-heading-xl);
+  line-height: var(--line-height-heading-xl);
   color: var(--neutral-900);
 }
 
 .donutLabel {
   font-family: var(--font-body);
-  font-size: 12px;
-  line-height: 16px;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
   color: var(--neutral-600);
 }
 
 .segment {
-  transition: opacity 150ms ease, stroke-width 150ms ease;
+  transition: opacity var(--duration-fast) ease, stroke-width var(--duration-fast) ease;
   cursor: default;
 }
 
@@ -106,11 +106,11 @@
   display: grid;
   grid-template-columns: 12px minmax(0, 1fr) auto 52px;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
+  gap: var(--space-3);
+  padding: var(--space-3);
   margin: 0 -12px;
-  border-radius: 12px;
-  transition: background 120ms ease, opacity 150ms ease;
+  border-radius: var(--radius-xl);
+  transition: background var(--duration-fast) ease, opacity var(--duration-fast) ease;
 }
 
 .legendRow + .legendRow {
@@ -128,31 +128,31 @@
 .swatch {
   width: 12px;
   height: 12px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
 }
 
 .legendName {
   margin: 0;
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-900);
 }
 
 .legendHint {
   margin: 0;
   font-family: var(--font-body);
-  font-size: 12px;
-  line-height: 16px;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
   color: var(--neutral-600);
 }
 
 .legendValue {
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-900);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -160,8 +160,8 @@
 
 .legendShare {
   font-family: var(--font-body);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body-sm);
   color: var(--neutral-600);
   font-variant-numeric: tabular-nums;
   text-align: right;
@@ -171,23 +171,23 @@
 .balance {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 24px;
+  gap: var(--space-4);
+  padding: var(--space-6);
 }
 
 .meterLabels {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-3);
   font-family: var(--font-body);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body-sm);
   color: var(--neutral-600);
 }
 
 .meter {
   height: 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--neutral-100);
   overflow: hidden;
 }
@@ -195,15 +195,15 @@
 .meterFill {
   height: 100%;
   min-width: 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--neutral-900);
-  transition: width 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width var(--duration-slow) cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 @media (max-width: 720px) {
@@ -215,24 +215,24 @@
 .stat {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 12px 14px;
-  border-radius: 12px;
+  gap: var(--space-0-5);
+  padding: var(--space-3) var(--space-3);
+  border-radius: var(--radius-xl);
   background: var(--card-bg);
-  box-shadow: 0px 2px 2.8px 0px rgba(82, 75, 71, 0.12), 0px 0px 0px 1px var(--neutral-100);
+  box-shadow: var(--shadow-tile);
 }
 
 .statLabel {
   font-family: var(--font-body);
-  font-size: 12px;
-  line-height: 16px;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
   color: var(--neutral-600);
 }
 
 .statValue {
   font-family: var(--font-title);
-  font-size: 20px;
-  line-height: 28px;
+  font-size: var(--font-size-heading-md);
+  line-height: var(--line-height-heading-md);
   color: var(--neutral-900);
   font-variant-numeric: tabular-nums;
 }
@@ -241,19 +241,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 12px 24px;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6);
   border-top: 1px solid var(--neutral-100);
   font-family: var(--font-body);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body-sm);
   color: var(--neutral-600);
 }
 
 .empty {
   margin: 0;
   font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 22px;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-600);
 }

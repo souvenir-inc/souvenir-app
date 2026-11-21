@@ -5,11 +5,10 @@ import { useForm, ValidationError } from '@formspree/react'
 import { CancelOneIcon } from '@strange-huge/icons'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/context/auth-context'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 
-const SHADOW_MODAL = '0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rgba(130,122,116,0.1)'
+const SHADOW_MODAL = 'var(--shadow-4)'
 const SHADOW_INPUT = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--text-field-ring)'
 
 // Closing the modal (the X, a click on the overlay) previously discarded
@@ -36,13 +35,13 @@ function clearDraft(): void {
 }
 
 const labelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-700)', margin: 0,
+  fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-700)', margin: 0,
 }
 const inputStyle: React.CSSProperties = {
-  flex: '1 0 0', minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)', padding: '0 2px',
+  flex: '1 0 0', minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', padding: '0 var(--space-0-5)',
 }
 const fieldErrorStyle: React.CSSProperties = {
-  display: 'block', fontFamily: 'var(--font-body)', fontSize: 12, lineHeight: '16px', color: 'var(--red-400)', marginTop: 2,
+  display: 'block', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--red-400)', marginTop: 'var(--space-0-5)',
 }
 
 export interface RequestFeatureModalProps {
@@ -89,40 +88,40 @@ export function RequestFeatureModal({ onClose }: RequestFeatureModalProps) {
         hideClose
         aria-label="Request a feature"
         className="kaya-scrollbar"
-        style={{ background: 'var(--modal-bg)', borderRadius: 20, padding: 8, boxShadow: SHADOW_MODAL, width: 738, maxWidth: 'calc(100vw - 48px)', maxHeight: 'calc(100dvh - 48px)', overflow: 'auto', display: 'block' }}
+        style={{ background: 'var(--modal-bg)', borderRadius: 'var(--radius-2xl)', padding: 'var(--space-2)', boxShadow: SHADOW_MODAL, width: 738, maxWidth: 'calc(100vw - 48px)', maxHeight: 'calc(100dvh - 48px)', overflow: 'auto', display: 'block' }}
       >
         <form onSubmit={handleSubmit}>
-          <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
 
             {/* Header */}
-            <div style={{ padding: '12px 12px 0', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-              <DialogPrimitive.Title asChild>
-              <p style={{ flex: '1 0 0', fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: 0 }}>
+            <div style={{ padding: 'var(--space-3) var(--space-3) 0', display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
+              <DialogTitle asChild>
+              <p style={{ flex: '1 0 0', fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0 }}>
                 Request a feature
               </p>
-              </DialogPrimitive.Title>
-              <button type="button" onClick={onClose} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, borderRadius: 8, display: 'flex', color: 'var(--neutral-700)', flexShrink: 0 }}>
+              </DialogTitle>
+              <button type="button" onClick={onClose} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 'var(--space-1-5)', borderRadius: 'var(--radius-md)', display: 'flex', color: 'var(--neutral-700)', flexShrink: 0 }}>
                 <CancelOneIcon size={20} />
               </button>
             </div>
 
             {/* Subtitle */}
-            <div style={{ padding: '0 12px 24px' }}>
-              <DialogPrimitive.Description asChild>
-              <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+            <div style={{ padding: '0 var(--space-3) var(--space-6)' }}>
+              <DialogDescription asChild>
+              <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
                 Got an idea for Souvenir?
               </p>
-              </DialogPrimitive.Description>
+              </DialogDescription>
             </div>
 
             {/* Form container */}
-            <div style={{ border: '1px solid var(--border-default)', borderRadius: 16, padding: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ border: '1px solid var(--border-default)', borderRadius: 'var(--radius-2xl)', padding: 'var(--space-3)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
 
               {/* Row 1: Work email + Full name */}
-              <div style={{ display: 'flex', gap: 12 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
+              <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', width: '100%' }}>
                   <label htmlFor="rf-email" style={labelStyle}>Work email</label>
-                  <div style={{ display: 'flex', alignItems: 'center', background: 'var(--field-surface)', borderRadius: 10, padding: '7px 10px', boxShadow: SHADOW_INPUT }}>
+                  <div style={{ display: 'flex', alignItems: 'center', background: 'var(--field-surface)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-1-5) var(--space-2-5)', boxShadow: SHADOW_INPUT }}>
                     <input id="rf-email" type="email" name="email" placeholder="you@company.com" defaultValue={user?.email ?? ''} required style={inputStyle} />
                   </div>
                   <span style={fieldErrorStyle}>
@@ -130,9 +129,9 @@ export function RequestFeatureModal({ onClose }: RequestFeatureModalProps) {
                   </span>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', width: '100%' }}>
                   <label htmlFor="rf-name" style={labelStyle}>Full name</label>
-                  <div style={{ display: 'flex', alignItems: 'center', background: 'var(--field-surface)', borderRadius: 10, padding: '7px 10px', boxShadow: SHADOW_INPUT }}>
+                  <div style={{ display: 'flex', alignItems: 'center', background: 'var(--field-surface)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-1-5) var(--space-2-5)', boxShadow: SHADOW_INPUT }}>
                     <input id="rf-name" type="text" name="name" placeholder="Jane Smith" defaultValue={displayName} style={inputStyle} />
                   </div>
                   <span style={fieldErrorStyle}>
@@ -142,7 +141,7 @@ export function RequestFeatureModal({ onClose }: RequestFeatureModalProps) {
               </div>
 
               {/* What would help you — tall textarea */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                 <label htmlFor="rf-message" style={labelStyle}>What would help you?</label>
                 <textarea
                   id="rf-message"
@@ -152,7 +151,7 @@ export function RequestFeatureModal({ onClose }: RequestFeatureModalProps) {
                   required
                   value={message}
                   onChange={e => setMessage(e.target.value)}
-                  style={{ width: '100%', boxSizing: 'border-box', border: 'none', outline: 'none', background: 'var(--field-surface)', borderRadius: 10, padding: '9px 12px', boxShadow: SHADOW_INPUT, fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)', resize: 'none' }}
+                  style={{ width: '100%', boxSizing: 'border-box', border: 'none', outline: 'none', background: 'var(--field-surface)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-2) var(--space-3)', boxShadow: SHADOW_INPUT, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', resize: 'none' }}
                 />
                 <span style={fieldErrorStyle}>
                   <ValidationError field="message" errors={state.errors} />
@@ -162,7 +161,7 @@ export function RequestFeatureModal({ onClose }: RequestFeatureModalProps) {
             </div>
 
             {/* Footer */}
-            <div style={{ padding: '24px 0 12px' }}>
+            <div style={{ padding: 'var(--space-6) 0 var(--space-3)' }}>
               <Button variant="default" fluid type="submit" sendState={state.submitting ? 'loading' : state.succeeded ? 'success' : 'idle'}>
                 Submit request
               </Button>

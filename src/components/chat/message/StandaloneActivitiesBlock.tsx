@@ -7,12 +7,12 @@ import type { ActivityItem } from "@/types/chat";
 
 // ── Standalone Activities Block (collapsible, used when no reasoning) ─────────
 
-const wrapperStyle: React.CSSProperties = { margin: "4px 0 8px" };
+const wrapperStyle: React.CSSProperties = { margin: "var(--space-1) 0 var(--space-2)" };
 
-const headerRowStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 7, minHeight: 20, userSelect: "none" };
+const headerRowStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 'var(--space-1-5)', minHeight: 20, userSelect: "none" };
 
 const summaryStyle: React.CSSProperties = {
-  fontSize: 14,
+  fontSize: 'var(--font-size-body)',
   color: "var(--neutral-600)",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -25,10 +25,10 @@ const toggleStyle: React.CSSProperties = {
   background: "transparent",
   border: "none",
   cursor: "pointer",
-  padding: 3,
+  padding: 'var(--space-0-5)',
   display: "flex",
   alignItems: "center",
-  borderRadius: 4,
+  borderRadius: 'var(--radius-xs)',
   flexShrink: 0,
 };
 
@@ -36,7 +36,7 @@ const chevronStyle: React.CSSProperties = { display: "block", flexShrink: 0 };
 
 const clipStyle: React.CSSProperties = { overflow: "hidden", minHeight: 0 };
 
-const panelStyle: React.CSSProperties = { paddingTop: 10 };
+const panelStyle: React.CSSProperties = { paddingTop: 'var(--space-2-5)' };
 
 export function StandaloneActivitiesBlock({
   activities,

@@ -54,7 +54,7 @@ function PopIn({ status, children }: { status: string; children: React.ReactNode
 /** A plan step's mark: a hollow ring waiting, a spinner working, a check or alert after. */
 function PlanMark({ status }: { status: PlanItem['status'] }) {
   if (status === 'pending') {
-    return <span style={{ width: 13, height: 13, borderRadius: 999, boxShadow: 'inset 0 0 0 1.5px var(--neutral-300)', display: 'inline-block' }} />
+    return <span style={{ width: 13, height: 13, borderRadius: 'var(--radius-full)', boxShadow: 'inset 0 0 0 1.5px var(--neutral-300)', display: 'inline-block' }} />
   }
   if (status === 'in_progress') return <Spinner size={14} color="var(--blue-500)" />
   return (
@@ -101,10 +101,10 @@ export function TurnStatus({ state, seconds, count }: { state: TurnState; second
       style={{
         display:         'inline-flex',
         alignItems:      'center',
-        gap:             5,
+        gap:             'var(--space-1)',
         height:          22,
-        padding:         '0 8px 0 7px',
-        borderRadius:    999,
+        padding:         '0 var(--space-2) 0 var(--space-1-5)',
+        borderRadius:    'var(--radius-full)',
         backgroundColor: tint,
         color:           'var(--neutral-700)',
         fontWeight:      'var(--font-weight-medium)',
@@ -161,7 +161,7 @@ export function PlanList({ plan, steps }: { plan: PlanItem[]; steps: ActivityIte
       initial={reduceMotion ? false : { opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.28, ease: EASE }}
-      style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 2 }}
+      style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)' }}
     >
       {plan.map(item => {
         const current = item.status === 'in_progress'
@@ -190,10 +190,10 @@ export function PlanList({ plan, steps }: { plan: PlanItem[]; steps: ActivityIte
 export function Favicon({ domain }: { domain: string }) {
   const [failed, setFailed] = useState(false)
   if (!domain || failed) {
-    return <span style={{ ...CAPTION, width: 16, height: 16, borderRadius: 4, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--border-default)', color: 'var(--neutral-600)', fontSize: 10 }}>{(domain[0] ?? '?').toUpperCase()}</span>
+    return <span style={{ ...CAPTION, width: 16, height: 16, borderRadius: 'var(--radius-xs)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--border-default)', color: 'var(--neutral-600)', fontSize: 'var(--font-size-caption)' }}>{(domain[0] ?? '?').toUpperCase()}</span>
   }
   return (
     // eslint-disable-next-line @next/next/no-img-element -- external favicon, same source as ActivityRow
-    <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`} alt="" width={16} height={16} onError={() => setFailed(true)} style={{ borderRadius: 4 }} />
+    <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`} alt="" width={16} height={16} onError={() => setFailed(true)} style={{ borderRadius: 'var(--radius-xs)' }} />
   )
 }

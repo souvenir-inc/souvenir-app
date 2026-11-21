@@ -56,7 +56,7 @@ function AccountPermissions({ entry }: { entry: SlackScopeConnector }) {
     return () => { cancelled = true }
   }, [entry.connector.slug, entry.accountId, refresh])
 
-  if (!loaded) return <div className="kaya-skeleton" style={{ width: '100%', height: 120, borderRadius: 8 }} />
+  if (!loaded) return <div className="kaya-skeleton" style={{ width: '100%', height: 120, borderRadius: 'var(--radius-md)' }} />
   return (
     <PermissionsTab
       key={refresh}

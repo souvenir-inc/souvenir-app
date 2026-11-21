@@ -31,7 +31,7 @@ export function MentionAvatar({ agent }: { agent: { id: string; name: string } }
         justifyContent:  'center',
         width:           28,
         height:          28,
-        borderRadius:    8,
+        borderRadius:    'var(--radius-md)',
         ...agentHeroStyle(avatar.colors[0]),
         flexShrink:      0,
       }}
@@ -49,7 +49,7 @@ export function AgentMentionMenu({ items, loading, activeIndex, selectedId, onPi
       aria-label="Agents"
       // Keep focus in the textarea: a click on a row must not blur it first.
       onMouseDown={event => event.preventDefault()}
-      style={{ position: 'absolute', bottom: 'calc(100% + 8px)', left: 0, zIndex: 30, minWidth: 260, maxWidth: '100%' }}
+      style={{ position: 'absolute', bottom: 'calc(100% + 8px)', left: 0, zIndex: 'var(--z-dropdown)', minWidth: 260, maxWidth: '100%' }}
     >
       <Dropdown size="md" maxHeight="min(280px, 40dvh)">
         <Dropdown.Section fluid label="Agents">

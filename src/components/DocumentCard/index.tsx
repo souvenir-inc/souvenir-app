@@ -30,7 +30,7 @@ export interface DocumentCardProps {
 
 export function DocumentCard({ ref, name, type, sizeLabel, onRemove, onClick }: DocumentCardProps & { ref?: React.Ref<HTMLDivElement> }) {
     return (
-      // eslint-disable-next-line click-events-have-key-events, no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements
       <div
         ref={ref}
         onClick={onClick}
@@ -38,9 +38,9 @@ export function DocumentCard({ ref, name, type, sizeLabel, onRemove, onClick }: 
           display:         'flex',
           flexDirection:   'column',
           justifyContent:  'space-between',
-          gap:             '8px',
-          padding:         '12px',
-          borderRadius:    '18px',
+          gap:             'var(--space-2)',
+          padding:         'var(--space-3)',
+          borderRadius:    'var(--radius-2xl)',
           background:      'var(--neutral-white)',
           boxShadow:       '0px 4px 4px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
           cursor:          onClick ? 'pointer' : 'default',
@@ -52,8 +52,8 @@ export function DocumentCard({ ref, name, type, sizeLabel, onRemove, onClick }: 
           style={{
             fontFamily:  'var(--font-body)',
             fontWeight:  'var(--font-weight-medium)',
-            fontSize:    '14px',
-            lineHeight:  '22px',
+            fontSize:    'var(--font-size-body)',
+            lineHeight:  'var(--line-height-body)',
             color:       'var(--legacy-1a1714)',
             margin:      0,
             wordBreak:   'break-word',
@@ -85,7 +85,7 @@ export function DocumentCard({ ref, name, type, sizeLabel, onRemove, onClick }: 
                 background:     'none',
                 cursor:         'pointer',
                 color:          'var(--neutral-400)',
-                borderRadius:   '4px',
+                borderRadius:   'var(--radius-xs)',
                 flexShrink:     0,
               }}
             >
