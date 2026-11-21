@@ -85,12 +85,16 @@ function Harness({ onReady, liveOverlay = false, view }: { onReady: (api: Return
       messages = typeof update === 'function' ? update(messages) : update
     },
     liveOverlay,
+    // Stop reaches the backend through this: a spy by default, so no test sends a real
+    // request (a view can still pass its own, as the backend-stop test does).
+    onStopBackend: defaultStopBackend,
     ...(view as object),
   })
   useEffect(() => onReady(api))
   return null
 }
 
+const defaultStopBackend = vi.fn()
 const reply = (id: string) => messages.find((message) => message.id === id)!
 
 beforeEach(() => {
@@ -1154,6 +1158,22 @@ describe('useStreamingChat with overlapping follows', () => {
     FakeXHR.all[1].end()
     expect(await done).toBe('done')
     expect(onRunGone).toHaveBeenCalledOnce()
+  })
+
+  it("tells the follow's caller when a reconnect after a drop fails before it attaches", async () => {
+    const incomplete = vi.fn()
+    const done = hook.followStream('chat-A', 'reply-A', undefined, undefined, undefined, undefined, incomplete)
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].status = 0
+    FakeXHR.all[0].end() // dropped: a reconnect follows
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+    FakeXHR.all[1].status = 503 // the reconnect fails before attaching
+    FakeXHR.all[1].responseText = 'Service Unavailable'
+    FakeXHR.all[1].end()
+    await act(async () => { await done })
+    expect(incomplete).toHaveBeenCalledOnce() // its caller can try again
   })
 
   it('records a clean close with no terminal event as an inconclusive end', async () => {
