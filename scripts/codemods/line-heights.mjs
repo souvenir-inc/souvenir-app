@@ -123,7 +123,11 @@ export function transform(src, isCss, counter) {
   const masked = codeMask(src, { css: isCss });
   // Regular-expression literals (`/\{lineHeight: 1.5,\}/`) are not masked as strings are:
   // their spans are found here (a `/` where an expression starts) and left alone.
-  const regexSpans = isCss ? [] : regexLiteralSpans(src, masked);
+  // In CSS, an unquoted url(…) is one token (the mask covers only quoted strings): text inside it
+  // (`url(/a/line-height:1.5;b.svg)`) is a path, not a declaration, and is left alone too.
+  const regexSpans = isCss
+    ? [...src.matchAll(/\burl\(\s*(?!["'])[^)]*\)/gi)].map((m) => [m.index, m.index + m[0].length])
+    : regexLiteralSpans(src, masked);
   const inRegex = (i) => regexSpans.some(([from, to]) => i >= from && i < to);
   return src.replace(re, (w, pre, val, post = "", off) => {
     if (typeof post === "number") { off = post; post = ""; }

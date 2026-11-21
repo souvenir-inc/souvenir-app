@@ -156,6 +156,16 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
     // A recorded failed answer: this card offers its retry (seeded above) and does not answer
     // afresh, even if the app is connected by now.
     if (failedAtMount) return () => { abortedRef.current = true }
+    // One that failed after this card rendered (sent and failed before this effect ran): the
+    // same, read now. A recorded "Not now" is never overruled by a connection found meanwhile.
+    const failedSince = failedAnswers.get(prompt.respond_url)
+    if (failedSince) {
+      if (failedSince.decision === 'cancel') declinedRef.current = true
+      // Shown a tick later, not from the effect body (no render cascade); not once unmounted.
+      let shown = true
+      queueMicrotask(() => { if (shown && !abortedRef.current) showFailure(failedSince.decision, new Error(failedSince.message)) })
+      return () => { shown = false; abortedRef.current = true }
+    }
     if (pending) return () => { abortedRef.current = true }
     getConnector(prompt.connector.slug)
       .then((entry) => {

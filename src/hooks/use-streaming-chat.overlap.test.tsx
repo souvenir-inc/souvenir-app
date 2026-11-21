@@ -968,6 +968,32 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(getChatQueue('chat-A')?.heldBy).toBe('error') // the earlier failure still holds it
   })
 
+  it("does not show done over a follow started from a refused follow's end notice", async () => {
+    const states: string[] = []
+    const view: View = { currentChatIdRef: { current: 'chat-A' }, setStreamState: (state) => { states.push(state) } }
+    act(() => root.render(<Harness view={view} onReady={(api) => { hook = api }} />))
+    const other = createRoot(document.createElement('div'))
+    let otherHook!: ReturnType<typeof useStreamingChat>
+    act(() => other.render(<Harness view={view} onReady={(api) => { otherHook = api }} />))
+    const done = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    let again: Promise<unknown> | undefined
+    const off = subscribeStreams((e) => { if (e.type === 'end' && e.chatId === 'chat-A' && !again) again = otherHook.followStream('chat-A', 'reply-A') })
+    FakeXHR.all[0].status = 404 // no running turn: refused
+    FakeXHR.all[0].responseText = '{"detail":"no running turn"}'
+    FakeXHR.all[0].end()
+    await act(async () => { await done })
+    off()
+    expect(again).toBeDefined()
+    expect(states.at(-1)).not.toBe('done') // the newer follow's state stands
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+    FakeXHR.all[1].start()
+    FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runA }, { type: 'RUN_FINISHED', ...runA })
+    FakeXHR.all[1].end()
+    await act(async () => { await again })
+    act(() => other.unmount())
+  })
+
   it("does not show done for a chat a follow has taken up again from the end notice", async () => {
     const states: string[] = []
     const view: View = { currentChatIdRef: { current: 'chat-A' }, setStreamState: (state) => { states.push(state) } }

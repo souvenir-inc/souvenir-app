@@ -134,6 +134,12 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   // that has already begun — and a running id handed to the wrong chat makes the
   // follow attach one chat's stream to another's reply.
   const [runningOwner, setRunningOwner] = useState<{ chatId: string; id: string } | null>(null)
+  // When a running reply was last cleared by a stop or a finished end, by "chat:reply" (or
+  // "chat:*" for a finished end, which ends any reply of the chat), as a step of clearSeq. A
+  // history request that started before that step may still list the reply as running: its
+  // install does not bring it back.
+  const clearSeqRef = useRef(0)
+  const clearedAtRef = useRef(new Map<string, number>())
   // Bumped when a background stream ends, purely to re-run the write-back
   // effect: the stream's final commit can land before completeStream() clears
   // the registry, in which case the effect would skip that commit and the chat
@@ -187,12 +193,14 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   const install = useCallback((
     id: string,
     list: UIMessage[],
-    meta: { hasMore: boolean; cursor: string | undefined; runningId: string | null },
+    meta: { hasMore: boolean; cursor: string | undefined; runningId: string | null; requestedAt?: number },
   ) => {
     cursorRef.current = meta.cursor
     pagesRef.current = 1
     setState({ chatId: id, list, loaded: true })
-    setRunningOwner(meta.runningId ? { chatId: id, id: meta.runningId } : null)
+    const clearedAt = Math.max(clearedAtRef.current.get(`${id}:${meta.runningId}`) ?? -1, clearedAtRef.current.get(`${id}:*`) ?? -1)
+    const stale = meta.requestedAt !== undefined && clearedAt > meta.requestedAt
+    setRunningOwner(meta.runningId && !stale ? { chatId: id, id: meta.runningId } : null)
     setHasMoreMessages(meta.hasMore)
     setHistoryLoadId((n) => n + 1)
     setMessagesLoadError(null)
@@ -203,10 +211,12 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   }, [cacheEnabled])
 
   /** Fetches `id`'s first page through whichever loader is configured. */
-  const fetchHistory = useCallback(async (id: string): Promise<{ list: UIMessage[]; hasMore: boolean; cursor: string | undefined; runningId: string | null }> => {
+  const fetchHistory = useCallback(async (id: string): Promise<{ list: UIMessage[]; hasMore: boolean; cursor: string | undefined; runningId: string | null; requestedAt: number }> => {
+    // The clear step this request started at (see clearedAtRef).
+    const requestedAt = clearSeqRef.current
     if (options?.loadMessages) {
       const msgs = await options.loadMessages(id)
-      return { list: msgs, hasMore: false, cursor: undefined, runningId: null }
+      return { list: msgs, hasMore: false, cursor: undefined, runningId: null, requestedAt }
     }
     const res = await getChatMessages(id)
     const list = withRunningTurn(toUIMessages(res.messages))
@@ -215,6 +225,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
       hasMore: res.has_more,
       cursor: res.next_cursor ?? undefined,
       runningId: runningReply(list)?.id ?? null,
+      requestedAt,
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- options is stable for each hook consumer
   }, [])
@@ -293,7 +304,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
         // installing the server's copy would delete the message being sent and
         // orphan the stream writing into it.
         if (background && (getStreamCompletion(chatId) || stateRef.current.list.some(isPendingLocal))) return
-        install(chatId, result.list, { hasMore: result.hasMore, cursor: result.cursor, runningId: result.runningId })
+        install(chatId, result.list, { hasMore: result.hasMore, cursor: result.cursor, runningId: result.runningId, requestedAt: result.requestedAt })
       } catch (err) {
         logger.error("[useChatState] Failed to load messages", err)
         if (cancelled || background) return
@@ -349,7 +360,9 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   // backend stops the run, and nothing else would clear it (no reload follows a Stop). Another
   // send stopped before its run took over leaves it, as above.
   useEffect(() => subscribeStreams((event) => {
+    const noteCleared = (key: string) => { clearSeqRef.current += 1; clearedAtRef.current.set(key, clearSeqRef.current) }
     if (event.type === "stopped") {
+      noteCleared(`${event.chatId}:${event.replyId}`)
       // Stopped with no entry to end (a follow waiting to reconnect): the same rule, by reply id.
       setRunningOwner((owner) => (owner && owner.chatId === event.chatId && owner.id === event.replyId ? null : owner))
       return
@@ -360,6 +373,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
     const finished = (event.outcome === "done" && !event.inconclusive) || (event.outcome === "error" && event.runEnded === true)
     const stoppedThisReply = event.outcome === "aborted" && event.replyId !== undefined
     if (!finished && !stoppedThisReply) return
+    noteCleared(finished ? `${event.chatId}:*` : `${event.chatId}:${event.replyId}`)
     setRunningOwner((owner) => (owner && owner.chatId === event.chatId && (finished || owner.id === event.replyId) ? null : owner))
   }), [])
 
@@ -481,7 +495,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
     setIsLoadingMessages(true)
     try {
       const result = await fetchHistory(chatId)
-      install(chatId, result.list, { hasMore: result.hasMore, cursor: result.cursor, runningId: result.runningId })
+      install(chatId, result.list, { hasMore: result.hasMore, cursor: result.cursor, runningId: result.runningId, requestedAt: result.requestedAt })
     } catch (err) {
       logger.error("[useChatState] Failed to refresh messages", err)
       const message = err instanceof Error ? err.message : "Failed to refresh messages"

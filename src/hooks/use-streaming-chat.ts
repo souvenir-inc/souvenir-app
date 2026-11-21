@@ -858,7 +858,8 @@ export function useStreamingChat({
           if (result === "gone") {
             // The retry's own failed follow already ended the registry entry (as done). Ending
             // it again here could remove a reservation someone made in between.
-            if (showsChat(liveChatId, false)) setStreamState?.("done")
+            // Not over a stream that has taken the chat up since (its entry; ours is gone).
+            if (showsChat(liveChatId, false) && !isStreamActive(liveChatId)) setStreamState?.("done")
             onStreamLost?.(liveChatId)
             // That reload may fail, and the chat would still show the reply as running: the
             // caller (the view's recovery) keeps it pending until a history load lands.
@@ -966,7 +967,8 @@ export function useStreamingChat({
     if (result === "attached") return outcome
     // Already ended (as done) by the follow itself: no second completeStream, which could
     // remove a reservation made for the chat's next queued message in between.
-    if (showsChat(chatId, false)) setStreamState?.("done")
+    // Not over a follow an end listener started for the chat meanwhile (it has the entry now).
+    if (showsChat(chatId, false) && !isStreamActive(chatId)) setStreamState?.("done")
     onRefused?.()
     onStreamLost?.(chatId)
     return "done"
