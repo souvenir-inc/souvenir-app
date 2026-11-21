@@ -29,6 +29,48 @@ interface BackgroundSend {
   key:     number;
 }
 let nextSendKey = 0;
+/**
+ * One reconcile pass: takes the next message of every chat that is ready for a background
+ * send and reserves the chat. Outside the component: its try/finally is out of React
+ * Compiler's reach (which cannot compile one, and would skip the whole component).
+ */
+function reconcileQueues(
+  pass: { reconciling: boolean; again: boolean },
+  blocked: boolean,
+  setHasQueued: (queued: boolean) => void,
+  setSends: React.Dispatch<React.SetStateAction<BackgroundSend[]>>,
+) {
+  if (pass.reconciling) {
+    pass.again = true;
+    return;
+  }
+  pass.reconciling = true;
+  try {
+    do {
+      pass.again = false;
+      setHasQueued(hasQueuedMessages());
+      if (blocked) break;
+      for (const chatId of queuedChatsReadyForBackground()) {
+        const message = takeNextQueuedMessage(chatId);
+        if (!message) continue;
+        // Reserved now, ahead of the request: the chat counts as busy (one
+        // message per reply), and opening it meanwhile waits for this reply.
+        registerStream(chatId);
+        // The key is taken here, not inside the updater: React may run an updater twice.
+        const key = ++nextSendKey;
+        const send = { chatId, message, key };
+        unclaimed.set(key, send);
+        setSends((prev) => [...prev, send]);
+      }
+    } while (pass.again);
+  } finally {
+    pass.reconciling = false;
+  }
+}
+
+// Messages taken from their queue whose worker has not mounted yet. The runner owns them
+// until then: if it goes away first, it puts them back and frees their chats.
+const unclaimed = new Map<number, BackgroundSend>();
 
 /**
  * Sends the next queued message of a chat that isn't on screen once the reply it
@@ -48,37 +90,30 @@ export function MessageQueueRunner() {
     // Taking a message notifies the queue, which calls straight back in here.
     // Passes never nest — a nested one would see the chat as idle before its
     // stream is reserved and send its next message alongside — they rerun.
-    let reconciling = false;
-    let again = false;
-    const reconcile = () => {
-      if (reconciling) {
-        again = true;
-        return;
-      }
-      reconciling = true;
-      try {
-        do {
-          again = false;
-          setHasQueued(hasQueuedMessages());
-          if (blocked) break;
-          for (const chatId of queuedChatsReadyForBackground()) {
-            const message = takeNextQueuedMessage(chatId);
-            if (!message) continue;
-            // Reserved now, ahead of the request: the chat counts as busy (one
-            // message per reply), and opening it meanwhile waits for this reply.
-            registerStream(chatId);
-            // The key is taken here, not inside the updater: React may run an updater twice.
-            const key = ++nextSendKey;
-            setSends((prev) => [...prev, { chatId, message, key }]);
-          }
-        } while (again);
-      } finally {
-        reconciling = false;
-      }
-    };
+    const pass = { reconciling: false, again: false };
+    const reconcile = () => reconcileQueues(pass, blocked, setHasQueued, setSends);
     reconcile();
     return subscribeQueue(reconcile);
   }, [blocked]);
+
+  // A real unmount (confirmed a microtask later, so Strict Mode's mount, cleanup, mount is
+  // not one) returns every message whose worker never mounted to the front of its queue,
+  // and frees its chat. A mounted worker has claimed its message and handles its own.
+  const runnerMountedRef = useRef(false);
+  useEffect(() => {
+    runnerMountedRef.current = true;
+    return () => {
+      runnerMountedRef.current = false;
+      queueMicrotask(() => {
+        if (runnerMountedRef.current) return;
+        for (const send of unclaimed.values()) {
+          restoreQueuedMessage(send.chatId, send.message, 0);
+          completeStream(send.chatId, "done");
+        }
+        unclaimed.clear();
+      });
+    };
+  }, []);
 
   // A reload would lose what's still queued or being sent from here.
   const busy = hasQueued || sends.length > 0;
@@ -151,7 +186,7 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
   const unmountRef = useRef<{ fired: boolean; listeners: Set<() => void> } | null>(null);
   // Created by whichever effect runs first (the send's effect reads it too), so it never depends on effect order.
   const unmountSignal = () => {
-    unmountRef.current ??= { fired: false, listeners: new Set() };
+    if (!unmountRef.current) unmountRef.current = { fired: false, listeners: new Set() };
     return unmountRef.current;
   };
   const fireUnmount = () => {
@@ -188,6 +223,8 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
   // Strict Mode runs effects twice; the message goes out once.
   const startedRef = useRef(false);
   useEffect(() => {
+    // From here this worker owns its message (the runner no longer puts it back).
+    unclaimed.delete(send.key);
     if (startedRef.current) return;
     startedRef.current = true;
 

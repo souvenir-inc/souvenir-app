@@ -776,9 +776,57 @@ describe('useStreamingChat with overlapping follows', () => {
     registerStream('chat-A') // the chat's own view (another hook) follows it meanwhile
     expect(await done).toBe('done') // this retry stands down
     expect(getChatQueue('chat-A')?.heldBy).toBe('error') // nothing recovered yet
-    completeStream('chat-A', 'done') // that reader reads the turn to its end
-    expect(getChatQueue('chat-A')?.heldBy).toBeUndefined()
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
+    try {
+      completeStream('chat-A', 'done') // that reader reads the turn to its end…
+      runState.get = () => Promise.resolve('idle') // …and the backend confirms the run is over
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS) })
+      expect(getChatQueue('chat-A')?.heldBy).toBeUndefined()
+    } finally {
+      vi.useRealTimers()
+    }
   })
+
+  it("keeps the drop's hold while the run goes on when the other reader's follow is refused", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    // A second hook: the chat's own view, which follows it while this one's reconnect waits.
+    let other!: ReturnType<typeof useStreamingChat>
+    const otherRoot = createRoot(document.createElement('div'))
+    act(() => otherRoot.render(<Harness onReady={(api) => { other = api }} />))
+    try {
+      const timers = vi.spyOn(globalThis, 'setTimeout')
+      const done = hook.followStream('chat-A', 'reply-A')
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+      const xhr = FakeXHR.all[0]
+      xhr.start()
+      xhr.push({ type: 'RUN_STARTED', ...runA })
+      xhr.status = 0
+      xhr.end()
+      await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
+      await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+      timers.mockRestore()
+      const otherDone = other.followStream('chat-A', 'reply-A')
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+      expect(await done).toBe('done') // the reconnect stands down for the other reader
+      vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
+      try {
+        const refused = FakeXHR.all[1]
+        refused.status = 500 // the other reader's follow is refused: it ends as "done", recovering nothing
+        refused.responseText = '{"detail":"boom"}'
+        refused.end()
+        await act(async () => { await otherDone })
+        await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS * 2) })
+        expect(getChatQueue('chat-A')?.heldBy).toBe('error') // the run is still going
+        runState.get = () => Promise.resolve('idle')
+        await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS) })
+        expect(getChatQueue('chat-A')?.heldBy).toBeUndefined() // released once it has ended
+      } finally {
+        vi.useRealTimers()
+      }
+    } finally {
+      act(() => otherRoot.unmount())
+    }
+  }, 10000)
 
   it("keeps the drop's hold when the other reader fails", async () => {
     queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
@@ -797,4 +845,58 @@ describe('useStreamingChat with overlapping follows', () => {
     completeStream('chat-A', 'error')
     expect(getChatQueue('chat-A')?.heldBy).toBe('error')
   })
+
+  it("keeps a dropped chat's reservation when its run is on the chat's own endpoint", async () => {
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
+    try {
+      act(() => root.render(<Harness view={{ endpoint: '/api/agents/a1/chat' } as never} onReady={(api) => { hook = api }} />))
+      const doneA = hook.followStream('chat-A', 'reply-A')
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+      FakeXHR.all[0].start()
+      FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+      const doneB = hook.followStream('chat-B', 'reply-B') // A is dropped
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+      runState.get = () => Promise.resolve('idle') // the chat API knows nothing of the agent run
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS * 2) })
+      expect(isStreamActive('chat-A')).toBe(true) // not released on the chat API's word
+      FakeXHR.all[0].end()
+      FakeXHR.all[1].start()
+      FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+      FakeXHR.all[1].end()
+      await act(async () => { await doneA; await doneB })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it("lifts the drop's hold once the run ends when the reconnect was taken over", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const xhr = FakeXHR.all[0]
+    xhr.start()
+    xhr.push({ type: 'RUN_STARTED', ...runA })
+    xhr.status = 0
+    xhr.end() // dropped: held, reconnect waits
+    await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
+    try {
+      const doneB = hook.followStream('chat-B', 'reply-B') // another chat takes the hook in the wait
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+      expect(await doneA).toBe('done') // the reconnect stood down
+      expect(getChatQueue('chat-A')?.heldBy).toBe('error') // run still going
+      runState.get = (id) => Promise.resolve(id === 'chat-A' ? 'idle' : 'running')
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS) })
+      expect(getChatQueue('chat-A')?.heldBy).toBeUndefined()
+      FakeXHR.all[1].start()
+      FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+      FakeXHR.all[1].end()
+      await act(async () => { await doneB })
+    } finally {
+      vi.useRealTimers()
+    }
+  }, 10000)
 })
