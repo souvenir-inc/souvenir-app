@@ -27,7 +27,7 @@ vi.mock('@/lib/jwt-utils', async (orig) => {
   return { ...actual, ensureFreshToken: () => token.gate ?? actual.ensureFreshToken() }
 })
 import { DROPPED_RUN_POLL_MS, useStreamingChat } from '@/hooks/use-streaming-chat'
-import { completeStream, detachStream, isStreamActive, registerStream, stopStream, subscribeStreams } from '@/lib/stream-registry'
+import { completeStream, detachStream, isStreamActive, registerStream, stopStream, streamListenerCount, subscribeStreams } from '@/lib/stream-registry'
 import { getChatQueue, queueMessage, queuedChatsReadyForBackground, takeAllQueuedMessages } from '@/lib/message-queue'
 import { resetStreamStore } from '@/lib/chat/stream-store'
 import type { UIMessage } from '@/types/chat'
@@ -890,6 +890,85 @@ describe('useStreamingChat with overlapping follows', () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+
+  it("leaves no listener behind after a takeover when the drop set no hold of its own", async () => {
+    // Nothing queued: the drop sets no hold, so there is nothing to watch.
+    const before = streamListenerCount()
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].status = 0
+    FakeXHR.all[0].end() // dropped, reconnect waits
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
+    const doneB = hook.followStream('chat-B', 'reply-B') // another chat takes the hook in the wait
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+    expect(await doneA).toBe('done')
+    expect(streamListenerCount()).toBe(before) // A left nothing subscribed
+    FakeXHR.all[1].start()
+    FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+    FakeXHR.all[1].end()
+    await act(async () => { await doneB })
+  })
+
+  it("keeps the drop's hold when a reader of the chat fails during the wait, before a takeover", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].status = 0
+    FakeXHR.all[0].end() // dropped: held, reconnect waits
+    await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
+    registerStream('chat-A') // a reader of chat A, during the wait…
+    completeStream('chat-A', 'error') // …fails, still during it
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
+    try {
+      const doneB = hook.followStream('chat-B', 'reply-B') // then another chat takes the hook
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+      expect(await doneA).toBe('done')
+      runState.get = () => Promise.resolve('idle')
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS * 2) })
+      expect(getChatQueue('chat-A')?.heldBy).toBe('error')
+      FakeXHR.all[1].start()
+      FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+      FakeXHR.all[1].end()
+      await act(async () => { await doneB })
+    } finally {
+      vi.useRealTimers()
+    }
+  }, 10000)
+
+  it("lifts the drop's hold when the recovery follow after an incomplete read reads the turn to its end", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const incomplete = vi.fn()
+    const first = hook.followStream('chat-A', 'reply-A', undefined, undefined, undefined, undefined, incomplete)
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].status = 0
+    FakeXHR.all[0].end() // dropped: held
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+    FakeXHR.all[1].status = 503 // the reconnect fails before attaching
+    FakeXHR.all[1].responseText = 'Service Unavailable'
+    FakeXHR.all[1].end()
+    await act(async () => { await first })
+    expect(incomplete).toHaveBeenCalledOnce()
+    expect(getChatQueue('chat-A')?.heldBy).toBe('error')
+    // The caller follows again, and this time the turn is read to its end.
+    const second = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(3))
+    FakeXHR.all[2].start()
+    FakeXHR.all[2].push({ type: 'RUN_STARTED', ...runA }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'Done.' }, { type: 'RUN_FINISHED', ...runA })
+    FakeXHR.all[2].end()
+    await act(async () => { await second })
+    expect(getChatQueue('chat-A')?.heldBy).toBeUndefined() // the queue goes on
   })
 
   it("keeps the drop's hold when, after a takeover in the wait, a reader of the chat fails", async () => {

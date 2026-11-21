@@ -86,7 +86,14 @@ function mapValue(raw, block, counter) {
   // value (`padding: compact ? fontSize : …`) is an expression, not this block's font size.
   const lastFont = [...scope.matchAll(/(?<=(?:^|[{,;])\s*)(?:(["'])font-?[sS]ize\1|font-?[sS]ize)\s*:\s*(?<value>[^;,}\n]+)/g)]
     .filter((m) => !inString(m.index))
-    .at(-1)?.groups.value.trim().replace(/^['"]|['"]$/g, "");
+    // `!important` is not part of the value; an important declaration beats a normal one,
+    // whatever their order, and among equals the last one wins.
+    .map((m) => {
+      const raw = m.groups.value.trim();
+      const important = /!\s*important$/i.test(raw);
+      return { important, value: raw.replace(/\s*!\s*important$/i, "").replace(/^['"]|['"]$/g, "") };
+    })
+    .reduce((win, d) => (!win || d.important || !win.important ? d : win), null)?.value;
   // A spread (`...other`, `...{ fontSize }`) can override any key, so with one there is no
   // telling which fontSize wins: no pairing.
   // A `font` shorthand sets font-size too, and may come after the longhand: no pairing either.

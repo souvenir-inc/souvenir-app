@@ -144,6 +144,11 @@ describe("quoted keys", () => {
         "}",
       ].join("\n");
       expect(tsx(ternary)).toContain("lineHeight: 'var(--line-height-small)'");
+      // `!important` is not part of the value, and an important declaration wins over a later one.
+      const imp = transform(".a {\n  font-size: var(--font-size-small) !important;\n  line-height: 18px;\n}", true, { exact: 0, unitless: 0, snapped: 0 });
+      expect(imp).toContain("line-height: var(--line-height-small);");
+      const impFirst = transform(".a {\n  font-size: var(--font-size-small) !important;\n  font-size: var(--font-size-body-sm);\n  line-height: 18px;\n}", true, { exact: 0, unitless: 0, snapped: 0 });
+      expect(impFirst).toContain("line-height: var(--line-height-small);");
       // A later `font` shorthand sets font-size too: the longhand is not the pair.
       const css = [".a {", "  font-size: var(--font-size-small);", "  font: var(--font-size-body-sm) sans-serif;", "  line-height: 18px;", "}"].join("\n");
       expect(transform(css, true, { exact: 0, unitless: 0, snapped: 0 })).not.toContain("--line-height-small");
