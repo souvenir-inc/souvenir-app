@@ -434,6 +434,23 @@ export function useStreamingChat({
       const holdId = dropHoldId
       return pollUntilRunEnds(id, () => currentHoldId(id) === holdId && !stoppedByUser, () => releaseErrorHold(id, holdId), onStop)
     }
+    // Ends this call's registry entry, only while it is still this call's: after a Stop (which
+    // ends it) an end listener may register the chat again, and that newer entry is not ours.
+    const endOwnStream = (outcome: StreamOutcome, opts?: { inconclusive?: boolean }) => {
+      const id = myChatId
+      if (id && isStreamOwnedBy(id, stopThisCall)) completeStream(id, outcome, opts)
+    }
+    // As releaseHoldWhenRunEnds, while another reader has the chat: if that reader ends with a
+    // failure (or a Stop) the asking stops and the hold stays. A "done" end leaves it asking.
+    const releaseHoldUnlessReaderFails = (id: string) => {
+      let stopWatching = () => {}
+      const stopAsking = releaseHoldWhenRunEnds(id, () => stopWatching())
+      stopWatching = subscribeStreams((event) => {
+        if (event.type !== "end" || event.chatId !== id || event.outcome === "done") return
+        stopAsking()
+        stopWatching()
+      })
+    }
     const releaseWhenRunEnds = () => {
       const id = myChatId
       if (!id || id.startsWith("temp-") || !runStateReadable) return
@@ -642,7 +659,7 @@ export function useStreamingChat({
         if (!turn.streamFinished && !stopRequestedRef.current) finishTurn(ctx, turn, "ended")
 
         const outcome: StreamOutcome = stopRequestedRef.current ? "aborted" : turn.turnFailed ? "error" : "done"
-        completeStream(resolvedChatIdRef.current, outcome)
+        endOwnStream(outcome)
         // The backend saves the files this turn carried to Library; refresh what Library shows.
         if (options?.files?.length) notifyLibraryFilesChanged()
         if (isActiveStream()) setStreamState?.("done")
@@ -664,16 +681,18 @@ export function useStreamingChat({
         // an error would hold the chat's queue although nothing failed.
         // Whether the chat's queue was already held: an error hold this end sets is lifted again
         // if a reconnect below reads the turn to its end, one that was already there is not.
-        const heldBefore = !!getChatQueue(resolvedChatIdRef.current)?.heldBy
+        // This call's own chat, read once: the end below notifies listeners synchronously, and one
+        // may start another chat on this hook (moving the hook's ref) before this call reads it.
+        const ownChatId = myChatId
+        const heldBefore = !!getChatQueue(ownChatId)?.heldBy
         // Inconclusive unless it read the run (a follow that attached, or a send whose run
         // started): the run it was about may still be going.
-        completeStream(
-          resolvedChatIdRef.current,
+        endOwnStream(
           stopRequestedRef.current ? "aborted" : follow && !attached ? "done" : "error",
           { inconclusive: follow ? !attached : !runStarted },
         )
         // The hold this end just set (if it set one): what a later recovery may lift.
-        dropHoldId = heldBefore ? undefined : currentHoldId(resolvedChatIdRef.current)
+        dropHoldId = heldBefore ? undefined : currentHoldId(ownChatId)
         // A turn that failed or was stopped part-way may still have saved its files.
         if (options?.files?.length) notifyLibraryFilesChanged()
 
@@ -691,7 +710,7 @@ export function useStreamingChat({
 
         // The connection dropped but the backend is still running the turn: read
         // it again from its stream. A regular chat only; other endpoints have none.
-        const liveChatId = resolvedChatIdRef.current
+        const liveChatId = ownChatId
         const attempt = options?.followAttempt ?? 0
         if (
           error instanceof ConnectionDroppedError &&
@@ -726,15 +745,7 @@ export function useStreamingChat({
             // The backend is asked from now on, not only once that reader ends: it can also
             // go silently (reopening the chat detaches it, with no end). If it ends with a
             // failure the asking stops and the hold stays.
-            if (!heldBefore && dropHoldId !== undefined) {
-              let stopWatching = () => {}
-              const stopAsking = releaseHoldWhenRunEnds(liveChatId, () => stopWatching())
-              stopWatching = subscribeStreams((event) => {
-                if (event.type !== "end" || event.chatId !== liveChatId || event.outcome === "done") return
-                stopAsking()
-                stopWatching()
-              })
-            }
+            if (!heldBefore && dropHoldId !== undefined) releaseHoldUnlessReaderFails(liveChatId)
             // Stood down without reading the turn: its caller (owning an earlier hold) must not
             // take this "done" as a finished turn.
             return leftDetached()
@@ -761,7 +772,9 @@ export function useStreamingChat({
             // only once the backend says the run has ended.
             if (outcome === "done" && !heldBefore && dropHoldId !== undefined) {
               if (retryDetached) {
-                if (!stoppedByUser) releaseHoldWhenRunEnds(liveChatId) // a Stop keeps the hold
+                // A Stop keeps the hold; so does a reader that took over from the retry and failed
+                // (the queue keeps the same hold id, so the id check alone would not stop this).
+                if (!stoppedByUser) releaseHoldUnlessReaderFails(liveChatId)
               } else releaseErrorHold(liveChatId, dropHoldId)
             }
             // Passed up: a call above this one may own an earlier hold, and must not take a

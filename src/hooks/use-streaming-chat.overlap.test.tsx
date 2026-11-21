@@ -1037,6 +1037,38 @@ describe('useStreamingChat with overlapping follows', () => {
     }
   }, 15000)
 
+  it("keeps the drop's hold when a reader that took over from a nested reconnect fails", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].status = 0
+    FakeXHR.all[0].end() // first drop: the hold, owned by the top call
+    await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+    FakeXHR.all[1].start() // the reconnect attaches…
+    FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runA })
+    timers.mockClear()
+    FakeXHR.all[1].status = 0
+    FakeXHR.all[1].end() // …and drops: the nested reconnect waits
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
+    registerStream('chat-A', () => {}, () => {}) // another reader takes the chat during that wait
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
+    try {
+      await act(async () => { await vi.advanceTimersByTimeAsync(1000) })
+      expect(await doneA).toBe('done') // stood down for that reader
+      completeStream('chat-A', 'error') // the reader fails
+      runState.get = () => Promise.resolve('idle')
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS * 2) })
+      expect(getChatQueue('chat-A')?.heldBy).toBe('error') // a failed reply keeps the queue held
+    } finally {
+      vi.useRealTimers()
+    }
+  }, 15000)
+
   it("passes a detached reconnect's signal up through every level to the hold's owner", async () => {
     queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
     const doneA = hook.followStream('chat-A', 'reply-A')
@@ -1102,6 +1134,57 @@ describe('useStreamingChat with overlapping follows', () => {
       FakeXHR.all[2].start()
       FakeXHR.all[2].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
       FakeXHR.all[2].end()
+      await act(async () => { await doneB })
+    } finally {
+      vi.useRealTimers()
+    }
+  }, 15000)
+
+  it("leaves a newer registration alone when a stopped call's transport settles", async () => {
+    const done = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    const newer = vi.fn()
+    // An end listener registers the chat again as soon as Stop has ended its entry.
+    const off = subscribeStreams((event) => { if (event.type === 'end' && event.chatId === 'chat-A') registerStream('chat-A', newer) })
+    act(() => { stopStream('chat-A') })
+    off()
+    FakeXHR.all[0].end() // the stopped request settles afterwards
+    await act(async () => { await done })
+    expect(isStreamActive('chat-A')).toBe(true) // the newer entry is still there…
+    expect(stopStream('chat-A')).toBe(true) // …and Stop still reaches it
+    expect(newer).toHaveBeenCalledOnce()
+    completeStream('chat-A', 'done')
+  })
+
+  it("lifts its own chat's drop hold when an end listener starts another chat on the hook", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    let doneB: Promise<unknown> | undefined
+    // The drop's end starts chat B on the same hook, from inside the notification.
+    const off = subscribeStreams((event) => {
+      if (event.type === 'end' && event.chatId === 'chat-A' && !doneB) doneB = hook.followStream('chat-B', 'reply-B')
+    })
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
+    try {
+      FakeXHR.all[0].status = 0
+      FakeXHR.all[0].end() // dropped: A held
+      await vi.waitFor(() => expect(doneB).toBeDefined())
+      off()
+      expect(getChatQueue('chat-A')?.heldBy).toBe('error')
+      await act(async () => { await vi.advanceTimersByTimeAsync(1000) }) // the reconnect wait ends: taken over
+      expect(await doneA).toBe('done')
+      runState.get = (id) => Promise.resolve(id === 'chat-A' ? 'idle' : 'running')
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS * 2) })
+      expect(getChatQueue('chat-A')?.heldBy).toBeUndefined() // A's own hold went once its run ended
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+      FakeXHR.all[1].start()
+      FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+      FakeXHR.all[1].end()
       await act(async () => { await doneB })
     } finally {
       vi.useRealTimers()

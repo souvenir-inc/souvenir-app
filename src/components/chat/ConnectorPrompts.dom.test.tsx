@@ -196,6 +196,28 @@ describe('ConnectPromptCard "Not now"', () => {
     expect(tryAgain()).toBeDefined() // the failure reached the card on screen
   })
 
+  it('sees a failure that lands between the remounted card rendering and its effect running', async () => {
+    let fail!: (e: Error) => void
+    respondToChatPrompt.mockImplementationOnce(() => new Promise<void>((_, reject) => { fail = reject }))
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} />)) // connected: answers on mount
+    await flush()
+    await act(async () => root.unmount())
+    // The new card renders and commits, but its effect has not run yet when the POST fails.
+    const env = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+    env.IS_REACT_ACT_ENVIRONMENT = false
+    root = createRoot(container)
+    let effectsRan = false
+    const Probe = () => { React.useEffect(() => { effectsRan = true }); return null }
+    root.render(<><ConnectPromptCard prompt={prompt} /><Probe /></>)
+    await vi.waitFor(() => expect(container.querySelector('button')).not.toBeNull(), { interval: 0 })
+    const raced = !effectsRan
+    fail(new Error('Network error'))
+    await vi.waitFor(() => expect(tryAgain()).toBeDefined())
+    env.IS_REACT_ACT_ENVIRONMENT = true
+    expect(raced).toBe(true) // the race this test is about did happen
+    expect(respondToChatPrompt).toHaveBeenCalledTimes(1)
+  })
+
   it('does not take another message’s pending answer for its own when the request id repeats', async () => {
     let release!: () => void
     respondToChatPrompt.mockImplementationOnce(() => new Promise<void>((resolve) => { release = resolve }))

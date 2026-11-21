@@ -128,7 +128,9 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
     // An answer already on its way (sent by this card before it left the screen): this card
     // takes it over instead of answering again. On success the card that sent it has told
     // the chat; on failure this one shows it, with Try again.
-    const pending = answersInFlight.get(prompt.respond_url)
+    // The one seen at render first: if it settled before this effect ran, its entry is gone
+    // from the map, but the card was rendered as waiting on it and must still see how it ended.
+    const pending = pendingAtMount ?? answersInFlight.get(prompt.respond_url)
     if (pending && !sentHereRef.current) {
       void pending.outcome.then((failure) => {
         if (abortedRef.current) return

@@ -82,7 +82,9 @@ function mapValue(raw, block, counter) {
   // A quoted key (`"fontSize": …`) is a declaration too: both quotes, then the colon. The match
   // starts at its opening quote, a string's start, not inside one; text in a string value
   // (`content: "font-size: …"`) has no closing quote after the name, so it never matches.
-  const lastFont = [...scope.matchAll(/(?<![\w-])(?:(["'])font-?[sS]ize\1|font-?[sS]ize)\s*:\s*(?<value>[^;,}\n]+)/g)]
+  // Only at a declaration boundary (the block's start, or after `,` / `;`): a `fontSize` in a
+  // value (`padding: compact ? fontSize : …`) is an expression, not this block's font size.
+  const lastFont = [...scope.matchAll(/(?<=(?:^|[{,;])\s*)(?:(["'])font-?[sS]ize\1|font-?[sS]ize)\s*:\s*(?<value>[^;,}\n]+)/g)]
     .filter((m) => !inString(m.index))
     .at(-1)?.groups.value.trim().replace(/^['"]|['"]$/g, "");
   // A spread (`...other`, `...{ fontSize }`) can override any key, so with one there is no

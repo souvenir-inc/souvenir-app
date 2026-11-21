@@ -223,6 +223,21 @@ describe('MessageQueueRunner', () => {
     root = createRoot(container) // for teardown
   })
 
+  it("puts back only its own reservations when another runner is taking messages meanwhile", async () => {
+    const other = createRoot(document.createElement('div'))
+    await act(async () => other.render(<MessageQueueRunner />)) // a second runner, mounted alongside
+    await queueBehindReply('first')
+    // The first runner takes the message and goes away before its worker mounts. Its message
+    // goes back, the second runner takes it: that reservation is the second runner's own.
+    await act(async () => { completeStream('chat-1', 'done'); root.unmount() })
+    await act(async () => { await Promise.resolve() })
+    expect(getChatQueue('chat-1')).toBeUndefined()
+    expect(sentInputs()).toEqual(['first']) // sent once, by the second runner
+    await act(async () => finishSend('done'))
+    await act(async () => other.unmount())
+    root = createRoot(container) // for teardown
+  })
+
   it('leaves a chat on screen to its own view', async () => {
     await act(async () => setQueueForeground(view, 'chat-1'))
     await queueBehindReply('and then this')

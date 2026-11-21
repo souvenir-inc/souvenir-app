@@ -135,6 +135,15 @@ describe("quoted keys", () => {
       const src = `const s = { "fontSize": "var(--font-size-small)", lineHeight: "18px" }`;
       expect(tsx(src)).toContain("lineHeight: 'var(--line-height-small)'");
       expect(tsx(`const s = { fontSize: 'var(--font-size-small)', lineHeight: '18px' }`)).toContain("lineHeight: 'var(--line-height-small)'");
+      // A fontSize inside a value is not a declaration: the pair stays with the real one.
+      const ternary = [
+        "const s = {",
+        "  fontSize: 'var(--font-size-small)',",
+        "  padding: compact ? fontSize : 'var(--font-size-body-sm)',",
+        "  lineHeight: '18px',",
+        "}",
+      ].join("\n");
+      expect(tsx(ternary)).toContain("lineHeight: 'var(--line-height-small)'");
     } finally {
       setSnap(false);
     }
