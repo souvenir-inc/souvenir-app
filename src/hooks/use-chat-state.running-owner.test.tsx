@@ -28,9 +28,12 @@ let root: Root
 // Every value the hook hands out, render by render, tagged with the chat it was rendered for.
 let seen: Array<{ chatId: string; running: string | null }>
 
+let refresh: () => Promise<void>
 function Harness({ chatId }: { chatId: string }) {
   const api = useChatState(chatId)
   seen.push({ chatId, running: api.runningMessageId })
+  const { refreshMessages } = api
+  React.useEffect(() => { refresh = refreshMessages }, [refreshMessages])
   return null
 }
 
@@ -162,5 +165,24 @@ describe('runningMessageId across a chat switch', () => {
     expect(seen.at(-1)?.running).toBe('turn-A')
     await act(async () => { registerStream('a'); completeStream('a', 'error', { runEnded: true }) }) // the run failed
     expect(seen.at(-1)?.running).toBeNull()
+  })
+
+  it('does not bring back a reply stopped while a history request was out', async () => {
+    const running = { messages: [msg('m1', 'a'), msg('turn-A', 'a', { role: 'assistant', content: '', run } as Partial<Message>)], has_more: false, next_cursor: null }
+    getChatStreamId.mockResolvedValue('turn-A')
+    getChatMessages.mockResolvedValue(running)
+    await act(async () => { root.render(<Harness chatId="a" />); await Promise.resolve() })
+    await act(async () => { await Promise.resolve() })
+    expect(seen.at(-1)?.running).toBe('turn-A')
+    let answer!: (v: unknown) => void
+    getChatMessages.mockImplementationOnce(() => new Promise((resolve) => { answer = resolve }))
+    let pending!: Promise<void>
+    await act(async () => { pending = refresh() }) // a refresh goes out…
+    await act(async () => { reportStopped('a', 'turn-A') }) // …the reply is stopped meanwhile…
+    await act(async () => { answer(running); await pending }) // …and the answer still lists it running
+    expect(seen.at(-1)?.running).toBeNull()
+    // A refresh that starts after the stop takes the history at its word.
+    await act(async () => { await refresh() })
+    expect(seen.at(-1)?.running).toBe('turn-A')
   })
 })

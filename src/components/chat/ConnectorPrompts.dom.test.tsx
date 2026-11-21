@@ -21,7 +21,7 @@ vi.mock('@/lib/api/connectors', async (orig) => ({
 }))
 
 import { ConnectPromptCard } from '@/components/chat/ConnectorPrompts'
-import { answersInFlight, resetConnectPromptAnswers } from '@/components/chat/connector-prompt-answers'
+import { answersInFlight, failedAnswers, resetConnectPromptAnswers } from '@/components/chat/connector-prompt-answers'
 import { getConnector } from '@/lib/api/connectors'
 import { parsePrompt } from '@/lib/api/prompts'
 import type { ConnectorConnectPrompt } from '@/types/chat'
@@ -299,6 +299,16 @@ describe('ConnectPromptCard "Not now"', () => {
     const connect = [...container.querySelectorAll('button')].find((b) => b.textContent?.includes('Connect'))
     expect(connect?.disabled ?? true).toBe(true) // no sign-in can start while that answer is out
     await act(async () => { release(null); await Promise.resolve() })
+  })
+
+  it('keeps a "Not now" that failed after it rendered, before its effect ran, over a connection', async () => {
+    // Connected by now (the default lookup), but a decline failed between render and effect.
+    let recorded = false
+    const RecordFailure = () => { if (!recorded) { recorded = true; failedAnswers.set(prompt.respond_url, { decision: 'cancel', message: 'Network error' }) } return null }
+    await act(async () => root.render(<><ConnectPromptCard prompt={prompt} /><RecordFailure /></>))
+    await flush()
+    expect(respondToChatPrompt).not.toHaveBeenCalled() // no "connected"
+    expect(tryAgain()).toBeDefined() // the decline is offered again
   })
 
   it('stays gone on remount once a decision is recorded', async () => {

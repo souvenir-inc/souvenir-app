@@ -118,6 +118,14 @@ describe("line-heights --snap", () => {
   });
 });
 
+describe("unquoted CSS urls", () => {
+  it("leaves line-height text inside url(…) alone and still converts a real declaration", () => {
+    const css = ".a { background-image: url(/assets/line-height:1.5;icon.svg); }";
+    expect(transform(css, true, { exact: 0, unitless: 0, snapped: 0 })).toBe(css);
+    expect(transform(".a { line-height: 1.5; }", true, { exact: 0, unitless: 0, snapped: 0 })).toContain("line-height: var(--leading-normal);");
+  });
+});
+
 describe("type bodies", () => {
   it("leaves lineHeight literal types alone and converts runtime properties", () => {
     const type = "type Fixed = { lineHeight: 1.5 };";
