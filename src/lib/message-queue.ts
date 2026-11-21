@@ -44,7 +44,11 @@ export interface ChatQueue {
   messages: readonly QueuedMessage[]
   /** Set when the reply the queue waited on failed or was stopped — nothing more is sent. */
   heldBy?:  Exclude<StreamOutcome, "done">
+  /** Which hold this is: each new hold gets its own, so a release meant for one can't lift another. */
+  holdId?:  number
 }
+
+let nextHoldId = 0
 
 // ── Keys ─────────────────────────────────────────────────────────────────────
 // A chat's id, or — for a new chat whose first reply hasn't produced an id
@@ -134,7 +138,7 @@ export function subscribeQueue(listener: () => void): () => void {
 subscribeStreams((event) => {
   if (event.type === "end" && event.outcome !== "done") {
     const queue = queues.get(event.chatId)
-    if (queue && !queue.heldBy) queues.set(event.chatId, { ...queue, heldBy: event.outcome })
+    if (queue && !queue.heldBy) queues.set(event.chatId, { ...queue, heldBy: event.outcome, holdId: ++nextHoldId })
   }
   notify()
 })
@@ -216,7 +220,8 @@ export function restoreQueuedMessage(
   const messages = [...(queue?.messages ?? [])].filter((m) => m.id !== message.id)
   messages.splice(Math.min(index, messages.length), 0, message)
   const heldBy = queue?.heldBy ?? hold
-  setQueue(key, { ...queue, messages, ...(heldBy ? { heldBy } : {}) })
+  const holdId = queue?.heldBy ? queue.holdId : hold ? ++nextHoldId : undefined
+  setQueue(key, { ...queue, messages, ...(heldBy ? { heldBy, holdId } : {}) })
   notify()
 }
 
@@ -224,15 +229,23 @@ export function restoreQueuedMessage(
 export function holdQueue(key: string, reason: Exclude<StreamOutcome, "done">): void {
   const queue = queues.get(key)
   if (!queue || queue.heldBy) return
-  queues.set(key, { ...queue, heldBy: reason })
+  queues.set(key, { ...queue, heldBy: reason, holdId: ++nextHoldId })
   notify()
 }
 
+/** The id of `key`'s current hold, if it is held. */
+export function currentHoldId(key: string | null | undefined): number | undefined {
+  const queue = key ? queues.get(key) : undefined
+  return queue?.heldBy ? queue.holdId : undefined
+}
+
 /** Lifts `key`'s "error" hold: the failure that set it was recovered after all (a dropped
- *  connection whose reconnect read the turn to its end). Any other hold stays. */
-export function releaseErrorHold(key: string): void {
+ *  connection whose reconnect read the turn to its end). Any other hold stays, and with
+ *  `holdId` only that hold is lifted: one set since (a newer failure) is not. */
+export function releaseErrorHold(key: string, holdId?: number): void {
   const queue = queues.get(key)
   if (!queue || queue.heldBy !== "error") return
+  if (holdId !== undefined && queue.holdId !== holdId) return
   queues.set(key, { messages: queue.messages })
   notify()
 }
@@ -253,7 +266,7 @@ export function rekeyQueue(from: string, to: string): void {
     queues.delete(from)
     const existing = queues.get(to)
     queues.set(to, existing
-      ? { messages: [...existing.messages, ...moving.messages], heldBy: existing.heldBy ?? moving.heldBy }
+      ? { messages: [...existing.messages, ...moving.messages], heldBy: existing.heldBy ?? moving.heldBy, holdId: existing.heldBy ? existing.holdId : moving.holdId }
       : moving)
   }
   for (const [token, key] of foreground) {
