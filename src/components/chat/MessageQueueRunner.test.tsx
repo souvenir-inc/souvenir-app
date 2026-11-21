@@ -185,7 +185,8 @@ describe('MessageQueueRunner', () => {
       setQueueForeground(view, null)
     })
     expect(fetchAiResponse).not.toHaveBeenCalled() // the second did not go out in the gap
-    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 10)) })
+    // Wait for the hand-back itself (the first message back at the front), not a fixed time.
+    await vi.waitFor(() => expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['second']))
     // Back at the front, so the background takes the first again: the second still waits.
     expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['second'])
   })

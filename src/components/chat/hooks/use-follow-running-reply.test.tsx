@@ -117,6 +117,7 @@ describe('useFollowRunningReply', () => {
     await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 2 }) // backing off
     await act(async () => { registerStream('chat-A') }) // a send starts: the follow is cancelled
     await act(async () => { completeStream('chat-A', 'error') }) // and fails before its run
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) }) // the follow starts just after
     expect(followStream).toHaveBeenCalledTimes(2)
     expect(followStream.mock.calls[1][1]).toBe('r1')
   })
@@ -178,6 +179,7 @@ describe('useFollowRunningReply', () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(FOLLOW_REFUSED_BACKOFF_MS * 2) })
     expect(followStream).not.toHaveBeenCalled() // that stream owns the chat for now
     await act(async () => { completeStream('chat-A', 'error') })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
     expect(followStream).toHaveBeenCalledTimes(1)
     expect(followStream.mock.calls[0][1]).toBe('r1')
   })
@@ -225,5 +227,21 @@ describe('useFollowRunningReply', () => {
     await act(async () => { registerStream('chat-A') }) // the view sends after the load
     await act(async () => { completeStream('chat-A', 'done') })
     expect(onRunEnded).not.toHaveBeenCalled()
+  })
+
+  it("does not start the earlier reply's follow from inside the end notification", async () => {
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 2 }) // backing off
+    await act(async () => { registerStream('chat-A') }) // a send supersedes the follow
+    // The user stops it: while Stop's own end notification runs, no follow may start yet.
+    let duringEnd = -1
+    await act(async () => {
+      completeStream('chat-A', 'aborted')
+      duringEnd = followStream.mock.calls.length
+    })
+    expect(duringEnd).toBe(1)
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    expect(followStream).toHaveBeenCalledTimes(2) // then it does
   })
 })
