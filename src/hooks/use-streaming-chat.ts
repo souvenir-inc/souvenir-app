@@ -787,6 +787,10 @@ export function useStreamingChat({
             // detached retry's "done" as a finished turn either.
             return retryDetached ? leftDetached() : outcome
           }
+          // The reconnect never reached the stream (a 5xx, say): the run may still be going and
+          // nothing reads it, so it counts as an incomplete read; the follow's caller retries
+          // within its budget. Not after a Stop.
+          if (result === "failed" && !retryDetached && !stoppedByUser && !stopRequestedRef.current) options?.onIncomplete?.()
           if (result === "gone") {
             // The retry's own failed follow already ended the registry entry (as done). Ending
             // it again here could remove a reservation someone made in between.

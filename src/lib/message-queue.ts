@@ -297,6 +297,11 @@ export function beginHandOver(key: string): void {
   handingOver.add(key)
 }
 
+/** Whether `key`'s front message is being handed back (its queue gives nothing out until then). */
+export function isHandingOver(key: string): boolean {
+  return handingOver.has(key)
+}
+
 /** The handed-back message is in place (restore it first): the queue goes on as usual. */
 export function endHandOver(key: string): void {
   if (handingOver.delete(key)) notify()

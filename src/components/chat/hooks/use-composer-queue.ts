@@ -9,6 +9,8 @@ import {
   restoreQueuedMessage,
   takeAllQueuedMessages,
   takeNextQueuedMessage,
+  isHandingOver,
+  subscribeQueue,
   takeQueuedMessage,
   type QueuedMessage,
   type QueuedMessagePart,
@@ -217,23 +219,36 @@ export function useQueuedSend({
   useEffect(() => {
     if (!queueReady) return;
     let cancelled = false;
+    let stopWaiting: (() => void) | undefined;
     const send = () => {
       // A send that started this very tick has the floor (see isSendingRef).
       if (cancelled || isSendingRef.current || askingSaveRef.current > 0) return;
       setQueuedRowExit("sent");
       const message = takeNextQueuedMessage(queueKey);
-      if (message) void sendTurn({ ...message, fromQueue: true });
+      if (message) { void sendTurn({ ...message, fromQueue: true }); return; }
+      // The front message is being handed back from a background send: nothing comes out
+      // until it is in place. queueReady stays true meanwhile (the queue is not empty), so
+      // nothing would rerun this: it tries again once the hand-over ends.
+      if (isHandingOver(queueKey) && !stopWaiting) {
+        stopWaiting = subscribeQueue(() => {
+          if (isHandingOver(queueKey)) return;
+          stopWaiting?.();
+          stopWaiting = undefined;
+          send();
+        });
+      }
     };
     // Hidden tab: no beat (nobody is watching) and no timer — background
     // tabs throttle timers, up to a minute apart.
     if (pageHidden) {
       queueMicrotask(send);
-      return () => { cancelled = true; };
+      return () => { cancelled = true; stopWaiting?.(); };
     }
     const timer = setTimeout(send, QUEUE_SEND_DELAY_MS);
     return () => {
       cancelled = true;
       clearTimeout(timer);
+      stopWaiting?.();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- the refs, setter and sendTurn are stable
   }, [queueReady, queueKey, pageHidden]);
