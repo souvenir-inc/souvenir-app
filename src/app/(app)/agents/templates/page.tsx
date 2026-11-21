@@ -175,7 +175,7 @@ function CustomCard({ onClick, disabled }: { onClick: () => void; disabled?: boo
           padding: 'var(--space-1-5) var(--space-3)', borderRadius: 'var(--radius-md)',
           border: `1px solid ${hovered ? 'var(--neutral-400)' : 'var(--neutral-300)'}`,
           fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)',
-          fontSize: 'var(--font-size-body-sm)', lineHeight: '18px', color: 'var(--neutral-700)',
+          fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-700)',
           transition: 'border-color var(--duration-fast)',
         }}
       >

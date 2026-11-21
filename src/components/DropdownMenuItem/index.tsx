@@ -215,7 +215,7 @@ const subLabelTextStyle: React.CSSProperties = {
 /** `emphasis="strong"` on a header row — 13px/18px, off the 11px caption step. */
 const headerTextStyleStrong: React.CSSProperties = {
   fontSize:   'var(--font-size-code)',
-  lineHeight: '18px',
+  lineHeight: 'var(--line-height-code)',
   color:      'var(--dropdown-menu-item-muted)',
 }
 

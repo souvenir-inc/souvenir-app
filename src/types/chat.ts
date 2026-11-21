@@ -115,9 +115,10 @@ export interface UIMessage extends Message {
   /** When the backend started the turn's run (epoch ms, from the stream's opening
    *  `run` frame). Live turns only. */
   runStartedAt?: number
-  /** True when the user clicked Stop during generation — only ever that. A turn
-   *  cut short by a reload is not stopped: the backend keeps running it and the
-   *  chat picks it back up from the turn's stream. */
+  /** True when the user clicked Stop during generation — only ever that: live from
+   *  the click, and from history when the turn's run ended "stopped". A turn cut
+   *  short by a reload is not stopped: the backend keeps running it and the chat
+   *  picks it back up from the turn's stream. */
   stoppedByUser?: boolean
   /** True when `content` is a friendly error message rather than an actual
    *  model response — renders with a distinct error treatment instead of a

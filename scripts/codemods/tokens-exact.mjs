@@ -111,6 +111,43 @@ function replaceValue(prop, raw) {
  * starts. '/" strings end at a newline, templates at their `.
  */
 const OPERAND_KEYWORDS = new Set(["typeof", "case", "return", "in", "of", "instanceof", "void", "delete", "await", "yield", "new", "throw", "else", "do", "from", "extends"]);
+// Scripts never write outside the repository. A target is checked by its real path, so a
+// path that leaves it (`../other-app`) or a symlink that points out of it is refused.
+const REPO_ROOT = fs.realpathSync(path.resolve(import.meta.dirname, "../.."));
+export function insideRepo(p) {
+  let real;
+  try { real = fs.realpathSync(p); } catch { return false; }
+  const rel = path.relative(REPO_ROOT, real);
+  return rel === "" || (!rel.startsWith("..") && !path.isAbsolute(rel));
+}
+
+// Whether `at` sits in a type rather than a value: the object braces around it open a
+// `type X = {…}` or `interface X {…}` body. A literal there is a literal type, which other
+// code is checked against; swapping it for a token would break that check.
+export const inTypeBody = (src, masked, at) => {
+  let depth = 0;
+  for (let i = at - 1; i >= 0; i--) {
+    if (masked[i]) continue;
+    if (src[i] === "}") depth++;
+    else if (src[i] === "{") {
+      if (depth > 0) { depth--; continue; }
+      // An enclosing brace: a type body here, or further out (`type T = { card: { … } }`).
+      const before = src.slice(Math.max(0, i - 200), i);
+      if (/(?:\btype\s+[\w$]+(?:<[^>]*>)?\s*=\s*|\binterface\s+[\w$]+[^{;]*)$/.test(before)) return true;
+    }
+  }
+  return false;
+};
+
+/** Regular-expression literal spans in JS/TS source ([from, to] pairs): a `/` where an
+ *  expression starts, outside strings and comments (`masked`). codeMask leaves them as code,
+ *  but text inside one (`/{lineHeight: 1.5,}/`) is not a declaration. */
+export function regexLiteralSpans(src, masked) {
+  return [...src.matchAll(/(?<=(?:^|[=(,:[!&|?{};]|\breturn)\s*)\/(?![*/])(?:\\.|\[(?:\\.|[^\]\\\n])*\]|[^/\\\n[])+\/[a-z]*/gm)]
+    .filter((m) => !masked[m.index])
+    .map((m) => [m.index, m.index + m[0].length]);
+}
+
 export function codeMask(src, { css = false } = {}) {
   const mask = new Uint8Array(src.length);
   for (let i = 0; i < src.length; i++) {
@@ -204,7 +241,8 @@ function matchBrace(s, i, masked) {
 export function transformTsx(source, counter) {
   const masked = codeMask(source);
   const starts = [];
-  for (const m of source.matchAll(/style=\{\{/g)) if (!masked[m.index]) starts.push(m.index + "style={".length);
+  // The whole attribute name: `tickstyle={{…}}` is some other prop, typed by its component.
+  for (const m of source.matchAll(/(?<![\w$-])style=\{\{/g)) if (!masked[m.index]) starts.push(m.index + "style={".length);
   for (const m of source.matchAll(/:\s*(?:React\.)?CSSProperties\s*=\s*\{/g)) if (!masked[m.index]) starts.push(m.index + m[0].length - 1);
   // Identifier-aware on both sides: `$` continues a name, so \b alone let CSSProperties$Config match.
   for (const m of source.matchAll(/(?<![\w$.])as (?:React\.)?CSSProperties(?![\w$])/g)) {
@@ -239,13 +277,15 @@ export function transformTsx(source, counter) {
 
 export function transformCss(source, counter) {
   const masked = codeMask(source, { css: true });
-  return source.replace(/(^|[;{\s])([a-z-]+)(\s*:\s*)([^;{}]+)(;)/g, (whole, pre, prop, sep, val, semi, offset) => {
-    if (prop.startsWith("--") || masked[offset + pre.length]) return whole;
+  // The boundary before a declaration and its closing `;` are looked at, not consumed: in
+  // `.a{color:red;padding:16px;}` the `;` that ends one declaration is where the next begins.
+  return source.replace(/(?<=^|[;{\s])([a-z-]+)(\s*:\s*)([^;{}]+)(?=;)/g, (whole, prop, sep, val, offset) => {
+    if (prop.startsWith("--") || masked[offset]) return whole;
     const important = /\s*!important\s*$/.test(val) ? " !important" : "";
     const next = replaceValue(prop, val.replace(/\s*!important\s*$/, ""));
     if (!next) return whole;
     counter.n++;
-    return `${pre}${prop}${sep}${next}${important}${semi}`;
+    return `${prop}${sep}${next}${important}`;
   });
 }
 
@@ -272,6 +312,7 @@ const SKIP = [
   /src\/components\/layout\/sidebar\/(PersonaChatItem|ProjectChatItem|RecentsSection|StarredSection|ProjectsSection|PersonasSectionIndividual|RecentAgentChatsSection)\.tsx$/,
 ];
 const walk = (p) => {
+  if (!insideRepo(p)) { console.warn(`skipped (outside the repository): ${p}`); return; }
   const st = fs.statSync(p);
   const norm = p.split(path.sep).join("/");
   if (SKIP.some((re) => re.test(norm))) return;

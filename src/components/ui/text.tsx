@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 // neutral steps the app already uses (900 default, 700, 600, 500 muted, 400 subtle).
 // Chat answers keep their own prose styles (--prose-*); this is for UI chrome.
 
-export const textVariants = cva('m-0', {
+const textVariants = cva('m-0', {
   variants: {
     variant: {
       display:      'text-display',

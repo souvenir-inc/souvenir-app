@@ -423,7 +423,7 @@ export function MessageBubble({
                 style={{
                   fontFamily: 'var(--font-body)',
                   fontSize: 'var(--font-size-small)',
-                  lineHeight: 1,
+                  lineHeight: 'var(--leading-none)',
                   color:      'var(--neutral-400)',
                   userSelect: 'none',
                   marginLeft: 'var(--space-0-5)',

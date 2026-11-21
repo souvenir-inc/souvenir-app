@@ -201,7 +201,7 @@ export function CompareLab() {
                     }}
                   >
                     <span style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-900)" }}>{flow.title}</span>
-                    <span style={{ fontSize: 'var(--font-size-body-sm)', lineHeight: "19px", color: "var(--neutral-500)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{flow.task}</span>
+                    <span style={{ fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: "var(--neutral-500)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{flow.task}</span>
                     <span style={{ display: "flex", gap: 'var(--space-1)' }}>
                       {flow.apps.map((app) => (
                         <span key={app} style={{ fontSize: 'var(--font-size-caption)', lineHeight: "var(--line-height-small)", padding: "var(--space-0-5) var(--space-1-5)", borderRadius: 'var(--radius-sm)', backgroundColor: "var(--neutral-100)", color: "var(--neutral-700)" }}>{app}</span>

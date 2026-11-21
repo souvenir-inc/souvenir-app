@@ -290,6 +290,23 @@ export function PresetModelSelectorDialog() {
     setPreferLeftTooltips(left + DROPDOWN_WIDTH >= vw - 24);
   }, [isOpen, anchorEl]);
 
+  // On open (or once the models arrive), focus moves into the panel (the selected model,
+  // else the first one): the panel
+  // is mounted elsewhere in the page, so Tab from the trigger would leave it and close it.
+  useEffect(() => {
+    if (!isOpen) return;
+    const frame = requestAnimationFrame(() => {
+      const panel = dropdownRef.current;
+      if (!panel || panel.contains(document.activeElement)) return;
+      const target =
+        panel.querySelector<HTMLElement>('[aria-pressed="true"]') ??
+        panel.querySelector<HTMLElement>('input, button, [tabindex="0"]');
+      target?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
+    // models too: opened before the list loaded, focus moves in once it arrives.
+  }, [isOpen, models.length]);
+
   // Close on outside click or Escape
   useEffect(() => {
     if (!isOpen) return;
@@ -303,14 +320,29 @@ export function PresetModelSelectorDialog() {
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+      if (e.key !== "Escape") return;
+      close();
+      anchorEl?.focus();
+    };
+
+    // Focus landing outside (Tab away, or a modal opened from the keyboard, which takes
+    // focus) closes it too. The panel sits on the popover layer, above dialogs, so one
+    // left open would otherwise float over a modal that opened without a mouse press.
+    const handleFocusIn = (e: FocusEvent) => {
+      if (
+        dropdownRef.current?.contains(e.target as Node) ||
+        anchorEl?.contains(e.target as Node)
+      ) return;
+      close();
     };
 
     document.addEventListener("mousedown", handleMouseDown);
     document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("focusin", handleFocusIn);
     return () => {
       document.removeEventListener("mousedown", handleMouseDown);
       document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("focusin", handleFocusIn);
     };
   }, [isOpen, anchorEl, close]);
 
@@ -352,7 +384,7 @@ export function PresetModelSelectorDialog() {
           transition={{ type: "spring", stiffness: 400, damping: 30 }}
           style={{
             position: "fixed",
-            zIndex: 51,
+            zIndex: 'var(--z-popover)',
             ...style,
           }}
         >
@@ -369,7 +401,11 @@ export function PresetModelSelectorDialog() {
             <PresetModelSelectorContent
               models={models}
               selectedModel={selectedModel}
-              onSelect={selectModel}
+              onSelect={(model) => {
+                selectModel(model);
+                // The chosen row goes with the panel: focus returns to the trigger.
+                anchorEl?.focus();
+              }}
               preferLeftTooltips={preferLeftTooltips}
             />
           </Popover>

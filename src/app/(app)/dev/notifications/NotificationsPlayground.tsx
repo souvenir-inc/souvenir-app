@@ -219,7 +219,7 @@ function PlaygroundContent() {
       <div style={{ maxWidth: 1180, margin: '0 auto', padding: 'var(--space-7) var(--space-6) var(--space-10)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
           <span style={{ display: 'inline-flex', color: 'var(--neutral-700)' }}><BellRingIcon size={28} animated /></span>
-          <h1 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-xl)', lineHeight: '34px', color: 'var(--neutral-900)' }}>
+          <h1 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-xl)', lineHeight: 'var(--line-height-heading-xl)', color: 'var(--neutral-900)' }}>
             Notifications playground
           </h1>
           <Badge label="Dev only" color="Purple" />

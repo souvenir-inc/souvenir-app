@@ -9,7 +9,7 @@ version: "1.0.0"
 Bootstraps a fresh environment that follows this codebase's stack, so a fork or
 sibling project stays compatible instead of drifting into a different set of
 libraries/versions. The full rationale for every choice below lives in
-`docs/onboarding/TECH-STACK.md` — read that first if anything here is unclear,
+`docs/_archive/2026-05-v1-build/onboarding/tech-stack.md` (archived, so treat it as background, not current rules) — read it if anything here is unclear,
 especially the shadcn/ui vs. Hero UI section.
 
 ## 1. Confirm the runtime
@@ -55,7 +55,7 @@ hex values in components — that's what breaks dark mode later.
 ## 4. Initialize shadcn/ui for the component layer
 
 Do **not** reach for a packaged UI library (Hero UI, MUI, Chakra, etc.) here — see
-`docs/onboarding/TECH-STACK.md` §4 for why. Instead:
+the archived tech-stack doc §3 for why. Instead:
 
 ```bash
 npx shadcn@latest init
@@ -81,7 +81,7 @@ clobber your logic.
 
 ## 5. Wire up secrets (don't commit real env values)
 
-Follow the two-file split from `docs/onboarding/TECH-STACK.md` §8:
+Follow the two-file split from the archived tech-stack doc §6:
 
 1. `.env.local` (gitignored) — bootstrap-only creds (e.g. AWS access key/secret,
    region, secret name), never the real app secrets.
@@ -108,9 +108,9 @@ If `npm run dev` fails immediately on missing env vars, that's step 5 not done y
 
 ## 7. Sanity-check before building features
 
-- [ ] `node -v` matches the LTS pinned in `.nvmrc`
+- [ ] `node -v` matches the LTS pinned in `.nvmrc` (the new repo should add one; the source repo has none)
 - [ ] Tailwind config is CSS-first (v4), no `tailwind.config.js`
-- [ ] `components.json` exists (shadcn initialized) and points at the real token CSS
+- [ ] `components.json` exists in the new repo (shadcn initialized; the source repo predates it) and points at the real token CSS
 - [ ] Only one icon library installed (`lucide-react`) — resist adding a second
 - [ ] Real secrets never sit in a file that isn't gitignored
 - [ ] `npm run dev`, `lint`, `test`, and `tsc --noEmit` all pass clean

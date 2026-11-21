@@ -18,7 +18,7 @@ import type { SearchResultType, SearchResult } from './index'
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
 
-export const SHADOW_MODAL   = '0px 8px 32px 0px rgba(82,75,71,0.18), 0px 0px 0px 1px var(--neutral-100)'
+export const SHADOW_MODAL   = 'var(--shadow-4)'
 export const SHADOW_FOCUSED = '0px 0px 0px 1.5px var(--blue-400)'
 
 // ── Color system — mirrors KDS tag palette (Chip, Badge) ─────────────────────

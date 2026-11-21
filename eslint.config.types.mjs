@@ -22,6 +22,10 @@ export default [
   ...base,
   {
     files: ["src/**/*.{ts,tsx}"],
+    // tsconfig.json excludes **/*.test.ts(x), and projectService refuses a file no
+    // project owns — without this every test file is a parsing error (255 of them)
+    // and the run never reaches the promise rules. Tests keep the base config.
+    ignores: ["src/**/*.test.{ts,tsx}"],
     languageOptions: {
       parserOptions: {
         projectService: true,

@@ -56,7 +56,7 @@ export function ExhaustionBanner({ children }: { children?: React.ReactNode }) {
               fontFamily: 'var(--font-body)',
               fontWeight: 'var(--font-weight-medium)',
               fontSize:   'var(--font-size-body)',
-              lineHeight: '14px',
+              lineHeight: 'var(--line-height-small)',
               color:      'var(--color-tag-Red-text)',
             }}
           >

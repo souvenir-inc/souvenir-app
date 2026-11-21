@@ -311,7 +311,7 @@ export function ScheduleDetailView({
           padding:         'var(--space-2-5) var(--space-3)',
           borderRadius:    'var(--radius-lg)',
           backgroundColor: 'var(--yellow-50)',
-          boxShadow:       '0px 0px 0px 1px var(--yellow-200, #fef08a)',
+          boxShadow:       '0px 0px 0px 1px var(--yellow-200)',
         }}>
           <AlertTwoIcon size={16} color="var(--yellow-600)" style={{ flexShrink: 0, marginTop: 'var(--space-0-5)' }} />
           <p style={{ margin: 0, ...valueStyle, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-700)' }}>

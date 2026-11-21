@@ -20,7 +20,7 @@ function renderTableCell(cell: TableCellValue, badgeMap?: TableData["badgeMap"])
       <span style={{
         display: "inline-flex", alignItems: "center",
         background: cell.bg, color: cell.color, border: `1px solid ${cell.border ?? cell.bg}`,
-        borderRadius: 99, padding: "var(--space-0-5) var(--space-2)", fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', lineHeight: "18px", whiteSpace: "nowrap",
+        borderRadius: 99, padding: "var(--space-0-5) var(--space-2)", fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-small)', whiteSpace: "nowrap",
       }}>
         {cell.label}
       </span>
@@ -48,7 +48,7 @@ function renderTableCell(cell: TableCellValue, badgeMap?: TableData["badgeMap"])
       <span style={{
         display: "inline-flex", alignItems: "center",
         background: bs.bg, color: bs.color, border: `1px solid ${bs.border ?? bs.bg}`,
-        borderRadius: 99, padding: "var(--space-0-5) var(--space-2)", fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', lineHeight: "18px", whiteSpace: "nowrap",
+        borderRadius: 99, padding: "var(--space-0-5) var(--space-2)", fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-small)', whiteSpace: "nowrap",
       }}>
         {strVal}
       </span>
@@ -205,7 +205,7 @@ export function AnimatedTable({ data, onComplete, animate = true }: { data: Tabl
                   className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                   style={{ appearance: "none", border: "none", background: "none", padding: 0, margin: 0, flex: 1, minWidth: 0, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "inherit", gap: 'var(--space-1)', borderRadius: 'var(--radius-xs)', font: "inherit", color: "inherit", letterSpacing: "inherit", textAlign: "inherit" }}>
                   <span>{h}</span>
-                  <span aria-hidden style={{ fontSize: 'var(--font-size-small)', lineHeight: 1, color: sortCol === ci ? "var(--brown-700)" : "var(--neutral-300)" }}>
+                  <span aria-hidden style={{ fontSize: 'var(--font-size-small)', lineHeight: 'var(--leading-none)', color: sortCol === ci ? "var(--brown-700)" : "var(--neutral-300)" }}>
                   {sortCol === ci ? (sortDir === "asc" ? "↑" : "↓") : "↕"}
                   </span>
                 </button>

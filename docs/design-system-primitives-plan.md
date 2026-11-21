@@ -701,6 +701,58 @@ Checks:
 
 What is left (about 11%): z-index values off the scale (1, 2, 50, 9997–9999…) that need a per-site decision rather than rounding; hand-written shadows; colour literals in onboarding and the weather / code-block widgets; unitless line heights; untyped style objects the codemod skips; chart geometry.
 
+### Leftovers 1 — z-index onto the scale: done 2026-11-18 (branch `ds/phase-6-zindex`)
+
+The primitives themselves sat off the scale (`ui/dialog` 9997, `Dropdown` 9998, `Tooltip` 9999, `Sheet`/`Popover` 50), so the 1000–1500 layers were unused. Each page-level site was mapped by what it is, keeping today's relative order:
+
+| Today | Sites | Now |
+|---|---|---|
+| 9999 | `Tooltip` default | `--z-tooltip` |
+| 9998, 50, 51 (portalled floating content) | `Dropdown`, `Popover`, `PresetModelSelectorDialog` | `--z-popover`, **not** `--z-dropdown`: menus open inside dialogs and must sit above `--z-modal` |
+| 9997/9996; fixed modals at 9998, 9999, 60/61, 60, 20/22 | `ui/dialog` (+overlay), `Sheet` (was 50), billing cancel modal, `RightSidebar` ×3, `ModelSwitchDialog`, `AccountDetailView` | `--z-modal` / `--z-overlay` |
+| 20–50 (absolute, in-page) | `TeamSwitcher`, `AgentCardMenu`, `AgentMentionMenu` | `--z-dropdown` |
+| 20–30 (floating page chrome) | `AgentPageShell` actions, `ProjectToolsMenu`, `ChatFilePanelSlot` | `--z-sticky` |
+| 50, 49 | `WorkspaceLockedOverlay`, `FlatSidebar` scrim | `--z-overlay` |
+| 10, 11 | `QuestionCard` drag, scroll fades over a `--z-raised` header | `--z-raised`, `calc(var(--z-raised) + 1)` |
+
+**Rule (new):** z-index −1…9 orders siblings inside one component and stays literal; `ds-scan` reports these separately and doesn't count them. Anything 10+ uses a `--z-*` token. The `Sheet` / `Tooltip` `zIndex` props now accept a token string.
+
+Result: z-index wired 21.7% → **94.5%** (3 left, all in the out-of-scope old `Sidebar`; 74 local values not counted); total 88.8% → **89.5%**. Screens: 21 × light/dark, no visual change (pre-change diffs on settings-ai/analytics were live data and were re-baselined first). Unit suite: the same 13 pre-existing failures. Static screens don't open overlays, so dialog-over-menu stacking follows from the order above but wasn't seen on screen.
+
+### Leftovers 2 — shadows and colour literals: 2026-11-18 (branch `ds/phase-6-shadows-colours`)
+
+**Shadows.** New codemod `scripts/codemods/shadows-exact.mjs` (same skip list as `tokens-exact`): a whole value or a single layer equal to a generic `--shadow-*` token becomes that token (component-named tokens such as `--shadow-sidebar-*` are never borrowed); a ring layer (`[inset] 0 0 0 Npx <colour>`) whose colour equals a palette primitive points at it. A ring acts as a border, so it follows the theme. Blur colours are never swapped, because flipping them in dark would turn shadows into glows. 50 values in 39 files, light-identical.
+
+**Dialog elevation.** `--shadow-4` had no users and didn't match any dialog. It's now the `ui/dialog` surface shadow (`0 19px 32px rgba(18,12,8,.15), 0 2px 2.8px rgba(130,122,116,.1)`), already used by ConfirmModal-style dialogs, billing, ContactSales, ReportBug, RequestDemo and RequestFeature (exact, no change). The other hand-written modal shadows (six variants: `0 8px 32px …` ×4 colours, `0 8px 40px`, `0 24px 72px`) in 22 files were snapped to it (D5), so every modal now has one elevation. No dark override yet, the same as before; a dark-specific dialog shadow is a separate design call. The Slack settings menu and the chart tooltip boxes went to `--shadow-3` (menus/popovers).
+
+**Colour fallbacks.** 226 `var(--token, #hex)` fallbacks (Figma-export leftovers; some disagreed, e.g. `--neutral-100` with both `#F5F5F5` and `#EDE1D7`) were removed where the token is defined at `:root`. They never applied, so nothing renders differently. Kept: 5 fallbacks whose token **doesn't exist** and so is what renders: `--color-border-subtle`, `--color-text-secondary` ×2, `--orange-500`, `--neutral-900-04`. These are small bugs to fix by pointing at real tokens.
+
+| | Before | After |
+|---|---|---|
+| Shadow on tokens | 65.0% | 73.9% |
+| Hex literals | 418 | 192 |
+| rgb()/rgba() literals | 526 | 435 |
+| Total style values wired | 89.5% | 89.8% |
+
+Checks: 21 screens × light/dark show no visual change; tsc clean; unit suite the same 13 pre-existing failures (one snapshot recorded the removed `var(--purple-500, #8b5cf6)` fallback and was updated). Modal shadows were not on screen in the screenshot set; open one or two dialogs to judge the snap.
+
+Left on purpose (needs a design call, not a token): focus halos (`0 0 0 3px` in projects/new, EditProjectModal, Slack); drawer edge shadows `4px 0 24px` (FlatSidebar, SettingsSidebar); danger ring `rgba(238,48,48,.22)`; the onboarding plan-card emboss/glow and `ModelFeaturedCard` gold glow; small `0 1px 2px` card shadows (Slack, GeneratedFilesList, EffortSlider) that would get visibly heavier on `--shadow-soft`. **Exemption (approved 2026-11-18, like D7):** the `CodeBlock` syntax palette (light + One Dark) and `XmlWeather` illustration colours are content colours, not UI. `ds-scan` doesn't count their colours (`CONTENT_COLOUR_FILE`); their spacing and type still count. Hex 192 → 132.
+
+### Leftovers 3 — line heights: 2026-11-18 (branch `ds/phase-6-line-heights`)
+
+**New tokens:** a unitless `--leading-*` scale for text whose size is inherited or varies (`none` 1, `tight` 1.25, `snug` 1.375, `normal` 1.5, `loose` 2). These are Tailwind's own `leading-*` values, mapped in `@theme`, so the classes and inline styles agree.
+
+**Codemod** `scripts/codemods/line-heights.mjs` (any object, typed or not; skips chart geometry):
+
+| Pass | Rule | Values | Screens |
+|---|---|---|---|
+| 1 exact | on-scale px → `--line-height-*`; unitless 1 / 1.5 / 2 … → `--leading-*` | 48 | no change |
+| 2 `--snap` | off-scale px → the line height paired with the element's font-size token if within 4px (13px text at 18px → `--line-height-body-sm` 20px; 12px text at 18px → 16px); otherwise the nearest step within 2px, ties round up. Unitless within 0.08 → nearest `--leading-*` (1.3 → 1.25, 1.4 → 1.375) | 109 px + 18 unitless | 10 screens × light/dark shifted (agents 0.3%, connectors 5%): 1–2px per text row that adds up down a card (account settings ≈6px by the last row). Reviewed and accepted |
+
+`18px` was the main case (57 sites). It sits exactly between the 16 and 20 steps, so the earlier `--snap` passes left it; pairing with the font-size token settles it, matching the scale's own size/line-height pairs.
+
+Result: typography literals 503 → 345; total style values wired 89.9% → **91.1%**. tsc clean; unit suite the same 13 pre-existing failures (one assertion and one snapshot recorded `22px`, now `var(--line-height-body)`, the same value). What's left in typography is mostly line heights more than 2px from any step (11–12px badges, 26px, 0.9) and font-size/weight literals in skipped files.
+
 ---
 
 ## Phase 7 — Lock it in

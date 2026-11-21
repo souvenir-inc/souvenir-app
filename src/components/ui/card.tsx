@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 // repeats — 12px radius, var(--card-bg), the card shadow (--shadow-1). Header / Body / Footer give
 // the usual padded sections; a card with one block of content can take `padding` instead.
 
-export const cardVariants = cva('flex flex-col min-w-0 rounded-xl bg-[var(--card-bg)]', {
+const cardVariants = cva('flex flex-col min-w-0 rounded-xl bg-[var(--card-bg)]', {
   variants: {
     variant: {
       /** Default: card shadow on the page background. */

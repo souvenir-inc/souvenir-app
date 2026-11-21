@@ -29,7 +29,7 @@ export function CitationChip({ n, citation }: { n: number; citation?: WebCitatio
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
           verticalAlign: 'text-bottom', width: 18, height: 18, borderRadius: 'var(--radius-full)',
           backgroundColor: 'transparent', fontFamily: 'var(--font-body)',
-          fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-caption)', lineHeight: 1, color: 'var(--neutral-600)',
+          fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--leading-none)', color: 'var(--neutral-600)',
           marginLeft: 'var(--space-0-5)', flexShrink: 0, border: '1px dashed var(--neutral-300)',
         }}
       >

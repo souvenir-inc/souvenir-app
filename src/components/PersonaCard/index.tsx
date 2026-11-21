@@ -636,7 +636,7 @@ function PersonaCardInner({
                   maxWidth:     '100%',
                   fontFamily:   'var(--font-body)',
                   fontSize:     'var(--font-size-caption)',
-                  lineHeight:   '18px',
+                  lineHeight:   'var(--line-height-caption)',
                   color:        'var(--neutral-600)',
                   overflow:     'hidden',
                   textOverflow: 'ellipsis',

@@ -47,7 +47,9 @@ import { useInitialPrompt } from "./hooks/use-initial-prompt";
 import { useAttachmentIntake } from "./hooks/use-attachment-intake";
 import { useComposerQueue, useQueuedSend } from "./hooks/use-composer-queue";
 import { useRevealSettle } from "./hooks/use-reveal-settle";
+import { useFollowRunningReply } from "./hooks/use-follow-running-reply";
 import { sendTurn as sendTurnWith, useMessageActions, useTurnGuards, type TurnKit } from "./hooks/use-chat-turns";
+
 
 // The container for a chat: message state, sending/queueing turns and the
 // composer. Each hook below is called in the order its effects must run.
@@ -227,7 +229,9 @@ export function ChatInterface({
     onChatMoveToTop: (id) => moveToTop(id),
     setStreamState,
     onStreamDone: refreshUser,
-    onStreamLost: () => void refreshMessages(),
+    // Only the chat on screen reloads: a stream lost after the user moved to another chat
+    // must not install its chat's history over that one.
+    onStreamLost: (lostChatId) => { if (lostChatId === currentChatIdRef.current) void refreshMessages() },
     currentChatIdRef,
     // Streamed tokens go to lib/chat/stream-store and re-render only the
     // streaming row (LiveChatMessage), not this whole tree.
@@ -236,14 +240,11 @@ export function ChatInterface({
     ...(onStopBackend ? { onStopBackend } : {}),
   });
 
-  // A chat opened while its reply is still being generated (a reload, another
-  // tab, coming back from another chat) reads the reply from the turn's stream,
-  // into the turn's own message. Only the regular chat endpoint has one.
-  useEffect(() => {
-    if (!chatId || endpoint || !runningMessageId || isStreamActive(chatId)) return
-    void followStream(chatId, runningMessageId, messages.find((message) => message.id === runningMessageId))
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per history load that finds a running turn; followStream is fresh each render
-  }, [chatId, runningMessageId, historyLoadId])
+  // Follows a reply still being generated when the chat is opened (see the hook).
+  const resetFollowBudget = useFollowRunningReply({
+    chatId, enabled: !endpoint, runningMessageId, historyLoadId, messages, followStream,
+    onRunEnded: () => void refreshMessages(),
+  })
 
   const isStreaming = streamState === "streaming" || streamState === "waiting";
   // This chat's reply is running — here, or still from before the user
@@ -462,8 +463,14 @@ export function ChatInterface({
   // starts the next turn, so the answer is sent like any other message.
   // An answer given after the turn's run had left takes the run back up on the
   // backend: the history is read again, and the running reply is followed from it.
-  const handlePromptAnswered = () => {
-    if (chatId && !isStreamActive(chatId)) void refreshMessages();
+  const handlePromptAnswered = (answeredChatId: string) => {
+    // The answer takes the run up again, often under the same reply id: refusals counted
+    // before it say nothing about the resumed run, so it starts with a fresh budget. Only
+    // that chat's: the answer can land after the user has moved to another chat.
+    resetFollowBudget(answeredChatId);
+    // The chat on screen now, not when this callback was made: the answer can land after
+    // the user has opened another chat, whose history must not be replaced with this one's.
+    if (answeredChatId === currentChatIdRef.current && !isStreamActive(answeredChatId)) void refreshMessages();
   };
 
   const { revealingMessage, isRevealing, handleRevealSettled } = useRevealSettle({
@@ -475,7 +482,10 @@ export function ChatInterface({
   // settled (see useQueuedSend).
   const queueReady =
     queuedMessages.length > 0 && !queueHeldBy &&
-    !replyInFlight && !hookBusy && !askingSave &&
+    // runningMessageId: the history shows a reply still running that no stream here has
+    // followed to its end yet (just opened, before the follow starts): a message sent now
+    // would go into that run.
+    !replyInFlight && !runningMessageId && !hookBusy && !askingSave &&
     (!isRevealing || pageHidden) &&
     !isLoadingMessages && !isSettling &&
     !queuePausedReason && !readOnly && !archived;

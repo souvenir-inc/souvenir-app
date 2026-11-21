@@ -47,7 +47,7 @@ export function SettingsCard({
       style={{
         border:        `1px solid ${danger ? 'var(--red-400)' : 'var(--border-default)'}`,
         borderRadius:  'var(--radius-2xl)',
-        boxShadow:     '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+        boxShadow:     'var(--shadow-soft)',
         display:       'flex',
         flexDirection: 'column',
         overflow:      'hidden',

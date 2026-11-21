@@ -136,7 +136,7 @@ export default function SouvenirSlackPage() {
                 <span style={{ minWidth: 0 }}>
                   <span className={styles.connectionTitle} style={{ display: 'block' }}>{teamName ?? 'Slack workspace'}</span>
                   <span className={styles.connectionMeta} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
-                    <CheckmarkCircleTwoIcon size={12} color="var(--green-600, #16a34a)" />
+                    <CheckmarkCircleTwoIcon size={12} color="var(--green-600)" />
                     {workspace?.needsReinstall ? 'Connected · Permission update needed' : 'Connected'}
                   </span>
                 </span>

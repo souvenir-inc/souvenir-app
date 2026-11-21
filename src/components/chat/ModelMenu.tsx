@@ -143,7 +143,7 @@ function EffortSlider({ options, value, onChange }: {
       onKeyDown={(e) => { if (e.key.startsWith('Arrow') || e.key === 'Home' || e.key === 'End') e.stopPropagation() }}
       style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', padding: 'var(--space-1) var(--space-2-5) var(--space-2)', '--effort-color': color } as React.CSSProperties}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)' }}>
         <span style={{ color: 'var(--neutral-700)' }}>Effort</span>
         <span key={index} className={styles.value}>{effortLabel(steps[index])}</span>
       </div>

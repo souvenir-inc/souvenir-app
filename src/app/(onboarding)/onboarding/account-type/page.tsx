@@ -80,8 +80,8 @@ function OptionCard({
         cursor: "pointer",
         outline: "none",
         boxShadow: selected
-          ? "0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 2px var(--neutral-900,#26211e)"
-          : "0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+          ? "0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 2px var(--neutral-900)"
+          : "0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)",
         transition: "box-shadow var(--duration-fast)",
       }}
     >
@@ -115,7 +115,7 @@ function OptionCard({
             fontWeight: 'var(--font-weight-regular)',
             fontSize: 'var(--font-size-heading)',
             lineHeight: "var(--line-height-heading)",
-            color: "var(--neutral-600,#6a625d)",
+            color: "var(--neutral-600)",
             whiteSpace: "nowrap",
           }}
         >
@@ -130,7 +130,7 @@ function OptionCard({
           fontWeight: 'var(--font-weight-regular)',
           fontSize: 'var(--font-size-body)',
           lineHeight: "var(--line-height-body)",
-          color: "var(--neutral-600,#6a625d)",
+          color: "var(--neutral-600)",
         }}
       >
         {config.description}

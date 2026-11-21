@@ -21,7 +21,7 @@ export const ModelSelectorContext = React.createContext<{ category: string; prov
 // Identical shadow system to DropdownMenuItem - shares the same warm-neutral hover language.
 
 const SHADOW_ACTIVE =
-  '0px 1px 1.5px 0px var(--neutral-700-12), 0px 0px 0px 1px var(--neutral-300-40)'
+  'var(--shadow-surface-card-hover)'
 
 const SHADOW_INNER =
   'inset 0px 1px 0px 0px var(--neutral-50-61), inset 0px -1px 0px 0px var(--neutral-600-05)'

@@ -37,7 +37,7 @@ interface ChatMessageListProps {
   onRevealSettled: (() => void) | undefined;
   onEdit: (messageId: string, newContent: string) => void;
   onPromptDecided: (messageId: string, requestId: string, decision: string) => void;
-  onPromptAnswered: () => void;
+  onPromptAnswered: (chatId: string) => void;
 }
 
 /**

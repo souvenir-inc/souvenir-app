@@ -36,7 +36,7 @@ export function PageCard({
         width:           '100%',
         border:          '1px solid var(--border-default)',
         borderRadius:    'var(--radius-2xl)',
-        boxShadow:       '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+        boxShadow:       'var(--shadow-soft)',
         overflow:        'hidden',
         backgroundColor: 'var(--neutral-50)',
         padding,

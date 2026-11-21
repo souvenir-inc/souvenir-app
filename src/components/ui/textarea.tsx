@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils'
 const LINE_HEIGHT = 22
 const PADDING_Y = 7
 
-export const textareaClassName = cn(
+const textareaClassName = cn(
   'block w-full min-w-0 resize-none box-border m-0 border-0 outline-none',
   'px-2.5 py-[7px] rounded-lg', // 7px matches InputField's padding exactly
   'text-body font-normal font-[family-name:var(--font-body)]',

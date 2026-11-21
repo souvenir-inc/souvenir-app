@@ -40,7 +40,7 @@ type BaseProps = React.HTMLAttributes<HTMLElement> & {
 
 // ── Box ─────────────────────────────────────────────────────────────────────
 
-export const boxVariants = cva('', {
+const boxVariants = cva('', {
   variants: {
     radius: {
       none: 'rounded-none', xs: 'rounded-xs', sm: 'rounded-sm', md: 'rounded-md', lg: 'rounded-lg',

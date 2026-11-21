@@ -7,7 +7,7 @@ import { Spinner } from '@/components/Spinner'
 function ChevronDownIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden>
-      <path d="M5 8l5 5 5-5" stroke="var(--neutral-400,#9c938b)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M5 8l5 5 5-5" stroke="var(--neutral-400)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -89,14 +89,14 @@ export function PillSelect<T extends string>({
           borderRadius:    8,
           border:          'none',
           backgroundColor: 'var(--field-surface)',
-          boxShadow:       '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)',
+          boxShadow:       '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)',
           cursor:          pending ? 'not-allowed' : 'pointer',
           opacity:         pending ? 0.6 : 1,
           fontFamily:      'var(--font-body)',
           fontWeight:      500,
           fontSize:        14,
-          lineHeight:      '22px',
-          color:           'var(--neutral-700,#524b47)',
+          lineHeight:      'var(--line-height-body)',
+          color:           'var(--neutral-700)',
         }}
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', minWidth: 0, overflow: 'hidden' }}>

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type Dispatch, type RefObject, type SetStateAction } from "react";
+import { useCallback, useEffect, useRef, useState, type Dispatch, type RefObject, type SetStateAction } from "react";
 import { toast } from "sonner";
 import { holdQueue } from "@/lib/message-queue";
 import type { StreamOutcome } from "@/lib/stream-registry";
@@ -151,6 +151,37 @@ export async function sendTurn(
  * function would be frozen at whatever settings and messages it closed over
  * when the button appeared.
  */
+/**
+ * Records a prompt card's answer on its message. The card is found by its request id as
+ * well as the message id: an answer that lands after the message_saved id swap still
+ * carries the message's old id, and would otherwise be lost (the card then shows as
+ * unanswered once its row remounts).
+ */
+export function applyPromptDecision(messages: UIMessage[], messageId: string, requestId: string, decision: string): UIMessage[] {
+  const hasPrompt = (prompts?: readonly { request_id: string }[]) => !!prompts?.some((p) => p.request_id === requestId)
+  const holdsCard = (msg: UIMessage) => hasPrompt(msg.connectorConnectPrompts) || hasPrompt(msg.connectorPermissionPrompts) || hasPrompt(msg.chatPrompts)
+  // The card's own message: by its id, or (after the id swap) the one message holding that
+  // request id. Never every message that does: another may hold a card with the same id.
+  // `reactKey` keeps the id a reply had before the swap, so it still names the card's message.
+  const owner = messages.find((msg) => (msg.id === messageId || msg.reactKey === messageId) && holdsCard(msg)) ?? messages.find(holdsCard)
+  return messages.map((msg) =>
+    msg === owner
+      ? {
+          ...msg,
+          connectorConnectPrompts: msg.connectorConnectPrompts?.map((p) =>
+            p.request_id === requestId ? { ...p, decision } : p,
+          ),
+          connectorPermissionPrompts: msg.connectorPermissionPrompts?.map((p) =>
+            p.request_id === requestId ? { ...p, decision } : p,
+          ),
+          chatPrompts: msg.chatPrompts?.map((p) =>
+            p.request_id === requestId ? { ...p, decision } : p,
+          ),
+        }
+      : msg,
+  )
+}
+
 export function useMessageActions(kit: TurnKit, {
   isStreaming,
   isSendingRef,
@@ -208,22 +239,19 @@ export function useMessageActions(kit: TurnKit, {
 
   // Permission-prompt answers live on the message, not in card-local state —
   // otherwise the message_saved id swap remounts the row and resurrects
-  // already-answered cards.
+  // already-answered cards. The card is found by its request id, not only the message id:
+  // an answer that lands after that swap still carries the message's old id.
+  // Only in the chat that asked: a card keeps the callback it was rendered with, so an answer
+  // that lands after a chat switch carries the old chat id and is not written into the chat
+  // now on screen (whose prompts may share its request id). A chat that had no id yet when the
+  // card rendered (a new chat getting its id mid-turn) is still the same chat.
+  const shownChatRef = useRef(kit.chatId);
+  useEffect(() => { shownChatRef.current = kit.chatId; }, [kit.chatId]);
+  const askedIn = kit.chatId;
   const handlePromptDecided = useCallback((messageId: string, requestId: string, decision: string) => {
-    setMessages((prev) => prev.map((msg) =>
-      msg.id === messageId
-        ? {
-            ...msg,
-            connectorPermissionPrompts: msg.connectorPermissionPrompts?.map((p) =>
-              p.request_id === requestId ? { ...p, decision } : p,
-            ),
-            chatPrompts: msg.chatPrompts?.map((p) =>
-              p.request_id === requestId ? { ...p, decision } : p,
-            ),
-          }
-        : msg,
-    ));
-  }, [setMessages]);
+    if (askedIn && shownChatRef.current && shownChatRef.current !== askedIn) return;
+    setMessages((prev) => applyPromptDecision(prev, messageId, requestId, decision));
+  }, [setMessages, askedIn]);
 
   // A prompt answered at `/chats/{id}/resume` continues the turn as a new
   // stream: it renders into a fresh assistant message below the card.

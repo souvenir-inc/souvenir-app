@@ -7,20 +7,14 @@ import { cn } from '@/lib/utils'
 //
 //   <Meter label="Credits used" value={12538} max={20000} caption="12,538 of 20,000" trailing="63%" />
 
-export type MeterTone = 'neutral' | 'auto' | 'success' | 'warning' | 'danger'
+import { meterToneFor, type MeterTone } from './meter-tone'
+export type { MeterTone } from './meter-tone'
 
 const FILL: Record<Exclude<MeterTone, 'auto'>, string> = {
   neutral: 'bg-[var(--neutral-900)]',
   success: 'bg-[var(--success-500)]',
   warning: 'bg-[var(--warning-500)]',
   danger:  'bg-[var(--red-400)]',
-}
-
-/** The tone `auto` resolves to for a fraction 0–1. */
-export function meterToneFor(fraction: number): Exclude<MeterTone, 'auto' | 'neutral'> {
-  if (fraction >= 0.85) return 'danger'
-  if (fraction >= 0.6) return 'warning'
-  return 'success'
 }
 
 export interface MeterProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {

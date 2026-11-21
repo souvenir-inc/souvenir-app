@@ -86,7 +86,7 @@ function ActivityPageSkeleton() {
           <SkeletonBlock width={140} height={28} radius={6} />
           <SkeletonBlock width={300} height={14} radius={4} />
         </div>
-        <div style={{ border: '1px solid var(--border-default)', borderRadius: 'var(--radius-2xl)', boxShadow: '0px 2px 2.8px 0px rgba(82,75,71,0.12)', background: 'var(--neutral-50)', overflow: 'hidden', padding: 'var(--space-3) 0' }}>
+        <div style={{ border: '1px solid var(--border-default)', borderRadius: 'var(--radius-2xl)', boxShadow: 'var(--shadow-soft)', background: 'var(--neutral-50)', overflow: 'hidden', padding: 'var(--space-3) 0' }}>
           {/* Toolbar — title left, search field + filter dropdown button right */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-3)', padding: 'var(--space-3) var(--space-6) var(--space-6)', borderBottom: '1px solid var(--neutral-100)' }}>
             <SkeletonBlock width={110} height={18} radius={6} />

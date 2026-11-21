@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils'
 // ── Shadows (Figma exact) ─────────────────────────────────────────────────────
 
 // Chip: rest = ghost ring, elevated (row hovered/focused) = filled with inner highlight
-const SHADOW_CHIP_REST     = '0px 0px 0px 1px rgba(59,54,50,0.3)'
+const SHADOW_CHIP_REST     = '0px 0px 0px 1px var(--neutral-800-30)'
 const SHADOW_CHIP_ELEVATED = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4)'
 const SHADOW_CHIP_INNER    = 'inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 61%, transparent), inset 0px -1px 0px 0px rgba(106,98,93,0.05)'
 

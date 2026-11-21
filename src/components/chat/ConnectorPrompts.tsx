@@ -4,7 +4,6 @@ import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import type { ConnectorConnectPrompt } from '@/types/chat'
 import { ConnectorPromptShell } from '@/components/shared/ConnectorHeading'
-import { ConnectorStatusBadge } from '@/components/ConnectorStatusBadge'
 import { Button } from '@/components/ui/button'
 import {
   getConnector,
@@ -22,14 +21,34 @@ import { isApiProviderConnector, isZapierProviderConnector, onLinkResult, waitFo
 
 const SIGN_IN_WAIT_MS = 300_000
 
+type ConnectDecision = 'connected' | 'cancel'
+
 interface ConnectPromptCardProps {
-  prompt:        ConnectorConnectPrompt
-  onConnected?:  () => void
+  prompt:       ConnectorConnectPrompt
+  /** Records the answer in message state, so the card stays gone across remounts. */
+  onDecided?:   (decision: ConnectDecision) => void
+  /** The answer reached the backend: the turn's run may have been taken back up. */
+  onAnswered?:  () => void
 }
 
-export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProps) {
-  const [state,        setState]        = useState<'idle' | 'connecting' | 'polling' | 'connected' | 'error'>('idle')
+// Answers on their way to the backend, by the prompt's respond URL (unique to that prompt; a
+// request id can repeat across messages): the decision sent and how it ends (null, or
+// the failure). Module-level: it outlives a card that leaves the virtual list and remounts,
+// which must neither send the answer again nor lose its outcome (a failure, with Try again).
+const answersInFlight = new Map<string, { decision: ConnectDecision; outcome: Promise<Error | null> }>()
+
+export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectPromptCardProps) {
+  const [state,        setState]        = useState<'idle' | 'connecting' | 'polling' | 'error'>('idle')
+  const [decided,      setDecided]      = useState(false)
   const [errorMsg,     setErrorMsg]     = useState('')
+  // The answer was given but the chat was not told: retrying resends that answer alone,
+  // not the whole sign-in.
+  const [respondFailed, setRespondFailed] = useState<ConnectDecision | null>(null)
+  // The answer is on its way: Try again shows it, and the last failure is not shown meanwhile.
+  // An answer already in flight for this prompt (this card remounted while it was being sent),
+  // read once when the card mounts: it seeds the state and refs below.
+  const [pendingAtMount] = useState(() => answersInFlight.get(prompt.respond_url))
+  const [responding, setResponding] = useState(pendingAtMount !== undefined)
   // api_key flow
   const [apiKeyFields, setApiKeyFields] = useState<Record<string, string>>({})
   const [fieldDefs,    setFieldDefs]    = useState<ApiKeyField[] | null>(
@@ -38,20 +57,97 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
   const [showApiForm,  setShowApiForm]  = useState(false)
   const abortedRef  = useRef(false)
   const answeredRef = useRef(false)
+  // The "already connected" check and the sign-in poll can both call finish; only
+  // one answer may be in flight, or the backend gets it twice.
+  const respondingRef = useRef(pendingAtMount !== undefined)
+  // The person said "Not now": that stays the card's answer until the backend has it (a
+  // failed send keeps it for Try again). A connection found afterwards doesn't overrule it.
+  const declinedRef = useRef(pendingAtMount?.decision === 'cancel')
+  // This card sent the answer in flight itself (Strict Mode remounts the same card): it settles
+  // it where it sent it, and does not also take it over.
+  const sentHereRef = useRef(false)
+
+  // A failed answer: the card says so and Try again resends that answer alone.
+  const showFailure = useCallback((decision: ConnectDecision, failure: Error) => {
+    setState('error')
+    setRespondFailed(decision)
+    setErrorMsg(failure.message)
+    toast.error(decision === 'connected'
+      ? `Connected ${prompt.connector.name}, but the chat was not told. Try again.`
+      : 'Could not tell the chat. Try again.')
+  }, [prompt.connector.name])
 
   // The turn that asked is waiting on this answer, or has left and takes its run back up on it.
-  const finish = useCallback(async () => {
-    if (answeredRef.current || abortedRef.current) return
+  // "cancel" is "not now" for this one ask: the next request that needs the app asks again.
+  const answer = useCallback(async (decision: ConnectDecision) => {
+    if (answeredRef.current || abortedRef.current || respondingRef.current) return
+    // Kept outside the card: a card that left the screen and came back mid-answer is a new
+    // instance with empty refs, and must not send the same answer again.
+    if (answersInFlight.has(prompt.respond_url)) return
+    if (decision === 'cancel') declinedRef.current = true
+    else if (declinedRef.current) return
+    // The answer is only "given" once the backend has it. Marking it beforehand and
+    // swallowing the failure left the run waiting for a reply that never came, with
+    // this guard refusing every retry; so the flag is set after the POST resolves.
+    respondingRef.current = true
+    setResponding(true)
+    // The outcome as a value rather than try/catch/finally: React Compiler cannot
+    // compile a `finally`, and leaves the whole component unoptimised when it meets one.
+    const outcome = respondToChatPrompt(decision, prompt.respond_url).then(
+      () => null,
+      (err: unknown) => (err instanceof Error ? err : new Error('Could not tell the chat your answer.')),
+    )
+    answersInFlight.set(prompt.respond_url, { decision, outcome })
+    sentHereRef.current = true
+    const failure = await outcome
+    answersInFlight.delete(prompt.respond_url)
+    respondingRef.current = false
+    setResponding(false)
+    if (failure) {
+      // Gone meanwhile: a card mounted since has taken this answer over and shows the failure.
+      if (abortedRef.current) return
+      showFailure(decision, failure)
+      return
+    }
     answeredRef.current = true
-    await respondToChatPrompt('connected', prompt.respond_url).catch(() => {})
-    if (abortedRef.current) return
-    setState('connected')
-    toast.success(`${prompt.connector.name} connected — continuing your request.`)
-    onConnected?.()
-  }, [prompt.respond_url, prompt.connector.name, onConnected])
+    setRespondFailed(null)
+    if (decision === 'connected') toast.success(`${prompt.connector.name} connected — continuing your request.`)
+    onDecided?.(decision)
+    onAnswered?.()
+    if (!abortedRef.current) setDecided(true)
+  }, [prompt.respond_url, prompt.connector.name, onDecided, onAnswered, showFailure])
+  const finish = useCallback(() => answer('connected'), [answer])
 
   // The app may already be connected (from Connectors, or another tab) by the time this card shows.
   useEffect(() => {
+    if (prompt.decision) return
+    // Cleared on every mount, not only the first: StrictMode (and anything else that
+    // re-runs effects) mounts again with the same refs after the cleanup below set it,
+    // and a card left "aborted" never answers its turn or shows a failed sign-in.
+    abortedRef.current = false
+    // An answer already on its way (sent by this card before it left the screen): this card
+    // takes it over instead of answering again. On success the card that sent it has told
+    // the chat; on failure this one shows it, with Try again.
+    // The one seen at render first: if it settled before this effect ran, its entry is gone
+    // from the map, but the card was rendered as waiting on it and must still see how it ended.
+    const pending = pendingAtMount ?? answersInFlight.get(prompt.respond_url)
+    if (pending && !sentHereRef.current) {
+      void pending.outcome.then((failure) => {
+        if (abortedRef.current) return
+        respondingRef.current = false
+        setResponding(false)
+        if (failure) showFailure(pending.decision, failure)
+        else {
+          answeredRef.current = true
+          setDecided(true)
+          // The card that sent it told the view it was on, which this card has replaced: this
+          // view refreshes too, to follow the run the answer resumed.
+          onAnswered?.()
+        }
+      })
+      return () => { abortedRef.current = true }
+    }
+    if (pending) return () => { abortedRef.current = true }
     getConnector(prompt.connector.slug)
       .then((entry) => {
         if (entry.ownedConnections.some((row) => row.connected && !row.needsReconnect)) void finish()
@@ -110,7 +206,9 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
       })
       .then((entry) => { if (entry) return finish() })
       .catch((err: unknown) => {
-        if (abortedRef.current || answeredRef.current) return
+        // Also while an answer is on its way: the app is connected (the "already
+        // connected" check found it), and a sign-in error now would be stale.
+        if (abortedRef.current || answeredRef.current || respondingRef.current) return
         setState('error')
         setErrorMsg(
           ended === 'cancelled' ? 'The sign-in was cancelled.'
@@ -139,8 +237,9 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
   const showCredentialForm = !isZapierProviderConnector(prompt.provider)
     && (prompt.auth_mode === 'api_key' || needsInitFields)
 
+  if (decided || prompt.decision) return null
+
   const busy = state === 'connecting' || state === 'polling'
-  const done = state === 'connected'
   const fields = fieldDefs ?? [DEFAULT_API_KEY_FIELD]
   const allFilled = fields.filter((field) => field.required).every((field) => (apiKeyFields[field.name] ?? '').trim())
   const connectLabel = state === 'polling' ? 'Waiting for connection…' : `Connect ${prompt.connector.name}`
@@ -154,8 +253,8 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
         : <>Task needs access to {prompt.connector.name} to keep going.</>}
     >
 
-      {state === 'error' && (
-        <span role="alert" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', color: 'var(--red-600, #DC2626)' }}>
+      {state === 'error' && !responding && (
+        <span role="alert" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', color: 'var(--red-600)' }}>
           {errorMsg || 'Connection failed.'} Try again.
         </span>
       )}
@@ -166,70 +265,134 @@ export function ConnectPromptCard({ prompt, onConnected }: ConnectPromptCardProp
         </span>
       )}
 
-      {showCredentialForm && showApiForm && !done && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-          {fields.map((field) => (
-            <div key={field.name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-              <label
-                htmlFor={`cf-${prompt.connector.slug}-${field.name}`}
-                style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-600)' }}
-              >
-                {field.label}
-              </label>
-              <input
-                id={`cf-${prompt.connector.slug}-${field.name}`}
-                type={field.secret ? 'password' : 'text'}
-                autoComplete="off"
-                placeholder={field.help || field.label}
-                value={apiKeyFields[field.name] ?? ''}
-                disabled={busy}
-                onChange={(e) => setApiKeyFields((prev) => ({ ...prev, [field.name]: e.target.value }))}
-                style={{
-                  padding:         'var(--space-1-5) var(--space-2-5)',
-                  borderRadius:    'var(--radius-md)',
-                  border:          '1px solid var(--neutral-300)',
-                  fontFamily:      'var(--font-body)',
-                  fontSize:        'var(--font-size-caption)',
-                  outline:         'none',
-                  width:           '100%',
-                  boxSizing:       'border-box',
-                  backgroundColor: 'var(--field-surface)',
-                }}
-              />
-            </div>
-          ))}
-        </div>
+      {showCredentialForm && showApiForm && (
+        <CredentialFields
+          slug={prompt.connector.slug}
+          fields={fields}
+          values={apiKeyFields}
+          disabled={busy}
+          onChange={(name, value) => setApiKeyFields((prev) => ({ ...prev, [name]: value }))}
+        />
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
-        {done ? (
-          <ConnectorStatusBadge status="connected" />
-        ) : showCredentialForm && !showApiForm ? (
-          <Button size="sm" variant="approve" attention onClick={() => setShowApiForm(true)}>
-            Enter credentials
+      {/* While an answer is being sent (Not now, or the connected notice), the sign-in
+          actions wait: starting a sign-in then would race the answer. A failed answer
+          shows Try again instead, which stays available. And while a sign-in is under way,
+          Not now waits: declining then would leave the sign-in window going. */}
+      <ConnectActions
+        respondFailed={respondFailed}
+        responding={responding}
+        busy={busy}
+        showCredentialForm={showCredentialForm}
+        showApiForm={showApiForm}
+        allFilled={allFilled}
+        connectLabel={connectLabel}
+        onAnswer={(decision) => void answer(decision)}
+        onShowApiForm={setShowApiForm}
+        onSubmitCredentials={prompt.auth_mode === 'api_key' ? handleApiKey : () => handleOAuth(apiKeyFields)}
+        onConnect={() => handleOAuth()}
+      />
+    </ConnectorPromptShell>
+  )
+}
+
+/** The API-key (or app-credential) fields of a connect card. */
+function CredentialFields({ slug, fields, values, disabled, onChange }: {
+  slug: string
+  fields: ApiKeyField[]
+  values: Record<string, string>
+  disabled: boolean
+  onChange: (name: string, value: string) => void
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+      {fields.map((field) => (
+        <div key={field.name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+          <label
+            htmlFor={`cf-${slug}-${field.name}`}
+            style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-600)' }}
+          >
+            {field.label}
+          </label>
+          <input
+            id={`cf-${slug}-${field.name}`}
+            type={field.secret ? 'password' : 'text'}
+            autoComplete="off"
+            placeholder={field.help || field.label}
+            value={values[field.name] ?? ''}
+            disabled={disabled}
+            onChange={(e) => onChange(field.name, e.target.value)}
+            style={{
+              padding:         'var(--space-1-5) var(--space-2-5)',
+              borderRadius:    'var(--radius-md)',
+              border:          '1px solid var(--neutral-300)',
+              fontFamily:      'var(--font-body)',
+              fontSize:        'var(--font-size-caption)',
+              outline:         'none',
+              width:           '100%',
+              boxSizing:       'border-box',
+              backgroundColor: 'var(--field-surface)',
+            }}
+          />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** A connect card's actions: Not now, then Try again, the credential form's, or Connect. */
+function ConnectActions({
+  respondFailed, responding, busy, showCredentialForm, showApiForm, allFilled, connectLabel,
+  onAnswer, onShowApiForm, onSubmitCredentials, onConnect,
+}: {
+  respondFailed: ConnectDecision | null
+  responding: boolean
+  busy: boolean
+  showCredentialForm: boolean
+  showApiForm: boolean
+  allFilled: boolean
+  connectLabel: string
+  onAnswer: (decision: ConnectDecision) => void
+  onShowApiForm: (show: boolean) => void
+  onSubmitCredentials: () => void
+  onConnect: () => void
+}) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
+      {respondFailed !== 'connected' && (
+        <Button size="sm" variant="outline" disabled={responding || busy} onClick={() => onAnswer('cancel')}>
+          Not now
+        </Button>
+      )}
+      {respondFailed ? (
+        <Button size="sm" variant="approve" attention={!responding} loading={responding} onClick={() => onAnswer(respondFailed)}>
+          Try again
+        </Button>
+      ) : showCredentialForm && !showApiForm ? (
+        <Button size="sm" variant="approve" attention={!responding} disabled={responding} onClick={() => onShowApiForm(true)}>
+          Enter credentials
+        </Button>
+      ) : showCredentialForm ? (
+        <>
+          <Button size="sm" variant="outline" disabled={busy || responding} onClick={() => onShowApiForm(false)}>
+            Cancel
           </Button>
-        ) : showCredentialForm ? (
-          <>
-            <Button size="sm" variant="outline" disabled={busy} onClick={() => setShowApiForm(false)}>
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              variant="approve"
-              loading={busy}
-              disabled={!allFilled}
-              onClick={prompt.auth_mode === 'api_key' ? handleApiKey : () => handleOAuth(apiKeyFields)}
-            >
-              {connectLabel}
-            </Button>
-          </>
-        ) : (
-          <Button size="sm" variant="approve" attention={!busy} loading={busy} onClick={() => handleOAuth()}>
+          <Button
+            size="sm"
+            variant="approve"
+            loading={busy}
+            disabled={!allFilled || responding}
+            onClick={onSubmitCredentials}
+          >
             {connectLabel}
           </Button>
-        )}
-      </div>
-    </ConnectorPromptShell>
+        </>
+      ) : (
+        <Button size="sm" variant="approve" attention={!busy && !responding} loading={busy} disabled={responding} onClick={onConnect}>
+          {connectLabel}
+        </Button>
+      )}
+    </div>
   )
 }
 

@@ -228,7 +228,7 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
             flexShrink: 0,
             overflow: 'hidden',
             backgroundColor: 'var(--neutral-100)',
-            boxShadow: '0px 0px 0px 1px rgba(59,54,50,0.15)',
+            boxShadow: '0px 0px 0px 1px var(--neutral-800-15)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -248,7 +248,7 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
                 fontWeight: 'var(--font-weight-semibold)',
                 fontSize: 'var(--font-size-heading)',
                 color: 'var(--neutral-500)',
-                lineHeight: 1,
+                lineHeight: 'var(--leading-none)',
               }}
             >
               {(preview.persona_name || '?').trim()[0].toUpperCase()}
@@ -275,7 +275,7 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
               fontFamily: 'var(--font-body)',
               fontWeight: 'var(--font-weight-regular)',
               fontSize: 'var(--font-size-body-sm)',
-              lineHeight: '18px',
+              lineHeight: 'var(--line-height-body-sm)',
               color: 'var(--neutral-500)',
               margin: 0,
               textAlign: 'center',
@@ -347,7 +347,7 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
             fontFamily: 'var(--font-body)',
             fontWeight: 'var(--font-weight-regular)',
             fontSize: 'var(--font-size-small)',
-            lineHeight: '18px',
+            lineHeight: 'var(--line-height-small)',
             color: 'var(--blue-700)',
             margin: 0,
           }}
@@ -387,7 +387,7 @@ function MetaRow({ label, value }: { label: string; value: string }) {
           fontFamily: 'var(--font-body)',
           fontWeight: 'var(--font-weight-medium)',
           fontSize: 'var(--font-size-body-sm)',
-          lineHeight: '18px',
+          lineHeight: 'var(--line-height-body-sm)',
           color: 'var(--neutral-500)',
           minWidth: 120,
           flexShrink: 0,
@@ -400,7 +400,7 @@ function MetaRow({ label, value }: { label: string; value: string }) {
           fontFamily: 'var(--font-body)',
           fontWeight: 'var(--font-weight-regular)',
           fontSize: 'var(--font-size-body-sm)',
-          lineHeight: '18px',
+          lineHeight: 'var(--line-height-body-sm)',
           color: 'var(--neutral-800)',
         }}
       >
@@ -422,7 +422,7 @@ const cardStyle: React.CSSProperties = {
   width: '100%',
   maxWidth: 480,
   boxShadow:
-    '0px 12px 16px -4px var(--neutral-500-12), 0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
+    '0px 12px 16px -4px var(--neutral-500-12), var(--shadow-soft), 0px 0px 0px 1px var(--neutral-100)',
 }
 
 const footerStyle: React.CSSProperties = {

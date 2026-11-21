@@ -17,7 +17,7 @@ export function WorkspaceLockedOverlay({ isAdmin, onAdminAction }: WorkspaceLock
       style={{
         position:             'absolute',
         inset:                0,
-        zIndex:               50,
+        zIndex:               'var(--z-overlay)',
         display:              'flex',
         alignItems:           'center',
         justifyContent:       'center',
@@ -68,7 +68,7 @@ export function WorkspaceLockedOverlay({ isAdmin, onAdminAction }: WorkspaceLock
             fontFamily: 'var(--font-title)',
             fontWeight: 'var(--font-weight-medium)',
             fontSize:   'var(--font-size-heading-sm)',
-            lineHeight: '26px',
+            lineHeight: 'var(--line-height-heading-sm)',
             color:      'var(--neutral-900)',
             margin:     0,
           }}>

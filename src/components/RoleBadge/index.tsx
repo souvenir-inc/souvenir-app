@@ -201,7 +201,7 @@ export const RoleBadge = React.forwardRef<HTMLSpanElement | HTMLButtonElement, R
                 fontFamily: 'var(--font-body)',
                 fontWeight: 'var(--font-weight-medium)',
                 fontSize:   'var(--font-size-caption)',
-                lineHeight: 1,
+                lineHeight: 'var(--leading-none)',
                 color:      tokens.text,
                 whiteSpace: 'nowrap',
                 flexShrink: 0,

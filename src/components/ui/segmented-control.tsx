@@ -74,9 +74,10 @@ export function SegmentedControl<T extends string>({
             aria-label={option['aria-label']}
             className={cn(
               'relative flex items-center justify-center rounded-sm border-0 bg-transparent font-medium cursor-pointer',
-              'text-[var(--neutral-500)] hover:text-[var(--neutral-900)] data-[checked]:text-[var(--neutral-900)]',
+              'text-[var(--neutral-500)] [&:not([data-disabled])]:hover:text-[var(--neutral-900)] data-[checked]:text-[var(--neutral-900)]',
               'outline-2 outline-solid outline-offset-1 outline-transparent focus-visible:outline-[var(--neutral-400)]',
-              'disabled:cursor-not-allowed',
+              // Radio.Root renders a <span>, which never matches :disabled; Base UI marks it data-disabled.
+              'data-[disabled]:cursor-not-allowed',
               SEGMENT_SIZE[size],
               fluid && 'flex-1',
             )}

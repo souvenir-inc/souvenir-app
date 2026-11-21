@@ -89,7 +89,7 @@ export function LeaveWorkspaceModal({ onClose }: LeaveWorkspaceModalProps) {
 
         {!membersLoading && isLastAdmin && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px', color: 'var(--neutral-700)', margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-700)', margin: 0 }}>
               New admin
             </p>
             <Dropdown.Float
@@ -102,7 +102,7 @@ export function LeaveWorkspaceModal({ onClose }: LeaveWorkspaceModalProps) {
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)',
                     width: '100%', padding: 'var(--space-2) var(--space-2-5)', borderRadius: 'var(--radius-lg)', border: 'none',
-                    backgroundColor: 'var(--neutral-white)', boxShadow: '0px 0px 0px 1px rgba(59,54,50,0.3)',
+                    backgroundColor: 'var(--neutral-white)', boxShadow: '0px 0px 0px 1px var(--neutral-800-30)',
                     cursor: 'pointer', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-900)',
                   }}
                 >

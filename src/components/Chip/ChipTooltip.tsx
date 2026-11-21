@@ -62,7 +62,7 @@ export function ChipTooltip({ title, detail, lines = [], hints = [] }: ChipToolt
                       paddingBottom: 'var(--space-0-5)',
                       flexShrink: 0,
                       fontSize: 'var(--font-size-small)',
-                      lineHeight: 1,
+                      lineHeight: 'var(--leading-none)',
                       borderRadius: 'var(--radius-sm)',
                       background: 'color-mix(in srgb, currentColor 12%, transparent)',
                       boxShadow: 'inset 0 -1px 0 color-mix(in srgb, currentColor 22%, transparent)',

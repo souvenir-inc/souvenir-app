@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 
 // ── Style constants (mirrors org/plans page tokens) ──────────────────────────
 
-const SHADOW_MODAL = '0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rgba(130,122,116,0.1)'
+const SHADOW_MODAL = 'var(--shadow-4)'
 const SHADOW_INPUT = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--text-field-ring)'
 const SHADOW_PILL  = '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)'
 const SHADOW_PILL_ACTIVE = '0px 0px 0px 1px var(--neutral-black), 0px 1.091px 1.091px 0px rgba(59,54,50,0.1), 0px 1.455px 3.127px 0px rgba(59,54,50,0.4)'
@@ -101,7 +101,7 @@ function TimePill({
             position:     'absolute',
             inset:        0,
             borderRadius: 'var(--radius-lg)',
-            background:   'linear-gradient(180deg, var(--neutral-700, #524b47) 0%, var(--neutral-900, #26211e) 100%)',
+            background:   'linear-gradient(180deg, var(--neutral-700) 0%, var(--neutral-900) 100%)',
             pointerEvents: 'none',
           }}
         />

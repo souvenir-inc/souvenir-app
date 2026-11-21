@@ -85,3 +85,38 @@ describe("tokens-exact on CSS", () => {
     expect(out).toContain(`margin: var(--space-2);`);
   });
 });
+
+describe("insideRepo", () => {
+  it("accepts paths in the repository and refuses ones outside it", async () => {
+    const { insideRepo } = await import("./tokens-exact.mjs");
+    const path = await import("node:path");
+    const root = path.resolve(import.meta.dirname, "../..");
+    expect(insideRepo(path.join(root, "src"))).toBe(true);
+    expect(insideRepo(path.join(root, "package.json"))).toBe(true);
+    expect(insideRepo(path.join(root, ".."))).toBe(false);
+    expect(insideRepo(path.join(root, "no-such-file.tsx"))).toBe(false);
+  });
+});
+
+describe("review edge cases", () => {
+  it("only converts a real style attribute, not one whose name ends in style", async () => {
+    const { transformTsx } = await import("./tokens-exact.mjs");
+    expect(transformTsx("<Axis tickstyle={{ fontSize: 12 }} />", { n: 0 })).toBe("<Axis tickstyle={{ fontSize: 12 }} />");
+    expect(transformTsx("<div style={{ padding: 8 }} />", { n: 0 })).toContain("var(--space-2)");
+  });
+
+  it("converts every declaration in compact CSS", async () => {
+    const { transformCss } = await import("./tokens-exact.mjs");
+    expect(transformCss(".a{color:red;padding:16px;margin:8px;}", { n: 0 })).toBe(".a{color:red;padding:var(--space-4);margin:var(--space-2);}");
+  });
+
+  it("leaves strings, unrelated asserted types and objects past a commented brace alone", async () => {
+    const { transformTsx } = await import("./tokens-exact.mjs");
+    for (const src of [
+      "const example = 'style={{ padding: 8 }}';",
+      "type CSSPropertiesConfig = { fontSize: number }; const config = { fontSize: 12 } as CSSPropertiesConfig;",
+    ]) expect(transformTsx(src, { n: 0 })).toBe(src);
+    const out = transformTsx("function f() {\n  const style: CSSProperties = { padding: 16 /* { */ };\n  const chart = { fontSize: 12 };\n  return chart.fontSize * 2;\n}", { n: 0 });
+    expect(out).toContain("const chart = { fontSize: 12 }");
+  });
+});

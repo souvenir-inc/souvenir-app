@@ -63,13 +63,21 @@
   --font-size-small:        12px;
   --line-height-small:      16px;
 
+  /* Unitless line heights, relative to the element's own font size: for text whose size is inherited
+     or varies (markdown, single-line controls). Same values as Tailwind's leading-* defaults. */
+  --leading-none:   1;
+  --leading-tight:  1.25;
+  --leading-snug:   1.375;
+  --leading-normal: 1.5;
+  --leading-loose:  2;
+
   /* ── Elevation ───────────────────────────────────────────────────────────────
      Generic levels on top of the existing component shadows; dark mode follows
      because each one points at a token theme.css already overrides. */
   --shadow-1: var(--shadow-surface-card);  /* cards, list rows on a page */
   --shadow-2: var(--shadow-card-deep);     /* raised cards (projects, schedules) */
   --shadow-3: var(--shadow-popover);       /* menus, popovers, tooltips */
-  --shadow-4: var(--shadow-popover), 0px 16px 32px -8px rgba(38, 33, 30, 0.18); /* dialogs, sheets */
+  --shadow-4: 0px 19px 32px 0px rgba(18, 12, 8, 0.15), 0px 2px 2.8px 0px rgba(130, 122, 116, 0.1); /* dialogs, sheets: the ui/dialog surface */
 
   /* Settings surfaces: a soft drop plus a hairline ring. The drop was written out by hand 46 times
      in 33 files before these tokens existed. */
@@ -151,6 +159,12 @@
   --text-caption--line-height:     var(--line-height-caption);
   --text-code:                     var(--font-size-code);
   --text-code--line-height:        var(--line-height-code);
+
+  --leading-none:   var(--leading-none);
+  --leading-tight:  var(--leading-tight);
+  --leading-snug:   var(--leading-snug);
+  --leading-normal: var(--leading-normal);
+  --leading-loose:  var(--leading-loose);
 
   --shadow-1: var(--shadow-1);
   --shadow-2: var(--shadow-2);

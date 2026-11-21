@@ -23,7 +23,9 @@ export type StreamOutcome = "done" | "error" | "aborted"
 
 export type StreamEvent =
   | { type: "start"; chatId: string }
-  | { type: "end"; chatId: string; outcome: StreamOutcome }
+  /** `inconclusive`: the stream ended without showing how the chat's run went (a follow
+   *  that never reached the stream, a send that failed before its run): the run may go on. */
+  | { type: "end"; chatId: string; outcome: StreamOutcome; inconclusive?: boolean }
 
 interface StreamEntry {
   promise: Promise<void>
@@ -80,23 +82,37 @@ export function registerStream(chatId: string | null, stop?: () => void, detach?
  * Resolves the stored promise and removes the entry.
  * Safe to call multiple times (subsequent calls are no-ops).
  */
-export function completeStream(chatId: string | null, outcome: StreamOutcome = "done"): void {
+export function completeStream(chatId: string | null, outcome: StreamOutcome = "done", options?: { inconclusive?: boolean }): void {
   if (!chatId) return
   const entry = registry.get(chatId)
   if (entry) {
     entry.resolve()
     registry.delete(chatId)
   }
-  if (entry) emit({ type: "end", chatId, outcome })
+  if (entry) emit({ type: "end", chatId, outcome, ...(options?.inconclusive ? { inconclusive: true } : {}) })
 }
 
 /** Stops the active stream for `chatId`, wherever it was started. Returns
  *  false when there is none, or it can't be stopped from here. */
+/** Whether `chatId`'s entry still belongs to the stream `stop` was registered for. */
+export function isStreamOwnedBy(chatId: string, stop: () => void): boolean {
+  return registry.get(chatId)?.stop === stop
+}
+
 export function stopStream(chatId: string): boolean {
   const stop = registry.get(chatId)?.stop
   if (!stop) return false
   stop()
   return true
+}
+
+/**
+ * Sets (or, with undefined, removes) what detachStream does for `chatId`'s stream. For a
+ * reservation whose owner can hand the chat over at one stage and not at a later one.
+ */
+export function setStreamDetach(chatId: string, detach: (() => void) | undefined): void {
+  const entry = registry.get(chatId)
+  if (entry) entry.detach = detach
 }
 
 /**

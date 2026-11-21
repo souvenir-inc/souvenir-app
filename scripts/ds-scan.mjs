@@ -11,6 +11,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const SRC = path.join(ROOT, "src");
@@ -32,6 +33,12 @@ const ART_FILE = [
   /^src\/lib\/llm-icons\.generated\.ts$/,
   /^src\/components\/(CardBrandLogo|ModelIcon|SouvenirLogo|ConnectorGlyph|ThemedLlmIcon)\//,
 ];
+// Content colours: a syntax-highlighting theme and weather illustration. Their colours aren't counted
+// (decided 2026-11-18); their spacing and type still are.
+const CONTENT_COLOUR_FILE = [
+  /^src\/components\/chat\/CodeBlock(\.module)?\.(tsx|css)$/,
+  /^src\/components\/chat\/XmlWeather\.tsx$/,
+];
 
 // ── Style property categories ───────────────────────────────────────────────
 const CATEGORIES = {
@@ -46,10 +53,23 @@ const CATEGORIES = {
 };
 const NEUTRAL = /^["'`]?(inherit|initial|unset|none|auto|transparent|currentColor|0|0px|100%|50%)["'`]?$/i;
 
-function classify(value) {
+// `isCss`: a stylesheet value. CSS has no variables by bare name, so a word there
+// (`red`, `bold`) is a literal; only in a style object can it be a JS identifier.
+/** A stylesheet's declarations as [property, value] pairs (custom properties left out).
+ *  The closing `;` is looked at, not consumed: it is also where the next declaration starts,
+ *  so `.a{padding:16px;margin:8px;}` gives both. */
+export function cssDeclarations(source) {
+  const decls = [];
+  for (const m of source.matchAll(/(?:^|[;{\s])([a-z-]+)\s*:\s*([^;{}]+)(?=;)/g)) if (!m[1].startsWith("--")) decls.push([m[1], m[2]]);
+  return decls;
+}
+
+function classify(value, isCss = false) {
   const v = value.trim();
-  if (/var\(--/.test(v) || /^[A-Z_][A-Z0-9_]*(\.[\w.]+)?$/.test(v) || /^(tokens?|theme)\./.test(v)) return "token";
+  if (/var\(--/.test(v)) return "token";
   if (NEUTRAL.test(v)) return "neutral";
+  if (isCss) return "literal";
+  if (/^[A-Z_][A-Z0-9_]*(\.[\w.]+)?$/.test(v) || /^(tokens?|theme)\./.test(v)) return "token";
   if (/^[a-zA-Z_$][\w$.]*$/.test(v) || /\?/.test(v) || /\$\{/.test(v) || /\(/.test(v) && !/^["'`]/.test(v) && !/^(rgba?|hsla?|calc|cubic-bezier)\(/.test(v)) return "dynamic";
   return "literal";
 }
@@ -94,6 +114,7 @@ function scan() {
   for (const file of files) {
     const source = stripComments(fs.readFileSync(path.join(ROOT, file), "utf8"));
     const isArt = ART_FILE.some((re) => re.test(file));
+    const contentColour = CONTENT_COLOUR_FILE.some((re) => re.test(file));
     const isCss = file.endsWith(".css");
     const isTsx = file.endsWith(".tsx");
     // The primitive layer: components/ui plus the Radix wrappers that still have their own folders.
@@ -104,17 +125,20 @@ function scan() {
       // Declarations: CSS rules, or keys of inline style objects.
       const decls = [];
       if (isCss) {
-        for (const m of source.matchAll(/(?:^|[;{\s])([a-z-]+)\s*:\s*([^;{}]+);/g)) if (!m[1].startsWith("--")) decls.push([m[1], m[2]]);
+        decls.push(...cssDeclarations(source));
       } else if (isTsx) {
         for (const block of source.matchAll(/style=\{\{([\s\S]*?)\}\}/g))
           for (const m of block[1].matchAll(/([a-zA-Z]+)\s*:\s*([^,\n}]+)/g)) decls.push([m[1], m[2]]);
       }
       for (const [prop, value] of decls) {
         const category = Object.keys(CATEGORIES).find((c) => CATEGORIES[c].test(prop));
-        if (category) add(`${classify(value)}.${category}`, file);
+        // z-index -1…9 orders siblings inside one component; page layers (10+) must use the --z-* scale.
+        const local = category === "zIndex" && /^["'`]?(-1|\d)["'`]?$/.test(value.trim());
+        if (category === "color" && contentColour) continue;
+        if (category) add(`${local ? "local" : classify(value, isCss)}.${category}`, file);
       }
-      add("colorLiteral.hex", file, count(source, /#[0-9a-fA-F]{3,8}(?![0-9a-zA-Z_-])/g));
-      add("colorLiteral.rgb", file, count(source, /\brgba?\(\s*\d/g));
+      if (!contentColour) add("colorLiteral.hex", file, count(source, /#[0-9a-fA-F]{3,8}(?![0-9a-zA-Z_-])/g));
+      if (!contentColour) add("colorLiteral.rgb", file, count(source, /\brgba?\(\s*\d/g));
     }
 
     if (!isTsx) continue;
@@ -153,7 +177,8 @@ function summary(counts) {
     lines.push(`  ${c.padEnd(16)}${String(tok).padStart(7)}${String(lit).padStart(10)}${pct(tok, tok + lit).padStart(8)}${pct(lit, tok + lit).padStart(12)}`);
   }
   lines.push(`  ${"TOTAL".padEnd(16)}${String(tTok).padStart(7)}${String(tLit).padStart(10)}${pct(tTok, tTok + tLit).padStart(8)}${pct(tLit, tTok + tLit).padStart(12)}`);
-  lines.push(`\nColour literals     hex ${g("colorLiteral.hex")} · rgb()/rgba() ${g("colorLiteral.rgb")}`);
+  lines.push(`  (not counted: ${g("local.zIndex")} z-index values -1…9, sibling order inside one component)`);
+  lines.push(`\nColour literals    hex ${g("colorLiteral.hex")} · rgb()/rgba() ${g("colorLiteral.rgb")}`);
   lines.push(`Inline style blocks ${g("styleBlocks")} · className ${g("classNames")} · Tailwind arbitrary values ${g("twArbitrary")}`);
 
   const btnPrim = g("use.Button") + g("use.IconButton") + g("use.ChipButton");
@@ -208,7 +233,8 @@ function update(counts) {
 }
 
 // ── CLI ──────────────────────────────────────────────────────────────────────
-{
+// Only when run directly, so tests can import cssDeclarations.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
   const { counts, byFile } = scan();
   const top = args.find((a) => a.startsWith("--top="));

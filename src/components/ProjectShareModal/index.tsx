@@ -54,7 +54,7 @@ export function ProjectShareModal({ open, onClose, projectId, projectVisibility,
           // has flex-basis 0 and only grows into space the container
           // actually has. The Workspace branch stays auto-height.
           height:          projectVisibility === 'shared' ? 600 : undefined,
-          boxShadow:       '0px 8px 32px rgba(18,12,8,0.18), 0px 0px 0px 1px var(--neutral-100)',
+          boxShadow:       'var(--shadow-4)',
           padding:         'var(--space-6)',
           gap:             'var(--space-4)',
         }}

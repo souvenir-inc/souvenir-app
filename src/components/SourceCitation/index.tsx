@@ -89,7 +89,7 @@ function ConnectorLogoBox({ connector: _connector, title, url }: { connector?: s
       <span style={{
         fontFamily:    'var(--font-body)',
         fontSize:      'var(--font-size-caption)',
-        lineHeight:    1,
+        lineHeight:    'var(--leading-none)',
         fontWeight:    'var(--font-weight-medium)' as React.CSSProperties['fontWeight'],
         color:         'var(--neutral-500)',
         textTransform: 'uppercase',
@@ -186,7 +186,7 @@ function SourceCardContent({ index, source, onOpen }: SourceCardContentProps) {
             fontFamily:      'var(--font-body)',
             fontWeight:      'var(--font-weight-medium)',
             fontSize:        'var(--font-size-caption)',
-            lineHeight:      1,
+            lineHeight:      'var(--leading-none)',
             color:           'var(--neutral-500)',
             marginTop:       'var(--space-0-5)',
           }}
@@ -303,7 +303,7 @@ export const SourceCitation = React.forwardRef<HTMLButtonElement, SourceCitation
               fontFamily:      'var(--font-body)',
               fontWeight:      'var(--font-weight-medium)',
               fontSize:        'var(--font-size-caption)',
-              lineHeight:      1,
+              lineHeight:      'var(--leading-none)',
               color:           'var(--neutral-600)',
               flexShrink:      0,
               outline:         'none',
@@ -438,7 +438,7 @@ function SourceCard({ source }: { source: SourceItem; index: number }) {
           <span style={{
             fontFamily:    'var(--font-body)',
             fontSize:      'var(--font-size-caption)',
-            lineHeight:    1,
+            lineHeight:    'var(--leading-none)',
             color:         'var(--neutral-500)',
             textTransform: 'uppercase',
           }}>

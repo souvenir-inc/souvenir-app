@@ -92,7 +92,7 @@
   margin: 0;
   font-family: var(--font-title);
   font-size: var(--font-size-heading-sm);
-  line-height: 26px;
+  line-height: var(--line-height-heading-sm);
   color: var(--neutral-900);
 }
 
@@ -128,7 +128,7 @@
   text-align: left;
   font-family: var(--font-body);
   font-size: var(--font-size-small);
-  line-height: 18px;
+  line-height: var(--line-height-small);
   color: var(--neutral-700);
   opacity: 0;
   animation: rise 420ms cubic-bezier(0.22, 1, 0.36, 1) forwards;

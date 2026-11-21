@@ -110,7 +110,7 @@ const AccountHeader = ({ name, email, avatarSrc, roleLabel }: { name: string; em
           {name}
         </p>
         {roleLabel && (
-          <span style={{ flexShrink: 0, padding: '0 var(--space-1-5)', borderRadius: 'var(--radius-full)', backgroundColor: 'var(--neutral-100)', boxShadow: 'inset 0 0 0 1px var(--border-default)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', lineHeight: '18px', color: 'var(--neutral-600)' }}>
+          <span style={{ flexShrink: 0, padding: '0 var(--space-1-5)', borderRadius: 'var(--radius-full)', backgroundColor: 'var(--neutral-100)', boxShadow: 'inset 0 0 0 1px var(--border-default)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-600)' }}>
             {roleLabel}
           </span>
         )}

@@ -41,7 +41,7 @@ export function CancelSubscriptionDialog({
     <div
       onClick={() => { if (!isCanceling) onKeep() }}
       style={{
-        position: 'fixed', inset: 0, zIndex: 9998, background: 'var(--overlay-bg)',
+        position: 'fixed', inset: 0, zIndex: 'var(--z-modal)', background: 'var(--overlay-bg)',
         backdropFilter: 'blur(2px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-4)',
       }}
     >
@@ -111,7 +111,7 @@ export function PermToggle({ checked, onChange }: { checked: boolean; onChange: 
         padding:    0,
         cursor:     'pointer',
         flexShrink: 0,
-        background: checked ? 'var(--blue-400, #6e98cb)' : 'var(--neutral-100, #F5F5F5)',
+        background: checked ? 'var(--blue-400)' : 'var(--neutral-100)',
         boxShadow:  checked
           ? '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--blue-700-70)'
           : '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4)',

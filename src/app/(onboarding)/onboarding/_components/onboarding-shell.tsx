@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 // from screen to screen. Figma 5795:41421 — neutral-50 → neutral-100 → neutral-200.
 
 const CANVAS_GRADIENT =
-  "linear-gradient(180deg, var(--neutral-50) 3.76%, var(--neutral-100,#F5F5F5) 75%, var(--neutral-200,#E5E5E5) 116.79%)";
+  "linear-gradient(180deg, var(--neutral-50) 3.76%, var(--neutral-100) 75%, var(--neutral-200) 116.79%)";
 
 // ── Logo glyph ──────────────────────────────────────────────────────────────────
 
@@ -72,7 +72,7 @@ export function OnboardingScreen({
                 fontWeight: 'var(--font-weight-regular)',
                 fontSize: 'var(--font-size-heading)',
                 lineHeight: "var(--line-height-heading)",
-                color: "var(--neutral-800,#3b3632)",
+                color: "var(--neutral-800)",
                 margin: 0,
               }}
             >
@@ -85,7 +85,7 @@ export function OnboardingScreen({
                   fontWeight: 'var(--font-weight-regular)',
                   fontSize: 'var(--font-size-body-lg)',
                   lineHeight: "var(--line-height-body)",
-                  color: "var(--neutral-800,#3b3632)",
+                  color: "var(--neutral-800)",
                   margin: 0,
                 }}
               >

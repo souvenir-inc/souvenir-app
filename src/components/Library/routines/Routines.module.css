@@ -18,7 +18,7 @@
 .row { display: flex; align-items: center; gap: var(--space-2-5); min-height: 48px; padding: var(--space-1) 0; }
 .row > svg { flex: none; color: var(--neutral-600); }
 .fail > svg { color: var(--color-tag-Red-text); }
-.grow { flex: 1; min-width: 0; line-height: 1.3; }
+.grow { flex: 1; min-width: 0; line-height: var(--leading-tight); }
 .grow > span { display: block; font-size: var(--font-size-body); color: var(--neutral-900); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .grow > small { font-size: var(--font-size-small); color: var(--neutral-600); }
 .fail .grow > span { color: var(--color-tag-Red-text); }
@@ -34,7 +34,7 @@
   font: inherit;
   color: inherit;
   text-decoration: none;
-  line-height: 1.3;
+  line-height: var(--leading-tight);
   cursor: pointer;
 }
 .rowLink > span { display: block; font-size: var(--font-size-body); color: var(--neutral-900); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -65,7 +65,7 @@
   color: var(--color-tag-Yellow-text);
   font-family: var(--font-body);
   font-size: var(--font-size-body);
-  line-height: 1.45;
+  line-height: var(--leading-normal);
 }
 .warn > svg { flex: none; margin-top: var(--space-0-5); }
 .warnText { flex: 1; min-width: 0; }

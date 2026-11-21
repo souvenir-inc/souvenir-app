@@ -93,7 +93,10 @@ export function ScheduleCard({
       style={{
         display:         'flex',
         flexDirection:   'column',
-        height:          '240px',
+        // At least 240px, not exactly: a two-line name with a three-line description and
+        // run stats needs a little more, and a fixed height pushed the footer out of the
+        // card. The grid stretches the row, so the card beside it grows to match.
+        minHeight:       '240px',
         overflow:        'hidden',
         padding:         'var(--space-5)',
         boxSizing:       'border-box',
@@ -155,14 +158,15 @@ export function ScheduleCard({
         {name}
       </p>
 
-      {/* Description — 3 lines max, same clamp/height cap as ProjectCard's */}
+      {/* Description — 3 lines max, same clamp as ProjectCard's. The cap follows the line
+          height: a fixed 54px (3 × 18) clipped the third line once it became 20px. */}
       <p style={{
-        maxHeight:       '54px',
+        maxHeight:       'calc(var(--line-height-body-sm) * 3)',
         flexShrink:      0,
         fontFamily:      'var(--font-body)',
         fontWeight:      'var(--font-weight-regular)',
         fontSize:        'var(--font-size-body-sm)',
-        lineHeight:      '18px',
+        lineHeight:      'var(--line-height-body-sm)',
         color:           'var(--neutral-500)',
         overflow:        'hidden',
         textOverflow:    'ellipsis',
@@ -189,7 +193,7 @@ export function ScheduleCard({
             fontFamily:   'var(--font-body)',
             fontWeight:   'var(--font-weight-regular)',
             fontSize:     'var(--font-size-body-sm)',
-            lineHeight:   '18px',
+            lineHeight:   'var(--line-height-body-sm)',
             color:        'var(--neutral-500)',
             overflow:     'hidden',
             textOverflow: 'ellipsis',
@@ -222,7 +226,7 @@ export function ScheduleCard({
               <ConnectorGlyph key={connector.slug} slug={connector.slug} name={connector.name} logoUrl={connector.logoUrl} size={16} />
             ))}
             {connectors.length > MAX_CARD_CONNECTORS && (
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', lineHeight: '18px', color: 'var(--neutral-500)' }}>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-500)' }}>
                 +{connectors.length - MAX_CARD_CONNECTORS}
               </span>
             )}

@@ -48,7 +48,7 @@ const LABEL_STYLE: React.CSSProperties = {
 // is what actually announces "required" to assistive tech, regardless of
 // whether a given screen reader vocalizes the "*" glyph.
 function RequiredMark() {
-  return <span aria-hidden="true" style={{ color: 'var(--red-500, #ef4444)' }}>*</span>
+  return <span aria-hidden="true" style={{ color: 'var(--red-500)' }}>*</span>
 }
 
 // What a visibility change does to the people who have access now. The
@@ -166,7 +166,7 @@ export function EditProjectModal({
         onOpenAutoFocus={(e) => { e.preventDefault(); document.getElementById('edit-project-name')?.focus() }}
         style={{
           borderRadius: 'var(--radius-2xl)',
-          boxShadow:    '0px 8px 32px 0px rgba(26,23,20,0.24), 0px 0px 0px 1px rgba(59,54,50,0.12)',
+          boxShadow:    'var(--shadow-4)',
           width:        560,
           height:       580,
           maxHeight:    'calc(100dvh - 64px)',
@@ -244,7 +244,7 @@ export function EditProjectModal({
               aria-describedby={form.errors.name ? 'edit-project-name-error' : undefined}
             />
             {form.errors.name && (
-              <p id="edit-project-name-error" role="alert" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--red-500, #ef4444)', margin: 0 }}>
+              <p id="edit-project-name-error" role="alert" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--red-500)', margin: 0 }}>
                 {form.errors.name}
               </p>
             )}
@@ -288,7 +288,7 @@ export function EditProjectModal({
                 </Dropdown>
               </Dropdown.Float>
               {visibilityNote && (
-                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)', color: visibilityNote.losesAccess ? 'var(--red-500, #ef4444)' : 'var(--neutral-500)', margin: 0 }}>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)', color: visibilityNote.losesAccess ? 'var(--red-500)' : 'var(--neutral-500)', margin: 0 }}>
                   {visibilityNote.text}
                 </p>
               )}

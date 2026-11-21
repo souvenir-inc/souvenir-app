@@ -87,7 +87,7 @@ function ToneCard({
             fontWeight: 'var(--font-weight-regular)',
             fontSize: "var(--font-size-body-lg)",
             lineHeight: "var(--line-height-body)",
-            color: "var(--neutral-900, #26211e)",
+            color: "var(--neutral-900)",
             margin: 0,
           }}
         >
@@ -209,7 +209,7 @@ export default function OnboardingTonePage() {
             fontWeight: 'var(--font-weight-regular)',
             fontSize: "var(--font-size-body)",
             lineHeight: "var(--line-height-body)",
-            color: "var(--neutral-700, #524b47)",
+            color: "var(--neutral-700)",
             margin: 0,
           }}
         >

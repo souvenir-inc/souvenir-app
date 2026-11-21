@@ -81,7 +81,7 @@ export default function InviteLandingPage() {
               fontWeight: 'var(--font-weight-regular)',
               fontSize: 'var(--font-size-heading)',
               lineHeight: "var(--line-height-heading)",
-              color: "var(--neutral-800,#3b3632)",
+              color: "var(--neutral-800)",
               margin: 0,
             }}
           >
@@ -90,7 +90,7 @@ export default function InviteLandingPage() {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-5)' }}>
-          <p style={{ margin: 0, fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-body)", color: "var(--neutral-800,#3b3632)" }}>
+          <p style={{ margin: 0, fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-body)", color: "var(--neutral-800)" }}>
             {valid
               ? <>You&apos;ve been invited to join a workspace on Souvenir.</>
               : "This invite link is incomplete or wrong. Ask the person who invited you to send it again."}
@@ -109,9 +109,9 @@ export default function InviteLandingPage() {
 
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 'var(--space-2)' }}>
         <SouvenirMark size={32} />
-        <p style={{ margin: 0, fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-small)', lineHeight: "var(--line-height-small)", color: "var(--neutral-500,#827a74)" }}>
-          By continuing you agree to our <a href="/terms" style={{ color: "var(--blue-600,#0d6eb2)" }}>Terms</a> and{" "}
-          <a href="/privacy" style={{ color: "var(--blue-600,#0d6eb2)" }}>Privacy Policy</a>.
+        <p style={{ margin: 0, fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-small)', lineHeight: "var(--line-height-small)", color: "var(--neutral-500)" }}>
+          By continuing you agree to our <a href="/terms" style={{ color: "var(--blue-600)" }}>Terms</a> and{" "}
+          <a href="/privacy" style={{ color: "var(--blue-600)" }}>Privacy Policy</a>.
         </p>
       </div>
     </div>

@@ -138,7 +138,7 @@ function TeamRow({
           fontFamily:     'var(--font-title)',
           fontWeight:     'var(--font-weight-medium)',
           fontSize:       'var(--font-size-body-lg)',
-          lineHeight:     1,
+          lineHeight:     'var(--leading-none)',
           color:          'var(--color-text-on-accent)',
           boxShadow:      'inset 0px 4px 4px color-mix(in srgb, var(--static-black) 25%, transparent), inset 0px -1px 0.4px rgba(18,60,95,0.65)',
         }}
@@ -350,7 +350,7 @@ export const TeamSwitcherDropdown = React.forwardRef<HTMLDivElement, TeamSwitche
                     height:        '40px',
                     background:    'linear-gradient(to bottom, var(--popover-bg) 0%, transparent 100%)',
                     pointerEvents: 'none',
-                    zIndex:        11,
+                    zIndex:        'calc(var(--z-raised) + 1)',
                     opacity:       atTop ? 0 : 1,
                     transition:    'opacity var(--duration-fast) ease',
                   }} />
@@ -382,7 +382,7 @@ export const TeamSwitcherDropdown = React.forwardRef<HTMLDivElement, TeamSwitche
                     height:        '40px',
                     background:    'linear-gradient(to top, var(--popover-bg) 0%, transparent 100%)',
                     pointerEvents: 'none',
-                    zIndex:        11,
+                    zIndex:        'calc(var(--z-raised) + 1)',
                     opacity:       atBottom ? 0 : 1,
                     transition:    'opacity var(--duration-fast) ease',
                   }} />

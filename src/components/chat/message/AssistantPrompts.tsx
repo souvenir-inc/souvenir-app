@@ -18,7 +18,7 @@ export function AssistantPrompts({
 }: {
   message: UIMessage;
   onPromptDecided?: (messageId: string, requestId: string, decision: string) => void;
-  onPromptAnswered?: () => void;
+  onPromptAnswered?: (chatId: string) => void;
 }) {
   return (
     <>
@@ -26,7 +26,12 @@ export function AssistantPrompts({
       {message.connectorConnectPrompts && message.connectorConnectPrompts.length > 0 && (
         <div style={stackStyle}>
           {message.connectorConnectPrompts.map((prompt) => (
-            <ConnectPromptCard key={prompt.request_id} prompt={prompt} onConnected={onPromptAnswered} />
+            <ConnectPromptCard
+              key={prompt.request_id}
+              prompt={prompt}
+              onDecided={(decision) => onPromptDecided?.(message.id, prompt.request_id, decision)}
+              onAnswered={() => onPromptAnswered?.(message.chat_id)}
+            />
           ))}
         </div>
       )}
@@ -40,7 +45,7 @@ export function AssistantPrompts({
               prompt={prompt}
               onDecided={(policy) => {
                 respondToChatPrompt(policy, prompt.respond_url)
-                  .then(() => onPromptAnswered?.())
+                  .then(() => onPromptAnswered?.(message.chat_id))
                   .catch(() => {})
                 onPromptDecided?.(message.id, prompt.request_id, policy)
               }}
@@ -56,7 +61,7 @@ export function AssistantPrompts({
               key={prompt.request_id}
               prompt={prompt}
               onDecided={(decision) => onPromptDecided?.(message.id, prompt.request_id, decision)}
-              onAnswered={onPromptAnswered}
+              onAnswered={() => onPromptAnswered?.(message.chat_id)}
             />
           ))}
         </div>

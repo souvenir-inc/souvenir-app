@@ -200,7 +200,7 @@ export function GreetingsPlayground() {
     <div style={{ height: '100%', overflowY: 'auto', backgroundColor: 'var(--neutral-50)' }} className="kaya-scrollbar">
       <div style={{ maxWidth: 1180, margin: '0 auto', padding: 'var(--space-7) var(--space-6) var(--space-10)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-          <h1 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-xl)', lineHeight: '34px', color: 'var(--neutral-900)' }}>
+          <h1 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-xl)', lineHeight: 'var(--line-height-heading-xl)', color: 'var(--neutral-900)' }}>
             Greetings
           </h1>
           <Badge label="Dev only" color="Purple" />

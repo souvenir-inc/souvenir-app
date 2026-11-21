@@ -38,7 +38,7 @@ export function LibraryRouteError({
         This page hit an unexpected error. Your files are not affected.
       </p>
       {error.digest && (
-        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: '18px', color: 'var(--neutral-500)' }}>Reference: {error.digest}</p>
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)' }}>Reference: {error.digest}</p>
       )}
       <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
         <Button variant="default" onClick={onRetry}>Try again</Button>
