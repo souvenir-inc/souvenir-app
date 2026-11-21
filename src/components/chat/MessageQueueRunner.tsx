@@ -67,7 +67,9 @@ export function MessageQueueRunner() {
             // Reserved now, ahead of the request: the chat counts as busy (one
             // message per reply), and opening it meanwhile waits for this reply.
             registerStream(chatId);
-            setSends((prev) => [...prev, { chatId, message, key: ++nextSendKey }]);
+            // The key is taken here, not inside the updater: React may run an updater twice.
+            const key = ++nextSendKey;
+            setSends((prev) => [...prev, { chatId, message, key }]);
           }
         } while (again);
       } finally {
