@@ -473,11 +473,11 @@ export function useStreamingChat({
     // Tells the follow's caller this read was incomplete (it will follow again), noting the
     // chat's error hold as it stands: a later follow that reads the turn to its end lifts it.
     const reportIncomplete = () => {
+      // Only a hold this recovery chain set (this call's drop, or the one a reconnect was made
+      // for): an error hold that was already there before is a failure no later read undoes.
       const id = myChatId
-      if (id) {
-        const hold = currentHoldId(id)
-        if (hold !== undefined) incompleteReadHolds.set(id, hold)
-      }
+      const hold = dropHoldId ?? options?.recoveryHoldId
+      if (id && hold !== undefined && currentHoldId(id) === hold) incompleteReadHolds.set(id, hold)
       options?.onIncomplete?.()
     }
     const releaseWhenRunEnds = () => {
@@ -705,7 +705,11 @@ export function useStreamingChat({
         }
         // The backend saves the files this turn carried to Library; refresh what Library shows.
         if (options?.files?.length) notifyLibraryFilesChanged()
-        if (isActiveStream()) setStreamState?.("done")
+        // Not once another stream has the chat: this call's end above notifies listeners, and
+        // one may already have started a follow for it (on this hook, or with an entry of its
+        // own; ours is gone, so an entry now is the newer one's), whose state the composer shows.
+        const replaced = detached || (!!myChatId && isStreamActive(myChatId))
+        if (isActiveStream() && !replaced) setStreamState?.("done")
         onStreamDone?.()
         return outcome
       } catch (error) {
@@ -778,6 +782,8 @@ export function useStreamingChat({
           })
           await new Promise((resolve) => setTimeout(resolve, FOLLOW_RETRY_MS))
           stopWatchingWait()
+          // The call this reconnect was made for (which may own the hold) is told too.
+          if (readerFailedInWait) options?.onReaderFailed?.()
           // Taken over during the wait: the newer call reset stopRequestedRef, so that
           // alone would let this one start a second follow into the newer call's reply.
           // The newer call has its own chat; this one's drop hold goes once its run ends.
@@ -812,6 +818,7 @@ export function useStreamingChat({
           // hook could overwrite one before this one reads it.
           let result: FollowResult = "attached"
           let retryDetached = false
+          let nestedReaderFailed = false
           const outcome = await fetchAiResponse("", liveChatId, retryReplyId, null, {
             follow: true,
             followAttempt: attempt + 1,
@@ -820,6 +827,9 @@ export function useStreamingChat({
             onFollowResult: (r) => { result = r },
             onDetached: () => { retryDetached = true },
             onStopped: () => { stoppedByUser = true; options?.onStopped?.() },
+            // A reader of the chat that failed during a nested wait: the hold stays (passed up).
+            onReaderFailed: () => { nestedReaderFailed = true; options?.onReaderFailed?.() },
+            ...(dropHoldId ?? options?.recoveryHoldId) !== undefined ? { recoveryHoldId: dropHoldId ?? options?.recoveryHoldId } : {},
             ...(options?.onRunGone ? { onRunGone: options.onRunGone } : {}),
             ...(options?.onIncomplete ? { onIncomplete: options.onIncomplete } : {}),
           })
@@ -831,7 +841,7 @@ export function useStreamingChat({
               if (retryDetached) {
                 // A Stop keeps the hold; so does a reader that took over from the retry and failed
                 // (the queue keeps the same hold id, so the id check alone would not stop this).
-                if (!stoppedByUser) releaseHoldUnlessReaderFails(liveChatId)
+                if (!stoppedByUser && !nestedReaderFailed) releaseHoldUnlessReaderFails(liveChatId)
               } else releaseErrorHold(liveChatId, dropHoldId)
             }
             // Passed up: a call above this one may own an earlier hold, and must not take a

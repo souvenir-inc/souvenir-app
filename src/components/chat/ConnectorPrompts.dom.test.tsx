@@ -21,7 +21,7 @@ vi.mock('@/lib/api/connectors', async (orig) => ({
 }))
 
 import { ConnectPromptCard } from '@/components/chat/ConnectorPrompts'
-import { resetConnectPromptAnswers } from '@/components/chat/connector-prompt-answers'
+import { answersInFlight, resetConnectPromptAnswers } from '@/components/chat/connector-prompt-answers'
 import { getConnector } from '@/lib/api/connectors'
 import { parsePrompt } from '@/lib/api/prompts'
 import type { ConnectorConnectPrompt } from '@/types/chat'
@@ -285,6 +285,20 @@ describe('ConnectPromptCard "Not now"', () => {
     await act(async () => { release(); await Promise.resolve() })
     await flush()
     expect(shownView).toHaveBeenCalledOnce()
+  })
+
+  it('holds its actions while it waits on an answer that started after it rendered', async () => {
+    vi.mocked(getConnector).mockResolvedValueOnce({ ownedConnections: [], apiKeyFields: [] } as unknown as Awaited<ReturnType<typeof getConnector>>)
+    let release!: (v: Error | null) => void
+    const outcome = new Promise<Error | null>((resolve) => { release = resolve })
+    // Another card's answer starts after this card rendered and before its effect ran.
+    let started = false
+    const StartAnswer = () => { if (!started) { started = true; answersInFlight.set(prompt.respond_url, { decision: 'connected', outcome }) } return null }
+    await act(async () => root.render(<><ConnectPromptCard prompt={prompt} /><StartAnswer /></>))
+    await flush()
+    const connect = [...container.querySelectorAll('button')].find((b) => b.textContent?.includes('Connect'))
+    expect(connect?.disabled ?? true).toBe(true) // no sign-in can start while that answer is out
+    await act(async () => { release(null); await Promise.resolve() })
   })
 
   it('stays gone on remount once a decision is recorded', async () => {

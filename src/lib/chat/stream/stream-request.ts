@@ -65,6 +65,11 @@ export interface StreamRequestOptions {
   /** A follow that attached, but whose stream closed with no terminal event: the run may
    *  still be going, and nothing here read it to its end. Not for a Stop or a reported error. */
   onIncomplete?: () => void
+  /** A reconnect's: the error hold the dropped call it was made for set, for an incomplete
+   *  read further down the chain to note (a later full read lifts only that hold). */
+  recoveryHoldId?: number
+  /** A reconnect's: a reader of the chat failed during its wait; the call above keeps its hold. */
+  onReaderFailed?: () => void
 }
 
 export interface StreamTarget {
