@@ -79,6 +79,16 @@ export function useFollowRunningReply({
     if (!tallyRef.current.key.startsWith(`${chatId}:`)) tallyRef.current = { key: "", refused: 0 }
   }, [chatId])
 
+  // A reload asked for after a background stream finished the shown reply. That stream's end
+  // also clears the running reply, so the follow effect below no longer runs for it: if the
+  // reload fails, this keeps asking until a history load lands (or the chat changes).
+  const reloadPendingRef = useRef(false)
+  useEffect(() => { reloadPendingRef.current = false }, [historyLoadId])
+  useEffect(() => {
+    const retry = setInterval(() => { if (reloadPendingRef.current) runEnded() }, RUN_ENDED_POLL_MS)
+    return () => { clearInterval(retry); reloadPendingRef.current = false }
+  }, [chatId, runEnded])
+
   const seenHistoryLoadRef = useRef(historyLoadId)
   useEffect(() => {
     // A finished history load that shows no running reply ends any budget: if that reply
@@ -174,6 +184,7 @@ export function useFollowRunningReply({
         // loaded as running: nothing here read it, so the view reloads to show it whole. A send
         // made from this view after the load updates its own reply, and is left alone.
         superseded = false
+        reloadPendingRef.current = true // retried below until a history load lands
         runEnded()
       } else if (event.type === "end" && superseded && (event.outcome !== "done" || event.inconclusive)) {
         // Failed, stopped, or inconclusive (a reader refused before it attached): nothing newer

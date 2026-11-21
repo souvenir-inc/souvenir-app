@@ -306,14 +306,14 @@ export function useStreamingChat({
     }
 
     // Signal the backend to stop generation.
-    const chatId = resolvedChatIdRef.current
-    if (chatId && !chatId.startsWith("temp-")) {
-      if (onStopBackend) {
-        onStopBackend(chatId)
-      } else {
-        void apiFetch(CHAT_STOP_ENDPOINT(chatId), { method: "POST" }).catch(() => {})
-      }
-    }
+    stopBackend(resolvedChatIdRef.current)
+  }
+
+  // Asks the backend to stop `chatId`'s run.
+  const stopBackend = (chatId: string | null) => {
+    if (!chatId || chatId.startsWith("temp-")) return
+    if (onStopBackend) onStopBackend(chatId)
+    else void apiFetch(CHAT_STOP_ENDPOINT(chatId), { method: "POST" }).catch(() => {})
   }
 
   // ── fetchAiResponse ─────────────────────────────────────────────────────────
@@ -390,7 +390,20 @@ export function useStreamingChat({
     // The refs above belong to whichever call ran last, so stopping through
     // the registry is a no-op once a newer call has taken over this hook.
     const stopThisCall = () => {
-      if (activeStopRef.current === stopThisCall) handleStopGeneration()
+      if (activeStopRef.current === stopThisCall) { handleStopGeneration(); return }
+      // Dropped by a takeover, its entry kept while its run goes on: Stop still reaches that
+      // run, through the backend, and settles this call's own reply and entry. The hook's
+      // transport and refs are the newer call's now and are not touched.
+      if (!detached || !myChatId) return
+      stoppedByUser = true
+      stopBackend(myChatId)
+      const replyId = myReplyId
+      if (replyId) {
+        setMessages((prev) => prev.map((msg) => (msg.id === replyId && msg.isLoading
+          ? { ...msg, isLoading: false, isThinkingInProgress: false, stoppedByUser: true, activities: stopActiveActivities(msg.activities) }
+          : msg)))
+      }
+      if (isStreamOwnedBy(myChatId, stopThisCall)) completeStream(myChatId, "aborted")
     }
     activeStopRef.current = stopThisCall
     let stoppedByUser = false

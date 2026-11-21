@@ -321,4 +321,16 @@ describe('useFollowRunningReply', () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(0) })
     expect(followStream).toHaveBeenCalledTimes(2) // recovery resumed
   })
+
+  it('keeps asking for a reload after a background stream finished until a history load lands', async () => {
+    registerStream('chat-A') // a background send, going as the history loaded
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { completeStream('chat-A', 'done') }) // it finishes the shown reply
+    expect(onRunEnded).toHaveBeenCalledTimes(1)
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS) }) // that reload failed
+    expect(onRunEnded).toHaveBeenCalledTimes(2)
+    await render({ chatId: 'chat-A', runningMessageId: null, historyLoadId: 2 }) // a load lands
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS * 3) })
+    expect(onRunEnded).toHaveBeenCalledTimes(2)
+  })
 })
