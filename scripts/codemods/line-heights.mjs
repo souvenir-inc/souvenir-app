@@ -79,9 +79,12 @@ function mapValue(raw, block, counter) {
   // Only a declaration, not text inside a string (`content: "font-size: …"`) that looks like one.
   const strings = [...scope.matchAll(/(['"`])(?:\\.|(?!\1)[^\\\n])*\1/g)].map((m) => [m.index, m.index + m[0].length]);
   const inString = (i) => strings.some(([from, to]) => i > from && i < to);
-  const lastFont = [...scope.matchAll(/(?<![\w-])font-?[sS]ize\s*:\s*([^;,}\n]+)/g)]
+  // A quoted key (`"fontSize": …`) is a declaration too: both quotes, then the colon. The match
+  // starts at its opening quote, a string's start, not inside one; text in a string value
+  // (`content: "font-size: …"`) has no closing quote after the name, so it never matches.
+  const lastFont = [...scope.matchAll(/(?<![\w-])(?:(["'])font-?[sS]ize\1|font-?[sS]ize)\s*:\s*(?<value>[^;,}\n]+)/g)]
     .filter((m) => !inString(m.index))
-    .at(-1)?.[1].trim().replace(/^['"]|['"]$/g, "");
+    .at(-1)?.groups.value.trim().replace(/^['"]|['"]$/g, "");
   // A spread (`...other`, `...{ fontSize }`) can override any key, so with one there is no
   // telling which fontSize wins: no pairing.
   const font = /\.\.\./.test(scope) ? null : lastFont?.match(/^var\(--font-size-([a-z0-9-]+)\)$/);

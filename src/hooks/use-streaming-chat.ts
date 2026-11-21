@@ -394,7 +394,9 @@ export function useStreamingChat({
     }
     activeStopRef.current = stopThisCall
     let stoppedByUser = false
-    markCallStoppedRef.current = () => { stoppedByUser = true }
+    // Passed up too: a reconnect's Stop is the Stop of the call it reconnects for, which may
+    // own the queue hold.
+    markCallStoppedRef.current = () => { stoppedByUser = true; options?.onStopped?.() }
     // Set when the chat was reopened and follows this turn afresh: this call's
     // connection is dropped and it leaves the reply and the registry alone.
     let detached = false
@@ -733,14 +735,16 @@ export function useStreamingChat({
             prior: options?.prior,
             onFollowResult: (r) => { result = r },
             onDetached: () => { retryDetached = true },
+            onStopped: () => { stoppedByUser = true; options?.onStopped?.() },
           })
           if (result === "attached") {
             // Recovered: the drop that held the queue was not a failure after all.
             // Read to the end: lift it now. Detached part-way (its "done" is no finished turn):
             // only once the backend says the run has ended.
             if (outcome === "done" && !heldBefore && dropHoldId !== undefined) {
-              if (retryDetached) releaseHoldWhenRunEnds(liveChatId)
-              else releaseErrorHold(liveChatId, dropHoldId)
+              if (retryDetached) {
+                if (!stoppedByUser) releaseHoldWhenRunEnds(liveChatId) // a Stop keeps the hold
+              } else releaseErrorHold(liveChatId, dropHoldId)
             }
             // Passed up: a call above this one may own an earlier hold, and must not take a
             // detached retry's "done" as a finished turn either.

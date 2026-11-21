@@ -165,6 +165,22 @@ describe('ConnectPromptCard "Not now"', () => {
     expect(tryAgain()).toBeDefined()
   })
 
+  it('does not send an answer again when the card remounts while it is on its way', async () => {
+    let release!: () => void
+    respondToChatPrompt.mockImplementationOnce(() => new Promise<void>((resolve) => { release = resolve }))
+    // Already connected: the card answers on mount, and the answer is still in flight…
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} />))
+    await flush()
+    expect(respondToChatPrompt).toHaveBeenCalledTimes(1)
+    // …when the row leaves the virtual window and comes back: a new card instance mounts.
+    await act(async () => root.unmount())
+    root = createRoot(container)
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} />))
+    await flush()
+    expect(respondToChatPrompt).toHaveBeenCalledTimes(1)
+    await act(async () => { release(); await Promise.resolve() })
+  })
+
   it('stays gone on remount once a decision is recorded', async () => {
     await act(async () => root.render(<ConnectPromptCard prompt={{ ...prompt, decision: 'cancel' }} />))
     await flush()

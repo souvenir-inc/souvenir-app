@@ -36,4 +36,14 @@ describe('applyPromptDecision with a repeated request id', () => {
     expect(m1.connectorConnectPrompts?.[0]).toMatchObject({ decision: 'cancel' })
     expect(m2.connectorConnectPrompts?.[0]).not.toHaveProperty('decision')
   })
+
+describe('applyPromptDecision after an id swap with a repeated request id', () => {
+  it('finds the owning card by its stable key', () => {
+    const first = reply('m1', 'p1')
+    const second = { ...reply('real-2', 'p1'), reactKey: 'temp-2' } as UIMessage // swapped from temp-2
+    const [m1, m2] = applyPromptDecision([first, second], 'temp-2', 'p1', 'connected')
+    expect(m1.connectorConnectPrompts?.[0]).not.toHaveProperty('decision')
+    expect(m2.connectorConnectPrompts?.[0]).toMatchObject({ decision: 'connected' })
+  })
+})
 })
