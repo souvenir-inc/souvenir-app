@@ -39,6 +39,7 @@ function reconcileQueues(
   blocked: boolean,
   setHasQueued: (queued: boolean) => void,
   setSends: React.Dispatch<React.SetStateAction<BackgroundSend[]>>,
+  unclaimed: Map<number, BackgroundSend>,
 ) {
   if (pass.reconciling) {
     pass.again = true;
@@ -68,10 +69,6 @@ function reconcileQueues(
   }
 }
 
-// Messages taken from their queue whose worker has not mounted yet. The runner owns them
-// until then: if it goes away first, it puts them back and frees their chats.
-const unclaimed = new Map<number, BackgroundSend>();
-
 /**
  * Sends the next queued message of a chat that isn't on screen once the reply it
  * was waiting on has finished — by then the user may be in another chat, or
@@ -85,16 +82,20 @@ export function MessageQueueRunner() {
   const { plan } = useOrgPlan();
   // Out of credits, personally or as a workspace: messages stay queued; the chat's own view shows why.
   const blocked = creditStatus.blocked || plan?.poolStatus === "paused";
+  // Messages this runner took from their queue whose worker has not mounted yet. It owns them
+  // until then: if it goes away first, it puts them back and frees their chats. Per instance:
+  // a runner that replaces this one keeps its own, which this one's cleanup must not touch.
+  const [unclaimed] = useState(() => new Map<number, BackgroundSend>());
 
   useEffect(() => {
     // Taking a message notifies the queue, which calls straight back in here.
     // Passes never nest — a nested one would see the chat as idle before its
     // stream is reserved and send its next message alongside — they rerun.
     const pass = { reconciling: false, again: false };
-    const reconcile = () => reconcileQueues(pass, blocked, setHasQueued, setSends);
+    const reconcile = () => reconcileQueues(pass, blocked, setHasQueued, setSends, unclaimed);
     reconcile();
     return subscribeQueue(reconcile);
-  }, [blocked]);
+  }, [blocked, unclaimed]);
 
   // A real unmount (confirmed a microtask later, so Strict Mode's mount, cleanup, mount is
   // not one) returns every message whose worker never mounted to the front of its queue,
@@ -106,14 +107,17 @@ export function MessageQueueRunner() {
       runnerMountedRef.current = false;
       queueMicrotask(() => {
         if (runnerMountedRef.current) return;
-        for (const send of unclaimed.values()) {
+        // Taken out first: putting one back notifies the queue, and nothing may be added to
+        // what this loop goes through while it runs.
+        const leftOver = [...unclaimed.values()];
+        unclaimed.clear();
+        for (const send of leftOver) {
           restoreQueuedMessage(send.chatId, send.message, 0);
           completeStream(send.chatId, "done");
         }
-        unclaimed.clear();
       });
     };
-  }, []);
+  }, [unclaimed]);
 
   // A reload would lose what's still queued or being sent from here.
   const busy = hasQueued || sends.length > 0;
@@ -133,6 +137,7 @@ export function MessageQueueRunner() {
         <BackgroundSendTurn
           key={send.key}
           send={send}
+          onClaimed={() => unclaimed.delete(send.key)}
           onDone={() => setSends((prev) => prev.filter((s) => s !== send))}
         />
       ))}
@@ -148,7 +153,7 @@ export const RUN_POLL_MS = 3000;
 export const RUN_CHECK_ATTEMPTS = 5;
 
 /** One queued message going out, on its own streaming hook (one stream each). */
-function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: () => void }) {
+function BackgroundSendTurn({ send, onClaimed, onDone }: { send: BackgroundSend; onClaimed: () => void; onDone: () => void }) {
   const { refreshUser } = useAuth();
   const { moveToTop } = useChatHistoryContext();
   const { chatId, message } = send;
@@ -224,7 +229,7 @@ function BackgroundSendTurn({ send, onDone }: { send: BackgroundSend; onDone: ()
   const startedRef = useRef(false);
   useEffect(() => {
     // From here this worker owns its message (the runner no longer puts it back).
-    unclaimed.delete(send.key);
+    onClaimed();
     if (startedRef.current) return;
     startedRef.current = true;
 
