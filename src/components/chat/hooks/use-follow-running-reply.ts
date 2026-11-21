@@ -85,7 +85,11 @@ export function useFollowRunningReply({
   const reloadPendingRef = useRef(false)
   useEffect(() => { reloadPendingRef.current = false }, [historyLoadId])
   useEffect(() => {
-    const retry = setInterval(() => { if (reloadPendingRef.current) runEnded() }, RUN_ENDED_POLL_MS)
+    // Not while a stream for the chat is going (a send made since): a reload then could drop
+    // that turn's rows. It stays pending and goes once the chat is idle.
+    const retry = setInterval(() => {
+      if (reloadPendingRef.current && chatId && !isStreamActive(chatId)) runEnded()
+    }, RUN_ENDED_POLL_MS)
     return () => { clearInterval(retry); reloadPendingRef.current = false }
   }, [chatId, runEnded])
 

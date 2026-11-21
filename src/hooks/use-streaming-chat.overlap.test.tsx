@@ -1180,4 +1180,29 @@ describe('useStreamingChat with overlapping follows', () => {
     await act(async () => { await doneA; await doneB })
     expect(stopBackend).not.toHaveBeenCalledWith('chat-B')
   })
+
+  it("ends as stopped, keeping the hold, when Stop came before another reader took the chat", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].status = 0
+    FakeXHR.all[0].end()
+    await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
+    act(() => hook.handleStopGeneration()) // Stop during the wait…
+    registerStream('chat-A') // …then another view's reader registers the chat
+    expect(await doneA).toBe('aborted')
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
+    try {
+      runState.get = () => Promise.resolve('idle')
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS * 2) })
+      expect(getChatQueue('chat-A')?.heldBy).toBe('error')
+    } finally {
+      vi.useRealTimers()
+    }
+  }, 10000)
 })
