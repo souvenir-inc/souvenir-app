@@ -117,3 +117,12 @@ describe("line-heights --snap", () => {
     }
   });
 });
+
+describe("type bodies", () => {
+  it("leaves lineHeight literal types alone and converts runtime properties", () => {
+    const type = "type Fixed = { lineHeight: 1.5 };";
+    expect(tsx(type)).toBe(type);
+    expect(tsx("interface Fixed { lineHeight: 1.5, }")).toBe("interface Fixed { lineHeight: 1.5, }");
+    expect(tsx("const s = { lineHeight: 1.5, }")).toContain("lineHeight: 'var(--leading-normal)'");
+  });
+});

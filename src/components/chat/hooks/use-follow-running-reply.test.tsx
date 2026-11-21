@@ -292,4 +292,21 @@ describe('useFollowRunningReply', () => {
     await render({ chatId: 'chat-A', runningMessageId: null, historyLoadId: 2 }) // reloaded: not running
     expect(stillWanted()).toBe(false)
   })
+
+  it('tries again after a refusal even when no history load follows it', async () => {
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    expect(followStream).toHaveBeenCalledTimes(1) // refused; its history reload fails (no rerender)
+    await act(async () => { await vi.advanceTimersByTimeAsync(FOLLOW_REFUSED_BACKOFF_MS) })
+    expect(followStream).toHaveBeenCalledTimes(2) // tried again after the back-off
+  })
+
+  it('recovers, not reloads, when a stream from before the load ends inconclusively', async () => {
+    registerStream('chat-A')
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { completeStream('chat-A', 'done', { inconclusive: true }) })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    expect(onRunEnded).not.toHaveBeenCalled()
+    expect(followStream).toHaveBeenCalledTimes(1)
+  })
 })

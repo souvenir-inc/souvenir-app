@@ -121,12 +121,27 @@ export function useFollowRunningReply({
     // Once this effect's follow is under way, a start for the chat is that follow's own
     // stream, not a newer run: it neither cancels anything nor earns a restart.
     let followed = false
+    // At most one recovery waiting at a time (cleared by the cleanup, and by a newer stream).
+    let deferredFollow: ReturnType<typeof setTimeout> | undefined
+    // The next attempt, within the budget (else back to asking whether the run ended).
+    const recoverAfter = (delay: number) => {
+      clearTimeout(deferredFollow)
+      deferredFollow = setTimeout(() => {
+        if (stopped || isStreamActive(chatId)) return
+        if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS) pollForRunEnd()
+        else follow()
+      }, delay)
+    }
     const follow = () => {
       followed = true
       // stillWanted: if this follow has to wait its turn, it goes ahead only while this effect
       // (this chat, this running reply) is still the current one.
       void followLatest(chatId, runningMessageId, currentReply(runningMessageId), () => {
         if (tally.key === key) tally.refused += 1
+        // Refused: the history reload that follows reruns this effect if it succeeds (its
+        // cleanup cancels this). If it fails, nothing would: so the next attempt is scheduled
+        // here too, backing off as usual.
+        recoverAfter(FOLLOW_REFUSED_BACKOFF_MS * tally.refused)
       }, () => !stopped)
     }
     // Nothing is scheduled while a stream from before the load owns the chat, or with the
@@ -145,7 +160,6 @@ export function useFollowRunningReply({
     // before its run started): then nothing newer owns the chat, and the earlier reply is
     // followed after all (one already over comes back as gone, and the history reloads).
     let superseded = activeAtLoad
-    let deferredFollow: ReturnType<typeof setTimeout> | undefined
     const unsubscribe = subscribeStreams((event) => {
       if (event.chatId !== chatId) return
       if (followed) return
@@ -153,7 +167,7 @@ export function useFollowRunningReply({
         clearTimeout(timer)
         clearTimeout(deferredFollow) // a newer stream owns the chat; if it fails, its end schedules again
         superseded = true
-      } else if (event.type === "end" && superseded && event.outcome === "done" && activeAtLoad) {
+      } else if (event.type === "end" && superseded && event.outcome === "done" && !event.inconclusive && activeAtLoad) {
         // A stream from before the load (a background send) finished the reply this view
         // loaded as running: nothing here read it, so the view reloads to show it whole. A send
         // made from this view after the load updates its own reply, and is left alone.
@@ -166,12 +180,7 @@ export function useFollowRunningReply({
         // Within the budget: follow now. With it spent: back to asking whether the run ended.
         // Not from inside this notification: it may be Stop's, which still has its own reply
         // to settle, and a follow started now would take the hook (and that reply's ref) first.
-        clearTimeout(deferredFollow) // one deferred follow at most: a second end replaces the first
-        deferredFollow = setTimeout(() => {
-          if (isStreamActive(chatId)) return
-          if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS) pollForRunEnd()
-          else follow()
-        }, 0)
+        recoverAfter(0)
       }
     })
     return () => { stopped = true; clearInterval(poll); clearTimeout(timer); clearTimeout(deferredFollow); unsubscribe() }
