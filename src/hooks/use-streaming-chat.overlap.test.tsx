@@ -574,6 +574,7 @@ describe('useStreamingChat with overlapping follows', () => {
       retry.end()
       expect(await done).toBe('done')
       expect(getChatQueue('chat-A')?.heldBy).toBeUndefined()
+      expect(getChatQueue('chat-A')?.messages.map((m) => m.content)).toEqual(['next']) // and its message stays
     } finally {
       takeAllQueuedMessages('chat-A')
     }
@@ -1072,4 +1073,22 @@ describe('useStreamingChat with overlapping follows', () => {
       vi.useRealTimers()
     }
   }, 15000)
+
+  it('a follow that waited stands down if its caller no longer wants it, and leaves the holder alone', async () => {
+    const doneA = hook.fetchAiResponse('hello', 'chat-A', 'reply-A') // a send not yet accepted
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const send = FakeXHR.all[0]
+    send.start()
+    let wanted = true
+    const doneB = hook.followStream('chat-B', 'reply-B', undefined, undefined, () => wanted) // waits behind it
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 50)) })
+    wanted = false // B reloaded: that reply is no longer running
+    send.push({ type: 'RUN_STARTED', ...runA }) // the send is accepted: the follow's wait is over
+    expect(await doneB).toBe('done')
+    expect(FakeXHR.all).toHaveLength(1) // no stale follow request
+    expect(send.aborted).toBe(false) // and A's reader was not dropped for it
+    send.push({ type: 'RUN_FINISHED', ...runA })
+    send.end()
+    await act(async () => { await doneA })
+  })
 })

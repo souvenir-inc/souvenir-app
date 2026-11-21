@@ -350,7 +350,9 @@ export function useStreamingChat({
       }
       // A follow that had to wait: the user may have left its chat meanwhile, even gone
       // back to the chat it waited on. It stands down rather than cut that chat's stream.
-      if (waited && options?.follow && currentChatIdRef && currentChatIdRef.current !== chatId) {
+      // Nor if whoever asked for it no longer wants it (its chat reloaded and stopped showing
+      // that reply as running, say): it would drop the holder only to read a stale reply.
+      if (waited && options?.follow && ((currentChatIdRef && currentChatIdRef.current !== chatId) || options.stillWanted?.() === false)) {
         options.onLeftBeforeStart?.()
         return "done"
       }
@@ -822,11 +824,11 @@ export function useStreamingChat({
    */
   /** `onRefused` runs when the follow never reached the turn's stream (not when it
    *  attached and later ended), before the history reload that onStreamLost starts. */
-  const followStream = async (chatId: string, loadingMessageId: string, prior?: UIMessage, onRefused?: () => void): Promise<StreamOutcome> => {
+  const followStream = async (chatId: string, loadingMessageId: string, prior?: UIMessage, onRefused?: () => void, stillWanted?: () => boolean): Promise<StreamOutcome> => {
     let leftBeforeStart = false
     let result: FollowResult = "attached"
     const outcome = await fetchAiResponse("", chatId, loadingMessageId, null, {
-      follow: true, prior,
+      follow: true, prior, ...(stillWanted ? { stillWanted } : {}),
       onLeftBeforeStart: () => { leftBeforeStart = true },
       onFollowResult: (r) => { result = r },
     })

@@ -160,8 +160,10 @@ describe('useFollowRunningReply', () => {
     expect(onRunEnded).toHaveBeenCalledTimes(2)
     // A reload succeeds and shows nothing running: the checks stop.
     await render({ chatId: 'chat-A', runningMessageId: null, historyLoadId: load + 1 })
+    const lookups = getChatRunState.mock.calls.length
     await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS * 3) })
     expect(onRunEnded).toHaveBeenCalledTimes(2)
+    expect(getChatRunState.mock.calls.length).toBe(lookups) // no more lookups either
   })
 
   it('does not reload over a stream that has started in the chat', async () => {
@@ -268,5 +270,26 @@ describe('useFollowRunningReply', () => {
     })
     await act(async () => { await vi.advanceTimersByTimeAsync(10) })
     expect(followStream).toHaveBeenCalledTimes(1) // the obsolete reply is not followed
+  })
+
+  it('goes on recovering after another reader ends inconclusively', async () => {
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 2 }) // backing off
+    await act(async () => {
+      registerStream('chat-A') // another reader starts: the scheduled follow is cancelled
+      completeStream('chat-A', 'done', { inconclusive: true }) // and is refused before it attaches
+    })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    expect(followStream).toHaveBeenCalledTimes(2) // recovery went on
+  })
+
+  it('passes a stillWanted check that turns false once the effect is gone', async () => {
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    const stillWanted = followStream.mock.calls[0][4] as () => boolean
+    expect(stillWanted()).toBe(true)
+    await render({ chatId: 'chat-A', runningMessageId: null, historyLoadId: 2 }) // reloaded: not running
+    expect(stillWanted()).toBe(false)
   })
 })
