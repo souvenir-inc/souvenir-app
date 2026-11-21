@@ -105,7 +105,7 @@ export function useFollowRunningReply({
     // A stream already going for the chat (a send made as the history loaded) owns it for
     // now: nothing is scheduled, but it is listened to below, so that if it ends without a
     // finished turn the earlier reply is followed after all.
-    const activeAtLoad = isStreamActive(chatId)
+    let activeAtLoad = isStreamActive(chatId)
     const key = `${chatId}:${runningMessageId}`
     const tally = tallyRef.current
     if (tally.key !== key) { tally.key = key; tally.refused = 0 }
@@ -194,6 +194,9 @@ export function useFollowRunningReply({
         // Failed, stopped, or inconclusive (a reader refused before it attached): nothing newer
         // has the chat, so recovery goes on, within the budget.
         superseded = false
+        // The stream from before the load is over: a later send is this view's own, and its
+        // end must not be taken for that background stream's (and reload the history).
+        activeAtLoad = false
         // Within the budget: follow now. With it spent: back to asking whether the run ended.
         // Not from inside this notification: it may be Stop's, which still has its own reply
         // to settle, and a follow started now would take the hook (and that reply's ref) first.

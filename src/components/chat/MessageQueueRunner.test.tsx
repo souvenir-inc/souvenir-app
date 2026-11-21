@@ -118,8 +118,13 @@ describe('MessageQueueRunner', () => {
     await queueBehindReply('only')
     await act(async () => completeStream('chat-1', 'done'))
     const options = fetchAiResponse.mock.calls[0][4] as { onSendRefused?: () => void }
-    await act(async () => { options.onSendRefused?.(); finishSend('error') })
-    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 20)) })
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    try {
+      await act(async () => { options.onSendRefused?.(); finishSend('error') })
+      await act(async () => { await vi.runAllTimersAsync() }) // any retry would have gone out by now
+    } finally {
+      vi.useRealTimers()
+    }
     expect(fetchAiResponse).toHaveBeenCalledOnce()
     expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['only'])
     expect(getChatQueue('chat-1')).toMatchObject({ heldBy: 'error' })

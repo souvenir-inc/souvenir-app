@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type Dispatch, type RefObject, type SetStateAction } from "react";
+import { useCallback, useEffect, useRef, useState, type Dispatch, type RefObject, type SetStateAction } from "react";
 import { toast } from "sonner";
 import { holdQueue } from "@/lib/message-queue";
 import type { StreamOutcome } from "@/lib/stream-registry";
@@ -241,9 +241,17 @@ export function useMessageActions(kit: TurnKit, {
   // otherwise the message_saved id swap remounts the row and resurrects
   // already-answered cards. The card is found by its request id, not only the message id:
   // an answer that lands after that swap still carries the message's old id.
+  // Only in the chat that asked: a card keeps the callback it was rendered with, so an answer
+  // that lands after a chat switch carries the old chat id and is not written into the chat
+  // now on screen (whose prompts may share its request id). A chat that had no id yet when the
+  // card rendered (a new chat getting its id mid-turn) is still the same chat.
+  const shownChatRef = useRef(kit.chatId);
+  useEffect(() => { shownChatRef.current = kit.chatId; }, [kit.chatId]);
+  const askedIn = kit.chatId;
   const handlePromptDecided = useCallback((messageId: string, requestId: string, decision: string) => {
+    if (askedIn && shownChatRef.current && shownChatRef.current !== askedIn) return;
     setMessages((prev) => applyPromptDecision(prev, messageId, requestId, decision));
-  }, [setMessages]);
+  }, [setMessages, askedIn]);
 
   // A prompt answered at `/chats/{id}/resume` continues the turn as a new
   // stream: it renders into a fresh assistant message below the card.
