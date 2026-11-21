@@ -311,6 +311,16 @@ describe('useFollowRunningReply', () => {
     expect(followStream).toHaveBeenCalledTimes(1)
   })
 
+  it('does not reload for a later send once the stream from before the load ended inconclusively', async () => {
+    registerStream('chat-A') // going as the history loaded
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { completeStream('chat-A', 'done', { inconclusive: true }) }) // it ends without its turn
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) }) // recovery's follow (refused, mocked)
+    await act(async () => { registerStream('chat-A') }) // a send from this view, after the load
+    await act(async () => { completeStream('chat-A', 'done') }) // finishes its own reply
+    expect(onRunEnded).not.toHaveBeenCalled() // not taken for the background stream: no reload
+  })
+
   it('resumes recovery when a send that interrupted the retry after a refusal fails', async () => {
     await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
     await act(async () => { await vi.advanceTimersByTimeAsync(0) }) // refused; its reload fails

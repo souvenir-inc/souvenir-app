@@ -1074,6 +1074,40 @@ describe('useStreamingChat with overlapping follows', () => {
     }
   }, 15000)
 
+  it("keeps the hold when the user stops a taken-over attached reconnect before the run reports idle", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].status = 0
+    FakeXHR.all[0].end() // dropped: held
+    await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+    const reconnect = FakeXHR.all[1]
+    reconnect.start() // the reconnect attaches…
+    reconnect.push({ type: 'RUN_STARTED', ...runA })
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
+    try {
+      const doneB = hook.followStream('chat-B', 'reply-B') // …and is taken over
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(3))
+      reconnect.end()
+      expect(await doneA).toBe('done')
+      runState.get = (id) => Promise.resolve(id === 'chat-A' ? 'running' : 'idle')
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS) }) // still running
+      act(() => { stopStream('chat-A') }) // the user stops chat A before the run reports idle
+      runState.get = () => Promise.resolve('idle')
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS * 2) })
+      expect(getChatQueue('chat-A')?.heldBy).toBe('error') // the Stop keeps it held
+      FakeXHR.all[2].start()
+      FakeXHR.all[2].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+      FakeXHR.all[2].end()
+      await act(async () => { await doneB })
+    } finally {
+      vi.useRealTimers()
+    }
+  }, 15000)
+
   it('a follow that waited stands down if its caller no longer wants it, and leaves the holder alone', async () => {
     const doneA = hook.fetchAiResponse('hello', 'chat-A', 'reply-A') // a send not yet accepted
     await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))

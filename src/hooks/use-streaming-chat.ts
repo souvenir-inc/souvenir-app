@@ -396,6 +396,8 @@ export function useStreamingChat({
       // transport and refs are the newer call's now and are not touched.
       if (!detached || !myChatId) return
       stoppedByUser = true
+      // A reconnect's Stop is its caller's too, which may own the queue hold: passed up.
+      options?.onStopped?.()
       stopBackend(myChatId)
       const replyId = myReplyId
       if (replyId) {
@@ -430,7 +432,7 @@ export function useStreamingChat({
     const releaseHoldWhenRunEnds = (id: string, onStop?: () => void): (() => void) => {
       if (!runStateReadable || dropHoldId === undefined) { onStop?.(); return () => {} }
       const holdId = dropHoldId
-      return pollUntilRunEnds(id, () => currentHoldId(id) === holdId, () => releaseErrorHold(id, holdId), onStop)
+      return pollUntilRunEnds(id, () => currentHoldId(id) === holdId && !stoppedByUser, () => releaseErrorHold(id, holdId), onStop)
     }
     const releaseWhenRunEnds = () => {
       const id = myChatId
