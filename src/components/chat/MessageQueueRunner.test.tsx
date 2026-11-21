@@ -199,6 +199,18 @@ describe('MessageQueueRunner', () => {
     await act(async () => finishSend('done'))
   })
 
+  it('puts a message back if the runner goes away before its worker mounts', async () => {
+    getChatRunState.mockResolvedValue('running')
+    await queueBehindReply('first')
+    // The reply ends and the app unmounts in the same update: the worker never mounts.
+    await act(async () => { completeStream('chat-1', 'done'); root.unmount() })
+    await act(async () => { await Promise.resolve() })
+    expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['first'])
+    expect(isStreamActive('chat-1')).toBe(false)
+    expect(fetchAiResponse).not.toHaveBeenCalled()
+    root = createRoot(container) // for teardown
+  })
+
   it('leaves a chat on screen to its own view', async () => {
     await act(async () => setQueueForeground(view, 'chat-1'))
     await queueBehindReply('and then this')

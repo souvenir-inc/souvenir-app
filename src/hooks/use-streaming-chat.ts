@@ -362,9 +362,25 @@ export function useStreamingChat({
     // Nothing reads that run any more, so nothing would end the entry when the run ends: this
     // asks until it has, then ends it — if the entry is still this call's (reopening the chat,
     // or another reader, takes it over first). Its queue then goes on.
+    // The chat API's run state covers the regular chat endpoint only: a turn on a chat's own
+    // endpoint (an agent chat) is not in it, so for those nothing is released from here.
+    const runStateReadable = endpoint === "/api/chat" && !directEndpoints
+    // Once the backend says the chat's run has ended, lifts the error hold this call's drop
+    // set on its queue (one that was already there stays). For a reconnect that was taken
+    // over during its wait: nothing else would ever lift that hold.
+    const releaseHoldWhenRunEnds = (id: string) => {
+      if (!runStateReadable) return
+      const poll = setInterval(() => {
+        void getChatRunState(id).then((state) => {
+          if (state !== "idle") return
+          clearInterval(poll)
+          releaseErrorHold(id)
+        }, () => {})
+      }, DROPPED_RUN_POLL_MS)
+    }
     const releaseWhenRunEnds = () => {
       const id = myChatId
-      if (!id || id.startsWith("temp-")) return
+      if (!id || id.startsWith("temp-") || !runStateReadable) return
       const poll = setInterval(() => {
         if (!isStreamOwnedBy(id, stopThisCall)) { clearInterval(poll); return }
         void getChatRunState(id).then((state) => {
@@ -629,17 +645,22 @@ export function useStreamingChat({
           await new Promise((resolve) => setTimeout(resolve, FOLLOW_RETRY_MS))
           // Taken over during the wait: the newer call reset stopRequestedRef, so that
           // alone would let this one start a second follow into the newer call's reply.
-          if (detached) return "done"
+          // The newer call has its own chat; this one's drop hold goes once its run ends.
+          if (detached) {
+            if (!heldBefore) releaseHoldWhenRunEnds(liveChatId)
+            return "done"
+          }
           // Another reader holds the chat now (its own view following it, from another hook):
           // that one reads the turn, and this retry must not take over its registry entry.
-          // If that reader reads the turn to its end, the drop's hold (set above, not one
-          // that was already there) goes; if it fails, the hold stays.
+          // When that reader ends, the drop's hold (set above, not one that was already there)
+          // goes once the backend confirms the run has ended. Its "done" alone is not enough:
+          // a follow that never reached the stream ends as done too. An error end keeps it.
           if (isStreamActive(liveChatId)) {
             if (!heldBefore) {
               const stopWatching = subscribeStreams((event) => {
                 if (event.type !== "end" || event.chatId !== liveChatId) return
                 stopWatching()
-                if (event.outcome === "done") releaseErrorHold(liveChatId)
+                if (event.outcome === "done") releaseHoldWhenRunEnds(liveChatId)
               })
             }
             return "done"
