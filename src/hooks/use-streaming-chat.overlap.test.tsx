@@ -28,7 +28,7 @@ vi.mock('@/lib/jwt-utils', async (orig) => {
 })
 import { DROPPED_RUN_POLL_MS, useStreamingChat } from '@/hooks/use-streaming-chat'
 import { completeStream, detachStream, isStreamActive, registerStream, stopStream, streamListenerCount, subscribeStreams } from '@/lib/stream-registry'
-import { getChatQueue, queueMessage, queuedChatsReadyForBackground, takeAllQueuedMessages } from '@/lib/message-queue'
+import { getChatQueue, holdQueue, queueMessage, queuedChatsReadyForBackground, takeAllQueuedMessages } from '@/lib/message-queue'
 import { resetStreamStore } from '@/lib/chat/stream-store'
 import type { UIMessage } from '@/types/chat'
 
@@ -945,6 +945,87 @@ describe('useStreamingChat with overlapping follows', () => {
     }
   }, 10000)
 
+  it("keeps an error hold that was there before the drop, even after a later full read", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    registerStream('chat-A'); completeStream('chat-A', 'error') // an earlier reply failed: held
+    const first = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].status = 0
+    FakeXHR.all[0].end() // dropped (the hold was already there)
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+    FakeXHR.all[1].status = 503
+    FakeXHR.all[1].responseText = 'Service Unavailable'
+    FakeXHR.all[1].end() // the reconnect fails: an incomplete read
+    await act(async () => { await first })
+    const second = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(3))
+    FakeXHR.all[2].start()
+    FakeXHR.all[2].push({ type: 'RUN_STARTED', ...runA }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'Done.' }, { type: 'RUN_FINISHED', ...runA })
+    FakeXHR.all[2].end()
+    await act(async () => { await second })
+    expect(getChatQueue('chat-A')?.heldBy).toBe('error') // the earlier failure still holds it
+  })
+
+  it("does not show done for a chat a follow has taken up again from the end notice", async () => {
+    const states: string[] = []
+    const view: View = { currentChatIdRef: { current: 'chat-A' }, setStreamState: (state) => { states.push(state) } }
+    act(() => root.render(<Harness view={view} onReady={(api) => { hook = api }} />))
+    const done = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    let again: Promise<unknown> | undefined
+    const off = subscribeStreams((e) => { if (e.type === 'end' && e.chatId === 'chat-A' && !again) again = hook.followStream('chat-A', 'reply-A') })
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'Hi.' }, { type: 'RUN_FINISHED', ...runA })
+    FakeXHR.all[0].end()
+    await act(async () => { await done })
+    off()
+    expect(again).toBeDefined()
+    expect(states.at(-1)).not.toBe('done') // the newer follow's state stands
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+    FakeXHR.all[1].start()
+    FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runA }, { type: 'RUN_FINISHED', ...runA })
+    FakeXHR.all[1].end()
+    await act(async () => { await again })
+  })
+
+  it("keeps the first drop's hold when a reader fails during a nested reconnect's wait, before a takeover", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].status = 0
+    FakeXHR.all[0].end() // drop 1: the hold, owned by the top call
+    await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    FakeXHR.all[1].start() // reconnect 1 attaches…
+    FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[1].status = 0
+    FakeXHR.all[1].end() // …and drops: reconnect 2 waits
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
+    registerStream('chat-A', () => {}, () => {}) // a reader of A, during that wait…
+    completeStream('chat-A', 'error') // …fails before it ends
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
+    try {
+      const doneB = hook.followStream('chat-B', 'reply-B') // then another chat takes over
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(3), { timeout: 3000 })
+      await doneA
+      runState.get = () => Promise.resolve('idle')
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS * 2) })
+      expect(getChatQueue('chat-A')?.heldBy).toBe('error') // the failure keeps it
+      FakeXHR.all[2].start()
+      FakeXHR.all[2].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+      FakeXHR.all[2].end()
+      await act(async () => { await doneB })
+    } finally {
+      vi.useRealTimers()
+    }
+  }, 15000)
+
   it("lifts the drop's hold when the recovery follow after an incomplete read reads the turn to its end", async () => {
     queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
     const incomplete = vi.fn()
@@ -1054,8 +1135,9 @@ describe('useStreamingChat with overlapping follows', () => {
       // Meanwhile the user queues again (hold #1 lifted) and a newer reply fails: hold #2.
       takeAllQueuedMessages('chat-A')
       queueMessage('chat-A', { content: 'later', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
-      registerStream('chat-A')
-      completeStream('chat-A', 'error')
+      // Set directly, not through a stream end: an end would also stop the old drop's watcher,
+      // and the test would then pass without the hold-id check.
+      holdQueue('chat-A', 'error')
       expect(getChatQueue('chat-A')?.heldBy).toBe('error')
       runState.get = (id) => Promise.resolve(id === 'chat-A' ? 'idle' : 'running')
       await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS * 2) })

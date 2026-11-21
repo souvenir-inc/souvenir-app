@@ -134,6 +134,10 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
       // This setup's own: Strict Mode sets up twice, and the second clears abortedRef, so the
       // first setup's observer would run too (onAnswered, or the failure toast, twice).
       let observing = true
+      // Waiting on it (it may have started after this card rendered, so the state seeded at
+      // render can say otherwise): the card's actions wait too, as for its own answer.
+      respondingRef.current = true
+      setResponding(true)
       void pending.outcome.then((failure) => {
         if (!observing || abortedRef.current) return
         respondingRef.current = false
