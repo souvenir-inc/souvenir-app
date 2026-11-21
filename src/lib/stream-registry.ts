@@ -28,6 +28,9 @@ export type StreamEvent =
    *  `inconclusive`: the stream ended without showing how the chat's run went (a follow
    *  that never reached the stream, a send that failed before its run): the run may go on. */
   | { type: "end"; chatId: string; outcome: StreamOutcome; inconclusive?: boolean; replyId?: string }
+  /** The user stopped `replyId` in `chatId`. Sent whether or not the chat had an entry (a
+   *  follow waiting to reconnect has none), and it changes no entry. */
+  | { type: "stopped"; chatId: string; replyId: string }
 
 interface StreamEntry {
   promise: Promise<void>
@@ -92,6 +95,12 @@ export function completeStream(chatId: string | null, outcome: StreamOutcome = "
     registry.delete(chatId)
   }
   if (entry) emit({ type: "end", chatId, outcome, ...(options?.inconclusive ? { inconclusive: true } : {}), ...(options?.replyId ? { replyId: options.replyId } : {}) })
+}
+
+/** Tells listeners the user stopped `replyId` in `chatId`; registry entries are left alone. */
+export function reportStopped(chatId: string | null, replyId: string | null | undefined): void {
+  if (!chatId || !replyId) return
+  emit({ type: "stopped", chatId, replyId })
 }
 
 /** Stops the active stream for `chatId`, wherever it was started. Returns

@@ -20,7 +20,8 @@ vi.mock('@/lib/api/connectors', async (orig) => ({
   initiateLink: vi.fn(() => new Promise(() => {})),
 }))
 
-import { ConnectPromptCard, resetConnectPromptAnswers } from '@/components/chat/ConnectorPrompts'
+import { ConnectPromptCard } from '@/components/chat/ConnectorPrompts'
+import { resetConnectPromptAnswers } from '@/components/chat/connector-prompt-answers'
 import { getConnector } from '@/lib/api/connectors'
 import { parsePrompt } from '@/lib/api/prompts'
 import type { ConnectorConnectPrompt } from '@/types/chat'

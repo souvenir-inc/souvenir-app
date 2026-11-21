@@ -349,6 +349,11 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   // backend stops the run, and nothing else would clear it (no reload follows a Stop). Another
   // send stopped before its run took over leaves it, as above.
   useEffect(() => subscribeStreams((event) => {
+    if (event.type === "stopped") {
+      // Stopped with no entry to end (a follow waiting to reconnect): the same rule, by reply id.
+      setRunningOwner((owner) => (owner && owner.chatId === event.chatId && owner.id === event.replyId ? null : owner))
+      return
+    }
     if (event.type !== "end") return
     const finished = event.outcome === "done" && !event.inconclusive
     const stoppedThisReply = event.outcome === "aborted" && event.replyId !== undefined
