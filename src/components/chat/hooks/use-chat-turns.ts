@@ -159,8 +159,12 @@ export async function sendTurn(
  */
 export function applyPromptDecision(messages: UIMessage[], messageId: string, requestId: string, decision: string): UIMessage[] {
   const hasPrompt = (prompts?: readonly { request_id: string }[]) => !!prompts?.some((p) => p.request_id === requestId)
+  const holdsCard = (msg: UIMessage) => hasPrompt(msg.connectorConnectPrompts) || hasPrompt(msg.connectorPermissionPrompts) || hasPrompt(msg.chatPrompts)
+  // The card's own message: by its id, or (after the id swap) the one message holding that
+  // request id. Never every message that does: another may hold a card with the same id.
+  const owner = messages.find((msg) => msg.id === messageId && holdsCard(msg)) ?? messages.find(holdsCard)
   return messages.map((msg) =>
-    msg.id === messageId || hasPrompt(msg.connectorConnectPrompts) || hasPrompt(msg.connectorPermissionPrompts) || hasPrompt(msg.chatPrompts)
+    msg === owner
       ? {
           ...msg,
           connectorConnectPrompts: msg.connectorConnectPrompts?.map((p) =>

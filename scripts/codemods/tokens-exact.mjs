@@ -121,6 +121,24 @@ export function insideRepo(p) {
   return rel === "" || (!rel.startsWith("..") && !path.isAbsolute(rel));
 }
 
+// Whether `at` sits in a type rather than a value: the object braces around it open a
+// `type X = {…}` or `interface X {…}` body. A literal there is a literal type, which other
+// code is checked against; swapping it for a token would break that check.
+export const inTypeBody = (src, masked, at) => {
+  let depth = 0;
+  for (let i = at - 1; i >= 0; i--) {
+    if (masked[i]) continue;
+    if (src[i] === "}") depth++;
+    else if (src[i] === "{") {
+      if (depth > 0) { depth--; continue; }
+      // An enclosing brace: a type body here, or further out (`type T = { card: { … } }`).
+      const before = src.slice(Math.max(0, i - 200), i);
+      if (/(?:\btype\s+[\w$]+(?:<[^>]*>)?\s*=\s*|\binterface\s+[\w$]+[^{;]*)$/.test(before)) return true;
+    }
+  }
+  return false;
+};
+
 export function codeMask(src, { css = false } = {}) {
   const mask = new Uint8Array(src.length);
   for (let i = 0; i < src.length; i++) {

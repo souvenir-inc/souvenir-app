@@ -29,3 +29,11 @@ describe('applyPromptDecision', () => {
     expect(out[1].connectorConnectPrompts?.[0]).not.toHaveProperty('decision')
   })
 })
+
+describe('applyPromptDecision with a repeated request id', () => {
+  it('answers only the owning card', () => {
+    const [m1, m2] = applyPromptDecision([reply('m1', 'p1'), reply('m2', 'p1')], 'm1', 'p1', 'cancel')
+    expect(m1.connectorConnectPrompts?.[0]).toMatchObject({ decision: 'cancel' })
+    expect(m2.connectorConnectPrompts?.[0]).not.toHaveProperty('decision')
+  })
+})

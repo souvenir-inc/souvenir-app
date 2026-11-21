@@ -16,7 +16,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 // The same string/comment mask as tokens-exact, so the codemods agree on what is code.
-import { codeMask, insideRepo } from "./tokens-exact.mjs";
+import { codeMask, inTypeBody, insideRepo } from "./tokens-exact.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const TOKENS = path.join(ROOT, "src/styles/tokens");
@@ -132,23 +132,6 @@ const keep = (src, offset) => {
 // (same mask as tokens-exact). The value's own quotes start after the match, so a real
 // `boxShadow: '…'` is still code where it begins. Only a whole literal value is converted:
 // one that an expression goes on to use (`'…'.replace(…)`) is left alone.
-// Whether `at` sits in a type rather than a value: the object braces around it open a
-// `type X = {…}` or `interface X {…}` body. A literal there is a literal type, which other
-// code is checked against; swapping it for a token would break that check.
-const inTypeBody = (src, masked, at) => {
-  let depth = 0;
-  for (let i = at - 1; i >= 0; i--) {
-    if (masked[i]) continue;
-    if (src[i] === "}") depth++;
-    else if (src[i] === "{") {
-      if (depth > 0) { depth--; continue; }
-      // An enclosing brace: a type body here, or further out (`type T = { card: { … } }`).
-      const before = src.slice(Math.max(0, i - 200), i);
-      if (/(?:\btype\s+[\w$]+(?:<[^>]*>)?\s*=\s*|\binterface\s+[\w$]+[^{;]*)$/.test(before)) return true;
-    }
-  }
-  return false;
-};
 export const transformTsx = (src, c) => {
   const masked = codeMask(src);
   // Whole identifiers only: `rawboxShadow` or `MY_SHADOW_X` is some other name. A `:` must

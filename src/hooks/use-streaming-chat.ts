@@ -189,6 +189,9 @@ export function useStreamingChat({
   // Stops the current call's stream, and only that one — registered with the
   // stream registry so the stream can be stopped from wherever its chat is shown.
   const activeStopRef = useRef<(() => void) | null>(null)
+  // Records Stop on the call it stopped too: stopRequestedRef is the hook's, and a call that
+  // takes the hook over resets it, so a call waiting to reconnect would forget a Stop.
+  const markCallStoppedRef = useRef<(() => void) | null>(null)
   // The call that currently owns this hook. loadingMessageIdRef, resolvedChatIdRef,
   // the transport refs and the flush buffer are one set shared by every call, so
   // two overlapping streams — chat A's recovery still reading while chat B's starts —
@@ -276,6 +279,7 @@ export function useStreamingChat({
 
   const handleStopGeneration = () => {
     stopRequestedRef.current = true
+    markCallStoppedRef.current?.()
     xhrRef.current?.abort()
     stopFlushInterval()
     flushPending()
@@ -389,6 +393,8 @@ export function useStreamingChat({
       if (activeStopRef.current === stopThisCall) handleStopGeneration()
     }
     activeStopRef.current = stopThisCall
+    let stoppedByUser = false
+    markCallStoppedRef.current = () => { stoppedByUser = true }
     // Set when the chat was reopened and follows this turn afresh: this call's
     // connection is dropped and it leaves the reply and the registry alone.
     let detached = false
@@ -686,7 +692,9 @@ export function useStreamingChat({
           // alone would let this one start a second follow into the newer call's reply.
           // The newer call has its own chat; this one's drop hold goes once its run ends.
           if (detached) {
-            if (!heldBefore) releaseHoldWhenRunEnds(liveChatId)
+            // Not if the user stopped this turn during the wait: the hold stays, as it does
+            // when Stop lands with no takeover.
+            if (!heldBefore && !stoppedByUser) releaseHoldWhenRunEnds(liveChatId)
             return leftDetached() // the call that owns an earlier hold waits for the run's end too
           }
           // Another reader holds the chat now (its own view following it, from another hook):
