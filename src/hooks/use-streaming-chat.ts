@@ -13,7 +13,7 @@ import { logger } from "@/lib/logger"
 import { friendlyModelError } from "@/lib/model-error"
 import { AguiSSEDecoder } from "@/lib/sse-decoder"
 import type { UIMessage } from "@/types/chat"
-import { registerStream, completeStream, isStreamActive, isStreamOwnedBy, setStreamDetach, subscribeStreams, type StreamOutcome } from "@/lib/stream-registry"
+import { registerStream, completeStream, reportStopped, isStreamActive, isStreamOwnedBy, setStreamDetach, subscribeStreams, type StreamOutcome } from "@/lib/stream-registry"
 import { getChatRunState } from "@/lib/api/chat"
 import { currentHoldId, getChatQueue, releaseErrorHold } from "@/lib/message-queue"
 import { updateMessage } from "@/lib/chat/stream/message-patches"
@@ -292,6 +292,9 @@ export function useStreamingChat({
     stopFlushInterval()
     flushPending()
     completeStream(resolvedChatIdRef.current, "aborted", { replyId: loadingMessageIdRef.current ?? undefined })
+    // Also when the chat had no entry to end (a follow waiting to reconnect after a drop): the
+    // history's running reply is cleared by this, not only by an end.
+    reportStopped(resolvedChatIdRef.current, loadingMessageIdRef.current)
     setStreamState?.("aborted")
 
     const msgId = loadingMessageIdRef.current
@@ -414,6 +417,7 @@ export function useStreamingChat({
           : msg)))
       }
       if (isStreamOwnedBy(myChatId, stopThisCall)) completeStream(myChatId, "aborted", { replyId: replyId ?? undefined })
+      reportStopped(myChatId, replyId)
     }
     activeStopRef.current = stopThisCall
     let stoppedByUser = false
@@ -744,8 +748,9 @@ export function useStreamingChat({
           // The newer call has its own chat; this one's drop hold goes once its run ends.
           if (detached) {
             // Not if the user stopped this turn during the wait: the hold stays, as it does
-            // when Stop lands with no takeover.
-            if (!heldBefore && !stoppedByUser) releaseHoldWhenRunEnds(liveChatId)
+            // when Stop lands with no takeover. Nor if a reader of this chat (opened meanwhile)
+            // ends with a failure: the hold keeps its id, so the id check alone would lift it.
+            if (!heldBefore && !stoppedByUser) releaseHoldUnlessReaderFails(liveChatId)
             return leftDetached() // the call that owns an earlier hold waits for the run's end too
           }
           // Stopped during the wait: checked before handing over to another reader, so a Stop

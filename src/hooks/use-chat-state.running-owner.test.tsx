@@ -9,7 +9,7 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useChatState } from '@/hooks/use-chat-state'
 import { clearChatHistories } from '@/lib/chat/chat-message-cache'
-import { completeStream, registerStream } from '@/lib/stream-registry'
+import { completeStream, registerStream, reportStopped } from '@/lib/stream-registry'
 import type { Message } from '@/types/chat'
 
 const getChatMessages = vi.hoisted(() => vi.fn())
@@ -133,5 +133,20 @@ describe('runningMessageId across a chat switch', () => {
     expect(seen.at(-1)?.running).toBe('turn-A')
     await act(async () => { registerStream('a'); completeStream('a', 'aborted', { replyId: 'turn-A' }) }) // the follow of it, stopped
     expect(seen.at(-1)?.running).toBeNull() // the queue can go on
+  })
+
+  it('stops naming the running reply on a Stop that had no stream entry to end', async () => {
+    getChatStreamId.mockResolvedValue('turn-A')
+    getChatMessages.mockResolvedValue({
+      messages: [msg('m1', 'a'), msg('turn-A', 'a', { role: 'assistant', content: '', run } as Partial<Message>)],
+      has_more: false, next_cursor: null,
+    })
+    await act(async () => { root.render(<Harness chatId="a" />); await Promise.resolve() })
+    await act(async () => { await Promise.resolve() })
+    expect(seen.at(-1)?.running).toBe('turn-A')
+    await act(async () => { reportStopped('a', 'reply-new') }) // another reply stopped: kept
+    expect(seen.at(-1)?.running).toBe('turn-A')
+    await act(async () => { reportStopped('a', 'turn-A') }) // the follow waiting to reconnect, stopped
+    expect(seen.at(-1)?.running).toBeNull()
   })
 })

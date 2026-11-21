@@ -48,6 +48,7 @@ import { useAttachmentIntake } from "./hooks/use-attachment-intake";
 import { useComposerQueue, useQueuedSend } from "./hooks/use-composer-queue";
 import { useRevealSettle } from "./hooks/use-reveal-settle";
 import { useFollowRunningReply } from "./hooks/use-follow-running-reply";
+import { composerMustQueue } from "./composer-must-queue";
 import { sendTurn as sendTurnWith, useMessageActions, useTurnGuards, type TurnKit } from "./hooks/use-chat-turns";
 
 
@@ -402,8 +403,13 @@ export function ChatInterface({
 
     // A reply is still running (or messages are already waiting): this one is
     // queued to follow, in order. The isSendingRef check also catches a
-    // second send in the same tick, before `isStreaming` lands.
-    if (replyInFlight || isSendingRef.current || askingSaveRef.current > 0 || getChatQueue(queueKey)) {
+    // second send in the same tick, before `isStreaming` lands. runningMessageId: the
+    // history shows a reply still running that nothing here is reading yet; it goes out
+    // after that one, as a queued message would (see queueReady).
+    if (composerMustQueue({
+      replyInFlight, runningMessageId, sending: isSendingRef.current,
+      askingSave: askingSaveRef.current > 0, hasQueue: !!getChatQueue(queueKey),
+    })) {
       queueFromComposer(text);
       return;
     }

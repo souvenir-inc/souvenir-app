@@ -15,13 +15,13 @@ import {
   type ApiKeyField,
 } from '@/lib/api/connectors'
 import { respondToChatPrompt } from '@/lib/api/chat'
+import { answersInFlight, failedAnswers, type ConnectDecision } from './connector-prompt-answers'
 import { isApiProviderConnector, isZapierProviderConnector, onLinkResult, waitForZapierAuthId, zapierConnectHref } from '@/lib/connectorProvider'
 
 // ── ConnectPromptCard ─────────────────────────────────────────────────────────
 
 const SIGN_IN_WAIT_MS = 300_000
 
-type ConnectDecision = 'connected' | 'cancel'
 
 interface ConnectPromptCardProps {
   prompt:       ConnectorConnectPrompt
@@ -29,21 +29,6 @@ interface ConnectPromptCardProps {
   onDecided?:   (decision: ConnectDecision) => void
   /** The answer reached the backend: the turn's run may have been taken back up. */
   onAnswered?:  () => void
-}
-
-// Answers on their way to the backend, by the prompt's respond URL (unique to that prompt; a
-// request id can repeat across messages): the decision sent and how it ends (null, or
-// the failure). Module-level: it outlives a card that leaves the virtual list and remounts,
-// which must neither send the answer again nor lose its outcome (a failure, with Try again).
-const answersInFlight = new Map<string, { decision: ConnectDecision; outcome: Promise<Error | null> }>()
-// Answers that did not reach the backend, by respond URL, until one does: a card that unmounted
-// meanwhile would otherwise lose its answer, and the card that mounts next must offer that
-// answer's retry, not answer afresh (a "Not now" must never turn into "connected").
-const failedAnswers = new Map<string, { decision: ConnectDecision; message: string }>()
-/** For tests: forget every answer in flight or failed. */
-export function resetConnectPromptAnswers(): void {
-  answersInFlight.clear()
-  failedAnswers.clear()
 }
 
 export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectPromptCardProps) {
