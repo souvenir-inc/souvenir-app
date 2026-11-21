@@ -59,6 +59,9 @@ export interface StreamRequestOptions {
   /** A follow that never reached the turn's stream: "gone" (the turn has ended) or "failed".
    *  Per call, so one call's result can't be read as another's. */
   onFollowResult?: (result: "gone" | "failed") => void
+  /** A reconnect after a drop found the run already ended (404): the turn is over on the
+   *  backend, and only a history reload (which may fail) shows it. Passed up nested retries. */
+  onRunGone?: () => void
 }
 
 export interface StreamTarget {

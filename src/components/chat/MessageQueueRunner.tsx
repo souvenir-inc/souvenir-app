@@ -17,7 +17,7 @@ import {
   takeNextQueuedMessage,
   type QueuedMessage,
 } from "@/lib/message-queue";
-import { completeStream, registerStream, setStreamDetach } from "@/lib/stream-registry";
+import { completeStream, isStreamActive, registerStream, setStreamDetach } from "@/lib/stream-registry";
 import { getChatRunState } from "@/lib/api/chat";
 import { buildTurnOptions } from "@/lib/turn-options";
 import type { UIMessage } from "@/types/chat";
@@ -52,11 +52,13 @@ function reconcileQueues(
       setHasQueued(hasQueuedMessages());
       if (blocked) break;
       for (const chatId of queuedChatsReadyForBackground()) {
-        const message = takeNextQueuedMessage(chatId);
+        // Another sender may have reserved it since the list was made.
+        if (isStreamActive(chatId)) continue;
+        // Reserved as the message is taken, ahead of the request and before the queue tells
+        // anyone: the chat counts as busy (one message per reply), so no other runner takes its
+        // next message alongside, and opening it meanwhile waits for this reply.
+        const message = takeNextQueuedMessage(chatId, () => registerStream(chatId));
         if (!message) continue;
-        // Reserved now, ahead of the request: the chat counts as busy (one
-        // message per reply), and opening it meanwhile waits for this reply.
-        registerStream(chatId);
         // The key is taken here, not inside the updater: React may run an updater twice.
         const key = ++nextSendKey;
         const send = { chatId, message, key };

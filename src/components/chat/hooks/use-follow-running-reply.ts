@@ -24,6 +24,7 @@ type FollowStream = (
   prior?: UIMessage,
   onRefused?: () => void,
   stillWanted?: () => boolean,
+  onRunGone?: () => void,
 ) => Promise<StreamOutcome>
 
 /**
@@ -158,7 +159,11 @@ export function useFollowRunningReply({
         // cleanup cancels this). If it fails, nothing would: so the next attempt is scheduled
         // here too, backing off as usual.
         recoverAfter(FOLLOW_REFUSED_BACKOFF_MS * tally.refused)
-      }, () => !stopped).then(() => { ownFollowGoing = false }, () => { ownFollowGoing = false })
+      }, () => !stopped, () => {
+        // Attached, dropped, and the reconnect found the run over: its history reload may
+        // fail, so it is asked for again until a history load lands.
+        reloadPendingRef.current = true
+      }).then(() => { ownFollowGoing = false }, () => { ownFollowGoing = false })
     }
     // Nothing is scheduled while a stream from before the load owns the chat, or with the
     // budget spent; the timer is still made (and cleared by the cleanup) either way.

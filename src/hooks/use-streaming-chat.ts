@@ -656,10 +656,13 @@ export function useStreamingChat({
 
         // Stream ended without a done or error event - treat what was shown as
         // the complete response. A user Stop already finalised the message.
-        if (!turn.streamFinished && !stopRequestedRef.current) finishTurn(ctx, turn, "ended")
+        // No terminal event: the connection closed cleanly, but that says nothing about whether
+        // the run behind it has ended, so its end is recorded as inconclusive.
+        const endedWithoutEvent = !turn.streamFinished && !stopRequestedRef.current
+        if (endedWithoutEvent) finishTurn(ctx, turn, "ended")
 
         const outcome: StreamOutcome = stopRequestedRef.current ? "aborted" : turn.turnFailed ? "error" : "done"
-        endOwnStream(outcome)
+        endOwnStream(outcome, endedWithoutEvent ? { inconclusive: true } : undefined)
         // The backend saves the files this turn carried to Library; refresh what Library shows.
         if (options?.files?.length) notifyLibraryFilesChanged()
         if (isActiveStream()) setStreamState?.("done")
@@ -765,6 +768,7 @@ export function useStreamingChat({
             onFollowResult: (r) => { result = r },
             onDetached: () => { retryDetached = true },
             onStopped: () => { stoppedByUser = true; options?.onStopped?.() },
+            ...(options?.onRunGone ? { onRunGone: options.onRunGone } : {}),
           })
           if (result === "attached") {
             // Recovered: the drop that held the queue was not a failure after all.
@@ -786,6 +790,9 @@ export function useStreamingChat({
             // it again here could remove a reservation someone made in between.
             if (showsChat(liveChatId, false)) setStreamState?.("done")
             onStreamLost?.(liveChatId)
+            // That reload may fail, and the chat would still show the reply as running: the
+            // caller (the view's recovery) keeps it pending until a history load lands.
+            options?.onRunGone?.()
             onStreamDone?.()
             // The turn ended on the backend: the drop was no failure, so its hold goes (after
             // the reload above has started, which the queue waits on).
@@ -867,11 +874,11 @@ export function useStreamingChat({
    */
   /** `onRefused` runs when the follow never reached the turn's stream (not when it
    *  attached and later ended), before the history reload that onStreamLost starts. */
-  const followStream = async (chatId: string, loadingMessageId: string, prior?: UIMessage, onRefused?: () => void, stillWanted?: () => boolean): Promise<StreamOutcome> => {
+  const followStream = async (chatId: string, loadingMessageId: string, prior?: UIMessage, onRefused?: () => void, stillWanted?: () => boolean, onRunGone?: () => void): Promise<StreamOutcome> => {
     let leftBeforeStart = false
     let result: FollowResult = "attached"
     const outcome = await fetchAiResponse("", chatId, loadingMessageId, null, {
-      follow: true, prior, ...(stillWanted ? { stillWanted } : {}),
+      follow: true, prior, ...(stillWanted ? { stillWanted } : {}), ...(onRunGone ? { onRunGone } : {}),
       onLeftBeforeStart: () => { leftBeforeStart = true },
       onFollowResult: (r) => { result = r },
     })
