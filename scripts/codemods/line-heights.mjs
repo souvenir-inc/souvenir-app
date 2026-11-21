@@ -89,7 +89,9 @@ function mapValue(raw, block, counter) {
     .at(-1)?.groups.value.trim().replace(/^['"]|['"]$/g, "");
   // A spread (`...other`, `...{ fontSize }`) can override any key, so with one there is no
   // telling which fontSize wins: no pairing.
-  const font = /\.\.\./.test(scope) ? null : lastFont?.match(/^var\(--font-size-([a-z0-9-]+)\)$/);
+  // A `font` shorthand sets font-size too, and may come after the longhand: no pairing either.
+  const shorthand = [...scope.matchAll(/(?<=(?:^|[{,;])\s*)(["']?)font\1\s*:/gm)].some((m) => !inString(m.index));
+  const font = /\.\.\./.test(scope) || shorthand ? null : lastFont?.match(/^var\(--font-size-([a-z0-9-]+)\)$/);
   if (font && PAIR[font[1]] && Math.abs(PAIR[font[1]] - px) <= 4) {
     counter.snapped++;
     return `var(${PAIR_TOKEN[font[1]] || PX[PAIR[font[1]]]})`;

@@ -175,8 +175,12 @@ export function queueMessage(
   return message
 }
 
-/** Removes and returns the message due next — whoever takes it sends it. */
-export function takeNextQueuedMessage(key: string): QueuedMessage | undefined {
+/**
+ * Removes and returns the message due next — whoever takes it sends it. `reserve` runs after
+ * the message is taken and before anyone is told: a background sender reserves the chat there,
+ * so no other sender, reacting to the change, takes the chat's next message alongside it.
+ */
+export function takeNextQueuedMessage(key: string, reserve?: (message: QueuedMessage) => void): QueuedMessage | undefined {
   // Its front message is on its way back (a hand-over): nothing goes out ahead of it, from
   // the background or from the chat itself.
   if (handingOver.has(key)) return undefined
@@ -184,6 +188,7 @@ export function takeNextQueuedMessage(key: string): QueuedMessage | undefined {
   const next = queue?.messages[0]
   if (!queue || !next) return undefined
   setQueue(key, { ...queue, messages: queue.messages.slice(1) })
+  reserve?.(next)
   notify()
   return next
 }

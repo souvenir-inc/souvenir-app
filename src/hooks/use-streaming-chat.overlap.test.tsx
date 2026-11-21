@@ -1140,6 +1140,49 @@ describe('useStreamingChat with overlapping follows', () => {
     }
   }, 15000)
 
+  it("tells the follow's caller when a reconnect after a drop finds the run over", async () => {
+    const onRunGone = vi.fn()
+    const done = hook.followStream('chat-A', 'reply-A', undefined, undefined, undefined, onRunGone)
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].status = 0
+    FakeXHR.all[0].end() // dropped: a reconnect follows
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+    FakeXHR.all[1].status = 404 // the run is over
+    FakeXHR.all[1].responseText = '{"detail":"no running turn"}'
+    FakeXHR.all[1].end()
+    expect(await done).toBe('done')
+    expect(onRunGone).toHaveBeenCalledOnce()
+  })
+
+  it('records a clean close with no terminal event as an inconclusive end', async () => {
+    const ends: { outcome: string; inconclusive?: boolean }[] = []
+    const off = subscribeStreams((e) => { if (e.type === 'end' && e.chatId === 'chat-A') ends.push({ outcome: e.outcome, inconclusive: e.inconclusive }) })
+    const done = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'Part of it.' })
+    FakeXHR.all[0].end() // 200, closed, no RUN_FINISHED or error
+    await act(async () => { await done })
+    off()
+    // Shown as cut off (not a finished turn), and recorded as inconclusive: the run may go on.
+    expect(ends).toEqual([{ outcome: 'error', inconclusive: true }])
+  })
+
+  it('records a run that finished as a conclusive end', async () => {
+    const ends: { outcome: string; inconclusive?: boolean }[] = []
+    const off = subscribeStreams((e) => { if (e.type === 'end' && e.chatId === 'chat-A') ends.push({ outcome: e.outcome, inconclusive: e.inconclusive }) })
+    const done = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'All of it.' }, { type: 'RUN_FINISHED', ...runA })
+    FakeXHR.all[0].end()
+    await act(async () => { await done })
+    off()
+    expect(ends).toEqual([{ outcome: 'done', inconclusive: undefined }])
+  })
+
   it("leaves a newer registration alone when a stopped call's transport settles", async () => {
     const done = hook.followStream('chat-A', 'reply-A')
     await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))

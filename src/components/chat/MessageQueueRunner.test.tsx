@@ -238,6 +238,19 @@ describe('MessageQueueRunner', () => {
     root = createRoot(container) // for teardown
   })
 
+  it('with two runners, sends one message per reply for a chat', async () => {
+    const other = createRoot(document.createElement('div'))
+    await act(async () => other.render(<MessageQueueRunner />))
+    await queueBehindReply('first', 'second')
+    await act(async () => completeStream('chat-1', 'done'))
+    expect(sentInputs()).toEqual(['first']) // only one runner took a message
+    expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['second'])
+    await act(async () => finishSend('done'))
+    expect(sentInputs()).toEqual(['first', 'second']) // the next goes once the first is done
+    await act(async () => finishSend('done'))
+    await act(async () => other.unmount())
+  })
+
   it('leaves a chat on screen to its own view', async () => {
     await act(async () => setQueueForeground(view, 'chat-1'))
     await queueBehindReply('and then this')

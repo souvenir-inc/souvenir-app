@@ -21,7 +21,7 @@ const onRunEnded = vi.fn()
 let root: Root
 let container: HTMLDivElement
 // Each follow is refused (it never reaches the stream) unless a test says otherwise.
-type FollowStreamMock = (chatId: string, id: string, prior?: unknown, onRefused?: () => void, stillWanted?: () => boolean) => Promise<StreamOutcome>
+type FollowStreamMock = (chatId: string, id: string, prior?: unknown, onRefused?: () => void, stillWanted?: () => boolean, onRunGone?: () => void) => Promise<StreamOutcome>
 const followStream = vi.fn<FollowStreamMock>(async (_chatId, _id, _prior, onRefused) => {
   onRefused?.()
   return 'done'
@@ -345,16 +345,34 @@ describe('useFollowRunningReply', () => {
     expect(onRunEnded).toHaveBeenCalledTimes(2)
   })
 
+  it("keeps asking for a reload when a follow's reconnect finds the run over", async () => {
+    // The follow attaches, drops, and its reconnect gets a 404: the run is over.
+    followStream.mockImplementationOnce(async (_c, _i, _p, _r, _w, onRunGone) => { onRunGone?.(); return 'done' })
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    expect(followStream).toHaveBeenCalledTimes(1)
+    // Its reload failed: no new history load. The reload is asked for again, not the stream.
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS) })
+    expect(onRunEnded).toHaveBeenCalledTimes(1)
+    expect(followStream).toHaveBeenCalledTimes(1)
+    await render({ chatId: 'chat-A', runningMessageId: null, historyLoadId: 2 }) // a load lands
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS * 3) })
+    expect(onRunEnded).toHaveBeenCalledTimes(1)
+  })
+
   it('holds the background reload while a newer stream is going, then sends it', async () => {
     registerStream('chat-A')
     await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
     await act(async () => { completeStream('chat-A', 'done') }) // background stream finished: reload #1 (fails)
     expect(onRunEnded).toHaveBeenCalledTimes(1)
+    // The running owner is cleared; the refresh failed, so no new history load arrived.
+    await render({ chatId: 'chat-A', runningMessageId: null, historyLoadId: 1 })
     await act(async () => { registerStream('chat-A') }) // the user sends again
     await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS * 2) })
     expect(onRunEnded).toHaveBeenCalledTimes(1) // not over the newer stream
     await act(async () => { completeStream('chat-A', 'done') })
+    expect(onRunEnded).toHaveBeenCalledTimes(1) // the send's own end is not a reload
     await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS) })
-    expect(onRunEnded.mock.calls.length).toBeGreaterThan(1) // once idle, it goes
+    expect(onRunEnded).toHaveBeenCalledTimes(2) // the retry timer sends it once idle
   })
 })
