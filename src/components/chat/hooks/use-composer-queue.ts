@@ -17,6 +17,7 @@ import {
   type QueuedTurnContext,
 } from "@/lib/message-queue";
 import { PINS_ENABLED } from "@/lib/feature-flags";
+import { isStreamActive } from "@/lib/stream-registry";
 import type { PendingAttachment } from "../AttachmentManager";
 import type { QueuedRowExit } from "../QueuedMessagesTray";
 
@@ -216,6 +217,10 @@ export function useQueuedSend({
   /** Stable; always sends with the composer's latest settings. */
   sendTurn: (turn: QueuedMessagePart & { fromQueue: boolean }) => Promise<unknown>;
 }) {
+  // queueReady as it is now: a retry that fires from the queue (after a hand-over) runs outside
+  // a render, and a reply may have started since the effect that scheduled it.
+  const queueReadyRef = useRef(queueReady);
+  useEffect(() => { queueReadyRef.current = queueReady; }, [queueReady]);
   useEffect(() => {
     if (!queueReady) return;
     let cancelled = false;
@@ -234,7 +239,10 @@ export function useQueuedSend({
           if (isHandingOver(queueKey)) return;
           stopWaiting?.();
           stopWaiting = undefined;
-          send();
+          // Busy again (a reply started meanwhile, which the registry knows before React has
+          // rendered it): the message stays queued, and the next time the queue is ready this
+          // effect runs again and sends it.
+          if (queueReadyRef.current && !isStreamActive(queueKey)) send();
         });
       }
     };

@@ -20,7 +20,7 @@ vi.mock('@/lib/api/connectors', async (orig) => ({
   initiateLink: vi.fn(() => new Promise(() => {})),
 }))
 
-import { ConnectPromptCard } from '@/components/chat/ConnectorPrompts'
+import { ConnectPromptCard, resetConnectPromptAnswers } from '@/components/chat/ConnectorPrompts'
 import { getConnector } from '@/lib/api/connectors'
 import { parsePrompt } from '@/lib/api/prompts'
 import type { ConnectorConnectPrompt } from '@/types/chat'
@@ -39,6 +39,7 @@ const tryAgain = () => [...container.querySelectorAll('button')].find((b) => b.t
 
 beforeEach(() => {
   respondToChatPrompt.mockReset()
+  resetConnectPromptAnswers()
   container = document.createElement('div')
   document.body.appendChild(container)
   root = createRoot(container)
@@ -219,19 +220,16 @@ describe('ConnectPromptCard "Not now"', () => {
     await act(async () => root.render(<ConnectPromptCard prompt={prompt} />)) // connected: answers on mount
     await flush()
     await act(async () => root.unmount())
-    // The new card renders and commits, but its effect has not run yet when the POST fails.
-    const env = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
-    env.IS_REACT_ACT_ENVIRONMENT = false
+    // The new card renders (taking note of the answer in flight); before its effect runs, that
+    // answer's entry is gone (its sender settled it). Rendered after the card, in the same
+    // pass, so the order is fixed: the card's render, then this, then the card's effect.
+    let cleared = false
+    const SettleBeforeEffects = () => { if (!cleared) { cleared = true; resetConnectPromptAnswers() } return null }
     root = createRoot(container)
-    let effectsRan = false
-    const Probe = () => { React.useEffect(() => { effectsRan = true }); return null }
-    root.render(<><ConnectPromptCard prompt={prompt} /><Probe /></>)
-    await vi.waitFor(() => expect(container.querySelector('button')).not.toBeNull(), { interval: 0 })
-    const raced = !effectsRan
-    fail(new Error('Network error'))
-    await vi.waitFor(() => expect(tryAgain()).toBeDefined())
-    env.IS_REACT_ACT_ENVIRONMENT = true
-    expect(raced).toBe(true) // the race this test is about did happen
+    await act(async () => root.render(<><ConnectPromptCard prompt={prompt} /><SettleBeforeEffects /></>))
+    await act(async () => { fail(new Error('Network error')); await Promise.resolve() })
+    await flush()
+    expect(tryAgain()).toBeDefined() // the failure still reached the card
     expect(respondToChatPrompt).toHaveBeenCalledTimes(1)
   })
 
@@ -248,6 +246,44 @@ describe('ConnectPromptCard "Not now"', () => {
     expect(respondToChatPrompt).toHaveBeenCalledWith('connected', '/chats/c1/prompts/p1-second') // it answers for itself
     await act(async () => { release(); await Promise.resolve() })
     act(() => second.unmount())
+  })
+
+  it('keeps a "Not now" that failed after its card left, and never answers "connected" for it', async () => {
+    vi.mocked(getConnector).mockResolvedValueOnce({ ownedConnections: [], apiKeyFields: [] } as unknown as Awaited<ReturnType<typeof getConnector>>)
+    let fail!: (e: Error) => void
+    respondToChatPrompt.mockImplementationOnce(() => new Promise<void>((_, reject) => { fail = reject }))
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} />))
+    await flush()
+    const notNow = [...container.querySelectorAll('button')].find((b) => b.textContent?.includes('Not now'))!
+    await act(async () => notNow.click())
+    await act(async () => root.unmount()) // the row leaves the screen…
+    await act(async () => { fail(new Error('Network error')); await Promise.resolve() }) // …and the decline fails
+    await flush()
+    // The card comes back; the app is connected by now (the default lookup).
+    root = createRoot(container)
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} />))
+    await flush()
+    expect(respondToChatPrompt).toHaveBeenCalledTimes(1) // no "connected" sent
+    expect(tryAgain()).toBeDefined() // the decline is offered again
+    respondToChatPrompt.mockResolvedValueOnce(undefined)
+    await act(async () => tryAgain()!.click())
+    await flush()
+    expect(respondToChatPrompt).toHaveBeenLastCalledWith('cancel', '/chats/c1/prompts/p1')
+  })
+
+  it('tells the view once when an answer it took over goes through under Strict Mode', async () => {
+    let release!: () => void
+    respondToChatPrompt.mockImplementationOnce(() => new Promise<void>((resolve) => { release = resolve }))
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} />)) // answers on mount
+    await flush()
+    await act(async () => root.unmount())
+    root = createRoot(container)
+    const shownView = vi.fn()
+    await act(async () => root.render(<React.StrictMode><ConnectPromptCard prompt={prompt} onAnswered={shownView} /></React.StrictMode>))
+    await flush()
+    await act(async () => { release(); await Promise.resolve() })
+    await flush()
+    expect(shownView).toHaveBeenCalledOnce()
   })
 
   it('stays gone on remount once a decision is recorded', async () => {

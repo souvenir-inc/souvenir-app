@@ -204,7 +204,8 @@ describe('useStreamingChat turn result', () => {
     expect(await done).toBe('aborted')
     FakeXHR.last = null
     expect(isStreamActive('chat-1')).toBe(false)
-    expect(ended).toEqual([{ type: 'end', chatId: 'chat-1', outcome: 'aborted' }])
+    // The Stop names the reply it stopped, so a view can tell its own running reply's follow apart.
+    expect(ended).toEqual([{ type: 'end', chatId: 'chat-1', outcome: 'aborted', replyId: 'loading-1' }])
   })
 })
 

@@ -623,6 +623,22 @@ describe('useStreamingChat with overlapping follows', () => {
     await act(async () => { await done })
   })
 
+  it('keeps an answered card that the prior did not have', async () => {
+    const prior = { id: 'reply-A', role: 'assistant', content: 'earlier', created_at: '', chat_id: 'chat-A' } as UIMessage
+    messages = [{ ...prior, isLoading: true }]
+    const done = hook.followStream('chat-A', 'reply-A', prior)
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    // A card shown after the prior was taken, and answered, before the stream attaches.
+    const card = { request_id: 'p2', card: 'chat' } as never
+    messages = messages.map((m) => ({ ...m, chatPrompts: [{ ...(card as object), decision: 'yes' } as never] }))
+    const xhr = FakeXHR.all[0]
+    xhr.start() // attaches: the reply goes back to the prior
+    expect(messages[0].chatPrompts).toEqual([expect.objectContaining({ request_id: 'p2', decision: 'yes' })])
+    xhr.push({ type: 'RUN_STARTED', ...runA }, { type: 'RUN_FINISHED', ...runA })
+    xhr.end()
+    await act(async () => { await done })
+  })
+
   it("finishes a failed reconnect on its own reply and composer, not on a newer call's", async () => {
     const states: string[] = []
     const view: View = { currentChatIdRef: { current: 'chat-A' }, setStreamState: (state) => { states.push(state) } }
@@ -1175,6 +1191,23 @@ describe('useStreamingChat with overlapping follows', () => {
     await act(async () => { await done })
     expect(incomplete).toHaveBeenCalledOnce() // its caller can try again
   })
+
+  it("tells the follow's caller when the last allowed reconnect drops too", async () => {
+    const incomplete = vi.fn()
+    const done = hook.followStream('chat-A', 'reply-A', undefined, undefined, undefined, undefined, incomplete)
+    // The first read and every reconnect attach, then drop: 1 + 5 attempts.
+    for (let n = 1; n <= 6; n++) {
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(n), { timeout: 3000 })
+      const xhr = FakeXHR.all[n - 1]
+      xhr.start()
+      xhr.push({ type: 'RUN_STARTED', ...runA })
+      xhr.status = 0
+      xhr.end()
+    }
+    await act(async () => { await done })
+    expect(FakeXHR.all).toHaveLength(6) // no seventh try from here…
+    expect(incomplete).toHaveBeenCalledOnce() // …its caller is told to recover
+  }, 20000)
 
   it('records a clean close with no terminal event as an inconclusive end', async () => {
     const ends: { outcome: string; inconclusive?: boolean }[] = []

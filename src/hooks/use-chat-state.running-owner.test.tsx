@@ -119,4 +119,19 @@ describe('runningMessageId across a chat switch', () => {
     await act(async () => { registerStream('a'); completeStream('a', 'error') }) // a dropped reader
     expect(seen.at(-1)?.running).toBe('turn-A')
   })
+
+  it('stops naming the running reply when the user stops the follow of that reply, not another send', async () => {
+    getChatStreamId.mockResolvedValue('turn-A')
+    getChatMessages.mockResolvedValue({
+      messages: [msg('m1', 'a'), msg('turn-A', 'a', { role: 'assistant', content: '', run } as Partial<Message>)],
+      has_more: false, next_cursor: null,
+    })
+    await act(async () => { root.render(<Harness chatId="a" />); await Promise.resolve() })
+    await act(async () => { await Promise.resolve() })
+    expect(seen.at(-1)?.running).toBe('turn-A')
+    await act(async () => { registerStream('a'); completeStream('a', 'aborted', { replyId: 'reply-new' }) }) // another send, stopped
+    expect(seen.at(-1)?.running).toBe('turn-A')
+    await act(async () => { registerStream('a'); completeStream('a', 'aborted', { replyId: 'turn-A' }) }) // the follow of it, stopped
+    expect(seen.at(-1)?.running).toBeNull() // the queue can go on
+  })
 })

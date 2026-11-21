@@ -292,9 +292,26 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 
-// The full plugin lists with math added (keep everything from the basic setup):
+// remark-math marks equations as <code class="language-math math-inline|math-display">, and the
+// default schema strips those classes before rehype-katex sees them (the math would stay code).
+// Allow just those on <code>, keeping everything else from the basic setup's schema:
+const [, baseSchema] = sanitize;
+const sanitizeWithMath: [typeof rehypeSanitize, SanitizeOptions] = [rehypeSanitize, {
+  ...baseSchema,
+  attributes: {
+    ...baseSchema.attributes,
+    code: [
+      ...(baseSchema.attributes?.code ?? []),
+      ['className', /^language-./, 'math-inline', 'math-display'],
+    ],
+  },
+}];
+
+// The full plugin lists with math added (keep everything from the basic setup). KaTeX runs
+// after sanitize and renders from the equation text only (trust: false by default), so its
+// generated markup is not the model's HTML:
 remarkPlugins={[remarkGfm, remarkMath]}
-rehypePlugins={[sanitize, rehypeKatex, rehypeHighlight]} // `sanitize` as in the basic setup (footnote-safe)
+rehypePlugins={[sanitizeWithMath, rehypeKatex, rehypeHighlight]}
 ```
 
 ---

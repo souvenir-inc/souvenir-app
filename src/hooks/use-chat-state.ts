@@ -345,9 +345,15 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   // Only an end that shows the run finished: not an inconclusive one (a send that failed
   // before its run, a follow that never reached the stream), nor a failure or stop, after
   // which the earlier reply may still be running and stays eligible to be followed.
+  // A Stop is one too, when it stopped the stream writing that very reply (a follow of it): the
+  // backend stops the run, and nothing else would clear it (no reload follows a Stop). Another
+  // send stopped before its run took over leaves it, as above.
   useEffect(() => subscribeStreams((event) => {
-    if (event.type !== "end" || event.outcome !== "done" || event.inconclusive) return
-    setRunningOwner((owner) => (owner && owner.chatId === event.chatId ? null : owner))
+    if (event.type !== "end") return
+    const finished = event.outcome === "done" && !event.inconclusive
+    const stoppedThisReply = event.outcome === "aborted" && event.replyId !== undefined
+    if (!finished && !stoppedThisReply) return
+    setRunningOwner((owner) => (owner && owner.chatId === event.chatId && (finished || owner.id === event.replyId) ? null : owner))
   }), [])
 
   // Re-run the write-back once a reply for the shown chat has ended.
