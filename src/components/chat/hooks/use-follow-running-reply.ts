@@ -23,6 +23,7 @@ type FollowStream = (
   loadingMessageId: string,
   prior?: UIMessage,
   onRefused?: () => void,
+  stillWanted?: () => boolean,
 ) => Promise<StreamOutcome>
 
 /**
@@ -122,9 +123,11 @@ export function useFollowRunningReply({
     let followed = false
     const follow = () => {
       followed = true
+      // stillWanted: if this follow has to wait its turn, it goes ahead only while this effect
+      // (this chat, this running reply) is still the current one.
       void followLatest(chatId, runningMessageId, currentReply(runningMessageId), () => {
         if (tally.key === key) tally.refused += 1
-      })
+      }, () => !stopped)
     }
     // Nothing is scheduled while a stream from before the load owns the chat, or with the
     // budget spent; the timer is still made (and cleared by the cleanup) either way.
@@ -156,7 +159,9 @@ export function useFollowRunningReply({
         // made from this view after the load updates its own reply, and is left alone.
         superseded = false
         runEnded()
-      } else if (event.type === "end" && superseded && event.outcome !== "done") {
+      } else if (event.type === "end" && superseded && (event.outcome !== "done" || event.inconclusive)) {
+        // Failed, stopped, or inconclusive (a reader refused before it attached): nothing newer
+        // has the chat, so recovery goes on, within the budget.
         superseded = false
         // Within the budget: follow now. With it spent: back to asking whether the run ended.
         // Not from inside this notification: it may be Stop's, which still has its own reply
