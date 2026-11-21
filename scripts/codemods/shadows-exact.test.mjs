@@ -124,3 +124,11 @@ describe("transformCss", () => {
     expect(transformCss(`.card { box-shadow: ${shadow}; }`, { n: 0 })).toMatch(/box-shadow: var\(--shadow-/);
   });
 });
+describe("regex literals", () => {
+  it("leaves shadow text inside a regex literal alone", () => {
+    const src = "const pattern = /[{boxShadow: '0px 2px 2.8px rgba(82,75,71,0.12)'}]/;";
+    expect(transformTsx(src, { n: 0 })).toBe(src);
+    expect(transformTsx("const s = { boxShadow: '0px 2px 2.8px rgba(82,75,71,0.12)' };", { n: 0 })).toContain("'var(--shadow-");
+  });
+});
+

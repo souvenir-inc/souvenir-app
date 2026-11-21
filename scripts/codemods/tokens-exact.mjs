@@ -139,6 +139,15 @@ export const inTypeBody = (src, masked, at) => {
   return false;
 };
 
+/** Regular-expression literal spans in JS/TS source ([from, to] pairs): a `/` where an
+ *  expression starts, outside strings and comments (`masked`). codeMask leaves them as code,
+ *  but text inside one (`/{lineHeight: 1.5,}/`) is not a declaration. */
+export function regexLiteralSpans(src, masked) {
+  return [...src.matchAll(/(?<=(?:^|[=(,:[!&|?{};]|\breturn)\s*)\/(?![*/])(?:\\.|\[(?:\\.|[^\]\\\n])*\]|[^/\\\n[])+\/[a-z]*/gm)]
+    .filter((m) => !masked[m.index])
+    .map((m) => [m.index, m.index + m[0].length]);
+}
+
 export function codeMask(src, { css = false } = {}) {
   const mask = new Uint8Array(src.length);
   for (let i = 0; i < src.length; i++) {

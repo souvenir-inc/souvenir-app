@@ -196,6 +196,21 @@ describe('ConnectPromptCard "Not now"', () => {
     expect(tryAgain()).toBeDefined() // the failure reached the card on screen
   })
 
+  it('does not take another message’s pending answer for its own when the request id repeats', async () => {
+    let release!: () => void
+    respondToChatPrompt.mockImplementationOnce(() => new Promise<void>((resolve) => { release = resolve }))
+    respondToChatPrompt.mockResolvedValueOnce(undefined)
+    const other = { ...prompt, respond_url: '/chats/c1/prompts/p1-second' } as ConnectorConnectPrompt
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} />)) // m1/p1 answers on mount (connected)
+    await flush()
+    const second = createRoot(document.createElement('div'))
+    await act(async () => second.render(<ConnectPromptCard prompt={other} />)) // m2/p1 mounts meanwhile
+    await flush()
+    expect(respondToChatPrompt).toHaveBeenCalledWith('connected', '/chats/c1/prompts/p1-second') // it answers for itself
+    await act(async () => { release(); await Promise.resolve() })
+    act(() => second.unmount())
+  })
+
   it('stays gone on remount once a decision is recorded', async () => {
     await act(async () => root.render(<ConnectPromptCard prompt={{ ...prompt, decision: 'cancel' }} />))
     await flush()

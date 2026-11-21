@@ -21,7 +21,8 @@ const onRunEnded = vi.fn()
 let root: Root
 let container: HTMLDivElement
 // Each follow is refused (it never reaches the stream) unless a test says otherwise.
-const followStream = vi.fn(async (_chatId: string, _id: string, _prior?: unknown, onRefused?: () => void): Promise<StreamOutcome> => {
+type FollowStreamMock = (chatId: string, id: string, prior?: unknown, onRefused?: () => void, stillWanted?: () => boolean) => Promise<StreamOutcome>
+const followStream = vi.fn<FollowStreamMock>(async (_chatId, _id, _prior, onRefused) => {
   onRefused?.()
   return 'done'
 })
@@ -332,5 +333,18 @@ describe('useFollowRunningReply', () => {
     await render({ chatId: 'chat-A', runningMessageId: null, historyLoadId: 2 }) // a load lands
     await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS * 3) })
     expect(onRunEnded).toHaveBeenCalledTimes(2)
+  })
+
+  it('holds the background reload while a newer stream is going, then sends it', async () => {
+    registerStream('chat-A')
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { completeStream('chat-A', 'done') }) // background stream finished: reload #1 (fails)
+    expect(onRunEnded).toHaveBeenCalledTimes(1)
+    await act(async () => { registerStream('chat-A') }) // the user sends again
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS * 2) })
+    expect(onRunEnded).toHaveBeenCalledTimes(1) // not over the newer stream
+    await act(async () => { completeStream('chat-A', 'done') })
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS) })
+    expect(onRunEnded.mock.calls.length).toBeGreaterThan(1) // once idle, it goes
   })
 })

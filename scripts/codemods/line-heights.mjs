@@ -17,7 +17,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 // The same string/comment mask as tokens-exact, so both codemods agree on what is code.
-import { codeMask, inTypeBody, insideRepo } from "./tokens-exact.mjs";
+import { codeMask, inTypeBody, insideRepo, regexLiteralSpans } from "./tokens-exact.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const args = process.argv.slice(2);
@@ -112,9 +112,7 @@ export function transform(src, isCss, counter) {
   const masked = codeMask(src, { css: isCss });
   // Regular-expression literals (`/\{lineHeight: 1.5,\}/`) are not masked as strings are:
   // their spans are found here (a `/` where an expression starts) and left alone.
-  const regexSpans = isCss ? [] : [...src.matchAll(/(?<=(?:^|[=(,:[!&|?{};]|\breturn)\s*)\/(?![*/])(?:\\.|\[(?:\\.|[^\]\\\n])*\]|[^/\\\n[])+\/[a-z]*/gm)]
-    .filter((m) => !masked[m.index])
-    .map((m) => [m.index, m.index + m[0].length]);
+  const regexSpans = isCss ? [] : regexLiteralSpans(src, masked);
   const inRegex = (i) => regexSpans.some(([from, to]) => i >= from && i < to);
   return src.replace(re, (w, pre, val, post = "", off) => {
     if (typeof post === "number") { off = post; post = ""; }

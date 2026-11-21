@@ -712,6 +712,9 @@ export function useStreamingChat({
             if (!heldBefore && !stoppedByUser) releaseHoldWhenRunEnds(liveChatId)
             return leftDetached() // the call that owns an earlier hold waits for the run's end too
           }
+          // Stopped during the wait: checked before handing over to another reader, so a Stop
+          // keeps the hold rather than leaving it to that reader's outcome.
+          if (stopRequestedRef.current || stoppedByUser) return "aborted"
           // Another reader holds the chat now (its own view following it, from another hook):
           // that one reads the turn, and this retry must not take over its registry entry.
           // When that reader ends, the drop's hold (set above, not one that was already there)

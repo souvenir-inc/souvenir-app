@@ -16,7 +16,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 // The same string/comment mask as tokens-exact, so the codemods agree on what is code.
-import { codeMask, inTypeBody, insideRepo } from "./tokens-exact.mjs";
+import { codeMask, inTypeBody, insideRepo, regexLiteralSpans } from "./tokens-exact.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const TOKENS = path.join(ROOT, "src/styles/tokens");
@@ -134,11 +134,14 @@ const keep = (src, offset) => {
 // one that an expression goes on to use (`'…'.replace(…)`) is left alone.
 export const transformTsx = (src, c) => {
   const masked = codeMask(src);
+  // Text inside a regex literal (`/[{boxShadow: '…'}]/`) is not a declaration.
+  const regexSpans = regexLiteralSpans(src, masked);
+  const inRegex = (i) => regexSpans.some(([from, to]) => i >= from && i < to);
   // Whole identifiers only: `rawboxShadow` or `MY_SHADOW_X` is some other name. A `:` must
   // start an object property (after `{`, `,` or a line start): in `a ? boxShadow : '…'` it is
   // a ternary branch. An `=` must be an assignment, not `==`.
   return src.replace(/((?:(?<=(?:^|[{,])\s*)(?:boxShadow|SHADOW_\w*)(?![\w$])\s*:|(?<![\w$.])(?:boxShadow|SHADOW_\w*)(?![\w$])\s*=(?!=))\s*)(['"`])([^'"`\n]*)\2(?=\s*(?:[,;}]|$))/gm,
-    (w, pre, q, v, off) => masked[off] || keep(src, off) || inTypeBody(src, masked, off) ? w : `${pre}${q}${transformValue(v, c)}${q}`);
+    (w, pre, q, v, off) => masked[off] || inRegex(off) || keep(src, off) || inTypeBody(src, masked, off) ? w : `${pre}${q}${transformValue(v, c)}${q}`);
 };
 export const transformCss = (src, c) => {
   const masked = codeMask(src, { css: true });
