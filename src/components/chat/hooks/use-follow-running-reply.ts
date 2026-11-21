@@ -148,6 +148,7 @@ export function useFollowRunningReply({
       if (followed) return
       if (event.type === "start") {
         clearTimeout(timer)
+        clearTimeout(deferredFollow) // a newer stream owns the chat; if it fails, its end schedules again
         superseded = true
       } else if (event.type === "end" && superseded && event.outcome === "done" && activeAtLoad) {
         // A stream from before the load (a background send) finished the reply this view
