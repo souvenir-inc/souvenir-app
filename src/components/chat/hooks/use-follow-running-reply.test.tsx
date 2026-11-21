@@ -21,7 +21,7 @@ const onRunEnded = vi.fn()
 let root: Root
 let container: HTMLDivElement
 // Each follow is refused (it never reaches the stream) unless a test says otherwise.
-type FollowStreamMock = (chatId: string, id: string, prior?: unknown, onRefused?: () => void, stillWanted?: () => boolean, onRunGone?: () => void) => Promise<StreamOutcome>
+type FollowStreamMock = (chatId: string, id: string, prior?: unknown, onRefused?: () => void, stillWanted?: () => boolean, onRunGone?: () => void, onIncomplete?: () => void) => Promise<StreamOutcome>
 const followStream = vi.fn<FollowStreamMock>(async (_chatId, _id, _prior, onRefused) => {
   onRefused?.()
   return 'done'
@@ -358,6 +358,26 @@ describe('useFollowRunningReply', () => {
     await render({ chatId: 'chat-A', runningMessageId: null, historyLoadId: 2 }) // a load lands
     await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS * 3) })
     expect(onRunEnded).toHaveBeenCalledTimes(1)
+  })
+
+  it("does not mark a reload pending for the chat opened since a late 404", async () => {
+    let gone!: () => void
+    followStream.mockImplementationOnce((_c, _i, _p, _r, _w, onRunGone) => new Promise(() => { gone = () => onRunGone?.() }))
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    await render({ chatId: 'chat-B', runningMessageId: null, historyLoadId: 2 }) // the user opens chat B
+    await act(async () => { gone() }) // A's reconnect then finds its run over
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS * 3) })
+    expect(onRunEnded).not.toHaveBeenCalled() // B's history is not reloaded for it
+  })
+
+  it("follows again, within the budget, when its own follow closes without an end event", async () => {
+    followStream.mockImplementationOnce(async (_c, _i, _p, _r, _w, _g, onIncomplete) => { onIncomplete?.(); return 'error' })
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    expect(followStream).toHaveBeenCalledTimes(1)
+    await act(async () => { await vi.advanceTimersByTimeAsync(FOLLOW_REFUSED_BACKOFF_MS) })
+    expect(followStream).toHaveBeenCalledTimes(2) // recovery tried again
   })
 
   it('holds the background reload while a newer stream is going, then sends it', async () => {

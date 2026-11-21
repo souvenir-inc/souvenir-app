@@ -226,29 +226,35 @@ describe('MessageQueueRunner', () => {
   it("puts back only its own reservations when another runner is taking messages meanwhile", async () => {
     const other = createRoot(document.createElement('div'))
     await act(async () => other.render(<MessageQueueRunner />)) // a second runner, mounted alongside
-    await queueBehindReply('first')
-    // The first runner takes the message and goes away before its worker mounts. Its message
-    // goes back, the second runner takes it: that reservation is the second runner's own.
-    await act(async () => { completeStream('chat-1', 'done'); root.unmount() })
-    await act(async () => { await Promise.resolve() })
-    expect(getChatQueue('chat-1')).toBeUndefined()
-    expect(sentInputs()).toEqual(['first']) // sent once, by the second runner
-    await act(async () => finishSend('done'))
-    await act(async () => other.unmount())
-    root = createRoot(container) // for teardown
+    try {
+      await queueBehindReply('first')
+      // The first runner takes the message and goes away before its worker mounts. Its message
+      // goes back, the second runner takes it: that reservation is the second runner's own.
+      await act(async () => { completeStream('chat-1', 'done'); root.unmount() })
+      await act(async () => { await Promise.resolve() })
+      expect(getChatQueue('chat-1')).toBeUndefined()
+      expect(sentInputs()).toEqual(['first']) // sent once, by the second runner
+      await act(async () => finishSend('done'))
+    } finally {
+      await act(async () => other.unmount()) // even if an assertion failed: it shares the queue
+      root = createRoot(container) // for teardown
+    }
   })
 
   it('with two runners, sends one message per reply for a chat', async () => {
     const other = createRoot(document.createElement('div'))
     await act(async () => other.render(<MessageQueueRunner />))
-    await queueBehindReply('first', 'second')
-    await act(async () => completeStream('chat-1', 'done'))
-    expect(sentInputs()).toEqual(['first']) // only one runner took a message
-    expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['second'])
-    await act(async () => finishSend('done'))
-    expect(sentInputs()).toEqual(['first', 'second']) // the next goes once the first is done
-    await act(async () => finishSend('done'))
-    await act(async () => other.unmount())
+    try {
+      await queueBehindReply('first', 'second')
+      await act(async () => completeStream('chat-1', 'done'))
+      expect(sentInputs()).toEqual(['first']) // only one runner took a message
+      expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['second'])
+      await act(async () => finishSend('done'))
+      expect(sentInputs()).toEqual(['first', 'second']) // the next goes once the first is done
+      await act(async () => finishSend('done'))
+    } finally {
+      await act(async () => other.unmount()) // even if an assertion failed: it shares the queue
+    }
   })
 
   it('leaves a chat on screen to its own view', async () => {

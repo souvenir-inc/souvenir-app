@@ -62,6 +62,9 @@ export interface StreamRequestOptions {
   /** A reconnect after a drop found the run already ended (404): the turn is over on the
    *  backend, and only a history reload (which may fail) shows it. Passed up nested retries. */
   onRunGone?: () => void
+  /** A follow that attached, but whose stream closed with no terminal event: the run may
+   *  still be going, and nothing here read it to its end. Not for a Stop or a reported error. */
+  onIncomplete?: () => void
 }
 
 export interface StreamTarget {

@@ -663,6 +663,7 @@ export function useStreamingChat({
 
         const outcome: StreamOutcome = stopRequestedRef.current ? "aborted" : turn.turnFailed ? "error" : "done"
         endOwnStream(outcome, endedWithoutEvent ? { inconclusive: true } : undefined)
+        if (endedWithoutEvent && follow) options?.onIncomplete?.()
         // The backend saves the files this turn carried to Library; refresh what Library shows.
         if (options?.files?.length) notifyLibraryFilesChanged()
         if (isActiveStream()) setStreamState?.("done")
@@ -769,6 +770,7 @@ export function useStreamingChat({
             onDetached: () => { retryDetached = true },
             onStopped: () => { stoppedByUser = true; options?.onStopped?.() },
             ...(options?.onRunGone ? { onRunGone: options.onRunGone } : {}),
+            ...(options?.onIncomplete ? { onIncomplete: options.onIncomplete } : {}),
           })
           if (result === "attached") {
             // Recovered: the drop that held the queue was not a failure after all.
@@ -874,11 +876,11 @@ export function useStreamingChat({
    */
   /** `onRefused` runs when the follow never reached the turn's stream (not when it
    *  attached and later ended), before the history reload that onStreamLost starts. */
-  const followStream = async (chatId: string, loadingMessageId: string, prior?: UIMessage, onRefused?: () => void, stillWanted?: () => boolean, onRunGone?: () => void): Promise<StreamOutcome> => {
+  const followStream = async (chatId: string, loadingMessageId: string, prior?: UIMessage, onRefused?: () => void, stillWanted?: () => boolean, onRunGone?: () => void, onIncomplete?: () => void): Promise<StreamOutcome> => {
     let leftBeforeStart = false
     let result: FollowResult = "attached"
     const outcome = await fetchAiResponse("", chatId, loadingMessageId, null, {
-      follow: true, prior, ...(stillWanted ? { stillWanted } : {}), ...(onRunGone ? { onRunGone } : {}),
+      follow: true, prior, ...(stillWanted ? { stillWanted } : {}), ...(onRunGone ? { onRunGone } : {}), ...(onIncomplete ? { onIncomplete } : {}),
       onLeftBeforeStart: () => { leftBeforeStart = true },
       onFollowResult: (r) => { result = r },
     })
