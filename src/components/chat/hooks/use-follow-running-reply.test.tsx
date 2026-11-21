@@ -257,4 +257,16 @@ describe('useFollowRunningReply', () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(10) })
     expect(followStream).toHaveBeenCalledTimes(1) // neither deferred follow ran
   })
+
+  it('cancels a deferred follow when a newer stream starts before it runs', async () => {
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 2 }) // backing off
+    await act(async () => {
+      registerStream('chat-A'); completeStream('chat-A', 'error') // a failed send schedules recovery…
+      registerStream('chat-A'); completeStream('chat-A', 'done') // …then a newer send starts and finishes
+    })
+    await act(async () => { await vi.advanceTimersByTimeAsync(10) })
+    expect(followStream).toHaveBeenCalledTimes(1) // the obsolete reply is not followed
+  })
 })

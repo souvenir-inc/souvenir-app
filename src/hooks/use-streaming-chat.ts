@@ -640,7 +640,13 @@ export function useStreamingChat({
         // Whether the chat's queue was already held: an error hold this end sets is lifted again
         // if a reconnect below reads the turn to its end, one that was already there is not.
         const heldBefore = !!getChatQueue(resolvedChatIdRef.current)?.heldBy
-        completeStream(resolvedChatIdRef.current, stopRequestedRef.current ? "aborted" : follow && !attached ? "done" : "error")
+        // Inconclusive unless it read the run (a follow that attached, or a send whose run
+        // started): the run it was about may still be going.
+        completeStream(
+          resolvedChatIdRef.current,
+          stopRequestedRef.current ? "aborted" : follow && !attached ? "done" : "error",
+          { inconclusive: follow ? !attached : !runStarted },
+        )
         // The hold this end just set (if it set one): what a later recovery may lift.
         dropHoldId = heldBefore ? undefined : currentHoldId(resolvedChatIdRef.current)
         // A turn that failed or was stopped part-way may still have saved its files.
@@ -726,7 +732,9 @@ export function useStreamingChat({
               if (retryDetached) releaseHoldWhenRunEnds(liveChatId)
               else releaseErrorHold(liveChatId, dropHoldId)
             }
-            return outcome
+            // Passed up: a call above this one may own an earlier hold, and must not take a
+            // detached retry's "done" as a finished turn either.
+            return retryDetached ? leftDetached() : outcome
           }
           if (result === "gone") {
             // The retry's own failed follow already ended the registry entry (as done). Ending

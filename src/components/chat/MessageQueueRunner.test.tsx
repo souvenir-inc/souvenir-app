@@ -188,9 +188,12 @@ describe('MessageQueueRunner', () => {
     expect(isStreamActive('chat-1')).toBe(false) // handed over: the chat is free for now
     // Wait for the first message to be reclaimed: back at the front, the background takes it
     // again and reserves the chat once more. The second still waits behind it.
-    await vi.waitFor(() => expect(isStreamActive('chat-1')).toBe(true))
+    // (Generous timeout: under a full test run the hand-back and remount can take a while.)
+    await vi.waitFor(() => {
+      expect(isStreamActive('chat-1')).toBe(true)
+      expect(getChatRunState.mock.calls.length).toBeGreaterThan(1) // a fresh worker is checking for it
+    }, { timeout: 5000 })
     expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['second'])
-    expect(getChatRunState.mock.calls.length).toBeGreaterThan(1) // a fresh worker is checking for it
   })
 
   it('does not hand over a message once it is being sent', async () => {

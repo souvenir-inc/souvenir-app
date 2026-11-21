@@ -1035,4 +1035,41 @@ describe('useStreamingChat with overlapping follows', () => {
       vi.useRealTimers()
     }
   }, 15000)
+
+  it("passes a detached reconnect's signal up through every level to the hold's owner", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].status = 0
+    FakeXHR.all[0].end() // drop 1: the hold, owned by the top call
+    await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+    FakeXHR.all[1].start() // reconnect 1 attaches…
+    FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[1].status = 0
+    FakeXHR.all[1].end() // …and drops
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(3), { timeout: 3000 })
+    const second = FakeXHR.all[2]
+    second.start() // reconnect 2 attaches…
+    second.push({ type: 'RUN_STARTED', ...runA })
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
+    try {
+      const doneB = hook.followStream('chat-B', 'reply-B') // …and is taken over
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(4))
+      second.end()
+      expect(await doneA).toBe('done')
+      expect(getChatQueue('chat-A')?.heldBy).toBe('error') // the run may still be going: kept
+      runState.get = (id) => Promise.resolve(id === 'chat-A' ? 'idle' : 'running')
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS) })
+      expect(getChatQueue('chat-A')?.heldBy).toBeUndefined()
+      FakeXHR.all[3].start()
+      FakeXHR.all[3].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+      FakeXHR.all[3].end()
+      await act(async () => { await doneB })
+    } finally {
+      vi.useRealTimers()
+    }
+  }, 15000)
 })

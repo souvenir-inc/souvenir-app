@@ -342,8 +342,12 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
 
   // The history's running reply stops being "running" once a stream for this chat has
   // ended (the follow that read it, or a send after it): the queue waits on it until then.
+  // Only an end that shows the run finished: not an inconclusive one (a send that failed
+  // before its run, a follow that never reached the stream), nor a failure or stop, after
+  // which the earlier reply may still be running and stays eligible to be followed.
   useEffect(() => subscribeStreams((event) => {
-    if (event.type === "end") setRunningOwner((owner) => (owner && owner.chatId === event.chatId ? null : owner))
+    if (event.type !== "end" || event.outcome !== "done" || event.inconclusive) return
+    setRunningOwner((owner) => (owner && owner.chatId === event.chatId ? null : owner))
   }), [])
 
   // Re-run the write-back once a reply for the shown chat has ended.
