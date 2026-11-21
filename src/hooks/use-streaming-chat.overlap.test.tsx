@@ -735,7 +735,7 @@ describe('useStreamingChat with overlapping follows', () => {
   })
 
   it("frees a dropped chat once its run ends, so its queue can go on", async () => {
-    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
     try {
       const doneA = hook.followStream('chat-A', 'reply-A')
       await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
@@ -773,11 +773,12 @@ describe('useStreamingChat with overlapping follows', () => {
     await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
     await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
     timers.mockRestore()
-    registerStream('chat-A') // the chat's own view (another hook) follows it meanwhile
-    expect(await done).toBe('done') // this retry stands down
-    expect(getChatQueue('chat-A')?.heldBy).toBe('error') // nothing recovered yet
-    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
+    // Fake from here, before the stand-down: its run-state lookups run on this clock.
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
     try {
+      registerStream('chat-A') // the chat's own view (another hook) follows it meanwhile
+      expect(await done).toBe('done') // this retry stands down
+      expect(getChatQueue('chat-A')?.heldBy).toBe('error') // nothing recovered yet
       completeStream('chat-A', 'done') // that reader reads the turn to its end…
       runState.get = () => Promise.resolve('idle') // …and the backend confirms the run is over
       await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS) })
@@ -805,11 +806,11 @@ describe('useStreamingChat with overlapping follows', () => {
       await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
       await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
       timers.mockRestore()
-      const otherDone = other.followStream('chat-A', 'reply-A')
-      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
-      expect(await done).toBe('done') // the reconnect stands down for the other reader
-      vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
+      vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
       try {
+        const otherDone = other.followStream('chat-A', 'reply-A')
+        await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+        expect(await done).toBe('done') // the reconnect stands down for the other reader
         const refused = FakeXHR.all[1]
         refused.status = 500 // the other reader's follow is refused: it ends as "done", recovering nothing
         refused.responseText = '{"detail":"boom"}'
@@ -847,7 +848,7 @@ describe('useStreamingChat with overlapping follows', () => {
   })
 
   it("keeps a dropped chat's reservation when its run is on the chat's own endpoint", async () => {
-    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
     try {
       act(() => root.render(<Harness view={{ endpoint: '/api/agents/a1/chat' } as never} onReady={(api) => { hook = api }} />))
       const doneA = hook.followStream('chat-A', 'reply-A')
@@ -882,7 +883,7 @@ describe('useStreamingChat with overlapping follows', () => {
     await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
     await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
     timers.mockRestore()
-    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
     try {
       const doneB = hook.followStream('chat-B', 'reply-B') // another chat takes the hook in the wait
       await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
@@ -913,7 +914,7 @@ describe('useStreamingChat with overlapping follows', () => {
     await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
     await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
     timers.mockRestore()
-    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
     try {
       const doneB = hook.followStream('chat-B', 'reply-B') // the reconnect is taken over: it waits for the run's end
       await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
@@ -931,6 +932,32 @@ describe('useStreamingChat with overlapping follows', () => {
       FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
       FakeXHR.all[1].end()
       await act(async () => { await doneB })
+    } finally {
+      vi.useRealTimers()
+    }
+  }, 10000)
+
+  it("lifts the drop's hold after the run ends even if the other reader is detached silently", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    const done = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const xhr = FakeXHR.all[0]
+    xhr.start()
+    xhr.push({ type: 'RUN_STARTED', ...runA })
+    xhr.status = 0
+    xhr.end()
+    await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
+    try {
+      registerStream('chat-A', () => {}, () => {}) // another reader, which can be detached
+      expect(await done).toBe('done') // the reconnect stands down
+      expect(detachStream('chat-A')).toBe(true) // the chat reopens: that reader goes, with no end event
+      runState.get = () => Promise.resolve('idle') // and the run has ended
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS) })
+      expect(getChatQueue('chat-A')?.heldBy).toBeUndefined()
     } finally {
       vi.useRealTimers()
     }

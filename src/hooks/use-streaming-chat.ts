@@ -59,6 +59,37 @@ function keepPromptDecisions(next: UIMessage, current: UIMessage): UIMessage {
   }
 }
 
+/**
+ * Asks the backend, every DROPPED_RUN_POLL_MS, whether `chatId`'s run has ended, and calls
+ * `onIdle` once it has. The next lookup is scheduled only after the current one settles,
+ * so lookups never pile up. Stops when `stillWanted` turns false. `onStop` runs once,
+ * however it stops (idle, unwanted, or the returned stop).
+ */
+function pollUntilRunEnds(chatId: string, stillWanted: () => boolean, onIdle: () => void, onStop?: () => void): () => void {
+  let stopped = false
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const stop = () => {
+    if (stopped) return
+    stopped = true
+    clearTimeout(timer)
+    onStop?.()
+  }
+  const schedule = () => {
+    timer = setTimeout(() => {
+      if (stopped) return
+      if (!stillWanted()) { stop(); return }
+      void getChatRunState(chatId).then((state) => {
+        if (stopped) return
+        if (!stillWanted()) { stop(); return }
+        if (state === "idle") { onIdle(); stop(); return }
+        schedule()
+      }, () => { if (!stopped) schedule() })
+    }, DROPPED_RUN_POLL_MS)
+  }
+  schedule()
+  return stop
+}
+
 /** A 409 that says the same send already reached the backend (the Idempotency-Key guard),
  *  as opposed to a 409 refusal (an unpublished, paused or disabled agent). */
 function isAlreadySent(status: number, body: string): boolean {
@@ -372,29 +403,16 @@ export function useStreamingChat({
     // over during its wait: nothing else would ever lift that hold.
     // Only the hold this drop set (its id): if the user queued again (lifting it) or a newer
     // failure set another, the lookup stops and leaves that one alone.
-    const releaseHoldWhenRunEnds = (id: string) => {
-      if (!runStateReadable || dropHoldId === undefined) return
+    // Returns a stop for the lookup (it also stops by itself once done or no longer wanted).
+    const releaseHoldWhenRunEnds = (id: string, onStop?: () => void): (() => void) => {
+      if (!runStateReadable || dropHoldId === undefined) { onStop?.(); return () => {} }
       const holdId = dropHoldId
-      const poll = setInterval(() => {
-        if (currentHoldId(id) !== holdId) { clearInterval(poll); return }
-        void getChatRunState(id).then((state) => {
-          if (state !== "idle") return
-          clearInterval(poll)
-          releaseErrorHold(id, holdId)
-        }, () => {})
-      }, DROPPED_RUN_POLL_MS)
+      return pollUntilRunEnds(id, () => currentHoldId(id) === holdId, () => releaseErrorHold(id, holdId), onStop)
     }
     const releaseWhenRunEnds = () => {
       const id = myChatId
       if (!id || id.startsWith("temp-") || !runStateReadable) return
-      const poll = setInterval(() => {
-        if (!isStreamOwnedBy(id, stopThisCall)) { clearInterval(poll); return }
-        void getChatRunState(id).then((state) => {
-          if (state !== "idle" || !isStreamOwnedBy(id, stopThisCall)) return
-          clearInterval(poll)
-          completeStream(id, "done")
-        }, () => {})
-      }, DROPPED_RUN_POLL_MS)
+      pollUntilRunEnds(id, () => isStreamOwnedBy(id, stopThisCall), () => completeStream(id, "done"))
     }
     const detachThisCall = () => {
       // Detached from outside (the chat reopened) while it still holds the hook: what it
@@ -664,11 +682,16 @@ export function useStreamingChat({
           // goes once the backend confirms the run has ended. Its "done" alone is not enough:
           // a follow that never reached the stream ends as done too. An error end keeps it.
           if (isStreamActive(liveChatId)) {
-            if (!heldBefore) {
-              const stopWatching = subscribeStreams((event) => {
-                if (event.type !== "end" || event.chatId !== liveChatId) return
+            // The backend is asked from now on, not only once that reader ends: it can also
+            // go silently (reopening the chat detaches it, with no end). If it ends with a
+            // failure the asking stops and the hold stays.
+            if (!heldBefore && dropHoldId !== undefined) {
+              let stopWatching = () => {}
+              const stopAsking = releaseHoldWhenRunEnds(liveChatId, () => stopWatching())
+              stopWatching = subscribeStreams((event) => {
+                if (event.type !== "end" || event.chatId !== liveChatId || event.outcome === "done") return
+                stopAsking()
                 stopWatching()
-                if (event.outcome === "done") releaseHoldWhenRunEnds(liveChatId)
               })
             }
             return "done"
@@ -688,7 +711,7 @@ export function useStreamingChat({
           })
           if (result === "attached") {
             // Recovered: the drop that held the queue was not a failure after all.
-            if (outcome === "done" && !heldBefore) releaseErrorHold(liveChatId, dropHoldId)
+            if (outcome === "done" && !heldBefore && dropHoldId !== undefined) releaseErrorHold(liveChatId, dropHoldId)
             return outcome
           }
           if (result === "gone") {
@@ -699,7 +722,7 @@ export function useStreamingChat({
             onStreamDone?.()
             // The turn ended on the backend: the drop was no failure, so its hold goes (after
             // the reload above has started, which the queue waits on).
-            if (!heldBefore) releaseErrorHold(liveChatId, dropHoldId)
+            if (!heldBefore && dropHoldId !== undefined) releaseErrorHold(liveChatId, dropHoldId)
             return "done"
           }
         }

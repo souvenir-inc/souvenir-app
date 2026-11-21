@@ -240,12 +240,11 @@ export function currentHoldId(key: string | null | undefined): number | undefine
 }
 
 /** Lifts `key`'s "error" hold: the failure that set it was recovered after all (a dropped
- *  connection whose reconnect read the turn to its end). Any other hold stays, and with
- *  `holdId` only that hold is lifted: one set since (a newer failure) is not. */
-export function releaseErrorHold(key: string, holdId?: number): void {
+ *  connection whose reconnect read the turn to its end). Only the hold with that id is
+ *  lifted: one set since (a newer failure), or any other, stays. */
+export function releaseErrorHold(key: string, holdId: number): void {
   const queue = queues.get(key)
-  if (!queue || queue.heldBy !== "error") return
-  if (holdId !== undefined && queue.holdId !== holdId) return
+  if (!queue || queue.heldBy !== "error" || queue.holdId !== holdId) return
   queues.set(key, { messages: queue.messages })
   notify()
 }
