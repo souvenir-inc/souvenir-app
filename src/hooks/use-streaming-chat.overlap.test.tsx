@@ -16,7 +16,8 @@ vi.mock('@/lib/config', async (orig) => {
   return { ...actual, shouldUseDirectBackend: () => token.direct || actual.shouldUseDirectBackend() }
 })
 // Whether the backend still runs a chat's turn (a dropped call asks): running, unless a test says.
-const runState = vi.hoisted(() => ({ get: (_chatId: string): Promise<'running' | 'idle'> => Promise.resolve('running') }))
+type RunStateLookup = (chatId: string) => Promise<'running' | 'idle'>
+const runState = vi.hoisted(() => ({ get: (() => Promise.resolve('running')) as RunStateLookup }))
 vi.mock('@/lib/api/chat', async (orig) => ({
   ...(await orig<typeof import('@/lib/api/chat')>()),
   getChatRunState: (chatId: string) => runState.get(chatId),
@@ -958,6 +959,41 @@ describe('useStreamingChat with overlapping follows', () => {
       runState.get = () => Promise.resolve('idle') // and the run has ended
       await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS) })
       expect(getChatQueue('chat-A')?.heldBy).toBeUndefined()
+    } finally {
+      vi.useRealTimers()
+    }
+  }, 10000)
+
+  it("keeps the drop's hold until the run ends when the reconnect is detached after attaching", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const xhr = FakeXHR.all[0]
+    xhr.start()
+    xhr.push({ type: 'RUN_STARTED', ...runA })
+    xhr.status = 0
+    xhr.end() // dropped: held, reconnect waits
+    await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+    timers.mockRestore()
+    const retry = FakeXHR.all[1]
+    retry.start() // the reconnect attaches…
+    retry.push({ type: 'RUN_STARTED', ...runA })
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
+    try {
+      const doneB = hook.followStream('chat-B', 'reply-B') // …and is then taken over
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(3))
+      retry.end()
+      expect(await doneA).toBe('done')
+      expect(getChatQueue('chat-A')?.heldBy).toBe('error') // the run is still going: kept
+      runState.get = (id) => Promise.resolve(id === 'chat-A' ? 'idle' : 'running')
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS) })
+      expect(getChatQueue('chat-A')?.heldBy).toBeUndefined() // lifted once it has ended
+      FakeXHR.all[2].start()
+      FakeXHR.all[2].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+      FakeXHR.all[2].end()
+      await act(async () => { await doneB })
     } finally {
       vi.useRealTimers()
     }

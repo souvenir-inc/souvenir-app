@@ -142,6 +142,7 @@ export function useFollowRunningReply({
     // before its run started): then nothing newer owns the chat, and the earlier reply is
     // followed after all (one already over comes back as gone, and the history reloads).
     let superseded = activeAtLoad
+    let deferredFollow: ReturnType<typeof setTimeout> | undefined
     const unsubscribe = subscribeStreams((event) => {
       if (event.chatId !== chatId) return
       if (followed) return
@@ -157,16 +158,20 @@ export function useFollowRunningReply({
       } else if (event.type === "end" && superseded && event.outcome !== "done") {
         superseded = false
         // Within the budget: follow now. With it spent: back to asking whether the run ended.
-        if (!isStreamActive(chatId)) {
+        // Not from inside this notification: it may be Stop's, which still has its own reply
+        // to settle, and a follow started now would take the hook (and that reply's ref) first.
+        deferredFollow = setTimeout(() => {
+          if (isStreamActive(chatId)) return
           if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS) pollForRunEnd()
           else follow()
-        }
+        }, 0)
       }
     })
-    return () => { stopped = true; clearInterval(poll); clearTimeout(timer); unsubscribe() }
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per history load that finds a running turn; followStream is fresh each render
-  // `enabled` too: turning it off cancels a waiting follow, and turning it on looks again.
-  }, [chatId, enabled, runningMessageId, historyLoadId, resetCount])
+    return () => { stopped = true; clearInterval(poll); clearTimeout(timer); clearTimeout(deferredFollow); unsubscribe() }
+  // Runs once per history load that finds a running turn. `enabled` too: turning it off
+  // cancels a waiting follow, and turning it on looks again. The three callbacks are stable
+  // (useLatestCallback), so listing them reruns nothing; they read the latest props.
+  }, [chatId, enabled, runningMessageId, historyLoadId, resetCount, currentReply, followLatest, runEnded])
 
   return reset
 }

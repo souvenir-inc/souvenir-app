@@ -414,6 +414,11 @@ export function useStreamingChat({
       if (!id || id.startsWith("temp-") || !runStateReadable) return
       pollUntilRunEnds(id, () => isStreamOwnedBy(id, stopThisCall), () => completeStream(id, "done"))
     }
+    // A detached call ends as "done", but it did not read its turn to the end: its caller is told.
+    const leftDetached = (): StreamOutcome => {
+      options?.onDetached?.()
+      return "done"
+    }
     const detachThisCall = () => {
       // Detached from outside (the chat reopened) while it still holds the hook: what it
       // has buffered goes to its own reply now, or the next call would write it into its own.
@@ -515,7 +520,7 @@ export function useStreamingChat({
 
         // Dropped while getting ready (the token wait above): the request never goes out.
         // The transport sends synchronously, so a later abort would be too late.
-        if (detached) return "done"
+        if (detached) return leftDetached()
         // Stopped while getting ready: Stop has already settled the reply and the registry.
         if (stopRequestedRef.current) return "aborted"
         const sseDecoder = new AguiSSEDecoder()
@@ -603,7 +608,7 @@ export function useStreamingChat({
         // Checked first: the flush timer and buffer are shared, and now hold the
         // replacing call's tokens. Stopping or flushing them here would freeze that
         // call's stream and write its pending text from this call's unwinding.
-        if (detached) return "done"
+        if (detached) return leftDetached()
         stopFlushInterval()
         flushPending()
 
@@ -619,7 +624,7 @@ export function useStreamingChat({
         onStreamDone?.()
         return outcome
       } catch (error) {
-        if (detached) return "done"
+        if (detached) return leftDetached()
         stopFlushInterval()
         flushPending()
         // The backend answered the send with a refusal (4xx) before any run: it never took
@@ -702,16 +707,23 @@ export function useStreamingChat({
           // This retry's own result, not a value shared by the hook: another call in this
           // hook could overwrite one before this one reads it.
           let result: FollowResult = "attached"
+          let retryDetached = false
           const outcome = await fetchAiResponse("", liveChatId, retryReplyId, null, {
             follow: true,
             followAttempt: attempt + 1,
             userMessageId: retryUserMessageId,
             prior: options?.prior,
             onFollowResult: (r) => { result = r },
+            onDetached: () => { retryDetached = true },
           })
           if (result === "attached") {
             // Recovered: the drop that held the queue was not a failure after all.
-            if (outcome === "done" && !heldBefore && dropHoldId !== undefined) releaseErrorHold(liveChatId, dropHoldId)
+            // Read to the end: lift it now. Detached part-way (its "done" is no finished turn):
+            // only once the backend says the run has ended.
+            if (outcome === "done" && !heldBefore && dropHoldId !== undefined) {
+              if (retryDetached) releaseHoldWhenRunEnds(liveChatId)
+              else releaseErrorHold(liveChatId, dropHoldId)
+            }
             return outcome
           }
           if (result === "gone") {
