@@ -244,4 +244,17 @@ describe('useFollowRunningReply', () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(0) })
     expect(followStream).toHaveBeenCalledTimes(2) // then it does
   })
+
+  it('leaves no deferred follow behind when two streams end before it runs and the effect goes', async () => {
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 2 }) // backing off
+    await act(async () => {
+      registerStream('chat-A'); completeStream('chat-A', 'error') // one deferred follow…
+      registerStream('chat-A'); completeStream('chat-A', 'error') // …replaced by another
+    })
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 2, enabled: false }) // the effect goes
+    await act(async () => { await vi.advanceTimersByTimeAsync(10) })
+    expect(followStream).toHaveBeenCalledTimes(1) // neither deferred follow ran
+  })
 })

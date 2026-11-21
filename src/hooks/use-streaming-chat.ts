@@ -679,7 +679,7 @@ export function useStreamingChat({
           // The newer call has its own chat; this one's drop hold goes once its run ends.
           if (detached) {
             if (!heldBefore) releaseHoldWhenRunEnds(liveChatId)
-            return "done"
+            return leftDetached() // the call that owns an earlier hold waits for the run's end too
           }
           // Another reader holds the chat now (its own view following it, from another hook):
           // that one reads the turn, and this retry must not take over its registry entry.
@@ -699,7 +699,9 @@ export function useStreamingChat({
                 stopWatching()
               })
             }
-            return "done"
+            // Stood down without reading the turn: its caller (owning an earlier hold) must not
+            // take this "done" as a finished turn.
+            return leftDetached()
           }
           // Stopped during the wait: Stop has already settled the reply as stopped, and this
           // turn ends that way too, not as the error that led to the wait.

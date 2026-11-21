@@ -160,6 +160,7 @@ export function useFollowRunningReply({
         // Within the budget: follow now. With it spent: back to asking whether the run ended.
         // Not from inside this notification: it may be Stop's, which still has its own reply
         // to settle, and a follow started now would take the hook (and that reply's ref) first.
+        clearTimeout(deferredFollow) // one deferred follow at most: a second end replaces the first
         deferredFollow = setTimeout(() => {
           if (isStreamActive(chatId)) return
           if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS) pollForRunEnd()
