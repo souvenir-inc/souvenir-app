@@ -266,80 +266,133 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
       )}
 
       {showCredentialForm && showApiForm && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-          {fields.map((field) => (
-            <div key={field.name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-              <label
-                htmlFor={`cf-${prompt.connector.slug}-${field.name}`}
-                style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-600)' }}
-              >
-                {field.label}
-              </label>
-              <input
-                id={`cf-${prompt.connector.slug}-${field.name}`}
-                type={field.secret ? 'password' : 'text'}
-                autoComplete="off"
-                placeholder={field.help || field.label}
-                value={apiKeyFields[field.name] ?? ''}
-                disabled={busy}
-                onChange={(e) => setApiKeyFields((prev) => ({ ...prev, [field.name]: e.target.value }))}
-                style={{
-                  padding:         'var(--space-1-5) var(--space-2-5)',
-                  borderRadius:    'var(--radius-md)',
-                  border:          '1px solid var(--neutral-300)',
-                  fontFamily:      'var(--font-body)',
-                  fontSize:        'var(--font-size-caption)',
-                  outline:         'none',
-                  width:           '100%',
-                  boxSizing:       'border-box',
-                  backgroundColor: 'var(--field-surface)',
-                }}
-              />
-            </div>
-          ))}
-        </div>
+        <CredentialFields
+          slug={prompt.connector.slug}
+          fields={fields}
+          values={apiKeyFields}
+          disabled={busy}
+          onChange={(name, value) => setApiKeyFields((prev) => ({ ...prev, [name]: value }))}
+        />
       )}
 
       {/* While an answer is being sent (Not now, or the connected notice), the sign-in
           actions wait: starting a sign-in then would race the answer. A failed answer
           shows Try again instead, which stays available. And while a sign-in is under way,
           Not now waits: declining then would leave the sign-in window going. */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
-        {respondFailed !== 'connected' && (
-          <Button size="sm" variant="outline" disabled={responding || busy} onClick={() => void answer('cancel')}>
-            Not now
+      <ConnectActions
+        respondFailed={respondFailed}
+        responding={responding}
+        busy={busy}
+        showCredentialForm={showCredentialForm}
+        showApiForm={showApiForm}
+        allFilled={allFilled}
+        connectLabel={connectLabel}
+        onAnswer={(decision) => void answer(decision)}
+        onShowApiForm={setShowApiForm}
+        onSubmitCredentials={prompt.auth_mode === 'api_key' ? handleApiKey : () => handleOAuth(apiKeyFields)}
+        onConnect={() => handleOAuth()}
+      />
+    </ConnectorPromptShell>
+  )
+}
+
+/** The API-key (or app-credential) fields of a connect card. */
+function CredentialFields({ slug, fields, values, disabled, onChange }: {
+  slug: string
+  fields: ApiKeyField[]
+  values: Record<string, string>
+  disabled: boolean
+  onChange: (name: string, value: string) => void
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+      {fields.map((field) => (
+        <div key={field.name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+          <label
+            htmlFor={`cf-${slug}-${field.name}`}
+            style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-600)' }}
+          >
+            {field.label}
+          </label>
+          <input
+            id={`cf-${slug}-${field.name}`}
+            type={field.secret ? 'password' : 'text'}
+            autoComplete="off"
+            placeholder={field.help || field.label}
+            value={values[field.name] ?? ''}
+            disabled={disabled}
+            onChange={(e) => onChange(field.name, e.target.value)}
+            style={{
+              padding:         'var(--space-1-5) var(--space-2-5)',
+              borderRadius:    'var(--radius-md)',
+              border:          '1px solid var(--neutral-300)',
+              fontFamily:      'var(--font-body)',
+              fontSize:        'var(--font-size-caption)',
+              outline:         'none',
+              width:           '100%',
+              boxSizing:       'border-box',
+              backgroundColor: 'var(--field-surface)',
+            }}
+          />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** A connect card's actions: Not now, then Try again, the credential form's, or Connect. */
+function ConnectActions({
+  respondFailed, responding, busy, showCredentialForm, showApiForm, allFilled, connectLabel,
+  onAnswer, onShowApiForm, onSubmitCredentials, onConnect,
+}: {
+  respondFailed: ConnectDecision | null
+  responding: boolean
+  busy: boolean
+  showCredentialForm: boolean
+  showApiForm: boolean
+  allFilled: boolean
+  connectLabel: string
+  onAnswer: (decision: ConnectDecision) => void
+  onShowApiForm: (show: boolean) => void
+  onSubmitCredentials: () => void
+  onConnect: () => void
+}) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
+      {respondFailed !== 'connected' && (
+        <Button size="sm" variant="outline" disabled={responding || busy} onClick={() => onAnswer('cancel')}>
+          Not now
+        </Button>
+      )}
+      {respondFailed ? (
+        <Button size="sm" variant="approve" attention={!responding} loading={responding} onClick={() => onAnswer(respondFailed)}>
+          Try again
+        </Button>
+      ) : showCredentialForm && !showApiForm ? (
+        <Button size="sm" variant="approve" attention={!responding} disabled={responding} onClick={() => onShowApiForm(true)}>
+          Enter credentials
+        </Button>
+      ) : showCredentialForm ? (
+        <>
+          <Button size="sm" variant="outline" disabled={busy || responding} onClick={() => onShowApiForm(false)}>
+            Cancel
           </Button>
-        )}
-        {respondFailed ? (
-          <Button size="sm" variant="approve" attention={!responding} loading={responding} onClick={() => void answer(respondFailed)}>
-            Try again
-          </Button>
-        ) : showCredentialForm && !showApiForm ? (
-          <Button size="sm" variant="approve" attention={!responding} disabled={responding} onClick={() => setShowApiForm(true)}>
-            Enter credentials
-          </Button>
-        ) : showCredentialForm ? (
-          <>
-            <Button size="sm" variant="outline" disabled={busy || responding} onClick={() => setShowApiForm(false)}>
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              variant="approve"
-              loading={busy}
-              disabled={!allFilled || responding}
-              onClick={prompt.auth_mode === 'api_key' ? handleApiKey : () => handleOAuth(apiKeyFields)}
-            >
-              {connectLabel}
-            </Button>
-          </>
-        ) : (
-          <Button size="sm" variant="approve" attention={!busy && !responding} loading={busy} disabled={responding} onClick={() => handleOAuth()}>
+          <Button
+            size="sm"
+            variant="approve"
+            loading={busy}
+            disabled={!allFilled || responding}
+            onClick={onSubmitCredentials}
+          >
             {connectLabel}
           </Button>
-        )}
-      </div>
-    </ConnectorPromptShell>
+        </>
+      ) : (
+        <Button size="sm" variant="approve" attention={!busy && !responding} loading={busy} disabled={responding} onClick={onConnect}>
+          {connectLabel}
+        </Button>
+      )}
+    </div>
   )
 }
 
