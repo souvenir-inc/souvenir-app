@@ -525,7 +525,7 @@ export function DropdownMenuItem(
                   the checkbox itself stops propagation so the row's onClick
                   doesn't double-toggle it. Default variant only. */}
               {showCheckbox && !isDanger && (
-                // eslint-disable-next-line no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements
+                // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements
                 <div
                   style={{ flexShrink: 0, display: 'inline-flex', lineHeight: 0 }}
                   onClick={(e) => e.stopPropagation()}
@@ -660,7 +660,7 @@ export function DropdownMenuItem(
                 <Spinner size={16} />
               </div>
             ) : !isDanger && showSwitch ? (
-              // eslint-disable-next-line no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements
+              // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements
               <div
                 style={{ flexShrink: 0, display: 'inline-flex', lineHeight: 0 }}
                 // Switch toggle should not also fire the row's onClick.

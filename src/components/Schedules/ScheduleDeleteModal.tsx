@@ -1,9 +1,8 @@
 'use client'
 
 import React from 'react'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -45,7 +44,7 @@ export function ScheduleDeleteModal({
         }}
       >
         {/* Header */}
-        <DialogPrimitive.Title asChild>
+        <DialogTitle asChild>
           <span style={{
             fontFamily: 'var(--font-body)',
             fontSize:   'var(--font-size-body-lg)',
@@ -55,10 +54,10 @@ export function ScheduleDeleteModal({
           }}>
             Delete &quot;{scheduleName}&quot;?
           </span>
-        </DialogPrimitive.Title>
+        </DialogTitle>
 
         {/* Body */}
-        <DialogPrimitive.Description asChild>
+        <DialogDescription asChild>
           <p style={{
             margin:     0,
             fontFamily: 'var(--font-body)',
@@ -68,7 +67,7 @@ export function ScheduleDeleteModal({
           }}>
             This will permanently remove the schedule and all its run history.
           </p>
-        </DialogPrimitive.Description>
+        </DialogDescription>
 
         {/* Actions */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 4 }}>

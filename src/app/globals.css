@@ -1,12 +1,13 @@
 @import "tailwindcss";
 
 /* KDS Design Tokens - import order is mandatory
-   src/styles/tokens/ is a junction → design-system/src/styles/tokens/
+   scales.css also maps the radius, type, shadow, motion and z-index tokens into Tailwind (@theme).
    Replace with @kaya/design-system package imports before production. */
 @import "../styles/tokens/primitives.css";
 @import "../styles/tokens/aliases.css";
 @import "../styles/tokens/semantic.css";
 @import "../styles/tokens/typography.css";
+@import "../styles/tokens/scales.css";
 /* Dark theme (generated, additive — applies only under data-theme="dark").
    Must stay AFTER the token files above so its overrides win. */
 @import "../styles/tokens/theme.css";

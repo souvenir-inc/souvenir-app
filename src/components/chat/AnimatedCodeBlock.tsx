@@ -118,7 +118,7 @@ export function AnimatedCodeBlock({ data, onComplete, animate = true }: { data: 
         </div>
         <pre className="kaya-scrollbar" style={{ margin: 0, padding: "14px 16px", fontSize: 13, lineHeight: "20px", fontFamily: "var(--font-code, monospace)", overflowX: "auto" }}>
           {visibleLines.map((line, i) => (
-            // eslint-disable-next-line react/no-array-index-as-key
+            // eslint-disable-next-line react/no-array-index-key
             <m.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.08 }}
               style={{ display: "flex", gap: 14 }}>
               <span style={{ color: "color-mix(in srgb, var(--neutral-800) 55%, transparent)", userSelect: "none", fontSize: 12, minWidth: 18, textAlign: "right", flexShrink: 0, lineHeight: "20px" }}>{i + 1}</span>

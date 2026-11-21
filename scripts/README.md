@@ -12,5 +12,8 @@ Node scripts used by the front-end. None of them run in the browser or in produc
 | `migrate-inline-colors.mjs` | — (one-off) | Reviewable migration that points inline colours at theme tokens without changing light-theme pixels. | One-off; kept for reference. |
 | `split-openapi.mjs` | — (`node scripts/split-openapi.mjs`) | Splits `docs/openapi/openapi.yaml` into per-tag files in `docs/openapi/api_yaml/`. | After refreshing the backend OpenAPI spec. |
 | `sse-probe.mjs` | — (`node scripts/sse-probe.mjs`) | Calls the backend `/chats/create` with a JWT and prints every SSE event as it arrives. | Debugging streaming. Needs a token; never commit one. |
+| `ds-scan.mjs` | `npm run ds:scan`, `npm run ds:check` | Design-system scan: share of style values that use tokens and of UI that uses primitives (`--top=<counter>` lists the worst files). `ds:check` fails when a hardcoded count rises above `ds-baseline.json`; `ds:check -- --update` lowers the baseline. See `docs/design-system-primitives-plan.md`. | `ds:check` before pushing UI changes; `--update` after a clean-up lands. |
+| `ds-baseline.json` | — (data) | The ratchet baseline for `ds:check`. Only ever lowered. | Updated by `ds:check -- --update`. |
+| `ds-screenshots.mjs` | `npm run ds:screens` | Screenshots key screens in light and dark against a running dev server (logs in with `ADMIN_*` from `.env.local`) and diffs them with the baseline in `.ds-screens/` (git-ignored). `-- --update` saves a new baseline; `-- --only=a,b` limits screens. | Before and after each design-system change. Local only. |
 
 Conventions: scripts are ESM (`.mjs`), read the repo from `import.meta.dirname`, and never write outside the repo. A script that needs secrets reads them from the environment.

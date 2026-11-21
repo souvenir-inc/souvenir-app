@@ -81,7 +81,11 @@ export function InputField({
     }: InputFieldProps & { ref?: React.Ref<HTMLInputElement> }) {
     const [isFocused,        setIsFocused]        = useState(false)
     const [isHovered,        setIsHovered]        = useState(false)
-    const [internalHasValue, setInternalHasValue] = useState(false)
+    // Uncontrolled: until the person types, "filled" follows defaultValue, which may arrive after the
+    // first render (a prefilled email once the profile loads); after that, what they typed decides.
+    const [typedHasValue, setInternalHasValue] = useState<boolean | null>(null)
+    const defaultFilled = String(inputProps.defaultValue ?? '').length > 0
+    const internalHasValue = typedHasValue ?? defaultFilled
 
     const hasValue = typeof value === 'string' ? value.length > 0 : internalHasValue
 

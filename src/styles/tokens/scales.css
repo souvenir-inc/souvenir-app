@@ -1,0 +1,181 @@
+/* ── Scales: radius, type styles, elevation, motion, layering, spacing aliases ──
+   Phase 1 of docs/design-system-primitives-plan.md. Values come from what the
+   code already renders most often (see the plan's snapping table, Appendix B).
+
+   Each token is defined once below, under :root, so inline styles and CSS
+   modules can use var(--radius-md). The @theme block at the end maps the same
+   names into Tailwind, so `rounded-md`, `text-body`, `shadow-2`, `duration-fast`,
+   `ease-standard`, `z-modal` and `p-inset-md` resolve to these tokens.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+:root {
+
+  /* ── Radius ──────────────────────────────────────────────────────────────────
+     Seven steps cover ~90% of the 57 radii in use (4, 6, 8, 10, 12, 16, 999). */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:   10px;
+  --radius-xl:   12px;
+  --radius-2xl:  16px;
+  --radius-full: 9999px;
+
+  /* ── Spacing: half steps ─────────────────────────────────────────────────────
+     The 4px scale in primitives.css skips 2, 6 and 10, which are among the
+     most used gaps (6 and 10 alone: ~230 uses). */
+  --space-0-5:  2px;
+  --space-1-5:  6px;
+  --space-2-5: 10px;
+
+  /* ── Spacing: semantic aliases ───────────────────────────────────────────────
+     inset  = padding inside a container
+     stack  = vertical space between stacked blocks
+     inline = horizontal space between items in a row */
+  --space-inset-xs:  var(--space-1);    /*  4 */
+  --space-inset-sm:  var(--space-2);    /*  8 */
+  --space-inset-md:  var(--space-3);    /* 12 */
+  --space-inset-lg:  var(--space-4);    /* 16 */
+  --space-inset-xl:  var(--space-6);    /* 24 */
+
+  --space-stack-xs:  var(--space-1);    /*  4 */
+  --space-stack-sm:  var(--space-2);    /*  8 */
+  --space-stack-md:  var(--space-4);    /* 16 */
+  --space-stack-lg:  var(--space-6);    /* 24 */
+  --space-stack-xl:  var(--space-7);    /* 32 */
+
+  --space-inline-xs: var(--space-1);    /*  4 */
+  --space-inline-sm: var(--space-1-5);  /*  6 */
+  --space-inline-md: var(--space-2);    /*  8 */
+  --space-inline-lg: var(--space-3);    /* 12 */
+
+  /* ── Type styles ─────────────────────────────────────────────────────────────
+     Size + line height pairs, in the order the code uses them most. Weight is
+     set separately (--font-weight-*), because the same size appears at 400, 500
+     and 600 across the app. The base sizes live in typography.css. */
+  --font-size-heading-xl:   28px;
+  --line-height-heading-xl: 36px;
+  --font-size-heading-md:   20px;
+  --line-height-heading-md: 28px;
+  --font-size-heading-sm:   18px;
+  --line-height-heading-sm: 24px;
+  --font-size-body-sm:      13px;
+  --line-height-body-sm:    20px;
+  --font-size-small:        12px;
+  --line-height-small:      16px;
+
+  /* ── Elevation ───────────────────────────────────────────────────────────────
+     Generic levels on top of the existing component shadows; dark mode follows
+     because each one points at a token theme.css already overrides. */
+  --shadow-1: var(--shadow-surface-card);  /* cards, list rows on a page */
+  --shadow-2: var(--shadow-card-deep);     /* raised cards (projects, schedules) */
+  --shadow-3: var(--shadow-popover);       /* menus, popovers, tooltips */
+  --shadow-4: var(--shadow-popover), 0px 16px 32px -8px rgba(38, 33, 30, 0.18); /* dialogs, sheets */
+
+  /* Settings surfaces: a soft drop plus a hairline ring. The drop was written out by hand 46 times
+     in 33 files before these tokens existed. */
+  --shadow-soft:  0px 2px 2.8px 0px rgba(82, 75, 71, 0.12);
+  --shadow-panel: var(--shadow-soft), 0px 0px 0px 1px var(--neutral-200);  /* bordered panels */
+  --shadow-tile:  var(--shadow-soft), 0px 0px 0px 1px var(--neutral-100);  /* stat tiles inside a panel */
+
+  /* ── Motion ──────────────────────────────────────────────────────────────── */
+  --duration-instant: 80ms;
+  --duration-fast:    120ms;
+  --duration-base:    200ms;
+  --duration-slow:    320ms;
+
+  --ease-standard:   cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.3, 0, 0, 1.3);
+  --ease-exit:       cubic-bezier(0, 0, 0.2, 1);
+
+  /* ── Layering ────────────────────────────────────────────────────────────── */
+  --z-base:     0;
+  --z-raised:   10;
+  --z-sticky:   100;
+  --z-dropdown: 1000;
+  --z-overlay:  1100;
+  --z-modal:    1200;
+  --z-popover:  1300;
+  --z-toast:    1400;
+  --z-tooltip:  1500;
+}
+
+/* ── Tailwind mapping ──────────────────────────────────────────────────────────
+   `inline` makes each utility use var(--token) directly, so a theme override on
+   :root (dark mode) reaches the class too; `reference` stops Tailwind writing its
+   own copy of each variable, since the :root block above already defines them.
+   Tailwind's own defaults for these names (rounded-md = 6px, rounded-lg = 8px, …) are
+   replaced. */
+@theme inline reference {
+  --radius-xs:   var(--radius-xs);
+  --radius-sm:   var(--radius-sm);
+  --radius-md:   var(--radius-md);
+  --radius-lg:   var(--radius-lg);
+  --radius-xl:   var(--radius-xl);
+  --radius-2xl:  var(--radius-2xl);
+  --radius-full: var(--radius-full);
+
+  --spacing-inset-xs:  var(--space-inset-xs);
+  --spacing-inset-sm:  var(--space-inset-sm);
+  --spacing-inset-md:  var(--space-inset-md);
+  --spacing-inset-lg:  var(--space-inset-lg);
+  --spacing-inset-xl:  var(--space-inset-xl);
+  --spacing-stack-xs:  var(--space-stack-xs);
+  --spacing-stack-sm:  var(--space-stack-sm);
+  --spacing-stack-md:  var(--space-stack-md);
+  --spacing-stack-lg:  var(--space-stack-lg);
+  --spacing-stack-xl:  var(--space-stack-xl);
+  --spacing-inline-xs: var(--space-inline-xs);
+  --spacing-inline-sm: var(--space-inline-sm);
+  --spacing-inline-md: var(--space-inline-md);
+  --spacing-inline-lg: var(--space-inline-lg);
+
+  --text-display:                  var(--font-size-display);
+  --text-display--line-height:     var(--line-height-display);
+  --text-heading-xl:               var(--font-size-heading-xl);
+  --text-heading-xl--line-height:  var(--line-height-heading-xl);
+  --text-heading:                  var(--font-size-heading);
+  --text-heading--line-height:     var(--line-height-heading);
+  --text-heading-md:               var(--font-size-heading-md);
+  --text-heading-md--line-height:  var(--line-height-heading-md);
+  --text-heading-sm:               var(--font-size-heading-sm);
+  --text-heading-sm--line-height:  var(--line-height-heading-sm);
+  --text-body-lg:                  var(--font-size-body-lg);
+  --text-body-lg--line-height:     var(--line-height-body-lg);
+  --text-body:                     var(--font-size-body);
+  --text-body--line-height:        var(--line-height-body);
+  --text-body-sm:                  var(--font-size-body-sm);
+  --text-body-sm--line-height:     var(--line-height-body-sm);
+  --text-small:                    var(--font-size-small);
+  --text-small--line-height:       var(--line-height-small);
+  --text-caption:                  var(--font-size-caption);
+  --text-caption--line-height:     var(--line-height-caption);
+  --text-code:                     var(--font-size-code);
+  --text-code--line-height:        var(--line-height-code);
+
+  --shadow-1: var(--shadow-1);
+  --shadow-2: var(--shadow-2);
+  --shadow-3: var(--shadow-3);
+  --shadow-4: var(--shadow-4);
+  --shadow-soft:  var(--shadow-soft);
+  --shadow-panel: var(--shadow-panel);
+  --shadow-tile:  var(--shadow-tile);
+
+  --transition-duration-instant: var(--duration-instant);
+  --transition-duration-fast:    var(--duration-fast);
+  --transition-duration-base:    var(--duration-base);
+  --transition-duration-slow:    var(--duration-slow);
+
+  --ease-standard:   var(--ease-standard);
+  --ease-emphasized: var(--ease-emphasized);
+  --ease-exit:       var(--ease-exit);
+
+  --z-index-base:     var(--z-base);
+  --z-index-raised:   var(--z-raised);
+  --z-index-sticky:   var(--z-sticky);
+  --z-index-dropdown: var(--z-dropdown);
+  --z-index-overlay:  var(--z-overlay);
+  --z-index-modal:    var(--z-modal);
+  --z-index-popover:  var(--z-popover);
+  --z-index-toast:    var(--z-toast);
+  --z-index-tooltip:  var(--z-tooltip);
+}

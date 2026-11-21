@@ -336,6 +336,7 @@ export function SuperLinkDrawer({ ref, link, onClose, onStatusChange, onLimitCha
           <m.aside
             ref={ref}
             key={link.id}
+            // eslint-disable-next-line no-restricted-syntax -- ds-allow: framer-motion exit animation; moves to ui/dialog once it has a motion variant (plan Phase 2 follow-up)
             role="dialog"
             aria-modal="true"
             aria-label={`${link.personaName} Super Link detail`}

@@ -648,8 +648,7 @@ export interface ChatInputProps extends Omit<React.HTMLAttributes<HTMLDivElement
   /**
    * Project pin folders - derived from the user's Sidebar projects.
    * Rendered in the Add menu's "Pin folders" submenu under a "Project
-   * folders" section header. See `specs/patterns/project-pinboard-folder-sync.md`
-   * for the canonical mapping. Ignored when `addMenu` is overridden.
+   * folders" section header. Ignored when `addMenu` is overridden.
    */
   projectFolders?: ChatInputFolder[]
   // ── Auto-chip state (uncontrolled / controlled) ─────────────────────────

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import * as HoverCardPrimitive from '@radix-ui/react-hover-card'
+import { HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger } from '@/components/ui/hover-card'
 import { motion, AnimatePresence } from 'framer-motion'
 import { springs } from '@/lib/springs'
 
@@ -277,13 +277,13 @@ export const SourceCitation = React.forwardRef<HTMLButtonElement, SourceCitation
     useEffect(() => { if (open) setMounted(true) }, [open])
 
     return (
-      <HoverCardPrimitive.Root
+      <HoverCard
         open={open}
         onOpenChange={setOpen}
         openDelay={250}
         closeDelay={120}
       >
-        <HoverCardPrimitive.Trigger asChild>
+        <HoverCardTrigger asChild>
           <button
             ref={ref}
             className={className}
@@ -314,11 +314,11 @@ export const SourceCitation = React.forwardRef<HTMLButtonElement, SourceCitation
           >
             {index}
           </button>
-        </HoverCardPrimitive.Trigger>
+        </HoverCardTrigger>
 
         {mounted && (
-          <HoverCardPrimitive.Portal forceMount>
-            <HoverCardPrimitive.Content
+          <HoverCardPortal forceMount>
+            <HoverCardContent
               side="top"
               sideOffset={6}
               align="start"
@@ -341,10 +341,10 @@ export const SourceCitation = React.forwardRef<HTMLButtonElement, SourceCitation
                   </motion.div>
                 )}
               </AnimatePresence>
-            </HoverCardPrimitive.Content>
-          </HoverCardPrimitive.Portal>
+            </HoverCardContent>
+          </HoverCardPortal>
         )}
-      </HoverCardPrimitive.Root>
+      </HoverCard>
     )
   },
 )

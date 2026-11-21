@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
-import * as Dialog from '@radix-ui/react-dialog'
+import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { ArrowDownOneIcon, ArrowUpTwoIcon, BrainTwoIcon, CancelOneIcon, DeleteTwoIcon } from '@strange-huge/icons'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -225,39 +225,22 @@ function ManageDialog({ open, onOpenChange, orgId, summary, onSummary, draft, on
 
   const ready = draft.trim() && !updating
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
-      <Dialog.Overlay style={{ position: 'fixed', inset: 0, zIndex: 9998, background: 'var(--overlay-bg)', backdropFilter: 'blur(2px)' }} />
-      <Dialog.Content
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        hideClose
         aria-describedby={undefined}
-        style={{
-          position:      'fixed',
-          top:           '50%',
-          left:          '50%',
-          transform:     'translate(-50%, -50%)',
-          zIndex:        9999,
-          width:         760,
-          maxWidth:      'calc(100vw - 32px)',
-          height:        'calc(100dvh - 64px)',
-          display:       'flex',
-          flexDirection: 'column',
-          background:    'var(--neutral-white)',
-          borderRadius:  16,
-          boxShadow:     '0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rgba(130,122,116,0.1)',
-          outline:       'none',
-          overflow:      'hidden',
-        }}
+        style={{ width: 760, height: 'calc(100dvh - 64px)' }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '14px 16px 14px 24px', borderBottom: '1px solid var(--neutral-100)' }}>
-          <Dialog.Title style={{ margin: 0, fontFamily: BODY, fontWeight: 600, fontSize: 16, lineHeight: '24px', color: 'var(--neutral-900)' }}>
+          <DialogTitle style={{ margin: 0, fontFamily: BODY, fontWeight: 600, fontSize: 16, lineHeight: '24px', color: 'var(--neutral-900)' }}>
             {orgId ? 'Organization memory summary' : 'Memory summary'}
-          </Dialog.Title>
-          <Dialog.Close
+          </DialogTitle>
+          <DialogClose
             aria-label="Close"
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, border: 'none', background: 'transparent', borderRadius: 8, cursor: 'pointer', color: 'var(--neutral-500)' }}
           >
             <CancelOneIcon size={14} />
-          </Dialog.Close>
+          </DialogClose>
         </div>
 
         <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', padding: '16px 24px' }}>
@@ -326,9 +309,8 @@ function ManageDialog({ open, onOpenChange, orgId, summary, onSummary, draft, on
             </button>
           </div>
         </form>
-      </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+      </DialogContent>
+    </Dialog>
   )
 }
 

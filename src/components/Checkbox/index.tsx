@@ -32,8 +32,7 @@ function Checkbox(
   // Required because the Checkbox's resting box-shadow contains a 1 px ring
   // at the box edge (gray off / blue on); a class-based outline on the inner
   // button would stack outside that ring and read as two concentric rings on
-  // focus - same precedent as Switch. See specs/accessibility/focus-visible.md
-  // → "Two-rings issue (Switch precedent)".
+  // focus - same precedent as Switch.
   const [isFocused,  setIsFocused]  = React.useState(false)
   const [isPressed,  setIsPressed]  = React.useState(false)
   React.useEffect(() => {

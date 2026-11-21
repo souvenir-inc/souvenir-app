@@ -8,7 +8,6 @@ import { StreamingContentRenderer } from './StreamingContentRenderer'
 import { BreathingDot } from '@/components/BreathingDot'
 
 // ── Streaming typewriter hook ─────────────────────────────────────────────────
-// Ported from front-end/src/components/chat/chat-message.tsx.
 // RAF ease-out lerp: reveals ~6% of remaining chars per 16ms frame.
 // Fast when far behind the latest token; decelerates gracefully as it catches up.
 // Pass enabled=false (or when isComplete=true) to snap to full text immediately.
@@ -140,7 +139,6 @@ function InlineContent({ text, keyPrefix }: { text: string; keyPrefix: string })
 }
 
 // ── Markdown renderer ──────────────────────────────────────────────────────────
-// Adapted from front-end/src/components/chat/chat-message.tsx > renderTextContent.
 // Converted from Tailwind → KDS semantic tokens (var(--token)).
 // Handles: headings (h1–h3), bullet lists, code blocks (with copy), paragraphs, bold.
 

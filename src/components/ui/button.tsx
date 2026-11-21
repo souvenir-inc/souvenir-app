@@ -30,7 +30,7 @@ const BASE =
   'group/button relative inline-flex shrink-0 items-center justify-center whitespace-nowrap select-none ' +
   'border border-transparent [font-family:var(--font-title)] font-[var(--font-weight-medium)] ' +
   'text-[length:var(--font-size-body)] leading-[var(--line-height-body)] ' +
-  'transition-[background-color,border-color,box-shadow,filter,translate,scale,opacity] duration-200 ' +
+  'transition-[background-color,border-color,box-shadow,filter,translate,scale,opacity] duration-base ' +
   'cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[var(--focus-ring)] ' +
   'active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 ' +
   // Disabled: no hover wash, lift or press (pointer events stay on so the not-allowed cursor shows).
@@ -100,10 +100,10 @@ export const buttonVariants = cva(BASE, {
     size: {
       // Heights as before (xs 24 · sm 32 · md 36 · lg 40); side padding is shadcn's (8 · 12 · 16 · 24)
       // counting the label's own 2px.
-      md: 'min-h-9 gap-1 rounded-[10px] px-3.5',
-      sm: 'min-h-8 gap-1 rounded-[8px] px-2.5',
-      xs: 'min-h-6 gap-0.5 rounded-[6px] px-1.5 text-xs leading-4',
-      lg: 'min-h-10 gap-1.5 rounded-[10px] px-[22px]',
+      md: 'min-h-9 gap-1 rounded-lg px-3.5',
+      sm: 'min-h-8 gap-1 rounded-md px-2.5',
+      xs: 'min-h-6 gap-0.5 rounded-sm px-1.5 text-xs leading-4',
+      lg: 'min-h-10 gap-1.5 rounded-lg px-[22px]',
     },
   },
   defaultVariants: { variant: 'default', size: 'md' },
@@ -302,9 +302,9 @@ const iconButtonVariants = cva(BASE + ' p-0', {
       ),
     },
     size: {
-      md: 'size-9 rounded-[10px]',
-      sm: 'size-8 rounded-[8px]',
-      xs: 'size-6 rounded-[6px]',
+      md: 'size-9 rounded-lg',
+      sm: 'size-8 rounded-md',
+      xs: 'size-6 rounded-sm',
     },
   },
   defaultVariants: { variant: 'default', size: 'md' },

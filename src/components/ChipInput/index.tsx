@@ -68,7 +68,7 @@ export function ChipInput(
     const [isHovered, setIsHovered] = useState(false)
     const [isFocused, setIsFocused] = useState(false)
     // Shake-on-cap animation - same controls API as `PinCommentField`'s
-    // 2-line cap, applied here when the user types past `MAX_LENGTH`.
+    // 2-line cap, applied here when the user types past `maxLength`.
     const shakeControls = useAnimation()
 
     const isControlled = controlledValue !== undefined

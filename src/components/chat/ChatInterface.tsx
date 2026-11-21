@@ -379,7 +379,7 @@ export function ChatInterface({
     if (!text.trim() && allFiles.length === 0) return;
 
     // Hard-stop backstop: an exhausted credit/topup user cannot send. The input is
-    // already disabled and the CreditStatusBanner explains why, so block silently.
+    // already disabled and the credit banner (ExhaustionBanner) explains why, so block silently.
     if (creditStatus.blocked) return;
 
     // Same idea: a just-selected persona's system prompt/model is still being

@@ -419,7 +419,7 @@ export function PinboardExpanded(
                       selected={activeSidebarId === f.id}
                       onClick={() => onSidebarItemClick?.(f.id)}
                     />
-                    {/* eslint-disable-next-line click-events-have-key-events, no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements */}
+                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements */}
                     <div
                       style={{
                         position:      'absolute',
@@ -511,7 +511,7 @@ export function PinboardExpanded(
                       selected={activeSidebarId === f.id}
                       onClick={() => onSidebarItemClick?.(f.id)}
                     />
-                    {/* eslint-disable-next-line click-events-have-key-events, no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements */}
+                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements */}
                     <div
                       style={{
                         position:      'absolute',

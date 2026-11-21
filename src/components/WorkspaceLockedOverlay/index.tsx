@@ -10,6 +10,7 @@ export interface WorkspaceLockedOverlayProps {
 export function WorkspaceLockedOverlay({ isAdmin, onAdminAction }: WorkspaceLockedOverlayProps) {
   return (
     <div
+      // eslint-disable-next-line no-restricted-syntax -- ds-allow: covers one panel (position: absolute), not the page, so it can't be a portalled modal Dialog
       role="dialog"
       aria-modal="true"
       aria-label="Workspace locked"

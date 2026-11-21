@@ -51,7 +51,7 @@ function ThemePreview({ mode }: { mode: ThemeMode }) {
           flexShrink:      0,
         }}>
           {[true, false, false, false].map((isActive, i) => (
-            // eslint-disable-next-line react/no-array-index-as-key -- static fixed-length skeleton array, index is stable
+            // eslint-disable-next-line react/no-array-index-key -- static fixed-length skeleton array, index is stable
             <div key={i} style={{
               height:          5,
               width:           24,
@@ -212,7 +212,7 @@ export default function PreferencesPage() {
             {THEME_OPTIONS.map(opt => {
               const selected = themeMode === opt.value
               return (
-                // eslint-disable-next-line click-events-have-key-events, no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements
+                // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements
                 <div
                   key={opt.value}
                   onClick={() => setThemeMode(opt.value)}

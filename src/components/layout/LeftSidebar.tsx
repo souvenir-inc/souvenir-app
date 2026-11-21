@@ -394,10 +394,9 @@ function LeftSidebarImpl({
       onProjectsClick={() => { toast.info("Opening Projects", { id: 'nav' }); push(PROJECTS_ROUTE) }}
       onPersonasClick={() => { toast.info("Opening Agents", { id: 'nav' }); push(AGENTS_ROUTE) }}
       onNewAgentChat={() => push(AGENTS_ROUTE)}
-      // Shared/team-agent UI hidden app-wide — always the private-only listing
-      // now, regardless of project/org context. `PersonasSectionAll` (the
-      // team-shared variant) stays defined, just unused from this call site,
-      // so it isn't rebuilt from scratch if this is ever re-shown.
+      // Shared/team-agent UI hidden app-wide — always the private-only listing,
+      // regardless of project/org context. The team-shared variant this used to
+      // swap to is gone, so re-showing it means writing that listing again.
       agentItems={<PersonasSectionIndividual />}
       onAllAgentsClick={() => { toast.info("Opening Agents", { id: 'nav' }); push(AGENTS_ROUTE) }}
       // Clicking the admin tab switches the sidebar body to admin AND navigates

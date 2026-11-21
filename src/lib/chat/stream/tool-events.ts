@@ -75,9 +75,15 @@ export function handleToolExecuting(ctx: StreamEventContext, turn: StreamTurn, p
   // Check if tool_calls_streaming already created a preliminary activity. A
   // call that carries its id is matched by it, so two calls to the same tool
   // in one round keep a row each.
+  // A preliminary row made before any id was known (tool_calls_streaming without
+  // one) carries a synthetic id; the first real id for that tool takes it over
+  // rather than adding a second row. A row that already has a real id is never
+  // taken over, so two calls to one tool still keep a row each.
+  const byName = turn.toolCallIdByName.get(toolName)
+  const syntheticByName = byName?.startsWith(`tcs-${toolName}-`) ? byName : undefined
   const existingActivityId = givenId
-    ? (turn.toolCallIds.has(givenId) ? givenId : undefined)
-    : turn.toolCallIdByName.get(toolName)
+    ? (turn.toolCallIds.has(givenId) ? givenId : syntheticByName)
+    : byName
   turn.toolCallIds.add(toolCallId)
 
   // Register the real tool_call_id so subsequent tool_progress/tool_complete events can find it
@@ -187,6 +193,9 @@ export function handleToolFinished(ctx: StreamEventContext, turn: StreamTurn, pa
   const toolCallId = asString(parsed.tool_call_id)
   const msgId = ctx.messageId()
   if (!toolCallId || !msgId) return
+  // Queued updates may hold an older timeline; flushed after this write, they
+  // would put the finished activity back to running.
+  ctx.flushPending()
   const results = webSearchResults(undefined, parsed.results)
   const durationS = turn.reasoning.finishActivity(toolCallId, turn.eventAt)
   ctx.setMessages(updateMessage(msgId, (msg) => ({

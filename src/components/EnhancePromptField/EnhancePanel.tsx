@@ -162,7 +162,7 @@ export default function EnhancePanel({ flow, value }: { flow: EnhanceFlow; value
                     }}
                   >
                     {diffSegments.map((seg, i) => (
-                      // eslint-disable-next-line react/no-array-index-as-key -- diff segments are positionally stable; no stable IDs available
+                      // eslint-disable-next-line react/no-array-index-key -- diff segments are positionally stable; no stable IDs available
                       <DiffLine key={i} variant={seg.type} style={{ whiteSpace: 'pre-wrap' }}>{seg.text}</DiffLine>
                     ))}
                   </div>

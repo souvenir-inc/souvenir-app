@@ -172,7 +172,7 @@ export function RequestDemoModal({ onClose, onSubmit }: RequestDemoModalProps) {
             <button
               onClick={onClose}
               aria-label="Close"
-              className="flex shrink-0 cursor-pointer rounded-lg border-none bg-transparent p-1.5 text-[var(--neutral-700)]"
+              className="flex shrink-0 cursor-pointer rounded-md border-none bg-transparent p-1.5 text-[var(--neutral-700)]"
             >
               <CancelOneIcon size={20} />
             </button>

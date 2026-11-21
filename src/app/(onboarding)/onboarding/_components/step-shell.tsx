@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 
 // ── Shared shell for the v1.5 workspace-onboarding steps ─────────────────────
 // Figma: Onboarding v1, nodes 27:1196 / 55:2726 ("Setup your workspace"),
@@ -256,41 +257,20 @@ export function LeaveGuardModal({
   onStay: () => void;
   onLeave: () => void;
 }) {
-  if (!open) return null;
   return (
-    <div
-      role="presentation"
-      onClick={onStay}
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 10000,
-        backgroundColor: "var(--overlay-bg)",
-        backdropFilter: "blur(2px)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="Unsaved changes"
-        onClick={(e) => e.stopPropagation()}
+    <Dialog open={open} onOpenChange={(next) => { if (!next) onStay(); }}>
+      <DialogContent
+        hideClose
         style={{
           backgroundColor: "var(--modal-bg)",
-          borderRadius: 16,
           padding: 24,
           width: 380,
-          maxWidth: "calc(100vw - 32px)",
-          display: "flex",
-          flexDirection: "column",
           gap: 20,
           boxShadow: "0px 8px 32px 0px rgba(38,33,30,0.18), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
         }}
       >
         <div>
-          <p
+          <DialogTitle
             style={{
               fontFamily: "var(--font-body)",
               fontWeight: 600,
@@ -301,8 +281,8 @@ export function LeaveGuardModal({
             }}
           >
             Leave this step?
-          </p>
-          <p
+          </DialogTitle>
+          <DialogDescription
             style={{
               fontFamily: "var(--font-body)",
               fontWeight: 400,
@@ -313,7 +293,7 @@ export function LeaveGuardModal({
             }}
           >
             You have unsaved changes on this page. If you leave now, they won&apos;t be saved.
-          </p>
+          </DialogDescription>
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
           <Button variant="ghost" size="sm" onClick={onStay}>
@@ -323,8 +303,8 @@ export function LeaveGuardModal({
             Leave without saving
           </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
