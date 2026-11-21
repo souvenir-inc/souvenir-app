@@ -123,12 +123,17 @@ export function useFollowRunningReply({
     // One timer for the whole effect, owned by its cleanup; it only asks once polling is on.
     let stopped = false
     let polling = false
+    // One lookup at a time: a slow one (up to its timeout) answering "idle" after a newer one
+    // said "running" must not end a run that has since started. A tick skips while one is out.
+    let lookingUp = false
     const poll = setInterval(() => {
-      if (!polling) return
+      if (!polling || lookingUp) return
+      lookingUp = true
       void getChatRunState(chatId).then((state) => {
+        lookingUp = false
         if (stopped || state !== "idle" || isStreamActive(chatId)) return
         runEnded()
-      }, () => {})
+      }, () => { lookingUp = false })
     }, RUN_ENDED_POLL_MS)
     const pollForRunEnd = () => { polling = true }
     if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS && !activeAtLoad) {

@@ -23,11 +23,13 @@ export type StreamOutcome = "done" | "error" | "aborted"
 
 export type StreamEvent =
   | { type: "start"; chatId: string }
-  /** `replyId`: the reply the stream was writing, when known (a Stop names it, so a view can
+  /** `runEnded`: the run itself reported its end (a terminal event, done or error), as opposed
+   *  to a reader that dropped (also "error") while the run may go on.
+   *  `replyId`: the reply the stream was writing, when known (a Stop names it, so a view can
    *  tell a stopped follow of its running reply from another send that was stopped).
    *  `inconclusive`: the stream ended without showing how the chat's run went (a follow
    *  that never reached the stream, a send that failed before its run): the run may go on. */
-  | { type: "end"; chatId: string; outcome: StreamOutcome; inconclusive?: boolean; replyId?: string }
+  | { type: "end"; chatId: string; outcome: StreamOutcome; inconclusive?: boolean; replyId?: string; runEnded?: boolean }
   /** The user stopped `replyId` in `chatId`. Sent whether or not the chat had an entry (a
    *  follow waiting to reconnect has none), and it changes no entry. */
   | { type: "stopped"; chatId: string; replyId: string }
@@ -51,6 +53,11 @@ const listeners = new Set<(event: StreamEvent) => void>()
 function emit(event: StreamEvent): void {
   // Copied first: a listener may (un)subscribe or start another stream.
   for (const listener of [...listeners]) listener(event)
+}
+
+/** For tests: how many listeners are subscribed (none should be left behind). */
+export function streamListenerCount(): number {
+  return listeners.size
 }
 
 /** Called with every stream start and end. Returns an unsubscribe. */
@@ -87,14 +94,14 @@ export function registerStream(chatId: string | null, stop?: () => void, detach?
  * Resolves the stored promise and removes the entry.
  * Safe to call multiple times (subsequent calls are no-ops).
  */
-export function completeStream(chatId: string | null, outcome: StreamOutcome = "done", options?: { inconclusive?: boolean; replyId?: string }): void {
+export function completeStream(chatId: string | null, outcome: StreamOutcome = "done", options?: { inconclusive?: boolean; replyId?: string; runEnded?: boolean }): void {
   if (!chatId) return
   const entry = registry.get(chatId)
   if (entry) {
     entry.resolve()
     registry.delete(chatId)
   }
-  if (entry) emit({ type: "end", chatId, outcome, ...(options?.inconclusive ? { inconclusive: true } : {}), ...(options?.replyId ? { replyId: options.replyId } : {}) })
+  if (entry) emit({ type: "end", chatId, outcome, ...(options?.inconclusive ? { inconclusive: true } : {}), ...(options?.replyId ? { replyId: options.replyId } : {}), ...(options?.runEnded ? { runEnded: true } : {}) })
 }
 
 /** Tells listeners the user stopped `replyId` in `chatId`; registry entries are left alone. */

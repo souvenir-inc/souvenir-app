@@ -355,7 +355,9 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
       return
     }
     if (event.type !== "end") return
-    const finished = event.outcome === "done" && !event.inconclusive
+    // A run that ended on its own error is over too (not a dropped reader, which says "error"
+    // without runEnded): the queue must not wait on it.
+    const finished = (event.outcome === "done" && !event.inconclusive) || (event.outcome === "error" && event.runEnded === true)
     const stoppedThisReply = event.outcome === "aborted" && event.replyId !== undefined
     if (!finished && !stoppedThisReply) return
     setRunningOwner((owner) => (owner && owner.chatId === event.chatId && (finished || owner.id === event.replyId) ? null : owner))

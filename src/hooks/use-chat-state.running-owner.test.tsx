@@ -149,4 +149,18 @@ describe('runningMessageId across a chat switch', () => {
     await act(async () => { reportStopped('a', 'turn-A') }) // the follow waiting to reconnect, stopped
     expect(seen.at(-1)?.running).toBeNull()
   })
+
+  it('stops naming the running reply when its run ends on its own error, not when a reader drops', async () => {
+    getChatStreamId.mockResolvedValue('turn-A')
+    getChatMessages.mockResolvedValue({
+      messages: [msg('m1', 'a'), msg('turn-A', 'a', { role: 'assistant', content: '', run } as Partial<Message>)],
+      has_more: false, next_cursor: null,
+    })
+    await act(async () => { root.render(<Harness chatId="a" />); await Promise.resolve() })
+    await act(async () => { await Promise.resolve() })
+    await act(async () => { registerStream('a'); completeStream('a', 'error') }) // a reader dropped: the run may go on
+    expect(seen.at(-1)?.running).toBe('turn-A')
+    await act(async () => { registerStream('a'); completeStream('a', 'error', { runEnded: true }) }) // the run failed
+    expect(seen.at(-1)?.running).toBeNull()
+  })
 })

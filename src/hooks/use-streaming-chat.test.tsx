@@ -185,7 +185,8 @@ describe('useStreamingChat turn result', () => {
       { type: 'RUN_ERROR', message: 'stream error' },
     ])
     expect(outcome).toBe('error')
-    expect(ended).toEqual([{ type: 'end', chatId: 'chat-1', outcome: 'error' }])
+    // The run reported its own end (RUN_ERROR): marked so, unlike a reader that dropped.
+    expect(ended).toEqual([{ type: 'end', chatId: 'chat-1', outcome: 'error', runEnded: true }])
   })
 
   it('reports a failed request as an error', async () => {

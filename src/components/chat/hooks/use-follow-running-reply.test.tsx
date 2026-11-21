@@ -70,6 +70,19 @@ describe('useFollowRunningReply', () => {
     expect(followStream).toHaveBeenCalledTimes(FOLLOW_REFUSED_ATTEMPTS)
   })
 
+  it('asks the run state one lookup at a time, so a slow "idle" cannot follow a newer "running"', async () => {
+    const load = await spendBudget('r1')
+    const answers: Array<(state: string) => void> = []
+    getChatRunState.mockImplementation(() => new Promise((resolve) => { answers.push(resolve) }))
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: load })
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS * 3) })
+    expect(getChatRunState).toHaveBeenCalledTimes(1) // the first is still out: no second lookup
+    await act(async () => { answers[0]('running') })
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS) })
+    expect(getChatRunState).toHaveBeenCalledTimes(2) // the next one goes once it answered
+    expect(onRunEnded).not.toHaveBeenCalled()
+  })
+
   it('follows the same reply afresh once a finished load showed it no longer running', async () => {
     let load = await spendBudget('r1')
     // A load finishes with no running reply (it paused for a prompt, say)…
@@ -257,6 +270,9 @@ describe('useFollowRunningReply', () => {
       registerStream('chat-A'); completeStream('chat-A', 'error') // …replaced by another
     })
     await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 2, enabled: false }) // the effect goes
+    // Only the reload-retry interval (its own effect, still mounted) is left: the deferred
+    // follows were cleared, not merely skipped when they fire.
+    expect(vi.getTimerCount()).toBe(1)
     await act(async () => { await vi.advanceTimersByTimeAsync(10) })
     expect(followStream).toHaveBeenCalledTimes(1) // neither deferred follow ran
   })
