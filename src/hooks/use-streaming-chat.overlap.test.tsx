@@ -519,14 +519,17 @@ describe('useStreamingChat with overlapping follows', () => {
     const ends: string[] = []
     const unsubscribe = subscribeStreams((event) => { if (event.type === 'end' && event.chatId === 'chat-A') ends.push(event.outcome) })
     const refused = vi.fn()
-    const done = hook.followStream('chat-A', 'reply-A', undefined, refused)
-    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
-    const xhr = FakeXHR.all[0]
-    xhr.status = 404 // the turn has ended
-    xhr.responseText = '{"detail":"no stream"}'
-    xhr.end()
-    expect(await done).toBe('done')
-    unsubscribe()
+    try {
+      const done = hook.followStream('chat-A', 'reply-A', undefined, refused)
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+      const xhr = FakeXHR.all[0]
+      xhr.status = 404 // the turn has ended
+      xhr.responseText = '{"detail":"no stream"}'
+      xhr.end()
+      expect(await done).toBe('done')
+    } finally {
+      unsubscribe() // before teardown ends chat-A, whatever happened above
+    }
     expect(ends).toEqual(['done'])
     expect(refused).toHaveBeenCalledTimes(1) // its own result reached its caller
   })
@@ -537,14 +540,17 @@ describe('useStreamingChat with overlapping follows', () => {
     const unsubscribe = subscribeStreams((event) => {
       if (event.type === 'end' && event.chatId === 'chat-A' && !reserved) { reserved = true; registerStream('chat-A') }
     })
-    const done = hook.followStream('chat-A', 'reply-A')
-    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
-    const xhr = FakeXHR.all[0]
-    xhr.status = 404
-    xhr.responseText = '{"detail":"no stream"}'
-    xhr.end()
-    await done
-    unsubscribe()
+    try {
+      const done = hook.followStream('chat-A', 'reply-A')
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+      const xhr = FakeXHR.all[0]
+      xhr.status = 404
+      xhr.responseText = '{"detail":"no stream"}'
+      xhr.end()
+      await done
+    } finally {
+      unsubscribe() // before teardown ends chat-A: a leaked listener would reserve it again
+    }
     expect(isStreamActive('chat-A')).toBe(true) // the reservation stands
     completeStream('chat-A')
   })
@@ -752,5 +758,43 @@ describe('useStreamingChat with overlapping follows', () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+
+  it("lifts the drop's hold when another reader takes the chat and reads the turn to its end", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    const done = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const xhr = FakeXHR.all[0]
+    xhr.start()
+    xhr.push({ type: 'RUN_STARTED', ...runA })
+    xhr.status = 0
+    xhr.end() // dropped: held, and the reconnect waits a moment
+    await vi.waitFor(() => expect(getChatQueue('chat-A')?.heldBy).toBe('error'))
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
+    registerStream('chat-A') // the chat's own view (another hook) follows it meanwhile
+    expect(await done).toBe('done') // this retry stands down
+    expect(getChatQueue('chat-A')?.heldBy).toBe('error') // nothing recovered yet
+    completeStream('chat-A', 'done') // that reader reads the turn to its end
+    expect(getChatQueue('chat-A')?.heldBy).toBeUndefined()
+  })
+
+  it("keeps the drop's hold when the other reader fails", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    const done = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    const xhr = FakeXHR.all[0]
+    xhr.start()
+    xhr.push({ type: 'RUN_STARTED', ...runA })
+    xhr.status = 0
+    xhr.end()
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
+    registerStream('chat-A')
+    await done
+    completeStream('chat-A', 'error')
+    expect(getChatQueue('chat-A')?.heldBy).toBe('error')
   })
 })

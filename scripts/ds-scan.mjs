@@ -11,6 +11,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const SRC = path.join(ROOT, "src");
@@ -54,6 +55,15 @@ const NEUTRAL = /^["'`]?(inherit|initial|unset|none|auto|transparent|currentColo
 
 // `isCss`: a stylesheet value. CSS has no variables by bare name, so a word there
 // (`red`, `bold`) is a literal; only in a style object can it be a JS identifier.
+/** A stylesheet's declarations as [property, value] pairs (custom properties left out).
+ *  The closing `;` is looked at, not consumed: it is also where the next declaration starts,
+ *  so `.a{padding:16px;margin:8px;}` gives both. */
+export function cssDeclarations(source) {
+  const decls = [];
+  for (const m of source.matchAll(/(?:^|[;{\s])([a-z-]+)\s*:\s*([^;{}]+)(?=;)/g)) if (!m[1].startsWith("--")) decls.push([m[1], m[2]]);
+  return decls;
+}
+
 function classify(value, isCss = false) {
   const v = value.trim();
   if (/var\(--/.test(v)) return "token";
@@ -115,7 +125,7 @@ function scan() {
       // Declarations: CSS rules, or keys of inline style objects.
       const decls = [];
       if (isCss) {
-        for (const m of source.matchAll(/(?:^|[;{\s])([a-z-]+)\s*:\s*([^;{}]+);/g)) if (!m[1].startsWith("--")) decls.push([m[1], m[2]]);
+        decls.push(...cssDeclarations(source));
       } else if (isTsx) {
         for (const block of source.matchAll(/style=\{\{([\s\S]*?)\}\}/g))
           for (const m of block[1].matchAll(/([a-zA-Z]+)\s*:\s*([^,\n}]+)/g)) decls.push([m[1], m[2]]);
@@ -223,7 +233,8 @@ function update(counts) {
 }
 
 // ── CLI ──────────────────────────────────────────────────────────────────────
-{
+// Only when run directly, so tests can import cssDeclarations.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
   const { counts, byFile } = scan();
   const top = args.find((a) => a.startsWith("--top="));
