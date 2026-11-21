@@ -59,6 +59,8 @@ export function useFollowRunningReply({
   // during the back-off is part of it, and would be lost if an older copy were followed into.
   const currentReply = useLatestCallback((id: string) => messages.find((message) => message.id === id))
   const runEnded = useLatestCallback(() => onRunEnded?.())
+  // The caller's followStream as it is now, not as it was when the effect last ran.
+  const followLatest = useLatestCallback(followStream)
   const tallyRef = useRef<{ key: string; refused: number }>({ key: "", refused: 0 })
   // Only the given chat's budget: the tally belongs to whichever chat it was counting. The
   // follow effect then runs again, so a spent budget (only polling for the end) goes back to
@@ -97,20 +99,20 @@ export function useFollowRunningReply({
     // The asking goes on until a reload shows no running reply (this effect then ends):
     // a reload that fails is tried again at the next check. Not while a stream for the chat
     // is going (a send just made): a reload then would drop its turn from the list.
+    // One timer for the whole effect, owned by its cleanup; it only asks once polling is on.
     let stopped = false
-    let poll: ReturnType<typeof setInterval> | undefined
-    const pollForRunEnd = () => {
-      poll ??= setInterval(() => {
-        void getChatRunState(chatId).then((state) => {
-          if (stopped || state !== "idle" || isStreamActive(chatId)) return
-          runEnded()
-        }, () => {})
-      }, RUN_ENDED_POLL_MS)
-    }
-    const stopPolling = () => { stopped = true; if (poll) clearInterval(poll) }
+    let polling = false
+    const poll = setInterval(() => {
+      if (!polling) return
+      void getChatRunState(chatId).then((state) => {
+        if (stopped || state !== "idle" || isStreamActive(chatId)) return
+        runEnded()
+      }, () => {})
+    }, RUN_ENDED_POLL_MS)
+    const pollForRunEnd = () => { polling = true }
     if (tally.refused >= FOLLOW_REFUSED_ATTEMPTS && !activeAtLoad) {
       pollForRunEnd()
-      return stopPolling
+      return () => { stopped = true; clearInterval(poll) }
     }
     // The first go is immediate; a repeat only happens because the last was refused,
     // so it backs off rather than returning at round-trip speed.
@@ -120,14 +122,17 @@ export function useFollowRunningReply({
     let followed = false
     const follow = () => {
       followed = true
-      void followStream(chatId, runningMessageId, currentReply(runningMessageId), () => {
+      void followLatest(chatId, runningMessageId, currentReply(runningMessageId), () => {
         if (tally.key === key) tally.refused += 1
       })
     }
-    const timer = activeAtLoad || tally.refused >= FOLLOW_REFUSED_ATTEMPTS ? undefined : setTimeout(() => {
+    // Nothing is scheduled while a stream from before the load owns the chat, or with the
+    // budget spent; the timer is still made (and cleared by the cleanup) either way.
+    const scheduled = !activeAtLoad && tally.refused < FOLLOW_REFUSED_ATTEMPTS
+    const timer = setTimeout(() => {
       // Checked again when the wait ends: a stream may have started for this chat in
       // the meantime (a message sent during the back-off), and that one owns the reply.
-      if (isStreamActive(chatId)) return
+      if (!scheduled || isStreamActive(chatId)) return
       follow()
     }, wait)
     // A stream that starts for this chat before the wait ends (a send) is a newer run, and
@@ -158,7 +163,7 @@ export function useFollowRunningReply({
         }
       }
     })
-    return () => { clearTimeout(timer); unsubscribe(); stopPolling() }
+    return () => { stopped = true; clearInterval(poll); clearTimeout(timer); unsubscribe() }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per history load that finds a running turn; followStream is fresh each render
   // `enabled` too: turning it off cancels a waiting follow, and turning it on looks again.
   }, [chatId, enabled, runningMessageId, historyLoadId, resetCount])
