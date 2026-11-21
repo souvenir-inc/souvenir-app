@@ -44,12 +44,20 @@ const FOLLOW_RETRY_MS = 1000
 // How often a dropped call asks whether its chat's run has ended, to free the chat.
 export const DROPPED_RUN_POLL_MS = 5000
 
-/** `next` with the prompt-card answers already recorded on `current` (the same reply). */
+/**
+ * `next` with the prompt-card answers already recorded on `current` (the same reply). An
+ * answered card that `next` lacks (shown after `prior` was taken) is kept, answer and all:
+ * the replay adds a card only when none with its request id is there, so its replayed copy
+ * then leaves the answered one in place rather than showing it unanswered again.
+ */
 function keepPromptDecisions(next: UIMessage, current: UIMessage): UIMessage {
   const merge = <P extends { request_id: string; decision?: unknown }>(into?: P[], from?: P[]) => {
-    if (!into || !from) return into
-    const decided = new Map(from.filter((p) => p.decision !== undefined).map((p) => [p.request_id, p.decision]))
-    return decided.size ? into.map((p) => (decided.has(p.request_id) ? { ...p, decision: decided.get(p.request_id) } : p)) : into
+    const answered = (from ?? []).filter((p) => p.decision !== undefined)
+    if (answered.length === 0) return into
+    const decided = new Map(answered.map((p) => [p.request_id, p.decision]))
+    const kept = (into ?? []).map((p) => (decided.has(p.request_id) ? { ...p, decision: decided.get(p.request_id) } : p))
+    const present = new Set(kept.map((p) => p.request_id))
+    return [...kept, ...answered.filter((p) => !present.has(p.request_id))]
   }
   return {
     ...next,
@@ -283,7 +291,7 @@ export function useStreamingChat({
     xhrRef.current?.abort()
     stopFlushInterval()
     flushPending()
-    completeStream(resolvedChatIdRef.current, "aborted")
+    completeStream(resolvedChatIdRef.current, "aborted", { replyId: loadingMessageIdRef.current ?? undefined })
     setStreamState?.("aborted")
 
     const msgId = loadingMessageIdRef.current
@@ -405,7 +413,7 @@ export function useStreamingChat({
           ? { ...msg, isLoading: false, isThinkingInProgress: false, stoppedByUser: true, activities: stopActiveActivities(msg.activities) }
           : msg)))
       }
-      if (isStreamOwnedBy(myChatId, stopThisCall)) completeStream(myChatId, "aborted")
+      if (isStreamOwnedBy(myChatId, stopThisCall)) completeStream(myChatId, "aborted", { replyId: replyId ?? undefined })
     }
     activeStopRef.current = stopThisCall
     let stoppedByUser = false
@@ -438,7 +446,7 @@ export function useStreamingChat({
     // ends it) an end listener may register the chat again, and that newer entry is not ours.
     const endOwnStream = (outcome: StreamOutcome, opts?: { inconclusive?: boolean }) => {
       const id = myChatId
-      if (id && isStreamOwnedBy(id, stopThisCall)) completeStream(id, outcome, opts)
+      if (id && isStreamOwnedBy(id, stopThisCall)) completeStream(id, outcome, { ...opts, ...(outcome === "aborted" && myReplyId ? { replyId: myReplyId } : {}) })
     }
     // As releaseHoldWhenRunEnds, while another reader has the chat: if that reader ends with a
     // failure (or a Stop) the asking stops and the hold stays. A "done" end leaves it asking.
@@ -715,6 +723,9 @@ export function useStreamingChat({
         // The connection dropped but the backend is still running the turn: read
         // it again from its stream. A regular chat only; other endpoints have none.
         const liveChatId = ownChatId
+        // Set once the follow's caller has been told of an incomplete read (below), so it is
+        // told once.
+        let toldIncomplete = false
         const attempt = options?.followAttempt ?? 0
         if (
           error instanceof ConnectionDroppedError &&
@@ -790,7 +801,10 @@ export function useStreamingChat({
           // The reconnect never reached the stream (a 5xx, say): the run may still be going and
           // nothing reads it, so it counts as an incomplete read; the follow's caller retries
           // within its budget. Not after a Stop.
-          if (result === "failed" && !retryDetached && !stoppedByUser && !stopRequestedRef.current) options?.onIncomplete?.()
+          if (result === "failed" && !retryDetached && !stoppedByUser && !stopRequestedRef.current) {
+            toldIncomplete = true
+            options?.onIncomplete?.()
+          }
           if (result === "gone") {
             // The retry's own failed follow already ended the registry entry (as done). Ending
             // it again here could remove a reservation someone made in between.
@@ -805,6 +819,14 @@ export function useStreamingChat({
             if (!heldBefore && dropHoldId !== undefined) releaseErrorHold(liveChatId, dropHoldId)
             return "done"
           }
+        }
+
+        // A follow that had attached and then dropped, with no reconnect left to try (the last
+        // allowed one dropped too): the run may still be going and nothing reads it. Reported as
+        // an incomplete read, so the follow's caller retries within its budget and then asks
+        // whether the run ended. Not for a terminal stream error, or after a Stop.
+        if (follow && !toldIncomplete && error instanceof ConnectionDroppedError && !stopRequestedRef.current && !stoppedByUser) {
+          options?.onIncomplete?.()
         }
 
         // A FriendlyStreamError was already logged where it was raised (status, endpoint,

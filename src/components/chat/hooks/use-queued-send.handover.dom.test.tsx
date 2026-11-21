@@ -9,7 +9,8 @@ import React, { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useQueuedSend } from './use-composer-queue'
-import { beginHandOver, endHandOver, queueMessage, takeAllQueuedMessages } from '@/lib/message-queue'
+import { beginHandOver, endHandOver, getChatQueue, queueMessage, takeAllQueuedMessages } from '@/lib/message-queue'
+import { completeStream, registerStream } from '@/lib/stream-registry'
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
@@ -27,7 +28,7 @@ function Harness() {
 }
 
 beforeEach(() => { sendTurn.mockClear(); root = createRoot(document.createElement('div')) })
-afterEach(() => { act(() => root.unmount()); endHandOver('c1'); takeAllQueuedMessages('c1') })
+afterEach(() => { act(() => root.unmount()); endHandOver('c1'); takeAllQueuedMessages('c1'); completeStream('c1') })
 
 describe('useQueuedSend during a hand-over', () => {
   it('sends the queued message once the hand-over ends', async () => {
@@ -38,5 +39,15 @@ describe('useQueuedSend during a hand-over', () => {
     await act(async () => { endHandOver('c1') })
     expect(sendTurn).toHaveBeenCalledOnce()
     expect(sendTurn.mock.calls[0][0]).toMatchObject({ content: 'next', fromQueue: true })
+  })
+
+  it('keeps the message queued when a reply started during the hand-over', async () => {
+    queueMessage('c1', { content: 'next', attachments: [], mentionedPins: [] }, context)
+    beginHandOver('c1')
+    await act(async () => { root.render(<Harness />); await Promise.resolve() })
+    registerStream('c1') // a reply starts (a follow, say) before React renders it as busy
+    await act(async () => { endHandOver('c1') })
+    expect(sendTurn).not.toHaveBeenCalled()
+    expect(getChatQueue('c1')?.messages.map((m) => m.content)).toEqual(['next'])
   })
 })
