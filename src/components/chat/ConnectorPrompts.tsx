@@ -31,9 +31,10 @@ interface ConnectPromptCardProps {
   onAnswered?:  () => void
 }
 
-// Prompts whose answer is on its way to the backend. Module-level: it outlives a card that
-// leaves the virtual list and remounts, which would otherwise send the answer twice.
-const answersInFlight = new Set<string>()
+// Answers on their way to the backend, by prompt: the decision sent and how it ends (null, or
+// the failure). Module-level: it outlives a card that leaves the virtual list and remounts,
+// which must neither send the answer again nor lose its outcome (a failure, with Try again).
+const answersInFlight = new Map<string, { decision: ConnectDecision; outcome: Promise<Error | null> }>()
 
 export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectPromptCardProps) {
   const [state,        setState]        = useState<'idle' | 'connecting' | 'polling' | 'error'>('idle')
@@ -43,7 +44,8 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
   // not the whole sign-in.
   const [respondFailed, setRespondFailed] = useState<ConnectDecision | null>(null)
   // The answer is on its way: Try again shows it, and the last failure is not shown meanwhile.
-  const [responding, setResponding] = useState(false)
+  // Seeded from an answer already in flight (this card remounted while it was being sent).
+  const [responding, setResponding] = useState(() => answersInFlight.has(prompt.request_id))
   // api_key flow
   const [apiKeyFields, setApiKeyFields] = useState<Record<string, string>>({})
   const [fieldDefs,    setFieldDefs]    = useState<ApiKeyField[] | null>(
@@ -54,10 +56,23 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
   const answeredRef = useRef(false)
   // The "already connected" check and the sign-in poll can both call finish; only
   // one answer may be in flight, or the backend gets it twice.
-  const respondingRef = useRef(false)
+  const respondingRef = useRef(answersInFlight.has(prompt.request_id))
   // The person said "Not now": that stays the card's answer until the backend has it (a
   // failed send keeps it for Try again). A connection found afterwards doesn't overrule it.
-  const declinedRef = useRef(false)
+  const declinedRef = useRef(answersInFlight.get(prompt.request_id)?.decision === 'cancel')
+  // This card sent the answer in flight itself (Strict Mode remounts the same card): it settles
+  // it where it sent it, and does not also take it over.
+  const sentHereRef = useRef(false)
+
+  // A failed answer: the card says so and Try again resends that answer alone.
+  const showFailure = useCallback((decision: ConnectDecision, failure: Error) => {
+    setState('error')
+    setRespondFailed(decision)
+    setErrorMsg(failure.message)
+    toast.error(decision === 'connected'
+      ? `Connected ${prompt.connector.name}, but the chat was not told. Try again.`
+      : 'Could not tell the chat. Try again.')
+  }, [prompt.connector.name])
 
   // The turn that asked is waiting on this answer, or has left and takes its run back up on it.
   // "cancel" is "not now" for this one ask: the next request that needs the app asks again.
@@ -72,25 +87,23 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
     // swallowing the failure left the run waiting for a reply that never came, with
     // this guard refusing every retry; so the flag is set after the POST resolves.
     respondingRef.current = true
-    answersInFlight.add(prompt.request_id)
     setResponding(true)
     // The outcome as a value rather than try/catch/finally: React Compiler cannot
     // compile a `finally`, and leaves the whole component unoptimised when it meets one.
-    const failure = await respondToChatPrompt(decision, prompt.respond_url).then(
+    const outcome = respondToChatPrompt(decision, prompt.respond_url).then(
       () => null,
       (err: unknown) => (err instanceof Error ? err : new Error('Could not tell the chat your answer.')),
     )
-    respondingRef.current = false
+    answersInFlight.set(prompt.request_id, { decision, outcome })
+    sentHereRef.current = true
+    const failure = await outcome
     answersInFlight.delete(prompt.request_id)
+    respondingRef.current = false
     setResponding(false)
     if (failure) {
+      // Gone meanwhile: a card mounted since has taken this answer over and shows the failure.
       if (abortedRef.current) return
-      setState('error')
-      setRespondFailed(decision)
-      setErrorMsg(failure.message)
-      toast.error(decision === 'connected'
-        ? `Connected ${prompt.connector.name}, but the chat was not told. Try again.`
-        : 'Could not tell the chat. Try again.')
+      showFailure(decision, failure)
       return
     }
     answeredRef.current = true
@@ -99,7 +112,7 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
     onDecided?.(decision)
     onAnswered?.()
     if (!abortedRef.current) setDecided(true)
-  }, [prompt.respond_url, prompt.request_id, prompt.connector.name, onDecided, onAnswered])
+  }, [prompt.respond_url, prompt.request_id, prompt.connector.name, onDecided, onAnswered, showFailure])
   const finish = useCallback(() => answer('connected'), [answer])
 
   // The app may already be connected (from Connectors, or another tab) by the time this card shows.
@@ -109,6 +122,21 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
     // re-runs effects) mounts again with the same refs after the cleanup below set it,
     // and a card left "aborted" never answers its turn or shows a failed sign-in.
     abortedRef.current = false
+    // An answer already on its way (sent by this card before it left the screen): this card
+    // takes it over instead of answering again. On success the card that sent it has told
+    // the chat; on failure this one shows it, with Try again.
+    const pending = answersInFlight.get(prompt.request_id)
+    if (pending && !sentHereRef.current) {
+      void pending.outcome.then((failure) => {
+        if (abortedRef.current) return
+        respondingRef.current = false
+        setResponding(false)
+        if (failure) showFailure(pending.decision, failure)
+        else { answeredRef.current = true; setDecided(true) }
+      })
+      return () => { abortedRef.current = true }
+    }
+    if (pending) return () => { abortedRef.current = true }
     getConnector(prompt.connector.slug)
       .then((entry) => {
         if (entry.ownedConnections.some((row) => row.connected && !row.needsReconnect)) void finish()

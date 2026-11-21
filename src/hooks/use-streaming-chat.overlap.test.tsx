@@ -27,7 +27,7 @@ vi.mock('@/lib/jwt-utils', async (orig) => {
   return { ...actual, ensureFreshToken: () => token.gate ?? actual.ensureFreshToken() }
 })
 import { DROPPED_RUN_POLL_MS, useStreamingChat } from '@/hooks/use-streaming-chat'
-import { completeStream, detachStream, isStreamActive, registerStream, subscribeStreams } from '@/lib/stream-registry'
+import { completeStream, detachStream, isStreamActive, registerStream, stopStream, subscribeStreams } from '@/lib/stream-registry'
 import { getChatQueue, queueMessage, queuedChatsReadyForBackground, takeAllQueuedMessages } from '@/lib/message-queue'
 import { resetStreamStore } from '@/lib/chat/stream-store'
 import type { UIMessage } from '@/types/chat'
@@ -1157,4 +1157,27 @@ describe('useStreamingChat with overlapping follows', () => {
       vi.useRealTimers()
     }
   }, 15000)
+
+  it("stops a dropped chat's run through the backend without touching the call that took over", async () => {
+    const stopBackend = vi.fn()
+    act(() => root.render(<Harness view={{ onStopBackend: stopBackend } as never} onReady={(api) => { hook = api }} />))
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    const doneB = hook.followStream('chat-B', 'reply-B') // B takes over: A is dropped, still busy
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+    expect(isStreamActive('chat-A')).toBe(true)
+    expect(stopStream('chat-A')).toBe(true) // Stop on chat A
+    expect(stopBackend).toHaveBeenCalledWith('chat-A')
+    expect(reply('reply-A')).toMatchObject({ isLoading: false, stoppedByUser: true })
+    expect(isStreamActive('chat-A')).toBe(false)
+    expect(FakeXHR.all[1].aborted).toBe(false) // B's stream goes on
+    FakeXHR.all[0].end()
+    FakeXHR.all[1].start()
+    FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+    FakeXHR.all[1].end()
+    await act(async () => { await doneA; await doneB })
+    expect(stopBackend).not.toHaveBeenCalledWith('chat-B')
+  })
 })

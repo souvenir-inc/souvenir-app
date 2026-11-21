@@ -140,3 +140,11 @@ describe("quoted keys", () => {
     }
   });
 });
+
+describe("regular expressions", () => {
+  it("leaves a regex literal that contains lineHeight alone", () => {
+    const src = "const pattern = /\{lineHeight: 1.5,\}/;";
+    expect(tsx(src)).toBe(src);
+    expect(tsx("const s = { lineHeight: 1.5, }; const ratio = a / b;")).toContain("lineHeight: 'var(--leading-normal)'");
+  });
+});

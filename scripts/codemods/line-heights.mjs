@@ -110,9 +110,15 @@ export function transform(src, isCss, counter) {
   // lineHeight must start an object property: in `a ? lineHeight : 1.5` it is a ternary branch.
   // Text inside a string or comment can look like a declaration (`"lineHeight: 1.5,"`).
   const masked = codeMask(src, { css: isCss });
+  // Regular-expression literals (`/\{lineHeight: 1.5,\}/`) are not masked as strings are:
+  // their spans are found here (a `/` where an expression starts) and left alone.
+  const regexSpans = isCss ? [] : [...src.matchAll(/(?<=(?:^|[=(,:[!&|?{};]|\breturn)\s*)\/(?![*/])(?:\\.|\[(?:\\.|[^\]\\\n])*\]|[^/\\\n[])+\/[a-z]*/gm)]
+    .filter((m) => !masked[m.index])
+    .map((m) => [m.index, m.index + m[0].length]);
+  const inRegex = (i) => regexSpans.some(([from, to]) => i >= from && i < to);
   return src.replace(re, (w, pre, val, post = "", off) => {
     if (typeof post === "number") { off = post; post = ""; }
-    if (masked[off]) return w;
+    if (masked[off] || inRegex(off)) return w;
     // A literal type (`type T = { lineHeight: 1.5 }`) is checked against, not shown: left alone.
     if (!isCss && inTypeBody(src, masked, off)) return w;
     if (keep(src, off)) return w;
