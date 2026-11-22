@@ -17,7 +17,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 // The same string/comment mask as tokens-exact, so both codemods agree on what is code.
-import { codeMask, inTypeBody, insideRepo, regexLiteralSpans } from "./tokens-exact.mjs";
+import { codeMask, inJsxText, inTypeBody, insideRepo, regexLiteralSpans } from "./tokens-exact.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const args = process.argv.slice(2);
@@ -140,6 +140,8 @@ export function transform(src, isCss, counter) {
     if (masked[off] || inRegex(off)) return w;
     // A literal type (`type T = { lineHeight: 1.5 }`) is checked against, not shown: left alone.
     if (!isCss && inTypeBody(src, masked, off)) return w;
+    // Displayed JSX text that reads like a property is left as written.
+    if (!isCss && inJsxText(src, masked, off)) return w;
     if (keep(src, off)) return w;
     const out = mapValue(val, enclosing(src, off, masked), counter, isCss);
     if (!out) return w;

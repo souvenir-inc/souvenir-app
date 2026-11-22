@@ -210,12 +210,15 @@ describe('ConnectPromptCard "Not now"', () => {
     await act(async () => root.unmount()) // the row leaves mid-answer…
     root = createRoot(container)
     const shownView = vi.fn()
-    await act(async () => root.render(<ConnectPromptCard prompt={prompt} onAnswered={shownView} />)) // …and comes back
+    const shownDecided = vi.fn()
+    await act(async () => root.render(<ConnectPromptCard prompt={prompt} onAnswered={shownView} onDecided={shownDecided} />)) // …and comes back
     await flush()
     await act(async () => { release(); await Promise.resolve() })
     await flush()
     expect(shownView).toHaveBeenCalledOnce() // the view on screen refreshes
     expect(respondToChatPrompt).toHaveBeenCalledTimes(1)
+    expect(shownDecided).toHaveBeenCalledExactlyOnceWith('connected') // and records the answer
+
   })
 
   it('shows a failed answer, with Try again, on the card that remounted while it was being sent', async () => {

@@ -163,6 +163,17 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   const cursorRef = useRef<string | undefined>(undefined)
   const pagesRef = useRef(1)
   const loadingRef = useRef(false)
+  // Which request holds loadingRef: only that one frees it (and stops the spinner). A later
+  // request (the next chat's load, say) takes it over, and an earlier one settling late leaves
+  // it alone.
+  const loadOwnerRef = useRef<object | null>(null)
+  const takeLoadGuard = () => { const token = {}; loadOwnerRef.current = token; loadingRef.current = true; return token }
+  const freeLoadGuard = (token: object) => {
+    if (loadOwnerRef.current !== token) return false
+    loadOwnerRef.current = null
+    loadingRef.current = false
+    return true
+  }
   // Mirrors `state` for the guards that run outside render (a background
   // refresh deciding whether a turn started while it was in flight). Synced in
   // an effect, not during render: a background fetch resolves whole ticks after
@@ -214,7 +225,10 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
     // is not shown as loading either, or it would spin with nothing left to follow.
     const shown = stale ? list.map((msg) => (msg.id === meta.runningId ? { ...msg, isLoading: false } : msg)) : list
     setState({ chatId: id, list: shown, loaded: true })
-    setRunningOwner(meta.runningId && !stale ? { chatId: id, id: meta.runningId } : null)
+    const owner = meta.runningId && !stale ? { chatId: id, id: meta.runningId } : null
+    // Kept in step at once (not only after the render): an end handled before then must see it.
+    runningOwnerRef.current = owner
+    setRunningOwner(owner)
     setHasMoreMessages(meta.hasMore)
     setHistoryLoadId((n) => n + 1)
     setMessagesLoadError(null)
@@ -263,6 +277,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
 
     hasPreviousChatRef.current = true
     setMessagesLoadError(null)
+    runningOwnerRef.current = null
     setRunningOwner(null)
 
     // If this chatId was just created during an active stream, skip the
@@ -313,7 +328,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
     let cancelled = false
 
     const load = async () => {
-      loadingRef.current = true
+      const guard = takeLoadGuard()
       if (!background) setIsLoadingMessages(true)
       try {
         if (pendingStream) await waitForChatStreams(chatId, 90_000)
@@ -333,7 +348,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
         setMessagesLoadError(message)
       } finally {
         if (!cancelled && !background) setIsLoadingMessages(false)
-        loadingRef.current = false
+        freeLoadGuard(guard)
       }
     }
 
@@ -384,6 +399,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
     if (event.type === "stopped") {
       noteCleared(`${event.chatId}:${event.replyId}`)
       // Stopped with no entry to end (a follow waiting to reconnect): the same rule, by reply id.
+      if (runningOwnerRef.current?.chatId === event.chatId && runningOwnerRef.current.id === event.replyId) runningOwnerRef.current = null
       setRunningOwner((owner) => (owner && owner.chatId === event.chatId && owner.id === event.replyId ? null : owner))
       return
     }
@@ -396,12 +412,16 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
     // A finished end clears the reply that was running then (not any reply of the chat: one that
     // started after it is still running, and a snapshot naming it is not stale).
     const owner = runningOwnerRef.current
+    // (Read from the ref, which every write keeps current, and the same reply is the one cleared
+    // below: the recorded clear and the cleared owner never differ.)
     // With no reply installed yet for the chat (its history still loading), the end's own reply.
     // An end that names its reply clears that reply only (a later one still running stays); one
     // that names none clears the reply that was running then.
     const cleared = event.replyId ?? (finished && owner && owner.chatId === event.chatId ? owner.id : undefined)
     if (cleared) noteCleared(`${event.chatId}:${cleared}`)
-    setRunningOwner((owner) => (owner && owner.chatId === event.chatId && (event.replyId !== undefined ? owner.id === event.replyId : finished) ? null : owner))
+    if (!cleared) return
+    if (runningOwnerRef.current?.chatId === event.chatId && runningOwnerRef.current.id === cleared) runningOwnerRef.current = null
+    setRunningOwner((current) => (current && current.chatId === event.chatId && current.id === cleared ? null : current))
   }), [])
 
   // Re-run the write-back once a reply for the shown chat has ended.
@@ -418,7 +438,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
 
   const loadMoreMessages = useCallback(async () => {
     if (!chatId || loadingRef.current || !hasMoreMessages) return
-    loadingRef.current = true
+    const guard = takeLoadGuard()
     try {
       const res = await getChatMessages(chatId, cursorRef.current)
       cursorRef.current = res.next_cursor ?? undefined
@@ -429,7 +449,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
       logger.error("[useChatState] Failed to load more messages", err)
       toast.error(err instanceof Error ? err.message : "Failed to load more messages")
     } finally {
-      loadingRef.current = false
+      freeLoadGuard(guard)
     }
   }, [chatId, hasMoreMessages, setMessages])
 
@@ -518,7 +538,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
    *  from a dropped background-stream connection). */
   const refreshMessages = useCallback(async () => {
     if (!chatId || loadingRef.current) return
-    loadingRef.current = true
+    const guard = takeLoadGuard()
     setIsLoadingMessages(true)
     const visit = visitRef.current
     try {
@@ -532,10 +552,10 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
       toast.error(message)
       setMessagesLoadError(message)
     } finally {
-      // The chat open now has its own loading state, which a stale refresh leaves alone. The guard
-      // is freed either way: left set, no refresh could ever run again in a chat with no load.
-      if (visitRef.current === visit) setIsLoadingMessages(false)
-      loadingRef.current = false
+      // Only while this refresh still holds the guard: a load that took it over (the next chat's)
+      // owns the spinner. If none did (the next chat came from cache), this stops the spinner it
+      // started, in whichever chat is open, so it never stays on.
+      if (freeLoadGuard(guard)) setIsLoadingMessages(false)
     }
   }, [chatId, fetchHistory, install])
 

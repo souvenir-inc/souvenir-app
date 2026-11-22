@@ -1079,6 +1079,29 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(getChatQueue('chat-A')?.heldBy).toBe('error') // the failure still holds it
   })
 
+  it("lifts an incomplete read's hold when a later follow of that reply finds the run over (404)", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const first = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].status = 0
+    FakeXHR.all[0].end() // dropped: held
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+    FakeXHR.all[1].status = 503
+    FakeXHR.all[1].responseText = 'Service Unavailable'
+    FakeXHR.all[1].end() // incomplete read
+    await act(async () => { await first })
+    expect(getChatQueue('chat-A')?.heldBy).toBe('error')
+    const second = hook.followStream('chat-A', 'reply-A') // followed again…
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(3))
+    FakeXHR.all[2].status = 404 // …the run is over
+    FakeXHR.all[2].responseText = '{"detail":"no running turn"}'
+    FakeXHR.all[2].end()
+    await act(async () => { await second })
+    expect(getChatQueue('chat-A')?.heldBy).toBeUndefined() // the queue goes on
+  })
+
   it("keeps an error hold that was there before the drop, even after a later full read", async () => {
     queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
     registerStream('chat-A'); completeStream('chat-A', 'error') // an earlier reply failed: held

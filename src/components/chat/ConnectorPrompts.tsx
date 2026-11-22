@@ -147,7 +147,9 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
           answeredRef.current = true
           setDecided(true)
           // The card that sent it told the view it was on, which this card has replaced: this
-          // view refreshes too, to follow the run the answer resumed.
+          // view records the answer (so the card stays gone even if the refresh fails) and
+          // refreshes too, to follow the run the answer resumed.
+          onDecided?.(pending.decision)
           onAnswered?.()
         }
       })

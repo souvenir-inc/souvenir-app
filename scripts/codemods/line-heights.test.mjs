@@ -179,3 +179,12 @@ describe("regular expressions", () => {
     expect(tsx("const s = { lineHeight: 1.5, }; const ratio = a / b;")).toContain("lineHeight: 'var(--leading-normal)'");
   });
 });
+
+describe("JSX text", () => {
+  it("leaves displayed text that reads like a property alone, and converts real styles", () => {
+    const src = "const view = <p>\nlineHeight: 1.5,\n</p>;";
+    expect(tsx(src)).toBe(src);
+    expect(tsx("const view = <p style={{ lineHeight: 1.5, }}>hi</p>;")).toContain("lineHeight: 'var(--leading-normal)'");
+    expect(tsx("const s = {\n  lineHeight: 1.5,\n}")).toContain("lineHeight: 'var(--leading-normal)'");
+  });
+});

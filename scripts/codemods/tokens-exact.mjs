@@ -184,6 +184,28 @@ export function codeMask(src, { css = false } = {}) {
   return mask;
 }
 
+/**
+ * Whether `off` is in JSX text (`<p>\nlineHeight: 1.5,\n</p>`): displayed words, not a property.
+ * Walks back over code (strings and comments skipped) to the nearest unmatched opener: a `{`,
+ * `(` or `[` means code; a `>` that closes a JSX tag means text.
+ */
+export function inJsxText(src, masked, off) {
+  let depth = 0;
+  for (let i = off - 1; i >= 0; i--) {
+    if (masked[i]) continue;
+    const ch = src[i];
+    if (ch === "}" || ch === ")" || ch === "]") depth++;
+    else if (ch === "{" || ch === "(" || ch === "[") {
+      if (depth === 0) return false;
+      depth--;
+    } else if (ch === ">" && depth === 0 && src[i - 1] !== "=") {
+      const lt = src.lastIndexOf("<", i);
+      if (lt >= 0 && /^<\/?[A-Za-z][\w.:-]*(\s[^<>]*)?\/?$/.test(src.slice(lt, i))) return true;
+    }
+  }
+  return false;
+}
+
 // ── TSX ─────────────────────────────────────────────────────────────────────
 
 /** Brace depth at each index of `body` (which starts with the object's own `{`), strings skipped. */
