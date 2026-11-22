@@ -867,7 +867,9 @@ export function useStreamingChat({
             onStreamDone?.()
             // The turn ended on the backend: the drop was no failure, so its hold goes (after
             // the reload above has started, which the queue waits on).
-            if (!heldBefore && dropHoldId !== undefined) releaseErrorHold(liveChatId, dropHoldId)
+            // Not if another reader of the chat failed (or was stopped) during the wait, here or in a
+            // nested one: that failure keeps the hold, as on the other release paths.
+            if (!heldBefore && dropHoldId !== undefined && !readerFailedInWait && !nestedReaderFailed && !stoppedByUser) releaseErrorHold(liveChatId, dropHoldId)
             return "done"
           }
         }

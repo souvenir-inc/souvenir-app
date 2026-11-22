@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { composerMustQueue } from "./composer-must-queue"
+import { composerMustQueue, runningReplyToWaitOn } from "./composer-must-queue"
 
 const idle = { replyInFlight: false, runningMessageId: null, sending: false, askingSave: false, hasQueue: false }
 
@@ -16,5 +16,15 @@ describe("composerMustQueue", () => {
     for (const key of ["replyInFlight", "sending", "askingSave", "hasQueue"] as const) {
       expect(composerMustQueue({ ...idle, [key]: true })).toBe(true)
     }
+  })
+})
+
+describe("runningReplyToWaitOn", () => {
+  it("waits on the history's running reply in a regular chat", () => {
+    expect(runningReplyToWaitOn("turn-A", undefined)).toBe("turn-A")
+  })
+
+  it("does not wait on one in a chat with its own endpoint, which nothing would ever clear", () => {
+    expect(runningReplyToWaitOn("turn-A", "/api/agents/x/chat")).toBeNull()
   })
 })

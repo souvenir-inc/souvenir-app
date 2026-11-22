@@ -914,6 +914,27 @@ describe('useStreamingChat with overlapping follows', () => {
     await act(async () => { await doneB })
   })
 
+  it("keeps the drop's hold when a reader failed during the wait and the reconnect then finds the run over", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    const done = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].status = 0
+    FakeXHR.all[0].end() // dropped: held, reconnect waits
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
+    registerStream('chat-A') // a reader of A, during the wait…
+    completeStream('chat-A', 'error') // …fails
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+    FakeXHR.all[1].status = 404 // the reconnect finds no running turn
+    FakeXHR.all[1].responseText = '{"detail":"no running turn"}'
+    FakeXHR.all[1].end()
+    await act(async () => { await done })
+    expect(getChatQueue('chat-A')?.heldBy).toBe('error') // the failure keeps the queue held
+  })
+
   it("keeps the drop's hold when a reader of the chat fails during the wait, before a takeover", async () => {
     queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
     const timers = vi.spyOn(globalThis, 'setTimeout')
