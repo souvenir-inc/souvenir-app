@@ -120,3 +120,11 @@ describe("review edge cases", () => {
     expect(out).toContain("const chart = { fontSize: 12 }");
   });
 });
+
+describe("unquoted CSS urls", () => {
+  it("leaves declaration-like text inside url(…) alone and converts real declarations", () => {
+    const src = ".a{background-image:url(/assets/icon.svg;padding:8px;v=1);}";
+    expect(css(src)).toBe(src);
+    expect(css(".a{color:red;padding:8px;}")).toMatch(/padding:var\(--space-/);
+  });
+});

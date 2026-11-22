@@ -167,15 +167,20 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
       return () => { shown = false; abortedRef.current = true }
     }
     if (pending) return () => { abortedRef.current = true }
+    // This setup's own: under Strict Mode both setups look the connector up, and the first
+    // one's answer must not send anything once the second has taken over (say, after its own
+    // answer failed and the card offers Try again).
+    let current = true
     getConnector(prompt.connector.slug)
       .then((entry) => {
+        if (!current) return
         if (entry.ownedConnections.some((row) => row.connected && !row.needsReconnect)) void finish()
         else if (prompt.auth_mode === 'api_key' && !abortedRef.current) {
           setFieldDefs((current) => current ?? (entry.apiKeyFields.length > 0 ? entry.apiKeyFields : [DEFAULT_API_KEY_FIELD]))
         }
       })
       .catch(() => {})
-    return () => { abortedRef.current = true }
+    return () => { current = false; abortedRef.current = true }
     // Checked once, when the card shows.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

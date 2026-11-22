@@ -383,7 +383,8 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
     // A finished end clears the reply that was running then (not any reply of the chat: one that
     // started after it is still running, and a snapshot naming it is not stale).
     const owner = runningOwnerRef.current
-    const cleared = finished ? (owner && owner.chatId === event.chatId ? owner.id : undefined) : event.replyId
+    // With no reply installed yet for the chat (its history still loading), the end's own reply.
+    const cleared = finished ? (owner && owner.chatId === event.chatId ? owner.id : event.replyId) : event.replyId
     if (cleared) noteCleared(`${event.chatId}:${cleared}`)
     setRunningOwner((owner) => (owner && owner.chatId === event.chatId && (finished || owner.id === event.replyId) ? null : owner))
   }), [])

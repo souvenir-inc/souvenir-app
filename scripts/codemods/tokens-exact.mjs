@@ -168,6 +168,11 @@ export function codeMask(src, { css = false } = {}) {
       let j = i + 1;
       while (j < src.length && src[j] !== c && (c === "`" || src[j] !== "\n")) j += src[j] === "\\" ? 2 : 1;
       end = Math.min(j, src.length - 1);
+    } else if (css && (c === "u" || c === "U") && /^url\(\s*(?!["'])/i.test(src.slice(i, i + 6)) && !/[\w-]/.test(src[i - 1] ?? "")) {
+      // An unquoted url(…) is one token in CSS: what is inside (`url(/a;padding:8px;b)`) is a
+      // path, never declarations. Masked to its closing parenthesis.
+      end = src.indexOf(")", i);
+      end = end < 0 ? src.length - 1 : end;
     }
     if (end >= i) {
       mask.fill(1, i, end + 1);

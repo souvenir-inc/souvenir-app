@@ -64,6 +64,24 @@ describe('ConnectPromptCard under StrictMode', () => {
   })
 })
 
+describe('ConnectPromptCard lookups under StrictMode', () => {
+  it("does not answer again from the first setup's lookup after the second setup's answer failed", async () => {
+    const connected = { ownedConnections: [{ connected: true, needsReconnect: false }], apiKeyFields: [] } as unknown as Awaited<ReturnType<typeof getConnector>>
+    let firstLookup!: (v: typeof connected) => void
+    vi.mocked(getConnector)
+      .mockImplementationOnce(() => new Promise((resolve) => { firstLookup = resolve }) as ReturnType<typeof getConnector>) // setup 1: slow
+      .mockResolvedValueOnce(connected) // setup 2: connected at once
+    respondToChatPrompt.mockRejectedValueOnce(new Error('Network error')) // its answer fails
+    await act(async () => root.render(<React.StrictMode><ConnectPromptCard prompt={prompt} /></React.StrictMode>))
+    await flush()
+    expect(respondToChatPrompt).toHaveBeenCalledTimes(1)
+    expect(tryAgain()).toBeDefined()
+    await act(async () => firstLookup(connected)) // the first setup's lookup answers late
+    await flush()
+    expect(respondToChatPrompt).toHaveBeenCalledTimes(1) // nothing sent without a click
+  })
+})
+
 describe('ConnectPromptCard when the answer does not reach the backend', () => {
   it('does not report connected, shows the error, and offers a retry', async () => {
     respondToChatPrompt.mockRejectedValueOnce(new Error('Network error'))
@@ -288,7 +306,6 @@ describe('ConnectPromptCard "Not now"', () => {
   })
 
   it('holds its actions while it waits on an answer that started after it rendered', async () => {
-    vi.mocked(getConnector).mockResolvedValueOnce({ ownedConnections: [], apiKeyFields: [] } as unknown as Awaited<ReturnType<typeof getConnector>>)
     let release!: (v: Error | null) => void
     const outcome = new Promise<Error | null>((resolve) => { release = resolve })
     // Another card's answer starts after this card rendered and before its effect ran.

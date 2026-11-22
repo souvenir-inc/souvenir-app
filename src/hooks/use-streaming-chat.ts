@@ -43,7 +43,7 @@ const FOLLOW_ATTEMPTS = 5
 const FOLLOW_RETRY_MS = 1000
 // The error hold an incomplete follow read left on a chat's queue (by chat id), for the
 // recovery follow that reads the turn to its end to lift.
-const incompleteReadHolds = new Map<string, number>()
+const incompleteReadHolds = new Map<string, { hold: number; replyId: string | null }>()
 
 // How often a dropped call asks whether its chat's run has ended, to free the chat.
 export const DROPPED_RUN_POLL_MS = 5000
@@ -454,7 +454,7 @@ export function useStreamingChat({
     // ends it) an end listener may register the chat again, and that newer entry is not ours.
     const endOwnStream = (outcome: StreamOutcome, opts?: { inconclusive?: boolean; runEnded?: boolean }) => {
       const id = myChatId
-      if (id && isStreamOwnedBy(id, stopThisCall)) completeStream(id, outcome, { ...opts, ...(outcome === "aborted" && myReplyId ? { replyId: myReplyId } : {}) })
+      if (id && isStreamOwnedBy(id, stopThisCall)) completeStream(id, outcome, { ...opts, ...(myReplyId ? { replyId: myReplyId } : {}) })
     }
     // As releaseHoldWhenRunEnds, while another reader has the chat: if that reader ends with a
     // failure (or a Stop) the asking stops and the hold stays. A "done" end leaves it asking.
@@ -477,13 +477,13 @@ export function useStreamingChat({
       // for): an error hold that was already there before is a failure no later read undoes.
       const id = myChatId
       const hold = dropHoldId ?? options?.recoveryHoldId
-      if (id && hold !== undefined && currentHoldId(id) === hold) incompleteReadHolds.set(id, hold)
+      if (id && hold !== undefined && currentHoldId(id) === hold) incompleteReadHolds.set(id, { hold, replyId: myReplyId })
       options?.onIncomplete?.()
     }
     const releaseWhenRunEnds = () => {
       const id = myChatId
       if (!id || id.startsWith("temp-") || !runStateReadable) return
-      pollUntilRunEnds(id, () => isStreamOwnedBy(id, stopThisCall), () => completeStream(id, "done"))
+      pollUntilRunEnds(id, () => isStreamOwnedBy(id, stopThisCall), () => completeStream(id, "done", { replyId: myReplyId ?? undefined }))
     }
     // A detached call ends as "done", but it did not read its turn to the end: its caller is told.
     const leftDetached = (): StreamOutcome => {
@@ -699,9 +699,13 @@ export function useStreamingChat({
         // this chat (a drop whose recovery this is) was no failure after all. Only that hold: a
         // newer one (its id changed) stays.
         if (follow && outcome === "done" && !endedWithoutEvent && myChatId) {
-          const hold = incompleteReadHolds.get(myChatId)
-          incompleteReadHolds.delete(myChatId)
-          if (hold !== undefined && currentHoldId(myChatId) === hold) releaseErrorHold(myChatId, hold)
+          // Only a full read of the same reply: another reply finishing says nothing about the one
+          // whose read was cut short.
+          const noted = incompleteReadHolds.get(myChatId)
+          if (noted && noted.replyId === myReplyId) {
+            incompleteReadHolds.delete(myChatId)
+            if (currentHoldId(myChatId) === noted.hold) releaseErrorHold(myChatId, noted.hold)
+          }
         }
         // The backend saves the files this turn carried to Library; refresh what Library shows.
         if (options?.files?.length) notifyLibraryFilesChanged()
@@ -842,7 +846,7 @@ export function useStreamingChat({
                 // A Stop keeps the hold; so does a reader that took over from the retry and failed
                 // (the queue keeps the same hold id, so the id check alone would not stop this).
                 if (!stoppedByUser && !nestedReaderFailed) releaseHoldUnlessReaderFails(liveChatId)
-              } else releaseErrorHold(liveChatId, dropHoldId)
+              } else if (!nestedReaderFailed && !readerFailedInWait) releaseErrorHold(liveChatId, dropHoldId) // a reader that failed during a wait keeps it
             }
             // Passed up: a call above this one may own an earlier hold, and must not take a
             // detached retry's "done" as a finished turn either.
