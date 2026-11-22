@@ -392,6 +392,17 @@ describe('useFollowRunningReply', () => {
     expect(onRunEnded).toHaveBeenCalledTimes(1)
   })
 
+  it("does not mark a reload pending from a follow a later history load superseded", async () => {
+    let gone!: () => void
+    followStream.mockImplementationOnce((_c, _i, _p, _r, _w, onRunGone) => new Promise(() => { gone = () => onRunGone?.() }))
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    await render({ chatId: 'chat-A', runningMessageId: null, historyLoadId: 2 }) // a load lands: the reply is not running
+    await act(async () => { gone() }) // the old follow reports late
+    await act(async () => { await vi.advanceTimersByTimeAsync(RUN_ENDED_POLL_MS * 3) })
+    expect(onRunEnded).not.toHaveBeenCalled() // no reload over the history just loaded
+  })
+
   it("does not mark a reload pending for the chat opened since a late 404", async () => {
     let gone!: () => void
     followStream.mockImplementationOnce((_c, _i, _p, _r, _w, onRunGone) => new Promise(() => { gone = () => onRunGone?.() }))

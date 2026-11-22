@@ -132,3 +132,12 @@ describe("regex literals", () => {
   });
 });
 
+
+describe("JSX text", () => {
+  it("leaves displayed text that reads like a property alone, and converts real styles", () => {
+    const shadow = "0px 2px 2.8px rgba(82,75,71,0.12)";
+    const src = `const view = <p>\nboxShadow: '${shadow}',\n</p>;`;
+    expect(transformTsx(src, { n: 0 })).toBe(src);
+    expect(transformTsx(`const s = {\n  boxShadow: '${shadow}',\n}`, { n: 0 })).toMatch(/boxShadow: 'var\(--shadow-/);
+  });
+});

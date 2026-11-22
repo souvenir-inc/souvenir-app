@@ -470,7 +470,7 @@ All of them use `cva`, forward refs, accept `className`, and support `asChild` w
 
 | File | Exports |
 |---|---|
-| `components/ui/text.tsx` | `Text` (`variant` = the 11 type styles, `tone` default/secondary/tertiary/muted/subtle/inverse/danger/success/inherit, `weight`, `truncate`, `lineClamp`, `align`, `as`), `Heading` (`level` 1–4 sets element + default size/weight; `as`, `variant`, `weight` override), `textVariants` |
+| `components/ui/text.tsx` | `Text` (`variant` = the 11 type styles, `tone` default/secondary/tertiary/muted/subtle/inverse/danger/success/inherit, `weight`, `truncate`, `lineClamp`, `align`, `as`), `Heading` (`level` 1–4 sets element + default size/weight; `as`, `variant`, `weight` override) |
 | `components/ui/layout.tsx` | `Box` (`p`/`px`/`py`, `radius`, `surface`, `bordered`, `as`), `Stack`, `Inline` (`gap`, `align`, `justify`, `wrap`), `Grid` (`cols` number or `{ base, md, lg }`, `gap`). Spacing props accept only the 4px scale (`'0'` … `'16'`). |
 | `components/ui/card.tsx` | `Card` (`variant` plain/raised/inset/panel/tile/interactive, `padding` none/sm/md/lg, `as`), `CardHeader`, `CardBody`, `CardFooter` |
 | `components/ui/index.ts` | the above, plus `Separator` (= `Divider`) |

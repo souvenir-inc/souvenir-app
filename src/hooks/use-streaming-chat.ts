@@ -985,6 +985,16 @@ export function useStreamingChat({
     // Not over a follow an end listener started for the chat meanwhile (it has the entry now).
     if (showsChat(chatId, false) && !isStreamActive(chatId)) setStreamState?.("done")
     onRefused?.()
+    // Refused because the run is over (404): a hold an earlier incomplete read of this reply left
+    // was no failure, as when a later read reaches the end. Only that reply's, and only while it
+    // is still the chat's current hold.
+    if (result === "gone") {
+      const noted = incompleteReadHolds.get(chatId)
+      if (noted && noted.replyId === loadingMessageId) {
+        incompleteReadHolds.delete(chatId)
+        if (currentHoldId(chatId) === noted.hold) releaseErrorHold(chatId, noted.hold)
+      }
+    }
     onStreamLost?.(chatId)
     return "done"
   }

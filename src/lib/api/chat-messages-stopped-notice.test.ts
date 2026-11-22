@@ -21,6 +21,10 @@ describe("getChatMessages, an unfinished answer", () => {
   it("shows no failure notice on a stopped turn, in either format", async () => {
     const { messages } = await getChatMessages("c1");
     const notice = (id: string) => messages.find((m) => m.id === id)?.errorNotice;
+    // The stopped replies are there (a dropped row would pass the checks below too).
+    for (const id of ["s1", "p1"]) {
+      expect(messages.find((m) => m.id === id)).toMatchObject({ role: "assistant", run: { status: "stopped" } });
+    }
     expect(notice("s1")).toBeUndefined();
     expect(notice("p1")).toBeUndefined();
     expect(notice("s2")).toBe(INCOMPLETE_ANSWER_MESSAGE);

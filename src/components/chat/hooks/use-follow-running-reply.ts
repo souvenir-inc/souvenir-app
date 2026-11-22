@@ -177,7 +177,8 @@ export function useFollowRunningReply({
       void followLatest(chatId, runningMessageId, currentReply(runningMessageId), () => { if (!stopped) tryAgain() }, () => !stopped, () => {
         // Attached, dropped, and the reconnect found the run over: its history reload may
         // fail, so it is asked for again until a history load lands. Only for this visit.
-        if (visitRef.current === visit) reloadPendingRef.current = true
+        // Not from a follow a later history load has superseded (this effect's cleanup ran).
+        if (!stopped && visitRef.current === visit) reloadPendingRef.current = true
       }, () => { if (!stopped) tryAgain() }).then(() => { ownFollowGoing = false }, () => { ownFollowGoing = false })
     }
     // Nothing is scheduled while a stream from before the load owns the chat, or with the

@@ -30,10 +30,12 @@ let seen: Array<{ chatId: string; running: string | null }>
 
 let refresh: () => Promise<void>
 let shownList: Array<{ id: string; isLoading?: boolean }> = []
+let loadingShown = false
 function Harness({ chatId }: { chatId: string }) {
   const api = useChatState(chatId)
   seen.push({ chatId, running: api.runningMessageId })
-  const { refreshMessages, messages } = api
+  const { refreshMessages, messages, isLoadingMessages } = api
+  React.useEffect(() => { loadingShown = isLoadingMessages }, [isLoadingMessages])
   React.useEffect(() => { refresh = refreshMessages }, [refreshMessages])
   React.useEffect(() => { shownList = messages }, [messages])
   return null
@@ -258,5 +260,55 @@ describe('runningMessageId across a chat switch', () => {
     await act(async () => { await Promise.resolve() })
     await act(async () => { answer({ messages: [msg('a-msg', 'a')], has_more: false, next_cursor: null }); await pending })
     expect(shownList.map((m) => m.id)).toEqual(['b-msg']) // B still shows B
+  })
+
+  it('stops the spinner a refresh started when the next chat opened from its cache', async () => {
+    getChatStreamId.mockResolvedValue(null)
+    getChatMessages.mockImplementation((chatId: string) => Promise.resolve({ messages: [msg(`${chatId}-msg`, chatId)], has_more: false, next_cursor: null }))
+    await act(async () => { root.render(<Harness chatId="b" />); await Promise.resolve() }) // B loads (and is cached)
+    await act(async () => { await Promise.resolve() })
+    await act(async () => { root.render(<Harness chatId="a" />); await Promise.resolve() })
+    await act(async () => { await Promise.resolve() })
+    let answer!: (v: unknown) => void
+    getChatMessages.mockImplementationOnce(() => new Promise((resolve) => { answer = resolve }))
+    let pending!: Promise<void>
+    await act(async () => { pending = refresh() }) // a refresh of A: the spinner goes on…
+    expect(loadingShown).toBe(true)
+    await act(async () => { root.render(<Harness chatId="b" />); await Promise.resolve() }) // …B opens from its cache
+    await act(async () => { await Promise.resolve() })
+    await act(async () => { answer({ messages: [msg('a-msg', 'a')], has_more: false, next_cursor: null }); await pending })
+    expect(loadingShown).toBe(false) // not left spinning
+  })
+
+  it("leaves the next chat's load guard alone when an earlier refresh settles", async () => {
+    getChatStreamId.mockResolvedValue(null)
+    getChatMessages.mockImplementation((chatId: string) => Promise.resolve({ messages: [msg(`${chatId}-msg`, chatId)], has_more: false, next_cursor: null }))
+    await act(async () => { root.render(<Harness chatId="a" />); await Promise.resolve() })
+    await act(async () => { await Promise.resolve() })
+    let answerA!: (v: unknown) => void
+    getChatMessages.mockImplementationOnce(() => new Promise((resolve) => { answerA = resolve }))
+    let pending!: Promise<void>
+    await act(async () => { pending = refresh() }) // A's refresh is out…
+    getChatMessages.mockImplementationOnce(() => new Promise(() => {})) // …and B's load never answers in this test
+    await act(async () => { root.render(<Harness chatId="c" />); await Promise.resolve() }) // C (not cached) loads
+    await act(async () => { answerA({ messages: [msg('a-msg', 'a')], has_more: false, next_cursor: null }); await pending })
+    const calls = getChatMessages.mock.calls.length
+    await act(async () => { await refresh() }) // C's load still holds the guard: no second request
+    expect(getChatMessages.mock.calls.length).toBe(calls)
+  })
+
+  it('clears the reply an unnamed end recorded, not one a history installed just before it', async () => {
+    const withRunning = (id: string) => ({ messages: [msg('m1', 'a'), msg(id, 'a', { role: 'assistant', content: '', run } as Partial<Message>)], has_more: false, next_cursor: null })
+    getChatStreamId.mockResolvedValue('turn-A')
+    getChatMessages.mockResolvedValue(withRunning('turn-A'))
+    await act(async () => { root.render(<Harness chatId="a" />); await Promise.resolve() })
+    await act(async () => { await Promise.resolve() })
+    getChatMessages.mockResolvedValueOnce(withRunning('turn-B'))
+    // In one batch: a refresh installs turn-B, then an end that names no reply arrives.
+    await act(async () => {
+      await refresh()
+      registerStream('a'); completeStream('a', 'done')
+    })
+    expect(seen.at(-1)?.running).toBeNull() // turn-B was the running reply then, and it is the one cleared
   })
 })

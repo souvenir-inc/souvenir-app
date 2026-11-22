@@ -497,7 +497,10 @@ export function ChatInterface({
     // would go into that run.
     !replyInFlight && !runningMessageId && !hookBusy && !askingSave &&
     (!isRevealing || pageHidden) &&
-    !isLoadingMessages && !isSettling &&
+    // A history that failed to load: whether the reply before is still running is unknown (a
+    // message handed back from the background waits on this too), so nothing goes out until a
+    // load succeeds.
+    !isLoadingMessages && !messagesLoadError && !isSettling &&
     !queuePausedReason && !readOnly && !archived;
   useQueuedSend({
     queueReady, queueKey, pageHidden, isSendingRef, askingSaveRef, setQueuedRowExit, sendTurn: sendTurnLatest,
