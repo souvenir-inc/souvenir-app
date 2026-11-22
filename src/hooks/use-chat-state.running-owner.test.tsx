@@ -229,4 +229,34 @@ describe('runningMessageId across a chat switch', () => {
     await act(async () => { registerStream('a'); completeStream('a', 'done', { replyId: 'turn-A' }) })
     expect(seen.at(-1)?.running).toBeNull()
   })
+
+  it('keeps a run taken back up (more segments) running, though an earlier stretch of it was stopped', async () => {
+    const at = (segments: number) => ({ messages: [msg('m1', 'a'), msg('turn-A', 'a', { role: 'assistant', content: '', run: { ...run, segments } } as Partial<Message>)], has_more: false, next_cursor: null })
+    getChatStreamId.mockResolvedValue('turn-A')
+    getChatMessages.mockResolvedValue(at(1))
+    await act(async () => { root.render(<Harness chatId="a" />); await Promise.resolve() })
+    await act(async () => { await Promise.resolve() })
+    let answer!: (v: unknown) => void
+    getChatMessages.mockImplementationOnce(() => new Promise((resolve) => { answer = resolve }))
+    let pending!: Promise<void>
+    await act(async () => { pending = refresh() })
+    await act(async () => { reportStopped('a', 'turn-A') }) // its first stretch is stopped…
+    await act(async () => { answer(at(2)); await pending }) // …and the answer shows it taken back up
+    expect(seen.at(-1)?.running).toBe('turn-A')
+  })
+
+  it('does not install a refresh that finishes after another chat was opened', async () => {
+    getChatStreamId.mockResolvedValue(null)
+    getChatMessages.mockImplementation((chatId: string) => Promise.resolve({ messages: [msg(chatId === 'a' ? 'a-msg' : 'b-msg', chatId)], has_more: false, next_cursor: null }))
+    await act(async () => { root.render(<Harness chatId="a" />); await Promise.resolve() })
+    await act(async () => { await Promise.resolve() })
+    let answer!: (v: unknown) => void
+    getChatMessages.mockImplementationOnce(() => new Promise((resolve) => { answer = resolve }))
+    let pending!: Promise<void>
+    await act(async () => { pending = refresh() }) // a refresh of chat A goes out…
+    await act(async () => { root.render(<Harness chatId="b" />); await Promise.resolve() }) // …chat B opens
+    await act(async () => { await Promise.resolve() })
+    await act(async () => { answer({ messages: [msg('a-msg', 'a')], has_more: false, next_cursor: null }); await pending })
+    expect(shownList.map((m) => m.id)).toEqual(['b-msg']) // B still shows B
+  })
 })

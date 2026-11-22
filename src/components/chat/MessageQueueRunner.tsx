@@ -241,18 +241,6 @@ function BackgroundSendTurn({ send, onClaimed, onDone }: { send: BackgroundSend;
       mentionedPinIds: message.mentionedPins.map((p) => p.id),
     });
 
-    // Analytics: same event and metadata as a send from the chat itself.
-    trackBrowserEvent("chat_message_sent", {
-      has_agent: !!settings.personaId,
-      model_pick: "manual",
-      model_id: modelId != null ? String(modelId) : undefined,
-      web_search: settings.webSearch,
-      reasoning: settings.reasoningEffort === undefined ? undefined : settings.reasoningEffort !== null,
-      attachment_count: files.length,
-      pin_count: options.pinIds?.length ?? 0,
-      queued: true,
-    });
-
     // The registry is what this tab knows; the backend is the source of truth. A chat
     // can look idle here while its run is still going (left mid-reply, or left again
     // while it was being reopened), and a message sent into a running turn is lost to
@@ -319,6 +307,18 @@ function BackgroundSendTurn({ send, onClaimed, onDone }: { send: BackgroundSend;
           // (it never took it) does it go back, to the front and held, so it waits for the
           // user rather than going straight out again. Any other failure may have reached
           // the backend: re-sending could repeat it, so it stays with the chat's failed turn.
+          // Analytics: same event and metadata as a send from the chat itself. Here, where it goes out:
+          // a wait that ends in a hand-over, a reclaim or an unmount sends nothing and counts nothing.
+          trackBrowserEvent("chat_message_sent", {
+            has_agent: !!settings.personaId,
+            model_pick: "manual",
+            model_id: modelId != null ? String(modelId) : undefined,
+            web_search: settings.webSearch,
+            reasoning: settings.reasoningEffort === undefined ? undefined : settings.reasoningEffort !== null,
+            attachment_count: files.length,
+            pin_count: options.pinIds?.length ?? 0,
+            queued: true,
+          });
           let refused = false;
           return fetchAiResponse(message.content, chatId, `queued-${message.id}`, modelId, {
             ...options,

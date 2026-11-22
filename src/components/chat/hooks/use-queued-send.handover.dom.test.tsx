@@ -9,7 +9,7 @@ import React, { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useQueuedSend } from './use-composer-queue'
-import { beginHandOver, endHandOver, getChatQueue, queueMessage, takeAllQueuedMessages } from '@/lib/message-queue'
+import { beginHandOver, endHandOver, getChatQueue, holdQueue, queueMessage, takeAllQueuedMessages } from '@/lib/message-queue'
 import { completeStream, registerStream } from '@/lib/stream-registry'
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
@@ -46,6 +46,16 @@ describe('useQueuedSend during a hand-over', () => {
     beginHandOver('c1')
     await act(async () => { root.render(<Harness />); await Promise.resolve() })
     registerStream('c1') // a reply starts (a follow, say) before React renders it as busy
+    await act(async () => { endHandOver('c1') })
+    expect(sendTurn).not.toHaveBeenCalled()
+    expect(getChatQueue('c1')?.messages.map((m) => m.content)).toEqual(['next'])
+  })
+
+  it('keeps the message queued when the queue was held during the hand-over', async () => {
+    queueMessage('c1', { content: 'next', attachments: [], mentionedPins: [] }, context)
+    beginHandOver('c1')
+    await act(async () => { root.render(<Harness />); await Promise.resolve() })
+    holdQueue('c1', 'error') // a reply failed meanwhile
     await act(async () => { endHandOver('c1') })
     expect(sendTurn).not.toHaveBeenCalled()
     expect(getChatQueue('c1')?.messages.map((m) => m.content)).toEqual(['next'])

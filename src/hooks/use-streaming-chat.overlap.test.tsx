@@ -1052,6 +1052,33 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(getChatQueue('chat-A')?.heldBy).toBe('error') // the failure keeps it
   }, 15000)
 
+  it("keeps the hold a reader failure kept, even after a later full read, when the reconnect got a 503", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    const first = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].status = 0
+    FakeXHR.all[0].end() // dropped: held, the reconnect waits
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
+    registerStream('chat-A') // a reader of A during the wait…
+    completeStream('chat-A', 'error') // …fails
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+    FakeXHR.all[1].status = 503
+    FakeXHR.all[1].responseText = 'Service Unavailable'
+    FakeXHR.all[1].end() // the reconnect fails: an incomplete read
+    await act(async () => { await first })
+    const second = hook.followStream('chat-A', 'reply-A') // the same reply, read to its end
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(3))
+    FakeXHR.all[2].start()
+    FakeXHR.all[2].push({ type: 'RUN_STARTED', ...runA }, { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a', delta: 'Done.' }, { type: 'RUN_FINISHED', ...runA })
+    FakeXHR.all[2].end()
+    await act(async () => { await second })
+    expect(getChatQueue('chat-A')?.heldBy).toBe('error') // the failure still holds it
+  })
+
   it("keeps an error hold that was there before the drop, even after a later full read", async () => {
     queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
     registerStream('chat-A'); completeStream('chat-A', 'error') // an earlier reply failed: held
@@ -1082,23 +1109,54 @@ describe('useStreamingChat with overlapping follows', () => {
     const other = createRoot(document.createElement('div'))
     let otherHook!: ReturnType<typeof useStreamingChat>
     act(() => other.render(<Harness view={view} onReady={(api) => { otherHook = api }} />))
-    const done = hook.followStream('chat-A', 'reply-A')
+    try {
+      const done = hook.followStream('chat-A', 'reply-A')
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+      let again: Promise<unknown> | undefined
+      const off = subscribeStreams((e) => { if (e.type === 'end' && e.chatId === 'chat-A' && !again) again = otherHook.followStream('chat-A', 'reply-A') })
+      FakeXHR.all[0].status = 404 // no running turn: refused
+      FakeXHR.all[0].responseText = '{"detail":"no running turn"}'
+      FakeXHR.all[0].end()
+      await act(async () => { await done })
+      off()
+      expect(again).toBeDefined()
+      expect(states.at(-1)).not.toBe('done') // the newer follow's state stands
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
+      FakeXHR.all[1].start()
+      FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runA }, { type: 'RUN_FINISHED', ...runA })
+      FakeXHR.all[1].end()
+      await act(async () => { await again })
+    } finally {
+      act(() => other.unmount()) // even if an assertion failed
+    }
+  })
+
+  it("keeps Stop on the call that got it when an end listener starts another chat on the hook", async () => {
+    const stopBackend = vi.fn()
+    act(() => root.render(<Harness view={{ onStopBackend: stopBackend } as never} onReady={(api) => { hook = api }} />))
+    const doneA = hook.followStream('chat-A', 'reply-A')
     await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
-    let again: Promise<unknown> | undefined
-    const off = subscribeStreams((e) => { if (e.type === 'end' && e.chatId === 'chat-A' && !again) again = otherHook.followStream('chat-A', 'reply-A') })
-    FakeXHR.all[0].status = 404 // no running turn: refused
-    FakeXHR.all[0].responseText = '{"detail":"no running turn"}'
-    FakeXHR.all[0].end()
-    await act(async () => { await done })
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].abort = () => FakeXHR.all[0].onabort?.()
+    let doneB: Promise<unknown> | undefined
+    const stopped: string[] = []
+    const off = subscribeStreams((e) => {
+      if (e.type === 'end' && e.chatId === 'chat-A' && !doneB) doneB = hook.followStream('chat-B', 'reply-B')
+      if (e.type === 'stopped') stopped.push(`${e.chatId}:${e.replyId}`)
+    })
+    act(() => hook.handleStopGeneration()) // Stop on A; its end starts B on this hook
     off()
-    expect(again).toBeDefined()
-    expect(states.at(-1)).not.toBe('done') // the newer follow's state stands
+    expect(stopped).toEqual(['chat-A:reply-A']) // A's reply is the one reported
+    expect(stopBackend).toHaveBeenCalledWith('chat-A')
+    expect(stopBackend).not.toHaveBeenCalledWith('chat-B')
+    expect(reply('reply-B')).toMatchObject({ isLoading: true }) // B is untouched
+    await act(async () => { await doneA })
     await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2))
     FakeXHR.all[1].start()
-    FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runA }, { type: 'RUN_FINISHED', ...runA })
+    FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
     FakeXHR.all[1].end()
-    await act(async () => { await again })
-    act(() => other.unmount())
+    await act(async () => { await doneB })
   })
 
   it("does not show done for a chat a follow has taken up again from the end notice", async () => {

@@ -242,7 +242,9 @@ export function useQueuedSend({
           // Busy again (a reply started meanwhile, which the registry knows before React has
           // rendered it): the message stays queued, and the next time the queue is ready this
           // effect runs again and sends it.
-          if (queueReadyRef.current && !isStreamActive(queueKey)) send();
+          // Nor while the queue is held (a failure during the hand-over sets that at once; the
+          // readiness above only catches up on the next render).
+          if (queueReadyRef.current && !isStreamActive(queueKey) && !getChatQueue(queueKey)?.heldBy) send();
         });
       }
     };
