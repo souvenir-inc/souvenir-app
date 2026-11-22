@@ -48,7 +48,7 @@ import { useAttachmentIntake } from "./hooks/use-attachment-intake";
 import { useComposerQueue, useQueuedSend } from "./hooks/use-composer-queue";
 import { useRevealSettle } from "./hooks/use-reveal-settle";
 import { useFollowRunningReply } from "./hooks/use-follow-running-reply";
-import { composerMustQueue } from "./composer-must-queue";
+import { composerMustQueue, runningReplyToWaitOn } from "./composer-must-queue";
 import { sendTurn as sendTurnWith, useMessageActions, useTurnGuards, type TurnKit } from "./hooks/use-chat-turns";
 
 
@@ -194,8 +194,12 @@ export function ChatInterface({
     refreshMessages,
     messagesLoadError,
     historyLoadId,
-    runningMessageId,
+    runningMessageId: historyRunningId,
   } = useChatState(chatId, chatStateOptions);
+  // The reply the history shows still running, which sends wait on. Not for a chat on its own
+  // endpoint: nothing here follows that reply or can ask whether its run ended (the run-state
+  // lookup covers the regular chat endpoint only), so waiting on it would hold every send.
+  const runningMessageId = runningReplyToWaitOn(historyRunningId, endpoint);
 
   // Append host-supplied local messages (the agent card) — merged during render; see the hook.
   useInjectedMessages(injectedMessages, setMessages, onInjectedMessagesConsumed);

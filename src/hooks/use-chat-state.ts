@@ -134,12 +134,16 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   // that has already begun — and a running id handed to the wrong chat makes the
   // follow attach one chat's stream to another's reply.
   const [runningOwner, setRunningOwner] = useState<{ chatId: string; id: string } | null>(null)
-  // When a running reply was last cleared by a stop or a finished end, by "chat:reply" (or
-  // "chat:*" for a finished end, which ends any reply of the chat), as a step of clearSeq. A
+  // When a running reply was last cleared by a stop or a finished end, by "chat:reply", as a
+  // step of clearSeq. A
   // history request that started before that step may still list the reply as running: its
   // install does not bring it back.
   const clearSeqRef = useRef(0)
   const clearedAtRef = useRef(new Map<string, number>())
+  // The running reply as of the last render, for the stream listener (which outlives renders):
+  // a finished end clears that reply, and is recorded under its id.
+  const runningOwnerRef = useRef(runningOwner)
+  useEffect(() => { runningOwnerRef.current = runningOwner }, [runningOwner])
   // Bumped when a background stream ends, purely to re-run the write-back
   // effect: the stream's final commit can land before completeStream() clears
   // the registry, in which case the effect would skip that commit and the chat
@@ -197,9 +201,12 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   ) => {
     cursorRef.current = meta.cursor
     pagesRef.current = 1
-    setState({ chatId: id, list, loaded: true })
-    const clearedAt = Math.max(clearedAtRef.current.get(`${id}:${meta.runningId}`) ?? -1, clearedAtRef.current.get(`${id}:*`) ?? -1)
-    const stale = meta.requestedAt !== undefined && clearedAt > meta.requestedAt
+    const clearedAt = clearedAtRef.current.get(`${id}:${meta.runningId}`) ?? -1
+    const stale = meta.runningId !== null && meta.requestedAt !== undefined && clearedAt > meta.requestedAt
+    // A stale "running": that reply was stopped or finished after this request went out. Its row
+    // is not shown as loading either, or it would spin with nothing left to follow.
+    const shown = stale ? list.map((msg) => (msg.id === meta.runningId ? { ...msg, isLoading: false } : msg)) : list
+    setState({ chatId: id, list: shown, loaded: true })
     setRunningOwner(meta.runningId && !stale ? { chatId: id, id: meta.runningId } : null)
     setHasMoreMessages(meta.hasMore)
     setHistoryLoadId((n) => n + 1)
@@ -373,7 +380,11 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
     const finished = (event.outcome === "done" && !event.inconclusive) || (event.outcome === "error" && event.runEnded === true)
     const stoppedThisReply = event.outcome === "aborted" && event.replyId !== undefined
     if (!finished && !stoppedThisReply) return
-    noteCleared(finished ? `${event.chatId}:*` : `${event.chatId}:${event.replyId}`)
+    // A finished end clears the reply that was running then (not any reply of the chat: one that
+    // started after it is still running, and a snapshot naming it is not stale).
+    const owner = runningOwnerRef.current
+    const cleared = finished ? (owner && owner.chatId === event.chatId ? owner.id : undefined) : event.replyId
+    if (cleared) noteCleared(`${event.chatId}:${cleared}`)
     setRunningOwner((owner) => (owner && owner.chatId === event.chatId && (finished || owner.id === event.replyId) ? null : owner))
   }), [])
 

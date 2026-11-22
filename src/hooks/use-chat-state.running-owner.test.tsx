@@ -29,11 +29,13 @@ let root: Root
 let seen: Array<{ chatId: string; running: string | null }>
 
 let refresh: () => Promise<void>
+let shownList: Array<{ id: string; isLoading?: boolean }> = []
 function Harness({ chatId }: { chatId: string }) {
   const api = useChatState(chatId)
   seen.push({ chatId, running: api.runningMessageId })
-  const { refreshMessages } = api
+  const { refreshMessages, messages } = api
   React.useEffect(() => { refresh = refreshMessages }, [refreshMessages])
+  React.useEffect(() => { shownList = messages }, [messages])
   return null
 }
 
@@ -181,8 +183,26 @@ describe('runningMessageId across a chat switch', () => {
     await act(async () => { reportStopped('a', 'turn-A') }) // …the reply is stopped meanwhile…
     await act(async () => { answer(running); await pending }) // …and the answer still lists it running
     expect(seen.at(-1)?.running).toBeNull()
+    expect(shownList.find((m) => m.id === 'turn-A')?.isLoading).toBeFalsy() // not left spinning
     // A refresh that starts after the stop takes the history at its word.
     await act(async () => { await refresh() })
     expect(seen.at(-1)?.running).toBe('turn-A')
+    expect(shownList.find((m) => m.id === 'turn-A')?.isLoading).toBe(true)
+  })
+
+  it('keeps a reply that started after a finished run as running, from a snapshot taken before that end', async () => {
+    const withRunning = (id: string) => ({ messages: [msg('m1', 'a'), msg(id, 'a', { role: 'assistant', content: '', run } as Partial<Message>)], has_more: false, next_cursor: null })
+    getChatStreamId.mockResolvedValue('turn-A')
+    getChatMessages.mockResolvedValue(withRunning('turn-A'))
+    await act(async () => { root.render(<Harness chatId="a" />); await Promise.resolve() })
+    await act(async () => { await Promise.resolve() })
+    expect(seen.at(-1)?.running).toBe('turn-A')
+    let answer!: (v: unknown) => void
+    getChatMessages.mockImplementationOnce(() => new Promise((resolve) => { answer = resolve }))
+    let pending!: Promise<void>
+    await act(async () => { pending = refresh() }) // a refresh goes out…
+    await act(async () => { registerStream('a'); completeStream('a', 'done') }) // …turn-A's run finishes…
+    await act(async () => { answer(withRunning('turn-B')); await pending }) // …and the answer shows a newer reply running
+    expect(seen.at(-1)?.running).toBe('turn-B') // not hidden by turn-A's end
   })
 })
