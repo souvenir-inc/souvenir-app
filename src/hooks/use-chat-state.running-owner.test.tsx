@@ -205,4 +205,17 @@ describe('runningMessageId across a chat switch', () => {
     await act(async () => { answer(withRunning('turn-B')); await pending }) // …and the answer shows a newer reply running
     expect(seen.at(-1)?.running).toBe('turn-B') // not hidden by turn-A's end
   })
+
+  it('does not show a reply as running when its run finished before the first history arrived', async () => {
+    const running = { messages: [msg('m1', 'a'), msg('turn-A', 'a', { role: 'assistant', content: '', run } as Partial<Message>)], has_more: false, next_cursor: null }
+    getChatStreamId.mockResolvedValue('turn-A')
+    let answer!: (v: unknown) => void
+    getChatMessages.mockImplementationOnce(() => new Promise((resolve) => { answer = resolve }))
+    await act(async () => { root.render(<Harness chatId="a" />); await Promise.resolve() }) // the first load is out
+    await act(async () => { registerStream('a'); completeStream('a', 'done', { replyId: 'turn-A' }) }) // turn-A finishes meanwhile
+    await act(async () => { answer(running); await Promise.resolve() })
+    await act(async () => { await Promise.resolve() })
+    expect(seen.at(-1)?.running).toBeNull()
+    expect(shownList.find((m) => m.id === 'turn-A')?.isLoading).toBeFalsy()
+  })
 })
