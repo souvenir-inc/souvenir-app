@@ -52,7 +52,7 @@ function enclosing(src, at, masked) {
   return src.slice(start, end);
 }
 
-function mapValue(raw, block, counter) {
+function mapValue(raw, block, counter, isCss = false) {
   const v = raw.trim().replace(/^['"]|['"]$/g, "");
   if (/^-?[\d.]+$/.test(v)) {
     const n = parseFloat(v);
@@ -72,7 +72,11 @@ function mapValue(raw, block, counter) {
   // nested rule or object (`& .label { … }`), which styles something else.
   // Strings are matched first and kept, so a `//` or `/*` inside one (`content: "//"`) is text,
   // not a comment that would swallow the declarations after it.
-  let scope = block.replace(/(['"`])(?:\\.|(?!\1)[^\\\n])*\1|\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, (m) => (/^['"`]/.test(m) ? m : ""));
+  // CSS has no line comments (`//` is text there, as in `url(https://…)`): only /* */ go.
+  const comment = isCss
+    ? /(['"])(?:\\.|(?!\1)[^\\\n])*\1|\/\*[\s\S]*?\*\//g
+    : /(['"`])(?:\\.|(?!\1)[^\\\n])*\1|\/\*[\s\S]*?\*\/|\/\/[^\n]*/g;
+  let scope = block.replace(comment, (m) => (/^['"`]/.test(m) ? m : ""));
   // Braces inside a string are text, not a nested block: blanked before nested blocks go.
   scope = scope.replace(/(['"`])(?:\\.|(?!\1)[^\\\n])*\1/g, (str) => str.replace(/[{}]/g, " "));
   while (/\{[^{}]*\}/.test(scope)) scope = scope.replace(/\{[^{}]*\}/g, "");
@@ -137,7 +141,7 @@ export function transform(src, isCss, counter) {
     // A literal type (`type T = { lineHeight: 1.5 }`) is checked against, not shown: left alone.
     if (!isCss && inTypeBody(src, masked, off)) return w;
     if (keep(src, off)) return w;
-    const out = mapValue(val, enclosing(src, off, masked), counter);
+    const out = mapValue(val, enclosing(src, off, masked), counter, isCss);
     if (!out) return w;
     return isCss ? `${pre}${out}${post}` : `${pre}'${out}'${post}`;
   });

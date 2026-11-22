@@ -152,6 +152,9 @@ describe("quoted keys", () => {
         "}",
       ].join("\n");
       expect(tsx(ternary)).toContain("lineHeight: 'var(--line-height-small)'");
+      // CSS has no line comments: the `//` of a url is text, and the font-size after it pairs.
+      const url = transform(".a {\n  background-image: url(https://example.test/icon.svg); font-size: var(--font-size-small);\n  line-height: 18px;\n}", true, { exact: 0, unitless: 0, snapped: 0 });
+      expect(url).toContain("line-height: var(--line-height-small);");
       // A `//` inside a string is not a comment: the font-size after it still pairs.
       const slashes = transform('.a::before {\n  content: "//"; font-size: var(--font-size-small);\n  line-height: 18px;\n}', true, { exact: 0, unitless: 0, snapped: 0 });
       expect(slashes).toContain("line-height: var(--line-height-small);");

@@ -139,7 +139,11 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   // history request that started before that step may still list the reply as running: its
   // install does not bring it back.
   const clearSeqRef = useRef(0)
-  const clearedAtRef = useRef(new Map<string, number>())
+  // With each clear, the run's segment count as last seen in a history (the backend counts one
+  // segment, plus one per answer the run went on from): a snapshot with more segments is the
+  // run taken back up after that clear, not the run that ended.
+  const clearedAtRef = useRef(new Map<string, { seq: number; segments: number | undefined }>())
+  const seenSegmentsRef = useRef(new Map<string, number>())
   // The running reply as of the last render, for the stream listener (which outlives renders):
   // a finished end clears that reply, and is recorded under its id.
   const runningOwnerRef = useRef(runningOwner)
@@ -197,12 +201,15 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   const install = useCallback((
     id: string,
     list: UIMessage[],
-    meta: { hasMore: boolean; cursor: string | undefined; runningId: string | null; requestedAt?: number },
+    meta: { hasMore: boolean; cursor: string | undefined; runningId: string | null; runningSegments?: number; requestedAt?: number },
   ) => {
     cursorRef.current = meta.cursor
     pagesRef.current = 1
-    const clearedAt = clearedAtRef.current.get(`${id}:${meta.runningId}`) ?? -1
-    const stale = meta.runningId !== null && meta.requestedAt !== undefined && clearedAt > meta.requestedAt
+    const key = `${id}:${meta.runningId}`
+    const clear = clearedAtRef.current.get(key)
+    const resumedSince = clear?.segments !== undefined && meta.runningSegments !== undefined && meta.runningSegments > clear.segments
+    const stale = meta.runningId !== null && meta.requestedAt !== undefined && clear !== undefined && clear.seq > meta.requestedAt && !resumedSince
+    if (meta.runningId !== null && meta.runningSegments !== undefined && !stale) seenSegmentsRef.current.set(key, meta.runningSegments)
     // A stale "running": that reply was stopped or finished after this request went out. Its row
     // is not shown as loading either, or it would spin with nothing left to follow.
     const shown = stale ? list.map((msg) => (msg.id === meta.runningId ? { ...msg, isLoading: false } : msg)) : list
@@ -218,7 +225,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   }, [cacheEnabled])
 
   /** Fetches `id`'s first page through whichever loader is configured. */
-  const fetchHistory = useCallback(async (id: string): Promise<{ list: UIMessage[]; hasMore: boolean; cursor: string | undefined; runningId: string | null; requestedAt: number }> => {
+  const fetchHistory = useCallback(async (id: string): Promise<{ list: UIMessage[]; hasMore: boolean; cursor: string | undefined; runningId: string | null; runningSegments?: number; requestedAt: number }> => {
     // The clear step this request started at (see clearedAtRef).
     const requestedAt = clearSeqRef.current
     if (options?.loadMessages) {
@@ -232,13 +239,19 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
       hasMore: res.has_more,
       cursor: res.next_cursor ?? undefined,
       runningId: runningReply(list)?.id ?? null,
+      runningSegments: runningReply(list)?.run?.segments,
       requestedAt,
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- options is stable for each hook consumer
   }, [])
 
+  // Which visit to a chat this is: opening another chat starts a new one, and a refresh that
+  // started in an earlier visit installs nothing (its history is another chat's).
+  const visitRef = useRef(0)
+
   // Load messages whenever chatId changes
   useEffect(() => {
+    visitRef.current += 1
     if (!chatId) {
       if (hasPreviousChatRef.current) setState(EMPTY_HISTORY)
       setHasMoreMessages(false)
@@ -311,7 +324,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
         // installing the server's copy would delete the message being sent and
         // orphan the stream writing into it.
         if (background && (getStreamCompletion(chatId) || stateRef.current.list.some(isPendingLocal))) return
-        install(chatId, result.list, { hasMore: result.hasMore, cursor: result.cursor, runningId: result.runningId, requestedAt: result.requestedAt })
+        install(chatId, result.list, { hasMore: result.hasMore, cursor: result.cursor, runningId: result.runningId, runningSegments: result.runningSegments, requestedAt: result.requestedAt })
       } catch (err) {
         logger.error("[useChatState] Failed to load messages", err)
         if (cancelled || background) return
@@ -367,7 +380,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   // backend stops the run, and nothing else would clear it (no reload follows a Stop). Another
   // send stopped before its run took over leaves it, as above.
   useEffect(() => subscribeStreams((event) => {
-    const noteCleared = (key: string) => { clearSeqRef.current += 1; clearedAtRef.current.set(key, clearSeqRef.current) }
+    const noteCleared = (key: string) => { clearSeqRef.current += 1; clearedAtRef.current.set(key, { seq: clearSeqRef.current, segments: seenSegmentsRef.current.get(key) }) }
     if (event.type === "stopped") {
       noteCleared(`${event.chatId}:${event.replyId}`)
       // Stopped with no entry to end (a follow waiting to reconnect): the same rule, by reply id.
@@ -507,16 +520,21 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
     if (!chatId || loadingRef.current) return
     loadingRef.current = true
     setIsLoadingMessages(true)
+    const visit = visitRef.current
     try {
       const result = await fetchHistory(chatId)
-      install(chatId, result.list, { hasMore: result.hasMore, cursor: result.cursor, runningId: result.runningId, requestedAt: result.requestedAt })
+      if (visitRef.current !== visit) return
+      install(chatId, result.list, { hasMore: result.hasMore, cursor: result.cursor, runningId: result.runningId, runningSegments: result.runningSegments, requestedAt: result.requestedAt })
     } catch (err) {
+      if (visitRef.current !== visit) return
       logger.error("[useChatState] Failed to refresh messages", err)
       const message = err instanceof Error ? err.message : "Failed to refresh messages"
       toast.error(message)
       setMessagesLoadError(message)
     } finally {
-      setIsLoadingMessages(false)
+      // The chat open now has its own loading state, which a stale refresh leaves alone. The guard
+      // is freed either way: left set, no refresh could ever run again in a chat with no load.
+      if (visitRef.current === visit) setIsLoadingMessages(false)
       loadingRef.current = false
     }
   }, [chatId, fetchHistory, install])

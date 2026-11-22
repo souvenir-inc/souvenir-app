@@ -27,6 +27,7 @@ const getChatRunState = vi.fn()
 vi.mock('@/lib/api/chat', () => ({ getChatRunState: (...args: unknown[]) => getChatRunState(...args) }))
 
 import { MessageQueueRunner, RUN_CHECK_ATTEMPTS, RUN_POLL_MS } from './MessageQueueRunner'
+import { trackBrowserEvent } from '@/lib/analytics/events'
 import { getChatQueue, queueMessage, setQueueForeground, takeAllQueuedMessages } from '@/lib/message-queue'
 import { completeStream, detachStream, isStreamActive, registerStream } from '@/lib/stream-registry'
 
@@ -135,6 +136,28 @@ describe('MessageQueueRunner', () => {
     await act(async () => completeStream('chat-1', 'done'))
     await act(async () => finishSend('error'))
     expect(getChatQueue('chat-1')?.messages.map((m) => m.content)).toEqual(['second'])
+  })
+
+  it('counts a send only when it goes out, not for a wait that ends in a hand-over', async () => {
+    vi.mocked(trackBrowserEvent).mockClear()
+    vi.useFakeTimers()
+    try {
+      getChatRunState.mockResolvedValue('running')
+      await queueBehindReply('first')
+      await act(async () => completeStream('chat-1', 'done'))
+      await act(async () => { await vi.advanceTimersByTimeAsync(RUN_POLL_MS) }) // waiting on the run
+      await act(async () => { setQueueForeground(view, 'chat-1'); detachStream('chat-1') }) // handed over
+      await act(async () => { await vi.advanceTimersByTimeAsync(10) })
+      expect(trackBrowserEvent).not.toHaveBeenCalled()
+      await act(async () => setQueueForeground(view, null)) // the user leaves: the runner sends it
+      getChatRunState.mockResolvedValue('idle')
+      await act(async () => { await vi.advanceTimersByTimeAsync(RUN_POLL_MS * 2) })
+      expect(fetchAiResponse).toHaveBeenCalledOnce()
+      expect(vi.mocked(trackBrowserEvent).mock.calls.filter(([name]) => name === 'chat_message_sent')).toHaveLength(1)
+      await act(async () => finishSend('done'))
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('hands a waiting message over to the chat when it is opened, without making it wait', async () => {

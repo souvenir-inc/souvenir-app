@@ -290,18 +290,24 @@ export function useStreamingChat({
   // ── handleStopGeneration ────────────────────────────────────────────────────
 
   const handleStopGeneration = () => {
+    // The call being stopped, read before anything is told: the end below notifies listeners,
+    // and one may start another call on this hook, which takes over the shared refs. What
+    // follows is this call's: its chat, its reply, its backend run.
+    const chatId = resolvedChatIdRef.current
+    const msgId = loadingMessageIdRef.current
+    const stoppedCall = activeStopRef.current
     stopRequestedRef.current = true
     markCallStoppedRef.current?.()
     xhrRef.current?.abort()
     stopFlushInterval()
     flushPending()
-    completeStream(resolvedChatIdRef.current, "aborted", { replyId: loadingMessageIdRef.current ?? undefined })
+    completeStream(chatId, "aborted", { replyId: msgId ?? undefined })
     // Also when the chat had no entry to end (a follow waiting to reconnect after a drop): the
     // history's running reply is cleared by this, not only by an end.
-    reportStopped(resolvedChatIdRef.current, loadingMessageIdRef.current)
-    setStreamState?.("aborted")
+    reportStopped(chatId, msgId)
+    // The composer shows the call that owns the hook: not this one, if another took over above.
+    if (activeStopRef.current === stoppedCall) setStreamState?.("aborted")
 
-    const msgId = loadingMessageIdRef.current
     if (msgId) {
       setMessages((prev) =>
         prev.map((msg) =>
@@ -320,8 +326,8 @@ export function useStreamingChat({
       )
     }
 
-    // Signal the backend to stop generation.
-    stopBackend(resolvedChatIdRef.current)
+    // Signal the backend to stop generation (this call's chat).
+    stopBackend(chatId)
   }
 
   // Asks the backend to stop `chatId`'s run.
@@ -397,6 +403,9 @@ export function useStreamingChat({
     let myReplyId: string | null = loadingMessageId
     // The queue hold this call's drop set, if any (see the catch below).
     let dropHoldId: number | undefined
+    // Set once a reader of this chat failed during one of this call's waits (or a nested one's):
+    // that failure keeps the hold, so no later full read may lift it.
+    let readerFailedSeen = false
     userMessageIdRef.current = options?.userMessageId ?? null
     resolvedChatIdRef.current = chatId
     // This call's own chat id, as with its reply id: the ref is the hook's, and after a wait
@@ -477,7 +486,7 @@ export function useStreamingChat({
       // for): an error hold that was already there before is a failure no later read undoes.
       const id = myChatId
       const hold = dropHoldId ?? options?.recoveryHoldId
-      if (id && hold !== undefined && currentHoldId(id) === hold) incompleteReadHolds.set(id, { hold, replyId: myReplyId })
+      if (id && hold !== undefined && currentHoldId(id) === hold && !readerFailedSeen) incompleteReadHolds.set(id, { hold, replyId: myReplyId })
       options?.onIncomplete?.()
     }
     const releaseWhenRunEnds = () => {
@@ -782,7 +791,7 @@ export function useStreamingChat({
           // wait, since the registry does not replay ends. Its failure keeps the drop's hold.
           let readerFailedInWait = false
           const stopWatchingWait = subscribeStreams((event) => {
-            if (event.type === "end" && event.chatId === liveChatId && event.outcome !== "done") readerFailedInWait = true
+            if (event.type === "end" && event.chatId === liveChatId && event.outcome !== "done") { readerFailedInWait = true; readerFailedSeen = true }
           })
           await new Promise((resolve) => setTimeout(resolve, FOLLOW_RETRY_MS))
           stopWatchingWait()
@@ -832,7 +841,7 @@ export function useStreamingChat({
             onDetached: () => { retryDetached = true },
             onStopped: () => { stoppedByUser = true; options?.onStopped?.() },
             // A reader of the chat that failed during a nested wait: the hold stays (passed up).
-            onReaderFailed: () => { nestedReaderFailed = true; options?.onReaderFailed?.() },
+            onReaderFailed: () => { nestedReaderFailed = true; readerFailedSeen = true; options?.onReaderFailed?.() },
             ...(dropHoldId ?? options?.recoveryHoldId) !== undefined ? { recoveryHoldId: dropHoldId ?? options?.recoveryHoldId } : {},
             ...(options?.onRunGone ? { onRunGone: options.onRunGone } : {}),
             ...(options?.onIncomplete ? { onIncomplete: options.onIncomplete } : {}),

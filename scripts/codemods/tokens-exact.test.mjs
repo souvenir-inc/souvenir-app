@@ -128,3 +128,11 @@ describe("unquoted CSS urls", () => {
     expect(css(".a{color:red;padding:8px;}")).toMatch(/padding:var\(--space-/);
   });
 });
+
+describe("quoted CSS urls after spaces", () => {
+  it("masks a quoted url that follows spaces as a string, and still converts real declarations", () => {
+    const src = '.a { background-image: url( "/icon);padding:8px;x.svg"); }';
+    expect(css(src)).toBe(src);
+    expect(css(".a{color:red;padding:8px;}")).toMatch(/padding:var\(--space-/);
+  });
+});
