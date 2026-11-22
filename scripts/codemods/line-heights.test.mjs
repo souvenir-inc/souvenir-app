@@ -152,6 +152,9 @@ describe("quoted keys", () => {
         "}",
       ].join("\n");
       expect(tsx(ternary)).toContain("lineHeight: 'var(--line-height-small)'");
+      // A `//` inside a string is not a comment: the font-size after it still pairs.
+      const slashes = transform('.a::before {\n  content: "//"; font-size: var(--font-size-small);\n  line-height: 18px;\n}', true, { exact: 0, unitless: 0, snapped: 0 });
+      expect(slashes).toContain("line-height: var(--line-height-small);");
       // `!important` is not part of the value, and an important declaration wins over a later one.
       const imp = transform(".a {\n  font-size: var(--font-size-small) !important;\n  line-height: 18px;\n}", true, { exact: 0, unitless: 0, snapped: 0 });
       expect(imp).toContain("line-height: var(--line-height-small);");

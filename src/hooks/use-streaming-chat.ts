@@ -845,7 +845,7 @@ export function useStreamingChat({
               if (retryDetached) {
                 // A Stop keeps the hold; so does a reader that took over from the retry and failed
                 // (the queue keeps the same hold id, so the id check alone would not stop this).
-                if (!stoppedByUser && !nestedReaderFailed) releaseHoldUnlessReaderFails(liveChatId)
+                if (!stoppedByUser && !nestedReaderFailed && !readerFailedInWait) releaseHoldUnlessReaderFails(liveChatId)
               } else if (!nestedReaderFailed && !readerFailedInWait) releaseErrorHold(liveChatId, dropHoldId) // a reader that failed during a wait keeps it
             }
             // Passed up: a call above this one may own an earlier hold, and must not take a

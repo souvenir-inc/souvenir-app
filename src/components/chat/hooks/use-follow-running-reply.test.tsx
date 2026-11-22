@@ -310,6 +310,22 @@ describe('useFollowRunningReply', () => {
     expect(stillWanted()).toBe(false)
   })
 
+  it("does not spend the shared budget on a refusal from a follow its effect no longer owns", async () => {
+    const refusals: Array<() => void> = []
+    const outstanding: FollowStreamMock = (_c, _i, _p, onRefused) => new Promise((resolve) => { refusals.push(() => { onRefused?.(); resolve('done') }) })
+    followStream.mockImplementationOnce(outstanding).mockImplementationOnce(outstanding) // the next two stay out until refused
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    expect(followStream).toHaveBeenCalledTimes(1) // follow 1, still out
+    await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 2 }) // a load lands: the effect reruns
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    expect(followStream).toHaveBeenCalledTimes(2) // follow 2, from the new effect
+    await act(async () => { refusals[0]() }) // the old follow is refused late: not counted
+    await act(async () => { refusals[1]() }) // the new one is refused: the first refusal
+    await act(async () => { await vi.advanceTimersByTimeAsync(FOLLOW_REFUSED_BACKOFF_MS) })
+    expect(followStream).toHaveBeenCalledTimes(3) // retried after one back-off, not two
+  })
+
   it('tries again after a refusal even when no history load follows it', async () => {
     await render({ chatId: 'chat-A', runningMessageId: 'r1', historyLoadId: 1 })
     await act(async () => { await vi.advanceTimersByTimeAsync(0) })
