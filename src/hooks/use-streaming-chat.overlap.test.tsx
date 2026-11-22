@@ -989,6 +989,43 @@ describe('useStreamingChat with overlapping follows', () => {
     expect(getChatQueue('chat-A')?.heldBy).toBe('error') // reply-A's hold stays
   })
 
+  it("keeps the hold when a reader failed in the first wait and the retry later detached", async () => {
+    queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
+    const timers = vi.spyOn(globalThis, 'setTimeout')
+    const doneA = hook.followStream('chat-A', 'reply-A')
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(1))
+    FakeXHR.all[0].start()
+    FakeXHR.all[0].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[0].status = 0
+    FakeXHR.all[0].end() // drop 1: the hold; the first wait starts
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    registerStream('chat-A') // a reader of A during the first wait…
+    completeStream('chat-A', 'error') // …fails
+    await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(2), { timeout: 3000 })
+    timers.mockClear()
+    FakeXHR.all[1].start() // the retry attaches…
+    FakeXHR.all[1].push({ type: 'RUN_STARTED', ...runA })
+    FakeXHR.all[1].status = 0
+    FakeXHR.all[1].end() // …and drops: the nested reconnect waits
+    await vi.waitFor(() => expect(timers.mock.calls.some(([, ms]) => ms === 1000)).toBe(true))
+    timers.mockRestore()
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] })
+    try {
+      const doneB = hook.followStream('chat-B', 'reply-B') // another chat takes over: the retry detaches
+      await vi.waitFor(() => expect(FakeXHR.all).toHaveLength(3), { timeout: 3000 })
+      await doneA
+      runState.get = () => Promise.resolve('idle')
+      await act(async () => { await vi.advanceTimersByTimeAsync(DROPPED_RUN_POLL_MS * 2) })
+      expect(getChatQueue('chat-A')?.heldBy).toBe('error') // the first wait's failure keeps it
+      FakeXHR.all[2].start()
+      FakeXHR.all[2].push({ type: 'RUN_STARTED', ...runB }, { type: 'RUN_FINISHED', ...runB })
+      FakeXHR.all[2].end()
+      await act(async () => { await doneB })
+    } finally {
+      vi.useRealTimers()
+    }
+  }, 15000)
+
   it("keeps the hold when a reader failed in a nested wait and that reconnect then found the run over", async () => {
     queueMessage('chat-A', { content: 'next', attachments: [], mentionedPins: [] }, { settings: { pinsEnabled: true, webSearch: true }, modelId: 1 } as never)
     const doneA = hook.followStream('chat-A', 'reply-A')

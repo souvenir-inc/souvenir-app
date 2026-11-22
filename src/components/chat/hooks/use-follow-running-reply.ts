@@ -172,7 +172,9 @@ export function useFollowRunningReply({
       // (this chat, this running reply) is still the current one.
       // Refused: the history reload that follows reruns this effect if it succeeds (its cleanup
       // cancels this). If it fails, nothing would: so the next attempt is scheduled here too.
-      void followLatest(chatId, runningMessageId, currentReply(runningMessageId), tryAgain, () => !stopped, () => {
+      // Not from a follow this effect no longer owns (its cleanup ran): the tally is shared with the
+      // effect that replaced it, which would start an attempt short.
+      void followLatest(chatId, runningMessageId, currentReply(runningMessageId), () => { if (!stopped) tryAgain() }, () => !stopped, () => {
         // Attached, dropped, and the reconnect found the run over: its history reload may
         // fail, so it is asked for again until a history load lands. Only for this visit.
         if (visitRef.current === visit) reloadPendingRef.current = true

@@ -70,7 +70,9 @@ function mapValue(raw, block, counter) {
   if (!SNAP) return null;
   // Only this scope's active fontSize pairs: not a commented-out one, and not one inside a
   // nested rule or object (`& .label { … }`), which styles something else.
-  let scope = block.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/[^\n]*/g, "$1");
+  // Strings are matched first and kept, so a `//` or `/*` inside one (`content: "//"`) is text,
+  // not a comment that would swallow the declarations after it.
+  let scope = block.replace(/(['"`])(?:\\.|(?!\1)[^\\\n])*\1|\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, (m) => (/^['"`]/.test(m) ? m : ""));
   // Braces inside a string are text, not a nested block: blanked before nested blocks go.
   scope = scope.replace(/(['"`])(?:\\.|(?!\1)[^\\\n])*\1/g, (str) => str.replace(/[{}]/g, " "));
   while (/\{[^{}]*\}/.test(scope)) scope = scope.replace(/\{[^{}]*\}/g, "");

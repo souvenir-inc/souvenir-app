@@ -218,4 +218,15 @@ describe('runningMessageId across a chat switch', () => {
     expect(seen.at(-1)?.running).toBeNull()
     expect(shownList.find((m) => m.id === 'turn-A')?.isLoading).toBeFalsy()
   })
+
+  it('keeps the running reply when an end names a different reply', async () => {
+    getChatStreamId.mockResolvedValue('turn-A')
+    getChatMessages.mockResolvedValue({ messages: [msg('m1', 'a'), msg('turn-A', 'a', { role: 'assistant', content: '', run } as Partial<Message>)], has_more: false, next_cursor: null })
+    await act(async () => { root.render(<Harness chatId="a" />); await Promise.resolve() })
+    await act(async () => { await Promise.resolve() })
+    await act(async () => { registerStream('a'); completeStream('a', 'done', { replyId: 'turn-older' }) })
+    expect(seen.at(-1)?.running).toBe('turn-A')
+    await act(async () => { registerStream('a'); completeStream('a', 'done', { replyId: 'turn-A' }) })
+    expect(seen.at(-1)?.running).toBeNull()
+  })
 })
