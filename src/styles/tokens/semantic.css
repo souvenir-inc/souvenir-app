@@ -882,3 +882,156 @@
   outline:        2px solid var(--focus-ring);
   outline-offset: -2px;
 }
+
+/* ── Dashboard (Figma wRr8cpImqSXbIgk0XhNj7a, node 17:889) ───────────────────
+   Board panel, metric cards and charts. Values the palette already has point at
+   it; the rest are the Figma literals. The dark block sits here, outside the
+   generated theme.css, so regenerating the theme can't drop it (same as
+   --border-default in globals.css).
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --dashboard-panel-bg:        #FAF9F7;
+  --dashboard-card-bg:         var(--card-bg);
+  --dashboard-card-shadow:     0px 1px 2px 0px rgba(38, 33, 30, 0.04), 0px 0px 0px 1px rgba(38, 33, 30, 0.07);
+  --dashboard-raised-shadow:   0px 16px 32px -8px rgba(38, 33, 30, 0.14), 0px 4px 8px -2px rgba(38, 33, 30, 0.06), 0px 0px 0px 1px rgba(38, 33, 30, 0.08);
+  --dashboard-label:           var(--neutral-600);   /* card titles, idle tabs */
+  --dashboard-figure:          var(--neutral-900);   /* big numbers, period label */
+  --dashboard-muted:           var(--neutral-500);   /* axis ticks, legend, "vs previous" */
+  --dashboard-positive:        var(--success-700);
+  --dashboard-negative:        #B42318;
+  --dashboard-chart-ink:       var(--neutral-900);   /* bars, current-period line */
+  --dashboard-chart-area:      rgba(38, 33, 30, 0.04);
+  --dashboard-chart-soft:      var(--neutral-200);   /* gridlines, in-progress bar */
+  --dashboard-chart-compare:   #D3CEC8;              /* previous-period dashed line */
+  --dashboard-tabs-track:      #EFEBE7;
+  --dashboard-tab-active-from: var(--color-interactive-primary-surface-from);
+  --dashboard-tab-active-to:   var(--color-interactive-primary-surface-to);
+  --dashboard-tab-active-text: var(--color-interactive-primary-text);
+  --dashboard-sync-bg:         #F0ECE8;
+  --dashboard-sync-icon:       var(--neutral-700);
+  /* Board tabs (Figma 136:20976 "Tabs · every state") */
+  --dashboard-tab-hover:       #E5E0DA;
+  --dashboard-tab-pressed:     #DCD6CF;
+  --dashboard-tab-lifted:      #FFFFFF;              /* rename field, drag copy, open "N more" */
+  --dashboard-tab-lifted-shadow: 0px 6px 16px 0px rgba(38, 33, 30, 0.14), 0px 1px 2px 0px rgba(38, 33, 30, 0.08);
+  --dashboard-drop-line:       var(--focus-ring);    /* #0D6EB2 */
+  --dashboard-faint:           #8C847E;              /* placeholder, hidden boards, counts */
+  --dashboard-error:           #9F2623;
+  --dashboard-error-bg:        #FEF2F1;
+  --dashboard-error-border:    #EFC6C3;
+  /* Board screen 6D (Figma 73:20404) */
+  --dashboard-sync-behind:     #B45309;              /* amber dot: an app is behind */
+  --dashboard-sync-failed:     #B42318;              /* red dot: an app failed */
+  --dashboard-popover-shadow:  0px 12px 28px -6px rgba(38, 33, 30, 0.18), 0px 2px 4px 0px rgba(38, 33, 30, 0.06), 0px 0px 0px 1px rgba(38, 33, 30, 0.08);
+  --dashboard-control-shadow:  0px 1px 2px 0px rgba(38, 33, 30, 0.1), 0px 0px 0px 1px rgba(38, 33, 30, 0.06);  /* card ×, Refresh */
+  --dashboard-drop-slot:       rgba(13, 110, 178, 0.06);  /* where a dragged card will land */
+  /* Manage tabs (Figma 415:64464) */
+  --dashboard-tag-bg:          rgba(38, 33, 30, 0.07);  /* Tag / Shared: text colour at 7 %, see-through */
+  --dashboard-tag-bg-muted:    rgba(38, 33, 30, 0.04);  /* Tag / Shared, Muted (Hidden list) */
+  --dashboard-row-hover:       rgba(38, 33, 30, 0.04);  /* a Manage tabs row on hover or with its ⋯ open */
+  --dashboard-avatar-violet:   #8B6CC9;                 /* the owner avatar in a shared board's menu */
+  /* Sync (Figma 95:18703) */
+  --dashboard-sync-fresh:      var(--dashboard-positive);  /* green dot, synced banner icon */
+  --dashboard-sync-offline:    var(--dashboard-faint);     /* grey dot: can't check now */
+  --dashboard-spinner-track:   #DDD7D1;
+  --dashboard-spinner-ink:     var(--neutral-700);
+  --dashboard-shimmer-light:   #C9C2BC;                    /* the light band across a syncing number */
+  --dashboard-banner-failed-bg:     #FDEFED;
+  --dashboard-banner-failed-border: #F2CBC6;
+  --dashboard-banner-behind-bg:     #FDF4E7;
+  --dashboard-banner-behind-border: #F1D9B5;
+  --dashboard-banner-syncing-bg:    #F5F2EF;
+  --dashboard-banner-syncing-border: var(--neutral-200);
+  --dashboard-banner-synced-bg:     #EDF7F0;
+  --dashboard-banner-synced-border: #C9E7D3;
+  --dashboard-toast-border:    #E7E2DC;
+  --dashboard-toast-shadow:    0px 1px 2px 0px rgba(38, 33, 30, 0.06), 0px 8px 24px 0px rgba(38, 33, 30, 0.12);
+  --dashboard-window-bar-bg:   var(--neutral-900);         /* offline bar above the window */
+  --dashboard-window-bar-text: #F7F2ED;
+  --dashboard-window-bar-muted: #C9C2BC;
+  --dashboard-window-bar-online: var(--dashboard-positive);
+  /* Cards while reading (Figma 167:27720) */
+  --dashboard-card-hover-shadow: 0px 0px 0px 1px rgba(38, 33, 30, 0.16), 0px 8px 20px -10px rgba(38, 33, 30, 0.16);
+  --dashboard-chart-previous:  #C9C4BF;              /* the period before: dashed line, legend, readout dot */
+  --dashboard-hover-line:      #C9C4BF;              /* the hairline on the hovered day */
+  --dashboard-hover-band:      #F5F2EF;              /* the hovered week behind its bar; a hovered list row */
+  --dashboard-readout-shadow:  0px 4px 12px -2px rgba(38, 33, 30, 0.12), 0px 0px 0px 1px #E4E0DC;
+  --dashboard-window-shadow:   0px 24px 48px -12px rgba(38, 33, 30, 0.28);
+  --dashboard-list-shadow:     0px 12px 24px -8px rgba(38, 33, 30, 0.16);
+  --dashboard-list-border:     #D3CEC8;
+  --dashboard-shimmer-from:    #F0ECE8;              /* a loading number's shape */
+  --dashboard-shimmer-via:     #F8F6F3;
+  --dashboard-pill-bg:         #F9F8F5;              /* health pill: on track, below / above healthy */
+  --dashboard-pill-border:     #E4E0DC;
+  --dashboard-pill-bad-bg:     rgba(239, 68, 68, 0.08);  /* health pill: off target, red flag */
+  --dashboard-pill-bad-border: rgba(239, 68, 68, 0.3);
+  --dashboard-pill-bad-text:   #B91C1C;
+  --dashboard-pill-warn-text:  #92400E;
+  --dashboard-pill-warn-dot:   #D97706;
+  /* Add cards (Figma 167:27723) */
+  --dashboard-checkbox-border: #C9C2BB;
+  --dashboard-landed-ring:     #8A817B;              /* a new card for 2 s */
+  --dashboard-landed-halo:     rgba(38, 33, 30, 0.08);
+  --dashboard-field-shadow:    0px 0px 0px 3px rgba(38, 33, 30, 0.06);  /* the picker search field's soft ring */
+  --dashboard-rail-rule:       rgba(59, 54, 50, 0.1);
+  --dashboard-lift-shadow:     0px 1px 1px rgba(38, 33, 30, 0.06);  /* a selected rail item, a picked row */
+  --dashboard-button-shadow:   0px 1px 2px rgba(38, 33, 30, 0.06);  /* outlined Connect, Clear search */
+}
+
+:root[data-theme="dark"] {
+  --dashboard-panel-bg:        #161616;
+  --dashboard-card-shadow:     0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 0px 0px 1px rgba(255, 255, 255, 0.08);
+  --dashboard-raised-shadow:   0px 16px 32px -8px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px rgba(255, 255, 255, 0.12);
+  --dashboard-negative:        var(--danger-700);
+  --dashboard-chart-area:      rgba(255, 255, 255, 0.05);
+  --dashboard-chart-soft:      #383838;
+  --dashboard-chart-compare:   #555555;
+  --dashboard-tabs-track:      #222222;
+  --dashboard-sync-bg:         #222222;
+  --dashboard-tab-hover:       #2C2C2C;
+  --dashboard-tab-pressed:     #363636;
+  --dashboard-tab-lifted:      #2A2A2A;
+  --dashboard-tab-lifted-shadow: 0px 6px 16px 0px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px rgba(255, 255, 255, 0.1);
+  --dashboard-faint:           #8A8A8A;
+  --dashboard-error:           var(--danger-700);
+  --dashboard-error-bg:        rgba(220, 38, 38, 0.12);
+  --dashboard-error-border:    rgba(220, 38, 38, 0.4);
+  --dashboard-sync-behind:     #F59E0B;
+  --dashboard-sync-failed:     var(--danger-700);
+  --dashboard-spinner-track:   #444444;
+  --dashboard-shimmer-light:   #6B6B6B;
+  --dashboard-banner-failed-bg:     rgba(220, 38, 38, 0.12);
+  --dashboard-banner-failed-border: rgba(220, 38, 38, 0.35);
+  --dashboard-banner-behind-bg:     rgba(245, 158, 11, 0.12);
+  --dashboard-banner-behind-border: rgba(245, 158, 11, 0.35);
+  --dashboard-banner-syncing-bg:    #222222;
+  --dashboard-banner-syncing-border: #383838;
+  --dashboard-banner-synced-bg:     rgba(34, 197, 94, 0.12);
+  --dashboard-banner-synced-border: rgba(34, 197, 94, 0.35);
+  --dashboard-toast-border:    #383838;
+  --dashboard-toast-shadow:    0px 8px 24px 0px rgba(0, 0, 0, 0.5);
+  --dashboard-window-bar-bg:   #000000;
+  --dashboard-card-hover-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.18), 0px 8px 20px -10px rgba(0, 0, 0, 0.6);
+  --dashboard-chart-previous:  #5A5A5A;
+  --dashboard-hover-line:      #5A5A5A;
+  --dashboard-hover-band:      #262626;
+  --dashboard-readout-shadow:  0px 4px 12px -2px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px #383838;
+  --dashboard-window-shadow:   0px 24px 48px -12px rgba(0, 0, 0, 0.6);
+  --dashboard-list-shadow:     0px 12px 24px -8px rgba(0, 0, 0, 0.5);
+  --dashboard-list-border:     #383838;
+  --dashboard-shimmer-from:    #262626;
+  --dashboard-shimmer-via:     #303030;
+  --dashboard-pill-bg:         #1F1F1F;
+  --dashboard-pill-border:     #383838;
+  --dashboard-pill-bad-text:   #FCA5A5;
+  --dashboard-pill-warn-text:  #FCD34D;
+  --dashboard-checkbox-border: #5A5A5A;
+  --dashboard-landed-ring:     #8A8A8A;
+  --dashboard-landed-halo:     rgba(255, 255, 255, 0.08);
+  --dashboard-popover-shadow:  0px 12px 28px -6px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px rgba(255, 255, 255, 0.1);
+  --dashboard-control-shadow:  0px 0px 0px 1px rgba(255, 255, 255, 0.12);
+  --dashboard-drop-slot:       rgba(13, 110, 178, 0.16);
+  --dashboard-tag-bg:          rgba(255, 255, 255, 0.1);
+  --dashboard-tag-bg-muted:    rgba(255, 255, 255, 0.05);
+  --dashboard-row-hover:       rgba(255, 255, 255, 0.05);
+}

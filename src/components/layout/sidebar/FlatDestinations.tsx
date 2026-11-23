@@ -2,12 +2,12 @@
 
 import { usePathname } from "next/navigation";
 import { useGuardedRouter } from "@/context/nav-guard-context";
-import { CalendarThreeIcon, FolderLibraryIcon, LinkSixIcon, QuillWriteTwoIcon, UserAiIcon } from "@strange-huge/icons";
+import { CalendarThreeIcon, DashboardSquareOneIcon, FolderLibraryIcon, LinkSixIcon, QuillWriteTwoIcon, UserAiIcon } from "@strange-huge/icons";
 import { FlatSidebarRow, FlatSidebarSlackConnector } from "@/components/ui";
 import { useOrg } from "@/context/org-context";
-import { ORG_SOUVENIR_SLACK_ROUTE, AGENTS_ROUTE, SCHEDULES_ROUTE, LIBRARY_ROUTE, ORG_CONNECTORS_ROUTE } from "@/lib/routes";
+import { ORG_SOUVENIR_SLACK_ROUTE, AGENTS_ROUTE, DASHBOARD_ROUTE, SCHEDULES_ROUTE, LIBRARY_ROUTE, ORG_CONNECTORS_ROUTE } from "@/lib/routes";
 
-// -- FlatDestinations — New / Agents / Schedules / Connectors / Slack ---------
+// -- FlatDestinations — New / Agents / Dashboard / Schedules / Connectors / Slack
 // Plain nav rows per the Figma scan (no expand arrows) — Agents/Schedules
 // navigate straight to their pages rather than expanding an inline tree; see
 // the open question in docs/features/sidebar-current-state-audit.md and the
@@ -33,6 +33,10 @@ export function FlatDestinations({ onNewChat, newChatSelected, collapsed = false
         collapsed={collapsed} variant="default" icon={<UserAiIcon size={20} />} label="Agents"
         selected={pathname.startsWith(AGENTS_ROUTE)}
         href={AGENTS_ROUTE} onClick={() => push(AGENTS_ROUTE)}
+      />
+      <FlatSidebarRow
+        collapsed={collapsed} variant="default" icon={<DashboardSquareOneIcon size={20} />} label="Dashboard"
+        selected={pathname.startsWith(DASHBOARD_ROUTE)} href={DASHBOARD_ROUTE} onClick={() => push(DASHBOARD_ROUTE)}
       />
       <FlatSidebarRow
         collapsed={collapsed} variant="default" icon={<CalendarThreeIcon size={20} animated />} label="Schedules"

@@ -14,6 +14,7 @@ export const AGENTS_NEW_ROUTE = "/agents/new";
 export const AGENTS_BASICS_NAME_ROUTE = "/agents/basics/name";
 export const AGENTS_BASICS_PURPOSE_ROUTE = "/agents/basics/purpose";
 export const AGENTS_BASICS_TONE_ROUTE = "/agents/basics/tone";
+export const DASHBOARD_ROUTE = "/dashboard";
 export const SCHEDULES_ROUTE = "/schedules";
 export const LIBRARY_ROUTE = "/library";
 export const LIBRARY_TRASH_ROUTE = "/library/trash";
