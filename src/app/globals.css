@@ -1014,3 +1014,17 @@ button:disabled[aria-busy="true"] {
   appearance: none;
   display: none;
 }
+
+/* Dashboard: toasts sit left of the board's + button instead of on top of it, as in the Figma
+   (136:20976 — toast right edge 86 px from the window, bottom in line with the button). The
+   toaster is global, so this applies only while a dashboard panel is on screen. */
+body:has([data-dashboard-panel]) [data-sonner-toaster][data-x-position="right"] {
+  --offset-right: 86px !important;
+  --offset-bottom: 31px !important;
+}
+/* In edit mode the wide edit bar takes that corner, so toasts sit above it, right-aligned with it
+   (BS-23): the bar sits 20 px from the bottom and is 44 px tall, then a 12 px gap. */
+body:has([data-dashboard-editbar]) [data-sonner-toaster][data-x-position="right"] {
+  --offset-right: 20px !important;
+  --offset-bottom: 76px !important;
+}

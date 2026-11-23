@@ -32,6 +32,7 @@ import {
   ORG_BASE_ROUTE,
   TEAMS_BASE_ROUTE,
   SCHEDULES_ROUTE,
+  DASHBOARD_ROUTE,
   ORG_CONNECTORS_ROUTE,
   ORG_SOUVENIR_SLACK_ROUTE,
   CHAT_ROUTE,
@@ -118,6 +119,8 @@ export function AppLayout({
   const isTemplatePage = pathname.startsWith(TEMPLATE_BASE_ROUTE)
   // Schedules builds its own glass card, so it takes the same bare shell.
   const isSchedulesPage = pathname.startsWith(SCHEDULES_ROUTE)
+  // Dashboard builds its own board panel (Figma 17:889): no TopBar or floating chat tools.
+  const isDashboardPage = pathname.startsWith(DASHBOARD_ROUTE)
   // Connectors / Souvenir-in-Slack are settings-style pages too (moved off
   // /org/* to their own top-level routes) — same TopBar/FloatingPanel strip
   // as /org and /teams/[teamId] above.
@@ -169,7 +172,7 @@ export function AppLayout({
 
   // The shared LeftSidebar, then the page itself full-height, with no TopBar
   // or floating chat tools.
-  if (isTemplatePage || isSchedulesPage) {
+  if (isTemplatePage || isSchedulesPage || isDashboardPage) {
     return (
       <div
         style={{

@@ -882,3 +882,80 @@
   outline:        2px solid var(--focus-ring);
   outline-offset: -2px;
 }
+
+/* ── Dashboard (Figma wRr8cpImqSXbIgk0XhNj7a, node 17:889) ───────────────────
+   Board panel, metric cards and charts. Values the palette already has point at
+   it; the rest are the Figma literals. The dark block sits here, outside the
+   generated theme.css, so regenerating the theme can't drop it (same as
+   --border-default in globals.css).
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --dashboard-panel-bg:        #FAF9F7;
+  --dashboard-card-bg:         var(--card-bg);
+  --dashboard-card-shadow:     0px 1px 2px 0px rgba(38, 33, 30, 0.04), 0px 0px 0px 1px rgba(38, 33, 30, 0.07);
+  --dashboard-raised-shadow:   0px 16px 32px -8px rgba(38, 33, 30, 0.14), 0px 4px 8px -2px rgba(38, 33, 30, 0.06), 0px 0px 0px 1px rgba(38, 33, 30, 0.08);
+  --dashboard-label:           var(--neutral-600);   /* card titles, idle tabs */
+  --dashboard-figure:          var(--neutral-900);   /* big numbers, period label */
+  --dashboard-muted:           var(--neutral-500);   /* axis ticks, legend, "vs previous" */
+  --dashboard-positive:        var(--success-700);
+  --dashboard-negative:        #B42318;
+  --dashboard-chart-ink:       var(--neutral-900);   /* bars, current-period line */
+  --dashboard-chart-area:      rgba(38, 33, 30, 0.04);
+  --dashboard-chart-soft:      var(--neutral-200);   /* gridlines, in-progress bar */
+  --dashboard-chart-compare:   #D3CEC8;              /* previous-period dashed line */
+  --dashboard-tabs-track:      #EFEBE7;
+  --dashboard-tab-active-from: var(--color-interactive-primary-surface-from);
+  --dashboard-tab-active-to:   var(--color-interactive-primary-surface-to);
+  --dashboard-tab-active-text: var(--color-interactive-primary-text);
+  --dashboard-sync-bg:         #F0ECE8;
+  --dashboard-sync-icon:       var(--neutral-700);
+  /* Board tabs (Figma 136:20976 "Tabs · every state") */
+  --dashboard-tab-hover:       #E5E0DA;
+  --dashboard-tab-pressed:     #DCD6CF;
+  --dashboard-tab-lifted:      #FFFFFF;              /* rename field, drag copy, open "N more" */
+  --dashboard-tab-lifted-shadow: 0px 6px 16px 0px rgba(38, 33, 30, 0.14), 0px 1px 2px 0px rgba(38, 33, 30, 0.08);
+  --dashboard-drop-line:       var(--focus-ring);    /* #0D6EB2 */
+  --dashboard-faint:           #8C847E;              /* placeholder, hidden boards, counts */
+  --dashboard-error:           #9F2623;
+  --dashboard-error-bg:        #FEF2F1;
+  --dashboard-error-border:    #EFC6C3;
+  /* Board screen 6D (Figma 73:20404) */
+  --dashboard-sync-behind:     #B45309;              /* amber dot: an app is behind */
+  --dashboard-sync-failed:     #B42318;              /* red dot: an app failed */
+  --dashboard-popover-shadow:  0px 12px 28px -6px rgba(38, 33, 30, 0.18), 0px 2px 4px 0px rgba(38, 33, 30, 0.06), 0px 0px 0px 1px rgba(38, 33, 30, 0.08);
+  --dashboard-control-shadow:  0px 1px 2px 0px rgba(38, 33, 30, 0.1), 0px 0px 0px 1px rgba(38, 33, 30, 0.06);  /* card ×, Refresh */
+  --dashboard-drop-slot:       rgba(13, 110, 178, 0.06);  /* where a dragged card will land */
+  /* Manage tabs (Figma 415:64464) */
+  --dashboard-tag-bg:          rgba(38, 33, 30, 0.07);  /* Tag / Shared: text colour at 7 %, see-through */
+  --dashboard-tag-bg-muted:    rgba(38, 33, 30, 0.04);  /* Tag / Shared, Muted (Hidden list) */
+  --dashboard-row-hover:       rgba(38, 33, 30, 0.04);  /* a Manage tabs row on hover or with its ⋯ open */
+  --dashboard-avatar-violet:   #8B6CC9;                 /* the owner avatar in a shared board's menu */
+}
+
+:root[data-theme="dark"] {
+  --dashboard-panel-bg:        #161616;
+  --dashboard-card-shadow:     0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 0px 0px 1px rgba(255, 255, 255, 0.08);
+  --dashboard-raised-shadow:   0px 16px 32px -8px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px rgba(255, 255, 255, 0.12);
+  --dashboard-negative:        var(--danger-700);
+  --dashboard-chart-area:      rgba(255, 255, 255, 0.05);
+  --dashboard-chart-soft:      #383838;
+  --dashboard-chart-compare:   #555555;
+  --dashboard-tabs-track:      #222222;
+  --dashboard-sync-bg:         #222222;
+  --dashboard-tab-hover:       #2C2C2C;
+  --dashboard-tab-pressed:     #363636;
+  --dashboard-tab-lifted:      #2A2A2A;
+  --dashboard-tab-lifted-shadow: 0px 6px 16px 0px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px rgba(255, 255, 255, 0.1);
+  --dashboard-faint:           #8A8A8A;
+  --dashboard-error:           var(--danger-700);
+  --dashboard-error-bg:        rgba(220, 38, 38, 0.12);
+  --dashboard-error-border:    rgba(220, 38, 38, 0.4);
+  --dashboard-sync-behind:     #F59E0B;
+  --dashboard-sync-failed:     var(--danger-700);
+  --dashboard-popover-shadow:  0px 12px 28px -6px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px rgba(255, 255, 255, 0.1);
+  --dashboard-control-shadow:  0px 0px 0px 1px rgba(255, 255, 255, 0.12);
+  --dashboard-drop-slot:       rgba(13, 110, 178, 0.16);
+  --dashboard-tag-bg:          rgba(255, 255, 255, 0.1);
+  --dashboard-tag-bg-muted:    rgba(255, 255, 255, 0.05);
+  --dashboard-row-hover:       rgba(255, 255, 255, 0.05);
+}

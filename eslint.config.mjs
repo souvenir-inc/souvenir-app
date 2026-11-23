@@ -153,9 +153,16 @@ const eslintConfig = defineConfig([
     },
   },
   // The chart components that own Recharts. SparklineChart is loaded lazily by components/Sparkline;
-  // UsageBarChart is only used by the admin analytics route.
+  // UsageBarChart is only used by the admin analytics route. ui/chart is the shadcn chart layer,
+  // imported only by the dashboard's chart modules, which components/Dashboard/charts.tsx loads lazily.
   {
-    files: ["src/components/Sparkline/SparklineChart.tsx", "src/components/UsageBarChart/index.tsx"],
+    files: [
+      "src/components/Sparkline/SparklineChart.tsx",
+      "src/components/UsageBarChart/index.tsx",
+      "src/components/ui/chart.tsx",
+      "src/components/Dashboard/Sparkline.tsx",
+      "src/components/Dashboard/WeeklyBars.tsx",
+    ],
     rules: {
       "no-restricted-imports": ["error", { paths: [llmIcons, mermaid, mixpanel] }],
     },
