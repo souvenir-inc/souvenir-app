@@ -1,27 +1,34 @@
 // Where a dragged card lands (docs-v2/dashboard/02-board-screen-rules.md, BS-24 – BS-28).
 // Pure, so the rules are testable without a browser.
 //
-// The grid fills cards in reading order (CSS grid auto-placement, not dense). With mixed sizes,
+// Narrower than the design grid, cards fill in reading order, dense: a later small card fills a
+// gap beside an earlier one (CR-36). With mixed sizes,
 // "before card X" doesn't always put a card where X is on screen, so instead of reasoning about
 // neighbours, the drag tries every place in the order, works out where the grid would put the
 // card for each, and picks the place whose slot is under (or nearest) the pointer (BS-25).
 
+import { dims } from './grid-layout'
 import type { CardSize } from './types'
 
 export interface Cell { col: number; row: number; w: number; h: number }
 
-/** How many columns and rows a card covers in a grid of `columns`. One column: everything is 1 wide. */
+/**
+ * How many columns and rows a card covers in a grid of `columns` (CR-36): on 4 columns its own
+ * size; on 2, 3-wide cards take half a row and 6- and 12-wide ones the whole row; on 1, all full
+ * width. Heights stay.
+ */
 export function span(size: CardSize, columns: number): { w: number; h: number } {
-  const w = columns >= 2 && size !== 'sm' ? 2 : 1
-  return { w, h: size === 'lg' ? 2 : 1 }
+  const d = dims(size)
+  const w = columns >= 4 ? d.w : columns >= 2 && d.w > 1 ? 2 : 1
+  return { w, h: d.h }
 }
 
 /**
- * CSS grid's auto-placement for items with no set position, in the default sparse mode: a cursor
- * that only moves forward, and each item goes in the first place at or after the cursor where
- * it fits. Returns each item's cell.
+ * CSS grid's auto-placement for items with no set position. Dense (the default, as the board
+ * uses): each item takes the first place from the top where it fits. Sparse: a cursor that only
+ * moves forward, and each item goes in the first place at or after it. Returns each item's cell.
  */
-export function layoutCells(sizes: CardSize[], columns: number): Cell[] {
+export function layoutCells(sizes: CardSize[], columns: number, dense = true): Cell[] {
   const taken = new Set<string>()
   const free = (col: number, row: number, w: number, h: number) => {
     if (col + w > columns) return false
@@ -32,8 +39,8 @@ export function layoutCells(sizes: CardSize[], columns: number): Cell[] {
   let cursorCol = 0
   return sizes.map((size) => {
     const { w, h } = span(size, columns)
-    let row = cursorRow
-    let col = cursorCol
+    let row = dense ? 0 : cursorRow
+    let col = dense ? 0 : cursorCol
     while (!free(col, row, w, h)) {
       col += 1
       if (col + w > columns) { col = 0; row += 1 }

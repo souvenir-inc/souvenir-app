@@ -6,7 +6,7 @@ import { initialDashboardState } from '../mock-data'
 import type { BoardCard, CardSize } from '../types'
 import {
   MAX_NAME,
-  boardReducer, canDelete, canLeave, canRename, cleanName, namesInUse, uniqueName,
+  boardReducer, canDelete, canLeave, canRename, cardIdsFor, cleanName, namesInUse, uniqueName,
   type Board, type BoardAction,
 } from './board-state'
 
@@ -233,6 +233,19 @@ export function useDashboard() {
 
   const setDates = (id: string, dates: { period?: string; compare?: string }) => dispatch({ type: 'set-dates', id, ...dates })
 
+  /**
+   * Cards added at the end of a board, in order (06 AC-16, AC-23). One undo step takes them all off
+   * again (AC-18); ⌘Z does the same. Returns the new card ids and that undo.
+   */
+  const addCards = (boardId: string, cards: { metricId: string; size: CardSize }[]) => {
+    const before = state.boards[boardId]?.cards
+    if (!before || !cards.length) return null
+    const ids = cardIdsFor(before.map((c) => c.metricId), cards.map((c) => c.metricId))
+    dispatch({ type: 'add-cards', id: boardId, cards })
+    const key = record([{ type: 'set-cards', id: boardId, cards: before }])
+    return { ids, undo: () => undo(key) }
+  }
+
   // ── Card actions on one board ─────────────────────────────────────────────
 
   // Each change is applied by the reducer to the board as it is then, never to a copy captured
@@ -241,6 +254,13 @@ export function useDashboard() {
     step: (metricId: string, by: -1 | 1) => dispatch({ type: 'step-card', id, metricId, by }),
     resize: (metricId: string, size: CardSize) => dispatch({ type: 'resize-card', id, metricId, size }),
     remove: (metricId: string) => dispatch({ type: 'remove-card', id, metricId }),
+    /** Remove card on an empty card while reading: it goes with Undo (05 CR-22). */
+    removeWithUndo: (metricId: string, label: string) => {
+      const before = state.boards[id]?.cards
+      if (!before) return
+      dispatch({ type: 'remove-card', id, metricId })
+      undoToast(`${label} removed`, [{ type: 'set-cards', id, cards: before }])
+    },
     /** A narrow window's drag, or the keyboard: the card to a place in reading order (BS-25, BS-31). */
     moveTo: (metricId: string, index: number) => dispatch({ type: 'move-card', id, metricId, to: index }),
     /** A whole layout: a drag's preview or result, or the start put back on Esc (BS-26, BS-29). */
@@ -251,7 +271,7 @@ export function useDashboard() {
 
   return {
     state, openBoard, undo,
-    open, rename, moveTab, createBoard, duplicate, hide, show, remove, restore, leave,
+    open, rename, moveTab, createBoard, addCards, duplicate, hide, show, remove, restore, leave,
     applyManage, copyLink, startOver, setDates, cardActions,
   }
 }

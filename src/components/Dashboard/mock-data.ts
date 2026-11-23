@@ -33,18 +33,18 @@ const FLAT = {
 const up = (label: string, sentiment: 'positive' | 'negative' = 'positive') => ({ label, direction: 'up' as const, sentiment })
 const down = (label: string, sentiment: 'positive' | 'negative' = 'positive') => ({ label, direction: 'down' as const, sentiment })
 
-export const METRICS: Record<string, Metric> = Object.fromEntries(
+const METRIC_LIST: Record<string, Metric> = Object.fromEntries(
   ([
-    { id: 'aov', label: 'Average order value', source: 'shopify', value: '$86.40', change: up('1.9%'), trend: FLAT, weekly: weekly([84.1, 85.2, 86.9, 85.7, 86.4]), format: 'currency' },
-    { id: 'orders', label: 'Orders', source: 'shopify', value: '558', change: up('6.1%'), trend: RISING, weekly: weekly([165, 152, 156, 160, 84]), format: 'number' },
-    { id: 'new-customers', label: 'New customers', source: 'shopify', value: '312', change: up('8.0%'), trend: RISING_2, weekly: weekly([88, 79, 84, 92, 41]), format: 'number' },
+    { id: 'aov', label: 'Average order value', source: 'shopify', value: '$86.40', change: up('1.9%'), trend: FLAT, weekly: weekly([84.1, 85.2, 86.9, 85.7, 86.4]), format: 'currency', health: { by: 'target', verdict: 'on', target: '$85' }, definition: 'Revenue divided by the number of orders.' },
+    { id: 'orders', label: 'Orders', source: 'shopify', value: '558', change: up('6.1%'), trend: RISING, weekly: weekly([165, 152, 156, 160, 84]), format: 'number', bars: true, health: { by: 'target', verdict: 'on', target: '150 a week' }, definition: 'Orders placed in your store in the period, after cancellations.' },
+    { id: 'new-customers', label: 'New customers', source: 'shopify', value: '312', change: up('8.0%'), trend: RISING_2, weekly: weekly([88, 79, 84, 92, 41]), format: 'number', health: { by: 'target', verdict: 'on', target: '46 a day', perDay: 46 }, definition: 'People who placed their first order in the period.' },
     { id: 'roas', label: 'Platform ROAS', source: 'meta', value: '2.6x', change: up('3.0%'), trend: FLAT, weekly: weekly([2.4, 2.5, 2.5, 2.6, 2.6]), format: 'ratio' },
     { id: 'ad-spend', label: 'Ad spend', source: 'meta', value: '$15.6k', change: up('5.0%'), trend: RISING, weekly: weekly([4400, 4100, 4300, 4600, 2200]), format: 'currency' },
-    { id: 'revenue', label: 'Revenue', source: 'shopify', value: '$48.2k', change: up('12.4%'), trend: RISING, weekly: weekly([13800, 12900, 13300, 14100, 7200]), format: 'currency' },
+    { id: 'revenue', label: 'Revenue', source: 'shopify', value: '$48.2k', change: up('12.4%'), trend: RISING, weekly: weekly([13800, 12900, 13300, 14100, 7200]), format: 'currency', health: { by: 'target', verdict: 'off', off: '−12%', target: '$55k' }, definition: 'Gross sales minus discounts and returns, before shipping and taxes.' },
     { id: 'cpa', label: 'Platform CPA', source: 'meta', value: '$24.10', change: down('2.2%'), trend: FALLING, weekly: weekly([26.2, 25.4, 24.9, 24.1, 24.3]), format: 'currency' },
-    { id: 'ctr', label: 'CTR', source: 'meta', value: '1.42%', change: down('0.8%', 'negative'), trend: FALLING, weekly: weekly([1.51, 1.48, 1.45, 1.42, 1.4]), format: 'percent' },
+    { id: 'ctr', label: 'CTR', source: 'meta', value: '1.42%', change: down('0.8%', 'negative'), trend: FALLING, weekly: weekly([1.51, 1.48, 1.45, 1.42, 1.4]), format: 'percent', health: { by: 'benchmark', verdict: 'below' }, definition: 'Link clicks divided by impressions.' },
     { id: 'net-sales', label: 'Net sales', source: 'shopify', value: '$41.9k', change: up('10.8%'), trend: RISING_2, weekly: weekly([12000, 11200, 11600, 12300, 6300]), format: 'currency' },
-    { id: 'discount-rate', label: 'Discount rate', source: 'shopify', value: '13.1%', change: up('1.4%', 'negative'), trend: FLAT, weekly: weekly([12.2, 12.6, 12.9, 13.1, 13.4]), format: 'percent' },
+    { id: 'discount-rate', label: 'Discount rate', source: 'shopify', value: '13.1%', change: up('1.4%', 'negative'), trend: FLAT, weekly: weekly([12.2, 12.6, 12.9, 13.1, 13.4]), format: 'percent', health: { by: 'benchmark', verdict: 'red' }, definition: 'Discounts as a share of gross sales.' },
     { id: 'refund-rate', label: 'Refund rate', source: 'shopify', value: '4.32%', change: down('0.3%'), trend: FALLING, weekly: weekly([4.6, 4.5, 4.4, 4.32, 4.3]), format: 'percent' },
     // Growth
     { id: 'sessions', label: 'Sessions', source: 'shopify', value: '24.8k', change: up('9.2%'), trend: RISING, weekly: weekly([6900, 6400, 6700, 7100, 3500]), format: 'number' },
@@ -54,24 +54,49 @@ export const METRICS: Record<string, Metric> = Object.fromEntries(
     // Ads
     { id: 'impressions', label: 'Impressions', source: 'meta', value: '1.1M', change: up('7.7%'), trend: RISING, weekly: weekly([310000, 290000, 300000, 320000, 160000]), format: 'number' },
     { id: 'clicks', label: 'Link clicks', source: 'meta', value: '15.6k', change: up('4.9%'), trend: RISING_2, weekly: weekly([4300, 4100, 4200, 4500, 2300]), format: 'number' },
+    { id: 'cpc', label: 'Cost per click', source: 'meta', value: '$1.84', change: up('3.4%', 'negative'), trend: RISING_2, weekly: weekly([1.71, 1.76, 1.79, 1.84, 1.86]), format: 'currency', health: { by: 'benchmark', verdict: 'above' }, definition: 'Ad spend divided by link clicks.' },
     { id: 'cpm', label: 'CPM', source: 'meta', value: '$14.18', change: down('1.1%'), trend: FALLING, weekly: weekly([14.6, 14.4, 14.3, 14.2, 14.1]), format: 'currency' },
     // Contribution margin
-    { id: 'contribution-margin', label: 'Contribution margin', source: 'shopify', value: '$11.3k', change: up('14.6%'), trend: RISING, weekly: weekly([3200, 2900, 3100, 3400, 1600]), format: 'currency' },
+    { id: 'contribution-margin', label: 'Contribution margin', source: 'shopify', custom: true, value: '$11.3k', change: up('14.6%'), trend: RISING, weekly: weekly([3200, 2900, 3100, 3400, 1600]), format: 'currency', definition: 'Net sales minus cost of goods, shipping, fees and ad spend. A custom metric from the Metric library.' },
     { id: 'gross-profit', label: 'Gross profit', source: 'shopify', value: '$26.9k', change: up('11.0%'), trend: RISING_2, weekly: weekly([7600, 7100, 7400, 7900, 4000]), format: 'currency' },
     { id: 'cogs', label: 'Cost of goods', source: 'shopify', value: '$15.0k', change: up('9.4%', 'negative'), trend: RISING, weekly: weekly([4300, 4000, 4100, 4400, 2200]), format: 'currency' },
     // One metric per other app, for Founder overview (Figma "Up to date · many apps": 11 apps).
     { id: 'google-ads-spend', label: 'Google Ads spend', source: 'google-ads', value: '$6.2k', change: up('4.1%'), trend: RISING, weekly: weekly([1700, 1600, 1650, 1800, 900]), format: 'currency' },
     { id: 'tiktok-views', label: 'TikTok video views', source: 'tiktok', value: '412k', change: up('12.3%'), trend: RISING_2, weekly: weekly([98000, 104000, 110000, 120000, 60000]), format: 'number' },
-    { id: 'ga-sessions', label: 'Engaged sessions', source: 'google-analytics', value: '18.3k', change: up('3.2%'), trend: FLAT, weekly: weekly([4800, 4600, 4700, 4900, 2400]), format: 'number' },
+    { id: 'ga-sessions', label: 'Sessions', source: 'google-analytics', value: '18.3k', change: up('3.2%'), trend: FLAT, weekly: weekly([4800, 4600, 4700, 4900, 2400]), format: 'number' },
     { id: 'pinterest-saves', label: 'Pin saves', source: 'pinterest', value: '2.9k', change: up('6.7%'), trend: RISING, weekly: weekly([700, 690, 720, 780, 400]), format: 'number' },
     { id: 'stripe-payouts', label: 'Stripe payouts', source: 'stripe', value: '$38.7k', change: up('9.9%'), trend: RISING, weekly: weekly([10400, 9800, 10100, 10900, 5500]), format: 'currency' },
     { id: 'paypal-volume', label: 'PayPal volume', source: 'paypal', value: '$7.8k', change: down('1.6%', 'negative'), trend: FALLING, weekly: weekly([2100, 2050, 2000, 1950, 980]), format: 'currency' },
-    { id: 'zendesk-tickets', label: 'Support tickets', source: 'zendesk', value: '214', change: down('5.3%'), trend: FALLING, weekly: weekly([60, 57, 55, 52, 26]), format: 'number' },
+    { id: 'zendesk-tickets', label: 'Tickets created', source: 'zendesk', value: '214', change: down('5.3%'), trend: FALLING, weekly: weekly([60, 57, 55, 52, 26]), format: 'number' },
     { id: 'reddit-clicks', label: 'Reddit Ads clicks', source: 'reddit', value: '3.1k', change: up('2.4%'), trend: FLAT, weekly: weekly([780, 760, 790, 800, 400]), format: 'number' },
     { id: 'hubspot-leads', label: 'New leads', source: 'hubspot', value: '486', change: up('7.5%'), trend: RISING_2, weekly: weekly([120, 118, 125, 131, 66]), format: 'number' },
+    // Contribution margin's other cards (Figma C-5): two apps, a first sync, an unmeasured cost.
+    { id: 'mer', label: 'MER', source: 'shopify', alsoFrom: 'meta', value: '3.1x', change: up('7.0%'), trend: RISING, weekly: weekly([2.8, 2.9, 3.0, 3.1, 3.1]), format: 'ratio', definition: 'Revenue divided by ad spend, across every channel.' },
+    { id: 'processing-fees', label: 'Processing fees', source: 'stripe', value: '$1.2k', change: up('9.8%', 'negative'), trend: RISING_2, weekly: weekly([330, 310, 320, 350, 170]), format: 'currency' },
+    { id: 'shipping-cost', label: 'Shipping cost', source: 'shipstation', value: '$3.1k', change: up('2.0%', 'negative'), trend: FLAT, weekly: weekly([880, 860, 870, 890, 450]), format: 'currency' },
+    { id: 'return-label-cost', label: 'Return label cost', source: 'shopify', unmeasured: true, value: '$0', change: up('0%'), trend: FLAT, weekly: weekly([0, 0, 0, 0, 0]), format: 'currency' },
+    // Catalog-only metrics, from the Add cards drawings (06 §7).
+    { id: 'ga-conversion-rate', label: 'Conversion rate', source: 'google-analytics', value: '2.41%', change: up('0.6%'), trend: FLAT, weekly: weekly([2.3, 2.35, 2.4, 2.42, 2.41]), format: 'percent', definition: 'Sessions that ended in a purchase, as Google Analytics counts them.' },
+    { id: 'first-response-time', label: 'First response time', source: 'zendesk', value: '38', change: down('6.0%'), trend: FALLING, weekly: weekly([44, 42, 40, 38, 37]), format: 'number', definition: 'Minutes until a ticket gets its first reply.' },
+    { id: 'cancellation-rate', label: 'Cancellation rate', source: 'shopify', value: '1.8%', change: up('0.2%', 'negative'), trend: FLAT, weekly: weekly([1.7, 1.7, 1.8, 1.8, 1.8]), format: 'percent', definition: 'Orders cancelled as a share of all orders.' },
+    { id: 'revenue-per-customer', label: 'Revenue per customer', source: 'shopify', value: '$134.20', change: up('4.1%'), trend: RISING, weekly: weekly([126, 129, 131, 134, 135]), format: 'currency', definition: 'Revenue divided by the number of customers who ordered.' },
+    { id: 'gross-margin', label: 'Gross margin', source: 'shopify', unmeasured: true, value: '$0', change: up('0%'), trend: FLAT, weekly: weekly([0, 0, 0, 0, 0]), format: 'percent', definition: 'Gross profit as a share of net sales. Needs product costs.' },
+    { id: 'gross-sales', label: 'Gross sales', source: 'shopify', value: '$55.1k', change: up('11.2%'), trend: RISING, weekly: weekly([15600, 14700, 15100, 16000, 8100]), format: 'currency', definition: 'Sales before discounts and returns.' },
+    { id: 'items-per-order', label: 'Items per order', source: 'shopify', value: '1.9', change: up('1.1%'), trend: FLAT, weekly: weekly([1.8, 1.9, 1.9, 1.9, 1.9]), format: 'ratio', definition: 'Items sold divided by orders.' },
+    { id: 'reach', label: 'Reach', source: 'meta', value: '412k', change: up('6.4%'), trend: RISING, weekly: weekly([110000, 104000, 108000, 116000, 58000]), format: 'number', definition: 'People who saw your ads at least once.' },
+    { id: 'frequency', label: 'Frequency', source: 'meta', value: '2.7', change: up('3.8%', 'negative'), trend: RISING_2, weekly: weekly([2.5, 2.6, 2.6, 2.7, 2.7]), format: 'ratio', definition: 'Impressions divided by reach.' },
+    { id: 'platform-conversion-rate', label: 'Platform conversion rate', source: 'meta', value: '3.1%', change: up('0.3%'), trend: FLAT, weekly: weekly([2.9, 3.0, 3.0, 3.1, 3.1]), format: 'percent', definition: 'Purchases Meta Ads counts, divided by link clicks.' },
     { id: 'shipping', label: 'Shipping costs', source: 'shopify', value: '$3.4k', change: down('2.8%'), trend: FALLING, weekly: weekly([980, 940, 950, 930, 470]), format: 'currency' },
   ] satisfies Metric[]).map((m) => [m.id, m]),
 )
+
+/** The card id of a second copy, "revenue#2", names the same metric as "revenue" (06 AC-6). */
+export const baseMetricId = (cardId: string) => cardId.split('#')[0]
+
+/** Every metric by id; a second copy's card id ("revenue#2") reads the same metric. */
+export const METRICS: Record<string, Metric> = new Proxy(METRIC_LIST, {
+  get: (target, key) => (typeof key === 'string' ? target[baseMetricId(key)] : undefined),
+})
 
 // ── Boards ──────────────────────────────────────────────────────────────────────
 // Twelve tabs, so the row folds into "6 more" as in the Figma (141:21681); Q4 plan is shared
@@ -85,9 +110,9 @@ const MAYA: Person = { name: "Maya Patel", initials: "MP", color: "var(--dashboa
 
 const BOARD_SPECS: Array<{ id: string; label: string; period?: string; access?: Board["access"]; sharedBy?: Person; cards: Spec }> = [
   { id: "store-overview", label: "Store overview", cards: [["aov", "sm"], ["orders", "lg"], ["new-customers", "sm"], ["roas", "sm"], ["ad-spend", "sm"], ["revenue", "md"], ["cpa", "sm"], ["ctr", "sm"], ["net-sales", "md"], ["discount-rate", "sm"], ["refund-rate", "sm"]] },
-  { id: "growth", label: "Growth", period: "30d", cards: [["sessions", "md"], ["conversion-rate", "sm"], ["returning-rate", "sm"], ["new-customers", "lg"], ["refund-rate", "sm"], ["aov", "sm"], ["orders", "sm"], ["revenue", "sm"]] },
-  { id: "ads", label: "Ads", cards: [["ad-spend", "lg"], ["roas", "sm"], ["cpa", "sm"], ["ctr", "sm"], ["cpm", "sm"], ["impressions", "md"], ["clicks", "md"]] },
-  { id: "contribution-margin", label: "Contribution margin", cards: [["contribution-margin", "lg"], ["gross-profit", "sm"], ["net-sales", "sm"], ["cogs", "sm"], ["shipping", "sm"], ["revenue", "md"], ["discount-rate", "sm"], ["refund-rate", "sm"]] },
+  { id: "growth", label: "Growth", period: "30d", cards: [["new-customers", "full-lg"], ["aov", "sm-tall"], ["conversion-rate", "sm-tall"], ["returning-rate", "sm-tall"], ["refund-rate", "sm-tall"], ["sessions", "md"], ["orders", "sm"], ["revenue", "sm"]] },
+  { id: "ads", label: "Ads", cards: [["ad-spend", "lg"], ["roas", "sm"], ["cpa", "sm"], ["ctr", "sm"], ["cpc", "sm"], ["impressions", "md"], ["clicks", "md"], ["cpm", "sm"]] },
+  { id: "contribution-margin", label: "Contribution margin", cards: [["contribution-margin", "lg"], ["net-sales", "sm"], ["discount-rate", "sm"], ["refund-rate", "sm"], ["shipping-cost", "sm"], ["processing-fees", "sm"], ["return-label-cost", "sm"], ["mer", "sm"]] },
   { id: "weekly-check-in", label: "Weekly check-in", cards: [["revenue", "md"], ["orders", "sm"], ["aov", "sm"], ["net-sales", "md"], ["roas", "sm"], ["ad-spend", "sm"]] },
   { id: "retention", label: "Retention", period: "90d", cards: [["returning-rate", "lg"], ["refund-rate", "sm"], ["orders", "sm"], ["new-customers", "sm"], ["aov", "sm"]] },
   { id: "email-sms", label: "Email & SMS", cards: [["sessions", "md"], ["conversion-rate", "sm"], ["clicks", "sm"], ["revenue", "md"]] },
@@ -96,7 +121,7 @@ const BOARD_SPECS: Array<{ id: string; label: string; period?: string; access?: 
   { id: "returns", label: "Returns", cards: [["refund-rate", "md"], ["orders", "sm"], ["shipping", "sm"]] },
   { id: "inventory", label: "Inventory", cards: [["cogs", "md"], ["orders", "sm"], ["gross-profit", "sm"]] },
   // Reads all eleven apps (Figma "Up to date · many apps, the list scrolls").
-  { id: "founder-overview", label: "Founder overview", cards: [["revenue", "md"], ["orders", "sm"], ["roas", "sm"], ["ad-spend", "sm"], ["google-ads-spend", "sm"], ["tiktok-views", "sm"], ["ga-sessions", "md"], ["pinterest-saves", "sm"], ["stripe-payouts", "sm"], ["paypal-volume", "sm"], ["zendesk-tickets", "sm"], ["reddit-clicks", "sm"], ["hubspot-leads", "sm"]] },
+  { id: "founder-overview", label: "Founder overview", cards: [["revenue", "md"], ["orders", "sm"], ["roas", "sm"], ["ad-spend", "sm"], ["google-ads-spend", "sm"], ["tiktok-views", "sm"], ["cpm", "md"], ["pinterest-saves", "sm"], ["stripe-payouts", "sm"], ["paypal-volume", "sm"], ["impressions", "sm"], ["reddit-clicks", "sm"], ["hubspot-leads", "sm"]] },
   // Hidden
   { id: "holiday-2025", label: "Holiday 2025", cards: [["revenue", "lg"], ["orders", "sm"], ["discount-rate", "sm"]] },
   { id: "creative-tests", label: "Creative tests", cards: [["ctr", "md"], ["cpm", "sm"], ["impressions", "sm"]] },

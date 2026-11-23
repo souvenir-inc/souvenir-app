@@ -1058,3 +1058,11 @@ body:has([data-dashboard-editbar]) [data-sonner-toaster][data-x-position="right"
   border: 0 !important;
   box-shadow: none;
 }
+
+/* Dashboard: a loading card's number and chart shimmer in their own shapes (Figma 170:89069, CR-19). */
+.dashboard-shape-shimmer {
+  background-image: linear-gradient(90deg, var(--dashboard-shimmer-from) 0%, var(--dashboard-shimmer-via) 50%, var(--dashboard-shimmer-from) 100%);
+  background-size: 200% 100%;
+  animation: dashboard-shimmer-text 1.4s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) { .dashboard-shape-shimmer { animation: none; } }

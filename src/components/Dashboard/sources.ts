@@ -13,10 +13,11 @@ export const SOURCE_NAMES: Record<MetricSource, string> = {
   zendesk: 'Zendesk',
   reddit: 'Reddit Ads',
   hubspot: 'HubSpot',
+  shipstation: 'ShipStation',
 }
 
 /** The workspace's apps in the order the Figma lists them; ties in Data sources keep it. */
 export const APP_ORDER: MetricSource[] = [
   'shopify', 'meta', 'google-ads', 'tiktok', 'google-analytics', 'pinterest',
-  'stripe', 'paypal', 'zendesk', 'reddit', 'hubspot',
+  'stripe', 'paypal', 'zendesk', 'reddit', 'hubspot', 'shipstation',
 ]

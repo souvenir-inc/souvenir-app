@@ -6,7 +6,6 @@ import { Ellipsis, LayoutGrid, Pencil, Plus, Share } from 'lucide-react'
 import { Dropdown } from '@/components/Dropdown'
 import { IconButton } from '@/components/ui'
 import { cn } from '@/lib/utils'
-import { METRICS } from './mock-data'
 import { MoreMenuContent, type BoardMenuHandlers } from './tabs/BoardMenus'
 import type { Board } from './tabs/board-state'
 
@@ -141,18 +140,13 @@ export function SpeedDial({ board, startOpen, onAddCards, onNewBoard, onEditBoar
 // ── Edit bar (BS-17) ──────────────────────────────────────────────────────────
 
 interface EditBarProps {
-  board: Board
-  /** Open the card picker straight away (the dial's Add cards, BS-20). */
-  startPicking: boolean
-  onAdd: (metricId: string) => void
+  /** Opens the card picker; edit mode stays on underneath (06 AC-2). */
+  onAddCards: () => void
   onNewBoard: () => void
   onDone: () => void
 }
 
-export function EditBar({ board, startPicking, onAdd, onNewBoard, onDone }: EditBarProps) {
-  const [picking, setPicking] = useState(startPicking)
-  const onBoard = new Set(board.cards.map((c) => c.metricId))
-  const available = Object.values(METRICS).filter((x) => !onBoard.has(x.id))
+export function EditBar({ onAddCards, onNewBoard, onDone }: EditBarProps) {
   const segment = cn('flex h-9 cursor-pointer items-center gap-1.5 rounded-full border-0 bg-transparent pl-3 pr-3.5 text-[13px] font-medium leading-5 text-[var(--dashboard-figure)] transition-colors duration-fast hover:bg-[var(--neutral-100)]', FOCUS)
   return (
     <div
@@ -162,31 +156,10 @@ export function EditBar({ board, startPicking, onAdd, onNewBoard, onDone }: Edit
       aria-label="Editing the board"
       className="absolute bottom-5 right-5 z-30 flex items-center gap-0.5 rounded-full bg-[var(--dashboard-card-bg)] p-1 shadow-[var(--dashboard-popover-shadow)]"
     >
-      <Dropdown.Float
-        open={picking}
-        onOpenChange={setPicking}
-        placement="top-end"
-        autoFlipVertical
-        trigger={
-          // eslint-disable-next-line no-restricted-syntax -- ds-allow: a segment of the floating edit bar (Figma 75:21287)
-          <button type="button" className={segment}>
-            <Plus aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth />Add cards
-          </button>
-        }
-      >
-        {/* Stand-in for the card picker (its own Figma section): metrics not on the board (BS-20). */}
-        <Dropdown size="lg">
-          <Dropdown.Section label="Add cards" fluid>
-            {available.length === 0 ? (
-              <Dropdown.Item label="Every metric is on this board" disabled fluid />
-            ) : (
-              available.map((x) => (
-                <Dropdown.Item key={x.id} label={x.label} onClick={() => { onAdd(x.id); setPicking(false) }} fluid />
-              ))
-            )}
-          </Dropdown.Section>
-        </Dropdown>
-      </Dropdown.Float>
+      {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a segment of the floating edit bar (Figma 75:21287) */}
+      <button type="button" className={segment} onClick={onAddCards}>
+        <Plus aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth />Add cards
+      </button>
       {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a segment of the floating edit bar (Figma 75:21287) */}
       <button type="button" className={segment} onClick={onNewBoard}>
         <Plus aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth />New board

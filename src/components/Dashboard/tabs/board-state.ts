@@ -4,7 +4,7 @@
 // The state is the contract a backend will need: every board you can see, your tab order, the
 // boards you've hidden, the boards you deleted (kept 30 days) and the open board.
 
-import { firstFit, flowCards, pack, resize, toItems, withItems } from '../grid-layout'
+import { dims, firstFit, fitAtEnd, flowCards, pack, resize, toItems, withItems } from '../grid-layout'
 import type { BoardCard, CardSize } from '../types'
 
 export type Access = 'owner' | 'edit' | 'view'
@@ -179,6 +179,8 @@ export type BoardAction =
   | { type: 'resize-card'; id: string; metricId: string; size: CardSize }
   | { type: 'remove-card'; id: string; metricId: string }
   | { type: 'add-card'; id: string; metricId: string }
+  /** Several cards at the end, in this order, each at its size (06 AC-16). A metric already on the board gets a second card ("revenue#2"). */
+  | { type: 'add-cards'; id: string; cards: { metricId: string; size: CardSize }[] }
   | { type: 'set-dates'; id: string; period?: string; compare?: string }
   | { type: 'purge-expired'; now: number }
 
@@ -320,6 +322,11 @@ export function boardReducer(s: DashboardState, a: BoardAction): DashboardState 
       const b = s.boards[a.id]
       return b ? { ...s, boards: { ...s.boards, [a.id]: { ...b, cards: a.cards } } } : s
     }
+    case 'add-cards': {
+      const board = s.boards[a.id]
+      if (!board || !a.cards.length) return s
+      return { ...s, boards: { ...s.boards, [a.id]: { ...board, cards: addCardsAtEnd(board.cards, a.cards) } } }
+    }
     case 'move-card':
     case 'step-card':
     case 'resize-card':
@@ -343,4 +350,26 @@ export function boardReducer(s: DashboardState, a: BoardAction): DashboardState 
       return { ...s, boards, deleted: s.deleted.filter((d) => !expired.includes(d.id)) }
     }
   }
+}
+
+/** The card ids `addCardsAtEnd` gives: a metric already there (or twice in the batch) gets "#2", "#3"… */
+export function cardIdsFor(existing: string[], metricIds: string[]): string[] {
+  const used = new Set(existing)
+  return metricIds.map((id) => {
+    let cardId = id
+    for (let n = 2; used.has(cardId); n++) cardId = `${id}#${n}`
+    used.add(cardId)
+    return cardId
+  })
+}
+
+/** Cards added at the end, in order (06 AC-16). */
+export function addCardsAtEnd(cards: BoardCard[], add: { metricId: string; size: CardSize }[]): BoardCard[] {
+  const ids = cardIdsFor(cards.map((c) => c.metricId), add.map((c) => c.metricId))
+  let next = cards
+  add.forEach((c, i) => {
+    const d = dims(c.size)
+    next = [...next, { metricId: ids[i], size: c.size, ...fitAtEnd(toItems(next), d.w, d.h) }]
+  })
+  return withItems(next, toItems(next))
 }

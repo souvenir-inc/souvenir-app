@@ -49,20 +49,68 @@ export interface SyncSnapshot {
   isAdmin: boolean
   /** Banners closed with ×, as `boardId|banner key` (SY-20). */
   dismissed: string[]
+  /** Apps that aren't connected, and Connect's progress (06 AC-8, AC-9). Connected apps aren't listed. */
+  connections: Partial<Record<AppId, Connection>>
 }
+
+/** An app's connection while it isn't simply connected: off, connecting, just connected, failed. */
+export type Connection = 'off' | 'connecting' | 'connected' | 'failed'
+
+/** Apps not connected in the dummy workspace (as drawn in the Add cards picker). */
+const NOT_CONNECTED: AppId[] = ['google-analytics', 'zendesk']
+const CONNECT_MS = 2_500
+/** A just-connected app's first sync (stand-in). */
+const FIRST_SYNC_AFTER_CONNECT_MS = 30_000
 
 // Minutes since each app last synced, all up to date (Figma "Up to date · many apps").
 const FRESH_MINUTES: Record<AppId, number> = {
   shopify: 2, meta: 3, 'google-ads': 3, tiktok: 4, 'google-analytics': 4, pinterest: 5,
-  stripe: 6, paypal: 6, zendesk: 8, reddit: 9, hubspot: 11,
+  stripe: 6, paypal: 6, zendesk: 8, reddit: 9, hubspot: 11, shipstation: 0,
 }
 
 function freshApps(now: number): Record<AppId, AppSync> {
-  return Object.fromEntries(ALL_APPS.map((id) => [id, { syncedAt: now - FRESH_MINUTES[id] * MIN, failed: false, syncing: null }])) as Record<AppId, AppSync>
+  const apps = Object.fromEntries(ALL_APPS.map((id) => [id, { syncedAt: now - FRESH_MINUTES[id] * MIN, failed: false, syncing: null }])) as Record<AppId, AppSync>
+  // ShipStation was connected this morning and its first sync is still running (05 CR-22: the
+  // Contribution margin board's Shipping cost reads "No data yet").
+  apps.shipstation = { syncedAt: null, failed: false, syncing: { startedAt: now - 2 * HOUR, kind: 'first' } }
+  for (const id of NOT_CONNECTED) apps[id] = { syncedAt: null, failed: false, syncing: null }
+  return apps
+}
+
+const offApps = () => Object.fromEntries(NOT_CONNECTED.map((id) => [id, 'off'])) as Partial<Record<AppId, Connection>>
+
+/** Whether an app is connected (just-connected counts). */
+export const isConnected = (s: SyncSnapshot, id: AppId) => {
+  const c = s.connections[id]
+  return c === undefined || c === 'connected'
+}
+
+let failConnectOnce = false
+
+/**
+ * Connect an app from the picker (06 AC-9). Stand-in: no sign-in window; it connects after 2.5 s
+ * (or fails once with `?connect=fail`), then runs its first sync.
+ */
+export function connectApp(id: AppId) {
+  const c = snap.connections[id]
+  if (c !== 'off' && c !== 'failed') return
+  set({ connections: { ...snap.connections, [id]: 'connecting' } })
+  window.setTimeout(() => {
+    if (failConnectOnce) {
+      failConnectOnce = false
+      set({ connections: { ...snap.connections, [id]: 'failed' } })
+      return
+    }
+    const startedAt = Date.now()
+    set({ connections: { ...snap.connections, [id]: 'connected' }, apps: { ...snap.apps, [id]: { syncedAt: null, failed: false, syncing: { startedAt, kind: 'first' } } } })
+    window.setTimeout(() => {
+      if (snap.apps[id].syncing?.startedAt === startedAt) setApp(id, { syncedAt: Date.now(), syncing: null })
+    }, FIRST_SYNC_AFTER_CONNECT_MS)
+  }, CONNECT_MS)
 }
 
 function initial(now: number): SyncSnapshot {
-  return { now, apps: freshApps(now), online: true, offlineSince: null, backOnlineAt: null, refreshRunning: false, cooldownUntil: 0, recent: [], isAdmin: true, dismissed: [] }
+  return { now, apps: freshApps(now), online: true, offlineSince: null, backOnlineAt: null, refreshRunning: false, cooldownUntil: 0, recent: [], isAdmin: true, dismissed: [], connections: offApps() }
 }
 
 // The server render and the first client render share this snapshot; the times in it only show
@@ -181,7 +229,7 @@ export function refreshAll(): boolean {
   if (blockedReason(snap, Date.now())) return false
   const ids = ALL_APPS.filter((id) => {
     const a = snap.apps[id]
-    return !a.failed && !a.syncing
+    return !a.failed && !a.syncing && isConnected(snap, id)
   })
   if (!ids.length) return false
   start(ids, 'refresh', null)
@@ -233,11 +281,14 @@ const SCENARIOS: Record<string, (now: number, apps: Record<AppId, AppSync>) => v
   },
   both: (now, a) => { a.meta = { syncedAt: now - 5 * HOUR, failed: true, syncing: null }; a.shopify.syncedAt = now - 3 * HOUR - 5 * MIN },
   slow: (now, a) => { a.meta = { syncedAt: now - 3 * HOUR, failed: false, syncing: { startedAt: now - 25 * MIN, kind: 'sync' } } },
+  // Meta Ads last synced yesterday: on Today its cards read a dash (05 CR-26).
+  yesterday: (now, a) => { const midnight = new Date(now); midnight.setHours(0, 0, 0, 0); a.meta.syncedAt = midnight.getTime() - 3 * HOUR },
   first: (now, a) => { a.meta = { syncedAt: null, failed: false, syncing: { startedAt: now, kind: 'first' } } },
 }
 
 /** Start in a drawn state. Runs once per distinct query; a plain /dashboard keeps what's running. */
-export function seedFromQuery(params: { sync: string | null; fail: string | null; role: string | null }) {
+export function seedFromQuery(params: { sync: string | null; fail: string | null; role: string | null; connect?: string | null }) {
+  failConnectOnce = params.connect === 'fail'
   const key = `${params.sync ?? ''}|${params.fail ?? ''}|${params.role ?? ''}`
   if (seededWith === key || (seededWith !== null && key === '||')) return
   seededWith = key
@@ -246,7 +297,7 @@ export function seedFromQuery(params: { sync: string | null; fail: string | null
   SCENARIOS[params.sync ?? '']?.(now, apps)
   failNext.clear()
   for (const id of (params.fail ?? '').split(',')) if ((ALL_APPS as string[]).includes(id)) failNext.add(id as AppId)
-  set({ apps, refreshRunning: false, cooldownUntil: 0, recent: [], isAdmin: params.role !== 'member', dismissed: [] })
+  set({ apps, refreshRunning: false, cooldownUntil: 0, recent: [], isAdmin: params.role !== 'member', dismissed: [], connections: offApps() })
   if (params.sync === 'first') window.setTimeout(() => setApp('meta', { syncedAt: Date.now(), syncing: null }), FIRST_SYNC_MS)
   if (params.sync === 'slow') {
     // The attempt stops an hour after it started; the app goes back to behind (SY-31).

@@ -125,6 +125,11 @@ is silent. **Stand-in** marks what the dummy build fakes until the back end exis
   light band). The banner, rows and footer show a small spinner and plain text instead. A newly
   connected app's cards show the **loading skeleton** until data arrives ("No data yet" only if the
   first sync fails).
+  - *Reconciled with `05-cards-reading-rules.md` (2026-11-23):* the Cards row draws a first sync
+    that's still running as "No data yet" (CR-22), and so does Add cards (A-5b). Built: "No data yet"
+    from the start of a first sync (since 2026-11-23, 06). The Cards row also draws a syncing card with a
+    spinner after its label instead of the shimmer (CR-27); this file's shimmer stays until design
+    settles it.
 
 ## 6. Reconnect and people (SY-25 – SY-27)
 
@@ -176,7 +181,8 @@ is silent. **Stand-in** marks what the dummy build fakes until the back end exis
 ## 9. Dummy data and scenarios (stand-in)
 
 The sync engine is a front-end mock (`src/components/Dashboard/sync/`): a sync takes 2.5 s. The
-workspace has 11 apps; **Founder overview** reads all 11 (SY-6), **Growth** reads only Shopify
+workspace has 12 apps, Google Analytics and Zendesk **not connected** (06 §7), ShipStation on a long
+first sync; **Founder overview** reads nine (SY-6), **Growth** reads only Shopify
 (SY-30). Add `?sync=<scenario>` to `/dashboard` to start in a drawn state:
 
 | `?sync=` | State |

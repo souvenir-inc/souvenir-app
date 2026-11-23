@@ -950,6 +950,32 @@
   --dashboard-window-bar-text: #F7F2ED;
   --dashboard-window-bar-muted: #C9C2BC;
   --dashboard-window-bar-online: var(--dashboard-positive);
+  /* Cards while reading (Figma 167:27720) */
+  --dashboard-card-hover-shadow: 0px 0px 0px 1px rgba(38, 33, 30, 0.16), 0px 8px 20px -10px rgba(38, 33, 30, 0.16);
+  --dashboard-chart-previous:  #C9C4BF;              /* the period before: dashed line, legend, readout dot */
+  --dashboard-hover-line:      #C9C4BF;              /* the hairline on the hovered day */
+  --dashboard-hover-band:      #F5F2EF;              /* the hovered week behind its bar; a hovered list row */
+  --dashboard-readout-shadow:  0px 4px 12px -2px rgba(38, 33, 30, 0.12), 0px 0px 0px 1px #E4E0DC;
+  --dashboard-window-shadow:   0px 24px 48px -12px rgba(38, 33, 30, 0.28);
+  --dashboard-list-shadow:     0px 12px 24px -8px rgba(38, 33, 30, 0.16);
+  --dashboard-list-border:     #D3CEC8;
+  --dashboard-shimmer-from:    #F0ECE8;              /* a loading number's shape */
+  --dashboard-shimmer-via:     #F8F6F3;
+  --dashboard-pill-bg:         #F9F8F5;              /* health pill: on track, below / above healthy */
+  --dashboard-pill-border:     #E4E0DC;
+  --dashboard-pill-bad-bg:     rgba(239, 68, 68, 0.08);  /* health pill: off target, red flag */
+  --dashboard-pill-bad-border: rgba(239, 68, 68, 0.3);
+  --dashboard-pill-bad-text:   #B91C1C;
+  --dashboard-pill-warn-text:  #92400E;
+  --dashboard-pill-warn-dot:   #D97706;
+  /* Add cards (Figma 167:27723) */
+  --dashboard-checkbox-border: #C9C2BB;
+  --dashboard-landed-ring:     #8A817B;              /* a new card for 2 s */
+  --dashboard-landed-halo:     rgba(38, 33, 30, 0.08);
+  --dashboard-field-shadow:    0px 0px 0px 3px rgba(38, 33, 30, 0.06);  /* the picker search field's soft ring */
+  --dashboard-rail-rule:       rgba(59, 54, 50, 0.1);
+  --dashboard-lift-shadow:     0px 1px 1px rgba(38, 33, 30, 0.06);  /* a selected rail item, a picked row */
+  --dashboard-button-shadow:   0px 1px 2px rgba(38, 33, 30, 0.06);  /* outlined Connect, Clear search */
 }
 
 :root[data-theme="dark"] {
@@ -985,6 +1011,23 @@
   --dashboard-toast-border:    #383838;
   --dashboard-toast-shadow:    0px 8px 24px 0px rgba(0, 0, 0, 0.5);
   --dashboard-window-bar-bg:   #000000;
+  --dashboard-card-hover-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.18), 0px 8px 20px -10px rgba(0, 0, 0, 0.6);
+  --dashboard-chart-previous:  #5A5A5A;
+  --dashboard-hover-line:      #5A5A5A;
+  --dashboard-hover-band:      #262626;
+  --dashboard-readout-shadow:  0px 4px 12px -2px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px #383838;
+  --dashboard-window-shadow:   0px 24px 48px -12px rgba(0, 0, 0, 0.6);
+  --dashboard-list-shadow:     0px 12px 24px -8px rgba(0, 0, 0, 0.5);
+  --dashboard-list-border:     #383838;
+  --dashboard-shimmer-from:    #262626;
+  --dashboard-shimmer-via:     #303030;
+  --dashboard-pill-bg:         #1F1F1F;
+  --dashboard-pill-border:     #383838;
+  --dashboard-pill-bad-text:   #FCA5A5;
+  --dashboard-pill-warn-text:  #FCD34D;
+  --dashboard-checkbox-border: #5A5A5A;
+  --dashboard-landed-ring:     #8A8A8A;
+  --dashboard-landed-halo:     rgba(255, 255, 255, 0.08);
   --dashboard-popover-shadow:  0px 12px 28px -6px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px rgba(255, 255, 255, 0.1);
   --dashboard-control-shadow:  0px 0px 0px 1px rgba(255, 255, 255, 0.12);
   --dashboard-drop-slot:       rgba(13, 110, 178, 0.16);

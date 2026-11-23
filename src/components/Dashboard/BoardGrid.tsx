@@ -7,8 +7,8 @@ import { cn } from '@/lib/utils'
 import { DashboardSquareOneIcon } from '@strange-huge/icons'
 import { EmptyState } from '@/components/ui'
 import { bestIndex, edgeScrollSpeed } from './card-placement'
-import { dims, place, sameLayout, sizeFromGrip, toItems, withItems, type Item } from './grid-layout'
-import { MetricCard, SIZE_LABEL, type GripProps } from './MetricCard'
+import { dims, place, sameLayout, sizeFromGrip, sizeOf, toItems, withItems, type Item } from './grid-layout'
+import { MetricCard, SIZE_LABEL, type CardView, type GripProps } from './MetricCard'
 import { METRICS } from './mock-data'
 import type { BoardCard, CardSize } from './types'
 
@@ -29,10 +29,15 @@ import type { BoardCard, CardSize } from './types'
 //           Keyboard: arrows on the grip.
 //   Remove  the card's ×, or Delete on a focused card.
 
+// Narrower than the design grid (CR-36): 3-wide cards take half a row, 6- and 12-wide the whole
+// row; heights stay. On the design grid each card sits at its own cell instead (--gc / --gr).
 const SPAN: Record<CardSize, string> = {
   sm: '',
+  'sm-tall': 'row-span-2',
   md: '@lg:col-span-2',
   lg: '@lg:col-span-2 row-span-2',
+  full: '@lg:col-span-2',
+  'full-lg': '@lg:col-span-2 row-span-2',
 }
 const ROW = 156
 const GAP = 16
@@ -40,15 +45,18 @@ const DRAG_START = 4   // px before a press becomes a drag, so a click stays a c
 const SETTLE_MS = 140  // after a move, let the cards slide before reading the pointer again
 const DROP_MS = 180    // the copy settling into its slot
 
-/** Arrow keys on the grip: → / ← wider or narrower, ↓ / ↑ taller or shorter. */
+const WIDTHS = [1, 2, 4]
+
+/** Arrow keys on the grip: → / ← one width wider or narrower (3 · 6 · 12), ↓ / ↑ taller or shorter. */
 function sizeForKey(size: CardSize, key: string): CardSize | null {
-  switch (key) {
-    case 'ArrowRight': return size === 'sm' ? 'md' : null
-    case 'ArrowLeft':  return size === 'sm' ? null : 'sm'
-    case 'ArrowDown':  return size === 'lg' ? null : 'lg'
-    case 'ArrowUp':    return size === 'lg' ? 'md' : null
-    default:           return null
-  }
+  const { w, h } = dims(size)
+  const at = WIDTHS.indexOf(w)
+  let next: CardSize | null = null
+  if (key === 'ArrowRight' && at < WIDTHS.length - 1) next = sizeOf(WIDTHS[at + 1], h)
+  if (key === 'ArrowLeft' && at > 0) next = sizeOf(WIDTHS[at - 1], h)
+  if (key === 'ArrowDown' && h === 1) next = sizeOf(w, 2)
+  if (key === 'ArrowUp' && h === 2) next = sizeOf(w, 1)
+  return next
 }
 
 interface DragView {
@@ -74,20 +82,44 @@ interface BoardGridProps {
   onRemove: (metricId: string) => void
   /** Edit mode: cards move, resize and go (BS-18, BS-19). */
   editing?: boolean
-  /** The board was just opened: names show, figures and charts shimmer (TAB-6). */
-  loading?: boolean
-  /** Each card's sync look: a dot, a shimmer, or the skeleton of a first sync (SY-23, SY-24). */
-  cardSync?: (metricId: string) => CardSync | undefined
+  /** How each card reads: body state, dot, shimmer, series, health (05-cards-reading-rules.md). */
+  cardView?: (metricId: string) => CardView | undefined
+  /** Reading: a click or Enter on a card opens its metric window (CR-7). */
+  onOpenCard?: (metricId: string) => void
+  /** Try again on a card that couldn't load (CR-20). */
+  onRetryCard?: (metricId: string) => void
+  /** Remove card on an empty card while reading, with Undo (CR-22). */
+  onRemoveEmpty?: (metricId: string) => void
+  /** Cards just added: a soft ring for 2 s, scrolled into view (06 AC-17). `n` changes on every landing. */
+  landed?: { ids: string[]; n: number } | null
 }
 
-export interface CardSync {
-  dot?: 'failed' | 'behind'
-  syncing?: boolean
-  loading?: boolean
-}
+const RING_MS = 2000
 
-export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRemove, editing = false, loading = false, cardSync }: BoardGridProps) {
+export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRemove, editing = false, cardView, onOpenCard, onRetryCard, onRemoveEmpty, landed }: BoardGridProps) {
   const reduceMotion = useReducedMotion()
+  // New cards: ringed, then the ring fades after 2 s (AC-17). Adjusted while rendering when a new
+  // landing arrives, React's pattern for state that follows a prop.
+  const [ring, setRing] = useState<{ ids: string[]; on: boolean; n: number } | null>(null)
+  if (landed && landed.n !== ring?.n) setRing({ ids: landed.ids, on: true, n: landed.n })
+  useEffect(() => {
+    if (!ring?.on) return
+    // Just enough scrolling to show them all when they fit, the first one first, clear of the toast.
+    const els = ring.ids.map((id) => gridRef.current?.querySelector(`[data-card-id="${CSS.escape(id)}"]`)).filter((e): e is Element => !!e)
+    const scroller = gridRef.current?.closest<HTMLElement>('.kaya-scrollbar')
+    if (els.length && scroller) {
+      const view = scroller.getBoundingClientRect()
+      const top = Math.min(...els.map((e) => e.getBoundingClientRect().top))
+      const bottom = Math.max(...els.map((e) => e.getBoundingClientRect().bottom))
+      const margin = 24
+      const down = Math.min(bottom + margin + 72 - view.bottom, top - margin - view.top) // 72: room for the toast
+      const up = top - margin - view.top
+      const by = up < 0 ? up : down > 0 ? down : 0
+      if (by) scroller.scrollBy({ top: by, behavior: reduceMotion ? 'auto' : 'smooth' })
+    }
+    const t = window.setTimeout(() => setRing((r) => (r ? { ...r, on: false } : r)), RING_MS)
+    return () => window.clearTimeout(t)
+  }, [ring?.on, ring?.n, ring?.ids, reduceMotion])
   const gridRef = useRef<HTMLUListElement>(null)
   const [drag, setDrag] = useState<DragView | null>(null)
   const [resizingId, setResizingId] = useState<string | null>(null)
@@ -255,7 +287,9 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
   const dragged = drag ? METRICS[drag.id] : null
   return (
     <div className="@container">
-      <ul ref={gridRef} className="m-0 grid list-none auto-rows-[156px] grid-cols-1 gap-4 p-0 @lg:grid-cols-2 @4xl:grid-cols-4">
+      {/* 4 design columns from 960 px of board (about 1100 px of window, CR-35); 2 below, filling gaps
+          dense (CR-36); 1 under 512 px. */}
+      <ul ref={gridRef} className="m-0 grid list-none auto-rows-[156px] grid-flow-row-dense grid-cols-1 gap-4 p-0 @lg:grid-cols-2 @min-[60rem]:grid-cols-4">
         {cards.map((card, i) => {
           const metric = METRICS[card.metricId]
           if (!metric) return null
@@ -288,7 +322,7 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
               className={cn(
                 'relative min-w-0 rounded-xl select-none',
                 SPAN[card.size],
-                '@4xl:[grid-column:var(--gc)]! @4xl:[grid-row:var(--gr)]!',
+                '@min-[60rem]:[grid-column:var(--gc)]! @min-[60rem]:[grid-row:var(--gr)]!',
                 editing && 'touch-none cursor-grab outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]',
                 resizingId === card.metricId && 'z-20',
               )}
@@ -302,12 +336,23 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
                   size={card.size}
                   dragging={resizingId === card.metricId}
                   editing={editing}
-                  loading={loading || !!cardSync?.(card.metricId)?.loading}
-                  syncDot={cardSync?.(card.metricId)?.dot}
-                  syncing={!!cardSync?.(card.metricId)?.syncing}
+                  view={cardView?.(card.metricId)}
                   index={i}
-                  onRemove={() => onRemove(card.metricId)}
+                  onOpen={onOpenCard ? () => onOpenCard(card.metricId) : undefined}
+                  onRetry={onRetryCard ? () => onRetryCard(card.metricId) : undefined}
+                  onRemove={() => (editing ? onRemove(card.metricId) : onRemoveEmpty?.(card.metricId))}
                   grip={editing ? gripFor(card) : undefined}
+                />
+              )}
+              {ring?.ids.includes(card.metricId) && (
+                <span
+                  aria-hidden
+                  data-landed={ring.on || undefined}
+                  className={cn(
+                    'pointer-events-none absolute inset-0 rounded-xl border-[1.5px] border-solid border-[var(--dashboard-landed-ring)] shadow-[0_0_0_4px_var(--dashboard-landed-halo)]',
+                    'transition-opacity duration-slow motion-reduce:transition-none',
+                    ring.on ? 'opacity-100' : 'opacity-0',
+                  )}
                 />
               )}
             </m.li>
@@ -332,7 +377,7 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
               transition: drag.settleAt ? `left ${DROP_MS}ms ease-out, top ${DROP_MS}ms ease-out, transform ${DROP_MS}ms ease-out` : 'transform 120ms ease-out',
             }}
           >
-            <MetricCard metric={dragged} size={drag.size} dragging />
+            <MetricCard metric={dragged} size={drag.size} view={cardView?.(drag.id)} dragging />
           </div>
         </>,
         document.body,

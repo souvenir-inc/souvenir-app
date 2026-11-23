@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { collide, firstFit, flowCards, pack, place, resize, sameLayout, sizeFromGrip, toItems, type Item } from './grid-layout'
+import { collide, dims, firstFit, flowCards, pack, place, resize, sameLayout, sizeFromGrip, sizeOf, toItems, type Item } from './grid-layout'
 import type { CardSize } from './types'
 
 // The Figma board (17:889) in order.
@@ -122,9 +122,17 @@ describe('the resize grip reads direction, not position (BS-19)', () => {
     expect(sizeFromGrip('sm', -200, 0, C, R)).toBe('md')
     expect(sizeFromGrip('sm', 100, 0, C, R)).toBe('sm') // under half a column: no change
   })
-  it('a small card dragged down becomes large (there is no tall narrow size)', () => {
-    expect(sizeFromGrip('sm', 0, 100, C, R)).toBe('lg')
+  it('a small card dragged down becomes small, tall (3 × 2); down and sideways, medium (6 × 2)', () => {
+    expect(sizeFromGrip('sm', 0, 100, C, R)).toBe('sm-tall')
     expect(sizeFromGrip('sm', 200, 100, C, R)).toBe('lg')
+  })
+  it('widths snap to 3, 6 or 12 of 12 columns (CR-1)', () => {
+    expect(sizeFromGrip('md', 300, 0, C, R)).toBe('full')       // a whole column more: 6 → 12 wide
+    expect(sizeFromGrip('md', 200, 0, C, R)).toBe('md')         // under a whole column: stays 6 wide
+    expect(sizeFromGrip('sm', 600, 0, C, R)).toBe('full')       // two columns more at once
+    expect(sizeFromGrip('full', -300, 0, C, R)).toBe('md')
+    expect(sizeFromGrip('full-lg', 0, -100, C, R)).toBe('full')
+    expect(sizeFromGrip('sm-tall', 200, 0, C, R)).toBe('lg')
   })
   it('medium grows taller or narrows; large shortens or narrows', () => {
     expect(sizeFromGrip('md', 0, 100, C, R)).toBe('lg')
@@ -153,5 +161,19 @@ describe('resize and add', () => {
     const b = board().filter((i) => i.id !== 'cpa')
     expect(firstFit(b, 1, 1)).toEqual({ x: 2, y: 2 })
     expect(firstFit(board(), 1, 1)).toEqual({ x: 0, y: 4 })
+  })
+})
+
+describe('six sizes (CR-1)', () => {
+  it('cover 1, 2 or 4 columns by 1 or 2 rows, and back', () => {
+    const sizes = ['sm', 'sm-tall', 'md', 'lg', 'full', 'full-lg'] as const
+    expect(sizes.map((z) => { const d = dims(z); return `${d.w}x${d.h}` })).toEqual(['1x1', '1x2', '2x1', '2x2', '4x1', '4x2'])
+    for (const z of sizes) { const d = dims(z); expect(sizeOf(d.w, d.h)).toBe(z) }
+  })
+  it('a full-width card resized in place pushes the rest below it', () => {
+    const b = resize(board(), 'aov', 'full')
+    expect(pos(b, 'aov')).toEqual([0, 0])
+    expect(noOverlap(b)).toBe(true)
+    expect(b.filter((i) => i.id !== 'aov').every((i) => i.y >= 1)).toBe(true)
   })
 })

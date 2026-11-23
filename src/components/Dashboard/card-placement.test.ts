@@ -18,11 +18,20 @@ describe('grid layout matches CSS auto-placement (BS-28)', () => {
   it('stacks everything in one column', () => {
     expect(layoutCells(['sm', 'md', 'lg'], 1).map((c) => [c.row, c.w, c.h])).toEqual([[0, 1, 1], [1, 1, 1], [2, 1, 2]])
   })
-  it('never moves the cursor back (sparse: a gap stays a gap)', () => {
+  it('sparse never moves the cursor back: a gap stays a gap', () => {
     // A large card that doesn't fit next to a small one leaves the rest of that row empty.
-    const cells = layoutCells(['sm', 'sm', 'sm', 'lg', 'sm'], 4)
+    const cells = layoutCells(['sm', 'sm', 'sm', 'lg', 'sm'], 4, false)
     expect(cells[3]).toMatchObject({ col: 0, row: 1 })
     expect(cells[4]).toMatchObject({ col: 2, row: 1 })
+  })
+  it('dense (the narrow board, CR-36): a later small card fills a gap beside an earlier one', () => {
+    const cells = layoutCells(['sm', 'sm', 'sm', 'lg', 'sm'], 4)
+    expect(cells[3]).toMatchObject({ col: 0, row: 1 })
+    expect(cells[4]).toMatchObject({ col: 3, row: 0 })
+  })
+  it('on two columns, 3-wide cards take half a row and 6- and 12-wide ones the whole row', () => {
+    const cells = layoutCells(['sm', 'md', 'sm', 'full', 'sm-tall', 'sm'], 2)
+    expect(cells.map((c) => `${c.col},${c.row},${c.w}x${c.h}`)).toEqual(['0,0,1x1', '0,1,2x1', '1,0,1x1', '0,2,2x1', '0,3,1x2', '1,3,1x1'])
   })
 })
 
@@ -57,7 +66,15 @@ describe('the slot goes where the pointer is (BS-25)', () => {
     expect(bestIndex(FIGMA, 'cpa', at({ col: 2, row: 2 }), G)).toBe(6)
   })
   it('goes to the end below the last row', () => {
-    expect(bestIndex(FIGMA, 'aov', { x: 100, y: 4 * 172 + 60 }, G)).toBe(FIGMA.length - 1)
+    // The narrow board (2 columns, dense) is where this runs. Dense, the last two places can land
+    // in the same bottom row, so what matters is the card ends up in the last row.
+    const to = bestIndex(FIGMA, 'aov', { x: 100, y: 9 * 172 + 60 }, { ...G, columns: 2 })
+    const order = FIGMA.filter((c) => c.id !== 'aov')
+    order.splice(to, 0, FIGMA[0])
+    const cells = layoutCells(order.map((c) => c.size), 2)
+    const lastRow = Math.max(...cells.map((c) => c.row + c.h - 1))
+    expect(to).toBeGreaterThanOrEqual(FIGMA.length - 2)
+    expect(cells[to].row + cells[to].h - 1).toBe(lastRow)
   })
 })
 

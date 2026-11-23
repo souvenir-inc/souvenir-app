@@ -1,7 +1,7 @@
 // The board's card positions on the 4-column design grid (docs-v2/dashboard/02-board-screen-rules.md,
 // BS-24 – BS-31). Pure, so every rule is testable without a browser.
 //
-// Each card has a place (x, y in cells) and a size (w × h: small 1×1, medium 2×1, large 2×2).
+// Each card has a place (x, y in cells) and a size (w × h: 1, 2 or 4 columns by 1 or 2 rows).
 // Placing a card pins it at the cell asked for and packs the others around it in reading order,
 // each in the first space it fits, so the board never has holes and a big card can go anywhere.
 // A card dropped exactly onto one card of the same size swaps places with it.
@@ -12,9 +12,21 @@ export const COLUMNS = 4
 
 export interface Item { id: string; x: number; y: number; w: number; h: number }
 
-/** Cells a size covers on the 4-column grid. */
+const DIMS: Record<CardSize, { w: number; h: number }> = {
+  sm: { w: 1, h: 1 }, 'sm-tall': { w: 1, h: 2 }, md: { w: 2, h: 1 }, lg: { w: 2, h: 2 }, full: { w: 4, h: 1 }, 'full-lg': { w: 4, h: 2 },
+}
+
+/** Cells a size covers on the 4-column grid (3, 6 or 12 of the Figma's 12 columns). */
 export function dims(size: CardSize): { w: number; h: number } {
-  return size === 'sm' ? { w: 1, h: 1 } : size === 'md' ? { w: 2, h: 1 } : { w: 2, h: 2 }
+  return DIMS[size]
+}
+
+/** The size that covers w × h cells (w is 1, 2 or 4; h is 1 or 2). */
+export function sizeOf(w: number, h: number): CardSize {
+  const tall = h >= 2
+  if (w >= 4) return tall ? 'full-lg' : 'full'
+  if (w >= 2) return tall ? 'lg' : 'md'
+  return tall ? 'sm-tall' : 'sm'
 }
 
 export const collide = (a: Item, b: Item) =>
@@ -143,21 +155,18 @@ export function place(items: Item[], id: string, x: number, y: number, columns =
 /**
  * The size a grip drag asks for, from how far the grip has moved since it was pressed (BS-19).
  * Direction, not position, so a card at the right edge can still grow (it grows leftwards):
- *   - sideways past half a column (either way) makes a 1-wide card 2 wide; left past half a column
- *     makes a 2-wide card 1 wide;
+ *   - widths snap to 1, 2 or 4 columns (3, 6 or 12 of 12). A 1-wide card grows sideways either
+ *     way; wider cards grow right and shrink left. Half a column decides 1 ↔ 2, a whole one 2 ↔ 4;
  *   - down past half a row makes a 1-tall card 2 tall; up past half a row makes it 1 tall again.
- * There's no 1 × 2 size, so a small card dragged down becomes large.
  */
 export function sizeFromGrip(size: CardSize, dx: number, dy: number, colWidth: number, rowHeight: number): CardSize {
   const { w, h } = dims(size)
-  let nw = w
+  const raw = w + (w === 1 ? Math.abs(dx) : dx) / colWidth
+  const nw = raw < 1.5 ? 1 : raw < 3 ? 2 : 4
   let nh = h
-  if (w === 1 && Math.abs(dx) > colWidth / 2) nw = 2
-  if (w === 2 && dx < -colWidth / 2) nw = 1
   if (h === 1 && dy > rowHeight / 2) nh = 2
   if (h === 2 && dy < -rowHeight / 2) nh = 1
-  if (nh === 2) return 'lg'
-  return nw === 2 ? 'md' : 'sm'
+  return sizeOf(nw, nh)
 }
 
 /** A card changes size where it stands; the others pack around it (BS-19). */
@@ -167,6 +176,21 @@ export function resize(items: Item[], id: string, size: CardSize, columns = COLU
     const d = dims(size)
     return { ...i, ...d, x: Math.min(i.x, columns - d.w) }
   }), id, columns)
+}
+
+/**
+ * Where a new card goes: at the end of the board (06 AC-16), the first place after the last card in
+ * reading order where it fits.
+ */
+export function fitAtEnd(items: Item[], w: number, h: number, columns = COLUMNS): { x: number; y: number } {
+  const last = [...items].sort(byPosition).pop()
+  if (!last) return { x: 0, y: 0 }
+  for (let y = last.y; ; y++) {
+    for (let x = y === last.y ? last.x + last.w : 0; x + w <= columns; x++) {
+      const probe = { id: '', x, y, w, h }
+      if (!items.some((it) => collide(it, probe))) return { x, y }
+    }
+  }
 }
 
 /** The first place, row by row, where a card of this size fits (a new card, BS-20). */

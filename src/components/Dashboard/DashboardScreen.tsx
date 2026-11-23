@@ -2,15 +2,24 @@
 
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { m } from 'framer-motion'
+import { TriangleAlert } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { AddCardsDialog } from './AddCardsDialog'
 import { EditBar, SpeedDial } from './BoardActions'
+import { landingSize } from './catalog'
 import { BoardGrid } from './BoardGrid'
+import { cardBody, consumeAddFail, flagOf, healthFor, healthPill, reasonOf, retryBoard, retryCard, seedAddFail, seedCardsFromQuery, useCardStates } from './card-states'
+import type { CardView } from './MetricCard'
+import { MetricWindow } from './MetricWindow'
+import { NeedsAttention, type AttentionItem } from './NeedsAttention'
+import { seriesFor } from './series'
+import { SOURCE_NAMES } from './sources'
 import { PeriodMenu, SharedByAvatar } from './BoardHeader'
 import { METRICS } from './mock-data'
 import { SyncBanners } from './sync/SyncBanners'
 import { SyncButton } from './sync/SyncButton'
-import { appState, clock, type AppId } from './sync/sync-model'
+import { appState, clock, hoursSince, type AppId } from './sync/sync-model'
 import { getSyncSnapshot, onSyncEnd, reconnectApps, seedFromQuery, useSyncSnapshot } from './sync/sync-store'
 import { showSyncErrorToast, showSyncedToast } from './sync/sync-toasts'
 import type { BoardMenuHandlers } from './tabs/BoardMenus'
@@ -81,7 +90,10 @@ export function DashboardScreen() {
   // ?sync=<scenario> starts the dummy sync in a drawn state (04-sync-rules.md §9).
   useEffect(() => {
     const q = new URLSearchParams(window.location.search)
-    seedFromQuery({ sync: q.get('sync'), fail: q.get('fail'), role: q.get('role') })
+    seedFromQuery({ sync: q.get('sync'), fail: q.get('fail'), role: q.get('role'), connect: q.get('connect') })
+    // ?cards=<scenario> puts cards in the drawn states (05-cards-reading-rules.md §9).
+    seedCardsFromQuery(q.get('cards'))
+    seedAddFail(q.get('add'))
     const id = q.get('board')
     if (id) api.open(id)
     // Read once, on arrival.
@@ -97,7 +109,7 @@ export function DashboardScreen() {
   // ── Edit mode (BS-17 – BS-22) ──────────────────────────────────────────────
   // Per board: switching boards leaves it; a new board opens in it (TAB-36, BS-19, BS-21).
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [pickKey, setPickKey] = useState<{ n: number; pick: boolean }>({ n: 0, pick: false })
+  const [pickKey, setPickKey] = useState(0)
   // When the open board changes, edit mode ends unless it belongs to the board now open (a new
   // board). Adjusted while rendering, React's pattern for state that follows a prop.
   const [seenOpenId, setSeenOpenId] = useState(state.openId)
@@ -106,15 +118,15 @@ export function DashboardScreen() {
     if (editingId && editingId !== state.openId) setEditingId(null)
   }
   const editing = !!openBoard && editingId === openBoard.id && openBoard.access !== 'view' // BS-22
-  const startEditing = (pick: boolean) => {
+  const startEditing = () => {
     setEditingId(state.openId)
-    setPickKey((k) => ({ n: k.n + 1, pick }))
+    setPickKey((k) => k + 1)
   }
   const newBoard = () => {
     const id = api.createBoard()
     setRenamingId(id)
     setEditingId(id)
-    setPickKey((k) => ({ n: k.n + 1, pick: false }))
+    setPickKey((k) => k + 1)
   }
   // Esc leaves edit mode, like Done, when nothing else is open (BS-19).
   useEffect(() => {
@@ -177,29 +189,140 @@ export function DashboardScreen() {
     onLeave: (id) => { const board = state.boards[id]; if (board) setConfirm({ kind: 'leave', board }) },
   }
 
+  // ── Add cards (06-add-cards-rules.md) ──────────────────────────────────────
+  const [pickerOpen, setPickerOpen] = useState(false)
+  // New cards, ringed for 2 s and scrolled into view (AC-17). Added from the metric window to the
+  // board on screen, the ring waits until the window closes (AC-24).
+  const [landed, setLanded] = useState<{ boardId: string; ids: string[]; n: number } | null>(null)
+  const [landLater, setLandLater] = useState<{ boardId: string; ids: string[] } | null>(null)
+  const land = (boardId: string, ids: string[]) => setLanded((l) => ({ boardId, ids, n: (l?.n ?? 0) + 1 }))
+
+  // ── Cards while reading (05-cards-reading-rules.md) ──────────────────────────
+  const cardStates = useCardStates()
+  // The metric window: the card it was opened from, or a Needs attention row (CR-15, CR-33).
+  const [windowFor, setWindowFor] = useState<string | null>(null)
+
   if (!openBoard) return null
   const cards = api.cardActions(openBoard.id)
   const tabs = state.tabs.map((id) => state.boards[id]).filter(Boolean)
   const hidden = state.hidden.map((id) => state.boards[id]).filter(Boolean)
-  // The apps this board's cards read, and how many cards read each (SY-1, SY-6).
-  const uses: Partial<Record<AppId, number>> = {}
-  for (const c of openBoard.cards) {
-    const app = METRICS[c.metricId]?.source
-    if (app) uses[app] = (uses[app] ?? 0) + 1
+  // The apps this board's cards read, and how many cards read each (SY-1, SY-6). A card reading
+  // two apps counts for both (MER).
+  const appsOf = (metricId: string): AppId[] => {
+    const m0 = METRICS[metricId]
+    if (!m0 || m0.unmeasured) return []
+    return m0.alsoFrom ? [m0.source, m0.alsoFrom] : [m0.source]
   }
+  const uses: Partial<Record<AppId, number>> = {}
+  for (const c of openBoard.cards) for (const app of appsOf(c.metricId)) uses[app] = (uses[app] ?? 0) + 1
   const boardApps = Object.keys(uses) as AppId[]
-  // A card's look follows its app (SY-23, SY-24): a dot, a shimmer, or a first sync's skeleton.
-  const cardSync = (metricId: string) => {
-    const app = METRICS[metricId]?.source
-    if (!app) return undefined
-    const st = appState(sync.apps[app], sync.now)
+  const boardLoading = loadedId !== openBoard.id || cardStates.retrying.includes('*')
+  const midnight = new Date(sync.now)
+  midnight.setHours(0, 0, 0, 0)
+
+  // How a card reads (CR-18 – CR-29): its body, its app's dot, a shimmer while it syncs, its days
+  // and its health.
+  const cardView = (metricId: string): CardView | undefined => {
+    const metric = METRICS[metricId]
+    if (!metric) return undefined
+    const apps = appsOf(metricId).map((id) => ({ id, a: sync.apps[id], st: appState(sync.apps[id], sync.now) }))
+    // An app on its first sync: "No data yet" until it lands (CR-22, AC-20).
+    const firstLong = apps.some((x) => x.st === 'first')
+    const body = cardBody({
+      loading: boardLoading || cardStates.retrying.includes(metricId),
+      removed: cardStates.removed.includes(metricId),
+      locked: cardStates.locked.includes(metricId),
+      firstSyncRunning: firstLong,
+      couldntLoad: cardStates.couldntLoad.includes(metricId),
+      unmeasured: metric.unmeasured,
+      // On Today, an app that hasn't synced since yesterday has nothing for today (CR-26).
+      todayEmpty: openBoard.period === 'today' && apps.some((x) => x.a.syncedAt != null && x.a.syncedAt < midnight.getTime()),
+    })
+    // The worse dot; hovering it names the app(s) and how old the numbers are (CR-25).
+    const failed = apps.filter((x) => x.st === 'failed')
+    const behind = apps.filter((x) => x.st === 'behind')
+    const tips = failed.length
+      ? failed.map((x) => `${SOURCE_NAMES[x.id]} sync failed · numbers from ${clock(x.a.syncedAt ?? sync.now)}`)
+      : behind.map((x) => {
+          const h = hoursSince(x.a.syncedAt, sync.now)
+          return `${SOURCE_NAMES[x.id]} hasn’t synced in ${h} hour${h === 1 ? '' : 's'} · numbers from ${clock(x.a.syncedAt ?? sync.now)}`
+        })
+    const health = healthFor(metric, cardStates)
     return {
-      dot: st === 'failed' || st === 'behind' ? st : undefined,
-      syncing: st === 'syncing',
-      loading: st === 'first',
+      body,
+      dot: tips.length ? { tone: failed.length ? 'failed' : 'behind', tip: tips.join('; ') } : undefined,
+      syncing: apps.some((x) => x.st === 'syncing'),
+      series: seriesFor(metric, openBoard.period, { connectedOn: cardStates.newMeta && apps.some((x) => x.id === 'meta') ? new Date(2025, 10, 12) : undefined }),
+      health: healthPill(health, body),
+      targetPerDay: health?.by === 'target' ? health.perDay : undefined,
+      canEdit: openBoard.access !== 'view',
     }
   }
+
+  // Needs attention: every flagged metric on your tabs, red first, with the boards it's on (CR-31).
+  const attention: AttentionItem[] = []
+  for (const b of tabs) {
+    for (const c of b.cards) {
+      const metric = METRICS[c.metricId]
+      const health = metric && healthFor(metric, cardStates)
+      const tone = flagOf(health)
+      if (!metric || !health || !tone || cardStates.locked.includes(metric.id) || cardStates.removed.includes(metric.id)) continue
+      const seen = attention.find((x) => x.metricId === metric.id)
+      if (seen) {
+        if (!seen.boards.split(', ').includes(b.label)) seen.boards += `, ${b.label}`
+        continue
+      }
+      attention.push({ metricId: metric.id, label: metric.label, boards: b.label, reason: reasonOf(health), value: metric.value, tone })
+    }
+  }
+  attention.sort((a, b) => (a.tone === b.tone ? 0 : a.tone === 'red' ? -1 : 1))
+  const windowMetric = windowFor ? METRICS[windowFor] ?? null : null
+  const related = windowMetric
+    ? openBoard.cards.map((c) => METRICS[c.metricId]).filter((x) => x && x.id !== windowMetric.id && x.source === windowMetric.source)
+    : []
   const notReady = (what: string) => toast.info(`${what} isn’t ready yet`, { id: 'dashboard-not-ready' })
+
+  // The picker's Add: at the end, in the order picked, each at the size that suits it (AC-16 – AC-18).
+  const addPicked = (metricIds: string[]) => {
+    setPickerOpen(false)
+    const result = api.addCards(openBoard.id, metricIds.map((id) => ({ metricId: id, size: landingSize(METRICS[id]) })))
+    if (!result) return
+    land(openBoard.id, result.ids)
+    const message = metricIds.length === 1 ? `Added ${METRICS[metricIds[0]]?.label}` : `Added ${metricIds.length} cards`
+    toast(message, { duration: 6000, action: { label: 'Undo', onClick: result.undo } })
+  }
+
+  // Add to board from a metric's window (AC-22 – AC-25).
+  const addToBoard = (metricId: string, boardId: string) => {
+    const board = state.boards[boardId]
+    const metric = METRICS[metricId]
+    if (!board || !metric) return
+    if (consumeAddFail()) {
+      toast(`Couldn’t add ${metric.label} to ${board.label}.`, {
+        duration: 6000, icon: <TriangleAlert aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth className="text-[var(--dashboard-sync-failed)]" />,
+        action: { label: 'Try again', onClick: () => addToBoard(metricId, boardId) },
+      })
+      return
+    }
+    const result = api.addCards(boardId, [{ metricId: metric.id, size: landingSize(metric) }])
+    if (!result) return
+    if (boardId === openBoard.id) {
+      setLandLater({ boardId, ids: result.ids })
+      toast(`Added ${metric.label} to ${board.label}`, { duration: 6000, action: { label: 'Undo', onClick: result.undo } })
+      return
+    }
+    toast(`Added ${metric.label} to ${board.label}`, {
+      duration: 6000,
+      action: { label: 'Undo', onClick: result.undo },
+      // View: close the window and open that board on the new card (AC-24).
+      cancel: { label: 'View', onClick: () => { setWindowFor(null); api.open(boardId); land(boardId, result.ids) } },
+    })
+  }
+  const closeWindow = () => {
+    setWindowFor(null)
+    if (landLater) { land(landLater.boardId, landLater.ids); setLandLater(null) }
+  }
+  const editableBoards = tabs.filter((b) => b.access !== 'view')
 
   return (
     <div className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-[var(--neutral-50)] py-2.5 pr-2.5">
@@ -248,6 +371,8 @@ export function DashboardScreen() {
               {/* The period and sync button keep their place at the top right (TAB-16). */}
               <div className="ml-auto flex shrink-0 items-center gap-1">
                 {openBoard.sharedBy && <SharedByAvatar person={openBoard.sharedBy} />}
+                {/* Before the period: what needs attention across every board (CR-31). */}
+                <NeedsAttention items={attention} onOpenMetric={setWindowFor} />
                 <PeriodMenu
                   period={openBoard.period}
                   compare={openBoard.compare}
@@ -260,18 +385,32 @@ export function DashboardScreen() {
             <div id={panelId} role="tabpanel" aria-labelledby={`board-tab-${openBoard.id}`} className="mt-5 outline-none">
               {/* Above the cards, also in edit mode and with Data sources open (SY-13, SY-21). */}
               <div className="empty:hidden mb-4"><SyncBanners boardId={openBoard.id} apps={boardApps} /></div>
-              <BoardGrid
-                cardSync={cardSync}
-                key={openBoard.id}
-                cards={openBoard.cards}
-                editing={editing}
-                loading={loadedId !== openBoard.id}
-                onMoveTo={cards.moveTo}
-                onSetLayout={cards.setLayout}
-                onStep={cards.step}
-                onResize={cards.resize}
-                onRemove={cards.remove}
-              />
+              {cardStates.boardFailed && !cardStates.retrying.includes('*') ? (
+                // The board itself couldn't load; the header keeps working (CR-21).
+                <div data-board-failed className="flex min-h-[240px] flex-col items-center justify-center gap-3 rounded-xl text-[13px] leading-[17px] text-[var(--dashboard-figure)]">
+                  <p className="m-0">Couldn’t load this board.</p>
+                  {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the white Try again of Figma 170:47131 (1px #D3CEC8, 8px radius, 32px) */}
+                  <button type="button" onClick={retryBoard} className="h-8 cursor-pointer rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-3.5 text-[13px] text-[var(--dashboard-figure)] outline-none hover:bg-[var(--neutral-100)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]">
+                    Try again
+                  </button>
+                </div>
+              ) : (
+                <BoardGrid
+                  key={openBoard.id}
+                  cards={openBoard.cards}
+                  editing={editing}
+                  cardView={cardView}
+                  onOpenCard={setWindowFor}
+                  onRetryCard={retryCard}
+                  onRemoveEmpty={(id) => cards.removeWithUndo(id, METRICS[id]?.label ?? 'Card')}
+                  landed={landed?.boardId === openBoard.id ? landed : null}
+                  onMoveTo={cards.moveTo}
+                  onSetLayout={cards.setLayout}
+                  onStep={cards.step}
+                  onResize={cards.resize}
+                  onRemove={cards.remove}
+                />
+              )}
             </div>
           </div>
         </m.div>
@@ -279,10 +418,8 @@ export function DashboardScreen() {
         {/* The corner: the speed dial reading the board, the edit bar in edit mode (BS-17). */}
         {editing ? (
           <EditBar
-            key={`${openBoard.id}-${pickKey.n}`}
-            board={openBoard}
-            startPicking={pickKey.pick}
-            onAdd={cards.add}
+            key={`${openBoard.id}-${pickKey}`}
+            onAddCards={() => setPickerOpen(true)}
             onNewBoard={newBoard}
             onDone={() => setEditingId(null)}
           />
@@ -295,9 +432,9 @@ export function DashboardScreen() {
             deletedCount={state.deleted.length}
             onlyOne={state.tabs.length <= 1}
             startOpen={openBoard.cards.length <= 2} // BS-5
-            onAddCards={() => startEditing(true)}
+            onAddCards={() => setPickerOpen(true)} // reading mode stays on (AC-19)
             onNewBoard={newBoard}
-            onEditBoard={() => startEditing(false)}
+            onEditBoard={startEditing}
             onShare={() => notReady('Sharing')}
             onOpen={api.open}
             onShow={api.show}
@@ -308,6 +445,18 @@ export function DashboardScreen() {
         )}
       </section>
 
+      <MetricWindow
+        metric={windowMetric}
+        view={windowFor ? cardView(windowFor) : undefined}
+        periodId={openBoard.period}
+        related={related}
+        onClose={closeWindow}
+        onOpenMetric={setWindowFor}
+        onNotReady={notReady}
+        boards={editableBoards}
+        onAddToBoard={(boardId) => windowFor && addToBoard(windowFor, boardId)}
+      />
+      <AddCardsDialog open={pickerOpen} onBoard={openBoard.cards.map((c) => c.metricId)} onClose={() => setPickerOpen(false)} onAdd={addPicked} />
       <ManageTabsDialog
         open={manage.open}
         initialTab={manage.tab}

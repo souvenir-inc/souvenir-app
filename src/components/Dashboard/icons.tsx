@@ -21,8 +21,26 @@ const MONO: Partial<Record<MetricSource, string>> = {
   meta: '/dashboard/sources/meta.svg',
 }
 
+// Apps the catalog has no logo for show a letter tile (Figma "source (letter tile)", CR-22).
+const NO_LOGO = new Set<MetricSource>(['shipstation'])
+
+function LetterTile({ source, size, className }: { source: MetricSource; size: number; className?: string }) {
+  return (
+    <span
+      role="img"
+      aria-label={SOURCE_NAMES[source]}
+      title={SOURCE_NAMES[source]}
+      style={{ width: size, height: size, fontSize: size * 0.64 }}
+      className={cn('inline-flex shrink-0 items-center justify-center rounded-[3px] bg-[var(--dashboard-sync-bg)] font-medium leading-none text-[var(--dashboard-label)]', className)}
+    >
+      {SOURCE_NAMES[source][0]}
+    </span>
+  )
+}
+
 /** The data-source mark in a card's top-right corner (Figma "source (mono)", 14px). */
 export function SourceMark({ source, className }: { source: MetricSource; className?: string }) {
+  if (NO_LOGO.has(source)) return <LetterTile source={source} size={14} className={className} />
   const mono = MONO[source]
   const label = SOURCE_NAMES[source]
   return (
@@ -36,5 +54,6 @@ export function SourceMark({ source, className }: { source: MetricSource; classN
 
 /** The app's brand logo in colour (16px), as in Data sources (Figma 75:21037). */
 export function SourceLogo({ source, className }: { source: MetricSource; className?: string }) {
+  if (NO_LOGO.has(source)) return <LetterTile source={source} size={16} className={className} />
   return <Image src={`/dashboard/sources/${source}-color.svg`} alt="" width={16} height={16} unoptimized className={className} draggable={false} />
 }
