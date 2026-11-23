@@ -62,7 +62,7 @@ section designs (§8).
 
 ## 5. Data sources (6D-3)
 
-- **BS-11** The sync button opens **Data sources** under it (right edges aligned, 320 px wide).
+- **BS-11** *(Replaced by `04-sync-rules.md`, SY-1 – SY-12.)* The sync button opens **Data sources** under it (right edges aligned, 320 px wide).
   While it's open the button turns **white with a fine border** (`#D3CEC8`) and its icon goes
   near-black.
 - **BS-12** Contents: heading **"Data sources"** with a count chip (the number of apps); one row per

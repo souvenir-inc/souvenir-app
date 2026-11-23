@@ -1028,3 +1028,33 @@ body:has([data-dashboard-editbar]) [data-sonner-toaster][data-x-position="right"
   --offset-right: 20px !important;
   --offset-bottom: 76px !important;
 }
+
+/* Dashboard: a card number that will change while its app syncs (Figma 95:19181, SY-24). */
+.dashboard-shimmer-text {
+  background-image: linear-gradient(90deg, var(--dashboard-figure) 0%, var(--dashboard-figure) 35%, var(--dashboard-shimmer-light) 50%, var(--dashboard-figure) 65%, var(--dashboard-figure) 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: dashboard-shimmer-text 1.4s linear infinite;
+}
+@keyframes dashboard-shimmer-text { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@media (prefers-reduced-motion: reduce) { .dashboard-shimmer-text { animation: none; background-position: 50% 0; } }
+
+/* Dashboard: Data sources scrolls after 5 apps with a thin 3 px bar (Figma 101:19902, SY-6). */
+.dashboard-thin-scroll { scrollbar-width: thin; scrollbar-color: var(--dashboard-chart-compare) transparent; }
+.dashboard-thin-scroll::-webkit-scrollbar { width: 3px; }
+.dashboard-thin-scroll::-webkit-scrollbar-thumb { background: var(--dashboard-chart-compare); border-radius: 2px; }
+
+/* Dashboard: the sync error toast draws its own box (Figma 287:60863) on one line, wider than the
+   stock toast, so the stock frame stands aside and it grows leftwards from the right edge. */
+[data-sonner-toaster] [data-sonner-toast].kds-toast:has([data-sync-toast]) {
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  left: auto;
+  right: 0;
+  padding: 0;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none;
+}

@@ -59,6 +59,16 @@ export const METRICS: Record<string, Metric> = Object.fromEntries(
     { id: 'contribution-margin', label: 'Contribution margin', source: 'shopify', value: '$11.3k', change: up('14.6%'), trend: RISING, weekly: weekly([3200, 2900, 3100, 3400, 1600]), format: 'currency' },
     { id: 'gross-profit', label: 'Gross profit', source: 'shopify', value: '$26.9k', change: up('11.0%'), trend: RISING_2, weekly: weekly([7600, 7100, 7400, 7900, 4000]), format: 'currency' },
     { id: 'cogs', label: 'Cost of goods', source: 'shopify', value: '$15.0k', change: up('9.4%', 'negative'), trend: RISING, weekly: weekly([4300, 4000, 4100, 4400, 2200]), format: 'currency' },
+    // One metric per other app, for Founder overview (Figma "Up to date · many apps": 11 apps).
+    { id: 'google-ads-spend', label: 'Google Ads spend', source: 'google-ads', value: '$6.2k', change: up('4.1%'), trend: RISING, weekly: weekly([1700, 1600, 1650, 1800, 900]), format: 'currency' },
+    { id: 'tiktok-views', label: 'TikTok video views', source: 'tiktok', value: '412k', change: up('12.3%'), trend: RISING_2, weekly: weekly([98000, 104000, 110000, 120000, 60000]), format: 'number' },
+    { id: 'ga-sessions', label: 'Engaged sessions', source: 'google-analytics', value: '18.3k', change: up('3.2%'), trend: FLAT, weekly: weekly([4800, 4600, 4700, 4900, 2400]), format: 'number' },
+    { id: 'pinterest-saves', label: 'Pin saves', source: 'pinterest', value: '2.9k', change: up('6.7%'), trend: RISING, weekly: weekly([700, 690, 720, 780, 400]), format: 'number' },
+    { id: 'stripe-payouts', label: 'Stripe payouts', source: 'stripe', value: '$38.7k', change: up('9.9%'), trend: RISING, weekly: weekly([10400, 9800, 10100, 10900, 5500]), format: 'currency' },
+    { id: 'paypal-volume', label: 'PayPal volume', source: 'paypal', value: '$7.8k', change: down('1.6%', 'negative'), trend: FALLING, weekly: weekly([2100, 2050, 2000, 1950, 980]), format: 'currency' },
+    { id: 'zendesk-tickets', label: 'Support tickets', source: 'zendesk', value: '214', change: down('5.3%'), trend: FALLING, weekly: weekly([60, 57, 55, 52, 26]), format: 'number' },
+    { id: 'reddit-clicks', label: 'Reddit Ads clicks', source: 'reddit', value: '3.1k', change: up('2.4%'), trend: FLAT, weekly: weekly([780, 760, 790, 800, 400]), format: 'number' },
+    { id: 'hubspot-leads', label: 'New leads', source: 'hubspot', value: '486', change: up('7.5%'), trend: RISING_2, weekly: weekly([120, 118, 125, 131, 66]), format: 'number' },
     { id: 'shipping', label: 'Shipping costs', source: 'shopify', value: '$3.4k', change: down('2.8%'), trend: FALLING, weekly: weekly([980, 940, 950, 930, 470]), format: 'currency' },
   ] satisfies Metric[]).map((m) => [m.id, m]),
 )
@@ -75,7 +85,7 @@ const MAYA: Person = { name: "Maya Patel", initials: "MP", color: "var(--dashboa
 
 const BOARD_SPECS: Array<{ id: string; label: string; period?: string; access?: Board["access"]; sharedBy?: Person; cards: Spec }> = [
   { id: "store-overview", label: "Store overview", cards: [["aov", "sm"], ["orders", "lg"], ["new-customers", "sm"], ["roas", "sm"], ["ad-spend", "sm"], ["revenue", "md"], ["cpa", "sm"], ["ctr", "sm"], ["net-sales", "md"], ["discount-rate", "sm"], ["refund-rate", "sm"]] },
-  { id: "growth", label: "Growth", period: "30d", cards: [["sessions", "md"], ["conversion-rate", "sm"], ["returning-rate", "sm"], ["new-customers", "lg"], ["cac", "sm"], ["aov", "sm"], ["orders", "sm"], ["revenue", "sm"]] },
+  { id: "growth", label: "Growth", period: "30d", cards: [["sessions", "md"], ["conversion-rate", "sm"], ["returning-rate", "sm"], ["new-customers", "lg"], ["refund-rate", "sm"], ["aov", "sm"], ["orders", "sm"], ["revenue", "sm"]] },
   { id: "ads", label: "Ads", cards: [["ad-spend", "lg"], ["roas", "sm"], ["cpa", "sm"], ["ctr", "sm"], ["cpm", "sm"], ["impressions", "md"], ["clicks", "md"]] },
   { id: "contribution-margin", label: "Contribution margin", cards: [["contribution-margin", "lg"], ["gross-profit", "sm"], ["net-sales", "sm"], ["cogs", "sm"], ["shipping", "sm"], ["revenue", "md"], ["discount-rate", "sm"], ["refund-rate", "sm"]] },
   { id: "weekly-check-in", label: "Weekly check-in", cards: [["revenue", "md"], ["orders", "sm"], ["aov", "sm"], ["net-sales", "md"], ["roas", "sm"], ["ad-spend", "sm"]] },
@@ -85,7 +95,8 @@ const BOARD_SPECS: Array<{ id: string; label: string; period?: string; access?: 
   { id: "q4-plan", label: "Q4 plan", access: "view", sharedBy: MAYA, cards: [["revenue", "lg"], ["ad-spend", "sm"], ["roas", "sm"], ["new-customers", "sm"], ["net-sales", "sm"]] },
   { id: "returns", label: "Returns", cards: [["refund-rate", "md"], ["orders", "sm"], ["shipping", "sm"]] },
   { id: "inventory", label: "Inventory", cards: [["cogs", "md"], ["orders", "sm"], ["gross-profit", "sm"]] },
-  { id: "founder-overview", label: "Founder overview", cards: [["revenue", "md"], ["contribution-margin", "md"], ["orders", "sm"], ["new-customers", "sm"], ["roas", "sm"], ["cac", "sm"]] },
+  // Reads all eleven apps (Figma "Up to date · many apps, the list scrolls").
+  { id: "founder-overview", label: "Founder overview", cards: [["revenue", "md"], ["orders", "sm"], ["roas", "sm"], ["ad-spend", "sm"], ["google-ads-spend", "sm"], ["tiktok-views", "sm"], ["ga-sessions", "md"], ["pinterest-saves", "sm"], ["stripe-payouts", "sm"], ["paypal-volume", "sm"], ["zendesk-tickets", "sm"], ["reddit-clicks", "sm"], ["hubspot-leads", "sm"]] },
   // Hidden
   { id: "holiday-2025", label: "Holiday 2025", cards: [["revenue", "lg"], ["orders", "sm"], ["discount-rate", "sm"]] },
   { id: "creative-tests", label: "Creative tests", cards: [["ctr", "md"], ["cpm", "sm"], ["impressions", "sm"]] },
@@ -130,12 +141,3 @@ export const COMPARISONS: Period[] = [
   { id: 'none', label: 'No comparison' },
 ]
 
-// ── Data sources (Figma 6D-3) ────────────────────────────────────────────────
-// The apps cards read from, with when each last synced. All fresh in the dummy data.
-
-export type SyncStatus = 'fresh' | 'behind' | 'failed'
-
-export const SOURCE_SYNC: Record<'shopify' | 'meta', { minutesAgo: number; status: SyncStatus }> = {
-  shopify: { minutesAgo: 2, status: 'fresh' },
-  meta: { minutesAgo: 3, status: 'fresh' },
-}

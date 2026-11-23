@@ -76,9 +76,17 @@ interface BoardGridProps {
   editing?: boolean
   /** The board was just opened: names show, figures and charts shimmer (TAB-6). */
   loading?: boolean
+  /** Each card's sync look: a dot, a shimmer, or the skeleton of a first sync (SY-23, SY-24). */
+  cardSync?: (metricId: string) => CardSync | undefined
 }
 
-export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRemove, editing = false, loading = false }: BoardGridProps) {
+export interface CardSync {
+  dot?: 'failed' | 'behind'
+  syncing?: boolean
+  loading?: boolean
+}
+
+export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRemove, editing = false, loading = false, cardSync }: BoardGridProps) {
   const reduceMotion = useReducedMotion()
   const gridRef = useRef<HTMLUListElement>(null)
   const [drag, setDrag] = useState<DragView | null>(null)
@@ -294,7 +302,9 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
                   size={card.size}
                   dragging={resizingId === card.metricId}
                   editing={editing}
-                  loading={loading}
+                  loading={loading || !!cardSync?.(card.metricId)?.loading}
+                  syncDot={cardSync?.(card.metricId)?.dot}
+                  syncing={!!cardSync?.(card.metricId)?.syncing}
                   index={i}
                   onRemove={() => onRemove(card.metricId)}
                   grip={editing ? gripFor(card) : undefined}

@@ -6,6 +6,7 @@ import { m } from "framer-motion";
 import { CancelOneIcon } from "@strange-huge/icons";
 import { LeftSidebar } from "./LeftSidebar";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { OfflineBar } from "@/components/Dashboard/sync/OfflineBar";
 import { RightSidebar } from "./RightSidebar";
 import { HighlightSidebar } from "./HighlightSidebar";
 import { TopBar } from "./TopBar";
@@ -174,13 +175,16 @@ export function AppLayout({
   // or floating chat tools.
   if (isTemplatePage || isSchedulesPage || isDashboardPage) {
     return (
+      // The dashboard's offline bar runs across the top of the window, above the whole app (SY-33).
+      <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100svh', backgroundColor: 'var(--neutral-white)' }}>
+      {isDashboardPage && <OfflineBar />}
       <div
         style={{
           display:         'flex',
           alignItems:      'stretch',
           width:           '100%',
-          height:          '100svh',
-          backgroundColor: 'var(--neutral-white)',
+          flex:            1,
+          minHeight:       0,
         }}
       >
         <ErrorBoundary variant="region" label="Sidebar">
@@ -198,6 +202,7 @@ export function AppLayout({
           <ErrorBoundary>{children}</ErrorBoundary>
         </main>
         <AppDialogs />
+      </div>
       </div>
     )
   }

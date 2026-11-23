@@ -930,6 +930,26 @@
   --dashboard-tag-bg-muted:    rgba(38, 33, 30, 0.04);  /* Tag / Shared, Muted (Hidden list) */
   --dashboard-row-hover:       rgba(38, 33, 30, 0.04);  /* a Manage tabs row on hover or with its ⋯ open */
   --dashboard-avatar-violet:   #8B6CC9;                 /* the owner avatar in a shared board's menu */
+  /* Sync (Figma 95:18703) */
+  --dashboard-sync-fresh:      var(--dashboard-positive);  /* green dot, synced banner icon */
+  --dashboard-sync-offline:    var(--dashboard-faint);     /* grey dot: can't check now */
+  --dashboard-spinner-track:   #DDD7D1;
+  --dashboard-spinner-ink:     var(--neutral-700);
+  --dashboard-shimmer-light:   #C9C2BC;                    /* the light band across a syncing number */
+  --dashboard-banner-failed-bg:     #FDEFED;
+  --dashboard-banner-failed-border: #F2CBC6;
+  --dashboard-banner-behind-bg:     #FDF4E7;
+  --dashboard-banner-behind-border: #F1D9B5;
+  --dashboard-banner-syncing-bg:    #F5F2EF;
+  --dashboard-banner-syncing-border: var(--neutral-200);
+  --dashboard-banner-synced-bg:     #EDF7F0;
+  --dashboard-banner-synced-border: #C9E7D3;
+  --dashboard-toast-border:    #E7E2DC;
+  --dashboard-toast-shadow:    0px 1px 2px 0px rgba(38, 33, 30, 0.06), 0px 8px 24px 0px rgba(38, 33, 30, 0.12);
+  --dashboard-window-bar-bg:   var(--neutral-900);         /* offline bar above the window */
+  --dashboard-window-bar-text: #F7F2ED;
+  --dashboard-window-bar-muted: #C9C2BC;
+  --dashboard-window-bar-online: var(--dashboard-positive);
 }
 
 :root[data-theme="dark"] {
@@ -952,6 +972,19 @@
   --dashboard-error-border:    rgba(220, 38, 38, 0.4);
   --dashboard-sync-behind:     #F59E0B;
   --dashboard-sync-failed:     var(--danger-700);
+  --dashboard-spinner-track:   #444444;
+  --dashboard-shimmer-light:   #6B6B6B;
+  --dashboard-banner-failed-bg:     rgba(220, 38, 38, 0.12);
+  --dashboard-banner-failed-border: rgba(220, 38, 38, 0.35);
+  --dashboard-banner-behind-bg:     rgba(245, 158, 11, 0.12);
+  --dashboard-banner-behind-border: rgba(245, 158, 11, 0.35);
+  --dashboard-banner-syncing-bg:    #222222;
+  --dashboard-banner-syncing-border: #383838;
+  --dashboard-banner-synced-bg:     rgba(34, 197, 94, 0.12);
+  --dashboard-banner-synced-border: rgba(34, 197, 94, 0.35);
+  --dashboard-toast-border:    #383838;
+  --dashboard-toast-shadow:    0px 8px 24px 0px rgba(0, 0, 0, 0.5);
+  --dashboard-window-bar-bg:   #000000;
   --dashboard-popover-shadow:  0px 12px 28px -6px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px rgba(255, 255, 255, 0.1);
   --dashboard-control-shadow:  0px 0px 0px 1px rgba(255, 255, 255, 0.12);
   --dashboard-drop-slot:       rgba(13, 110, 178, 0.16);

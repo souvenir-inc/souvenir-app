@@ -1,7 +1,10 @@
 // Dashboard data model. Server-shaped data (Metric) is kept apart from the board layout (BoardCard),
 // so a metric can be shown at any size and the layout can be saved on its own later.
 
-export type MetricSource = 'shopify' | 'meta'
+/** The apps cards read from (Figma 95:18703 lists eleven). */
+export type MetricSource =
+  | 'shopify' | 'meta' | 'google-ads' | 'tiktok' | 'google-analytics' | 'pinterest'
+  | 'stripe' | 'paypal' | 'zendesk' | 'reddit' | 'hubspot'
 
 /** sm = 1×1 figure only · md = 2×1 figure + sparkline · lg = 2×2 figure + weekly bars. */
 export type CardSize = 'sm' | 'md' | 'lg'

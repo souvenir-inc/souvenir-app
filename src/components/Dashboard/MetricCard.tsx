@@ -35,10 +35,14 @@ interface MetricCardProps {
   loading?: boolean
   /** Place on the board; the numbers fade in card by card. */
   index?: number
+  /** Its app failed or is behind: a dot after the label (SY-23). */
+  syncDot?: 'failed' | 'behind'
+  /** Its app is syncing: the number shimmers (SY-24). */
+  syncing?: boolean
   className?: string
 }
 
-export function MetricCard({ metric, size, dragging = false, editing = false, onRemove, grip, loading = false, index = 0, className }: MetricCardProps) {
+export function MetricCard({ metric, size, dragging = false, editing = false, onRemove, grip, loading = false, index = 0, syncDot, syncing = false, className }: MetricCardProps) {
   const reduceMotion = useReducedMotion()
   const chartBox = size === 'md' ? 'absolute bottom-4 left-1/2 right-4 top-[52px]' : 'absolute bottom-4 left-4 right-4 top-24'
   return (
@@ -51,8 +55,20 @@ export function MetricCard({ metric, size, dragging = false, editing = false, on
         className,
       )}
     >
-      <h3 className="absolute left-4 right-12 top-4 m-0 truncate text-[13px] font-medium leading-5 text-[var(--dashboard-label)]">
-        {metric.label}
+      <h3 className="absolute left-4 right-12 top-4 m-0 flex min-w-0 items-center gap-1.5 text-[13px] font-medium leading-5 text-[var(--dashboard-label)]">
+        <span className="truncate">{metric.label}</span>
+        {/* Its app failed (red) or is behind (amber), in the sync button's colour (SY-23). */}
+        {syncDot && (
+          <span
+            data-card-sync-dot={syncDot}
+            role="img"
+            aria-label={syncDot === 'failed' ? 'Its app failed to sync' : 'Its app is behind'}
+            className={cn(
+              'size-[7px] shrink-0 rounded-full shadow-[0_0_0_1.5px_var(--dashboard-card-bg)]',
+              syncDot === 'failed' ? 'bg-[var(--dashboard-sync-failed)]' : 'bg-[var(--dashboard-sync-behind)]',
+            )}
+          />
+        )}
       </h3>
 
       {/* Top right: the legend (large only), then the source mark, or the × in edit mode. */}
@@ -95,7 +111,7 @@ export function MetricCard({ metric, size, dragging = false, editing = false, on
           animate={{ opacity: 1 }}
           transition={{ duration: 0.25, delay: Math.min(index, 12) * 0.04 }}
         >
-          <Figure metric={metric} className={size === 'lg' ? 'top-11' : 'bottom-4'} />
+          <Figure metric={metric} syncing={syncing} className={size === 'lg' ? 'top-11' : 'bottom-4'} />
           {size === 'md' && <LazySparkline trend={metric.trend} className={cn(chartBox, '!w-auto')} />}
           {size === 'lg' && <LazyWeeklyBars metric={metric} className={cn(chartBox, '!w-auto')} />}
         </m.div>
@@ -130,12 +146,12 @@ export function MetricCard({ metric, size, dragging = false, editing = false, on
   )
 }
 
-function Figure({ metric, className }: { metric: Metric; className?: string }) {
+function Figure({ metric, syncing, className }: { metric: Metric; syncing: boolean; className?: string }) {
   const { change } = metric
   const Arrow = change.direction === 'up' ? ArrowUp : ArrowDown
   return (
     <div className={cn('absolute left-4 flex items-baseline gap-2', className)}>
-      <p className="m-0 whitespace-nowrap text-[28px] font-medium leading-8 tracking-[-0.56px] text-[var(--dashboard-figure)]">
+      <p data-syncing={syncing || undefined} className={cn('m-0 whitespace-nowrap text-[28px] font-medium leading-8 tracking-[-0.56px] text-[var(--dashboard-figure)]', syncing && 'dashboard-shimmer-text')}>
         {metric.value}
       </p>
       <p

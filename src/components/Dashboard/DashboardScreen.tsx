@@ -6,9 +6,13 @@ import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { EditBar, SpeedDial } from './BoardActions'
 import { BoardGrid } from './BoardGrid'
-import { PeriodMenu, SharedByAvatar, SyncStatusButton, type SourceState } from './BoardHeader'
-import { METRICS, SOURCE_SYNC } from './mock-data'
-import type { MetricSource } from './types'
+import { PeriodMenu, SharedByAvatar } from './BoardHeader'
+import { METRICS } from './mock-data'
+import { SyncBanners } from './sync/SyncBanners'
+import { SyncButton } from './sync/SyncButton'
+import { appState, clock, type AppId } from './sync/sync-model'
+import { getSyncSnapshot, onSyncEnd, reconnectApps, seedFromQuery, useSyncSnapshot } from './sync/sync-store'
+import { showSyncErrorToast, showSyncedToast } from './sync/sync-toasts'
 import type { BoardMenuHandlers } from './tabs/BoardMenus'
 import { ConfirmDialogs, type PendingConfirm } from './tabs/ConfirmDialogs'
 import { ManageTabsDialog, type ManageTab } from './tabs/ManageTabsDialog'
@@ -16,7 +20,7 @@ import { TabRow } from './tabs/TabRow'
 import { useDashboard } from './tabs/use-dashboard'
 
 // Dashboard board panel (Figma wRr8cpImqSXbIgk0XhNj7a: base 17:889, tabs 136:20976, Manage tabs
-// 415:64464). Rules: docs-v2/dashboard/01-tabs-rules.md. AppLayout renders /dashboard bare (like
+// 415:64464, sync 95:18703). Rules: docs-v2/dashboard/01 – 04. AppLayout renders /dashboard bare (like
 // /schedules), so this builds its own panel: 16px radius, hairline border, warm fill. Inside, a
 // 1200px column: the header row, then the open board's cards 20px below it.
 
@@ -74,8 +78,11 @@ export function DashboardScreen() {
   }, [state.openId, loadedId])
 
   // /dashboard?board=<id> opens that board (TAB-61); the URL follows the open board.
+  // ?sync=<scenario> starts the dummy sync in a drawn state (04-sync-rules.md §9).
   useEffect(() => {
-    const id = new URLSearchParams(window.location.search).get('board')
+    const q = new URLSearchParams(window.location.search)
+    seedFromQuery({ sync: q.get('sync'), fail: q.get('fail'), role: q.get('role') })
+    const id = q.get('board')
     if (id) api.open(id)
     // Read once, on arrival.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -123,27 +130,41 @@ export function DashboardScreen() {
     return () => window.removeEventListener('keydown', onKey)
   }, [editing])
 
-  // ── Data sources (BS-11 – BS-16) ──────────────────────────────────────────
-  // When each app last synced; the times tick so "2 min ago" stays true.
-  const [syncedAt, setSyncedAt] = useState(() => {
-    const t = Date.now()
-    return Object.fromEntries(Object.entries(SOURCE_SYNC).map(([k, v]) => [k, t - v.minutesAgo * 60_000])) as Record<MetricSource, number>
-  })
-  const [now, setNow] = useState(() => Date.now())
-  const [refreshing, setRefreshing] = useState(false)
-  useEffect(() => {
-    const t = window.setInterval(() => setNow(Date.now()), 30_000)
-    return () => window.clearInterval(t)
-  }, [])
-  const refresh = () => {
-    setRefreshing(true)
-    window.setTimeout(() => {
-      const t = Date.now()
-      setSyncedAt((prev) => Object.fromEntries(Object.keys(prev).map((k) => [k, t])) as Record<MetricSource, number>)
-      setNow(t)
-      setRefreshing(false)
-    }, 1200)
+  // ── Sync (04-sync-rules.md) ───────────────────────────────────────────────
+  const sync = useSyncSnapshot()
+  const [sourcesOpen, setSourcesOpen] = useState(false)
+  // Back online: the board fetches its numbers again (SY-34). Adjusted while rendering.
+  const [seenBackOnline, setSeenBackOnline] = useState(sync.backOnlineAt)
+  if (seenBackOnline !== sync.backOnlineAt) {
+    setSeenBackOnline(sync.backOnlineAt)
+    if (sync.backOnlineAt) setLoadedId('')
   }
+  // How a sync ended, as a toast when the board on screen doesn't already say so (SY-29, SY-30).
+  // The listener reads the latest board and list through a ref, set after each render.
+  const toastCtx = useRef({ boardId: '', apps: [] as AppId[], sourcesOpen: false, isAdmin: true })
+  useEffect(() => {
+    return onSyncEnd((e) => {
+      const ctx = toastCtx.current
+      const reconnect = (ids: AppId[]) => (ctx.isAdmin ? () => { reconnectApps(ids, ctx.boardId) } : null)
+      if (e.kind === 'refresh') {
+        // With Data sources open the list already shows it (SY-28).
+        if (e.failed.length && !ctx.sourcesOpen) showSyncErrorToast({ apps: e.failed, rest: 'Other apps synced', onReconnect: reconnect(e.failed) })
+        return
+      }
+      // Boards that read the app show its banner instead (SY-30).
+      if ([...e.ok, ...e.failed].some((id) => ctx.apps.includes(id))) return
+      if (e.failed.length) {
+        const at = e.failed.map((id) => getSyncSnapshot().apps[id]?.syncedAt).find((t) => t != null)
+        showSyncErrorToast({ apps: e.failed, rest: at ? `Data from ${clock(at)}` : 'No data yet', onReconnect: reconnect(e.failed) })
+      }
+      if (e.ok.length) showSyncedToast(e.ok)
+    })
+    // The listener lives as long as the screen; it reads the moment's values from toastCtx.
+  }, [])
+  useEffect(() => {
+    const apps = [...new Set((openBoard?.cards ?? []).map((c) => METRICS[c.metricId]?.source).filter(Boolean))] as AppId[]
+    toastCtx.current = { boardId: openBoard?.id ?? '', apps, sourcesOpen, isAdmin: sync.isAdmin }
+  })
 
   const handlers: BoardMenuHandlers = {
     onRename: (id) => setRenamingId(id),
@@ -160,9 +181,24 @@ export function DashboardScreen() {
   const cards = api.cardActions(openBoard.id)
   const tabs = state.tabs.map((id) => state.boards[id]).filter(Boolean)
   const hidden = state.hidden.map((id) => state.boards[id]).filter(Boolean)
-  // The apps this board's cards use, and only those (BS-15).
-  const boardSources: SourceState[] = [...new Set(openBoard.cards.map((c) => METRICS[c.metricId]?.source).filter(Boolean))]
-    .map((source) => ({ source: source!, syncedAt: syncedAt[source!], status: SOURCE_SYNC[source!].status }))
+  // The apps this board's cards read, and how many cards read each (SY-1, SY-6).
+  const uses: Partial<Record<AppId, number>> = {}
+  for (const c of openBoard.cards) {
+    const app = METRICS[c.metricId]?.source
+    if (app) uses[app] = (uses[app] ?? 0) + 1
+  }
+  const boardApps = Object.keys(uses) as AppId[]
+  // A card's look follows its app (SY-23, SY-24): a dot, a shimmer, or a first sync's skeleton.
+  const cardSync = (metricId: string) => {
+    const app = METRICS[metricId]?.source
+    if (!app) return undefined
+    const st = appState(sync.apps[app], sync.now)
+    return {
+      dot: st === 'failed' || st === 'behind' ? st : undefined,
+      syncing: st === 'syncing',
+      loading: st === 'first',
+    }
+  }
   const notReady = (what: string) => toast.info(`${what} isn’t ready yet`, { id: 'dashboard-not-ready' })
 
   return (
@@ -217,12 +253,15 @@ export function DashboardScreen() {
                   compare={openBoard.compare}
                   onChange={(dates) => api.setDates(openBoard.id, dates)}
                 />
-                <SyncStatusButton sources={boardSources} now={now} refreshing={refreshing} onRefresh={refresh} />
+                <SyncButton boardId={openBoard.id} apps={boardApps} uses={uses} open={sourcesOpen} onOpenChange={setSourcesOpen} />
               </div>
             </div>
 
             <div id={panelId} role="tabpanel" aria-labelledby={`board-tab-${openBoard.id}`} className="mt-5 outline-none">
+              {/* Above the cards, also in edit mode and with Data sources open (SY-13, SY-21). */}
+              <div className="empty:hidden mb-4"><SyncBanners boardId={openBoard.id} apps={boardApps} /></div>
               <BoardGrid
+                cardSync={cardSync}
                 key={openBoard.id}
                 cards={openBoard.cards}
                 editing={editing}
