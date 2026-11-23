@@ -11,6 +11,8 @@ import type { Health, Metric } from './types'
 // ── Body state (CR-18) ─────────────────────────────────────────────────────────
 
 export type CardBody =
+  /** Its app isn't connected: the card waits for it (08 NB-13). */
+  | 'needs-app'
   | 'loading' | 'removed' | 'locked' | 'no-data-yet' | 'couldnt-load' | 'no-data'
   /** Today, and its app hasn't synced today: "—" and "No data yet" (CR-26). */
   | 'today-empty'
@@ -18,6 +20,7 @@ export type CardBody =
 
 export interface BodyFacts {
   loading?: boolean
+  needsApp?: boolean
   removed?: boolean
   locked?: boolean
   /** Its app is on a first sync that has run a while (a fresh first sync shows the skeleton). */
@@ -30,6 +33,7 @@ export interface BodyFacts {
 /** One body state per card, in this order: loading, removed, locked, no data yet, couldn't load, no data, then the numbers. */
 export function cardBody(f: BodyFacts): CardBody {
   if (f.loading) return 'loading'
+  if (f.needsApp) return 'needs-app'
   if (f.removed) return 'removed'
   if (f.locked) return 'locked'
   if (f.firstSyncRunning) return 'no-data-yet'

@@ -8,6 +8,7 @@ import { DashboardSquareOneIcon } from '@strange-huge/icons'
 import { EmptyState } from '@/components/ui'
 import { bestIndex, edgeScrollSpeed } from './card-placement'
 import { dims, place, sameLayout, sizeFromGrip, sizeOf, toItems, withItems, type Item } from './grid-layout'
+import { LandingSlot, RemoveBadge, ResizeArc } from './EditChrome'
 import { MetricCard, SIZE_LABEL, type CardView, type GripProps } from './MetricCard'
 import { METRICS } from './mock-data'
 import type { BoardCard, CardSize } from './types'
@@ -88,6 +89,10 @@ interface BoardGridProps {
   onOpenCard?: (metricId: string) => void
   /** Try again on a card that couldn't load (CR-20). */
   onRetryCard?: (metricId: string) => void
+  /** Edit mode: a click (a press that doesn't move) or Enter opens the card's settings (10 CS-1). */
+  onOpenSettings?: (metricId: string) => void
+  /** What an empty board shows to someone who can edit it (08 NB-17); the plain empty state otherwise. */
+  empty?: React.ReactNode
   /** Remove card on an empty card while reading, with Undo (CR-22). */
   onRemoveEmpty?: (metricId: string) => void
   /** Cards just added: a soft ring for 2 s, scrolled into view (06 AC-17). `n` changes on every landing. */
@@ -96,7 +101,7 @@ interface BoardGridProps {
 
 const RING_MS = 2000
 
-export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRemove, editing = false, cardView, onOpenCard, onRetryCard, onRemoveEmpty, landed }: BoardGridProps) {
+export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRemove, editing = false, cardView, onOpenCard, onRetryCard, onRemoveEmpty, landed, empty, onOpenSettings }: BoardGridProps) {
   const reduceMotion = useReducedMotion()
   // New cards: ringed, then the ring fades after 2 s (AC-17). Adjusted while rendering when a new
   // landing arrives, React's pattern for state that follows a prop.
@@ -122,7 +127,9 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
   }, [ring?.on, ring?.n, ring?.ids, reduceMotion])
   const gridRef = useRef<HTMLUListElement>(null)
   const [drag, setDrag] = useState<DragView | null>(null)
-  const [resizingId, setResizingId] = useState<string | null>(null)
+  // A resize (Figma 2.7): the card's frame follows the pointer freely while its place on the board
+  // shows the landing slot at the snapped size; on release the frame glides into the slot.
+  const [resizing, setResizing] = useState<ResizeView | null>(null)
   const [announce, setAnnounce] = useState('')
   // The order as last rendered; pointer handlers read it between renders.
   const orderRef = useRef<{ id: string; size: CardSize }[]>([])
@@ -213,7 +220,8 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
       window.removeEventListener('pointercancel', cancel)
       window.removeEventListener('keydown', key, true)
       cancelAnimationFrame(frame)
-      if (!active) return
+      // A press that never moved is a click: the card's settings (10 CS-1).
+      if (!active) { if (commit) onOpenSettings?.(id); return }
       if (!commit) onSetLayout(startCards) // Esc: everything back where it was (BS-26)
       // Settle: glide the copy into the slot, then drop it (BS-26).
       requestAnimationFrame(() => {
@@ -243,26 +251,61 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
       if (!grid) return
       // The size follows how far the grip has moved from the press, not where the pointer is, so
       // a card in the right-hand column can grow too: it grows leftwards (sizeFromGrip).
+      const id = card.metricId
+      const li = grid.querySelector<HTMLElement>(`[data-card-id="${CSS.escape(id)}"]`)
+      if (!li) return
       const start = { x: e.clientX, y: e.clientY }
       const startSize = card.size
+      const startW = dims(startSize).w
+      const box = li.getBoundingClientRect()
+      const g = grid.getBoundingClientRect()
       const columns = getComputedStyle(grid).gridTemplateColumns.split(' ').length
-      const colWidth = (grid.getBoundingClientRect().width - GAP * (columns - 1)) / columns
+      const colWidth = (g.width - GAP * (columns - 1)) / columns
       let current = card.size
-      setResizingId(card.metricId)
+      let pointer = start
+      let frame = 0
+      // The free frame: from the press, as far as the pointer has gone. A one-column card grows
+      // either way (leftwards from the right edge); a wider one grows or shrinks to the right.
+      const frameAt = (): ResizeView => {
+        const dx = pointer.x - start.x
+        const dy = pointer.y - start.y
+        const width = clamp(box.width + (startW === 1 ? Math.abs(dx) : dx), colWidth * 0.75, g.width)
+        const height = clamp(box.height + dy, ROW * 0.75, ROW * 2 + GAP + ROW * 0.25)
+        const left = clamp(startW === 1 && dx < 0 ? box.right - width : box.left, g.left, g.right - width)
+        return { id, size: current, left, top: box.top, width, height }
+      }
+      setResizing(frameAt())
       const move = (ev: PointerEvent) => {
-        const next = sizeFromGrip(startSize, ev.clientX - start.x, ev.clientY - start.y, colWidth, ROW)
-        if (next !== current) { current = next; onResize(card.metricId, next) }
+        pointer = { x: ev.clientX, y: ev.clientY }
+        const next = sizeFromGrip(startSize, pointer.x - start.x, pointer.y - start.y, colWidth, ROW)
+        if (next !== current) { current = next; onResize(id, next) }
+        // One update a frame keeps it smooth on fast pointers.
+        if (!frame) frame = requestAnimationFrame(() => { frame = 0; setResizing(frameAt()) })
       }
-      const end = () => {
+      const end = (commit: boolean) => {
         window.removeEventListener('pointermove', move)
-        window.removeEventListener('pointerup', end)
-        window.removeEventListener('pointercancel', end)
-        setResizingId(null)
-        setAnnounce(`${METRICS[card.metricId]?.label ?? 'Card'} is ${SIZE_LABEL[current]}`)
+        window.removeEventListener('pointerup', up)
+        window.removeEventListener('pointercancel', cancel)
+        window.removeEventListener('keydown', key, true)
+        cancelAnimationFrame(frame)
+        if (!commit && current !== startSize) { current = startSize; onResize(id, startSize) } // Esc: as it was
+        setResizing((r) => (r ? { ...r, size: current } : r))
+        // Settle: glide the frame into its slot, then drop it (as a moved card does, BS-26).
+        requestAnimationFrame(() => {
+          const slot = grid.querySelector<HTMLElement>(`[data-card-id="${CSS.escape(id)}"]`)?.getBoundingClientRect()
+          if (!slot || reduceMotion) { setResizing(null); return }
+          setResizing((r) => (r ? { ...r, settleAt: { left: slot.left, top: slot.top, width: slot.width, height: slot.height } } : r))
+          window.setTimeout(() => setResizing(null), DROP_MS + 40)
+        })
+        setAnnounce(`${METRICS[id]?.label ?? 'Card'} is ${SIZE_LABEL[current]}`)
       }
+      const up = () => end(true)
+      const cancel = () => end(false)
+      const key = (ev: KeyboardEvent) => { if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); end(false) } }
       window.addEventListener('pointermove', move)
-      window.addEventListener('pointerup', end)
-      window.addEventListener('pointercancel', end)
+      window.addEventListener('pointerup', up)
+      window.addEventListener('pointercancel', cancel)
+      window.addEventListener('keydown', key, true)
     },
     onKeyDown: (e) => {
       if (!e.key.startsWith('Arrow')) return
@@ -274,6 +317,7 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
   })
 
   if (cards.length === 0) {
+    if (empty) return <>{empty}</>
     return (
       <EmptyState
         icon={<DashboardSquareOneIcon size={20} />}
@@ -285,6 +329,7 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
   }
 
   const dragged = drag ? METRICS[drag.id] : null
+  const resized = resizing ? METRICS[resizing.id] : null
   return (
     <div className="@container">
       {/* 4 design columns from 960 px of board (about 1100 px of window, CR-35); 2 below, filling gaps
@@ -307,13 +352,16 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
               onPointerDown={(e) => startMove(e, card)}
               // Edit mode: each card is a keyboard stop. ⌥← / ⌥→ move it; Delete removes it.
               tabIndex={editing ? 0 : undefined}
-              aria-keyshortcuts={editing ? 'Alt+ArrowLeft Alt+ArrowRight Delete' : undefined}
+              aria-keyshortcuts={editing ? 'Enter Alt+ArrowLeft Alt+ArrowRight Delete' : undefined}
               onKeyDown={editing ? (e) => {
                 if (e.target !== e.currentTarget) return
                 if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
                   e.preventDefault()
                   const by = e.key === 'ArrowLeft' ? -1 : 1
                   if (i + by >= 0 && i + by < cards.length) { onStep(card.metricId, by); setAnnounce(`${metric.label} moved to place ${i + by + 1} of ${cards.length}`) }
+                } else if (e.key === 'Enter') {
+                  e.preventDefault()
+                  onOpenSettings?.(card.metricId)
                 } else if (e.key === 'Delete' || e.key === 'Backspace') {
                   e.preventDefault()
                   onRemove(card.metricId)
@@ -324,25 +372,33 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
                 SPAN[card.size],
                 '@min-[60rem]:[grid-column:var(--gc)]! @min-[60rem]:[grid-row:var(--gr)]!',
                 editing && 'touch-none cursor-grab outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]',
-                resizingId === card.metricId && 'z-20',
+                resizing?.id === card.metricId && 'z-20',
               )}
             >
-              {isSlot ? (
+              {resizing?.id === card.metricId ? (
+                // Where the resized card will land, named (Figma 2.7).
+                <LandingSlot size={card.size} />
+              ) : isSlot ? (
                 // The drop slot: where the card will land (BS-24).
                 <div aria-hidden className="size-full rounded-xl border-2 border-dashed border-[var(--dashboard-drop-line)] bg-[var(--dashboard-drop-slot)]" />
               ) : (
                 <MetricCard
                   metric={metric}
                   size={card.size}
-                  dragging={resizingId === card.metricId}
                   editing={editing}
                   view={cardView?.(card.metricId)}
                   index={i}
                   onOpen={onOpenCard ? () => onOpenCard(card.metricId) : undefined}
                   onRetry={onRetryCard ? () => onRetryCard(card.metricId) : undefined}
                   onRemove={() => (editing ? onRemove(card.metricId) : onRemoveEmpty?.(card.metricId))}
-                  grip={editing ? gripFor(card) : undefined}
                 />
+              )}
+              {/* Edit mode's marks on the corners (Figma 2.5): remove, top left; resize, bottom right. */}
+              {editing && !isSlot && resizing?.id !== card.metricId && (
+                <>
+                  <RemoveBadge label={metric.label} onRemove={() => onRemove(card.metricId)} />
+                  <ResizeArc label={metric.label} size={card.size} grip={gripFor(card)} active={false} />
+                </>
               )}
               {ring?.ids.includes(card.metricId) && (
                 <span
@@ -360,6 +416,31 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
         })}
       </ul>
       <p className="sr-only" aria-live="polite">{announce}</p>
+
+      {/* The resized card's frame follows the pointer, then settles into its slot (Figma 2.7). */}
+      {resizing && resized && createPortal(
+        <>
+          <div aria-hidden className="fixed inset-0 z-[var(--z-overlay)] cursor-nwse-resize" />
+          <div
+            aria-hidden
+            data-resize-frame={resizing.size}
+            className="pointer-events-none fixed z-[var(--z-popover)]"
+            style={{
+              ...(resizing.settleAt ?? resizing),
+              transition: resizing.settleAt ? `left ${DROP_MS}ms ease-out, top ${DROP_MS}ms ease-out, width ${DROP_MS}ms ease-out, height ${DROP_MS}ms ease-out` : undefined,
+            }}
+          >
+            <MetricCard
+              metric={resized}
+              size={resizing.size}
+              view={cardView?.(resizing.id)}
+              dragging
+              className="shadow-[var(--dashboard-resize-shadow)] outline outline-1 outline-[var(--dashboard-figure)]"
+            />
+          </div>
+        </>,
+        document.body,
+      )}
 
       {/* The lifted copy follows the pointer (BS-24), then settles into the slot. */}
       {drag && dragged && createPortal(
@@ -385,3 +466,16 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
     </div>
   )
 }
+
+/** A resize in progress: the free frame (viewport px), the snapped size, and where it settles. */
+interface ResizeView {
+  id: string
+  size: CardSize
+  left: number
+  top: number
+  width: number
+  height: number
+  settleAt?: { left: number; top: number; width: number; height: number }
+}
+
+const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), Math.max(lo, hi))

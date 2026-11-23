@@ -10,7 +10,7 @@ import { LineChart } from './chart/LineChart'
 import { HealthPillView, type CardView } from './MetricCard'
 import { formatMetricValue } from './format'
 import { SOURCE_NAMES, SourceLogo } from './icons'
-import { PERIODS } from './mock-data'
+import { compareName, periodName } from './period'
 import { changeLabel, dayMonth, formatExact, parseFigure, previousOf, upIsGood, weekdayDayMonth, periodDays } from './series'
 import { ago } from './sync/sync-model'
 import { useSyncSnapshot } from './sync/sync-store'
@@ -53,7 +53,8 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
   const [tab, setTab] = useState<Tab>('Trend')
   const [table, setTable] = useState(false)
   const n = periodDays(periodId)
-  const periodLabel = PERIODS.find((p) => p.id === periodId)?.label ?? 'Last 7 days'
+  const periodLabel = periodName(periodId)
+  const lastYear = view?.series?.compare === 'last-year'
   const series = view?.series
   const comparable = series?.comparable ?? true
   const total = parseFigure(metric.value)
@@ -80,7 +81,7 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
                 <>
                   <Arrow aria-hidden size={13} strokeWidth={1.75} absoluteStrokeWidth className={good ? 'text-[var(--dashboard-positive)]' : 'text-[var(--dashboard-negative)]'} />
                   <span className={good ? 'text-[var(--dashboard-positive)]' : 'text-[var(--dashboard-negative)]'}>{pct}</span>
-                  <span className="whitespace-pre text-[var(--dashboard-muted)]">{`  vs the previous ${n} days`}</span>
+                  <span className="whitespace-pre text-[var(--dashboard-muted)]">{lastYear ? '  vs the same days last year' : `  vs the previous ${n} days`}</span>
                 </>
               ) : <span className="text-[var(--dashboard-muted)]">No comparison</span>}
             </p>
@@ -88,7 +89,7 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
           <div className="absolute right-5 top-[18px] flex items-center gap-2">
             <AddToBoard metric={metric} boards={boards} onPick={onAddToBoard} />
             <DialogClose asChild>
-              <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="size-7 rounded-lg" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
+              <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="size-7 rounded-[8px]" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
             </DialogClose>
           </div>
         </header>
@@ -123,7 +124,7 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
             <>
               <div className="flex items-center justify-between gap-4">
                 <p className="m-0 text-[15px] leading-5 text-[var(--dashboard-figure)]">
-                  {comparable ? `${metric.change.direction === 'up' ? 'Up' : 'Down'} ${pct} on the previous ${n} days` : 'Nothing to compare with yet'}
+                  {comparable ? `${metric.change.direction === 'up' ? 'Up' : 'Down'} ${pct} on ${lastYear ? 'the same days last year' : `the previous ${n} days`}` : 'Nothing to compare with yet'}
                 </p>
                 <div role="radiogroup" aria-label="Show as" className="flex shrink-0 gap-0.5 rounded-[10px] bg-[var(--dashboard-hover-band)] p-[3px]">
                   {(['Chart', 'Table'] as const).map((k) => (
@@ -152,7 +153,7 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
                 <table className="mt-5 w-full border-collapse text-[13px] leading-5">
                   <thead>
                     <tr className="text-left text-[12px] text-[var(--dashboard-muted)]">
-                      <th className="py-2 font-normal">Day</th><th className="py-2 text-right font-normal">This period</th><th className="py-2 text-right font-normal">Previous period</th><th className="py-2 text-right font-normal">Change</th>
+                      <th className="py-2 font-normal">Day</th><th className="py-2 text-right font-normal">This period</th><th className="py-2 text-right font-normal">{lastYear ? 'Last year' : compareName('previous')}</th><th className="py-2 text-right font-normal">Change</th>
                     </tr>
                   </thead>
                   <tbody>

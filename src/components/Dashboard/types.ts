@@ -74,6 +74,8 @@ export interface BoardCard {
   /** Top-left cell on the 4-column design grid (grid-layout.ts). */
   x: number
   y: number
+  /** The card's own chart, set in card settings (10 CS-6); unset, the metric's default. */
+  chart?: 'trend' | 'bars'
 }
 
 export interface Period {

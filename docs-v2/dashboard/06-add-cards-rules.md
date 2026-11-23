@@ -138,3 +138,12 @@ live at 1440 and 1024 px (Playwright).
 Differences: the search field also gets the app's blue search-focus ring (globals.css
 `[data-search-active]`), on top of the drawn soft ring. Later: Option B (one plain list), the empty
 board's Add cards, Change metric, a real sign-in window for Connect.
+
+### Second pass (2026-11-23)
+
+Section re-read (unchanged: 24 frames, 23 notes, 41 annotations) and A-2a, A-3b, A-4a, A-4c, A-5
+compared side by side with the app. Fixed: the thin divider before "Revenue is already on this
+board" (A-4a), and a custom metric's Σ on its small soft tile ("Logo16 / Custom", A-2a, A-3b).
+Noted, not changed: A-5 draws the "Added 3 cards" toast at the bottom centre; board toasts follow
+BS-23 (left of the +, bottom-aligned with it) like every other board toast. Inside "Apps not
+connected" the drawing lists Sessions before Conversion rate; the build keeps A–Z (AC-10).

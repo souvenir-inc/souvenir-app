@@ -233,6 +233,67 @@ export function useDashboard() {
 
   const setDates = (id: string, dates: { period?: string; compare?: string }) => dispatch({ type: 'set-dates', id, ...dates })
 
+  /** Apply actions as one undo step: `reverse` undoes them (toasts' Undo, ⌘Z). Returns that undo. */
+  const change = (actions: BoardAction[], reverse: BoardAction[]) => {
+    actions.forEach(dispatch)
+    const key = record(reverse)
+    return () => undo(key)
+  }
+
+  /** Apply actions without an undo step (a draft's own life: drafting, landing, 08). */
+  const apply = (actions: BoardAction[]) => actions.forEach(dispatch)
+
+  // ── New board (08-new-board-rules.md) ────────────────────────────────────────
+
+  /**
+   * A board from New board (a template, a copy, a draft): private, yours, the last tab, open
+   * (NB-12, NB-14, NB-34). Undo removes it outright and opens the board you were on. A draft isn't
+   * an undo step (`undoable: false`): its own bar decides what happens to it (NB-27).
+   */
+  const addBoard = (
+    fields: { label: string; cards: BoardCard[]; period: string; compare: string; draft?: boolean },
+    undoable = true,
+  ) => {
+    const id = newId()
+    const label = uniqueName(fields.label, namesInUse(state))
+    const b: Board = { id, label, cards: fields.cards, initialCards: fields.cards, period: fields.period, compare: fields.compare, access: 'owner', draft: fields.draft }
+    const add: BoardAction = { type: 'add-board', board: b, index: state.tabs.length, open: true }
+    if (!undoable) { dispatch(add); return { id, label, undo: () => {} } }
+    const undoIt = change([add], [{ type: 'remove-board', id }, { type: 'open', id: state.openId }])
+    return { id, label, undo: undoIt }
+  }
+
+  /** "Store overview copy" as the last tab, private, same cards and dates (NB-14). */
+  const copyBoard = (id: string) => {
+    const src = board(id)
+    if (!src) return
+    const base = src.label.slice(0, MAX_NAME - ' copy'.length).trimEnd()
+    return addBoard({ label: `${base} copy`, cards: src.cards, period: src.period, compare: src.compare })
+  }
+
+  /** Fill a board from a template: its cards and dates; an untouched "Untitled board" takes its name (NB-18). */
+  const fillBoard = (id: string, fields: { label: string; cards: BoardCard[]; period: string; compare: string }) => {
+    const b = board(id)
+    if (!b) return
+    const rename = /^Untitled board( \d+)?$/.test(b.label)
+    const label = rename ? uniqueName(fields.label, namesInUse(state, id)) : b.label
+    return change(
+      [{ type: 'update-board', id, patch: { cards: fields.cards, initialCards: fields.cards, period: fields.period, compare: fields.compare, label } }],
+      [{ type: 'update-board', id, patch: { cards: b.cards, initialCards: b.initialCards, period: b.period, compare: b.compare, label: b.label } }],
+    )
+  }
+
+  /** Discard a draft (NB-27): gone, the board you were on opens; Undo brings it back. Not in Recently deleted. */
+  const discardDraft = (id: string, openAfter: string) => {
+    const b = board(id)
+    if (!b) return
+    const index = state.tabs.indexOf(id)
+    return change(
+      [{ type: 'remove-board', id }, { type: 'open', id: openAfter }],
+      [{ type: 'add-board', board: b, index: index < 0 ? state.tabs.length : index, open: true }],
+    )
+  }
+
   /**
    * Cards added at the end of a board, in order (06 AC-16, AC-23). One undo step takes them all off
    * again (AC-18); ⌘Z does the same. Returns the new card ids and that undo.
@@ -259,7 +320,7 @@ export function useDashboard() {
       const before = state.boards[id]?.cards
       if (!before) return
       dispatch({ type: 'remove-card', id, metricId })
-      undoToast(`${label} removed`, [{ type: 'set-cards', id, cards: before }])
+      undoToast(`Removed ${label}`, [{ type: 'set-cards', id, cards: before }])
     },
     /** A narrow window's drag, or the keyboard: the card to a place in reading order (BS-25, BS-31). */
     moveTo: (metricId: string, index: number) => dispatch({ type: 'move-card', id, metricId, to: index }),
@@ -271,7 +332,7 @@ export function useDashboard() {
 
   return {
     state, openBoard, undo,
-    open, rename, moveTab, createBoard, addCards, duplicate, hide, show, remove, restore, leave,
+    open, rename, moveTab, createBoard, addCards, change, apply, addBoard, copyBoard, fillBoard, discardDraft, duplicate, hide, show, remove, restore, leave,
     applyManage, copyLink, startOver, setDates, cardActions,
   }
 }
