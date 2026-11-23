@@ -2,13 +2,17 @@
 
 import { useLayoutEffect, useRef, useState } from 'react'
 import { m, useReducedMotion } from 'framer-motion'
-import { ArrowDown, ArrowUp, Lock, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, Lock, Plug } from 'lucide-react'
 import { Tooltip } from '@/components/Tooltip'
 import { cn } from '@/lib/utils'
 import { opens, type CardBody, type HealthPill } from './card-states'
 import { WeeklyBars } from './chart/Bars'
 import { LineChart } from './chart/LineChart'
-import { SourceMark } from './icons'
+import { SOURCE_NAMES, SourceMark } from './icons'
+import { compareName } from './period'
+import { Spinner } from './sync/Spinner'
+import { connectApp } from './sync/sync-store'
+import type { AppId } from './sync/sync-model'
 import type { Series } from './series'
 import type { CardSize, Metric } from './types'
 
@@ -21,12 +25,20 @@ import type { CardSize, Metric } from './types'
 //   full-lg  12×2          the number, the full chart with its legend
 // Reading the board the whole card is a button that opens its metric window (CR-6 – CR-8); empty
 // and locked cards don't open (CR-18). In edit mode it shows a × in place of the logo and a resize
-// grip in the bottom-right corner (BS-18).
+// arc on the bottom-right corner and a remove badge on the top-left, drawn by BoardGrid (Figma 2.5).
 
 export const SIZE_LABEL: Record<CardSize, string> = {
   sm: 'small', 'sm-tall': 'small, tall', md: 'wide', lg: 'medium', full: 'full width', 'full-lg': 'large',
 }
-const SIZE_LEVEL: Record<CardSize, number> = { sm: 1, 'sm-tall': 2, md: 3, lg: 4, full: 5, 'full-lg': 6 }
+/** The chart a card draws unless its settings say otherwise: weekly bars on tall wide cards, the line on
+ * the rest (Figma 2.5: Orders 2 × 2 with bars, Revenue 2 × 1 with its line). */
+export const barsBySize = (size: CardSize) => size === 'lg' || size === 'full-lg'
+
+/** As the resize landing slot names them (Figma 2.7, 19:6006). */
+export const SIZE_NAME: Record<CardSize, string> = {
+  sm: 'Small', 'sm-tall': 'Small tall', md: 'Wide', lg: 'Medium', full: 'Full width', 'full-lg': 'Large',
+}
+export const SIZE_LEVEL: Record<CardSize, number> = { sm: 1, 'sm-tall': 2, md: 3, lg: 4, full: 5, 'full-lg': 6 }
 const TALL: CardSize[] = ['sm-tall', 'lg', 'full-lg']
 const WIDE: CardSize[] = ['md', 'lg', 'full', 'full-lg']
 
@@ -39,6 +51,8 @@ export interface GripProps {
 /** How a card reads right now, worked out by the screen (sync, scenarios, health). */
 export interface CardView {
   body: CardBody
+  /** The card's own chart: weekly bars or the trend (10 CS-6). Unset, the metric's default. */
+  bars?: boolean
   /** Its app failed or is behind (SY-23), and what hovering the dot says (CR-25). */
   dot?: { tone: 'failed' | 'behind'; tip: string }
   /** Its app is syncing: the number shimmers (SY-24). */
@@ -49,6 +63,8 @@ export interface CardView {
   targetPerDay?: number
   /** People who can edit get Remove card on an empty card (CR-22). */
   canEdit?: boolean
+  /** The app it waits for, and whether Connect is running (08 NB-13). */
+  needsApp?: { app: AppId; connecting: boolean }
 }
 
 interface MetricCardProps {
@@ -57,10 +73,9 @@ interface MetricCardProps {
   view?: CardView
   /** Lifted look while the card is being dragged or resized. */
   dragging?: boolean
-  /** Edit mode: × and the resize grip (BS-18). */
+  /** Edit mode: no hover lift, no opening; the corner marks are BoardGrid's (Figma 2.5). */
   editing?: boolean
   onRemove?: () => void
-  grip?: GripProps
   /** Opens the metric window (CR-7); left out in edit mode and for the drag copy. */
   onOpen?: () => void
   /** Try again on a card that couldn't load (CR-20). */
@@ -70,7 +85,11 @@ interface MetricCardProps {
   className?: string
 }
 
-export function MetricCard({ metric, size, view, dragging = false, editing = false, onRemove, grip, onOpen, onRetry, index = 0, className }: MetricCardProps) {
+export function MetricCard({ metric: base, size, view, dragging = false, editing = false, onRemove, onOpen, onRetry, index = 0, className }: MetricCardProps) {
+  // The chart follows the size: wide cards draw the line, tall wide cards weekly bars (Figma 2.5).
+  // A card's own choice in its settings wins (10 CS-6).
+  const bars = view?.bars ?? barsBySize(size)
+  const metric = bars === !!base.bars ? base : { ...base, bars }
   const body = view?.body ?? 'numbers'
   const openable = !!onOpen && !editing && opens(body)
   const tall = TALL.includes(size)
@@ -94,38 +113,24 @@ export function MetricCard({ metric, size, view, dragging = false, editing = fal
       className={cn(
         'group/card relative size-full overflow-clip rounded-xl bg-[var(--dashboard-card-bg)]',
         'transition-shadow duration-base ease-standard',
-        dragging ? 'shadow-[var(--dashboard-raised-shadow)]' : 'shadow-[var(--dashboard-card-shadow)]',
+        dragging ? 'shadow-[var(--dashboard-raised-shadow)]' : body === 'needs-app' ? 'border border-dashed border-[var(--dashboard-waiting-border)] bg-[var(--dashboard-panel-bg)] shadow-none' : 'shadow-[var(--dashboard-card-shadow)]',
         // Hover lifts the card a little; the pointer is a hand anywhere on it (CR-6). Focus: a 2 px
         // ring 4 px outside the card (CR-8).
         openable && 'cursor-pointer hover:shadow-[var(--dashboard-card-hover-shadow)] outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]',
         className,
       )}
     >
-      <div className={cn('absolute left-4 top-4 flex h-5 min-w-0 items-center gap-1.5', editing ? 'right-12' : metric.alsoFrom ? 'right-[60px]' : 'right-10', size === 'full-lg' && !editing && 'right-[230px]', size === 'lg' && metric.bars && !editing && 'right-[150px]')}>
-        <Title text={metric.label} />
+      <div className={cn('absolute left-4 top-4 flex h-5 min-w-0 items-center gap-1.5', metric.alsoFrom ? 'right-[60px]' : 'right-10', size === 'full-lg' && 'right-[230px]', size === 'lg' && metric.bars && 'right-[150px]')}>
+        <Title text={metric.label} muted={body === 'needs-app'} />
         {view?.dot && body !== 'locked' && <SyncDot tone={view.dot.tone} tip={view.dot.tip} />}
       </div>
 
-      {/* Top right: the legend (wide charts), then the app logo(s), or the × in edit mode. */}
-      <div className={cn('absolute flex items-center gap-3', editing ? 'right-3 top-3 h-6' : 'right-4 top-4 h-5')}>
+      {/* Top right: the legend (wide charts), then the app logo(s). In edit mode the remove badge and
+          the resize arc sit on the card's corners, drawn by BoardGrid (Figma 2.5). */}
+      <div className="absolute right-4 top-4 flex h-5 items-center gap-3">
         {body === 'numbers' && size === 'lg' && metric.bars && <Legend items={[['soft', 'Week in progress']]} />}
-        {body === 'numbers' && size === 'full-lg' && (metric.bars ? <Legend items={[['soft', 'Week in progress']]} /> : <Legend items={[['ink', 'This period'], ['previous', 'Previous period']]} />)}
-        {editing ? (
-          // eslint-disable-next-line no-restricted-syntax -- ds-allow: the card's 24px raised × of Figma 75:21094 (white, 6px radius, hairline ring)
-          <button
-            type="button"
-            aria-label={`Remove ${metric.label}`}
-            data-no-drag // never starts a card drag
-            onClick={onRemove}
-            className={cn(
-              'flex size-6 cursor-pointer items-center justify-center rounded-md border-0 bg-[var(--dashboard-card-bg)] p-0 text-[var(--dashboard-label)]',
-              'shadow-[var(--dashboard-control-shadow)] transition-colors duration-fast hover:bg-[var(--neutral-100)] hover:text-[var(--dashboard-figure)]',
-              'outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]',
-            )}
-          >
-            <X aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />
-          </button>
-        ) : !metric.unmeasured && (
+        {body === 'numbers' && size === 'full-lg' && (metric.bars ? <Legend items={[['soft', 'Week in progress']]} /> : <Legend items={[['ink', 'This period'], ['previous', compareName(view?.series?.compare ?? 'previous')]]} />)}
+        {!metric.unmeasured && (
           <span className="flex items-center gap-1.5">
             <SourceMark source={metric.source} className="block size-3.5" />
             {metric.alsoFrom && <SourceMark source={metric.alsoFrom} className="block size-3.5" />}
@@ -138,32 +143,6 @@ export function MetricCard({ metric, size, view, dragging = false, editing = fal
         onRetry={onRetry} onRemove={onRemove}
       />
 
-      {editing && grip && (
-        // The resize grip: two diagonal strokes in the corner (Figma 75:21098). Drag it, or use the
-        // arrow keys: → / ← wider or narrower, ↓ / ↑ taller or shorter (BS-19). Hidden on the
-        // narrow layout (CR-36).
-        <span
-          role="slider"
-          data-no-drag // the grip resizes; it never starts a move
-          tabIndex={0}
-          aria-label={`Resize ${metric.label}`}
-          aria-valuetext={SIZE_LABEL[size]}
-          aria-valuemin={1}
-          aria-valuemax={6}
-          aria-valuenow={SIZE_LEVEL[size]}
-          onPointerDown={grip.onPointerDown}
-          onKeyDown={grip.onKeyDown}
-          className={cn(
-            'absolute bottom-0 right-0 z-10 hidden size-7 cursor-nwse-resize touch-none items-center justify-center rounded text-[var(--neutral-400)] hover:text-[var(--dashboard-figure)] @min-[60rem]:flex',
-            'outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]',
-          )}
-        >
-          <svg aria-hidden width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-            <path d="M10.5 3.5 3.5 10.5" />
-            <path d="M10.5 7.5 7.5 10.5" />
-          </svg>
-        </span>
-      )}
     </article>
   )
 }
@@ -195,8 +174,30 @@ function Body({ metric, size, view, body, tall, wide, index, onRetry, onRemove }
     )
   }
 
+  if (body === 'needs-app' && view?.needsApp) {
+    // Waits for its app: "Connect Google Ads" where the number goes (NB-13).
+    const { app, connecting } = view.needsApp
+    return (
+      <div className={cn('absolute left-4 flex items-center', tall ? 'top-11' : 'bottom-4')}>
+        {connecting ? (
+          <span role="status" className="flex items-center gap-1.5 text-[13px] font-medium leading-[17px] text-[var(--dashboard-label)]"><Spinner size={14} />Connecting…</span>
+        ) : (
+          // eslint-disable-next-line no-restricted-syntax -- ds-allow: the waiting card's text action (Figma 170:63211)
+          <button
+            type="button"
+            data-no-drag
+            onClick={(e) => { e.stopPropagation(); connectApp(app) }}
+            className="flex cursor-pointer items-center gap-1.5 rounded-sm border-0 bg-transparent p-0 text-[13px] font-medium leading-[17px] text-[var(--neutral-700)] outline-none hover:text-[var(--dashboard-figure)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]"
+          >
+            <Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />Connect {SOURCE_NAMES[app]}
+          </button>
+        )}
+      </div>
+    )
+  }
+
   if (body !== 'numbers' && body !== 'today-empty') {
-    return <EmptyBody body={body} canEdit={!!view?.canEdit} onRetry={onRetry} onRemove={onRemove} tall={tall} />
+    return <EmptyBody body={body} label={metric.label} canEdit={!!view?.canEdit} onRetry={onRetry} onRemove={onRemove} tall={tall} />
   }
 
   if (body === 'today-empty') {
@@ -242,7 +243,7 @@ function chartBoxFor(size: CardSize, metric: Metric): string | null {
   }
 }
 
-const EMPTY_TEXT: Record<Exclude<CardBody, 'loading' | 'numbers' | 'today-empty'>, string> = {
+const EMPTY_TEXT: Record<Exclude<CardBody, 'loading' | 'numbers' | 'today-empty' | 'needs-app'>, string> = {
   removed: 'This metric was removed.',
   locked: 'No access',
   'no-data-yet': 'No data yet',
@@ -251,12 +252,13 @@ const EMPTY_TEXT: Record<Exclude<CardBody, 'loading' | 'numbers' | 'today-empty'
 }
 
 /** Empty, failed and locked cards (CR-20 – CR-23): one line where the number goes, and maybe a link. */
-function EmptyBody({ body, canEdit, onRetry, onRemove, tall }: { body: CardBody; canEdit: boolean; onRetry?: () => void; onRemove?: () => void; tall: boolean }) {
+function EmptyBody({ body, label, canEdit, onRetry, onRemove, tall }: { body: CardBody; label: string; canEdit: boolean; onRetry?: () => void; onRemove?: () => void; tall: boolean }) {
   const where = cn('absolute left-4 flex flex-col items-start gap-1 text-[13px] leading-[17px] text-[var(--dashboard-figure)]', tall ? 'top-11' : 'bottom-4')
   if (body === 'locked') {
     return (
       <div className={where}>
-        <Tooltip content="Ask the board’s owner for access" side="top" align="start">
+        {/* An admin sets metric access, not the board's owner (09 SH-30). */}
+        <Tooltip content={`No access to ${label}. Ask an admin for access.`} side="top" align="start">
           <span tabIndex={0} className="flex items-center gap-1.5 rounded-sm text-[var(--dashboard-label)] outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]">
             <Lock aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />No access
           </span>
@@ -286,7 +288,7 @@ function EmptyBody({ body, canEdit, onRetry, onRemove, tall }: { body: CardBody;
 }
 
 /** The title, cut with "…" and shown in full on hover when it doesn't fit (CR-9). */
-function Title({ text }: { text: string }) {
+function Title({ text, muted = false }: { text: string; muted?: boolean }) {
   const ref = useRef<HTMLHeadingElement>(null)
   const [cut, setCut] = useState(false)
   useLayoutEffect(() => {
@@ -296,7 +298,7 @@ function Title({ text }: { text: string }) {
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
-  const h = <h3 ref={ref} className="m-0 min-w-0 truncate text-[13px] font-medium leading-5 text-[var(--dashboard-label)]">{text}</h3>
+  const h = <h3 ref={ref} className={cn('m-0 min-w-0 truncate text-[13px] font-medium leading-5', muted ? 'text-[var(--dashboard-faint)]' : 'text-[var(--dashboard-label)]')}>{text}</h3>
   return <Tooltip content={text} side="top" align="start" disabled={!cut}>{h}</Tooltip>
 }
 

@@ -135,7 +135,7 @@ function ManageTabsBody({
           <DialogTitle>Manage tabs</DialogTitle>
           {/* × where the Figma draws it: its icon on the line ⋯ and Save end on (MT-1, MT-3). */}
           <DialogClose asChild>
-            <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute -right-0.5 top-0 size-7 rounded-lg"
+            <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute -right-0.5 top-0 size-7 rounded-[8px]"
               icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
           </DialogClose>
         </div>

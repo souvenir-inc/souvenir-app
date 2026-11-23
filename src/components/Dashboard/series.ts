@@ -4,6 +4,7 @@
 // Stand-in until the back end sends real series: the days are shaped from the metric's trend and
 // scaled so they add up to (sums) or sit around (rates) the number on the card.
 
+import { customRange, rangeDays, yearBefore } from './period'
 import type { Metric, MetricChange } from './types'
 
 /** The dummy data's today: Fri 14 Nov 2025 (the week in progress is Mon 10 – Fri 14 Nov). */
@@ -19,6 +20,8 @@ export interface Series {
   previous: Day[]
   /** Whether the period before has enough data to compare with (CR-24). */
   comparable: boolean
+  /** What the previous days are: the period before, or the same days last year (11 DT-7). */
+  compare: string
   /** Days in this period that have data. */
   daysWithData: number
 }
@@ -40,11 +43,15 @@ export function parseFigure(value: string): number {
 
 /** Days a period's charts cover. Today and Yesterday chart the 7 days ending then (our call). */
 export function periodDays(periodId: string): number {
-  return periodId === '30d' ? 30 : periodId === '90d' ? 90 : 7
+  const r = customRange(periodId)
+  if (r) return rangeDays(r.from, r.to)
+  return periodId === '30d' ? 30 : periodId === '60d' ? 60 : periodId === '90d' ? 90 : 7
 }
 
 /** The last day of the period: Yesterday ends the day before, every other period today. */
 export function periodEnd(periodId: string): Date {
+  const r = customRange(periodId)
+  if (r) return r.to
   return periodId === 'yesterday' ? new Date(TODAY.getTime() - DAY) : TODAY
 }
 
@@ -80,6 +87,8 @@ function spread(total: number, weights: number[], kind: 'sum' | 'rate', whole: b
 export interface SeriesOptions {
   /** The app was connected on this day: no data before it (CR-24, the Ads board on `?cards=newmeta`). */
   connectedOn?: Date
+  /** 'last-year': the previous days are the same days a year before (11 DT-7). */
+  compare?: string
 }
 
 export function seriesFor(metric: Metric, periodId: string, opts: SeriesOptions = {}): Series {
@@ -99,14 +108,15 @@ export function seriesFor(metric: Metric, periodId: string, opts: SeriesOptions 
     const date = day(i, 0)
     return { date, value: date.getTime() >= from ? value : null }
   })
+  const lastYear = opts.compare === 'last-year'
   const previous = prev.map((value, i) => {
-    const date = day(i, n)
+    const date = lastYear ? yearBefore(day(i, 0)) : day(i, n)
     return { date, value: date.getTime() >= from ? value : null }
   })
   const daysWithData = days.filter((d) => d.value != null).length
   // "Mostly empty": under half the days of the period before have data.
   const comparable = previous.filter((d) => d.value != null).length >= n / 2
-  return { days, previous, comparable, daysWithData }
+  return { days, previous, comparable, daysWithData, compare: opts.compare ?? 'previous' }
 }
 
 // ── Words ────────────────────────────────────────────────────────────────────

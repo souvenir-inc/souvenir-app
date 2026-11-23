@@ -1,7 +1,7 @@
 'use client'
 
 import {
-  ArchiveRestore, ArrowLeft, ArrowRight, ChevronRight, Copy, EyeOff, History, ImageDown,
+  ArchiveRestore, ArrowLeft, ArrowRight, ChevronRight, Copy, Download, EyeOff, History, House,
   LayoutGrid, Link2, LogOut, Pencil, Plus, RotateCcw, SlidersHorizontal, Trash2,
 } from 'lucide-react'
 import { Dropdown } from '@/components/Dropdown'
@@ -110,6 +110,10 @@ interface MoreMenuProps extends BoardMenuHandlers {
   onNewBoard: () => void
   onStartOver: (id: string) => void
   onNotReady: (what: string) => void
+  /** One Download dialog for everyone (09 SH-31). */
+  onDownload?: () => void
+  /** Admins only: the workspace's default board for new members (11 DT-8). */
+  onDefaultBoard?: () => void
   close: () => void
 }
 
@@ -134,7 +138,8 @@ export function MoreMenuContent({ board, tabs, hidden, deletedCount, onlyOne, cl
         {owner && <Dropdown.Item icon={<Pencil />} label="Rename" onClick={run(() => h.onRename(board.id))} fluid />}
         <Dropdown.Item icon={<Copy />} label="Duplicate" onClick={run(() => h.onDuplicate(board.id))} fluid />
         <Dropdown.Item icon={<Link2 />} label="Copy link" onClick={run(() => h.onCopyLink(board.id))} fluid />
-        <Dropdown.Item icon={<ImageDown />} label="Download as image" onClick={run(() => h.onNotReady('Download as image'))} fluid />
+        <Dropdown.Item icon={<Download />} label="Download…" onClick={run(() => (h.onDownload ? h.onDownload() : h.onNotReady('Download')))} fluid />
+        {h.onDefaultBoard && <Dropdown.Item icon={<House />} label="Default board for new members…" onClick={run(() => h.onDefaultBoard?.())} fluid />}
         {!view && <Dropdown.Item icon={<History />} label="Version history" onClick={run(() => h.onNotReady('Version history'))} fluid />}
       </Dropdown.Section>
       <Dropdown.Section divider fluid>

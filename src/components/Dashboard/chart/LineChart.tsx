@@ -196,13 +196,14 @@ export function readoutFor(metric: Metric, series: Series, i: number, withChange
     // Never a 0: a day after the app's last sync is "No data yet", a day without data "No data".
     value: d.value != null ? exact(d.value) : i > firstData ? 'No data yet' : 'No data',
   }]
-  if (p) rows.push({ dot: 'previous', label: `Previous period · ${dayMonth(p.date)}`, value: p.value != null ? exact(p.value) : 'No data', muted: true })
+  const lastYear = series.compare === 'last-year'
+  if (p) rows.push({ dot: 'previous', label: lastYear ? `Last year · ${dayMonth(p.date)} ${p.date.getFullYear()}` : `Previous period · ${dayMonth(p.date)}`, value: p.value != null ? exact(p.value) : 'No data', muted: true })
   if (target != null && met != null) rows.push({ label: `Target ${exact(target)}`, value: met ? 'Met' : 'Missed', muted: true })
   let footer: ReadoutContent['footer']
   if (withChange && p?.value != null && d.value != null) {
     const text = changeLabel(d.value, p.value)
     const rising = d.value >= p.value
-    footer = { text: `${text} vs previous period`, tone: rising === good ? 'good' : 'bad' }
+    footer = { text: `${text} vs ${lastYear ? 'last year' : 'previous period'}`, tone: rising === good ? 'good' : 'bad' }
   }
   return { title: weekdayDayMonth(d.date), rows, footer }
 }

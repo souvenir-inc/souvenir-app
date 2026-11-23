@@ -124,7 +124,7 @@ const BOARD_SPECS: Array<{ id: string; label: string; period?: string; access?: 
   { id: "founder-overview", label: "Founder overview", cards: [["revenue", "md"], ["orders", "sm"], ["roas", "sm"], ["ad-spend", "sm"], ["google-ads-spend", "sm"], ["tiktok-views", "sm"], ["cpm", "md"], ["pinterest-saves", "sm"], ["stripe-payouts", "sm"], ["paypal-volume", "sm"], ["impressions", "sm"], ["reddit-clicks", "sm"], ["hubspot-leads", "sm"]] },
   // Hidden
   { id: "holiday-2025", label: "Holiday 2025", cards: [["revenue", "lg"], ["orders", "sm"], ["discount-rate", "sm"]] },
-  { id: "creative-tests", label: "Creative tests", cards: [["ctr", "md"], ["cpm", "sm"], ["impressions", "sm"]] },
+  { id: "creative-tests", label: "Creative tests", access: "edit", sharedBy: MAYA, cards: [["ctr", "md"], ["cpm", "sm"], ["impressions", "sm"]] },
   // Recently deleted
   { id: "q3-review", label: "Q3 review", cards: [["revenue", "md"], ["orders", "sm"], ["aov", "sm"]] },
   { id: "spring-sale", label: "Spring sale", cards: [["revenue", "md"], ["discount-rate", "sm"], ["orders", "sm"]] },
@@ -157,6 +157,7 @@ export const PERIODS: Period[] = [
   { id: 'yesterday', label: 'Yesterday' },
   { id: '7d', label: 'Last 7 days' },
   { id: '30d', label: 'Last 30 days' },
+  { id: '60d', label: 'Last 60 days' }, // 11 DT-1
   { id: '90d', label: 'Last 90 days' },
 ]
 

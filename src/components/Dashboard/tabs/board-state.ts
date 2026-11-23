@@ -28,6 +28,8 @@ export interface Board {
   access: Access
   /** Set when someone else owns the board and shared it with you (TAB-50). */
   sharedBy?: Person
+  /** An Ask the AI draft, not saved yet: a sparkle on its tab (08 NB-21). */
+  draft?: boolean
 }
 
 export interface DeletedBoard {
@@ -165,6 +167,10 @@ export type BoardAction =
   | { type: 'rename'; id: string; label: string }
   | { type: 'move-tab'; id: string; to: number }
   | { type: 'add-board'; board: Board; index: number; open: boolean }
+  /** Change a board's own fields (a template filling it, a draft landing or kept, 08). */
+  | { type: 'update-board'; id: string; patch: Partial<Omit<Board, 'id'>> }
+  /** The whole state at once (the first visit's starter boards, 08 NB-32). */
+  | { type: 'replace'; state: DashboardState }
   | { type: 'remove-board'; id: string }
   | { type: 'hide'; id: string; openAfter?: string }
   | { type: 'show'; id: string; index?: number; open: boolean }
@@ -265,6 +271,12 @@ export function boardReducer(s: DashboardState, a: BoardAction): DashboardState 
         hidden: without(s.hidden, a.board.id),
         openId: a.open ? a.board.id : s.openId,
       }
+    case 'update-board': {
+      const b = s.boards[a.id]
+      return b ? { ...s, boards: { ...s.boards, [a.id]: { ...b, ...a.patch } } } : s
+    }
+    case 'replace':
+      return a.state
     case 'remove-board': {
       // Undo of new / duplicate; leaving a shared board; a board deleted by someone else (TAB-55).
       if (!s.boards[a.id]) return s

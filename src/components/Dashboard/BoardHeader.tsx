@@ -1,11 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Calendar, ChevronDown } from 'lucide-react'
+import { Calendar, CalendarRange, ChevronDown } from 'lucide-react'
 import { Dropdown } from '@/components/Dropdown'
 import { Tooltip } from '@/components/Tooltip'
 import { cn } from '@/lib/utils'
+import { CustomRange } from './CustomRange'
 import { COMPARISONS, PERIODS } from './mock-data'
+import { isCustom, periodName } from './period'
 import { PersonAvatar } from './tabs/BoardMenus'
 import type { Person } from './tabs/board-state'
 
@@ -23,9 +25,12 @@ interface PeriodMenuProps {
 /** "Last 7 days vs previous": the period, borderless, with the comparison in its menu (TAB-7, BS-3). */
 export function PeriodMenu({ period, compare, onChange }: PeriodMenuProps) {
   const [open, setOpen] = useState(false)
-  const periodLabel = PERIODS.find((p) => p.id === period)?.label
+  // Custom range… opens its own panel under the period (11 DT-2).
+  const [ranging, setRanging] = useState(false)
+  const periodLabel = periodName(period)
   const compareLabel = COMPARISONS.find((c) => c.id === compare)?.label
   return (
+    <div className="relative">
     <Dropdown.Float autoFlipVertical
       open={open}
       onOpenChange={setOpen}
@@ -54,6 +59,7 @@ export function PeriodMenu({ period, compare, onChange }: PeriodMenuProps) {
           {PERIODS.map((p) => (
             <Dropdown.Item key={p.id} label={p.label} selected={p.id === period} onClick={() => { onChange({ period: p.id }); setOpen(false) }} fluid />
           ))}
+          <Dropdown.Item icon={<CalendarRange />} label={isCustom(period) ? `${periodLabel}…` : 'Custom range…'} selected={isCustom(period)} onClick={() => { setOpen(false); setRanging(true) }} fluid />
         </Dropdown.Section>
         <Dropdown.Section label="Compare to" fluid>
           {COMPARISONS.map((c) => (
@@ -68,6 +74,16 @@ export function PeriodMenu({ period, compare, onChange }: PeriodMenuProps) {
         </Dropdown.Section>
       </Dropdown>
     </Dropdown.Float>
+    {ranging && (
+      <CustomRange
+        period={period}
+        compare={compare}
+        className="absolute right-0 top-[calc(100%+8px)] z-[var(--z-popover)]"
+        onClose={() => setRanging(false)}
+        onApply={(id) => { setRanging(false); onChange({ period: id }) }}
+      />
+    )}
+    </div>
   )
 }
 

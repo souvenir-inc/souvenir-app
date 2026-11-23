@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { m, useReducedMotion } from 'framer-motion'
-import { ChevronDown, SlidersHorizontal, TriangleAlert } from 'lucide-react'
+import { ChevronDown, SlidersHorizontal, Sparkles, TriangleAlert } from 'lucide-react'
 import { Dropdown } from '@/components/Dropdown'
 import { Tooltip } from '@/components/Tooltip'
 import { cn } from '@/lib/utils'
@@ -212,7 +212,7 @@ export function TabRow(props: TabRowProps) {
           the row of copies can never widen the page (no overflow-x). */}
       <div ref={measureRef} aria-hidden className="pointer-events-none invisible absolute left-0 top-0 size-0 overflow-hidden">
         <div className="flex w-max">
-          {boards.map((b) => <span key={b.id} data-measure={b.id} className={SEGMENT}>{b.label}</span>)}
+          {boards.map((b) => <span key={b.id} data-measure={b.id} className={SEGMENT}>{b.draft && <span className="mr-1.5 inline-block w-3.5" />}{b.label}</span>)}
           <span data-measure-count className={cn(SEGMENT, 'gap-1 pl-3.5 pr-3')}>{order.length} more<ChevronDown size={12} /></span>
           {/* The rename field: the typed name plus its border and caret room. */}
           {renamingId && <span data-measure-rename className={cn(SEGMENT, 'pr-4')}>{renameText || 'Board name'}</span>}
@@ -285,6 +285,8 @@ export function TabRow(props: TabRowProps) {
                         className="absolute inset-0 rounded-full bg-gradient-to-b from-[var(--dashboard-tab-active-from)] to-[var(--dashboard-tab-active-to)]"
                       />
                     )}
+                    {/* A draft not saved yet carries a sparkle (08 NB-21). */}
+                    {b.draft && <Sparkles aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="relative mr-1.5 shrink-0" />}
                     <span className="relative block min-w-0 max-w-[192px] truncate">{b.label}</span>
                   </button>
                 </Tooltip>

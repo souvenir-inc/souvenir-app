@@ -79,6 +79,14 @@ function freshApps(now: number): Record<AppId, AppSync> {
 
 const offApps = () => Object.fromEntries(NOT_CONNECTED.map((id) => [id, 'off'])) as Partial<Record<AppId, Connection>>
 
+/** Every app but Shopify not connected: the first visit of a Shopify-only store (08 NB-33). */
+export function seedShopifyOnly() {
+  const connections = Object.fromEntries(ALL_APPS.filter((id) => id !== 'shopify').map((id) => [id, 'off'])) as Partial<Record<AppId, Connection>>
+  const apps = { ...snap.apps }
+  for (const id of ALL_APPS) if (id !== 'shopify') apps[id] = { syncedAt: null, failed: false, syncing: null }
+  set({ connections, apps })
+}
+
 /** Whether an app is connected (just-connected counts). */
 export const isConnected = (s: SyncSnapshot, id: AppId) => {
   const c = s.connections[id]

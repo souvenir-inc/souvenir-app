@@ -145,7 +145,7 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
         <div className="relative flex h-[60px] shrink-0 items-end px-6 pb-3.5">
           <DialogTitle className="text-[16px] font-semibold leading-6 text-[var(--dashboard-figure)]">Add cards</DialogTitle>
           <DialogClose asChild>
-            <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-3.5 size-7 rounded-lg" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
+            <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-3.5 size-7 rounded-[8px]" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
           </DialogClose>
         </div>
 
@@ -224,7 +224,7 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
                 >
                   <Checkbox state={!can ? 'none' : picked ? 'on' : 'off'} />
                   <span className={cn('flex shrink-0 items-center gap-[3px]', !can && 'opacity-45')}>
-                    {m.custom ? <Sigma aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth className="text-[var(--dashboard-label)]" /> : <SourceLogo source={m.source} className="size-4" />}
+                    {m.custom ? <CustomMark /> : <SourceLogo source={m.source} className="size-4" />}
                     {m.alsoFrom && !m.custom && <SourceLogo source={m.alsoFrom} className="size-4" />}
                   </span>
                   <span title={m.label} className={cn('min-w-0 flex-1 truncate text-[14px] leading-[22px] text-[var(--dashboard-figure)]', picked && 'font-medium', !can && 'opacity-45')}>
@@ -246,6 +246,7 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
               <button type="button" onClick={() => setPicks([])} className={cn('cursor-pointer rounded-sm border-0 bg-transparent p-0 text-[14px] text-[var(--dashboard-label)] hover:text-[var(--dashboard-figure)]', FOCUS)}>Clear</button>
             </p>
           )}
+          {already.length > 0 && <span aria-hidden className="h-4 w-px shrink-0 bg-[var(--neutral-200)]" />}
           {already.length > 0 && (
             <p data-already className="m-0 min-w-0 truncate text-[13px] leading-5 text-[var(--dashboard-label)]">
               {nameList(already)} {already.length === 1 ? 'is' : 'are'} already on this board
@@ -339,5 +340,14 @@ function CallOut({ app, count, state }: { app: MetricSource; count: number; stat
         </button>
       )}
     </div>
+  )
+}
+
+/** A custom metric's mark: Σ on a small soft tile (Figma "Logo16 / Custom", 170:38000). */
+function CustomMark() {
+  return (
+    <span aria-hidden className="flex size-4 shrink-0 items-center justify-center rounded-[4px] bg-[var(--dashboard-sync-bg)] text-[var(--dashboard-label)]">
+      <Sigma size={11} strokeWidth={1.75} absoluteStrokeWidth />
+    </span>
   )
 }
