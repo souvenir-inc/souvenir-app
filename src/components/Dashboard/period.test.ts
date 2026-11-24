@@ -1,39 +1,46 @@
 import { describe, expect, it } from 'vitest'
-import { METRICS } from './mock-data'
-import { compareName, customId, customRange, periodName, rangeDays, rangeSummary } from './period'
-import { periodDays, periodEnd, seriesFor } from './series'
+import { chartWindow, comparedWindow, customId, customRange, periodName, periodWindow, rangeDays, rangeSummary } from './period'
 
 // 11-dates-tabs-reference-rules.md
-describe('custom ranges (DT-2 – DT-5)', () => {
-  const id = customId(new Date(2025, 10, 9), new Date(2025, 9, 12))
-  it('keeps the ends in order', () => {
-    expect(id).toBe('custom:2025-10-12:2025-11-09')
-    expect(customRange(id)?.from.getDate()).toBe(12)
-    expect(customRange('7d')).toBeNull()
+const TODAY = new Date(2025, 10, 14, 15, 30)
+const day = (m: number, d: number, y = 2025) => new Date(y, m, d)
+
+describe('the days a period covers (DT-1)', () => {
+  it('Last N days end today, both ends counted', () => {
+    expect(periodWindow('7d', TODAY)).toEqual({ from: day(10, 8), to: day(10, 14) })
+    expect(rangeDays(...Object.values(periodWindow('30d', TODAY)) as [Date, Date])).toBe(30)
   })
-  it('names the range and says how long it is', () => {
-    expect(periodName(id)).toBe('12 Oct – 9 Nov')
-    expect(periodName('60d')).toBe('Last 60 days')
-    expect(rangeDays(new Date(2025, 9, 12), new Date(2025, 10, 9))).toBe(29)
-    expect(rangeSummary(new Date(2025, 9, 12), new Date(2025, 10, 9), 'previous')).toBe('12 Oct – 9 Nov · 29 days, compared with the 29 days before')
-    expect(rangeSummary(new Date(2025, 9, 12), new Date(2025, 10, 9), 'last-year')).toBe('12 Oct – 9 Nov · 29 days, compared with the same days last year')
-  })
-  it('drives the series: its days end on the range’s last day', () => {
-    expect(periodDays(id)).toBe(29)
-    expect(periodEnd(id).getDate()).toBe(9)
-    const s = seriesFor(METRICS.revenue, id)
-    expect(s.days).toHaveLength(29)
-    expect(s.days[0].date.getDate()).toBe(12)
+  it('Today and Yesterday are one day; their charts draw the week ending then', () => {
+    expect(periodWindow('today', TODAY)).toEqual({ from: day(10, 14), to: day(10, 14) })
+    expect(periodWindow('yesterday', TODAY)).toEqual({ from: day(10, 13), to: day(10, 13) })
+    expect(chartWindow('yesterday', TODAY)).toEqual({ from: day(10, 7), to: day(10, 13) })
+    expect(chartWindow('7d', TODAY)).toEqual(periodWindow('7d', TODAY))
   })
 })
 
-describe('compared with last year (DT-7)', () => {
-  it('the previous days are the same days a year before', () => {
-    const s = seriesFor(METRICS.revenue, '7d', { compare: 'last-year' })
-    expect(s.compare).toBe('last-year')
-    expect(s.previous[6].date.getFullYear()).toBe(s.days[6].date.getFullYear() - 1)
-    expect(s.previous[6].date.getDate()).toBe(s.days[6].date.getDate())
-    expect(compareName('last-year')).toBe('Same period last year')
-    expect(compareName('previous')).toBe('Previous period')
+describe('custom ranges (DT-2 – DT-5)', () => {
+  const id = customId(day(10, 9), day(9, 12))
+  it('keeps the ends in order', () => {
+    expect(id).toBe('custom:2025-10-12:2025-11-09')
+    expect(customRange(id)).toEqual({ from: day(9, 12), to: day(10, 9) })
+  })
+  it('names the range and says how long it is', () => {
+    expect(periodName(id)).toBe('12 Oct – 9 Nov')
+    expect(rangeSummary(day(9, 12), day(10, 9), 'previous')).toBe('12 Oct – 9 Nov · 29 days, compared with the 29 days before')
+  })
+  it('covers exactly its own days, whatever today is', () => {
+    expect(periodWindow(id, TODAY)).toEqual({ from: day(9, 12), to: day(10, 9) })
+  })
+})
+
+describe('what a period is compared with (DT-7)', () => {
+  it('the same number of days just before', () => {
+    expect(comparedWindow(periodWindow('7d', TODAY), 'previous')).toEqual({ from: day(10, 1), to: day(10, 7) })
+  })
+  it('the same days a year before', () => {
+    expect(comparedWindow(periodWindow('7d', TODAY), 'last-year')).toEqual({ from: day(10, 8, 2024), to: day(10, 14, 2024) })
+  })
+  it('nothing, with no comparison', () => {
+    expect(comparedWindow(periodWindow('7d', TODAY), 'none')).toBeNull()
   })
 })

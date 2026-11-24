@@ -3,7 +3,7 @@
 import { TriangleAlert, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { appNames, type AppId } from './sync-model'
+import { appNames } from './sync-model'
 
 // The sync toasts (Figma 287:60863, 195:61735; SY-29, SY-30). The error toast is white with a
 // fine border, names the app, offers Reconnect (admins), and closes after 8 s, staying while
@@ -12,9 +12,9 @@ import { appNames, type AppId } from './sync-model'
 const FOCUS = 'outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]'
 const ERROR_MS = 8_000
 
-export function showSyncErrorToast({ apps, rest, onReconnect }: { apps: AppId[]; rest: string; onReconnect: (() => void) | null }) {
-  const { lead, more } = appNames(apps)
-  const verb = apps.length === 1 ? 'sync failed' : 'failed to sync'
+export function showSyncErrorToast({ names, rest, onReconnect }: { names: string[]; rest: string; onReconnect: (() => void) | null }) {
+  const { lead, more } = appNames(names)
+  const verb = names.length === 1 ? 'sync failed' : 'failed to sync'
   toast.custom((id) => (
     <div
       role="alert"
@@ -50,7 +50,7 @@ export function showSyncErrorToast({ apps, rest, onReconnect }: { apps: AppId[];
 }
 
 /** A sync you started ended well while you were on a board that doesn't read the app (SY-30). */
-export function showSyncedToast(apps: AppId[]) {
-  const { lead, more } = appNames(apps)
+export function showSyncedToast(names: string[]) {
+  const { lead, more } = appNames(names)
   toast(`${lead}${more ? ` & ${more}` : ''} synced just now`)
 }

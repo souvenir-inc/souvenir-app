@@ -1,10 +1,15 @@
-// Dashboard data model. Server-shaped data (Metric) is kept apart from the board layout (BoardCard),
-// so a metric can be shown at any size and the layout can be saved on its own later.
+// Dashboard data model. A Metric is what the warehouse measured for one period (live/metrics.ts);
+// the board layout (BoardCard) is kept apart, so a metric can be shown at any size.
 
-/** The apps cards read from (Figma 95:18703 lists eleven). */
-export type MetricSource =
-  | 'shopify' | 'meta' | 'google-ads' | 'tiktok' | 'google-analytics' | 'pinterest'
-  | 'stripe' | 'paypal' | 'zendesk' | 'reddit' | 'hubspot' | 'shipstation'
+/** A connection feeding the warehouse, by its connection id. */
+export type AppId = string
+
+export interface App {
+  id: AppId
+  /** The connector it is, e.g. "shopify_app", "metaads". */
+  slug: string
+  name: string
+}
 
 /**
  * The six card sizes (05-cards-reading-rules.md CR-1), named for the 12-column grid:
@@ -12,6 +17,8 @@ export type MetricSource =
  *   full-lg 12×2 Large. On the 4-column design grid that's 1, 2 or 4 columns by 1 or 2 rows.
  */
 export type CardSize = 'sm' | 'sm-tall' | 'md' | 'lg' | 'full' | 'full-lg'
+
+export type MetricFormat = 'number' | 'currency' | 'percent'
 
 export interface MetricChange {
   /** Already formatted, e.g. "6.1%". */
@@ -21,52 +28,66 @@ export interface MetricChange {
   sentiment: 'positive' | 'negative'
 }
 
-export interface WeeklyPoint {
-  week: string
-  value: number
+export interface Day { date: Date; value: number | null }
+
+export interface Series {
+  days: Day[]
+  /** The same days of the comparison period; empty with no comparison. */
+  previous: Day[]
+  /** Whether the comparison period has enough data to compare with (CR-24). */
+  comparable: boolean
+  /** What the previous days are: 'previous', 'last-year' or 'none' (11 DT-7). */
+  compare: string
+  daysWithData: number
+}
+
+export interface Week {
+  start: Date
+  /** The last day counted: today for the week in progress. */
+  end: Date
+  value: number | null
   /** The current, unfinished week: drawn in the soft colour. */
-  inProgress?: boolean
+  inProgress: boolean
+}
+
+/** How a metric is doing against its scorecard target (CR-28). */
+export interface Health {
+  verdict: 'on' | 'off'
+  /** How far off, e.g. "−12%". */
+  off?: string
+  /** As wider cards show it, e.g. "$55k". */
+  target: string
 }
 
 export interface Metric {
   id: string
   label: string
-  source: MetricSource
-  /** Already formatted, e.g. "$48.2k". */
-  value: string
-  change: MetricChange
-  /** One point per day of the period; `previous` is the comparison period. */
-  trend: { current: number[]; previous: number[] }
-  weekly: WeeklyPoint[]
-  /** Formats raw chart values (axis ticks, tooltips). */
-  format: 'number' | 'currency' | 'percent' | 'ratio'
-  /** A second app it reads from (MER: Shopify and Meta Ads): both logos, the worse dot (CR-5, CR-25). */
-  alsoFrom?: MetricSource
-  /** A sum or count shown by week instead of a line (CR-2). */
-  bars?: boolean
-  /** No connected app records it: "No data" (CR-22). */
-  unmeasured?: boolean
-  /** How it's doing against a target or the benchmark (CR-28). */
-  health?: Health
   /** One plain sentence for the metric window's Definition tab. */
-  definition?: string
-  /** Made in the Metric library: Σ instead of an app logo (06 AC-10). */
-  custom?: boolean
+  definition: string
+  format: MetricFormat
+  /** Adds up over days (a sum or count) rather than sitting around a rate (CR-3). */
+  sum: boolean
+  /** Added in this workspace: Σ instead of an app logo (06 AC-10). */
+  custom: boolean
+  /** A rise is good news (green): its scorecard's direction, else up. */
+  upIsGood: boolean
+  /** The connections whose data it reads, in workspace order. */
+  apps: AppId[]
+  /** The period's number; null before it's measured or when nothing was recorded. */
+  amount: number | null
+  /** The comparison period's number; null with no comparison or nothing recorded. */
+  previous: number | null
+  /** `amount` formatted for the card, e.g. "$48.2k"; "—" when there is none. */
+  value: string
+  /** Against the comparison period; null with no comparison or nothing to compare. */
+  change: MetricChange | null
+  series: Series
+  /** The last five weeks, the last one in progress (CR-11). */
+  weekly: Week[]
+  /** Why this store can't measure it, when it can't (CR-22). */
+  unmeasured: string | null
+  health: Health | null
 }
-
-/** A card's health (CR-28): against a target, or the benchmark when there's none. */
-export type Health =
-  | {
-      by: 'target'
-      verdict: 'on' | 'off'
-      /** How far off, e.g. "−12%". */
-      off?: string
-      /** As wider cards show it, e.g. "$55k", "46 a day". */
-      target: string
-      /** A target per day, drawn on the full chart (CR-13). */
-      perDay?: number
-    }
-  | { by: 'benchmark'; verdict: 'below' | 'above' | 'red' }
 
 export interface BoardCard {
   metricId: string
@@ -74,7 +95,7 @@ export interface BoardCard {
   /** Top-left cell on the 4-column design grid (grid-layout.ts). */
   x: number
   y: number
-  /** The card's own chart, set in card settings (10 CS-6); unset, the metric's default. */
+  /** The card's own chart, set in card settings (10 CS-6); unset, the size's default. */
   chart?: 'trend' | 'bars'
 }
 

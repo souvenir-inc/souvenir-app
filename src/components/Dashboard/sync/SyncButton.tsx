@@ -4,12 +4,11 @@ import { Plug, TriangleAlert } from 'lucide-react'
 import { PopoverContent, PopoverRoot, PopoverTrigger } from '@/components/Popover'
 import { Tooltip } from '@/components/Tooltip'
 import { cn } from '@/lib/utils'
-import { RotateCwClockIcon, SOURCE_NAMES, SourceLogo } from '../icons'
-import {
-  STILL_SYNCING_AFTER, ago, appState, buttonState, footerText, hoverText, sortApps,
-  type AppId, type ButtonState,
-} from './sync-model'
-import { blockedReason, reconnectApps, refreshAll, syncApps, useSyncSnapshot } from './sync-store'
+import { RotateCwClockIcon, SourceLogo } from '../icons'
+import { useDashboardData } from '../live/dashboard-data'
+import type { AppId } from '../types'
+import { ago, buttonState, footerText, hoverText, sortApps, type AppState, type ButtonState } from './sync-model'
+import { blockedReason, reconnect, refreshAll, refreshRunning, syncApps, useSyncSnapshot } from './sync-store'
 import { Spinner } from './Spinner'
 
 // The sync button and Data sources (Figma 95:18703; 04-sync-rules.md SY-1 – SY-12, SY-25).
@@ -43,7 +42,6 @@ const ROW_ACTION = cn(
 )
 
 interface SyncButtonProps {
-  boardId: string
   /** The apps this board's cards read (SY-1), with how many cards read each (SY-6). */
   apps: AppId[]
   uses: Partial<Record<AppId, number>>
@@ -51,14 +49,15 @@ interface SyncButtonProps {
   onOpenChange: (open: boolean) => void
 }
 
-export function SyncButton({ boardId, apps: ids, uses, open, onOpenChange }: SyncButtonProps) {
+export function SyncButton({ apps: ids, uses, open, onOpenChange }: SyncButtonProps) {
   const s = useSyncSnapshot()
+  const { apps } = useDashboardData()
   const now = s.now
-  const state = buttonState(ids, s.apps, now, s.online)
+  const state = buttonState(ids, s.apps, s.online)
   const hover = hoverText(ids, s.apps, now, s.online, s.offlineSince)
   const blocked = blockedReason(s, now)
-  const footer = footerText(ids, s.apps, now, s.refreshRunning)
-  const rows = sortApps(ids, s.apps, now, uses)
+  const footer = footerText(ids, s.apps, now, refreshRunning(s))
+  const rows = sortApps(ids, s.apps, uses, (id) => apps.rank(id))
   const refreshTip =
     blocked === 'cooldown' ? 'Synced just now • Refresh again in a minute'
     : blocked === 'offline' ? 'Refresh waits for the connection'
@@ -106,7 +105,7 @@ export function SyncButton({ boardId, apps: ids, uses, open, onOpenChange }: Syn
           {ids.length === 0 ? (
             <p className="m-0 px-2.5 py-2 text-[13px] leading-5 text-[var(--dashboard-muted)]">No apps on this board yet. Add a card to use one.</p>
           ) : (
-            <AppList ids={rows} boardId={boardId} blocked={blocked} />
+            <AppList ids={rows} blocked={blocked} />
           )}
           <div className="px-1 py-1.5"><div className="h-px bg-[var(--neutral-200)]" /></div>
           <div className="flex items-center justify-between gap-3 pb-1 pl-1 pr-2.5 pt-0.5">
@@ -116,7 +115,7 @@ export function SyncButton({ boardId, apps: ids, uses, open, onOpenChange }: Syn
                 {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the outlined Refresh pill of Figma 123:20854 (white, hairline ring, 13px Geist) */}
                 <button
                   type="button"
-                  onClick={() => refreshAll()}
+                  onClick={() => { void refreshAll() }}
                   disabled={blocked !== null}
                   className={cn(
                     'flex h-8 cursor-pointer items-center gap-1.5 rounded-full border-0 bg-[var(--dashboard-card-bg)] pl-2.5 pr-3.5 text-[13px] font-medium leading-5 text-[var(--dashboard-figure)]',
@@ -139,7 +138,7 @@ export function SyncButton({ boardId, apps: ids, uses, open, onOpenChange }: Syn
 }
 
 /** The first 5 apps, then a scroll with a fade over the fifth and a thin bar (SY-6). */
-function AppList({ ids, boardId, blocked }: { ids: AppId[]; boardId: string; blocked: ReturnType<typeof blockedReason> }) {
+function AppList({ ids, blocked }: { ids: AppId[]; blocked: ReturnType<typeof blockedReason> }) {
   const more = ids.length > 5
   return (
     <div className="relative">
@@ -147,69 +146,71 @@ function AppList({ ids, boardId, blocked }: { ids: AppId[]; boardId: string; blo
         className={cn('m-0 list-none p-0', more && 'dashboard-thin-scroll max-h-[180px] overflow-y-auto')}
         aria-label="Apps on this board"
       >
-        {ids.map((id) => <AppRow key={id} id={id} boardId={boardId} blocked={blocked} />)}
+        {ids.map((id) => <AppRow key={id} id={id} blocked={blocked} />)}
       </ul>
       {more && <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-b from-transparent to-[var(--dashboard-card-bg)]" />}
     </div>
   )
 }
 
-function AppRow({ id, boardId, blocked }: { id: AppId; boardId: string; blocked: ReturnType<typeof blockedReason> }) {
+function AppRow({ id, blocked }: { id: AppId; blocked: ReturnType<typeof blockedReason> }) {
   const s = useSyncSnapshot()
   const now = s.now
   const a = s.apps[id]
-  const state = appState(a, now)
-  const name = SOURCE_NAMES[id]
+  const state = a.state
+  const name = a.name
   return (
     <li data-app-row={id} data-app-state={state} className="flex h-9 items-center gap-2.5 rounded-lg px-2.5">
-      <SourceLogo source={id} className="size-4 shrink-0" />
+      <SourceLogo app={{ id, slug: a.slug, name }} className="size-4 shrink-0" />
       <span className="min-w-0 truncate text-[13px] leading-5 text-[var(--dashboard-figure)]">{name}</span>
       {state === 'behind' && (
         <Tooltip content={blocked === 'cooldown' ? 'Synced just now • Sync again in a minute' : `Sync ${name} now`} side="top">
           <span className="inline-flex rounded-full">
             {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: 24px round row action on the soft fill (Figma 123:20927) */}
-            <button type="button" aria-label={`Sync ${name} now`} disabled={blocked !== null} onClick={() => syncApps([id], boardId)} className={ROW_ACTION}>
+            <button type="button" aria-label={`Sync ${name} now`} disabled={blocked !== null} onClick={() => { void syncApps([id]) }} className={ROW_ACTION}>
               <RotateCwClockIcon aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />
             </button>
           </span>
         </Tooltip>
       )}
-      {state === 'failed' && s.isAdmin && (
+      {state === 'failed' && a.yours && (
         <Tooltip content={`Reconnect ${name}`} side="top">
           <span className="inline-flex rounded-full">
             {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: 24px round row action on the soft fill (Figma 123:20845) */}
-            <button type="button" aria-label={`Reconnect ${name}`} disabled={blocked === 'offline' || blocked === 'busy'} onClick={() => reconnectApps([id], boardId)} className={ROW_ACTION}>
+            <button type="button" aria-label={`Reconnect ${name}`} disabled={blocked === 'offline' || blocked === 'busy'} onClick={reconnect} className={ROW_ACTION}>
               <Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />
             </button>
           </span>
         </Tooltip>
       )}
       <span className="min-w-0 flex-1" />
-      <RowStatus id={id} state={state} now={now} member={!s.isAdmin} />
+      <RowStatus id={id} state={state} now={now} yours={a.yours} />
     </li>
   )
 }
 
-function RowStatus({ id, state, now, member }: { id: AppId; state: ReturnType<typeof appState>; now: number; member: boolean }) {
+function RowStatus({ id, state, now, yours }: { id: AppId; state: AppState; now: number; yours: boolean }) {
   const s = useSyncSnapshot()
   const a = s.apps[id]
   const text = 'shrink-0 whitespace-nowrap text-[12px] leading-4'
   switch (state) {
     case 'syncing':
     case 'first': {
-      const label = state === 'first' ? 'First sync…' : now - a.syncing!.startedAt >= STILL_SYNCING_AFTER ? 'Still syncing…' : 'Syncing…'
+      const label = state === 'first' ? 'First sync…' : a.slow ? 'Still syncing…' : 'Syncing…'
       return <span className={cn(text, 'flex items-center gap-1.5 text-[var(--dashboard-muted)]')}><Spinner />{label}</span>
     }
     case 'failed': {
+      // Hover says what the provider said; someone else's account is reconnected by its owner (SY-25).
+      const tip = [a.error, yours ? null : 'Only the person who connected it can reconnect it'].filter(Boolean).join(' • ')
       const status = (
-        <span tabIndex={member ? 0 : undefined} className={cn(text, 'flex items-center gap-[5px] rounded-sm font-medium text-[var(--dashboard-sync-failed)]', member && FOCUS)}>
-          <TriangleAlert aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />Sync failed
+        <span tabIndex={tip ? 0 : undefined} className={cn(text, 'flex items-center gap-[5px] rounded-sm font-medium text-[var(--dashboard-sync-failed)]', tip && FOCUS)}>
+          <TriangleAlert aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />{a.needsReconnect ? 'Reconnect needed' : 'Sync failed'}
         </span>
       )
-      return member ? <Tooltip content="Only admins can reconnect apps" side="top" align="end">{status}</Tooltip> : status
+      return tip ? <Tooltip content={tip} side="top" align="end">{status}</Tooltip> : status
     }
     case 'behind':
-      return <span className={cn(text, 'font-medium text-[var(--dashboard-sync-behind)]')}>{ago(a.syncedAt!, now)}</span>
+      return <span className={cn(text, 'font-medium text-[var(--dashboard-sync-behind)]')}>{a.syncedAt == null ? '' : ago(a.syncedAt, now)}</span>
     default:
       return <span className={cn(text, 'text-[var(--dashboard-muted)]')}>{a.syncedAt == null ? '' : ago(a.syncedAt, now)}</span>
   }

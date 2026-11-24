@@ -5,7 +5,6 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import { customId, customRange, rangeSummary } from './period'
-import { TODAY } from './series'
 
 // A custom range (Figma 4.2, 20:8181; 11-dates-tabs-reference-rules.md DT-2 – DT-5): two months side by
 // side, the ends dark, the days between filled; the footer says how long it is and what it's compared
@@ -28,15 +27,16 @@ interface CustomRangeProps {
 
 export function CustomRange({ period, compare, onApply, onClose, className }: CustomRangeProps) {
   const current = customRange(period)
+  const [today] = useState(() => new Date())
   const [from, setFrom] = useState<Date | null>(current?.from ?? null)
   const [to, setTo] = useState<Date | null>(current?.to ?? null)
   const [hover, setHover] = useState<Date | null>(null)
   // The right-hand month: the range's end, or this month.
-  const [right, setRight] = useState(() => new Date((current?.to ?? TODAY).getFullYear(), (current?.to ?? TODAY).getMonth(), 1))
+  const [right, setRight] = useState(() => new Date((current?.to ?? today).getFullYear(), (current?.to ?? today).getMonth(), 1))
   const ref = useRef<HTMLDivElement>(null)
-  const earliest = addMonths(TODAY, -12)
+  const earliest = addMonths(today, -12)
   const canBack = addMonths(right, -1).getTime() > new Date(earliest.getFullYear(), earliest.getMonth(), 1).getTime()
-  const canForward = !sameMonth(right, TODAY)
+  const canForward = !sameMonth(right, today)
 
   // Esc or a click outside closes it (DT-4).
   useEffect(() => {
@@ -69,7 +69,7 @@ export function CustomRange({ period, compare, onApply, onClose, className }: Cu
           {cells.map((d, i) => {
             if (!d) return <span key={i} />
             const t = d.getTime()
-            const future = t > day0(TODAY)
+            const future = t > day0(today)
             const isEnd = (lo && t === day0(lo)) || (hi && t === day0(hi))
             const inside = lo && hi && t > day0(lo) && t < day0(hi)
             // The fill runs between the ends, rounded at a week's or a range's edges.

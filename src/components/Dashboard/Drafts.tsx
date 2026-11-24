@@ -7,7 +7,7 @@ import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui
 import { cn } from '@/lib/utils'
 import { SourceLogo } from './icons'
 import { Spinner } from './sync/Spinner'
-import { ALL_APPS, isConnected, useSyncSnapshot } from './sync/sync-store'
+import { useDashboardData } from './live/dashboard-data'
 import { AI_EXAMPLES } from './templates'
 
 // Ask the AI (Figma 170:73483 – 171:89377; 08-new-board-rules.md NB-20 – NB-30): the describe
@@ -49,10 +49,10 @@ export function AskAIDialog({ open, ...rest }: AskAIDialogProps) {
 }
 
 function Describe({ initial, onSend }: Omit<AskAIDialogProps, 'open'>) {
-  const sync = useSyncSnapshot()
+  const { apps: connected } = useDashboardData()
   const [text, setText] = useState(initial)
   const boxRef = useRef<HTMLTextAreaElement>(null)
-  const apps = ALL_APPS.filter((a) => isConnected(sync, a))
+  const apps = connected.list
   const send = () => { if (text.trim()) onSend(text.trim()) }
   return (
     <DialogContent
@@ -102,7 +102,7 @@ function Describe({ initial, onSend }: Omit<AskAIDialogProps, 'open'>) {
         <span aria-hidden className="h-px bg-[var(--neutral-200)]" />
         <p data-drafts-from className="m-0 flex items-center gap-2 text-[12px] leading-4 text-[var(--dashboard-label)]">
           Drafts from
-          <span className="flex items-center gap-1">{apps.map((a) => <SourceLogo key={a} source={a} className="size-4" />)}</span>
+          <span className="flex items-center gap-1">{apps.map((a) => <SourceLogo key={a.id} app={a} className="size-4" />)}</span>
         </p>
       </div>
     </DialogContent>

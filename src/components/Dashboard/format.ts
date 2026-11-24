@@ -10,7 +10,6 @@ export function formatMetricValue(value: number, format: Metric['format']): stri
   switch (format) {
     case 'currency': return `$${n}`
     case 'percent':  return `${n}%`
-    case 'ratio':    return `${n}x`
     default:         return n
   }
 }

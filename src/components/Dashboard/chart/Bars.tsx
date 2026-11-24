@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { formatMetricValue, niceMax } from '../format'
-import { changeLabel, formatExact, sameDaysBefore, upIsGood, weekInfo } from '../series'
+import { changeLabel, dayMonth, formatExact, weekInfo } from '../series'
 import type { Metric } from '../types'
 import { Readout, useSize, type ReadoutContent } from './Readout'
 
@@ -12,7 +12,7 @@ import { Readout, useSize, type ReadoutContent } from './Readout'
 //            under it; 44 px bars (Figma "chart · weekly bars", 560 × 216).
 //   compact  the 6 × 1 card: 36 px bars, no axes (Figma "chart · weekly bars (compact)").
 // The week still filling in is the lighter bar. Hover: a soft band behind the week and a readout
-// per week; a week in progress reads "so far" against the same days of the week before.
+// per week against the week before; the week in progress reads "so far".
 
 const TICKS_W = 36
 const LABELS_H = 24
@@ -25,7 +25,8 @@ export function WeeklyBars({ metric, variant, className }: { metric: Metric; var
   const n = weeks.length
   const plotW = full ? width - TICKS_W : width
   const plotH = Math.max(0, full ? height - LABELS_H : height)
-  const max = full ? niceMax(Math.max(...weeks.map((w) => w.value))) : Math.max(...weeks.map((w) => w.value)) * 1.13
+  const values = weeks.map((w) => w.value ?? 0)
+  const max = full ? niceMax(Math.max(...values)) : Math.max(...values, 0) * 1.13 || 1
   const band = plotW / n
   const barW = full ? 44 : 36
   const cx = (i: number) => (full ? band * i + band / 2 : n === 1 ? plotW / 2 : barW / 2 + (i * (plotW - barW)) / (n - 1))
@@ -51,23 +52,23 @@ export function WeeklyBars({ metric, variant, className }: { metric: Metric; var
             <rect data-hover-week={hover} x={cx(hover) - (full ? 32 : 24)} y={0} width={full ? 64 : 48} height={plotH} rx={4} fill="var(--dashboard-hover-band)" />
           )}
           {weeks.map((w, i) => {
-            const h = plotH - y(w.value)
+            const h = plotH - y(w.value ?? 0)
             return (
               <path
-                key={w.week}
-                d={roundedTop(cx(i) - barW / 2, y(w.value), barW, h, full ? 4 : 3)}
+                key={w.start.getTime()}
+                d={roundedTop(cx(i) - barW / 2, y(w.value ?? 0), barW, h, full ? 4 : 3)}
                 fill={w.inProgress ? 'var(--dashboard-chart-soft)' : 'var(--dashboard-chart-ink)'}
               />
             )
           })}
           {full && weeks.map((w, i) => (
-            <text key={`l${w.week}`} x={cx(i)} y={plotH + 20} fontSize={12} textAnchor="middle" fill="var(--dashboard-muted)">{w.week}</text>
+            <text key={`l${w.start.getTime()}`} x={cx(i)} y={plotH + 20} fontSize={12} textAnchor="middle" fill="var(--dashboard-muted)">{dayMonth(w.start)}</text>
           ))}
           <rect x={0} y={0} width={plotW} height={plotH} fill="transparent" onPointerMove={onMove} onPointerDown={onMove} style={{ touchAction: 'pan-y' }} />
         </svg>
       )}
       {hover != null && (
-        <Readout content={weekReadout(metric, hover)} x={cx(hover) + (cx(hover) > width / 2 ? -barW / 2 : barW / 2)} y={y(weeks[hover].value)} width={width} height={height} />
+        <Readout content={weekReadout(metric, hover)} x={cx(hover) + (cx(hover) > width / 2 ? -barW / 2 : barW / 2)} y={y(weeks[hover].value ?? 0)} width={width} height={height} />
       )}
     </div>
   )
@@ -83,17 +84,15 @@ function roundedTop(x: number, y: number, w: number, h: number, r: number): stri
 /** What the readout says for week `i` (CR-11). */
 export function weekReadout(metric: Metric, i: number): ReadoutContent {
   const w = metric.weekly[i]
-  const info = weekInfo(i, !!w.inProgress)
-  const exact = (v: number) => formatExact(v, metric.format)
-  if (!w.inProgress) return { title: info.title, rows: [{ dot: 'ink', label: info.range, value: exact(w.value) }] }
-  const before = sameDaysBefore(metric.weekly[i - 1]?.value ?? w.value)
-  const good = upIsGood(metric.change)
+  const info = weekInfo(w)
+  const value = w.value === null ? 'No data' : formatExact(w.value, metric.format)
+  const row = { dot: w.inProgress ? 'soft' as const : 'ink' as const, label: info.range, value }
+  const before = metric.weekly[i - 1]?.value ?? null
+  // A week in progress isn't set against a whole week: its number is "so far".
+  if (w.inProgress || w.value === null || before === null) return { title: info.title, rows: [row] }
   return {
     title: info.title,
-    rows: [
-      { dot: 'soft', label: info.range, value: exact(w.value) },
-      { dot: 'previous', label: info.previousRange!, value: exact(before), muted: true },
-    ],
-    footer: { text: `${changeLabel(w.value, before)} on the same days`, tone: (w.value >= before) === good ? 'good' : 'bad' },
+    rows: [row],
+    footer: { text: `${changeLabel(w.value, before)} vs the week before`, tone: (w.value >= before) === metric.upIsGood ? 'good' : 'bad' },
   }
 }

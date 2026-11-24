@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { fileBase, numbersCsv, periodRange, stamp } from './export'
+import { metrics, TODAY } from '../live/live-fixtures'
+import { fileBase, numbersCsv, stamp } from './export'
 import { ME, boardLink, cantSeeOn, datesLabel, linkCaption, loseCount, matches, outsideEmail, roleFor, sortGrants, type Share } from './share-model'
 
 // 09-share-export-rules.md
@@ -59,32 +60,30 @@ describe('the link (SH-20, SH-21)', () => {
 })
 
 describe('downloads (SH-33 – SH-37)', () => {
+  const m = metrics()
   it('names files after the board or card and the days on screen', () => {
-    expect(fileBase('Store overview', '7d')).toBe('store-overview-2025-11-08-to-2025-11-14')
-    expect(fileBase('Email & SMS', '30d')).toBe('email-and-sms-2025-10-16-to-2025-11-14')
-    expect(periodRange('yesterday').to.getDate()).toBe(13)
+    expect(fileBase('Store overview', '7d', TODAY)).toBe('store-overview-2025-11-08-to-2025-11-14')
+    expect(fileBase('Email & SMS', '30d', TODAY)).toBe('email-and-sms-2025-10-16-to-2025-11-14')
+    expect(fileBase('Daily', 'yesterday', TODAY)).toBe('daily-2025-11-13-to-2025-11-13')
   })
   it('stamps the image', () => {
-    expect(stamp('Store overview', '7d', 'previous', 'Dev Shah')).toBe('Store overview · Last 7 days • Previous period · Dev Shah · 14 Nov 2025')
+    expect(stamp('Store overview', '7d', 'previous', 'A member', TODAY)).toBe('Store overview · Last 7 days • Previous period · A member · 14 Nov 2025')
   })
-  it('writes one sheet: title, who, blank, header, a row per day', () => {
-    const csv = numbersCsv({ title: 'Revenue', metricIds: ['revenue'], period: '7d', compare: 'previous', by: 'Dev Shah' })
+  it('writes one sheet: title, who, blank, header, a row per measured day', () => {
+    const csv = numbersCsv({ title: 'Revenue', metrics: [m.get('revenue')!], period: '7d', compare: 'previous', by: 'A member', on: TODAY })
     expect(csv.charCodeAt(0)).toBe(0xfeff)
     const lines = csv.slice(1).trim().split('\r\n')
     expect(lines[0]).toBe('Revenue · Last 7 days · vs previous 7 days')
-    expect(lines[1]).toBe('Exported by Dev Shah on 14 November 2025')
+    expect(lines[1]).toBe('Exported by A member on 14 November 2025')
     expect(lines[2]).toBe('')
     expect(lines[3]).toBe('Date,Revenue,Previous 7 days date,"Revenue, previous 7 days"')
     expect(lines).toHaveLength(4 + 7)
-    expect(lines[4].startsWith('2025-11-08,')).toBe(true)
-    // Exact: the seven days add up to the card's $48.2k.
-    const sum = lines.slice(4).reduce((s, l) => s + Number(l.split(',')[1]), 0)
-    expect(Math.round(sum / 100) * 100).toBe(48200)
-    expect(lines[4]).not.toMatch(/k|\$/)
+    expect(lines[4]).toBe('2025-11-08,6100,2025-11-01,')
+    expect(lines[10]).toBe('2025-11-14,7000,2025-11-07,6200')
   })
   it('puts every card side by side, rates with (%), no comparison columns without a comparison', () => {
-    const csv = numbersCsv({ title: 'Store overview', metricIds: ['orders', 'refund-rate'], period: '7d', compare: 'none', by: 'Dev Shah' })
-    const header = csv.slice(1).split('\r\n')[3]
-    expect(header).toBe('Date,Orders,Refund rate (%)')
+    const none = metrics({ totalBefore: undefined, dailyBefore: undefined, chartBefore: null, compare: 'none' })
+    const csv = numbersCsv({ title: 'Store overview', metrics: [none.get('orders')!, none.get('refund_rate')!], period: '7d', compare: 'none', by: 'A member', on: TODAY })
+    expect(csv.slice(1).split('\r\n')[3]).toBe('Date,Orders,Refund rate (%)')
   })
 })

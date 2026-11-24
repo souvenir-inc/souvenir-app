@@ -28,6 +28,8 @@ export interface Board {
   access: Access
   /** Set when someone else owns the board and shared it with you (TAB-50). */
   sharedBy?: Person
+  /** Every member of the workspace sees it; otherwise only its owner. */
+  shared: boolean
   /** An Ask the AI draft, not saved yet: a sparkle on its tab (08 NB-21). */
   draft?: boolean
 }

@@ -1,16 +1,17 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
-import { Check, CircleCheck, LayoutGrid, Plug, Search, Sigma, TriangleAlert, User, X, XCircle } from 'lucide-react'
+import { Check, LayoutGrid, Plug, Search, Sigma, User, X, XCircle } from 'lucide-react'
 import { Button, IconButton } from '@/components/ui'
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
 import { cn } from '@/lib/utils'
-import { CATALOG, OTHER_ROLES, ROLE_METRICS, YOUR_ROLE, groupOf, groupRank, matchOf, nameList } from './catalog'
-import { SOURCE_NAMES, SourceLogo } from './icons'
-import { METRICS, baseMetricId } from './mock-data'
-import { Spinner } from './sync/Spinner'
-import { connectApp, isConnected, useSyncSnapshot, type Connection } from './sync/sync-store'
-import type { Metric, MetricSource } from './types'
+import { OTHER_ROLES, ROLE_METRICS, YOUR_ROLE, catalogOf, groupOf, groupRank, matchOf, nameList } from './catalog'
+import { SourceLogo } from './icons'
+import { useDashboardData } from './live/dashboard-data'
+import { Metrics } from './live/metrics'
+import { measurable } from './templates'
+import type { App, Metric } from './types'
 
 // The Add cards picker (Figma 170:45414, docs-v2/dashboard/06-add-cards-rules.md AC-3 – AC-15),
 // Option A: grouped by role. Search across every metric; tick as many as you like; Add puts them at
@@ -36,45 +37,40 @@ export function AddCardsDialog({ open, ...rest }: AddCardsDialogProps) {
   )
 }
 
-/** A line in the list: a group heading, a metric row, a gap, or an app's call-out (AC-8). */
+/** A line in the list: a group heading, a metric row, a gap, or the call-out for metrics no app feeds (AC-8). */
 type Line =
   | { kind: 'heading'; text: string }
   | { kind: 'row'; metric: Metric; match?: { at: number; length: number } | null }
-  | { kind: 'callout'; app: MetricSource; count: number }
+  | { kind: 'callout'; count: number }
   | { kind: 'gap'; size: 4 | 8 }
 
 function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) {
-  const sync = useSyncSnapshot()
+  const { metrics, apps } = useDashboardData()
+  const catalog = catalogOf(metrics.all)
   const [view, setView] = useState<View>('founder')
   const [query, setQuery] = useState('')
   const [picks, setPicks] = useState<string[]>([])
   const [focus, setFocus] = useState(0)
   const searchRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
-  const boardIds = new Set(onBoard.map(baseMetricId))
-
-  const connection = (app: MetricSource): Connection | undefined => sync.connections[app]
-  const appOn = (m: Metric) => isConnected(sync, m.source) && (!m.alsoFrom || isConnected(sync, m.alsoFrom))
-  const pickable = (m: Metric) => !m.unmeasured && appOn(m)
+  const boardIds = new Set(onBoard.map(Metrics.base))
+  const pickable = measurable
 
   // ── What the list shows ─────────────────────────────────────────────────────
   const lines = useMemo<Line[]>(() => {
     const searching = query.trim().length > 0
     const source: { metric: Metric; match?: { at: number; length: number } | null }[] = searching
-      ? CATALOG.flatMap((metric) => { const match = matchOf(metric, query); return match === false ? [] : [{ metric, match }] })
-      : (view === 'all' ? CATALOG : view === 'custom' ? CATALOG.filter((m) => m.custom) : (ROLE_METRICS[view] ?? []).map((id) => METRICS[id]).filter(Boolean))
+      ? catalog.flatMap((metric) => { const match = matchOf(metric, query, apps); return match === false ? [] : [{ metric, match }] })
+      : (view === 'all' ? catalog : view === 'custom' ? catalog.filter((m) => m.custom) : (ROLE_METRICS[view] ?? []).map((id) => metrics.get(id)).filter((m): m is Metric => !!m))
           .map((metric) => ({ metric }))
-    // Apps that weren't connected stay under their call-out until the picker closes, even once
-    // connected (AC-9): the call-out turns green and its metrics become pickable.
-    const listedApart = (m: Metric) => sync.connections[m.source] !== undefined
-    const on = source.filter((x) => !listedApart(x.metric))
-    const off = source.filter((x) => listedApart(x.metric))
+    const on = source.filter((x) => pickable(x.metric))
+    const off = source.filter((x) => !pickable(x.metric))
     const out: Line[] = []
     if (searching || view === 'all') {
       // Grouped by app, A–Z inside each group (AC-10, AC-13).
       const groups = new Map<string, typeof on>()
-      for (const x of [...on].sort((a, b) => groupRank(a.metric) - groupRank(b.metric) || a.metric.label.localeCompare(b.metric.label))) {
-        const g = groupOf(x.metric)
+      for (const x of [...on].sort((a, b) => groupRank(a.metric, apps) - groupRank(b.metric, apps) || a.metric.label.localeCompare(b.metric.label))) {
+        const g = groupOf(x.metric, apps)
         groups.set(g, [...(groups.get(g) ?? []), x])
       }
       for (const [g, xs] of groups) {
@@ -84,21 +80,16 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
     } else {
       for (const x of on) out.push({ kind: 'row', metric: x.metric, match: x.match })
     }
-    // Apps that aren't connected: one call-out each, its metrics faded under it (AC-8).
-    const apps = [...new Set(off.map((x) => x.metric.source))]
-    if (apps.length) {
-      if (searching || view === 'all') out.push({ kind: 'heading', text: 'APPS NOT CONNECTED' })
+    // Metrics no connected app feeds: one call-out to Connectors, the metrics faded under it (AC-8).
+    if (off.length) {
+      if (searching || view === 'all') out.push({ kind: 'heading', text: 'NEEDS AN APP' })
       else out.push({ kind: 'gap', size: 8 })
-      for (const app of apps) {
-        const xs = off.filter((x) => x.metric.source === app)
-        out.push({ kind: 'callout', app, count: CATALOG.filter((m) => m.source === app).length })
-        out.push({ kind: 'gap', size: 4 })
-        for (const x of xs) out.push({ kind: 'row', metric: x.metric, match: x.match })
-      }
+      out.push({ kind: 'callout', count: off.length })
+      out.push({ kind: 'gap', size: 4 })
+      for (const x of off) out.push({ kind: 'row', metric: x.metric, match: x.match })
     }
     return out
-    // appOn and listedApart read sync.connections
-  }, [query, view, sync.connections])
+  }, [query, view, catalog, metrics, apps, pickable])
 
   const rows = lines.filter((l): l is Extract<Line, { kind: 'row' }> => l.kind === 'row')
   const focusIndex = Math.min(focus, Math.max(0, rows.length - 1))
@@ -126,7 +117,7 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
     }
   }
 
-  const already = picks.filter((id) => boardIds.has(id)).map((id) => METRICS[id]?.label ?? id)
+  const already = picks.filter((id) => boardIds.has(id)).map((id) => metrics.get(id)?.label ?? id)
   const searching = query.trim().length > 0
   let rowIndex = -1
 
@@ -196,14 +187,15 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
             ) : lines.map((l, i) => {
               if (l.kind === 'heading') return <p key={`h${i}`} className="m-0 px-2.5 pb-1.5 pt-2.5 text-[11px] font-semibold leading-4 tracking-[0.6px] text-[var(--dashboard-muted)] first:pt-1">{l.text}</p>
               if (l.kind === 'gap') return <span key={`g${i}`} aria-hidden className="shrink-0" style={{ height: l.size }} />
-              if (l.kind === 'callout') return <CallOut key={`c${l.app}`} app={l.app} count={l.count} state={connection(l.app) ?? 'connected'} />
+              if (l.kind === 'callout') return <CallOut key="callout" count={l.count} />
               rowIndex += 1
               const idx = rowIndex
               const m = l.metric
               const can = pickable(m)
               const picked = picks.includes(m.id)
-              const firstSync = appOn(m) && (sync.connections[m.source] === 'connected' || sync.apps[m.source]?.syncing?.kind === 'first')
-              const tag = m.unmeasured ? 'No data' : !appOn(m) ? null : firstSync ? 'No data yet' : boardIds.has(m.id) ? 'On board' : null
+              const firstSync = m.apps.some((id) => apps.firstSync(id))
+              const marks = m.apps.slice(0, 2).map((id) => apps.get(id)).filter((a): a is App => !!a)
+              const tag = !can ? null : firstSync ? 'No data yet' : boardIds.has(m.id) ? 'On board' : null
               return (
                 <div
                   key={`r${m.id}`}
@@ -224,8 +216,7 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
                 >
                   <Checkbox state={!can ? 'none' : picked ? 'on' : 'off'} />
                   <span className={cn('flex shrink-0 items-center gap-[3px]', !can && 'opacity-45')}>
-                    {m.custom ? <CustomMark /> : <SourceLogo source={m.source} className="size-4" />}
-                    {m.alsoFrom && !m.custom && <SourceLogo source={m.alsoFrom} className="size-4" />}
+                    {m.custom ? <CustomMark /> : marks.map((app) => <SourceLogo key={app.id} app={app} className="size-4" />)}
                   </span>
                   <span title={m.label} className={cn('min-w-0 flex-1 truncate text-[14px] leading-[22px] text-[var(--dashboard-figure)]', picked && 'font-medium', !can && 'opacity-45')}>
                     <Highlight text={m.label} match={l.match} />
@@ -307,38 +298,24 @@ function Highlight({ text, match }: { text: string; match?: { at: number; length
   )
 }
 
-/** An app that isn't connected (AC-8, AC-9), with Connect and its progress. */
-function CallOut({ app, count, state }: { app: MetricSource; count: number; state: Connection }) {
-  const name = SOURCE_NAMES[app]
+/** Metrics no connected app feeds (AC-8): Connect goes to Connectors, where apps are linked. */
+function CallOut({ count }: { count: number }) {
   return (
-    <div data-callout={app} data-connection={state} className="flex h-14 shrink-0 items-center gap-3 rounded-[10px] border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] p-2.5">
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-panel-bg)]">
-        <SourceLogo source={app} className="size-4" />
+    <div data-callout className="flex h-14 shrink-0 items-center gap-3 rounded-[10px] border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] p-2.5">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-panel-bg)] text-[var(--dashboard-label)]">
+        <Plug aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth />
       </span>
       <span className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-[14px] font-medium leading-5 text-[var(--dashboard-figure)]">{name}</span>
-        <span className={cn('flex items-center gap-[5px] truncate text-[12px] leading-4', state === 'connected' ? 'text-[var(--dashboard-positive)]' : state === 'failed' ? 'text-[var(--dashboard-sync-failed)]' : 'text-[var(--dashboard-label)]')}>
-          {state === 'connected' && <CircleCheck aria-hidden size={12} strokeWidth={1.5} absoluteStrokeWidth />}
-          {state === 'failed' && <TriangleAlert aria-hidden size={12} strokeWidth={1.5} absoluteStrokeWidth />}
-          {state === 'off' ? `Not connected · ${count} metric${count === 1 ? '' : 's'} need it`
-            : state === 'connecting' ? 'Finish signing in, in the window that opened'
-            : state === 'connected' ? 'Connected · first sync running'
-            : 'Connection failed'}
-        </span>
+        <span className="truncate text-[14px] font-medium leading-5 text-[var(--dashboard-figure)]">Not measured here yet</span>
+        <span className="truncate text-[12px] leading-4 text-[var(--dashboard-label)]">{count} metric{count === 1 ? '' : 's'} need an app this store hasn’t connected</span>
       </span>
-      {state === 'connecting' ? (
-        <span role="status" className="flex shrink-0 items-center gap-1.5 text-[13px] leading-[18px] text-[var(--dashboard-label)]"><Spinner size={14} />Connecting…</span>
-      ) : (state === 'off' || state === 'failed') && (
-        // eslint-disable-next-line no-restricted-syntax -- ds-allow: the call-out's outlined Connect / Try again (Figma 170:38075)
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); connectApp(app) }}
-          className={cn('flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1.5 pl-2.5 pr-3 text-[13px] font-medium leading-[18px] text-[var(--dashboard-figure)] shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}
-        >
-          {state === 'off' && <Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}
-          {state === 'off' ? 'Connect' : 'Try again'}
-        </button>
-      )}
+      { }
+      <a
+        href={ORG_CONNECTORS_ROUTE}
+        className={cn('flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1.5 pl-2.5 pr-3 text-[13px] font-medium leading-[18px] text-[var(--dashboard-figure)] no-underline shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}
+      >
+        <Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />Connect
+      </a>
     </div>
   )
 }

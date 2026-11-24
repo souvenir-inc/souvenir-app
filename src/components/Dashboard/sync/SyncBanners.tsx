@@ -5,9 +5,10 @@ import { Plug, TriangleAlert, X } from 'lucide-react'
 import { Tooltip } from '@/components/Tooltip'
 import { cn } from '@/lib/utils'
 import { RotateCwClockIcon } from '../icons'
-import { appNames, banners, clock, hoursSince, type AppId, type Banner } from './sync-model'
+import type { AppId } from '../types'
+import { appNames, banners, clock, hoursSince, type Banner } from './sync-model'
 import {
-  blockedReason, dismissBanner, dismissRecent, reconnectApps, syncApps, useSyncSnapshot, type Recent,
+  blockedReason, dismissBanner, dismissRecent, reconnect, syncApps, useSyncSnapshot, type Recent,
 } from './sync-store'
 import { Spinner } from './Spinner'
 
@@ -34,7 +35,7 @@ interface SyncBannersProps {
 export function SyncBanners({ boardId, apps: ids }: SyncBannersProps) {
   const s = useSyncSnapshot()
   const now = s.now
-  const shown = banners(ids, s.apps, now).filter((b) => !s.dismissed.includes(`${boardId}|${b.key}`))
+  const shown = banners(ids, s.apps, s.started).filter((b) => !s.dismissed.includes(`${boardId}|${b.key}`))
   const recent = s.recent.filter((r) => now - r.at < RECENT_SHOWN_MS && r.apps.some((id) => ids.includes(id)))
   if (!shown.length && !recent.length) return null
   return (
@@ -69,7 +70,8 @@ function Shell({ kind, children, onClose, ...rest }: { kind: keyof typeof LOOK; 
 
 /** "Meta Ads", "Shopify & Meta Ads", or "Meta Ads & 2 more apps" with the rest on hover (SY-17). */
 function Names({ ids }: { ids: AppId[] }) {
-  const { lead, more, rest } = appNames(ids)
+  const s = useSyncSnapshot()
+  const { lead, more, rest } = appNames(ids.map((id) => s.apps[id]?.name ?? 'An app'))
   if (!more) return <span className="font-medium">{lead}</span>
   return (
     <>
@@ -96,9 +98,7 @@ function ProblemBanner({ banner: b, boardId }: { banner: Banner; boardId: string
       <Shell kind="syncing" onClose={close}>
         <Spinner size={14} />
         <p className={cn(TEXT, 'm-0')}>
-          {b.reconnect
-            ? <><Names ids={b.apps} /> reconnected. Syncing the latest data.</>
-            : b.long
+          {b.long
               ? <><Names ids={b.apps} /> {one ? 'is' : 'are'} taking longer than usual. Cards using {these} refresh when done.</>
               : <>Syncing <Names ids={b.apps} />. Cards using {these} refresh when done.</>}
         </p>
@@ -108,6 +108,7 @@ function ProblemBanner({ banner: b, boardId }: { banner: Banner; boardId: string
 
   if (b.kind === 'failed') {
     const oldest = s.apps[b.apps[0]].syncedAt
+    const yours = b.apps.some((id) => s.apps[id].yours)
     return (
       <Shell kind="failed" onClose={close}>
         <TriangleAlert aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0 text-[var(--dashboard-sync-failed)]" />
@@ -115,11 +116,11 @@ function ProblemBanner({ banner: b, boardId }: { banner: Banner; boardId: string
           {one
             ? <><Names ids={b.apps} /> sync failed. Showing data from {oldest == null ? 'its first sync' : clock(oldest)}.</>
             : <><Names ids={b.apps} /> failed to sync. Showing their last synced data.</>}
-          {/* Members can't reconnect (SY-25). */}
-          {!s.isAdmin && (one ? ` Only an admin can reconnect ${appNames(b.apps).lead}.` : ' Only an admin can reconnect them.')}
+          {/* Someone else's account is reconnected by its owner (SY-25). */}
+          {!yours && (one ? ' Only the person who connected it can reconnect it.' : ' Only the people who connected them can reconnect them.')}
         </p>
-        {s.isAdmin && (
-          <BannerAction tone="failed" disabled={blocked === 'offline' || blocked === 'busy'} onClick={() => reconnectApps(b.apps, boardId)} icon={<Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}>
+        {yours && (
+          <BannerAction tone="failed" disabled={blocked === 'offline'} onClick={reconnect} icon={<Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}>
             Reconnect
           </BannerAction>
         )}
@@ -139,7 +140,7 @@ function ProblemBanner({ banner: b, boardId }: { banner: Banner; boardId: string
       <BannerAction
         tone="behind" disabled={blocked !== null}
         tooltip={blocked === 'cooldown' ? 'Synced just now • Sync again in a minute' : null}
-        onClick={() => syncApps(b.apps, boardId)}
+        onClick={() => { void syncApps(b.apps) }}
         icon={<RotateCwClockIcon aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}
       >
         Sync
@@ -185,7 +186,7 @@ function SyncedBanner({ recent, apps }: { recent: Recent; apps: AppId[] }) {
     <Shell kind="synced" onClose={() => dismissRecent(recent.id)} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
       <RotateCwClockIcon aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0 text-[var(--dashboard-sync-fresh)]" />
       <p className={cn(TEXT, 'm-0')}>
-        <Names ids={apps} /> {recent.kind === 'reconnect' ? 'reconnected and synced' : 'synced just now'}. Data is up to date.
+        <Names ids={apps} /> synced just now. Data is up to date.
       </p>
     </Shell>
   )

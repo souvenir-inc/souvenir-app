@@ -1,10 +1,9 @@
-// New board (docs-v2/dashboard/08-new-board-rules.md): the templates, what a template leaves out or
-// needs, the first visit's starter boards, and the stand-in "AI" drafter. Pure, so the rules are
-// testable; the screen decides what's connected and passes it in.
+// New board (docs-v2/dashboard/08-new-board-rules.md): the templates, what a template leaves out in
+// this store, the first visit's starter boards, and the stand-in "AI" drafter. Pure: the screen
+// passes in the warehouse's metrics.
 
 import { flowCards } from './grid-layout'
-import { METRICS } from './mock-data'
-import type { AppId } from './sync/sync-model'
+import type { Metrics } from './live/metrics'
 import type { Board, DashboardState } from './tabs/board-state'
 import type { BoardCard, CardSize, Metric } from './types'
 
@@ -21,72 +20,51 @@ export interface Template {
   cards: TemplateCard[]
 }
 
-/** The library's templates, your role first (NB-7). Metrics a store can't measure are left out when used (NB-9). */
+const card = (metricId: string, size: CardSize = 'sm'): TemplateCard => ({ metricId, size })
+
+/** The library's templates, your role first (NB-7). Metrics this store can't measure are left out when used (NB-9). */
 export const TEMPLATES: Template[] = [
   { id: 'founder', role: 'Founder or CEO', name: 'Founder', period: '7d', compare: 'previous', cards: [
-    { metricId: 'revenue', size: 'full' }, { metricId: 'contribution-margin', size: 'sm' }, { metricId: 'mer', size: 'sm' },
-    { metricId: 'new-customers', size: 'sm' }, { metricId: 'aov', size: 'sm' },
+    card('revenue', 'full'), card('contribution'), card('mer'), card('new_customers'), card('aov'),
   ] },
   { id: 'ecommerce', role: 'Head of e-commerce', name: 'Store', period: 'today', compare: 'previous', cards: [
-    { metricId: 'revenue', size: 'full' }, { metricId: 'orders', size: 'sm' }, { metricId: 'aov', size: 'sm' },
-    { metricId: 'returning-rate', size: 'sm' }, { metricId: 'cancellation-rate', size: 'sm' }, { metricId: 'gross-margin', size: 'sm' },
+    card('revenue', 'full'), card('orders'), card('aov'), card('new_customers'), card('cancellation_rate'), card('refund_rate'),
   ] },
   { id: 'growth', role: 'Growth or ads lead', name: 'Paid ads', period: 'today', compare: 'previous', cards: [
-    { metricId: 'ad-spend', size: 'full' }, { metricId: 'roas', size: 'sm' }, { metricId: 'mer', size: 'sm' },
-    { metricId: 'cpa', size: 'sm' }, { metricId: 'ga-conversion-rate', size: 'sm' }, { metricId: 'ga-sessions', size: 'sm' },
+    card('ad_spend', 'full'), card('platform_roas'), card('mer'), card('cpa'), card('site_conversion_rate'), card('site_sessions'),
   ] },
   { id: 'ops', role: 'Ops lead', name: 'Operations', period: '7d', compare: 'previous', cards: [
-    { metricId: 'orders', size: 'full' }, { metricId: 'shipping-cost', size: 'sm' }, { metricId: 'cancellation-rate', size: 'sm' },
-    { metricId: 'refund-rate', size: 'sm' }, { metricId: 'zendesk-tickets', size: 'sm' }, { metricId: 'first-response-time', size: 'sm' },
+    card('orders', 'full'), card('shipping_cost'), card('cancellation_rate'), card('refund_rate'), card('tickets_opened'), card('return_rate'),
   ] },
   { id: 'finance', role: 'Finance or fractional CFO', name: 'Finance', period: '30d', compare: 'previous', cards: [
-    { metricId: 'revenue', size: 'full' }, { metricId: 'gross-sales', size: 'sm' }, { metricId: 'net-sales', size: 'sm' },
-    { metricId: 'cogs', size: 'sm' }, { metricId: 'gross-profit', size: 'sm' }, { metricId: 'processing-fees', size: 'sm' },
-    { metricId: 'contribution-margin', size: 'sm' }, { metricId: 'discount-rate', size: 'sm' },
+    card('revenue', 'full'), card('gross_sales'), card('net_sales'), card('discounts'), card('refunds'),
+    card('processing_fees'), card('contribution'), card('discount_rate'),
   ] },
   { id: 'agency', role: 'Agency', name: 'Agency client', period: '7d', compare: 'previous', cards: [
-    { metricId: 'ad-spend', size: 'full' }, { metricId: 'roas', size: 'sm' }, { metricId: 'cpa', size: 'sm' },
-    { metricId: 'ctr', size: 'sm' }, { metricId: 'cpm', size: 'sm' },
+    card('ad_spend', 'full'), card('platform_roas'), card('platform_cpa'), card('ctr'), card('cpm'),
   ] },
 ]
 
 /** The templates shown on an empty board: your role first, then the two nearest (NB-17). */
 export const FOR_YOUR_ROLE = ['founder', 'ecommerce', 'growth']
 
-const appsOf = (m: Metric): AppId[] => (m.alsoFrom ? [m.source, m.alsoFrom] : [m.source])
+/** A connection feeds it, or it is the workspace's own: it can go on a board (NB-9). */
+export const measurable = (m: Metric | undefined): m is Metric => !!m && !m.unmeasured && (m.custom || m.apps.length > 0)
 
 export interface UsedTemplate {
-  /** Cards it makes, in order; `needsApp` when an app it reads isn't connected (NB-10, NB-13). */
-  cards: (TemplateCard & { needsApp?: AppId })[]
+  cards: TemplateCard[]
   /** Metrics this store can't measure, left out quietly (NB-9). */
   leftOut: string[]
 }
 
-/** What a template makes in this store (NB-9, NB-10). */
-export function templateFor(cards: TemplateCard[], isConnected: (app: AppId) => boolean): UsedTemplate {
+/** What a template makes in this store (NB-9). */
+export function templateFor(cards: TemplateCard[], metrics: Metrics): UsedTemplate {
   const out: UsedTemplate = { cards: [], leftOut: [] }
   for (const c of cards) {
-    const m = METRICS[c.metricId]
-    if (!m || m.unmeasured) { out.leftOut.push(c.metricId); continue }
-    const missing = appsOf(m).find((a) => !isConnected(a))
-    out.cards.push(missing ? { ...c, needsApp: missing } : c)
+    if (measurable(metrics.get(c.metricId))) out.cards.push(c)
+    else out.leftOut.push(c.metricId)
   }
   return out
-}
-
-/** The call-out's apps and how many cards need each (NB-10). */
-export function appsNeeded(used: UsedTemplate): { app: AppId; count: number }[] {
-  const counts = new Map<AppId, number>()
-  for (const c of used.cards) if (c.needsApp) counts.set(c.needsApp, (counts.get(c.needsApp) ?? 0) + 1)
-  return [...counts].map(([app, count]) => ({ app, count }))
-}
-
-/** "2 of these 6 cards need apps you haven't connected" (NB-10). */
-export function callOutTitle(needing: number, total: number, apps: number): string {
-  if (needing === total) return `Every card in this template needs ${apps === 1 ? 'an app' : 'apps'} you haven’t connected`
-  return needing === 1
-    ? `1 of these ${total} cards needs an app you haven’t connected`
-    : `${needing} of these ${total} cards need apps you haven’t connected`
 }
 
 /** Board cards from template cards, laid out by the grid's flow (the template's layout). */
@@ -94,32 +72,47 @@ export const toBoardCards = (cards: TemplateCard[]): BoardCard[] => flowCards(ca
 
 // ── First visit (NB-31 – NB-33) ──────────────────────────────────────────────────
 
-/** Shopify metrics that stand in for an ad card when no ad app is connected (N-11b). */
-const SHOPIFY_FALLBACKS = ['returning-rate', 'gross-sales', 'items-per-order', 'refund-rate', 'cancellation-rate', 'net-sales']
+const STARTERS: { label: string; period: string; cards: TemplateCard[] }[] = [
+  { label: 'Store overview', period: '7d', cards: [
+    card('aov'), card('orders', 'lg'), card('new_customers'), card('platform_roas'), card('ad_spend'), card('revenue', 'md'),
+    card('platform_cpa'), card('ctr'), card('net_sales', 'md'), card('discount_rate'), card('refund_rate'),
+  ] },
+  { label: 'Growth', period: '30d', cards: [
+    card('new_customers', 'full-lg'), card('aov', 'sm-tall'), card('site_conversion_rate', 'sm-tall'), card('cancellation_rate', 'sm-tall'),
+    card('refund_rate', 'sm-tall'), card('site_sessions', 'md'), card('orders'), card('revenue'),
+  ] },
+  { label: 'Ads', period: '7d', cards: [
+    card('ad_spend', 'lg'), card('platform_roas'), card('platform_cpa'), card('ctr'), card('cpc'), card('impressions', 'md'), card('clicks', 'md'), card('cpm'),
+  ] },
+  { label: 'Contribution margin', period: '7d', cards: [
+    card('contribution', 'lg'), card('net_sales'), card('discount_rate'), card('refund_rate'), card('shipping_cost'),
+    card('processing_fees'), card('return_label_cost'), card('mer'),
+  ] },
+]
+
+/** Store metrics that stand in for a card this store can't measure (N-11b). */
+const FALLBACKS = ['gross_sales', 'cancellation_rate', 'refunds', 'discounts', 'net_revenue', 'taxes']
 
 /**
- * The starter boards (NB-32, NB-33): Store overview always, Growth, Ads when an ad app is connected,
- * Contribution margin when its costs can be measured (here: with an ad app). Built from the
- * workspace's own boards, with ad cards swapped for Shopify ones when only Shopify is connected.
+ * The starter boards for a warehouse with none (NB-32, NB-33): Store overview always, and each other
+ * board whose lead metric this store can measure. A card it can't measure gives way to a store one.
  */
-export function starterState(full: DashboardState, isConnected: (app: AppId) => boolean): DashboardState {
-  const ads = isConnected('meta')
-  const ids = ['store-overview', 'growth', ...(ads ? ['ads', 'contribution-margin'] : [])]
+export function starterState(metrics: Metrics, newId: () => string): DashboardState {
   const boards: Record<string, Board> = {}
-  for (const id of ids) {
-    const b = full.boards[id]
-    if (!b) continue
-    const used = new Set(b.cards.map((c) => c.metricId))
-    const fallbacks = SHOPIFY_FALLBACKS.filter((f) => !used.has(f))
-    const cards = b.cards.map((c) => {
-      const m = METRICS[c.metricId]
-      if (!m || appsOf(m).every(isConnected)) return { metricId: c.metricId, size: c.size }
-      return { metricId: fallbacks.shift() ?? 'orders', size: 'sm' as CardSize }
-    })
+  const tabs: string[] = []
+  for (const [i, starter] of STARTERS.entries()) {
+    if (i > 0 && !measurable(metrics.get(starter.cards[0].metricId))) continue
+    const used = new Set(starter.cards.map((c) => c.metricId))
+    const fallbacks = FALLBACKS.filter((f) => !used.has(f) && measurable(metrics.get(f)))
+    const cards = starter.cards
+      .map((c) => (measurable(metrics.get(c.metricId)) ? c : { metricId: fallbacks.shift(), size: 'sm' as CardSize }))
+      .filter((c): c is TemplateCard => c.metricId !== undefined)
     const laid = flowCards(cards)
-    boards[id] = { ...b, cards: laid, initialCards: laid }
+    const id = newId()
+    boards[id] = { id, label: starter.label, cards: laid, initialCards: laid, period: starter.period, compare: 'previous', access: 'owner', shared: false }
+    tabs.push(id)
   }
-  return { boards, tabs: ids, hidden: [], deleted: [], openId: 'store-overview' }
+  return { boards, tabs, hidden: [], deleted: [], openId: tabs[0] }
 }
 
 // ── The stand-in AI drafter (NB-20 – NB-29) ────────────────────────────────────────
@@ -130,42 +123,34 @@ export type DraftResult =
 
 const TOPICS: { test: RegExp; name: string; cards: TemplateCard[] }[] = [
   { test: /\b(ads?|paid|roas|meta|spend)\b/, name: 'Paid ads', cards: [
-    { metricId: 'ad-spend', size: 'full' }, { metricId: 'roas', size: 'sm' }, { metricId: 'cpa', size: 'sm' }, { metricId: 'ctr', size: 'sm' }, { metricId: 'mer', size: 'sm' },
+    card('ad_spend', 'full'), card('platform_roas'), card('platform_cpa'), card('ctr'), card('mer'),
   ] },
   { test: /\b(margin|profit|costs?)\b/, name: 'Where my margin goes', cards: [
-    { metricId: 'contribution-margin', size: 'full' }, { metricId: 'gross-profit', size: 'sm' }, { metricId: 'cogs', size: 'sm' }, { metricId: 'shipping', size: 'sm' }, { metricId: 'net-sales', size: 'sm' },
+    card('contribution', 'full'), card('net_sales'), card('shipping_cost'), card('processing_fees'), card('discounts'),
   ] },
   { test: /\b(check-?in|store|sales|orders|revenue)\b/, name: 'Store check-in', cards: [
-    { metricId: 'revenue', size: 'full' }, { metricId: 'orders', size: 'sm' }, { metricId: 'aov', size: 'sm' }, { metricId: 'new-customers', size: 'sm' }, { metricId: 'returning-rate', size: 'sm' },
+    card('revenue', 'full'), card('orders'), card('aov'), card('new_customers'), card('refund_rate'),
   ] },
-]
-
-/** Things people ask for that this dummy store can't measure, and why (NB-23, NB-29). */
-const NOT_MEASURABLE: { test: RegExp; strip: RegExp; name: string; reason: string }[] = [
-  { test: /\bsessions?\b/, strip: /\bsessions?\b/g, name: 'Sessions', reason: 'Sessions, which this store can’t measure yet' },
-  { test: /\b(email|open rate)\b/, strip: /\bemail(\s+(revenue|sales))?\b|\bopen rates?\b/g, name: 'Email revenue and open rate', reason: 'Email revenue and open rate need an email app, and none is connected.' },
 ]
 
 /** Whether a request names a topic of its own (a change that does replaces the draft's topic, NB-24). */
 export const hasTopic = (text: string) => TOPICS.some((t) => t.test.test(text.toLowerCase()))
 
-/** A draft from a request (stand-in for the AI): measurable metrics only (NB-23, NB-29). */
-export function draftFor(request: string, isConnected: (app: AppId) => boolean): DraftResult {
+/** A draft from a request (stand-in for the AI): measurable metrics only, the rest named with why (NB-23, NB-29). */
+export function draftFor(request: string, metrics: Metrics): DraftResult {
   const q = request.toLowerCase()
-  const missing = NOT_MEASURABLE.filter((n) => n.test.test(q))
-  // What it can't measure doesn't pick the topic ("email revenue" isn't a store check-in).
-  const rest = missing.reduce((s, n) => s.replace(n.strip, ' '), q)
-  const topic = TOPICS.find((t) => t.test.test(rest))
-  const pick = topic ?? (missing.length ? null : TOPICS[2])
-  if (!pick) return { status: 'empty', reason: missing.map((n) => n.reason).join(' ') }
-  const used = templateFor(pick.cards, isConnected)
-  const cards = used.cards.filter((c) => !c.needsApp).map(({ metricId, size }) => ({ metricId, size }))
-  if (!cards.length) return { status: 'empty', reason: 'The metrics it asks for need apps that aren’t connected.' }
+  const pick = TOPICS.find((t) => t.test.test(q)) ?? TOPICS[2]
+  const used = templateFor(pick.cards, metrics)
+  const leftOut = used.leftOut.map((id) => {
+    const m = metrics.get(id)
+    return m ? `${m.label}: ${m.unmeasured ?? 'no connected app records it'}` : id
+  })
+  if (!used.cards.length) return { status: 'empty', reason: leftOut.join(' ') }
   const period = /\b(morning|today|daily|every day)\b/.test(q) ? 'today' : /\bmonth/.test(q) ? '30d' : '7d'
   const compare = /last year/.test(q) ? 'last-year' : 'previous'
   const cadence = /\bmorning\b/.test(q) ? ', every morning' : /\bmonday\b/.test(q) ? ', every Monday' : ''
   const name = pick === TOPICS[2] && /\bweekly\b/.test(q) ? 'Weekly check-in' : pick.name
-  return { status: 'ready', name: `${name}${cadence}`, period, compare, cards, leftOut: missing.map((n) => n.reason) }
+  return { status: 'ready', name: `${name}${cadence}`, period, compare, cards: used.cards, leftOut }
 }
 
 /** The three examples under the box (NB-20). */

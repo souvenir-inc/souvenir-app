@@ -1,9 +1,7 @@
-// The Add cards picker's catalog (docs-v2/dashboard/06-add-cards-rules.md): roles, short forms,
-// and how metrics group by app. Stand-in until the Metric library has an endpoint.
+// The Add cards picker's catalog (docs-v2/dashboard/06-add-cards-rules.md): roles, short forms, and
+// how metrics group by app. The metrics are the warehouse's library (live/metrics.ts).
 
-import { METRICS } from './mock-data'
-import { metricKind } from './series'
-import { APP_ORDER, SOURCE_NAMES } from './sources'
+import type { Apps } from './live/apps'
 import type { CardSize, Metric } from './types'
 
 export interface Role { id: string; label: string }
@@ -17,54 +15,51 @@ export const OTHER_ROLES: Role[] = [
   { id: 'agency', label: 'Agency' },
 ]
 
-/** Metrics by role, in the order the rail lists them (Founder or CEO as drawn in A-2). A metric can sit under several roles. */
+/** Metrics by role, in the order the rail lists them. A metric can sit under several roles. */
 export const ROLE_METRICS: Record<string, string[]> = {
-  founder: ['revenue', 'net-sales', 'orders', 'aov', 'new-customers', 'revenue-per-customer', 'mer', 'ad-spend', 'gross-margin', 'ga-sessions', 'ga-conversion-rate'],
-  ecommerce: ['revenue', 'orders', 'aov', 'conversion-rate', 'sessions', 'returning-rate', 'cancellation-rate', 'refund-rate', 'items-per-order', 'ga-conversion-rate'],
-  growth: ['ad-spend', 'roas', 'cpa', 'cac', 'ctr', 'cpc', 'cpm', 'impressions', 'clicks', 'reach', 'frequency', 'platform-conversion-rate', 'mer'],
-  ops: ['orders', 'shipping', 'shipping-cost', 'refund-rate', 'cancellation-rate', 'items-per-order', 'zendesk-tickets', 'first-response-time'],
-  finance: ['revenue', 'gross-sales', 'net-sales', 'gross-profit', 'gross-margin', 'cogs', 'contribution-margin', 'discount-rate', 'processing-fees', 'stripe-payouts', 'paypal-volume'],
-  agency: ['ad-spend', 'roas', 'mer', 'cpa', 'ctr', 'cpm', 'revenue', 'new-customers'],
+  founder: ['revenue', 'net_sales', 'orders', 'aov', 'new_customers', 'revenue_per_customer', 'mer', 'ad_spend', 'contribution', 'site_sessions', 'site_conversion_rate'],
+  ecommerce: ['revenue', 'orders', 'aov', 'site_conversion_rate', 'site_sessions', 'new_customers', 'cancellation_rate', 'refund_rate', 'return_rate', 'discount_rate'],
+  growth: ['ad_spend', 'platform_roas', 'platform_cpa', 'cac', 'ctr', 'cpc', 'cpm', 'impressions', 'clicks', 'reach', 'frequency', 'platform_conversion_rate', 'mer'],
+  ops: ['orders', 'shipping_cost', 'shipping_cost_per_order', 'refund_rate', 'cancellation_rate', 'return_rate', 'tickets_opened', 'tickets_per_order'],
+  finance: ['revenue', 'gross_sales', 'net_sales', 'net_revenue', 'discounts', 'refunds', 'contribution', 'contribution_after_ads', 'discount_rate', 'processing_fees', 'payouts_paid'],
+  agency: ['ad_spend', 'platform_roas', 'mer', 'platform_cpa', 'ctr', 'cpm', 'revenue', 'new_customers'],
 }
 
 /** Short forms search understands (AC-13). */
 const SHORT: Record<string, string> = {
-  aov: 'aov', roas: 'roas', mer: 'mer', ctr: 'ctr', cpa: 'cpa', cpc: 'cpc', cpm: 'cpm', cac: 'cac', cogs: 'cogs',
+  aov: 'aov', platform_roas: 'roas', mer: 'mer', ctr: 'ctr', cpa: 'cpa', platform_cpa: 'cpa', cpc: 'cpc', cpm: 'cpm', cac: 'cac',
 }
 
-/** Every metric the picker offers: the catalog, A–Z. */
-export const CATALOG: Metric[] = Object.values(METRICS)
-  .filter((m) => !(m.id in { 'return-label-cost': 1 }))
-  .sort((a, b) => a.label.localeCompare(b.label))
+/** Every metric the picker offers, A–Z. */
+export const catalogOf = (metrics: Metric[]): Metric[] => [...metrics].sort((a, b) => a.label.localeCompare(b.label))
 
 /** A new card's size (AC-16): sums and counts 6 × 1, rates and multiples 3 × 1. */
-// Revenue per customer lands 6 × 1 as drawn (A-5 calls it a sum: the number and its trend).
-const LANDS_WIDE = new Set(['revenue-per-customer'])
-export const landingSize = (m: Metric): CardSize => (metricKind(m) === 'sum' || LANDS_WIDE.has(m.id) ? 'md' : 'sm')
+export const landingSize = (m: Metric): CardSize => (m.sum ? 'md' : 'sm')
 
-/** The app group a metric sits in: its app, the blended pair, or Custom metrics (AC-10). */
-export function groupOf(m: Metric): string {
+/** The app group a metric sits in: its app, the apps it blends, or Custom metrics (AC-10). */
+export function groupOf(m: Metric, apps: Apps): string {
   if (m.custom) return 'Custom metrics'
-  if (m.alsoFrom) return `${SOURCE_NAMES[m.source]} + ${SOURCE_NAMES[m.alsoFrom]}`
-  return SOURCE_NAMES[m.source]
+  if (!m.apps.length) return 'Not connected'
+  return m.apps.map((id) => apps.name(id)).join(' + ')
 }
 
-/** Group order: the apps in workspace order, then blended ones, then custom metrics. */
-export function groupRank(m: Metric): number {
+/** Group order: the apps in workspace order, then blended ones, then custom, then the ones no app feeds. */
+export function groupRank(m: Metric, apps: Apps): number {
   if (m.custom) return 1000
-  if (m.alsoFrom) return 900
-  return APP_ORDER.indexOf(m.source)
+  if (!m.apps.length) return 2000
+  if (m.apps.length > 1) return 900
+  return apps.rank(m.apps[0])
 }
 
 /** Where a query matches a metric: the name (with the matched span), a short form, the app or the definition (AC-13). */
-export function matchOf(m: Metric, query: string): { at: number; length: number } | null | false {
+export function matchOf(m: Metric, query: string, apps: Apps): { at: number; length: number } | null | false {
   const q = query.trim().toLowerCase()
   if (!q) return null
   const at = m.label.toLowerCase().indexOf(q)
   if (at >= 0) return { at, length: q.length }
   if (SHORT[m.id]?.startsWith(q)) return null
-  if (SOURCE_NAMES[m.source].toLowerCase().includes(q) || (m.alsoFrom && SOURCE_NAMES[m.alsoFrom].toLowerCase().includes(q))) return null
-  if (m.definition?.toLowerCase().split(/\W+/).some((w) => w.startsWith(q))) return null
+  if (m.apps.some((id) => apps.name(id).toLowerCase().includes(q))) return null
+  if (m.definition.toLowerCase().split(/\W+/).some((w) => w.startsWith(q))) return null
   return false
 }
 

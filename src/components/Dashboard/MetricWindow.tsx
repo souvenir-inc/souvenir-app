@@ -9,13 +9,14 @@ import { cn } from '@/lib/utils'
 import { LineChart } from './chart/LineChart'
 import { HealthPillView, type CardView } from './MetricCard'
 import { formatMetricValue } from './format'
-import { SOURCE_NAMES, SourceLogo } from './icons'
-import { compareName, periodName } from './period'
-import { changeLabel, dayMonth, formatExact, parseFigure, previousOf, upIsGood, weekdayDayMonth, periodDays } from './series'
+import { SourceLogo } from './icons'
+import { useDashboardData } from './live/dashboard-data'
+import { Metrics } from './live/metrics'
+import { chartWindow, compareName, periodName, rangeDays } from './period'
+import { changeLabel, dayMonth, formatExact, weekdayDayMonth } from './series'
 import { ago } from './sync/sync-model'
 import { useSyncSnapshot } from './sync/sync-store'
-import type { Metric, MetricSource } from './types'
-import { baseMetricId } from './mock-data'
+import type { App, AppId, Metric } from './types'
 import type { Board } from './tabs/board-state'
 
 // The metric window (Figma 170:75690, 05-cards-reading-rules.md CR-15 – CR-17), drawn as it is today
@@ -52,16 +53,16 @@ export function MetricWindow({ metric, ...rest }: MetricWindowProps) {
 function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boards, onAddToBoard }: Omit<MetricWindowProps, 'metric' | 'onClose'> & { metric: Metric }) {
   const [tab, setTab] = useState<Tab>('Trend')
   const [table, setTable] = useState(false)
-  const n = periodDays(periodId)
+  const [today] = useState(() => new Date())
+  const chart = chartWindow(periodId, today)
+  const n = rangeDays(chart.from, chart.to)
   const periodLabel = periodName(periodId)
-  const lastYear = view?.series?.compare === 'last-year'
-  const series = view?.series
-  const comparable = series?.comparable ?? true
-  const total = parseFigure(metric.value)
-  const before = previousOf(total, metric.change)
-  const pct = metric.change.label
-  const Arrow = metric.change.direction === 'up' ? ArrowUp : ArrowDown
-  const good = metric.change.sentiment === 'positive'
+  const series = metric.series
+  const lastYear = series.compare === 'last-year'
+  const { change } = metric
+  const comparable = change !== null
+  const Arrow = change?.direction === 'up' ? ArrowUp : ArrowDown
+  const good = change?.sentiment === 'positive'
   return (
     <DialogContent
       size="lg"
@@ -80,7 +81,7 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
               {comparable ? (
                 <>
                   <Arrow aria-hidden size={13} strokeWidth={1.75} absoluteStrokeWidth className={good ? 'text-[var(--dashboard-positive)]' : 'text-[var(--dashboard-negative)]'} />
-                  <span className={good ? 'text-[var(--dashboard-positive)]' : 'text-[var(--dashboard-negative)]'}>{pct}</span>
+                  <span className={good ? 'text-[var(--dashboard-positive)]' : 'text-[var(--dashboard-negative)]'}>{change?.label}</span>
                   <span className="whitespace-pre text-[var(--dashboard-muted)]">{lastYear ? '  vs the same days last year' : `  vs the previous ${n} days`}</span>
                 </>
               ) : <span className="text-[var(--dashboard-muted)]">No comparison</span>}
@@ -124,7 +125,7 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
             <>
               <div className="flex items-center justify-between gap-4">
                 <p className="m-0 text-[15px] leading-5 text-[var(--dashboard-figure)]">
-                  {comparable ? `${metric.change.direction === 'up' ? 'Up' : 'Down'} ${pct} on ${lastYear ? 'the same days last year' : `the previous ${n} days`}` : 'Nothing to compare with yet'}
+                  {change ? `${change.direction === 'up' ? 'Up' : 'Down'} ${change.label} on ${lastYear ? 'the same days last year' : `the previous ${n} days`}` : 'Nothing to compare with yet'}
                 </p>
                 <div role="radiogroup" aria-label="Show as" className="flex shrink-0 gap-0.5 rounded-[10px] bg-[var(--dashboard-hover-band)] p-[3px]">
                   {(['Chart', 'Table'] as const).map((k) => (
@@ -144,12 +145,12 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
               </div>
               <div className="mt-[18px] flex items-center gap-5 text-[12px] leading-4">
                 <span className="flex items-center gap-1.5 text-[var(--dashboard-label)]"><span aria-hidden className="h-0.5 w-2.5 rounded-[1px] bg-[var(--dashboard-chart-ink)]" />{periodLabel}<strong className="font-medium text-[var(--dashboard-figure)]">{metric.value}</strong></span>
-                {comparable && <span className="flex items-center gap-1.5 text-[var(--dashboard-label)]"><span aria-hidden className="h-0.5 w-2.5 rounded-[1px] bg-[var(--dashboard-chart-previous)]" />Previous {n} days<strong className="font-medium text-[var(--dashboard-figure)]">{formatMetricValue(before, metric.format)}</strong></span>}
+                {comparable && metric.previous !== null && <span className="flex items-center gap-1.5 text-[var(--dashboard-label)]"><span aria-hidden className="h-0.5 w-2.5 rounded-[1px] bg-[var(--dashboard-chart-previous)]" />Previous {n} days<strong className="font-medium text-[var(--dashboard-figure)]">{formatMetricValue(metric.previous, metric.format)}</strong></span>}
                 {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the legend's underlined text link (Figma 170:75736) */}
                 <button type="button" onClick={() => onNotReady('Targets')} className={cn('cursor-pointer border-0 bg-transparent p-0 text-[12px] text-[var(--dashboard-figure)] underline underline-offset-2', FOCUS)}>Set a target</button>
               </div>
-              {series && !table && <LineChart metric={metric} series={series} variant="full" target={view?.targetPerDay} className="mt-6 h-[264px]" />}
-              {series && table && (
+              {!table && <LineChart metric={metric} series={series} variant="full" className="mt-6 h-[264px]" />}
+              {table && (
                 <table className="mt-5 w-full border-collapse text-[13px] leading-5">
                   <thead>
                     <tr className="text-left text-[12px] text-[var(--dashboard-muted)]">
@@ -165,7 +166,7 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
                           <td className="py-2 text-[var(--dashboard-label)]">{weekdayDayMonth(d.date)}</td>
                           <td className="py-2 text-right text-[var(--dashboard-figure)]">{d.value != null ? formatExact(d.value, metric.format) : 'No data'}</td>
                           <td className="py-2 text-right text-[var(--dashboard-muted)]">{p?.value != null ? `${formatExact(p.value, metric.format)} · ${dayMonth(p.date)}` : '—'}</td>
-                          <td className={cn('py-2 text-right', d.value != null && p?.value != null ? (rising === upIsGood(metric.change) ? 'text-[var(--dashboard-positive)]' : 'text-[var(--dashboard-negative)]') : 'text-[var(--dashboard-muted)]')}>
+                          <td className={cn('py-2 text-right', d.value != null && p?.value != null ? (rising === metric.upIsGood ? 'text-[var(--dashboard-positive)]' : 'text-[var(--dashboard-negative)]') : 'text-[var(--dashboard-muted)]')}>
                             {d.value != null && p?.value != null ? changeLabel(d.value, p.value) : '—'}
                           </td>
                         </tr>
@@ -177,12 +178,12 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
             </>
           )}
           {tab === 'Target' && (
-            view?.health && metric.health?.by === 'target'
+            view?.health
               ? <div className="flex items-center gap-2"><HealthPillView pill={view.health} withTarget /></div>
               : <EmptyTab text="This metric has no target yet." action={['Set a target', () => onNotReady('Targets')]} />
           )}
-          {tab === 'Definition' && <p className="m-0 max-w-[560px] text-[14px] leading-[22px] text-[var(--dashboard-figure)]">{metric.definition ?? 'No definition for this metric yet.'}</p>}
-          {tab === 'Sources' && <Sources apps={[metric.source, ...(metric.alsoFrom ? [metric.alsoFrom] : [])]} unmeasured={!!metric.unmeasured} />}
+          {tab === 'Definition' && <p className="m-0 max-w-[560px] text-[14px] leading-[22px] text-[var(--dashboard-figure)]">{metric.definition || 'No definition for this metric yet.'}</p>}
+          {tab === 'Sources' && <Sources apps={metric.apps} unmeasured={metric.unmeasured} />}
           {tab === 'Other related' && (
             related.length ? (
               <ul className="m-0 flex list-none flex-col gap-1 p-0">
@@ -216,19 +217,22 @@ function EmptyTab({ text, action }: { text: string; action?: [string, () => void
   )
 }
 
-function Sources({ apps, unmeasured }: { apps: MetricSource[]; unmeasured: boolean }) {
+function Sources({ apps: ids, unmeasured }: { apps: AppId[]; unmeasured: string | null }) {
   const s = useSyncSnapshot()
-  if (unmeasured) return <EmptyTab text="No connected app records this metric." />
+  const { apps } = useDashboardData()
+  if (unmeasured) return <EmptyTab text={`No connected app records this metric: ${unmeasured}.`} />
+  if (!ids.length) return <EmptyTab text="Built from this workspace’s own definition." />
   return (
     <ul className="m-0 flex list-none flex-col p-0">
-      {apps.map((id) => {
-        const a = s.apps[id]
-        const when = a?.syncing?.kind === 'first' ? 'First sync…' : a?.syncing ? 'Syncing…' : a?.failed ? 'Sync failed' : a?.syncedAt != null ? `Synced ${ago(a.syncedAt, s.now).toLowerCase()}` : ''
+      {ids.map((id) => apps.get(id)).filter((app): app is App => !!app).map((app) => {
+        const a = s.apps[app.id]
+        const state = a?.state
+        const when = state === 'first' ? 'First sync…' : state === 'syncing' ? 'Syncing…' : state === 'failed' ? 'Sync failed' : a?.syncedAt != null ? `Synced ${ago(a.syncedAt, s.now).toLowerCase()}` : ''
         return (
-          <li key={id} className="flex h-10 items-center gap-2.5 border-0 border-b border-solid border-[var(--neutral-200)] last:border-b-0">
-            <SourceLogo source={id} className="size-4 shrink-0" />
-            <span className="flex-1 text-[13px] text-[var(--dashboard-figure)]">{SOURCE_NAMES[id]}</span>
-            <span className={cn('text-[12px]', a?.failed ? 'text-[var(--dashboard-sync-failed)]' : 'text-[var(--dashboard-muted)]')}>{when}</span>
+          <li key={app.id} className="flex h-10 items-center gap-2.5 border-0 border-b border-solid border-[var(--neutral-200)] last:border-b-0">
+            <SourceLogo app={app} className="size-4 shrink-0" />
+            <span className="flex-1 text-[13px] text-[var(--dashboard-figure)]">{app.name}</span>
+            <span className={cn('text-[12px]', state === 'failed' ? 'text-[var(--dashboard-sync-failed)]' : 'text-[var(--dashboard-muted)]')}>{when}</span>
           </li>
         )
       })}
@@ -276,7 +280,7 @@ function AddToBoard({ metric, boards, onPick }: { metric: Metric; boards: Board[
             >
               <LayoutGrid aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0 text-[var(--dashboard-label)]" />
               <span className="min-w-0 flex-1 truncate">{b.label}</span>
-              {b.cards.some((c) => baseMetricId(c.metricId) === metric.id) && (
+              {b.cards.some((c) => Metrics.base(c.metricId) === metric.id) && (
                 <span className="shrink-0 rounded-full bg-[var(--dashboard-sync-bg)] px-2 py-0.5 text-[11px] font-medium leading-4 text-[var(--neutral-700)]">Already on it</span>
               )}
             </button>

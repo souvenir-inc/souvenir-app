@@ -1,9 +1,15 @@
 'use client'
 
-import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { m } from 'framer-motion'
 import { TriangleAlert } from 'lucide-react'
 import { toast } from 'sonner'
+import { useQuery } from '@tanstack/react-query'
+import { userFullName, useAuth } from '@/context/auth-context'
+import { useOrg, useOrgMembers } from '@/context/org-context'
+import type { Warehouse } from '@/lib/api/warehouse'
+import { orgScope, queryKeys } from '@/lib/query-keys'
+import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
 import { cn } from '@/lib/utils'
 import { AddCardsDialog } from './AddCardsDialog'
 import { EditBar, SpeedDial } from './BoardActions'
@@ -17,55 +23,113 @@ import { consumeDownloadFail, fileBase, nodeToPng, numbersCsv, saveFile, seedDow
 import { leaveNoAccess, seedLinkFromQuery, setViewDates, useLinkView } from './share/link-view'
 import { NoAccess } from './share/NoAccess'
 import { ShareDialog, type ShareStart } from './share/ShareDialog'
-import { ME, boardLink, nameOf, periodLabel } from './share/share-model'
+import { boardLink, periodLabel } from './share/share-model'
 import { copyText, seedShareFromQuery } from './share/share-store'
 import { Spinner } from './sync/Spinner'
-import { startFirstVisit, useFirstVisitChecking } from './first-visit'
 import type { Way } from './NewBoardChooser'
 import { NewBoardLibrary, type LibraryPick } from './NewBoardLibrary'
-import { TEMPLATES, draftFor, hasTopic, starterState, templateFor, toBoardCards } from './templates'
+import { TEMPLATES, draftFor, hasTopic, measurable, starterState, templateFor, toBoardCards } from './templates'
 import { landingSize } from './catalog'
 import { BoardGrid } from './BoardGrid'
-import { cardBody, consumeAddFail, flagOf, healthFor, healthPill, reasonOf, retryBoard, retryCard, seedAddFail, seedCardsFromQuery, useCardStates } from './card-states'
+import { cardBody, flagged, healthPill, reasonOf } from './card-states'
 import type { CardView } from './MetricCard'
 import { MetricWindow } from './MetricWindow'
 import { NeedsAttention, type AttentionItem } from './NeedsAttention'
-import { seriesFor } from './series'
-import { SOURCE_NAMES } from './sources'
 import { PeriodMenu, SharedByAvatar } from './BoardHeader'
-import { METRICS, baseMetricId, initialDashboardState } from './mock-data'
+import { Apps } from './live/apps'
+import { BoardStore } from './live/board-store'
+import { DashboardDataProvider, useBoardStatus, useLiveDashboard, useWarehouses } from './live/dashboard-data'
+import { Metrics } from './live/metrics'
 import { SyncBanners } from './sync/SyncBanners'
 import { SyncButton } from './sync/SyncButton'
-import { appState, clock, hoursSince, type AppId } from './sync/sync-model'
-import { getSyncSnapshot, isConnected, onSyncEnd, reconnectApps, seedFromQuery, seedShopifyOnly, useSyncSnapshot } from './sync/sync-store'
+import { clock, hoursSince } from './sync/sync-model'
+import { getSyncSnapshot, onSyncEnd, reconnect, useSyncSnapshot } from './sync/sync-store'
 import { showSyncErrorToast, showSyncedToast } from './sync/sync-toasts'
 import type { BoardMenuHandlers } from './tabs/BoardMenus'
 import { ConfirmDialogs, type PendingConfirm } from './tabs/ConfirmDialogs'
 import { ManageTabsDialog, type ManageTab } from './tabs/ManageTabsDialog'
 import { TabRow } from './tabs/TabRow'
-import { cardIdsFor, namesInUse, uniqueName } from './tabs/board-state'
+import { cardIdsFor, namesInUse, uniqueName, type DashboardState, type Person } from './tabs/board-state'
 import { useDashboard } from './tabs/use-dashboard'
+import type { AppId, Metric } from './types'
 
 // Dashboard board panel (Figma wRr8cpImqSXbIgk0XhNj7a: base 17:889, tabs 136:20976, Manage tabs
 // 415:64464, sync 95:18703). Rules: docs-v2/dashboard/01 – 04. AppLayout renders /dashboard bare (like
 // /schedules), so this builds its own panel: 16px radius, hairline border, warm fill. Inside, a
-// 1200px column: the header row, then the open board's cards 20px below it.
+// 1200px column: the header row, then the open board's cards 20px below it. The numbers, boards and
+// sync come from the organization's warehouse (live/).
 
-const LOAD_MS = 450 // dummy load after a switch, so the shimmer → numbers step shows (TAB-6)
 const BASE_PAD = 16 // space under the cards (pb-4)
 const DRAFT_MS = 2_500 // the stand-in AI's answer (08 NB-21)
+const AVATARS = 6
 
+/** The organization's warehouse, its catalog and the viewer's boards; then the board screen. */
 export function DashboardScreen() {
-  const api = useDashboard()
+  const warehouses = useWarehouses()
+  const warehouse = warehouses.data?.[0]
+  if (warehouses.isError) return <Frame><Problem text="Couldn’t load the dashboard." onRetry={() => { void warehouses.refetch() }} /></Frame>
+  if (!warehouses.data) return <Frame><Skeleton /></Frame>
+  if (!warehouse) return <Frame><NoStore /></Frame>
+  return <Loaded key={warehouse.id} warehouse={warehouse} />
+}
+
+function Loaded({ warehouse }: { warehouse: Warehouse }) {
+  const { user } = useAuth()
+  const { orgId } = useOrg()
+  const { members } = useOrgMembers()
+  const viewer = user?.auth0Id ?? ''
+  const org = orgScope(orgId)
+  const store = useMemo(() => new BoardStore(warehouse, viewer), [warehouse, viewer])
+  const catalog = useQuery({
+    queryKey: queryKeys.warehouse.catalog(org, warehouse.id),
+    queryFn: ({ signal }) => warehouse.metrics(signal),
+    staleTime: 5 * 60_000,
+  })
+  // Read once: from here the screen owns the boards and writes them back (tabs/use-dashboard.ts).
+  const boards = useQuery({
+    queryKey: queryKeys.warehouse.boards(org, warehouse.id),
+    queryFn: ({ signal }) => {
+      const people = new Map<string, Person>(members.map((p, i) => [p.id, {
+        name: p.name, initials: p.name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase(),
+        color: `var(--dashboard-avatar-${(i % AVATARS) + 1})`,
+      }]))
+      return store.load(people, signal)
+    },
+    enabled: !!viewer,
+    staleTime: Infinity,
+    gcTime: 0,
+  })
+  const names = useMemo(() => new Set(catalog.data?.map((e) => e.name) ?? []), [catalog.data])
+  const initial = useMemo((): DashboardState | null => {
+    if (!boards.data || !catalog.data) return null
+    if (boards.data.tabs.length) return boards.data
+    // A warehouse with no boards yet gets the starter boards (NB-32).
+    const apps = new Apps(warehouse.connections)
+    return starterState(new Metrics({ catalog: catalog.data, scorecards: [], apps, chart: { from: new Date(), to: new Date() }, chartBefore: null, compare: 'none', today: new Date() }), () => crypto.randomUUID())
+  }, [boards.data, catalog.data, warehouse])
+  if (catalog.isError || boards.isError) {
+    return <Frame><Problem text="Couldn’t load your boards." onRetry={() => { void catalog.refetch(); void boards.refetch() }} /></Frame>
+  }
+  if (!initial) return <Frame><Skeleton /></Frame>
+  return <Board warehouse={warehouse} initial={initial} store={store} names={names} />
+}
+
+function Board({ warehouse, initial, store, names }: { warehouse: Warehouse; initial: DashboardState; store: BoardStore; names: Set<string> }) {
+  const api = useDashboard(initial, store, names)
   const { state, openBoard } = api
   const panelId = useId()
+  const { user } = useAuth()
+  const { currentUserRole } = useOrg()
+  const isAdmin = currentUserRole === 'admin'
+  const me = userFullName(user)
+  const open = openBoard ?? state.boards[state.tabs[0]]
+  const live = useLiveDashboard(warehouse, { id: open?.id ?? '', period: open?.period ?? '7d', compare: open?.compare ?? 'previous', metricIds: (open?.cards ?? []).map((c) => c.metricId) })
+  useBoardStatus(warehouse, open?.id ?? '', !!open && !open.draft)
 
   const [renamingId, setRenamingId] = useState<string | null>(null)
   const [manage, setManage] = useState<{ open: boolean; tab: ManageTab }>({ open: false, tab: 'tabs' })
   const [confirm, setConfirm] = useState<PendingConfirm>(null)
   const [visibleCount, setVisibleCount] = useState(6)
-  // ?ai=fail: the first draft doesn't come through (08 NB-28).
-  const aiFail = useRef(false)
   // The latest state, for the stand-in AI's answer that lands later.
   const stateRef = useRef(state)
   useEffect(() => { stateRef.current = state })
@@ -102,28 +166,9 @@ export function DashboardScreen() {
     return () => ro.disconnect()
   }, [])
 
-  // Switching boards: the cards show at once, their numbers a moment later (TAB-6).
-  const [loadedId, setLoadedId] = useState(state.openId)
-  useEffect(() => {
-    if (loadedId === state.openId) return
-    const t = window.setTimeout(() => setLoadedId(state.openId), LOAD_MS)
-    return () => window.clearTimeout(t)
-  }, [state.openId, loadedId])
-
   // /dashboard?board=<id> opens that board (TAB-61); the URL follows the open board.
-  // ?sync=<scenario> starts the dummy sync in a drawn state (04-sync-rules.md §9).
   useEffect(() => {
     const q = new URLSearchParams(window.location.search)
-    seedFromQuery({ sync: q.get('sync'), fail: q.get('fail'), role: q.get('role'), connect: q.get('connect') })
-    // ?cards=<scenario> puts cards in the drawn states (05-cards-reading-rules.md §9).
-    seedCardsFromQuery(q.get('cards'))
-    seedAddFail(q.get('add'))
-    aiFail.current = q.get('ai') === 'fail'
-    // ?visit=first: the first visit's check, then the starter boards (08 NB-31 – NB-33).
-    if (q.get('visit') === 'first') {
-      if (q.get('store') === 'shopify-only') seedShopifyOnly()
-      startFirstVisit(() => api.apply([{ type: 'replace', state: starterState(initialDashboardState(Date.now()), (a) => isConnected(getSyncSnapshot(), a)) }]))
-    }
     seedShareFromQuery({ slack: q.get('slack'), copy: q.get('copy') })
     seedDownloadFail(q.get('download'))
     // A link: a board you can't see shows the no-access page; one you can opens on the link's dates,
@@ -131,15 +176,6 @@ export function DashboardScreen() {
     const id = seedLinkFromQuery({ board: q.get('board'), period: q.get('period'), compare: q.get('compare') })
     if (id && state.hidden.includes(id)) api.apply([{ type: 'show', id, index: state.tabs.length, open: true }])
     else if (id) api.open(id)
-    // ?shared=1: Maya Patel shares Q4 plan with you; it waits outside your tabs (SH-29, T-8).
-    if (q.get('shared') === '1') {
-      api.apply([{ type: 'hide', id: 'q4-plan' }])
-      // After the toaster is listening (its effect runs after this one).
-      window.setTimeout(() => toast('Maya Patel shared Q4 plan with you', {
-        duration: 10_000,
-        action: { label: 'Add to tabs', onClick: () => api.apply([{ type: 'show', id: 'q4-plan', index: stateRef.current.tabs.length, open: true }]) },
-      }), 300)
-    }
     // Read once, on arrival.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -189,37 +225,33 @@ export function DashboardScreen() {
   // ── Sync (04-sync-rules.md) ───────────────────────────────────────────────
   const sync = useSyncSnapshot()
   const [sourcesOpen, setSourcesOpen] = useState(false)
-  // Back online: the board fetches its numbers again (SY-34). Adjusted while rendering.
-  const [seenBackOnline, setSeenBackOnline] = useState(sync.backOnlineAt)
-  if (seenBackOnline !== sync.backOnlineAt) {
-    setSeenBackOnline(sync.backOnlineAt)
-    if (sync.backOnlineAt) setLoadedId('')
-  }
   // How a sync ended, as a toast when the board on screen doesn't already say so (SY-29, SY-30).
   // The listener reads the latest board and list through a ref, set after each render.
-  const toastCtx = useRef({ boardId: '', apps: [] as AppId[], sourcesOpen: false, isAdmin: true })
+  const toastCtx = useRef({ apps: [] as AppId[], sourcesOpen: false })
   useEffect(() => {
     return onSyncEnd((e) => {
       const ctx = toastCtx.current
-      const reconnect = (ids: AppId[]) => (ctx.isAdmin ? () => { reconnectApps(ids, ctx.boardId) } : null)
+      const apps = getSyncSnapshot().apps
+      const names = (ids: AppId[]) => ids.map((id) => apps[id]?.name ?? 'An app')
+      const fix = (ids: AppId[]) => (ids.some((id) => apps[id]?.yours) ? reconnect : null)
       if (e.kind === 'refresh') {
         // With Data sources open the list already shows it (SY-28).
-        if (e.failed.length && !ctx.sourcesOpen) showSyncErrorToast({ apps: e.failed, rest: 'Other apps synced', onReconnect: reconnect(e.failed) })
+        if (e.failed.length && !ctx.sourcesOpen) showSyncErrorToast({ names: names(e.failed), rest: 'Other apps synced', onReconnect: fix(e.failed) })
         return
       }
       // Boards that read the app show its banner instead (SY-30).
       if ([...e.ok, ...e.failed].some((id) => ctx.apps.includes(id))) return
       if (e.failed.length) {
-        const at = e.failed.map((id) => getSyncSnapshot().apps[id]?.syncedAt).find((t) => t != null)
-        showSyncErrorToast({ apps: e.failed, rest: at ? `Data from ${clock(at)}` : 'No data yet', onReconnect: reconnect(e.failed) })
+        const at = e.failed.map((id) => apps[id]?.syncedAt).find((t) => t != null)
+        showSyncErrorToast({ names: names(e.failed), rest: at ? `Data from ${clock(at)}` : 'No data yet', onReconnect: fix(e.failed) })
       }
-      if (e.ok.length) showSyncedToast(e.ok)
+      if (e.ok.length) showSyncedToast(names(e.ok))
     })
     // The listener lives as long as the screen; it reads the moment's values from toastCtx.
   }, [])
   useEffect(() => {
-    const apps = [...new Set((openBoard?.cards ?? []).map((c) => METRICS[c.metricId]?.source).filter(Boolean))] as AppId[]
-    toastCtx.current = { boardId: openBoard?.id ?? '', apps, sourcesOpen, isAdmin: sync.isAdmin }
+    const apps = [...new Set((open?.cards ?? []).flatMap((c) => live.data?.metrics.get(c.metricId)?.apps ?? []))]
+    toastCtx.current = { apps, sourcesOpen }
   })
 
   // ── Share and export (09-share-export-rules.md) ─────────────────────────────────────
@@ -228,7 +260,7 @@ export function DashboardScreen() {
   const [downloadOpen, setDownloadOpen] = useState(false)
   // The workspace's default board for new members (11 DT-8, stand-in: in memory).
   const [defaultOpen, setDefaultOpen] = useState(false)
-  const [defaultBoard, setDefaultBoard] = useState('store-overview')
+  const [defaultBoard, setDefaultBoard] = useState(state.tabs[0] ?? '')
   // The dates a board is looked at on: a link's, or a viewer's own, else the board's (SH-2, SH-23).
   const datesFor = (id: string) => {
     const d = linkView.dates?.boardId === id ? linkView.dates : state.boards[id]
@@ -293,14 +325,12 @@ export function DashboardScreen() {
   const land = (boardId: string, ids: string[]) => setLanded((l) => ({ boardId, ids, n: (l?.n ?? 0) + 1 }))
 
   // ── Cards while reading (05-cards-reading-rules.md) ──────────────────────────
-  const cardStates = useCardStates()
   // The metric window: the card it was opened from, or a Needs attention row (CR-15, CR-33).
   const [windowFor, setWindowFor] = useState<string | null>(null)
   // Card settings: the card id it's open for (10 CS-1).
   const [settingsFor, setSettingsFor] = useState<string | null>(null)
 
   // ── New board (08-new-board-rules.md) ──────────────────────────────────────────
-  const checking = useFirstVisitChecking()
   const [library, setLibrary] = useState<{ on: LibraryPick; fill: string | null } | null>(null)
   const [ask, setAsk] = useState({ open: false, initial: '' })
   // One draft at a time (NB-20). Dropped if its board goes (a ⌘Z past it, say). Adjusted while rendering.
@@ -316,12 +346,11 @@ export function DashboardScreen() {
         api.apply(board)
         setDraft((d) => (d && d.run === run ? { ...d, ...patch } : d))
       }
-      if (aiFail.current) {
-        aiFail.current = false
+      if (!live.data) {
         settle({ phase: 'failed' }, [{ type: 'update-board', id: boardId, patch: { label: 'Draft', cards: [], initialCards: [] } }])
         return
       }
-      const res = draftFor(request, (a) => isConnected(getSyncSnapshot(), a))
+      const res = draftFor(request, live.data.metrics)
       if (res.status === 'empty') {
         settle({ phase: 'empty', reason: res.reason }, [{ type: 'update-board', id: boardId, patch: { label: 'Draft', cards: [], initialCards: [] } }])
         return
@@ -343,23 +372,26 @@ export function DashboardScreen() {
     return () => window.removeEventListener('beforeunload', warn)
   }, [hasDraft])
 
-  if (!openBoard) return null
+  if (!openBoard) return <Frame><EmptyBoardList /></Frame>
+  if (!live.data) {
+    return <Frame>{live.failed ? <Problem text="Couldn’t load this board." onRetry={live.retry} /> : <Skeleton />}</Frame>
+  }
+  const { metrics, apps: workspaceApps } = live.data
   const cards = api.cardActions(openBoard.id)
   const tabs = state.tabs.map((id) => state.boards[id]).filter(Boolean)
   const hidden = state.hidden.map((id) => state.boards[id]).filter(Boolean)
   // The apps this board's cards read, and how many cards read each (SY-1, SY-6). A card reading
   // two apps counts for both (MER).
   const appsOf = (metricId: string): AppId[] => {
-    const m0 = METRICS[metricId]
-    if (!m0 || m0.unmeasured) return []
-    return m0.alsoFrom ? [m0.source, m0.alsoFrom] : [m0.source]
+    const m0 = metrics.get(metricId)
+    return !m0 || m0.unmeasured ? [] : m0.apps
   }
   const uses: Partial<Record<AppId, number>> = {}
   for (const c of openBoard.cards) for (const app of appsOf(c.metricId)) uses[app] = (uses[app] ?? 0) + 1
   const boardApps = Object.keys(uses) as AppId[]
   const here = draft && draft.boardId === openBoard.id ? draft : null
-  // A draft being made shimmers like a board that's loading (NB-21, NB-24).
-  const boardLoading = loadedId !== openBoard.id || cardStates.retrying.includes('*') || here?.phase === 'drafting'
+  // The numbers are on their way, or a draft is being made: the cards shimmer (TAB-6, NB-21, NB-24).
+  const boardLoading = live.measuring || here?.phase === 'drafting'
   // Dates that aren't the board's own: Reset (and Save for board for editors) beside the period (SH-23).
   const own = linkView.dates?.boardId === openBoard.id && (linkView.dates.period !== openBoard.period || linkView.dates.compare !== openBoard.compare) ? linkView.dates : null
   const dates = own ?? { period: openBoard.period, compare: openBoard.compare }
@@ -370,43 +402,33 @@ export function DashboardScreen() {
   // and its health.
   // `picture`: for an image, cards as they'll read once loaded (SH-34).
   const cardView = (metricId: string, picture = false): CardView | undefined => {
-    const metric = METRICS[metricId]
-    if (!metric) return undefined
-    const apps = appsOf(metricId).map((id) => ({ id, a: sync.apps[id], st: appState(sync.apps[id], sync.now) }))
-    // An app on its first sync: "No data yet" until it lands (CR-22, AC-20).
-    const firstLong = apps.some((x) => x.st === 'first')
-    // Its app isn't connected: it waits, with Connect (08 NB-13).
-    const waiting = apps.find((x) => !isConnected(sync, x.id))
+    const metric = metrics.get(metricId)
+    if (!metric) return { body: 'removed', canEdit: openBoard.access !== 'view' }
+    // The board's status knows each app's state; until it answers, the warehouse summary's first syncs.
+    const apps = appsOf(metricId).map((id) => ({ id, a: sync.apps[id] }))
+    const firstSync = apps.some((x) => (x.a ? x.a.state === 'first' : workspaceApps.firstSync(x.id)))
     const body = cardBody({
-      loading: !picture && (boardLoading || cardStates.retrying.includes(metricId)),
-      needsApp: !!waiting,
-      removed: cardStates.removed.includes(metricId),
-      locked: cardStates.locked.includes(metricId),
-      firstSyncRunning: firstLong,
-      couldntLoad: cardStates.couldntLoad.includes(metricId),
-      unmeasured: metric.unmeasured,
+      loading: !picture && boardLoading,
+      firstSyncRunning: firstSync,
+      unmeasured: !!metric.unmeasured,
       // On Today, an app that hasn't synced since yesterday has nothing for today (CR-26).
-      todayEmpty: dates.period === 'today' && apps.some((x) => x.a.syncedAt != null && x.a.syncedAt < midnight.getTime()),
+      todayEmpty: dates.period === 'today' && apps.some((x) => x.a?.syncedAt != null && x.a.syncedAt < midnight.getTime()),
     })
     // The worse dot; hovering it names the app(s) and how old the numbers are (CR-25).
-    const failed = apps.filter((x) => x.st === 'failed')
-    const behind = apps.filter((x) => x.st === 'behind')
+    const failed = apps.filter((x) => x.a?.state === 'failed')
+    const behind = apps.filter((x) => x.a?.state === 'behind')
     const tips = failed.length
-      ? failed.map((x) => `${SOURCE_NAMES[x.id]} sync failed · numbers from ${clock(x.a.syncedAt ?? sync.now)}`)
+      ? failed.map((x) => `${x.a.name} sync failed · numbers from ${x.a.syncedAt == null ? 'its first sync' : clock(x.a.syncedAt)}`)
       : behind.map((x) => {
           const h = hoursSince(x.a.syncedAt, sync.now)
-          return `${SOURCE_NAMES[x.id]} hasn’t synced in ${h} hour${h === 1 ? '' : 's'} · numbers from ${clock(x.a.syncedAt ?? sync.now)}`
+          return `${x.a.name} hasn’t synced in ${h} hour${h === 1 ? '' : 's'} · numbers from ${x.a.syncedAt == null ? 'its first sync' : clock(x.a.syncedAt)}`
         })
-    const health = healthFor(metric, cardStates)
     const chart = openBoard.cards.find((c) => c.metricId === metricId)?.chart
     return {
       body,
-      needsApp: waiting ? { app: waiting.id, connecting: sync.connections[waiting.id] === 'connecting' } : undefined,
-      dot: !waiting && tips.length ? { tone: failed.length ? 'failed' : 'behind', tip: tips.join('; ') } : undefined,
-      syncing: !picture && apps.some((x) => x.st === 'syncing'),
-      series: seriesFor(metric, dates.period, { compare: dates.compare, connectedOn: cardStates.newMeta && apps.some((x) => x.id === 'meta') ? new Date(2025, 10, 12) : undefined }),
-      health: healthPill(health, body),
-      targetPerDay: health?.by === 'target' ? health.perDay : undefined,
+      dot: tips.length ? { tone: failed.length ? 'failed' : 'behind', tip: tips.join('; ') } : undefined,
+      syncing: !picture && apps.some((x) => x.a?.state === 'syncing'),
+      health: healthPill(metric.health, body),
       canEdit: openBoard.access !== 'view',
       bars: chart ? chart === 'bars' : undefined,
     }
@@ -416,31 +438,29 @@ export function DashboardScreen() {
   const attention: AttentionItem[] = []
   for (const b of tabs) {
     for (const c of b.cards) {
-      const metric = METRICS[c.metricId]
-      const health = metric && healthFor(metric, cardStates)
-      const tone = flagOf(health)
-      if (!metric || !health || !tone || cardStates.locked.includes(metric.id) || cardStates.removed.includes(metric.id)) continue
+      const metric = metrics.get(c.metricId)
+      const health = metric?.health ?? null
+      if (!metric || !flagged(health)) continue
       const seen = attention.find((x) => x.metricId === metric.id)
       if (seen) {
         if (!seen.boards.split(', ').includes(b.label)) seen.boards += `, ${b.label}`
         continue
       }
-      attention.push({ metricId: metric.id, label: metric.label, boards: b.label, reason: reasonOf(health), value: metric.value, tone })
+      attention.push({ metricId: metric.id, label: metric.label, boards: b.label, reason: reasonOf(health), value: metric.value, tone: 'red' })
     }
   }
-  attention.sort((a, b) => (a.tone === b.tone ? 0 : a.tone === 'red' ? -1 : 1))
-  const windowMetric = windowFor ? METRICS[windowFor] ?? null : null
+  const windowMetric = windowFor ? metrics.get(windowFor) ?? null : null
   const related = windowMetric
-    ? openBoard.cards.map((c) => METRICS[c.metricId]).filter((x) => x && x.id !== windowMetric.id && x.source === windowMetric.source)
+    ? openBoard.cards.map((c) => metrics.get(c.metricId)).filter((x): x is Metric => !!x && x.id !== windowMetric.id && x.apps.some((a) => windowMetric.apps.includes(a)))
     : []
   const notReady = (what: string) => toast.info(`${what} isn’t ready yet`, { id: 'dashboard-not-ready' })
-  const stampText = stamp(openBoard.label, dates.period, dates.compare, nameOf(ME))
+  const stampText = stamp(openBoard.label, dates.period, dates.compare, me)
   // Numbers: one CSV, then the dialog closes; no toast, the file is the confirmation (SH-36, SH-37).
   const downloadNumbers = (ids: string[]) => new Promise<void>((resolve, reject) => {
     window.setTimeout(() => {
       if (consumeDownloadFail()) { reject(new Error('failed')); return }
-      const title = ids.length === 1 ? METRICS[ids[0]]?.label ?? openBoard.label : openBoard.label
-      const csv = numbersCsv({ title, metricIds: ids, period: dates.period, compare: dates.compare, by: nameOf(ME) })
+      const title = ids.length === 1 ? metrics.get(ids[0])?.label ?? openBoard.label : openBoard.label
+      const csv = numbersCsv({ title, metrics: ids.map((id) => metrics.get(id)).filter((x): x is Metric => !!x), period: dates.period, compare: dates.compare, by: me })
       saveFile(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `${fileBase(title, dates.period)}.csv`)
       setDownloadOpen(false)
       resolve()
@@ -451,25 +471,19 @@ export function DashboardScreen() {
   // The picker's Add: at the end, in the order picked, each at the size that suits it (AC-16 – AC-18).
   const addPicked = (metricIds: string[]) => {
     setPickerOpen(false)
-    const result = api.addCards(openBoard.id, metricIds.map((id) => ({ metricId: id, size: landingSize(METRICS[id]) })))
+    const picked = metricIds.map((id) => metrics.get(id)).filter((x): x is Metric => !!x)
+    const result = api.addCards(openBoard.id, picked.map((x) => ({ metricId: x.id, size: landingSize(x) })))
     if (!result) return
     land(openBoard.id, result.ids)
-    const message = metricIds.length === 1 ? `Added ${METRICS[metricIds[0]]?.label}` : `Added ${metricIds.length} cards`
+    const message = picked.length === 1 ? `Added ${picked[0].label}` : `Added ${picked.length} cards`
     toast(message, { duration: 6000, action: { label: 'Undo', onClick: result.undo } })
   }
 
   // Add to board from a metric's window (AC-22 – AC-25).
   const addToBoard = (metricId: string, boardId: string) => {
     const board = state.boards[boardId]
-    const metric = METRICS[metricId]
+    const metric = metrics.get(metricId)
     if (!board || !metric) return
-    if (consumeAddFail()) {
-      toast(`Couldn’t add ${metric.label} to ${board.label}.`, {
-        duration: 6000, icon: <TriangleAlert aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth className="text-[var(--dashboard-sync-failed)]" />,
-        action: { label: 'Try again', onClick: () => addToBoard(metricId, boardId) },
-      })
-      return
-    }
     const result = api.addCards(boardId, [{ metricId: metric.id, size: landingSize(metric) }])
     if (!result) return
     if (boardId === openBoard.id) {
@@ -493,7 +507,7 @@ export function DashboardScreen() {
   // ── Card settings (10-cards-reference-rules.md CS-1 – CS-9) ─────────────────────────
   // Only while editing, and only for a card still on the board.
   const settingsCard = editing && settingsFor ? openBoard.cards.find((c) => c.metricId === settingsFor) ?? null : null
-  const pickable = (m: (typeof METRICS)[string]) => !m.unmeasured && isConnected(sync, m.source) && (!m.alsoFrom || isConnected(sync, m.alsoFrom))
+  const pickable = measurable
   const setCards = (next: typeof openBoard.cards) => api.change([{ type: 'set-cards', id: openBoard.id, cards: next }], [{ type: 'set-cards', id: openBoard.id, cards: openBoard.cards }])
   // Another metric, same size and place; a chart it doesn't suit goes back to Trend (CS-5).
   const swapMetric = (metricId: string) => {
@@ -511,9 +525,9 @@ export function DashboardScreen() {
   // Duplicate: a copy at the end, same size and chart, ringed, with Undo (CS-7).
   const duplicateCard = () => {
     if (!settingsCard) return
-    const label = METRICS[settingsCard.metricId]?.label ?? 'Card'
+    const label = metrics.get(settingsCard.metricId)?.label ?? 'Card'
     setSettingsFor(null)
-    const result = api.addCards(openBoard.id, [{ metricId: baseMetricId(settingsCard.metricId), size: settingsCard.size }])
+    const result = api.addCards(openBoard.id, [{ metricId: Metrics.base(settingsCard.metricId), size: settingsCard.size }])
     if (!result) return
     if (settingsCard.chart) {
       const copyId = result.ids[0]
@@ -528,7 +542,6 @@ export function DashboardScreen() {
   }
 
   // ── New board: the chooser's ways (NB-6) ─────────────────────────────────────────
-  const connected = (app: AppId) => isConnected(sync, app)
   const undoable = (message: string, undoIt: () => void) => toast(message, { duration: 6000, action: { label: 'Undo', onClick: undoIt } })
   const pickWay = (way: Way) => {
     if (way === 'empty') { newBoard(); return }
@@ -546,7 +559,7 @@ export function DashboardScreen() {
     const t = TEMPLATES.find((x) => x.id === templateId)
     if (!t) return
     setLibrary(null)
-    const fields = { label: t.name, cards: toBoardCards(templateFor(t.cards, connected).cards), period: t.period, compare: t.compare }
+    const fields = { label: t.name, cards: toBoardCards(templateFor(t.cards, metrics).cards), period: t.period, compare: t.compare }
     if (fill) {
       const undoIt = api.fillBoard(fill, fields)
       if (undoIt) undoable(`Filled from the ${t.name} template`, undoIt)
@@ -596,6 +609,7 @@ export function DashboardScreen() {
   }
 
   return (
+    <DashboardDataProvider value={live.data}>
     <div className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-[var(--neutral-50)] py-2.5 pr-2.5">
       <section
         data-dashboard-panel
@@ -626,10 +640,6 @@ export function DashboardScreen() {
             {/* One row; on a very narrow panel the period and sync drop below the tabs rather than
                 pushing the row wider. */}
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-              {checking ? (
-                // The first visit's check: a placeholder capsule, no names (NB-31).
-                <span data-first-visit aria-label="Setting up your boards" role="status" className="dashboard-shape-shimmer block h-10 w-[min(420px,100%)] rounded-full" />
-              ) : (
               <TabRow
                 boards={tabs}
                 openId={noAccess ? '' : state.openId}
@@ -643,9 +653,8 @@ export function DashboardScreen() {
                 onLayout={setVisibleCount}
                 {...handlers}
               />
-              )}
               {/* The period and sync button keep their place at the top right (TAB-16). */}
-              <div className={cn('ml-auto flex shrink-0 items-center gap-1', (checking || noAccess) && 'invisible')}>
+              <div className={cn('ml-auto flex shrink-0 items-center gap-1', noAccess && 'invisible')}>
                 {openBoard.sharedBy && <SharedByAvatar person={openBoard.sharedBy} />}
                 {/* Before the period: what needs attention across every board (CR-31). */}
                 <NeedsAttention items={attention} onOpenMetric={setWindowFor} />
@@ -673,18 +682,18 @@ export function DashboardScreen() {
                     setViewDates(next.period === openBoard.period && next.compare === openBoard.compare ? null : next)
                   }}
                 />
-                <SyncButton boardId={openBoard.id} apps={boardApps} uses={uses} open={sourcesOpen} onOpenChange={setSourcesOpen} />
+                <SyncButton apps={boardApps} uses={uses} open={sourcesOpen} onOpenChange={setSourcesOpen} />
               </div>
             </div>
 
             <div id={panelId} role="tabpanel" aria-labelledby={`board-tab-${openBoard.id}`} className="mt-5 outline-none">
               {/* Above the cards, also in edit mode and with Data sources open (SY-13, SY-21). */}
-              {here && !checking && !noAccess && <div className="mb-4"><DraftLine draft={here} /></div>}
+              {here && !noAccess && <div className="mb-4"><DraftLine draft={here} /></div>}
               <div className="empty:hidden mb-4"><SyncBanners boardId={openBoard.id} apps={boardApps} /></div>
               {noAccess ? (
                 <NoAccess label={noAccess.label} owner={noAccess.owner} onBack={() => { leaveNoAccess(); api.open(state.tabs[0]) }} />
-              ) : checking || (here?.phase === 'drafting' && openBoard.cards.length === 0) ? (
-                // Plain card skeletons: the first visit's check, a draft being made (NB-21, NB-31).
+              ) : here?.phase === 'drafting' && openBoard.cards.length === 0 ? (
+                // Plain card skeletons: a draft being made (NB-21).
                 <Skeleton />
               ) : here && (here.phase === 'failed' || here.phase === 'empty') ? (
                 <DraftProblem
@@ -693,15 +702,9 @@ export function DashboardScreen() {
                   onChange={() => setAsk({ open: true, initial: here.request })}
                   onConnect={() => notReady('Connecting an app')}
                 />
-              ) : cardStates.boardFailed && !cardStates.retrying.includes('*') ? (
-                // The board itself couldn't load; the header keeps working (CR-21).
-                <div data-board-failed className="flex min-h-[240px] flex-col items-center justify-center gap-3 rounded-xl text-[13px] leading-[17px] text-[var(--dashboard-figure)]">
-                  <p className="m-0">Couldn’t load this board.</p>
-                  {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the white Try again of Figma 170:47131 (1px #D3CEC8, 8px radius, 32px) */}
-                  <button type="button" onClick={retryBoard} className="h-8 cursor-pointer rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-3.5 text-[13px] text-[var(--dashboard-figure)] outline-none hover:bg-[var(--neutral-100)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]">
-                    Try again
-                  </button>
-                </div>
+              ) : live.failed ? (
+                // The board's numbers couldn't load; the header keeps working (CR-21).
+                <Problem text="Couldn’t load this board." onRetry={live.retry} />
               ) : (
                 <BoardGrid
                   key={openBoard.id}
@@ -716,15 +719,15 @@ export function DashboardScreen() {
                   editing={editing}
                   cardView={cardView}
                   onOpenCard={setWindowFor}
-                  onRetryCard={retryCard}
+                  onRetryCard={live.retry}
                   onOpenSettings={editing ? setSettingsFor : undefined}
-                  onRemoveEmpty={(id) => cards.removeWithUndo(id, METRICS[id]?.label ?? 'Card')}
+                  onRemoveEmpty={(id) => cards.removeWithUndo(id, metrics.get(id)?.label ?? 'Card')}
                   landed={landed?.boardId === openBoard.id ? landed : null}
                   onMoveTo={cards.moveTo}
                   onSetLayout={cards.setLayout}
                   onStep={cards.step}
                   onResize={cards.resize}
-                  onRemove={(id) => cards.removeWithUndo(id, METRICS[id]?.label ?? 'Card')} // "Removed Revenue" with Undo (07, Toast)
+                  onRemove={(id) => cards.removeWithUndo(id, metrics.get(id)?.label ?? 'Card')} // "Removed Revenue" with Undo (07, Toast)
                 />
               )}
             </div>
@@ -753,11 +756,10 @@ export function DashboardScreen() {
             startOpen={openBoard.cards.length <= 2} // BS-5
             onAddCards={() => setPickerOpen(true)} // reading mode stays on (AC-19)
             onNewBoard={pickWay}
-            waiting={checking}
             onEditBoard={startEditing}
             onShare={() => setShare({ open: true, start: 'people' })}
             onDownload={() => setDownloadOpen(true)}
-            onDefaultBoard={sync.isAdmin ? () => setDefaultOpen(true) : undefined}
+            onDefaultBoard={isAdmin ? () => setDefaultOpen(true) : undefined}
             onOpen={api.open}
             onShow={api.show}
             onStartOver={api.startOver}
@@ -791,7 +793,6 @@ export function DashboardScreen() {
         period={dates.period}
         compare={dates.compare}
         cardView={(id) => cardView(id, true)}
-        locked={!!settingsCard && cardStates.locked.includes(baseMetricId(settingsCard.metricId))}
         stamp={stampText}
         pickable={pickable}
         onClose={() => setSettingsFor(null)}
@@ -801,7 +802,7 @@ export function DashboardScreen() {
         onRemove={() => {
           if (!settingsCard) return
           setSettingsFor(null)
-          cards.removeWithUndo(settingsCard.metricId, METRICS[settingsCard.metricId]?.label ?? 'Card') // CS-8
+          cards.removeWithUndo(settingsCard.metricId, metrics.get(settingsCard.metricId)?.label ?? 'Card') // CS-8
         }}
       />
       <AddCardsDialog open={pickerOpen} onBoard={openBoard.cards.map((c) => c.metricId)} onClose={() => setPickerOpen(false)} onAdd={addPicked} />
@@ -825,7 +826,7 @@ export function DashboardScreen() {
         board={openBoard}
         period={dates.period}
         compare={dates.compare}
-        isAdmin={sync.isAdmin}
+        isAdmin={isAdmin}
         cardView={(id) => cardView(id, true)}
         stamp={stampText}
         onClose={() => setShare((s) => ({ ...s, open: false }))}
@@ -851,7 +852,6 @@ export function DashboardScreen() {
         board={openBoard}
         period={dates.period}
         compare={dates.compare}
-        locked={cardStates.locked}
         onClose={() => setDownloadOpen(false)}
         onImage={prepareImage}
         onNumbers={downloadNumbers}
@@ -872,7 +872,49 @@ export function DashboardScreen() {
         }}
       />
     </div>
+    </DashboardDataProvider>
   )
+}
+
+/** The panel every state of the screen sits in (Figma base 17:889). */
+function Frame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-[var(--neutral-50)] py-2.5 pr-2.5">
+      <section aria-label="Dashboard" className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[var(--layout-radius)] border border-solid border-[var(--border-default)] bg-[var(--dashboard-panel-bg)]">
+        <div className="mx-auto box-border w-full max-w-[1232px] px-4 pt-[15px]">{children}</div>
+      </section>
+    </div>
+  )
+}
+
+const QUIET_BUTTON = 'h-8 cursor-pointer rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-3.5 text-[13px] text-[var(--dashboard-figure)] no-underline outline-none hover:bg-[var(--neutral-100)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]'
+
+/** Something the warehouse didn't answer, with Try again (CR-21). */
+function Problem({ text, onRetry }: { text: string; onRetry: () => void }) {
+  return (
+    <div data-board-failed className="flex min-h-[240px] flex-col items-center justify-center gap-3 rounded-xl text-[13px] leading-[17px] text-[var(--dashboard-figure)]">
+      <p className="m-0">{text}</p>
+      {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the white Try again of Figma 170:47131 (1px #D3CEC8, 8px radius, 32px) */}
+      <button type="button" onClick={onRetry} className={QUIET_BUTTON}>Try again</button>
+    </div>
+  )
+}
+
+/** No warehouse yet: one is made when the organization connects its store. */
+function NoStore() {
+  return (
+    <div data-no-store className="flex min-h-[320px] flex-col items-center justify-center gap-3 text-center text-[13px] leading-5 text-[var(--dashboard-figure)]">
+      <p className="m-0 text-[15px] font-medium">Connect your store to see its numbers</p>
+      <p className="m-0 max-w-[360px] text-[var(--dashboard-label)]">Your dashboard builds itself once Shopify or another store is connected. The first sync takes a few minutes.</p>
+      { }
+      <a href={ORG_CONNECTORS_ROUTE} className={cn(QUIET_BUTTON, 'flex items-center')}>Connect an app</a>
+    </div>
+  )
+}
+
+/** Every board was deleted or left. */
+function EmptyBoardList() {
+  return <div className="flex min-h-[240px] items-center justify-center text-[13px] text-[var(--dashboard-label)]">No boards yet.</div>
 }
 
 /** Plain card skeletons, no names or numbers (08 NB-21, NB-31). */

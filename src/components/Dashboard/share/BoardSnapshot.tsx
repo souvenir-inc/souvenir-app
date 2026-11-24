@@ -3,7 +3,7 @@
 import { forwardRef } from 'react'
 import { dims } from '../grid-layout'
 import { MetricCard, type CardView } from '../MetricCard'
-import { METRICS } from '../mock-data'
+import { useDashboardData } from '../live/dashboard-data'
 import type { BoardCard } from '../types'
 
 // The board as a picture (09 SH-25, SH-34): every card as it looks, on the board's background, a strip
@@ -26,6 +26,7 @@ interface BoardSnapshotProps {
 }
 
 export const BoardSnapshot = forwardRef<HTMLDivElement, BoardSnapshotProps>(function BoardSnapshot({ cards, cardView, stamp, columns = 4, className, style }, ref) {
+  const { metrics } = useDashboardData()
   const rows = cards.reduce((h, c) => Math.max(h, c.y + dims(c.size).h), 1)
   return (
     <div
@@ -36,7 +37,7 @@ export const BoardSnapshot = forwardRef<HTMLDivElement, BoardSnapshotProps>(func
     >
       <ul className="m-0 grid list-none gap-4 p-0" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, 156px)` }}>
         {cards.map((c, i) => {
-          const metric = METRICS[c.metricId]
+          const metric = metrics.get(c.metricId)
           if (!metric) return null
           const { w, h } = dims(c.size)
           return (

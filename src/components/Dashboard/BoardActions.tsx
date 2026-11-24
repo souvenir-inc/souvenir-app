@@ -34,8 +34,6 @@ interface SpeedDialProps extends BoardMenuHandlers {
   /** A way picked in the New board chooser (08 NB-6). */
   onNewBoard: (way: Way) => void
   onEditBoard: () => void
-  /** Greyed while the first visit sets up the starter boards (08 NB-31). */
-  waiting?: boolean
   onShare: () => void
   onOpen: (id: string) => void
   onShow: (id: string) => void
@@ -47,7 +45,7 @@ interface SpeedDialProps extends BoardMenuHandlers {
   onDefaultBoard?: () => void
 }
 
-export function SpeedDial({ board, startOpen, onAddCards, onNewBoard, onEditBoard, onShare, waiting = false, ...more }: SpeedDialProps) {
+export function SpeedDial({ board, startOpen, onAddCards, onNewBoard, onEditBoard, onShare, ...more }: SpeedDialProps) {
   const [mode, setMode] = useState<Mode>(startOpen ? 'dial' : 'closed')
   const rootRef = useRef<HTMLDivElement>(null)
   const fabRef = useRef<HTMLButtonElement>(null)
@@ -92,8 +90,7 @@ export function SpeedDial({ board, startOpen, onAddCards, onNewBoard, onEditBoar
           openAtPress.current = false
           setMode(wasOpen ? 'closed' : 'dial')
         }}
-        disabled={waiting}
-        className={cn('size-11 rounded-full border-0 [box-shadow:var(--dashboard-raised-shadow)]', DIAL, waiting && 'opacity-40')}
+        className={cn('size-11 rounded-full border-0 [box-shadow:var(--dashboard-raised-shadow)]', DIAL)}
       />
 
       {/* New board: the chooser above the ×, right-aligned (NB-1). Esc closes it and the dial (NB-5). */}

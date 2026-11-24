@@ -5,11 +5,13 @@ import { createPortal } from 'react-dom'
 import { Check, Copy, FileSpreadsheet, Image as ImageIcon, Search, Trash2, TriangleAlert, X } from 'lucide-react'
 import { Button, IconButton } from '@/components/ui'
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { userFullName, useAuth } from '@/context/auth-context'
 import { cn } from '@/lib/utils'
-import { CATALOG, groupOf } from './catalog'
+import { catalogOf, groupOf } from './catalog'
 import { dims } from './grid-layout'
 import { barsBySize, type CardView } from './MetricCard'
-import { METRICS, baseMetricId } from './mock-data'
+import { useDashboardData } from './live/dashboard-data'
+import { Metrics } from './live/metrics'
 import { BoardSnapshot } from './share/BoardSnapshot'
 import { consumeDownloadFail, fileBase, nodeToPng, numbersCsv, saveFile } from './share/export'
 import type { BoardCard, Metric } from './types'
@@ -24,9 +26,8 @@ interface CardSettingsProps {
   card: BoardCard | null
   period: string
   compare: string
-  /** How the card reads now (for its image) and whether it's locked to you (no numbers, CS-9). */
+  /** How the card reads now, for its image. */
   cardView: (cardId: string) => CardView | undefined
-  locked: boolean
   stamp: string
   /** Can this metric be picked: measured, and its apps connected (CS-4). */
   pickable: (m: Metric) => boolean
@@ -45,8 +46,10 @@ export function CardSettings({ card, ...rest }: CardSettingsProps) {
   )
 }
 
-function Settings({ card, period, compare, cardView, locked, stamp, pickable, onSwap, onChart, onDuplicate, onRemove }: Omit<CardSettingsProps, 'card' | 'onClose'> & { card: BoardCard }) {
-  const metric = METRICS[card.metricId]
+function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, onChart, onDuplicate, onRemove }: Omit<CardSettingsProps, 'card' | 'onClose'> & { card: BoardCard }) {
+  const { metrics, apps } = useDashboardData()
+  const { user } = useAuth()
+  const metric = metrics.get(card.metricId)
   const [changing, setChanging] = useState(false)
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
@@ -56,11 +59,11 @@ function Settings({ card, period, compare, cardView, locked, stamp, pickable, on
   const shotRef = useRef<HTMLDivElement>(null)
   if (!metric) return null
   const bars = card.chart ? card.chart === 'bars' : barsBySize(card.size)
-  const current = baseMetricId(card.metricId)
+  const current = Metrics.base(card.metricId)
 
   // The catalog search (CS-4): matching names, or everything when empty.
   const q = query.trim().toLowerCase()
-  const list = CATALOG.filter((m) => !q || m.label.toLowerCase().includes(q) || groupOf(m).toLowerCase().includes(q))
+  const list = catalogOf(metrics.all).filter((m) => !q || m.label.toLowerCase().includes(q) || groupOf(m, apps).toLowerCase().includes(q))
   const choosable = list.filter((m) => m.id !== current && pickable(m))
   const pick = (m: Metric) => {
     if (m.id === current) { setChanging(false); return }
@@ -92,7 +95,7 @@ function Settings({ card, period, compare, cardView, locked, stamp, pickable, on
     window.setTimeout(() => {
       setBusy(null)
       if (consumeDownloadFail()) { setFailed('numbers'); return }
-      const csv = numbersCsv({ title: metric.label, metricIds: [card.metricId], period, compare, by: 'Dev Shah' })
+      const csv = numbersCsv({ title: metric.label, metrics: [metric], period, compare, by: userFullName(user) })
       saveFile(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `${file}.csv`)
     }, 900)
   }
@@ -174,7 +177,7 @@ function Settings({ card, period, compare, cardView, locked, stamp, pickable, on
                   >
                     <span className="flex min-w-0 flex-1 flex-col">
                       <span className="truncate text-[14px] leading-5 text-[var(--dashboard-figure)]">{m.label}</span>
-                      <span className="truncate text-[12px] leading-4 text-[var(--dashboard-label)]">{groupOf(m)}</span>
+                      <span className="truncate text-[12px] leading-4 text-[var(--dashboard-label)]">{groupOf(m, apps)}</span>
                     </span>
                     {m.id === current && <Check aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}
                   </li>
@@ -217,12 +220,9 @@ function Settings({ card, period, compare, cardView, locked, stamp, pickable, on
 
         <div className="flex flex-wrap gap-2 pt-3 max-[760px]:flex-col max-[760px]:items-stretch">
           <Button variant="outline" size="sm" data-card-action="duplicate" className={action} leftIcon={<Copy aria-hidden strokeWidth={1.5} absoluteStrokeWidth />} onClick={onDuplicate}>Duplicate</Button>
-          {/* A locked card has no numbers to download (CS-9, S-8a). */}
-          {!locked && (
-            <Button variant="outline" size="sm" data-card-action="numbers" loading={busy === 'numbers'} disabled={busy === 'image'} leftIcon={<FileSpreadsheet aria-hidden strokeWidth={1.5} absoluteStrokeWidth />} onClick={downloadNumbers}>
-              {busy === 'numbers' ? 'Preparing…' : 'Download numbers'}
-            </Button>
-          )}
+          <Button variant="outline" size="sm" data-card-action="numbers" loading={busy === 'numbers'} disabled={busy === 'image'} leftIcon={<FileSpreadsheet aria-hidden strokeWidth={1.5} absoluteStrokeWidth />} onClick={downloadNumbers}>
+            {busy === 'numbers' ? 'Preparing…' : 'Download numbers'}
+          </Button>
           <Button variant="outline" size="sm" data-card-action="image" loading={busy === 'image'} disabled={busy === 'numbers'} leftIcon={<ImageIcon aria-hidden strokeWidth={1.5} absoluteStrokeWidth />} onClick={downloadImage}>
             {busy === 'image' ? 'Preparing…' : 'Download image'}
           </Button>

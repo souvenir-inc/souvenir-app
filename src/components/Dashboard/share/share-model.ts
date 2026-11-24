@@ -1,7 +1,7 @@
 // Sharing (docs-v2/dashboard/09-share-export-rules.md): the dummy workspace, who can do what, matches as
 // you type, and what a board's link opens on. Pure, so the rules are testable.
 
-import { COMPARISONS } from '../mock-data'
+import { COMPARISONS } from '../period'
 import { periodName } from '../period'
 
 export type Role = 'view' | 'edit'
@@ -19,8 +19,6 @@ export interface Share { owner: string; grants: Grant[]; general: General }
 export const WORKSPACE = 'Lumen & Co'
 /** Members of the workspace, for "12 people lose access" (SH-19). */
 export const WORKSPACE_SIZE = 14
-/** Metrics only some people can see; Slack images lock them for everyone (SH-26). */
-export const RESTRICTED = ['contribution-margin']
 
 const avatar = (n: number) => `var(--dashboard-avatar-${n})`
 export const PEOPLE: Person[] = [

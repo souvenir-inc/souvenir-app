@@ -1,25 +1,24 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { Calendar, CircleCheck, LayoutDashboard, LayoutTemplate, Plug, X } from 'lucide-react'
+import { Calendar, LayoutDashboard, LayoutTemplate, Plug, X } from 'lucide-react'
 import { Tooltip } from '@/components/Tooltip'
 import { Button, IconButton } from '@/components/ui'
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
 import { cn } from '@/lib/utils'
-import { SOURCE_NAMES, SourceLogo } from './icons'
-import { COMPARISONS, METRICS } from './mock-data'
-import { periodName } from './period'
-import { Spinner } from './sync/Spinner'
-import { connectApp, isConnected, useSyncSnapshot } from './sync/sync-store'
-import type { AppId } from './sync/sync-model'
+import { SourceLogo } from './icons'
+import { useDashboardData } from './live/dashboard-data'
+import { COMPARISONS, periodName } from './period'
 import type { Board } from './tabs/board-state'
-import { TEMPLATES, callOutTitle, templateFor, toBoardCards } from './templates'
+import { TEMPLATES, templateFor, toBoardCards } from './templates'
+import type { App } from './types'
 import { dims } from './grid-layout'
 
 // The template library (Figma 170:41837; 08-new-board-rules.md NB-7 – NB-15). Left, what you can
 // start from: templates by role, your boards, boards shared with you. Right, the selected one: its
-// name, the dates it opens on and the outline of its cards, no figures. Cards whose app isn't
-// connected are drawn faded and dashed, with a call-out to connect it (NB-10).
+// name, the dates it opens on and the outline of its cards, no figures. Metrics this store can't
+// measure are left out, and a call-out names them with why (NB-9, NB-10).
 
 const FOCUS = 'outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]'
 const YOUR_ROLE_TEMPLATE = 'founder'
@@ -48,8 +47,7 @@ export function NewBoardLibrary({ openOn, ...rest }: NewBoardLibraryProps) {
 interface Row { key: LibraryPick; label: string; kind: 'template' | 'board' }
 
 function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBoardLibraryProps, 'openOn'> & { initial: LibraryPick }) {
-  const sync = useSyncSnapshot()
-  const connected = (app: AppId) => isConnected(sync, app)
+  const { metrics, apps } = useDashboardData()
   const [picked, setPicked] = useState(initial)
   const listRef = useRef<HTMLDivElement>(null)
 
@@ -69,32 +67,14 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
   const id = picked.slice(cut + 1)
   const template = kind === 'template' ? TEMPLATES.find((t) => t.id === id) : undefined
   const board = kind === 'board' ? boards.find((b) => b.id === id) : undefined
-  const used = template ? templateFor(template.cards, connected) : null
-  const laid = template && used
-    ? toBoardCards(used.cards).map((c, i) => ({ ...c, needsApp: used.cards[i].needsApp }))
-    : (board?.cards ?? []).map((c) => ({ ...c, needsApp: undefined as AppId | undefined }))
+  const used = template ? templateFor(template.cards, metrics) : null
+  const laid = used ? toBoardCards(used.cards) : board?.cards ?? []
+  const leftOut = (used?.leftOut ?? []).map((id) => metrics.get(id)).filter((m) => !!m)
   const name = template?.name ?? board?.label ?? ''
   const period = template?.period ?? board?.period ?? '7d'
   const compare = template?.compare ?? board?.compare ?? 'previous'
 
-  // The call-out keeps a row for every app the template asked for, also once connected, until the
-  // dialog closes (NB-10). The dummy store marks such apps in `connections`.
-  const appRows: { app: AppId; count: number }[] = []
-  if (template) {
-    for (const c of template.cards) {
-      const m = METRICS[c.metricId]
-      if (!m || m.unmeasured) continue
-      for (const app of m.alsoFrom ? [m.source, m.alsoFrom] : [m.source]) {
-        if (sync.connections[app] === undefined) continue
-        const row = appRows.find((r) => r.app === app)
-        if (row) row.count += 1
-        else appRows.push({ app, count: 1 })
-      }
-    }
-  }
-  const needing = laid.filter((c) => c.needsApp).length
-  const waitingApps = new Set(laid.map((c) => c.needsApp).filter(Boolean)).size
-  const nothingShows = !!template && (laid.length === 0 || needing === laid.length)
+  const nothingShows = !!template && laid.length === 0
 
   const go = () => {
     if (template) { if (!nothingShows) onUseTemplate(template.id) }
@@ -186,12 +166,20 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
               </p>
             </div>
 
-            {appRows.length > 0 && (
+            {leftOut.length > 0 && (
               <div data-library-callout className="flex flex-col gap-2 rounded-xl border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-panel-bg)] p-3">
-                <p className="m-0 text-[13px] font-medium leading-5 text-[var(--dashboard-figure)]">
-                  {needing ? callOutTitle(needing, laid.length, waitingApps) : 'Every card in this template can show now'}
-                </p>
-                {appRows.map(({ app, count }) => <AppRow key={app} app={app} count={count} />)}
+                <div className="flex items-center gap-2.5">
+                  <p className="m-0 min-w-0 flex-1 text-[13px] font-medium leading-5 text-[var(--dashboard-figure)]">
+                    {leftOut.length === 1 ? '1 card is left out' : `${leftOut.length} cards are left out`}: this store doesn’t measure {leftOut.length === 1 ? 'it' : 'them'} yet
+                  </p>
+                  { }
+                  <a href={ORG_CONNECTORS_ROUTE} className={cn('flex shrink-0 items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1 pl-2.5 pr-3 text-[13px] font-medium leading-[18px] text-[var(--dashboard-figure)] no-underline shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}>
+                    <Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />Connect
+                  </a>
+                </div>
+                <ul className="m-0 flex list-none flex-col gap-1 p-0 text-[12px] leading-4 text-[var(--dashboard-label)]">
+                  {leftOut.map((m) => <li key={m.id}><span className="text-[var(--dashboard-figure)]">{m.label}</span> · {m.unmeasured ?? 'no connected app records it'}</li>)}
+                </ul>
               </div>
             )}
 
@@ -203,24 +191,20 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
               style={{ gridTemplateRows: `repeat(${Math.max(height, 1)}, 84px)` }}
             >
               {laid.map((c) => {
-                const m = METRICS[c.metricId]
+                const m = metrics.get(c.metricId)
                 if (!m) return null
                 const { w, h } = dims(c.size)
-                const apps: AppId[] = m.alsoFrom ? [m.source, m.alsoFrom] : [m.source]
+                const marks = m.apps.slice(0, 2).map((id) => apps.get(id)).filter((a): a is App => !!a)
                 return (
                   <li
                     key={c.metricId}
                     data-outline-card={c.metricId}
-                    data-needs-app={c.needsApp}
-                    className={cn(
-                      'flex min-w-0 flex-col justify-between rounded-xl border border-solid p-3',
-                      c.needsApp ? 'border-dashed border-[var(--dashboard-waiting-border)] bg-[var(--dashboard-panel-bg)] opacity-60' : 'border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)]',
-                    )}
+                    className="flex min-w-0 flex-col justify-between rounded-xl border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] p-3"
                     style={{ gridColumn: `${c.x + 1} / span ${w}`, gridRow: `${c.y + 1} / span ${h}` }}
                   >
                     <span className="flex min-w-0 items-center gap-1.5">
                       <span className="min-w-0 flex-1 truncate text-[14px] font-medium leading-5 text-[var(--dashboard-figure)]">{m.label}</span>
-                      {apps.map((a) => <SourceLogo key={a} source={a} className="size-3.5 shrink-0" />)}
+                      {marks.map((a) => <SourceLogo key={a.id} app={a} className="size-3.5 shrink-0" />)}
                     </span>
                     <span aria-hidden className="block h-3 w-16 rounded-full bg-[var(--dashboard-outline-bar)]" />
                   </li>
@@ -243,35 +227,5 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
         </div>
       </div>
     </DialogContent>
-  )
-}
-
-/** An app the template reads that isn't connected: Connect → Connecting… → Connected (NB-10). */
-function AppRow({ app, count }: { app: AppId; count: number }) {
-  const sync = useSyncSnapshot()
-  const state = sync.connections[app] ?? 'connected'
-  return (
-    <div data-callout={app} data-connection={state} className="flex items-center gap-2.5">
-      <span className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)]">
-        <SourceLogo source={app} className="size-4" />
-      </span>
-      <span className="min-w-0 flex-1 truncate text-[13px] leading-5 text-[var(--dashboard-figure)]">
-        {SOURCE_NAMES[app]} <span className="text-[var(--dashboard-label)]">· {count} card{count === 1 ? '' : 's'}</span>
-      </span>
-      {state === 'connecting' ? (
-        <span role="status" className="flex shrink-0 items-center gap-1.5 text-[13px] leading-[18px] text-[var(--dashboard-label)]"><Spinner size={14} />Connecting…</span>
-      ) : state === 'connected' ? (
-        <span role="status" className="flex shrink-0 items-center gap-1.5 text-[13px] font-medium leading-[18px] text-[var(--dashboard-positive)]"><CircleCheck aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />Connected</span>
-      ) : (
-        // eslint-disable-next-line no-restricted-syntax -- ds-allow: the call-out's outlined Connect (Figma 170:51126)
-        <button
-          type="button"
-          onClick={() => connectApp(app)}
-          className={cn('flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1 pl-2.5 pr-3 text-[13px] font-medium leading-[18px] text-[var(--dashboard-figure)] shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}
-        >
-          <Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />{state === 'failed' ? 'Try again' : 'Connect'}
-        </button>
-      )}
-    </div>
   )
 }

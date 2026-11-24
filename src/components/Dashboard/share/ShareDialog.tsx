@@ -7,12 +7,12 @@ import { Button, IconButton } from '@/components/ui'
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import type { CardView } from '../MetricCard'
-import { METRICS } from '../mock-data'
+import { useDashboardData } from '../live/dashboard-data'
 import type { Board } from '../tabs/board-state'
 import { dims } from '../grid-layout'
 import { BoardSnapshot, SNAPSHOT_WIDTH } from './BoardSnapshot'
 import {
-  ME, RESTRICTED, WORKSPACE, boardLink, cantSeeOn, datesLabel, displayName, linkCaption, loseCount, matches, memberById, nameOf,
+  ME, WORKSPACE, boardLink, cantSeeOn, datesLabel, displayName, linkCaption, loseCount, matches, memberById, nameOf,
   outsideEmail, personById, sortGrants, type Match, type Member, type Role,
 } from './share-model'
 import { connectSlack, copyText, invite, postToSlack, removeGrant, setGeneral, setRole, shareOf, useShareSnapshot } from './share-store'
@@ -55,6 +55,7 @@ export function ShareDialog({ open, ...rest }: ShareDialogProps) {
 }
 
 function Share({ startOn, board, period, compare, isAdmin, cardView, stamp, onClose, onPosted, onNotReady }: Omit<ShareDialogProps, 'open'>) {
+  const { metrics } = useDashboardData()
   const shares = useShareSnapshot()
   const share = shareOf(shares, board.id)
   const owner = board.access === 'owner'
@@ -128,7 +129,7 @@ function Share({ startOn, board, period, compare, isAdmin, cardView, stamp, onCl
                   key={g.id}
                   id={g.id}
                   sub={m.kind === 'team' ? `${m.members.length} people` : m.email}
-                  note={locked ? `Can’t see ${METRICS[locked.metricId]?.label}` : undefined}
+                  note={locked ? `Can’t see ${metrics.get(locked.metricId)?.label}` : undefined}
                   right={owner ? (
                     <RoleMenu
                       value={g.role}
@@ -335,6 +336,7 @@ function GeneralAccess({ boardId, editable }: { boardId: string; editable: boole
 // ── Adding people (SH-10 – SH-14) ──────────────────────────────────────────────────────
 
 function AddPeople({ boardId, metricIds, isAdmin, onListOpen, onNotReady }: { boardId: string; metricIds: string[]; isAdmin: boolean; onListOpen: (open: boolean) => void; onNotReady: (what: string) => void }) {
+  const { metrics } = useDashboardData()
   const shares = useShareSnapshot()
   const share = shareOf(shares, boardId)
   const [query, setQuery] = useState('')
@@ -423,7 +425,7 @@ function AddPeople({ boardId, metricIds, isAdmin, onListOpen, onNotReady }: { bo
       {cantSee.length > 0 && (
         <p data-cant-see-hint className="m-0 flex items-center gap-1.5 pt-2 text-[12px] leading-4 text-[var(--dashboard-label)]">
           <Lock aria-hidden size={12} strokeWidth={1.5} absoluteStrokeWidth />
-          {cantSee.map((x) => `${x.person.name} can’t see ${METRICS[x.metricId]?.label}.`).join(' ')} It will show locked for {cantSee.length === 1 ? 'them' : 'those people'}.
+          {cantSee.map((x) => `${x.person.name} can’t see ${metrics.get(x.metricId)?.label}.`).join(' ')} It will show locked for {cantSee.length === 1 ? 'them' : 'those people'}.
         </p>
       )}
 
@@ -484,12 +486,6 @@ function SlackStep({ board, period, compare, cardView, stamp, onBack, onPosted }
   const [posting, setPosting] = useState(false)
   const [failed, setFailed] = useState(false)
   const [open, setOpen] = useState(false)
-  const restricted = board.cards.map((c) => METRICS[c.metricId]).filter((m) => m && RESTRICTED.includes(m.id))
-  // Restricted numbers are locked in the image for everyone (SH-26).
-  const lockedView = (id: string): CardView | undefined => {
-    const v = cardView(id)
-    return RESTRICTED.includes(id) && v ? { ...v, body: 'locked', health: undefined, dot: undefined, syncing: false } : v
-  }
   const rows = board.cards.reduce((h, c) => Math.max(h, c.y + dims(c.size).h), 1)
   const fullHeight = 32 + rows * 156 + (rows - 1) * 16 + 28
   const width = 444
@@ -561,16 +557,11 @@ function SlackStep({ board, period, compare, cardView, stamp, onBack, onPosted }
               </p>
               <div aria-label="Board image" role="img" className="overflow-hidden rounded-lg border border-solid border-[var(--neutral-200)]" style={{ width, height: fullHeight * scale }}>
                 <div aria-hidden className="pointer-events-none origin-top-left" style={{ transform: `scale(${scale})` }}>
-                  <BoardSnapshot cards={board.cards} cardView={lockedView} stamp={stamp} />
+                  <BoardSnapshot cards={board.cards} cardView={cardView} stamp={stamp} />
                 </div>
               </div>
               <span className="w-fit rounded-md border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-2.5 py-1 text-[12px] font-medium leading-4 text-[var(--dashboard-figure)]">Open board</span>
             </div>
-            {restricted.length > 0 && (
-              <p data-slack-locked className="m-0 flex items-center gap-1.5 pt-2.5 text-[12px] leading-4 text-[var(--dashboard-label)]">
-                <Lock aria-hidden size={12} strokeWidth={1.5} absoluteStrokeWidth />{restricted.map((m) => m!.label).join(', ')} shows locked in Slack.
-              </p>
-            )}
             {failed && (
               <p role="alert" data-slack-failed className="m-0 flex items-center gap-1.5 pt-2.5 text-[12px] leading-4 text-[var(--dashboard-error)]">
                 <TriangleAlert aria-hidden size={12} strokeWidth={1.5} absoluteStrokeWidth />Couldn’t post to #{channel}. Try again.

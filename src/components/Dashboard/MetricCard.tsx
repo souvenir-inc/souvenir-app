@@ -2,19 +2,16 @@
 
 import { useLayoutEffect, useRef, useState } from 'react'
 import { m, useReducedMotion } from 'framer-motion'
-import { ArrowDown, ArrowUp, Lock, Plug } from 'lucide-react'
+import { ArrowDown, ArrowUp } from 'lucide-react'
 import { Tooltip } from '@/components/Tooltip'
 import { cn } from '@/lib/utils'
 import { opens, type CardBody, type HealthPill } from './card-states'
 import { WeeklyBars } from './chart/Bars'
 import { LineChart } from './chart/LineChart'
-import { SOURCE_NAMES, SourceMark } from './icons'
+import { SourceMark } from './icons'
+import { useDashboardData } from './live/dashboard-data'
 import { compareName } from './period'
-import { Spinner } from './sync/Spinner'
-import { connectApp } from './sync/sync-store'
-import type { AppId } from './sync/sync-model'
-import type { Series } from './series'
-import type { CardSize, Metric } from './types'
+import type { App, CardSize, Metric } from './types'
 
 // One metric card (Figma 17:889, 05-cards-reading-rules.md). What it shows follows its size (CR-1):
 //   sm       3×1  288×156  the number and its change
@@ -51,20 +48,15 @@ export interface GripProps {
 /** How a card reads right now, worked out by the screen (sync, scenarios, health). */
 export interface CardView {
   body: CardBody
-  /** The card's own chart: weekly bars or the trend (10 CS-6). Unset, the metric's default. */
+  /** The card's own chart: weekly bars or the trend (10 CS-6). Unset, the size's default. */
   bars?: boolean
   /** Its app failed or is behind (SY-23), and what hovering the dot says (CR-25). */
   dot?: { tone: 'failed' | 'behind'; tip: string }
   /** Its app is syncing: the number shimmers (SY-24). */
   syncing?: boolean
-  series?: Series
   health?: HealthPill | null
-  /** A target per day for the full chart (CR-13). */
-  targetPerDay?: number
   /** People who can edit get Remove card on an empty card (CR-22). */
   canEdit?: boolean
-  /** The app it waits for, and whether Connect is running (08 NB-13). */
-  needsApp?: { app: AppId; connecting: boolean }
 }
 
 interface MetricCardProps {
@@ -85,18 +77,20 @@ interface MetricCardProps {
   className?: string
 }
 
-export function MetricCard({ metric: base, size, view, dragging = false, editing = false, onRemove, onOpen, onRetry, index = 0, className }: MetricCardProps) {
+export function MetricCard({ metric, size, view, dragging = false, editing = false, onRemove, onOpen, onRetry, index = 0, className }: MetricCardProps) {
   // The chart follows the size: wide cards draw the line, tall wide cards weekly bars (Figma 2.5).
   // A card's own choice in its settings wins (10 CS-6).
   const bars = view?.bars ?? barsBySize(size)
-  const metric = bars === !!base.bars ? base : { ...base, bars }
+  const { apps } = useDashboardData()
+  // Up to two marks: the app, or the two it blends (CR-5).
+  const marks = metric.apps.slice(0, 2).map((id) => apps.get(id)).filter((a): a is App => !!a)
   const body = view?.body ?? 'numbers'
   const openable = !!onOpen && !editing && opens(body)
   const tall = TALL.includes(size)
   const wide = WIDE.includes(size)
-  const change = `${metric.change.direction === 'up' ? 'up' : 'down'} ${metric.change.label}`
+  const change = metric.change ? `${metric.change.direction === 'up' ? 'up' : 'down'} ${metric.change.label}` : 'no comparison'
   const label = openable
-    ? `${metric.label}, ${body === 'today-empty' ? 'no data yet' : `${metric.value}, ${view?.series && !view.series.comparable ? 'no comparison' : change}`}${view?.dot ? `, ${view.dot.tip}` : ''}. Open`
+    ? `${metric.label}, ${body === 'today-empty' ? 'no data yet' : `${metric.value}, ${change}`}${view?.dot ? `, ${view.dot.tip}` : ''}. Open`
     : metric.label
   return (
     <article
@@ -113,33 +107,32 @@ export function MetricCard({ metric: base, size, view, dragging = false, editing
       className={cn(
         'group/card relative size-full overflow-clip rounded-xl bg-[var(--dashboard-card-bg)]',
         'transition-shadow duration-base ease-standard',
-        dragging ? 'shadow-[var(--dashboard-raised-shadow)]' : body === 'needs-app' ? 'border border-dashed border-[var(--dashboard-waiting-border)] bg-[var(--dashboard-panel-bg)] shadow-none' : 'shadow-[var(--dashboard-card-shadow)]',
+        dragging ? 'shadow-[var(--dashboard-raised-shadow)]' : 'shadow-[var(--dashboard-card-shadow)]',
         // Hover lifts the card a little; the pointer is a hand anywhere on it (CR-6). Focus: a 2 px
         // ring 4 px outside the card (CR-8).
         openable && 'cursor-pointer hover:shadow-[var(--dashboard-card-hover-shadow)] outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]',
         className,
       )}
     >
-      <div className={cn('absolute left-4 top-4 flex h-5 min-w-0 items-center gap-1.5', metric.alsoFrom ? 'right-[60px]' : 'right-10', size === 'full-lg' && 'right-[230px]', size === 'lg' && metric.bars && 'right-[150px]')}>
-        <Title text={metric.label} muted={body === 'needs-app'} />
-        {view?.dot && body !== 'locked' && <SyncDot tone={view.dot.tone} tip={view.dot.tip} />}
+      <div className={cn('absolute left-4 top-4 flex h-5 min-w-0 items-center gap-1.5', marks.length > 1 ? 'right-[60px]' : 'right-10', size === 'full-lg' && 'right-[230px]', size === 'lg' && bars && 'right-[150px]')}>
+        <Title text={metric.label} />
+        {view?.dot && <SyncDot tone={view.dot.tone} tip={view.dot.tip} />}
       </div>
 
       {/* Top right: the legend (wide charts), then the app logo(s). In edit mode the remove badge and
           the resize arc sit on the card's corners, drawn by BoardGrid (Figma 2.5). */}
       <div className="absolute right-4 top-4 flex h-5 items-center gap-3">
-        {body === 'numbers' && size === 'lg' && metric.bars && <Legend items={[['soft', 'Week in progress']]} />}
-        {body === 'numbers' && size === 'full-lg' && (metric.bars ? <Legend items={[['soft', 'Week in progress']]} /> : <Legend items={[['ink', 'This period'], ['previous', compareName(view?.series?.compare ?? 'previous')]]} />)}
-        {!metric.unmeasured && (
+        {body === 'numbers' && size === 'lg' && bars && <Legend items={[['soft', 'Week in progress']]} />}
+        {body === 'numbers' && size === 'full-lg' && (bars ? <Legend items={[['soft', 'Week in progress']]} /> : <Legend items={[['ink', 'This period'], ['previous', compareName(metric.series.compare)]]} />)}
+        {!metric.unmeasured && marks.length > 0 && (
           <span className="flex items-center gap-1.5">
-            <SourceMark source={metric.source} className="block size-3.5" />
-            {metric.alsoFrom && <SourceMark source={metric.alsoFrom} className="block size-3.5" />}
+            {marks.map((app) => <SourceMark key={app.id} app={app} className="block size-3.5" />)}
           </span>
         )}
       </div>
 
       <Body
-        metric={metric} size={size} view={view} body={body} tall={tall} wide={wide} index={index}
+        metric={metric} bars={bars} size={size} view={view} body={body} tall={tall} wide={wide} index={index}
         onRetry={onRetry} onRemove={onRemove}
       />
 
@@ -149,6 +142,7 @@ export function MetricCard({ metric: base, size, view, dragging = false, editing
 
 interface BodyProps {
   metric: Metric
+  bars: boolean
   size: CardSize
   view?: CardView
   body: CardBody
@@ -159,9 +153,9 @@ interface BodyProps {
   onRemove?: () => void
 }
 
-function Body({ metric, size, view, body, tall, wide, index, onRetry, onRemove }: BodyProps) {
+function Body({ metric, bars, size, view, body, tall, wide, index, onRetry, onRemove }: BodyProps) {
   const reduceMotion = useReducedMotion()
-  const chartBox = chartBoxFor(size, metric)
+  const chartBox = chartBoxFor(size, bars)
   const figureAt = tall ? 'top-11' : view?.health && body === 'numbers' && !tall ? 'bottom-[46px]' : 'bottom-4'
 
   if (body === 'loading') {
@@ -174,30 +168,8 @@ function Body({ metric, size, view, body, tall, wide, index, onRetry, onRemove }
     )
   }
 
-  if (body === 'needs-app' && view?.needsApp) {
-    // Waits for its app: "Connect Google Ads" where the number goes (NB-13).
-    const { app, connecting } = view.needsApp
-    return (
-      <div className={cn('absolute left-4 flex items-center', tall ? 'top-11' : 'bottom-4')}>
-        {connecting ? (
-          <span role="status" className="flex items-center gap-1.5 text-[13px] font-medium leading-[17px] text-[var(--dashboard-label)]"><Spinner size={14} />Connecting…</span>
-        ) : (
-          // eslint-disable-next-line no-restricted-syntax -- ds-allow: the waiting card's text action (Figma 170:63211)
-          <button
-            type="button"
-            data-no-drag
-            onClick={(e) => { e.stopPropagation(); connectApp(app) }}
-            className="flex cursor-pointer items-center gap-1.5 rounded-sm border-0 bg-transparent p-0 text-[13px] font-medium leading-[17px] text-[var(--neutral-700)] outline-none hover:text-[var(--dashboard-figure)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]"
-          >
-            <Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />Connect {SOURCE_NAMES[app]}
-          </button>
-        )}
-      </div>
-    )
-  }
-
   if (body !== 'numbers' && body !== 'today-empty') {
-    return <EmptyBody body={body} label={metric.label} canEdit={!!view?.canEdit} onRetry={onRetry} onRemove={onRemove} tall={tall} />
+    return <EmptyBody body={body} reason={metric.unmeasured} canEdit={!!view?.canEdit} onRetry={onRetry} onRemove={onRemove} tall={tall} />
   }
 
   if (body === 'today-empty') {
@@ -210,68 +182,58 @@ function Body({ metric, size, view, body, tall, wide, index, onRetry, onRemove }
     )
   }
 
-  const series = view?.series
+  const series = metric.series
   return (
     <m.div
       initial={reduceMotion ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.25, delay: Math.min(index, 12) * 0.04 }}
     >
-      <Figure metric={metric} syncing={!!view?.syncing} comparable={series?.comparable ?? true} className={figureAt} inlinePill={tall && size !== 'sm-tall' ? view?.health : undefined} />
+      <Figure metric={metric} syncing={!!view?.syncing} className={figureAt} inlinePill={tall && size !== 'sm-tall' ? view?.health : undefined} />
       {view?.health && (!tall || size === 'sm-tall') && (
         <div className={cn('absolute left-4 flex items-center gap-2', size === 'sm-tall' ? 'top-[84px]' : 'bottom-4')}>
           <HealthPillView pill={view.health} withTarget={wide} />
         </div>
       )}
-      {series && chartBox && (
-        metric.bars && size !== 'sm-tall' && size !== 'full'
+      {chartBox && (
+        bars && size !== 'sm-tall' && size !== 'full'
           ? <WeeklyBars metric={metric} variant={size === 'md' ? 'compact' : 'full'} className={chartBox} />
-          : <LineChart metric={metric} series={series} variant={tall && size !== 'sm-tall' ? 'full' : 'spark'} target={view?.targetPerDay} className={chartBox} />
+          : <LineChart metric={metric} series={series} variant={tall && size !== 'sm-tall' ? 'full' : 'spark'} className={chartBox} />
       )}
     </m.div>
   )
 }
 
 /** Where the chart goes, by size (Figma 170:40175). */
-function chartBoxFor(size: CardSize, metric: Metric): string | null {
+function chartBoxFor(size: CardSize, bars: boolean): string | null {
   switch (size) {
     case 'sm': return null
     case 'sm-tall': return 'absolute bottom-4 left-4 right-4 top-[144px]'
-    case 'md': return metric.bars ? 'absolute bottom-4 left-[52.7%] right-4 top-[52px]' : 'absolute bottom-4 left-1/2 right-4 top-[52px]'
+    case 'md': return bars ? 'absolute bottom-4 left-[52.7%] right-4 top-[52px]' : 'absolute bottom-4 left-1/2 right-4 top-[52px]'
     case 'full': return 'absolute bottom-4 left-[320px] right-4 top-[52px]'
     default: return 'absolute bottom-4 left-4 right-4 top-24'
   }
 }
 
-const EMPTY_TEXT: Record<Exclude<CardBody, 'loading' | 'numbers' | 'today-empty' | 'needs-app'>, string> = {
+const EMPTY_TEXT: Record<Exclude<CardBody, 'loading' | 'numbers' | 'today-empty'>, string> = {
   removed: 'This metric was removed.',
-  locked: 'No access',
   'no-data-yet': 'No data yet',
   'couldnt-load': 'Couldn’t load.',
   'no-data': 'No data',
 }
 
 /** Empty, failed and locked cards (CR-20 – CR-23): one line where the number goes, and maybe a link. */
-function EmptyBody({ body, label, canEdit, onRetry, onRemove, tall }: { body: CardBody; label: string; canEdit: boolean; onRetry?: () => void; onRemove?: () => void; tall: boolean }) {
+function EmptyBody({ body, reason, canEdit, onRetry, onRemove, tall }: { body: CardBody; reason: string | null; canEdit: boolean; onRetry?: () => void; onRemove?: () => void; tall: boolean }) {
   const where = cn('absolute left-4 flex flex-col items-start gap-1 text-[13px] leading-[17px] text-[var(--dashboard-figure)]', tall ? 'top-11' : 'bottom-4')
-  if (body === 'locked') {
-    return (
-      <div className={where}>
-        {/* An admin sets metric access, not the board's owner (09 SH-30). */}
-        <Tooltip content={`No access to ${label}. Ask an admin for access.`} side="top" align="start">
-          <span tabIndex={0} className="flex items-center gap-1.5 rounded-sm text-[var(--dashboard-label)] outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]">
-            <Lock aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />No access
-          </span>
-        </Tooltip>
-      </div>
-    )
-  }
   const text = EMPTY_TEXT[body as keyof typeof EMPTY_TEXT]
   // Try again is for everyone; Remove card only for people who can edit (CR-20, CR-22).
   const action = body === 'couldnt-load' ? { label: 'Try again', run: onRetry } : canEdit ? { label: 'Remove card', run: onRemove } : null
   return (
     <div className={where}>
-      <p className="m-0">{text}</p>
+      {/* No data says why on hover: the warehouse's reason this store can't measure it (CR-22). */}
+      <Tooltip content={reason} disabled={body !== 'no-data' || !reason} side="top" align="start">
+        <p className="m-0">{text}</p>
+      </Tooltip>
       {action?.run && (
         // eslint-disable-next-line no-restricted-syntax -- ds-allow: the card's underlined text action (Figma 170:89079)
         <button
@@ -335,12 +297,10 @@ function Legend({ items }: { items: [keyof typeof LEGEND_DOT, string][] }) {
 const PILL: Record<HealthPill['tone'], string> = {
   good: 'border-[var(--dashboard-pill-border)] bg-[var(--dashboard-pill-bg)] text-[var(--dashboard-positive)]',
   bad: 'border-[var(--dashboard-pill-bad-border)] bg-[var(--dashboard-pill-bad-bg)] text-[var(--dashboard-pill-bad-text)]',
-  warn: 'border-[var(--dashboard-pill-border)] bg-[var(--dashboard-pill-bg)] text-[var(--dashboard-pill-warn-text)]',
 }
 const PILL_DOT: Record<HealthPill['tone'], string> = {
   good: 'bg-[var(--dashboard-positive)]',
   bad: 'bg-[var(--dashboard-negative)]',
-  warn: 'bg-[var(--dashboard-pill-warn-dot)]',
 }
 
 /** The health line (CR-28): one pill; wider cards add the target beside it. */
@@ -356,15 +316,15 @@ export function HealthPillView({ pill, withTarget }: { pill: HealthPill; withTar
   )
 }
 
-function Figure({ metric, syncing, comparable, inlinePill, className }: { metric: Metric; syncing: boolean; comparable: boolean; inlinePill?: HealthPill | null; className?: string }) {
+function Figure({ metric, syncing, inlinePill, className }: { metric: Metric; syncing: boolean; inlinePill?: HealthPill | null; className?: string }) {
   const { change } = metric
-  const Arrow = change.direction === 'up' ? ArrowUp : ArrowDown
+  const Arrow = change?.direction === 'up' ? ArrowUp : ArrowDown
   return (
     <div className={cn('absolute left-4 flex items-baseline gap-2', inlinePill && 'right-4 min-w-0', className)}>
       <p data-syncing={syncing || undefined} className={cn('m-0 whitespace-nowrap text-[28px] font-medium leading-8 tracking-[-0.56px] text-[var(--dashboard-figure)]', syncing && 'dashboard-shimmer-text')}>
         {metric.value}
       </p>
-      {comparable ? (
+      {change ? (
         <p
           className={cn(
             'm-0 flex items-center gap-0.5 whitespace-nowrap text-[12px] font-medium leading-4',
@@ -377,7 +337,7 @@ function Figure({ metric, syncing, comparable, inlinePill, className }: { metric
           <span className="sr-only"> vs previous period</span>
         </p>
       ) : (
-        // The period before is mostly empty: no change to show (CR-24).
+        // No comparison, or the period before is mostly empty: no change to show (CR-24).
         <p className="m-0 whitespace-nowrap text-[12px] leading-4 text-[var(--dashboard-muted)]">No comparison</p>
       )}
       {/* On a narrow card the target text gives way first, cut with an ellipsis. */}

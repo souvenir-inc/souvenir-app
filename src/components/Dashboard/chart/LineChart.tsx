@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { formatMetricValue } from '../format'
-import { changeLabel, dayMonth, formatExact, upIsGood, weekdayDayMonth, type Series } from '../series'
-import type { Metric } from '../types'
+import { changeLabel, dayMonth, formatExact, weekdayDayMonth } from '../series'
+import type { Metric, Series } from '../types'
 import { Readout, useSize, type ReadoutContent } from './Readout'
 
 // A card's line (05-cards-reading-rules.md):
@@ -75,7 +75,7 @@ function Plot({ metric, series, full, target, width, height, hover, onHover }: P
   const x = (i: number) => (n === 1 ? plotW / 2 : pad + (i * (plotW - pad * 2)) / (n - 1))
   const y = (v: number) => top + (plotH - top) * (1 - (v - min) / (max - min))
   const few = series.daysWithData <= 3
-  const good = upIsGood(metric.change)
+  const good = metric.upIsGood
   const met = (v: number) => (target == null ? null : good ? v >= target : v <= target)
 
   const path = (vals: (number | null)[]) => {
@@ -187,7 +187,7 @@ export function readoutFor(metric: Metric, series: Series, i: number, withChange
   const d = series.days[i]
   const p = series.comparable ? series.previous[i] : undefined
   const exact = (v: number) => formatExact(v, metric.format)
-  const good = upIsGood(metric.change)
+  const good = metric.upIsGood
   const met = target == null || d.value == null ? null : good ? d.value >= target : d.value <= target
   const firstData = series.days.findIndex((x) => x.value != null)
   const rows: ReadoutContent['rows'] = [{

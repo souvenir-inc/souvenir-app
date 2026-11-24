@@ -2,17 +2,17 @@
 
 import { useEffect, useReducer, useRef } from 'react'
 import { toast } from 'sonner'
-import { initialDashboardState } from '../mock-data'
+import type { BoardStore } from '../live/board-store'
 import type { BoardCard, CardSize } from '../types'
 import {
   MAX_NAME,
   boardReducer, canDelete, canLeave, canRename, cardIdsFor, cleanName, namesInUse, uniqueName,
-  type Board, type BoardAction,
+  type Board, type BoardAction, type DashboardState,
 } from './board-state'
 
 // The dashboard's state, its undo history and its messages. Every tab action that the rules give
 // an Undo to records the actions that reverse it; ⌘Z and the toast's Undo take the same step
-// (TAB-14). Everything is in memory: there are no board endpoints yet.
+// (TAB-14). Every change is written to the warehouse's boards by the BoardStore.
 
 interface UndoEntry {
   key: number
@@ -21,13 +21,21 @@ interface UndoEntry {
 
 export type RenameResult = { ok: true; name: string } | { ok: false; error: 'empty' }
 
-let seq = 0
-const newId = () => `board-${Date.now().toString(36)}-${(seq++).toString(36)}`
+/** The warehouse keeps boards under the id the app chose. */
+const newId = () => crypto.randomUUID()
 
-export function useDashboard() {
-  const [state, dispatch] = useReducer(boardReducer, undefined, () => initialDashboardState(Date.now()))
+export function useDashboard(initial: DashboardState, store: BoardStore, measurable: Set<string>) {
+  const [state, dispatch] = useReducer(boardReducer, initial)
   const history = useRef<UndoEntry[]>([])
   const keySeq = useRef(0)
+
+  // Every change lands in the warehouse; a refused write says so rather than pretending it saved.
+  useEffect(() => {
+    store.save(state, measurable).catch((error: unknown) => {
+      console.error('[dashboard] saving boards failed', error)
+      toast.error('Couldn’t save your boards. Your last change may be lost on reload.', { id: 'dashboard-save' })
+    })
+  }, [state, store, measurable])
 
   // Boards past 30 days in Recently deleted are gone for good (TAB-43).
   useEffect(() => { dispatch({ type: 'purge-expired', now: Date.now() }) }, [])
@@ -105,7 +113,7 @@ export function useDashboard() {
   const createBoard = (): string => {
     const id = newId()
     const label = uniqueName('Untitled board', namesInUse(state))
-    const b: Board = { id, label, cards: [], initialCards: [], period: '7d', compare: 'previous', access: 'owner' }
+    const b: Board = { id, label, cards: [], initialCards: [], period: '7d', compare: 'previous', access: 'owner', shared: false }
     const prevOpen = state.openId
     dispatch({ type: 'add-board', board: b, index: state.tabs.length, open: true })
     record([{ type: 'remove-board', id }, { type: 'open', id: prevOpen }])
@@ -121,7 +129,7 @@ export function useDashboard() {
     const base = cleanName(name ?? src.label) || src.label
     const label = uniqueName(`${base.slice(0, MAX_NAME - ' copy'.length).trimEnd()} copy`, namesInUse(state))
     // The copy is yours to edit and isn't shared (TAB-37).
-    const copy: Board = { ...src, id: copyId, label, access: 'owner', sharedBy: undefined, initialCards: src.cards }
+    const copy: Board = { ...src, id: copyId, label, access: 'owner', sharedBy: undefined, shared: false, initialCards: src.cards }
     const at = state.tabs.indexOf(id)
     const prevOpen = state.openId
     dispatch({ type: 'add-board', board: copy, index: at < 0 ? state.tabs.length : at + 1, open: true })
@@ -256,7 +264,7 @@ export function useDashboard() {
   ) => {
     const id = newId()
     const label = uniqueName(fields.label, namesInUse(state))
-    const b: Board = { id, label, cards: fields.cards, initialCards: fields.cards, period: fields.period, compare: fields.compare, access: 'owner', draft: fields.draft }
+    const b: Board = { id, label, cards: fields.cards, initialCards: fields.cards, period: fields.period, compare: fields.compare, access: 'owner', shared: false, draft: fields.draft }
     const add: BoardAction = { type: 'add-board', board: b, index: state.tabs.length, open: true }
     if (!undoable) { dispatch(add); return { id, label, undo: () => {} } }
     const undoIt = change([add], [{ type: 'remove-board', id }, { type: 'open', id: state.openId }])

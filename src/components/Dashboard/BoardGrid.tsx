@@ -10,7 +10,7 @@ import { bestIndex, edgeScrollSpeed } from './card-placement'
 import { dims, place, sameLayout, sizeFromGrip, sizeOf, toItems, withItems, type Item } from './grid-layout'
 import { LandingSlot, RemoveBadge, ResizeArc } from './EditChrome'
 import { MetricCard, SIZE_LABEL, type CardView, type GripProps } from './MetricCard'
-import { METRICS } from './mock-data'
+import { useDashboardData } from './live/dashboard-data'
 import type { BoardCard, CardSize } from './types'
 
 // The card grid (Figma "grid", 1200 wide): four 288px columns, 156px rows, 16px gaps. A medium
@@ -102,6 +102,7 @@ interface BoardGridProps {
 const RING_MS = 2000
 
 export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRemove, editing = false, cardView, onOpenCard, onRetryCard, onRemoveEmpty, landed, empty, onOpenSettings }: BoardGridProps) {
+  const { metrics } = useDashboardData()
   const reduceMotion = useReducedMotion()
   // New cards: ringed, then the ring fades after 2 s (AC-17). Adjusted while rendering when a new
   // landing arrives, React's pattern for state that follows a prop.
@@ -147,7 +148,7 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
     const grid = gridRef.current
     if (!grid) return
     const id = card.metricId
-    const label = METRICS[id]?.label ?? 'Card'
+    const label = metrics.get(id)?.label ?? 'Card'
     const start = { x: e.clientX, y: e.clientY }
     const box = li.getBoundingClientRect()
     const offsetX = e.clientX - box.left
@@ -297,7 +298,7 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
           setResizing((r) => (r ? { ...r, settleAt: { left: slot.left, top: slot.top, width: slot.width, height: slot.height } } : r))
           window.setTimeout(() => setResizing(null), DROP_MS + 40)
         })
-        setAnnounce(`${METRICS[id]?.label ?? 'Card'} is ${SIZE_LABEL[current]}`)
+        setAnnounce(`${metrics.get(id)?.label ?? 'Card'} is ${SIZE_LABEL[current]}`)
       }
       const up = () => end(true)
       const cancel = () => end(false)
@@ -312,7 +313,7 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
       e.preventDefault()
       e.stopPropagation()
       const next = sizeForKey(card.size, e.key)
-      if (next) { onResize(card.metricId, next); setAnnounce(`${METRICS[card.metricId]?.label ?? 'Card'} is ${SIZE_LABEL[next]}`) }
+      if (next) { onResize(card.metricId, next); setAnnounce(`${metrics.get(card.metricId)?.label ?? 'Card'} is ${SIZE_LABEL[next]}`) }
     },
   })
 
@@ -328,15 +329,15 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
     )
   }
 
-  const dragged = drag ? METRICS[drag.id] : null
-  const resized = resizing ? METRICS[resizing.id] : null
+  const dragged = drag ? metrics.get(drag.id) : null
+  const resized = resizing ? metrics.get(resizing.id) : null
   return (
     <div className="@container">
       {/* 4 design columns from 960 px of board (about 1100 px of window, CR-35); 2 below, filling gaps
           dense (CR-36); 1 under 512 px. */}
       <ul ref={gridRef} className="m-0 grid list-none auto-rows-[156px] grid-flow-row-dense grid-cols-1 gap-4 p-0 @lg:grid-cols-2 @min-[60rem]:grid-cols-4">
         {cards.map((card, i) => {
-          const metric = METRICS[card.metricId]
+          const metric = metrics.get(card.metricId)
           if (!metric) return null
           const isSlot = drag?.id === card.metricId
           return (

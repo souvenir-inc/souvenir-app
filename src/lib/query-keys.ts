@@ -116,4 +116,16 @@ export const queryKeys = {
     /** GET /organizations/{id}/slack/installation (the sidebar's Slack row). */
     slackStatus: (org: string) => [...queryKeys.orgs.all(org), "slack-status"] as const,
   },
+
+  /** The org's warehouses (GET /warehouse) and, per warehouse, what the dashboard reads. */
+  warehouse: {
+    all: (org: string) => ["warehouse", org] as const,
+    list: (org: string) => [...queryKeys.warehouse.all(org), "list"] as const,
+    one: (org: string, id: string) => [...queryKeys.warehouse.all(org), id] as const,
+    catalog: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "catalog"] as const,
+    scorecards: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "scorecards"] as const,
+    boards: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "boards"] as const,
+    status: (org: string, id: string, board: string) => [...queryKeys.warehouse.one(org, id), "status", board] as const,
+    measure: (org: string, id: string, request: object) => [...queryKeys.warehouse.one(org, id), "measure", request] as const,
+  },
 } as const;

@@ -1,40 +1,44 @@
 import { describe, expect, it } from 'vitest'
-import { CATALOG, ROLE_METRICS, groupOf, landingSize, matchOf, nameList } from './catalog'
+import { ROLE_METRICS, catalogOf, groupOf, landingSize, matchOf, nameList } from './catalog'
 import { fitAtEnd, toItems } from './grid-layout'
-import { METRICS, baseMetricId } from './mock-data'
+import { apps, metrics } from './live/live-fixtures'
+import { Metrics } from './live/metrics'
 import { addCardsAtEnd, cardIdsFor } from './tabs/board-state'
 import type { BoardCard } from './types'
 
+const m = metrics()
+const get = (id: string) => m.get(id)!
+
 describe('landing size (AC-16)', () => {
   it('sums and counts land 6 × 1, rates and multiples 3 × 1', () => {
-    expect(landingSize(METRICS['revenue-per-customer'])).toBe('md') // as drawn in A-5
-    expect(landingSize(METRICS.orders)).toBe('md')
-    expect(landingSize(METRICS['cancellation-rate'])).toBe('sm')
-    expect(landingSize(METRICS.mer)).toBe('sm')
-    expect(landingSize(METRICS['ga-sessions'])).toBe('md')
+    expect(landingSize(get('revenue'))).toBe('md')
+    expect(landingSize(get('orders'))).toBe('md')
+    expect(landingSize(get('net_after_ads'))).toBe('md')
+    expect(landingSize(get('cancellation_rate'))).toBe('sm')
+    expect(landingSize(get('mer'))).toBe('sm')
   })
 })
 
 describe('search (AC-13, AC-14)', () => {
   it('matches the name with its span, short forms, the app and the definition', () => {
-    expect(matchOf(METRICS['cancellation-rate'], 'rate')).toEqual({ at: 13, length: 4 })
-    expect(matchOf(METRICS.aov, 'aov')).toBeNull()             // a short form: found, nothing to bold
-    expect(matchOf(METRICS.ctr, 'meta')).toBeNull()            // the app
-    expect(matchOf(METRICS['gross-margin'], 'margin')).toEqual({ at: 6, length: 6 })
-    expect(matchOf(METRICS.revenue, 'cogs')).toBe(false)
+    expect(matchOf(get('cancellation_rate'), 'rate', apps())).toEqual({ at: 13, length: 4 })
+    expect(matchOf(get('aov'), 'aov', apps())).toBeNull()          // a short form: found, nothing to bold
+    expect(matchOf(get('platform_roas'), 'roas', apps())).toEqual({ at: 9, length: 4 })
+    expect(matchOf(get('ad_spend'), 'meta', apps())).toBeNull()    // the app
+    expect(matchOf(get('revenue'), 'paid', apps())).toBeNull()     // the definition: "What customers paid"
+    expect(matchOf(get('revenue'), 'cogs', apps())).toBe(false)
   })
-  it('nothing matches "cogs"… except Cost of goods by its short form', () => {
-    expect(CATALOG.filter((m) => matchOf(m, 'cogs') !== false).map((m) => m.label)).toEqual(['Cost of goods'])
+  it('lists the catalog A–Z', () => {
+    expect(catalogOf(m.all).slice(0, 3).map((x) => x.label)).toEqual(['Ad spend', 'Average order value', 'Cancellation rate'])
   })
-  it('groups: the app, the blended pair, custom metrics', () => {
-    expect(groupOf(METRICS.mer)).toBe('Shopify + Meta Ads')
-    expect(groupOf(METRICS['contribution-margin'])).toBe('Custom metrics')
-    expect(groupOf(METRICS.ctr)).toBe('Meta Ads')
+  it('groups: the app, the apps it blends, custom metrics, metrics no app feeds', () => {
+    expect(groupOf(get('ad_spend'), apps())).toBe('Meta Ads')
+    expect(groupOf(get('mer'), apps())).toBe('Shopify + Meta Ads')
+    expect(groupOf(get('net_after_ads'), apps())).toBe('Custom metrics')
+    expect(groupOf(get('shipping_cost'), apps())).toBe('Not connected')
   })
-  it('Founder or CEO lists the drawn metrics, in order (A-2)', () => {
-    expect(ROLE_METRICS.founder.map((id) => METRICS[id].label)).toEqual([
-      'Revenue', 'Net sales', 'Orders', 'Average order value', 'New customers', 'Revenue per customer', 'MER', 'Ad spend', 'Gross margin', 'Sessions', 'Conversion rate',
-    ])
+  it('roles name library metrics', () => {
+    expect(ROLE_METRICS.founder.slice(0, 4)).toEqual(['revenue', 'net_sales', 'orders', 'aov'])
   })
   it('names in a sentence', () => {
     expect(nameList(['Revenue'])).toBe('Revenue')
@@ -59,7 +63,7 @@ describe('landing at the end (AC-16, AC-6)', () => {
   })
   it('a metric already on the board gets a second card', () => {
     expect(cardIdsFor(['revenue', 'orders'], ['revenue', 'mer', 'revenue'])).toEqual(['revenue#2', 'mer', 'revenue#3'])
-    expect(baseMetricId('revenue#2')).toBe('revenue')
-    expect(METRICS['revenue#2'].label).toBe('Revenue')
+    expect(Metrics.base('revenue#2')).toBe('revenue')
+    expect(metrics().get('revenue#2')?.label).toBe('Revenue')
   })
 })

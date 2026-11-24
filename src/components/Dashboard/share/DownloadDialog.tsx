@@ -1,16 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { FileSpreadsheet, Image as ImageIcon, Lock, TriangleAlert, X } from 'lucide-react'
+import { FileSpreadsheet, Image as ImageIcon, TriangleAlert, X } from 'lucide-react'
 import { Button, IconButton } from '@/components/ui'
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
-import { METRICS } from '../mock-data'
+import { useDashboardData } from '../live/dashboard-data'
 import type { Board } from '../tabs/board-state'
 import { datesLabel } from './share-model'
 
 // One Download dialog in More, for everyone (Figma 174:57768; 09 SH-31 – SH-37), Option B: Image (the
-// board) or Numbers (any cards, one sheet). Cards you can't see are listed, locked and unticked.
+// board) or Numbers (any cards, one sheet).
 
 const FOCUS = 'outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]'
 
@@ -19,8 +19,6 @@ interface DownloadDialogProps {
   board: Board
   period: string
   compare: string
-  /** Metrics this person can't see: listed, locked, never ticked (SH-32). */
-  locked: string[]
   onClose: () => void
   /** The image: the dialog closes and a toast takes over (SH-33). */
   onImage: () => void
@@ -36,10 +34,11 @@ export function DownloadDialog({ open, ...rest }: DownloadDialogProps) {
   )
 }
 
-function Download({ board, period, compare, locked, onClose, onImage, onNumbers }: Omit<DownloadDialogProps, 'open'>) {
+function Download({ board, period, compare, onClose, onImage, onNumbers }: Omit<DownloadDialogProps, 'open'>) {
+  const { metrics } = useDashboardData()
   const ids = [...new Set(board.cards.map((c) => c.metricId))]
   const [kind, setKind] = useState<'image' | 'numbers'>('image')
-  const [ticked, setTicked] = useState(() => ids.filter((id) => !locked.includes(id)))
+  const [ticked, setTicked] = useState(() => ids)
   const [busy, setBusy] = useState(false)
   const [failed, setFailed] = useState(false)
 
@@ -99,22 +98,19 @@ function Download({ board, period, compare, locked, onClose, onImage, onNumbers 
             <p className="m-0 text-[12px] font-medium leading-4 text-[var(--dashboard-label)]">Cards</p>
             <ul data-download-cards className="m-0 grid list-none grid-cols-2 gap-x-4 gap-y-1 p-0">
               {ids.map((id) => {
-                const m = METRICS[id]
-                const isLocked = locked.includes(id)
+                const m = metrics.get(id)
                 const on = ticked.includes(id)
                 return (
                   <li key={id}>
-                    <label data-card-option={id} className={cn('flex h-7 items-center gap-2 text-[13px] leading-5', isLocked ? 'cursor-not-allowed text-[var(--dashboard-faint)]' : 'cursor-pointer text-[var(--dashboard-figure)]')}>
+                    <label data-card-option={id} className="flex h-7 cursor-pointer items-center gap-2 text-[13px] leading-5 text-[var(--dashboard-figure)]">
                       {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a native checkbox in the card list */}
                       <input
                         type="checkbox"
                         checked={on}
-                        disabled={isLocked}
                         onChange={() => setTicked((t) => (on ? t.filter((x) => x !== id) : [...t, id]))}
                         className="size-4 accent-[var(--neutral-900)]"
                       />
                       <span className="min-w-0 truncate">{m?.label ?? id}</span>
-                      {isLocked && <Lock aria-label="No access" size={12} strokeWidth={1.5} absoluteStrokeWidth />}
                     </label>
                   </li>
                 )

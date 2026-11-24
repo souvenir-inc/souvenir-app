@@ -1,49 +1,82 @@
-// Sync rules as pure functions (docs-v2/dashboard/04-sync-rules.md). No React, no timers: the
-// store (sync-store.ts) owns time and calls these to read the state.
+// Sync rules as pure functions (docs-v2/dashboard/04-sync-rules.md). The warehouse decides each
+// app's state (behind, failed, waiting on a reconnect…); these read it for the button, list, banners.
 
-import type { MetricSource } from '../types'
-import { APP_ORDER, SOURCE_NAMES } from '../sources'
-
-export type AppId = MetricSource
+import type { ConnectionState } from '@/lib/api/warehouse'
+import type { AppId } from '../types'
 
 const MIN = 60_000
 const HOUR = 60 * MIN
 
-/** Behind = no sync in over twice the usual interval (1 h in the dummy data). */
-export const BEHIND_AFTER = 2 * HOUR
-/** A sync running this long says "Still syncing…" (SY-31). */
-export const STILL_SYNCING_AFTER = 10 * MIN
-/** …and stops after this long; the app goes back to its last state (SY-31). */
-export const GIVE_UP_AFTER = HOUR
-/** One minute between syncs (SY-11). */
-export const COOLDOWN = MIN
+const time = (at: string | null) => (at === null ? null : new Date(at).getTime())
 
-export type SyncKind = 'refresh' | 'sync' | 'reconnect' | 'first'
+/** One app feeding the open board, as the warehouse reports it. */
+export class AppSync {
+  readonly id: AppId
+  readonly name: string
+  readonly slug: string
+  readonly status: ConnectionState['state']
+  /** What the provider said, when it failed or refused the sign-in. */
+  readonly error: string | null
+  /** The oldest of its feeds' last syncs; null until each has synced once. */
+  readonly syncedAt: number | null
+  readonly syncingSince: number | null
+  /** When Sync does something again (SY-11). */
+  readonly syncableAt: number | null
+  /** The viewer owns the account, so Reconnect is theirs (SY-25). */
+  readonly yours: boolean
 
-export interface AppSync {
-  /** When it last synced successfully; null before its first sync. */
-  syncedAt: number | null
-  /** Its last sync failed; numbers are from `syncedAt`. */
-  failed: boolean
-  syncing: { startedAt: number; kind: SyncKind } | null
+  constructor(wire: ConnectionState) {
+    this.id = wire.connectionId
+    this.name = wire.name
+    this.slug = wire.connectorSlug
+    this.status = wire.state
+    this.error = wire.error
+    this.syncedAt = time(wire.lastSyncedAt)
+    this.syncingSince = time(wire.syncingSince)
+    this.syncableAt = time(wire.syncableAt)
+    this.yours = wire.yours
+  }
+
+  get state(): AppState {
+    switch (this.status) {
+      case 'first_sync': return 'first'
+      case 'syncing':
+      case 'slow': return 'syncing'
+      case 'failed':
+      case 'reconnect': return 'failed'
+      case 'behind': return 'behind'
+      case 'up_to_date': return 'fresh'
+    }
+  }
+
+  /** The provider refused the sign-in: only Reconnect helps. */
+  get needsReconnect(): boolean {
+    return this.status === 'reconnect'
+  }
+
+  /** A sync running much longer than usual (SY-31). */
+  get slow(): boolean {
+    return this.status === 'slow'
+  }
 }
 
 export type AppState = 'fresh' | 'behind' | 'failed' | 'syncing' | 'first'
 
-export function appState(a: AppSync, now: number): AppState {
-  if (a.syncing) return a.syncing.kind === 'first' ? 'first' : 'syncing'
-  if (a.failed) return 'failed'
-  if (a.syncedAt != null && now - a.syncedAt > BEHIND_AFTER) return 'behind'
-  return 'fresh'
-}
+/** A sync this viewer started, for the banners and toasts it gets (SY-18, SY-29). */
+export type SyncKind = 'refresh' | 'sync'
 
 /** What the sync button shows (SY-2): worst state first; first syncs don't count. */
 export type ButtonState = 'none' | 'offline' | 'failed' | 'behind' | 'syncing' | 'fresh'
 
-export function buttonState(ids: AppId[], apps: Record<AppId, AppSync>, now: number, online: boolean): ButtonState {
-  if (!ids.length) return 'none'
+type Apps = Record<AppId, AppSync>
+
+const known = (ids: AppId[], apps: Apps) => ids.filter((id) => apps[id])
+
+export function buttonState(ids: AppId[], apps: Apps, online: boolean): ButtonState {
+  const here = known(ids, apps)
+  if (!here.length) return 'none'
   if (!online) return 'offline'
-  const states = ids.map((id) => appState(apps[id], now)).filter((s) => s !== 'first')
+  const states = here.map((id) => apps[id].state).filter((s) => s !== 'first')
   if (!states.length) return 'syncing'
   if (states.includes('failed')) return 'failed'
   if (states.includes('behind')) return 'behind'
@@ -64,40 +97,39 @@ export function ago(at: number, now: number): string {
   return `${Math.floor(min / 60)} h ago`
 }
 
-const oldest = (ids: AppId[], apps: Record<AppId, AppSync>) =>
-  Math.min(...ids.map((id) => apps[id].syncedAt ?? Infinity))
+const oldest = (ids: AppId[], apps: Apps) => Math.min(...ids.map((id) => apps[id].syncedAt ?? Infinity))
 
-const inState = (ids: AppId[], apps: Record<AppId, AppSync>, now: number, state: AppState) =>
-  ids.filter((id) => appState(apps[id], now) === state)
+const inState = (ids: AppId[], apps: Apps, state: AppState) => known(ids, apps).filter((id) => apps[id].state === state)
+
+/** "9:42 am", or "its first sync" when nothing has landed. */
+const since = (at: number) => (Number.isFinite(at) ? clock(at) : 'its first sync')
 
 /** The sync button's hover (SY-3). */
-export function hoverText(ids: AppId[], apps: Record<AppId, AppSync>, now: number, online: boolean, offlineSince: number | null): string {
-  const state = buttonState(ids, apps, now, online)
-  switch (state) {
+export function hoverText(ids: AppId[], apps: Apps, now: number, online: boolean, offlineSince: number | null): string {
+  switch (buttonState(ids, apps, online)) {
     case 'none': return 'No apps on this board yet'
     case 'offline': return `Offline • Data from ${clock(offlineSince ?? now)}`
-    case 'failed': return `Sync failed • Data from ${clock(oldest(inState(ids, apps, now, 'failed'), apps))}`
-    case 'behind': return `Out of date • Data from ${clock(oldest(inState(ids, apps, now, 'behind'), apps))}`
+    case 'failed': return `Sync failed • Data from ${since(oldest(inState(ids, apps, 'failed'), apps))}`
+    case 'behind': return `Out of date • Data from ${since(oldest(inState(ids, apps, 'behind'), apps))}`
     case 'syncing': return 'Syncing…'
     case 'fresh': {
-      const synced = ids.filter((id) => appState(apps[id], now) !== 'first')
+      const synced = known(ids, apps).filter((id) => apps[id].state !== 'first')
       return `Up to date • Synced ${ago(oldest(synced, apps), now).toLowerCase()}`
     }
   }
 }
 
 /**
- * Data sources order (SY-6): failed, then behind (longest first), then the apps the board uses most
- * (ties in the workspace's order).
- * `uses` counts the board's cards per app.
+ * Data sources order (SY-6): failed, then behind (longest first), then the apps the board uses most,
+ * ties in workspace order (`rank`). `uses` counts the board's cards per app.
  */
-export function sortApps(ids: AppId[], apps: Record<AppId, AppSync>, now: number, uses: Partial<Record<AppId, number>>): AppId[] {
-  const rank = (id: AppId) => ({ failed: 0, behind: 1 } as Partial<Record<AppState, number>>)[appState(apps[id], now)] ?? 2
-  return [...ids].sort((a, b) =>
-    rank(a) - rank(b) ||
-    (rank(a) < 2 ? (apps[a].syncedAt ?? 0) - (apps[b].syncedAt ?? 0) : 0) ||
+export function sortApps(ids: AppId[], apps: Apps, uses: Partial<Record<AppId, number>>, rank: (id: AppId) => number): AppId[] {
+  const level = (id: AppId) => ({ failed: 0, behind: 1 } as Partial<Record<AppState, number>>)[apps[id].state] ?? 2
+  return known(ids, apps).sort((a, b) =>
+    level(a) - level(b) ||
+    (level(a) < 2 ? (apps[a].syncedAt ?? 0) - (apps[b].syncedAt ?? 0) : 0) ||
     (uses[b] ?? 0) - (uses[a] ?? 0) ||
-    APP_ORDER.indexOf(a) - APP_ORDER.indexOf(b))
+    rank(a) - rank(b))
 }
 
 export interface FooterText { text: string; tone: 'muted' | 'behind' | 'failed' }
@@ -105,17 +137,19 @@ export interface FooterText { text: string; tone: 'muted' | 'behind' | 'failed' 
 const apps1 = (n: number) => `${n} app${n === 1 ? '' : 's'}`
 
 /** The summary right of Refresh (SY-8). */
-export function footerText(ids: AppId[], apps: Record<AppId, AppSync>, now: number, refreshRunning: boolean): FooterText {
-  const counted = ids.filter((id) => appState(apps[id], now) !== 'first')
-  const syncing = inState(counted, apps, now, 'syncing')
+export function footerText(ids: AppId[], apps: Apps, now: number, refreshRunning: boolean): FooterText {
+  const counted = known(ids, apps).filter((id) => apps[id].state !== 'first')
+  const syncing = inState(counted, apps, 'syncing')
   if (syncing.length) {
-    const started = Math.min(...syncing.map((id) => apps[id].syncing!.startedAt))
-    if (now - started >= STILL_SYNCING_AFTER) return { text: `Syncing since ${clock(started)}`, tone: 'muted' }
+    if (syncing.some((id) => apps[id].slow)) {
+      const started = Math.min(...syncing.map((id) => apps[id].syncingSince ?? now))
+      return { text: `Syncing since ${clock(started)}`, tone: 'muted' }
+    }
     if (refreshRunning && syncing.length === counted.length) return { text: 'Syncing…', tone: 'muted' }
     return { text: `Syncing ${apps1(syncing.length)}…`, tone: 'muted' }
   }
-  const failed = inState(counted, apps, now, 'failed').length
-  const behind = inState(counted, apps, now, 'behind').length
+  const failed = inState(counted, apps, 'failed').length
+  const behind = inState(counted, apps, 'behind').length
   if (failed && behind) return { text: `${failed} failed • ${behind} behind`, tone: 'failed' }
   if (failed) return { text: `${apps1(failed)} failed`, tone: 'failed' }
   if (behind) return { text: `${apps1(behind)} behind`, tone: 'behind' }
@@ -131,37 +165,29 @@ export interface Banner {
   apps: AppId[]
   /** × hides a banner until this changes (SY-20). */
   key: string
-  /** Syncing banners: after Reconnect, or running long (SY-18). */
-  reconnect?: boolean
+  /** A syncing banner running long (SY-18). */
   long?: boolean
 }
 
-/** The board's banners (SY-14 – SY-18): red, then amber, then the grey syncing one. */
-export function banners(ids: AppId[], apps: Record<AppId, AppSync>, now: number): Banner[] {
+/** The board's banners (SY-14 – SY-18): red, then amber, then the grey one for a Sync this viewer started. */
+export function banners(ids: AppId[], apps: Apps, started: Partial<Record<AppId, SyncKind>>): Banner[] {
   const byAge = (list: AppId[]) => [...list].sort((a, b) => (apps[a].syncedAt ?? 0) - (apps[b].syncedAt ?? 0))
   const out: Banner[] = []
-  const failed = byAge(inState(ids, apps, now, 'failed'))
-  const behind = byAge(inState(ids, apps, now, 'behind'))
+  const failed = byAge(inState(ids, apps, 'failed'))
+  const behind = byAge(inState(ids, apps, 'behind'))
   if (failed.length) out.push({ kind: 'failed', apps: failed, key: `failed:${failed.join(',')}` })
   if (behind.length) out.push({ kind: 'behind', apps: behind, key: `behind:${behind.join(',')}` })
-  // Refresh and first syncs don't show a banner; Sync and Reconnect do.
-  const syncing = ids.filter((id) => apps[id].syncing && (apps[id].syncing!.kind === 'sync' || apps[id].syncing!.kind === 'reconnect'))
+  // Refresh and scheduled syncs don't show a banner; a Sync you pressed does.
+  const syncing = inState(ids, apps, 'syncing').filter((id) => started[id] === 'sync')
   if (syncing.length) {
-    const started = Math.min(...syncing.map((id) => apps[id].syncing!.startedAt))
-    out.push({
-      kind: 'syncing',
-      apps: syncing,
-      key: `syncing:${syncing.join(',')}:${started}`,
-      reconnect: syncing.some((id) => apps[id].syncing!.kind === 'reconnect'),
-      long: now - started >= STILL_SYNCING_AFTER,
-    })
+    const startedAt = Math.min(...syncing.map((id) => apps[id].syncingSince ?? 0))
+    out.push({ kind: 'syncing', apps: syncing, key: `syncing:${syncing.join(',')}:${startedAt}`, long: syncing.some((id) => apps[id].slow) })
   }
   return out
 }
 
 /** "Meta Ads", "Shopify & Meta Ads", or "Meta Ads & 2 more apps" + the rest for the tooltip. */
-export function appNames(ids: AppId[]): { lead: string; more: string | null; rest: string } {
-  const names = ids.map((id) => SOURCE_NAMES[id])
+export function appNames(names: string[]): { lead: string; more: string | null; rest: string } {
   if (names.length <= 2) return { lead: names.join(' & '), more: null, rest: '' }
   const rest = names.slice(1)
   return {

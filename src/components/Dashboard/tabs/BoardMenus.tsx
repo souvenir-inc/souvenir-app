@@ -30,7 +30,7 @@ function Shortcut({ keys }: { keys: string; size?: number }) {
   return <span aria-hidden className="text-[12px] leading-4 text-[var(--neutral-400)]">{keys}</span>
 }
 
-/** "Shared by Maya Patel" with the sharer's avatar, at the foot of a shared board's menu (TAB-52). */
+/** "Shared by <name>" with the sharer's avatar, at the foot of a shared board's menu (TAB-52). */
 export function SharedByFooter({ board }: { board: Board }) {
   if (!board.sharedBy) return null
   return (
