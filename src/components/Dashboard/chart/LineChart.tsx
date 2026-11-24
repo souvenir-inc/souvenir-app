@@ -66,12 +66,7 @@ function Plot({ metric, series, full, target, width, height, hover, onHover }: P
   const cur = series.days.map((d) => d.value)
   const prev = series.comparable ? series.previous.map((d) => d.value) : series.previous.map(() => null)
   const values = [...cur, ...prev, target ?? null].filter((v): v is number => v != null)
-  // The full chart counts from 0 with round ticks; a sparkline uses its own range so its shape shows.
-  const hi = Math.max(...values)
-  const lo = Math.min(...values)
-  const spread = hi - lo || Math.abs(hi) || 1
-  const max = full ? roundStep(hi / 4) * 4 : hi + spread * 0.08
-  const min = full ? 0 : Math.max(0, lo - spread * 0.6)
+  const { min, max, ticks } = scaleFor(values, full)
   const x = (i: number) => (n === 1 ? plotW / 2 : pad + (i * (plotW - pad * 2)) / (n - 1))
   const y = (v: number) => top + (plotH - top) * (1 - (v - min) / (max - min))
   const few = series.daysWithData <= 3
@@ -92,10 +87,11 @@ function Plot({ metric, series, full, target, width, height, hover, onHover }: P
     // One closed shape per run of days with data, down to the baseline.
     const runs: number[][] = []
     vals.forEach((v, i) => { if (v == null) return; const last = runs[runs.length - 1]; if (last && last[last.length - 1] === i - 1) last.push(i); else runs.push([i]) })
-    return runs.map((r) => `M${x(r[0])},${y(min)}` + r.map((i) => `L${x(i).toFixed(1)},${y(vals[i]!).toFixed(1)}`).join('') + `L${x(r[r.length - 1])},${y(min)}Z`).join('')
+    // The fill runs to 0 when 0 is on the chart (so a negative day hangs below it), else to the bottom.
+    const base = y(Math.min(Math.max(0, min), max))
+    return runs.map((r) => `M${x(r[0])},${base}` + r.map((i) => `L${x(i).toFixed(1)},${y(vals[i]!).toFixed(1)}`).join('') + `L${x(r[r.length - 1])},${base}Z`).join('')
   }
   const lastIndex = cur.reduce<number>((acc, v, i) => (v != null ? i : acc), -1)
-  const ticks = [0, 0.25, 0.5, 0.75, 1].map((t) => t * max)
   const dateIdx = pickDates(n, plotW)
 
   const onMove = (e: React.PointerEvent<SVGRectElement>) => {
@@ -189,12 +185,13 @@ export function readoutFor(metric: Metric, series: Series, i: number, withChange
   const exact = (v: number) => formatExact(v, metric.format)
   const good = metric.upIsGood
   const met = target == null || d.value == null ? null : good ? d.value >= target : d.value <= target
-  const firstData = series.days.findIndex((x) => x.value != null)
+  // Days after the last day with data are "No data yet" (the app hasn't synced them); a gap before it is "No data".
+  const lastData = series.days.reduce<number>((acc, x, j) => (x.value != null ? j : acc), -1)
   const rows: ReadoutContent['rows'] = [{
     dot: met == null ? 'ink' : met ? 'met' : 'missed',
     label: dayMonth(d.date),
     // Never a 0: a day after the app's last sync is "No data yet", a day without data "No data".
-    value: d.value != null ? exact(d.value) : i > firstData ? 'No data yet' : 'No data',
+    value: d.value != null ? exact(d.value) : i > lastData ? 'No data yet' : 'No data',
   }]
   const lastYear = series.compare === 'last-year'
   if (p) rows.push({ dot: 'previous', label: lastYear ? `Last year · ${dayMonth(p.date)} ${p.date.getFullYear()}` : `Previous period · ${dayMonth(p.date)}`, value: p.value != null ? exact(p.value) : 'No data', muted: true })
@@ -206,6 +203,30 @@ export function readoutFor(metric: Metric, series: Series, i: number, withChange
     footer = { text: `${text} vs ${lastYear ? 'last year' : 'previous period'}`, tone: rising === good ? 'good' : 'bad' }
   }
   return { title: weekdayDayMonth(d.date), rows, footer }
+}
+
+/**
+ * The vertical range and ticks. The full chart counts from 0 with round ticks, and reaches below 0
+ * when a day is negative; a sparkline uses its own range so its shape shows, and a flat line sits in
+ * the middle. All zero: one tick at 0 and the line along the bottom.
+ */
+export function scaleFor(values: number[], full: boolean): { min: number; max: number; ticks: number[] } {
+  const hi = values.length ? Math.max(...values) : 0
+  const lo = values.length ? Math.min(...values) : 0
+  if (full) {
+    const top = Math.max(hi, 0)
+    const bottom = Math.min(lo, 0)
+    if (top === bottom) return { min: 0, max: 1, ticks: [0] }
+    const step = roundStep((top - bottom) / 4)
+    const min = Math.floor(bottom / step) * step
+    const max = Math.ceil(top / step) * step
+    const ticks: number[] = []
+    for (let t = min; t <= max + step / 2; t += step) ticks.push(Math.round(t / step) * step)
+    return { min, max, ticks }
+  }
+  if (hi === lo) { const s = Math.abs(hi) || 1; return { min: hi - s, max: hi + s, ticks: [] } }
+  const spread = hi - lo
+  return { min: lo >= 0 ? Math.max(0, lo - spread * 0.6) : lo - spread * 0.08, max: hi + spread * 0.08, ticks: [] }
 }
 
 /** A round tick step at or above v: 1, 1.5, 2, 2.5 or 5 times a power of ten (2.5k gives 0 – 10k; 15 gives 0 – 60). */

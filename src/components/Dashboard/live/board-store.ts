@@ -62,15 +62,20 @@ export class BoardStore {
     // Someone else's board its owner has since deleted isn't shown; the rest follow the viewer's own.
     const shown = read.filter((b) => b.wire.role === 'owner' || b.layout.deletedAt === null)
     const boards = Object.fromEntries(shown.map(({ wire, layout }) => [wire.id, this.boardOf(wire, layout, people)]))
-    const theirs = others.filter((b) => b.layout.deletedAt === null).map((b) => b.wire.id)
+    // Someone else's board joins the tabs when it was shared with the viewer by name; one only open to
+    // the whole workspace waits in All boards, so it never lands in tabs uninvited (SH-14, SH-29).
+    const live = others.filter((b) => b.layout.deletedAt === null)
+    const named = (b: (typeof live)[number]) => b.wire.grants.some((g) => g.userId === this.viewer)
+    const theirs = live.filter(named).map((b) => b.wire.id)
+    const workspace = live.filter((b) => !named(b)).map((b) => b.wire.id)
     const mine = own.filter((b) => !b.layout.hidden && b.layout.deletedAt === null).map((b) => b.wire.id)
     // Until a member arranges boards of their own, they open on the workspace's default board.
-    const first = mine.length === 0 && this.warehouse.defaultBoard !== null && theirs.includes(this.warehouse.defaultBoard) ? [this.warehouse.defaultBoard] : []
+    const first = mine.length === 0 && this.warehouse.defaultBoard !== null && [...theirs, ...workspace].includes(this.warehouse.defaultBoard) ? [this.warehouse.defaultBoard] : []
     const tabs = [...first, ...mine, ...theirs.filter((id) => !first.includes(id))]
     return {
       boards,
       tabs,
-      hidden: own.filter((b) => b.layout.hidden && b.layout.deletedAt === null).map((b) => b.wire.id),
+      hidden: [...own.filter((b) => b.layout.hidden && b.layout.deletedAt === null).map((b) => b.wire.id), ...workspace.filter((id) => !first.includes(id))],
       deleted: own.filter((b) => b.layout.deletedAt !== null).map((b) => ({ id: b.wire.id, deletedAt: b.layout.deletedAt! })),
       openId: tabs[0] ?? '',
     }

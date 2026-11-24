@@ -163,7 +163,7 @@ function AppRow({ id, blocked }: { id: AppId; blocked: ReturnType<typeof blocked
     <li data-app-row={id} data-app-state={state} className="flex h-9 items-center gap-2.5 rounded-lg px-2.5">
       <SourceLogo app={{ id, slug: a.slug, name }} className="size-4 shrink-0" />
       <span className="min-w-0 truncate text-[13px] leading-5 text-[var(--dashboard-figure)]">{name}</span>
-      {state === 'behind' && (
+      {(state === 'behind' || (state === 'failed' && !a.needsReconnect)) && (
         <Tooltip content={blocked === 'cooldown' ? 'Synced just now • Sync again in a minute' : `Sync ${name} now`} side="top">
           <span className="inline-flex rounded-full">
             {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: 24px round row action on the soft fill (Figma 123:20927) */}
@@ -173,11 +173,11 @@ function AppRow({ id, blocked }: { id: AppId; blocked: ReturnType<typeof blocked
           </span>
         </Tooltip>
       )}
-      {state === 'failed' && a.yours && (
+      {state === 'failed' && a.needsReconnect && a.yours && (
         <Tooltip content={`Reconnect ${name}`} side="top">
           <span className="inline-flex rounded-full">
             {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: 24px round row action on the soft fill (Figma 123:20845) */}
-            <button type="button" aria-label={`Reconnect ${name}`} disabled={blocked === 'offline' || blocked === 'busy'} onClick={reconnect} className={ROW_ACTION}>
+            <button type="button" aria-label={`Reconnect ${name}`} disabled={blocked === 'offline' || blocked === 'busy'} onClick={() => reconnect([id])} className={ROW_ACTION}>
               <Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />
             </button>
           </span>
@@ -201,7 +201,7 @@ function RowStatus({ id, state, now, yours }: { id: AppId; state: AppState; now:
     }
     case 'failed': {
       // Hover says what the provider said; someone else's account is reconnected by its owner (SY-25).
-      const tip = [a.error, yours ? null : 'Only the person who connected it can reconnect it'].filter(Boolean).join(' • ')
+      const tip = [a.error, yours || !a.needsReconnect ? null : 'Only the person who connected it can reconnect it'].filter(Boolean).join(' • ')
       const status = (
         <span tabIndex={tip ? 0 : undefined} className={cn(text, 'flex items-center gap-[5px] rounded-sm font-medium text-[var(--dashboard-sync-failed)]', tip && FOCUS)}>
           <TriangleAlert aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />{a.needsReconnect ? 'Reconnect needed' : 'Sync failed'}

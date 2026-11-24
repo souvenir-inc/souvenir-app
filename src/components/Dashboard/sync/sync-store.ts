@@ -7,7 +7,9 @@
 
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import type { BoardStatus, ConnectionState, Warehouse } from '@/lib/api/warehouse'
+import { ApiError } from '@/lib/api/client'
 import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
+import { toast } from 'sonner'
 import type { AppId } from '../types'
 import { AppSync, type SyncKind } from './sync-model'
 
@@ -184,6 +186,13 @@ export function blockedReason(s: SyncSnapshot, now: number): 'offline' | 'busy' 
   return null
 }
 
+/** A Sync or Refresh the server didn't start: said in a toast, never an unhandled rejection. */
+function syncRefused(error: unknown) {
+  console.error('[dashboard] sync refused', error)
+  const status = error instanceof ApiError ? error.status : 0
+  toast.error(status === 403 ? 'You don’t have access to sync this.' : 'Couldn’t start the sync. Try again in a moment.', { id: 'dashboard-sync' })
+}
+
 function marked(ids: AppId[], kind: SyncKind): Partial<Record<AppId, SyncKind>> {
   return { ...snap.started, ...Object.fromEntries(ids.map((id) => [id, kind])) }
 }
@@ -192,7 +201,13 @@ function marked(ids: AppId[], kind: SyncKind): Partial<Record<AppId, SyncKind>> 
 export async function refreshAll(): Promise<void> {
   if (!target || blockedReason(snap, Date.now())) return
   const { warehouse, boardId } = target
-  const status = await warehouse.refreshBoard(boardId)
+  let status: BoardStatus
+  try {
+    status = await warehouse.refreshBoard(boardId)
+  } catch (error) {
+    syncRefused(error)
+    return
+  }
   const syncing = status.connections.filter((c) => c.state === 'syncing' || c.state === 'slow').map((c) => c.connectionId)
   set({ started: marked(syncing, 'refresh') })
   setStatus(boardId, status)
@@ -202,24 +217,37 @@ export async function refreshAll(): Promise<void> {
 export async function syncApps(ids: AppId[]): Promise<void> {
   if (!target || blockedReason(snap, Date.now())) return
   const { warehouse, boardId } = target
-  const behind = ids.filter((id) => snap.apps[id]?.state === 'behind')
+  // Behind, or a sync that failed for a reason other than the sign-in: syncing again may fix it.
+  const behind = ids.filter((id) => snap.apps[id]?.state === 'behind' || (snap.apps[id]?.state === 'failed' && !snap.apps[id]?.needsReconnect))
   if (!behind.length) return
   set({ started: marked(behind, 'sync') })
   let states: ConnectionState[]
   try {
     states = await Promise.all(behind.map((id) => warehouse.syncConnection(id)))
   } catch (error) {
-    // A refused sync mustn't leave its spinner turning.
+    // A refused sync mustn't leave its spinner turning, and says why.
     set({ started: Object.fromEntries(Object.entries(snap.started).filter(([id]) => !behind.includes(id as AppId))) })
-    throw error
+    syncRefused(error)
+    return
   }
   const apps = { ...snap.apps, ...Object.fromEntries(states.map((c) => [c.connectionId, new AppSync(c)])) }
   if (target?.boardId === boardId) set({ apps })
 }
 
-/** Reconnect (SY-26): the app's sign-in lives on the Connectors page. */
-export function reconnect() {
-  window.location.assign(ORG_CONNECTORS_ROUTE)
+/**
+ * Reconnect (SY-26): opens that app's account on the Connectors page with its reconnect already
+ * started (`?open=<slug>&account=<id>&reconnect=1`). Given several apps, the first of the viewer's
+ * own that needs signing in again.
+ */
+export function reconnectHref(id: AppId): string {
+  const a = snap.apps[id]
+  if (!a) return ORG_CONNECTORS_ROUTE
+  return `${ORG_CONNECTORS_ROUTE}?open=${encodeURIComponent(a.slug)}&account=${encodeURIComponent(a.id)}&reconnect=1`
+}
+
+export function reconnect(ids: AppId[]) {
+  const id = ids.find((i) => snap.apps[i]?.needsReconnect && snap.apps[i]?.yours) ?? ids.find((i) => snap.apps[i]?.yours)
+  window.location.assign(id ? reconnectHref(id) : ORG_CONNECTORS_ROUTE)
 }
 
 /** × on a banner: hidden on this board until its key changes (SY-20). */

@@ -25,8 +25,12 @@ export function WeeklyBars({ metric, variant, className }: { metric: Metric; var
   const n = weeks.length
   const plotW = full ? width - TICKS_W : width
   const plotH = Math.max(0, full ? height - LABELS_H : height)
-  const values = weeks.map((w) => w.value ?? 0)
-  const max = full ? niceMax(Math.max(...values)) : Math.max(...values, 0) * 1.13 || 1
+  // A week below 0 draws as an empty week; the scale is the weeks above it.
+  const values = weeks.map((w) => Math.max(0, w.value ?? 0))
+  const top = Math.max(...values, 0)
+  const max = full ? (top > 0 ? niceMax(top) : 1) : top * 1.13 || 1
+  // Every week empty: say so rather than draw axes with no bars.
+  const empty = weeks.every((w) => w.value == null)
   const band = plotW / n
   const barW = full ? 44 : 36
   const cx = (i: number) => (full ? band * i + band / 2 : n === 1 ? plotW / 2 : barW / 2 + (i * (plotW - barW)) / (n - 1))
@@ -40,9 +44,12 @@ export function WeeklyBars({ metric, variant, className }: { metric: Metric; var
   }
   return (
     <div ref={ref} className={cn('relative', className)} data-chart={`bars-${variant}`} onPointerLeave={() => setHover(null)}>
-      {width > 0 && height > 0 && (
+      {empty && (
+        <p data-chart-empty className="m-0 flex h-full items-center text-[13px] leading-5 text-[var(--dashboard-muted)]">No weeks with data yet</p>
+      )}
+      {!empty && width > 0 && height > 0 && (
         <svg width={width} height={height} className="block overflow-visible" aria-hidden>
-          {full && [0, max / 2, max].map((t) => (
+          {full && (top > 0 ? [0, max / 2, max] : [0]).map((t) => (
             <g key={t}>
               <line x1={0} x2={plotW} y1={y(t)} y2={y(t)} stroke="var(--dashboard-chart-soft)" strokeDasharray={t === 0 ? undefined : '2 3'} />
               <text x={plotW + 10} y={y(t) + 4} fontSize={12} fill="var(--dashboard-muted)">{formatMetricValue(t, metric.format)}</text>
@@ -52,11 +59,11 @@ export function WeeklyBars({ metric, variant, className }: { metric: Metric; var
             <rect data-hover-week={hover} x={cx(hover) - (full ? 32 : 24)} y={0} width={full ? 64 : 48} height={plotH} rx={4} fill="var(--dashboard-hover-band)" />
           )}
           {weeks.map((w, i) => {
-            const h = plotH - y(w.value ?? 0)
+            const h = plotH - y(Math.max(0, w.value ?? 0))
             return (
               <path
                 key={w.start.getTime()}
-                d={roundedTop(cx(i) - barW / 2, y(w.value ?? 0), barW, h, full ? 4 : 3)}
+                d={roundedTop(cx(i) - barW / 2, y(Math.max(0, w.value ?? 0)), barW, h, full ? 4 : 3)}
                 fill={w.inProgress ? 'var(--dashboard-chart-soft)' : 'var(--dashboard-chart-ink)'}
               />
             )
@@ -68,7 +75,7 @@ export function WeeklyBars({ metric, variant, className }: { metric: Metric; var
         </svg>
       )}
       {hover != null && (
-        <Readout content={weekReadout(metric, hover)} x={cx(hover) + (cx(hover) > width / 2 ? -barW / 2 : barW / 2)} y={y(weeks[hover].value ?? 0)} width={width} height={height} />
+        <Readout content={weekReadout(metric, hover)} x={cx(hover) + (cx(hover) > width / 2 ? -barW / 2 : barW / 2)} y={y(Math.max(0, weeks[hover].value ?? 0))} width={width} height={height} />
       )}
     </div>
   )

@@ -109,6 +109,8 @@ function ProblemBanner({ banner: b, boardId }: { banner: Banner; boardId: string
   if (b.kind === 'failed') {
     const oldest = s.apps[b.apps[0]].syncedAt
     const yours = b.apps.some((id) => s.apps[id].yours)
+    // Only a refused sign-in needs Reconnect; any other failure is worth one more sync.
+    const signIn = b.apps.some((id) => s.apps[id].needsReconnect)
     return (
       <Shell kind="failed" onClose={close}>
         <TriangleAlert aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0 text-[var(--dashboard-sync-failed)]" />
@@ -117,11 +119,16 @@ function ProblemBanner({ banner: b, boardId }: { banner: Banner; boardId: string
             ? <><Names ids={b.apps} /> sync failed. Showing data from {oldest == null ? 'its first sync' : clock(oldest)}.</>
             : <><Names ids={b.apps} /> failed to sync. Showing their last synced data.</>}
           {/* Someone else's account is reconnected by its owner (SY-25). */}
-          {!yours && (one ? ' Only the person who connected it can reconnect it.' : ' Only the people who connected them can reconnect them.')}
+          {signIn && !yours && (one ? ' Only the person who connected it can reconnect it.' : ' Only the people who connected them can reconnect them.')}
         </p>
-        {yours && (
-          <BannerAction tone="failed" disabled={blocked === 'offline'} onClick={reconnect} icon={<Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}>
+        {signIn && yours && (
+          <BannerAction tone="failed" disabled={blocked === 'offline'} onClick={() => reconnect(b.apps)} icon={<Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}>
             Reconnect
+          </BannerAction>
+        )}
+        {!signIn && (
+          <BannerAction tone="failed" disabled={blocked !== null} onClick={() => { void syncApps(b.apps) }} icon={<RotateCwClockIcon aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}>
+            Try again
           </BannerAction>
         )}
       </Shell>

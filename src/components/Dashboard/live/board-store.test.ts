@@ -10,8 +10,9 @@ const layout = (over: Partial<Layout> = {}): Layout => ({
   position: 0, hidden: false, deletedAt: null, ...over,
 })
 
-const saved = (id: string, name: string, createdBy: string, l: Layout, role: SavedBoard['role'] = createdBy === VIEWER ? 'owner' : 'view'): SavedBoard =>
-  ({ id, name, layout: l, metrics: ['revenue'], general: 'view', grants: [], createdBy, updatedAt: '2025-11-14T09:00:00Z', role })
+// Someone else's board is shared with the viewer by name unless `named` is false (then only workspace-wide).
+const saved = (id: string, name: string, createdBy: string, l: Layout, role: SavedBoard['role'] = createdBy === VIEWER ? 'owner' : 'view', named = true): SavedBoard =>
+  ({ id, name, layout: l, metrics: ['revenue'], general: 'view', grants: createdBy !== VIEWER && named ? [{ userId: VIEWER, role: role === 'edit' ? 'edit' : 'view' }] : [], createdBy, updatedAt: '2025-11-14T09:00:00Z', role })
 
 function warehouseWith(boards: SavedBoard[], defaultBoard: string | null = null) {
   return {
@@ -46,6 +47,13 @@ describe('BoardStore', () => {
     expect(state.openId).toBe('a')
     expect(state.boards.a.access).toBe('owner')
     expect(state.boards.s).toMatchObject({ access: 'view', ownerId: OTHER, general: 'view', sharedBy: { name: 'Another member' } })
+  })
+
+  it('a board open to the whole workspace waits in All boards, not the tabs (SH-18, SH-29)', async () => {
+    api = warehouseWith([saved('mine', 'Mine', VIEWER, layout()), saved('w', 'Workspace', OTHER, layout(), 'view', false)])
+    const state = await new BoardStore(api as unknown as Warehouse, VIEWER).load(new Map())
+    expect(state.tabs).toEqual(['mine'])
+    expect(state.hidden).toEqual(['w'])
   })
 
   it('writes nothing back when nothing changed', async () => {

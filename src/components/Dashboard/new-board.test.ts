@@ -65,7 +65,7 @@ describe('first visit (NB-31 – NB-33)', () => {
     expect(st.tabs.map((id) => st.boards[id].label)).toEqual(['Store overview', 'Ads'])
     expect(st.openId).toBe(st.tabs[0])
     // Theirs, and open for the workspace to view until they say otherwise.
-    expect(Object.values(st.boards).every((b) => b.access === 'owner' && b.ownerId === 'auth0|viewer' && b.general === 'view')).toBe(true)
+    expect(Object.values(st.boards).every((b) => b.access === 'owner' && b.ownerId === 'auth0|viewer' && b.general === 'none')).toBe(true)
   })
   it('a card the store can’t measure gives way to a store one, never twice on a board', () => {
     const st = starterState(metrics(), ids(), 'auth0|viewer')

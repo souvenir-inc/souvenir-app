@@ -2,6 +2,7 @@
 
 import { useEffect, useReducer, useRef } from 'react'
 import { toast } from 'sonner'
+import { ApiError } from '@/lib/api/client'
 import type { BoardStore } from '../live/board-store'
 import type { BoardCard, CardSize } from '../types'
 import {
@@ -31,7 +32,8 @@ const SAVE_RETRY_MAX_MS = 60_000
 const newId = () => crypto.randomUUID()
 
 /** A board the viewer makes: theirs, and open for everyone in the workspace to view until they say otherwise. */
-const mine = (viewer: string) => ({ access: 'owner' as const, ownerId: viewer, general: 'view' as const, grants: [], sharedBy: undefined })
+// A new board (or a copy) is the maker's and private until they share it (SH-6, TAB-37, NB-14).
+const mine = (viewer: string) => ({ access: 'owner' as const, ownerId: viewer, general: 'none' as const, grants: [], sharedBy: undefined })
 
 export function useDashboard(initial: DashboardState, store: BoardStore, measurable: Set<string>, viewer: string) {
   const [state, dispatch] = useReducer(boardReducer, initial)
@@ -55,6 +57,19 @@ export function useDashboard(initial: DashboardState, store: BoardStore, measura
       () => { failures.current = 0 },
       (error: unknown) => {
         console.error('[dashboard] saving boards failed', error)
+        // Refused for good (no access any more, a board that's gone, an invalid change): trying again
+        // won't help. Say so and offer a reload, which shows the boards as the server has them.
+        const status = error instanceof ApiError ? error.status : 0
+        if (status >= 400 && status < 500 && status !== 408 && status !== 429) {
+          failures.current = 0
+          toast.error(status === 403 ? 'You can’t change this board any more.' : 'Couldn’t save your last change.', {
+            id: 'dashboard-save',
+            description: 'Reload to see the boards as they are now.',
+            action: { label: 'Reload', onClick: () => window.location.reload() },
+            duration: Infinity,
+          })
+          return
+        }
         waiting.current = true
         failures.current += 1
         toast.error('Couldn’t save your boards. Trying again…', { id: 'dashboard-save' })

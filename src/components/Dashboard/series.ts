@@ -18,7 +18,7 @@ const cents = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximum
 /** A day's exact value for the readout: "52", "$6,812", "$154.50", "1.42%" (CR-10). */
 export function formatExact(value: number, format: MetricFormat): string {
   switch (format) {
-    case 'currency': return `$${Math.abs(value) >= 1000 ? whole.format(value) : cents.format(value)}`
+    case 'currency': { const a = Math.abs(value); const n = a >= 1000 ? whole.format(a) : cents.format(a); return value < 0 ? `−$${n}` : `$${n}` }
     case 'percent': return `${cents.format(value)}%`
     case 'ratio': return cents.format(value)
     default: return whole.format(value)

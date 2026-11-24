@@ -45,6 +45,7 @@ import type { ManageTab } from './tabs/ManageTabsDialog'
 import { TabRow } from './tabs/TabRow'
 import { cardIdsFor, namesInUse, uniqueName, type DashboardState, type Person } from './tabs/board-state'
 import { useDashboard } from './tabs/use-dashboard'
+import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
 import { storeMidnight } from './period'
 import { AddCardsDialog, CardSettings, DefaultBoardDialog, DownloadDialog, ManageTabsDialog, MetricWindow, NewBoardLibrary, ShareDialog, preloadDashboardDialogs } from './lazy-dialogs'
 import type { AppId, Metric } from './types'
@@ -238,7 +239,8 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
       const ctx = toastCtx.current
       const apps = getSyncSnapshot().apps
       const names = (ids: AppId[]) => ids.map((id) => apps[id]?.name ?? 'An app')
-      const fix = (ids: AppId[]) => (ids.some((id) => apps[id]?.yours) ? reconnect : null)
+      // Reconnect only for a refused sign-in on the viewer's own account; it opens that account.
+      const fix = (ids: AppId[]) => (ids.some((id) => apps[id]?.needsReconnect && apps[id]?.yours) ? () => reconnect(ids) : null)
       if (e.kind === 'refresh') {
         // With Data sources open the list already shows it (SY-28).
         if (e.failed.length && !ctx.sourcesOpen) showSyncErrorToast({ names: names(e.failed), rest: 'Other apps synced', onReconnect: fix(e.failed) })
@@ -428,6 +430,8 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
     const body = cardBody({
       loading: !picture && boardLoading,
       firstSyncRunning: firstSync,
+      // The numbers didn't load: this card says so with Try again; the rest of the board keeps working (CR-20).
+      couldntLoad: live.numbersFailed,
       unmeasured: !!metric.unmeasured,
       // On Today, an app that hasn't synced since yesterday has nothing for today (CR-26).
       todayEmpty: dates.period === 'today' && apps.some((x) => x.a?.syncedAt != null && x.a.syncedAt < midnight),
@@ -449,6 +453,9 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
       health: healthPill(metric.health, body),
       canEdit: openBoard.access !== 'view',
       bars: chart ? chart === 'bars' : undefined,
+      // The chart has its own skeleton and its own failure: the number can show before (or without) it.
+      chartLoading: !picture && live.chartLoading(metricId),
+      chartFailed: live.chartsFailed,
     }
   }
 
@@ -715,7 +722,7 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
                   draft={here}
                   onTryAgain={() => { api.apply([{ type: 'update-board', id: here.boardId, patch: { label: 'Drafting…' } }]); setDraft({ ...here, phase: 'drafting', run: here.run + 1 }) }}
                   onChange={() => setAsk({ open: true, initial: here.request })}
-                  onConnect={() => notReady('Connecting an app')}
+                  onConnect={() => window.location.assign(ORG_CONNECTORS_ROUTE)}
                 />
               ) : live.failed ? (
                 // The board's numbers couldn't load; the header keeps working (CR-21).

@@ -57,6 +57,10 @@ export interface CardView {
   health?: HealthPill | null
   /** People who can edit get Remove card on an empty card (CR-22). */
   canEdit?: boolean
+  /** The number is in, the chart's days aren't yet: the chart area shimmers on its own. */
+  chartLoading?: boolean
+  /** The chart's days couldn't be read; the number still shows. */
+  chartFailed?: boolean
 }
 
 interface MetricCardProps {
@@ -183,6 +187,15 @@ function Body({ metric, bars, size, view, body, tall, wide, index, onRetry, onRe
   }
 
   const series = metric.series
+  // Measured, but nothing at all in these dates: say so once, instead of a "—" over an empty chart.
+  if (metric.amount === null && series.daysWithData === 0 && !view?.chartLoading) {
+    return (
+      <div className={cn('absolute left-4 flex flex-col items-start gap-0.5', figureAt)}>
+        <p className="m-0 text-[28px] font-medium leading-8 text-[var(--dashboard-muted)]">—</p>
+        <p className="m-0 text-[12px] leading-4 text-[var(--dashboard-muted)]">No data for these dates</p>
+      </div>
+    )
+  }
   return (
     <m.div
       initial={reduceMotion ? false : { opacity: 0 }}
@@ -195,7 +208,14 @@ function Body({ metric, bars, size, view, body, tall, wide, index, onRetry, onRe
           <HealthPillView pill={view.health} withTarget={wide} />
         </div>
       )}
-      {chartBox && (
+      {chartBox && view?.chartLoading && (
+        // The number is in; the chart's own days are on their way.
+        <span aria-hidden data-chart-loading className={cn('dashboard-shape-shimmer rounded-lg opacity-40', chartBox)} />
+      )}
+      {chartBox && !view?.chartLoading && view?.chartFailed && (
+        <p data-chart-failed className={cn('m-0 flex items-center justify-center text-center text-[12px] leading-4 text-[var(--dashboard-muted)]', chartBox)}>Couldn’t load the chart</p>
+      )}
+      {chartBox && !view?.chartLoading && !view?.chartFailed && (
         bars && size !== 'sm-tall' && size !== 'full'
           ? <WeeklyBars metric={metric} variant={size === 'md' ? 'compact' : 'full'} className={chartBox} />
           : <LineChart metric={metric} series={series} variant={tall && size !== 'sm-tall' ? 'full' : 'spark'} className={chartBox} />

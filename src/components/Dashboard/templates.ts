@@ -109,7 +109,7 @@ export function starterState(metrics: Metrics, newId: () => string, owner: strin
       .filter((c): c is TemplateCard => c.metricId !== undefined)
     const laid = flowCards(cards)
     const id = newId()
-    boards[id] = { id, label: starter.label, cards: laid, initialCards: laid, period: starter.period, compare: 'previous', access: 'owner', ownerId: owner, general: 'view', grants: [] }
+    boards[id] = { id, label: starter.label, cards: laid, initialCards: laid, period: starter.period, compare: 'previous', access: 'owner', ownerId: owner, general: 'none', grants: [] }
     tabs.push(id)
   }
   return { boards, tabs, hidden: [], deleted: [], openId: tabs[0] }

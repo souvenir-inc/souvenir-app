@@ -8,7 +8,7 @@ export function formatMetricValue(value: number, format: Metric['format']): stri
   // Lowercase "k" to match the card figures ("$48.2k"); millions stay "M".
   const n = Math.abs(value) >= 1000 ? compact.format(value).replace('K', 'k') : decimal.format(value)
   switch (format) {
-    case 'currency': return `$${n}`
+    case 'currency': return value < 0 ? `−$${n.replace('-', '')}` : `$${n}`
     case 'percent':  return `${n}%`
     default:         return n
   }

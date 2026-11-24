@@ -41,7 +41,7 @@ export function figure(amount: number | null, format: MetricFormat): string {
   const big = Math.abs(amount) >= 1000
   const short = compact.format(amount).replace('K', 'k')
   switch (format) {
-    case 'currency': return `$${big ? short : cents.format(amount)}`
+    case 'currency': { const n = big ? compact.format(Math.abs(amount)).replace('K', 'k') : cents.format(Math.abs(amount)); return amount < 0 ? `−$${n}` : `$${n}` }
     case 'percent': return `${Math.abs(amount) < 10 ? cents.format(amount) : amount.toFixed(1)}%`
     case 'ratio': return big ? short : cents.format(amount)
     default: return big ? short : whole.format(amount)

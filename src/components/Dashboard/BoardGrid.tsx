@@ -354,7 +354,29 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
       <ul ref={gridRef} className="m-0 grid list-none auto-rows-[156px] grid-flow-row-dense grid-cols-1 gap-4 p-0 @lg:grid-cols-2 @min-[60rem]:grid-cols-4">
         {cards.map((card, i) => {
           const metric = metrics.get(card.metricId)
-          if (!metric) return null
+          // A metric the warehouse no longer has: the card stays in its place and says so, with Remove
+          // card for people who can edit (CR-22), instead of vanishing without a word.
+          if (!metric) {
+            const canEdit = cardView?.(card.metricId)?.canEdit ?? editing
+            return (
+              <li
+                key={card.metricId}
+                data-card-id={card.metricId}
+                style={{ ['--gc' as string]: `${card.x + 1} / span ${dims(card.size).w}`, ['--gr' as string]: `${card.y + 1} / span ${dims(card.size).h}` }}
+                className={cn('relative min-w-0 rounded-xl', SPAN[card.size], '@min-[60rem]:[grid-column:var(--gc)]! @min-[60rem]:[grid-row:var(--gr)]!')}
+              >
+                <article data-card-body="removed" aria-label="Removed metric" className="relative flex size-full flex-col justify-end gap-1 overflow-clip rounded-xl bg-[var(--dashboard-card-bg)] p-4 text-[13px] leading-[17px] text-[var(--dashboard-figure)] shadow-[var(--dashboard-card-shadow)]">
+                  <p className="m-0">This metric was removed.</p>
+                  {canEdit && (
+                    // eslint-disable-next-line no-restricted-syntax -- ds-allow: the card's underlined text action (Figma 170:89079), as in MetricCard's EmptyBody
+                    <button type="button" data-no-drag onClick={() => (editing ? onRemove(card.metricId) : onRemoveEmpty?.(card.metricId))} className="cursor-pointer self-start rounded-sm border-0 bg-transparent p-0 text-[13px] leading-[17px] text-[var(--dashboard-figure)] underline underline-offset-2 outline-none hover:text-[var(--dashboard-label)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]">
+                      Remove card
+                    </button>
+                  )}
+                </article>
+              </li>
+            )
+          }
           const isSlot = drag?.id === card.metricId
           const view = cardView?.(card.metricId)
           return (

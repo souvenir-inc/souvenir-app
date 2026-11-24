@@ -186,6 +186,16 @@ export function ConnectorsExperience({ initialSearch = '' }: { initialSearch?: s
     setSetupOpen(true)
   }, [])
 
+  // `?open=<slug>&account=<id>&reconnect=1`: the dashboard's Reconnect lands here and starts the
+  // reconnect for that account at once, instead of leaving the viewer to find the button. Once per link.
+  const reconnectParam = searchParams.get('reconnect') === '1'
+  const autoReconnected = React.useRef<string | null>(null)
+  useEffect(() => {
+    if (!reconnectParam || !activeAccount || autoReconnected.current === activeAccount.id) return
+    autoReconnected.current = activeAccount.id
+    reconnectAccount(activeAccount)
+  }, [reconnectParam, activeAccount, reconnectAccount])
+
   const backToConnections = useCallback(() => {
     showView(null)
   }, [showView])

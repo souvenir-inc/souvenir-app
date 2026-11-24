@@ -53,7 +53,9 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
   const [focus, setFocus] = useState(0)
   const searchRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
-  const boardIds = new Set(onBoard.map(Metrics.base))
+  // Keyed by the ids, so the list below is worked out again only when the cards change.
+  const boardKey = [...new Set(onBoard.map(Metrics.base))].sort().join(',')
+  const boardIds = useMemo(() => new Set(boardKey ? boardKey.split(',') : []), [boardKey])
   const pickable = measurable
 
   // ── What the list shows ─────────────────────────────────────────────────────
@@ -63,8 +65,14 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
       ? catalog.flatMap((metric) => { const match = matchOf(metric, query, apps); return match === false ? [] : [{ metric, match }] })
       : (view === 'all' ? catalog : view === 'custom' ? catalog.filter((m) => m.custom) : (ROLE_METRICS[view] ?? []).map((id) => metrics.get(id)).filter((m): m is Metric => !!m))
           .map((metric) => ({ metric }))
-    const on = source.filter((x) => pickable(x.metric))
-    const off = source.filter((x) => !pickable(x.metric))
+    // A metric already on this board leaves the list: adding it is done.
+    const fresh = source.filter((x) => !boardIds.has(x.metric.id))
+    const on = fresh.filter((x) => pickable(x.metric))
+    // Not pickable for two different reasons: no connected app feeds it (Connect helps), or its app is
+    // connected but the warehouse has nothing for it yet (first sync, a failed feed; waiting helps).
+    const needsApp = (m: Metric) => !m.custom && m.apps.length === 0
+    const off = fresh.filter((x) => !pickable(x.metric) && needsApp(x.metric))
+    const waiting = fresh.filter((x) => !pickable(x.metric) && !needsApp(x.metric))
     const out: Line[] = []
     if (searching || view === 'all') {
       // Grouped by app, A–Z inside each group (AC-10, AC-13).
@@ -88,8 +96,12 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
       out.push({ kind: 'gap', size: 4 })
       for (const x of off) out.push({ kind: 'row', metric: x.metric, match: x.match })
     }
+    if (waiting.length) {
+      out.push({ kind: 'heading', text: 'WAITING FOR DATA' })
+      for (const x of waiting) out.push({ kind: 'row', metric: x.metric, match: x.match })
+    }
     return out
-  }, [query, view, catalog, metrics, apps, pickable])
+  }, [query, view, catalog, metrics, apps, pickable, boardIds])
 
   const rows = lines.filter((l): l is Extract<Line, { kind: 'row' }> => l.kind === 'row')
   const focusIndex = Math.min(focus, Math.max(0, rows.length - 1))
@@ -195,7 +207,7 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
               const picked = picks.includes(m.id)
               const firstSync = m.apps.some((id) => apps.firstSync(id))
               const marks = m.apps.slice(0, 2).map((id) => apps.get(id)).filter((a): a is App => !!a)
-              const tag = !can ? null : firstSync ? 'No data yet' : boardIds.has(m.id) ? 'On board' : null
+              const tag = firstSync || (!can && l.metric.apps.length > 0) ? 'No data yet' : null
               return (
                 <div
                   key={`r${m.id}`}
