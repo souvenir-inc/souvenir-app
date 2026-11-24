@@ -450,7 +450,7 @@ function AddPeople({ people, share, onListOpen, onInvite }: { people: People; sh
 // ── Post to Slack (SH-25 – SH-28) ──────────────────────────────────────────────────────
 
 function SlackStep({ board, period, compare, cardView, stamp, link, people, onBack, onPosted }: { board: Board; period: string; compare: string; cardView: (id: string) => CardView | undefined; stamp: string; link: string; people: People; onBack: () => void; onPosted: (channel: string) => void }) {
-  const { warehouse } = useDashboardData()
+  const { warehouse, today } = useDashboardData()
   const { orgId } = useOrgIdentity()
   // The channels Souvenir is in; none listed means Slack isn't installed for the workspace (SH-27).
   const slack = useQuery({
@@ -479,7 +479,7 @@ function SlackStep({ board, period, compare, cardView, stamp, link, people, onBa
     try {
       const image = await nodeToPng(shotRef.current)
       const text = `${sharer} shared *${board.label}* · ${datesLabel(period, compare)}\n${link}`
-      await warehouse.postToSlack(board.id, image, `${fileBase(board.label, period)}.png`, channel.id, text)
+      await warehouse.postToSlack(board.id, image, `${fileBase(board.label, period, today)}.png`, channel.id, text)
       onPosted(channel.name)
     } catch (error) {
       console.error('[dashboard] posting to Slack failed', error)

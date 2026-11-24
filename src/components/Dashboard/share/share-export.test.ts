@@ -97,6 +97,31 @@ describe('downloads (SH-33 – SH-37)', () => {
     expect(lines[4]).toBe('2025-11-08,6100,2025-11-01,')
     expect(lines[10]).toBe('2025-11-14,7000,2025-11-07,6200')
   })
+  it('gives Today one row, compared with the day before', () => {
+    const m = metrics()
+    const csv = numbersCsv({ title: 'Revenue', metrics: [m.get('revenue')!], period: 'today', compare: 'previous', by: 'A member', on: TODAY })
+    const lines = csv.slice(1).trim().split('\r\n')
+    expect(lines[0]).toBe('Revenue · Today · vs the day before')
+    expect(lines[3]).toBe('Date,Revenue,Day before date,"Revenue, day before"')
+    expect(lines).toHaveLength(5)
+    expect(lines[4]).toMatch(/^2025-11-14,7000,2025-11-13,\d/)
+  })
+  it('marks multiples with (x) in the header', () => {
+    const m = metrics()
+    const csv = numbersCsv({ title: 'Ads', metrics: [m.get('mer')!], period: '7d', compare: 'none', by: 'A member', on: TODAY })
+    expect(csv.slice(1).split('\r\n')[3]).toBe('Date,MER (x)')
+  })
+  it('keeps a board name in any script, and never leaves the name empty', () => {
+    expect(fileBase('Продажи', '7d', TODAY)).toBe('продажи-2025-11-08-to-2025-11-14')
+    expect(fileBase('🚀', '7d', TODAY)).toBe('board-2025-11-08-to-2025-11-14')
+  })
+  it('quotes out a board name that would run as a spreadsheet formula', () => {
+    const m = metrics()
+    const csv = numbersCsv({ title: '=HYPERLINK("http://x")', metrics: [m.get('revenue')!], period: '7d', compare: 'previous', by: '@someone', on: TODAY })
+    const lines = csv.slice(1).split('\r\n')
+    expect(lines[0].replace(/^"/, '')).toMatch(/^'=HYPERLINK/)
+    expect(lines[1]).not.toMatch(/^[=+\-@]/)
+  })
   it('puts every card side by side, rates with (%), no comparison columns without a comparison', () => {
     const none = metrics({ totalBefore: undefined, dailyBefore: undefined, chartBefore: null, compare: 'none' })
     const csv = numbersCsv({ title: 'Store overview', metrics: [none.get('orders')!, none.get('refund_rate')!], period: '7d', compare: 'none', by: 'A member', on: TODAY })

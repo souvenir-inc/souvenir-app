@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import { customId, customRange, rangeSummary } from './period'
+import { useDashboardData } from './live/dashboard-data'
 
 // A custom range (Figma 4.2, 20:8181; 11-dates-tabs-reference-rules.md DT-2 – DT-5): two months side by
 // side, the ends dark, the days between filled; the footer says how long it is and what it's compared
@@ -27,7 +28,8 @@ interface CustomRangeProps {
 
 export function CustomRange({ period, compare, onApply, onClose, className }: CustomRangeProps) {
   const current = customRange(period)
-  const [today] = useState(() => new Date())
+  // The store's day: a range can't run past the store's today (DT-2).
+  const { today } = useDashboardData()
   const [from, setFrom] = useState<Date | null>(current?.from ?? null)
   const [to, setTo] = useState<Date | null>(current?.to ?? null)
   const [hover, setHover] = useState<Date | null>(null)

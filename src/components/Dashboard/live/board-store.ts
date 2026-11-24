@@ -46,7 +46,13 @@ export class BoardStore {
   /** The viewer's boards and the boards shared with them; an empty state when there are none yet. */
   async load(people: Map<string, Person>, signal?: AbortSignal): Promise<DashboardState> {
     const saved = await this.warehouse.boards(signal)
-    const read = saved.map((wire) => ({ wire, layout: layoutSchema.parse(wire.layout) }))
+    // A board whose layout doesn't parse is left out (and left alone), not a reason to fail every board.
+    const read = saved.flatMap((wire) => {
+      const layout = layoutSchema.safeParse(wire.layout)
+      if (layout.success) return [{ wire, layout: layout.data }]
+      console.warn('[dashboard] skipped a board with an unreadable layout', wire.id)
+      return []
+    })
     const own = read.filter((b) => b.wire.createdBy === this.viewer).sort((a, b) => a.layout.position - b.layout.position)
     const others = read.filter((b) => b.wire.createdBy !== this.viewer)
     for (const { wire, layout } of read) {
@@ -91,19 +97,21 @@ export class BoardStore {
       const place = this.places.get(board.id)
       if (board.access === 'edit' && place) next.set(board.id, requestOf(board, place))
     }
+    // One refused write doesn't stop the others; what failed stays unwritten, so the next save tries it again.
     const job = async () => {
+      const failed: unknown[] = []
+      const attempt = async (write: () => Promise<void>) => { try { await write() } catch (error) { failed.push(error) } }
       for (const [id, request] of next) {
         const text = canonical(request)
         if (this.written.get(id) === text) continue
-        await this.warehouse.putBoard(id, request)
-        this.written.set(id, text)
+        await attempt(async () => { await this.warehouse.putBoard(id, request); this.written.set(id, text) })
       }
       for (const id of [...this.written.keys()]) {
         if (next.has(id)) continue
         // Their own board that went is deleted; one they could edit and left stays its owner's.
-        if (!this.places.has(id)) await this.warehouse.deleteBoard(id)
-        this.written.delete(id)
+        await attempt(async () => { if (!this.places.has(id)) await this.warehouse.deleteBoard(id); this.written.delete(id) })
       }
+      if (failed.length) throw failed[0]
     }
     this.queue = this.queue.then(job, job)
     return this.queue

@@ -1,11 +1,12 @@
 // Downloads (docs-v2/dashboard/09-share-export-rules.md SH-31 – SH-37): the spreadsheet, the file names,
 // the stamp, and saving a file. The CSV and the names are pure, so they're testable.
 
-import { chartWindow, isoDate as iso, periodWindow, rangeDays } from '../period'
+import { addDays, comparedWindow, isoDate as iso, periodWindow, rangeDays } from '../period'
 import type { Metric } from '../types'
 import { datesLabel, periodLabel } from './share-model'
 
-const slug = (s: string) => s.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+// Letters and digits in any script stay (a board called "Продажи" keeps its name); "board" when nothing does.
+const slug = (s: string) => s.toLowerCase().replace(/&/g, 'and').replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '') || 'board'
 
 /** "store-overview-2025-11-08-to-2025-11-14" (SH-33, SH-36). */
 export function fileBase(name: string, period: string, today: Date = new Date()): string {
@@ -21,15 +22,21 @@ export function stamp(board: string, period: string, compare: string, by: string
 
 /** "Previous 7 days" / "Same days last year": what the comparison columns are called. */
 function compareName(days: number, compare: string): string {
-  return compare === 'last-year' ? 'Same days last year' : `Previous ${days} days`
+  if (compare === 'last-year') return days === 1 ? 'Same day last year' : 'Same days last year'
+  return days === 1 ? 'Day before' : `Previous ${days} days`
 }
 
-/** A header for a card's column: rates say "(%)". */
-const header = (m: Metric) => (m.format === 'percent' ? `${m.label} (%)` : m.label)
+/** A header for a card's column: rates say "(%)", multiples "(x)" (SH-37). */
+const header = (m: Metric) => (m.format === 'percent' ? `${m.label} (%)` : m.format === 'ratio' ? `${m.label} (x)` : m.label)
 /** Exact, never "k": two decimals at most, no trailing zeros (6812.4, 5850). */
 const exact = (v: number | null) => (v == null ? '' : String(Math.round(v * 100) / 100))
 
-const cell = (s: string) => (/[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s)
+// A leading = + - @ (or tab/CR) runs as a formula in Excel or Sheets; names are user text, so quote it out.
+const defuse = (s: string) => (/^[=+\-@\t\r]/.test(s) ? `'${s}` : s)
+const cell = (raw: string) => {
+  const s = defuse(raw)
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+}
 
 /**
  * One sheet: a title row, who exported it and when, a blank row, then Date, each card, the comparison's
@@ -39,23 +46,31 @@ export function numbersCsv(opts: { title: string; metrics: Metric[]; period: str
   const { metrics, period, compare, by } = opts
   const on = opts.on ?? new Date()
   const series = metrics.map((m) => m.series)
-  const days = (() => { const w = chartWindow(period, on); return rangeDays(w.from, w.to) })()
-  const withCompare = compare !== 'none'
+  // One row per day of the period itself (Today is one row), not the wider window its chart draws.
+  const window = periodWindow(period, on)
+  const days = rangeDays(window.from, window.to)
+  const before = compare === 'none' ? null : comparedWindow(window, compare)
+  const withCompare = before !== null
   const cmp = compareName(days, compare)
-  const vs = compare === 'last-year' ? 'vs same days last year' : `vs previous ${days} days`
+  const vs = compare === 'last-year' ? (days === 1 ? 'vs same day last year' : 'vs same days last year') : days === 1 ? 'vs the day before' : `vs previous ${days} days`
+  // A day's figure from the card's series: its own days, or the comparison's (the day before Today is in its chart).
+  const valueOn = (s: Metric['series'], date: Date) => {
+    const k = iso(date)
+    return (s.days.find((d) => iso(d.date) === k) ?? s.previous.find((d) => d && iso(d.date) === k))?.value ?? null
+  }
   const rows: string[][] = [
     [`${opts.title} · ${periodLabel(period)}${withCompare ? ` · ${vs}` : ''}`],
     [`Exported by ${by} on ${on.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`],
     [],
     ['Date', ...metrics.map(header), ...(withCompare ? [`${cmp} date`, ...metrics.map((m) => `${header(m)}, ${cmp.toLowerCase()}`)] : [])],
   ]
-  const n = series[0]?.days.length ?? 0
-  for (let i = 0; i < n; i++) {
-    const prev = series[0].previous[i]
+  for (let i = 0; i < days && series.length; i++) {
+    const day = addDays(window.from, i)
+    const prev = before && addDays(before.from, i)
     rows.push([
-      iso(series[0].days[i].date),
-      ...series.map((s) => exact(s.days[i].value)),
-      ...(withCompare && prev ? [iso(prev.date), ...series.map((s) => exact(s.previous[i]?.value ?? null))] : []),
+      iso(day),
+      ...series.map((s) => exact(valueOn(s, day))),
+      ...(prev ? [iso(prev), ...series.map((s) => exact(valueOn(s, prev)))] : []),
     ])
   }
   return '﻿' + rows.map((r) => r.map(cell).join(',')).join('\r\n') + '\r\n'

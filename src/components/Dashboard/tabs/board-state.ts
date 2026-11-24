@@ -321,8 +321,12 @@ export function boardReducer(s: DashboardState, a: BoardAction): DashboardState 
     }
     case 'restore': {
       if (!s.deleted.some((d) => d.id === a.id)) return s
+      // Its name may have been taken while it sat in Recently deleted: it comes back as "Name 2" (TAB-26).
+      const board = s.boards[a.id]
+      const label = board ? uniqueName(board.label, namesInUse(s, a.id)) : undefined
       return {
         ...s,
+        boards: board && label && label !== board.label ? { ...s.boards, [a.id]: { ...board, label } } : s.boards,
         deleted: s.deleted.filter((d) => d.id !== a.id),
         tabs: insertAt(s.tabs, a.id, a.index ?? s.tabs.length),
         openId: a.open ? a.id : s.openId,

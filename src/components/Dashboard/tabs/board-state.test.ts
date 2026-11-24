@@ -200,4 +200,15 @@ describe('card changes read the board as it is (BS-25, BS-26, BS-31)', () => {
     expect(boardReducer(s, { type: 'move-card', id: 'a', metricId: 'x', to: 1 })).toBe(s)
     expect(boardReducer(s, { type: 'resize-card', id: 'a', metricId: 'x', size: 'sm' })).toBe(s)
   })
+
+describe('restore keeps names unique (TAB-26)', () => {
+  it('brings a board back as "Name 2" when its name was taken meanwhile', () => {
+    let s = boardReducer(state(['a', 'b', 'c']), { type: 'delete', id: 'b', at: 0 })
+    const taken = s.boards.b.label
+    s = boardReducer(s, { type: 'rename', id: 'a', label: taken })
+    s = boardReducer(s, { type: 'restore', id: 'b', open: false })
+    expect(s.boards.a.label).toBe(taken)
+    expect(s.boards.b.label).toBe(`${taken} 2`)
+  })
+})
 })

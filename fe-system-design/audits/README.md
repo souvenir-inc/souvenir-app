@@ -28,6 +28,7 @@ Scoring: 1 = applied, 0.5 = partial, 0 = absent, applicable principles only. Sco
 | 20 | Personas and Share | [personas-share-system-design-audit.md](./personas-share-system-design-audit.md) | ~45% | Phases 1–2 done, Phase 3 mostly done (Oct 14) |
 | 21 | Internal and API routes | [internal-api-routes-system-design-audit.md](./internal-api-routes-system-design-audit.md) | ~54% | Phases 1–4 done; D4–D5 for review (Oct 14) |
 | 22 | Library | [library-system-design-audit.md](./library-system-design-audit.md) | ~78% | Phase 1–2 done; Phase 3 Web Vitals done, budget and the rest blocked (Oct 14) |
+| 23 | Dashboard | [dashboard-system-design-audit.md](./dashboard-system-design-audit.md) | ~56% | Phase 1 done; Phase 2 mostly done (Nov 24) |
 
 All 21 feature areas in `features.md` are now audited, plus Library (added Oct 14). See the cross-cutting summary below.
 

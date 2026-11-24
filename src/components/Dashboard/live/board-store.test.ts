@@ -124,8 +124,10 @@ describe('BoardStore', () => {
     expect(api.putBoard.mock.calls[0][1]).toMatchObject({ general: 'none', grants })
   })
 
-  it('refuses a layout it doesn’t recognise instead of drawing a broken board', async () => {
-    api.boards.mockResolvedValueOnce([saved('x', 'Broken', VIEWER, { cards: 'nope' } as unknown as Layout)])
-    await expect(store.load(new Map())).rejects.toThrow()
+  it('leaves out a board whose layout it doesn’t recognise and still shows the rest', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    api.boards.mockResolvedValueOnce([saved('x', 'Broken', VIEWER, { cards: 'nope' } as unknown as Layout), saved('y', 'Fine', VIEWER, layout())])
+    const state = await store.load(new Map())
+    expect(Object.keys(state.boards)).toEqual(['y'])
   })
 })

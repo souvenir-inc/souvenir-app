@@ -53,7 +53,7 @@ export function MetricWindow({ metric, ...rest }: MetricWindowProps) {
 function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boards, onAddToBoard }: Omit<MetricWindowProps, 'metric' | 'onClose'> & { metric: Metric }) {
   const [tab, setTab] = useState<Tab>('Trend')
   const [table, setTable] = useState(false)
-  const [today] = useState(() => new Date())
+  const { today } = useDashboardData()
   const chart = chartWindow(periodId, today)
   const n = rangeDays(chart.from, chart.to)
   const periodLabel = periodName(periodId)

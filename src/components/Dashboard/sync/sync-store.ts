@@ -5,8 +5,8 @@
 // (live/use-live-dashboard.ts); Refresh and Sync go to the warehouse. Components read it through
 // useSyncSnapshot (useSyncExternalStore), never directly (React Compiler).
 
-import { useSyncExternalStore } from 'react'
-import type { BoardStatus, Warehouse } from '@/lib/api/warehouse'
+import { useEffect, useState, useSyncExternalStore } from 'react'
+import type { BoardStatus, ConnectionState, Warehouse } from '@/lib/api/warehouse'
 import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
 import type { AppId } from '../types'
 import { AppSync, type SyncKind } from './sync-model'
@@ -43,6 +43,8 @@ export interface SyncSnapshot {
 
 const SERVER: SyncSnapshot = { now: 0, apps: {}, online: true, offlineSince: null, backOnlineAt: null, started: {}, recent: [], dismissed: [] }
 let snap: SyncSnapshot = SERVER
+/** The snapshot as of the last real change: the clock tick doesn't replace it (see useSyncState). */
+let base: SyncSnapshot = SERVER
 let target: { warehouse: Warehouse; boardId: string } | null = null
 const listeners = new Set<() => void>()
 const endListeners = new Set<(e: SyncEnd) => void>()
@@ -50,6 +52,14 @@ let recentId = 0
 
 function set(next: Partial<SyncSnapshot>) {
   snap = { ...snap, ...next, now: Date.now() }
+  base = snap
+  listeners.forEach((l) => l())
+}
+
+// The clock only moves "now" (relative times, cooldowns); it skips hidden tabs and catches up on return.
+function tick() {
+  if (document.hidden) return
+  snap = { ...snap, now: Date.now() }
   listeners.forEach((l) => l())
 }
 
@@ -57,15 +67,43 @@ let ticker: number | undefined
 function subscribe(l: () => void) {
   listeners.add(l)
   ensureOnlineListener()
-  ticker ??= window.setInterval(() => set({}), 10_000)
+  if (ticker === undefined) {
+    ticker = window.setInterval(tick, 10_000)
+    document.addEventListener('visibilitychange', tick)
+  }
   return () => {
     listeners.delete(l)
-    if (!listeners.size) { window.clearInterval(ticker); ticker = undefined }
+    if (!listeners.size) {
+      window.clearInterval(ticker)
+      ticker = undefined
+      document.removeEventListener('visibilitychange', tick)
+    }
   }
 }
 
+/** A slow clock for the board's own day and hour maths (Today's midnight, "hasn't synced in N hours"). */
+export function useCoarseNow(everyMs = 5 * 60_000): number {
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const id = window.setInterval(() => { if (!document.hidden) setNow(Date.now()) }, everyMs)
+    const onShow = () => { if (!document.hidden) setNow(Date.now()) }
+    document.addEventListener('visibilitychange', onShow)
+    return () => { window.clearInterval(id); document.removeEventListener('visibilitychange', onShow) }
+  }, [everyMs])
+  return now
+}
+
+/** Every change, and the 10 s clock: for the small parts that show relative times. */
 export function useSyncSnapshot(): SyncSnapshot {
   return useSyncExternalStore(subscribe, () => snap, () => SERVER)
+}
+
+/**
+ * Real changes only, not the clock: for the board itself, so a tick doesn't re-render every card.
+ * Its `now` is when the state last changed; pair it with a coarse clock for day or hour maths.
+ */
+export function useSyncState(): SyncSnapshot {
+  return useSyncExternalStore(subscribe, () => base, () => SERVER)
 }
 
 /** The current state, for event handlers (render reads go through useSyncSnapshot). */
@@ -167,7 +205,14 @@ export async function syncApps(ids: AppId[]): Promise<void> {
   const behind = ids.filter((id) => snap.apps[id]?.state === 'behind')
   if (!behind.length) return
   set({ started: marked(behind, 'sync') })
-  const states = await Promise.all(behind.map((id) => warehouse.syncConnection(id)))
+  let states: ConnectionState[]
+  try {
+    states = await Promise.all(behind.map((id) => warehouse.syncConnection(id)))
+  } catch (error) {
+    // A refused sync mustn't leave its spinner turning.
+    set({ started: Object.fromEntries(Object.entries(snap.started).filter(([id]) => !behind.includes(id as AppId))) })
+    throw error
+  }
   const apps = { ...snap.apps, ...Object.fromEntries(states.map((c) => [c.connectionId, new AppSync(c)])) }
   if (target?.boardId === boardId) set({ apps })
 }

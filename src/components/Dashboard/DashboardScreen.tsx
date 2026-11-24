@@ -9,30 +9,25 @@ import { userFullName, useAuth } from '@/context/auth-context'
 import { useOrg, useOrgMembers } from '@/context/org-context'
 import { Warehouse } from '@/lib/api/warehouse'
 import { orgScope, queryKeys } from '@/lib/query-keys'
-import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
 import { cn } from '@/lib/utils'
-import { AddCardsDialog } from './AddCardsDialog'
 import { EditBar, SpeedDial } from './BoardActions'
 import { AskAIDialog, DraftBar, DraftLine, DraftProblem, type Draft } from './Drafts'
-import { CardSettings } from './CardSettings'
-import { DefaultBoardDialog } from './DefaultBoardDialog'
 import { EmptyBoard } from './EmptyBoard'
+import { EmptyBoardList, Frame, NoStore, Problem, Skeleton } from './DashboardStates'
 import { BoardSnapshot } from './share/BoardSnapshot'
-import { DownloadDialog } from './share/DownloadDialog'
 import { fileBase, nodeToPng, numbersCsv, saveFile, stamp } from './share/export'
 import { leaveNoAccess, seedLinkFromQuery, setViewDates, useLinkView } from './share/link-view'
 import { NoAccess } from './share/NoAccess'
-import { ShareDialog, type ShareStart } from './share/ShareDialog'
+import type { ShareStart } from './share/ShareDialog'
 import { boardLink, copyText, periodLabel } from './share/share-model'
 import { Spinner } from './sync/Spinner'
 import type { Way } from './NewBoardChooser'
-import { NewBoardLibrary, type LibraryPick } from './NewBoardLibrary'
+import type { LibraryPick } from './NewBoardLibrary'
 import { TEMPLATES, measurable, starterState, templateFor, toBoardCards } from './templates'
 import { landingSize } from './catalog'
 import { BoardGrid } from './BoardGrid'
 import { cardBody, flagged, healthPill, reasonOf } from './card-states'
 import type { CardView } from './MetricCard'
-import { MetricWindow } from './MetricWindow'
 import { NeedsAttention, type AttentionItem } from './NeedsAttention'
 import { PeriodMenu, SharedByAvatar } from './BoardHeader'
 import { Apps } from './live/apps'
@@ -42,14 +37,16 @@ import { Metrics } from './live/metrics'
 import { SyncBanners } from './sync/SyncBanners'
 import { SyncButton } from './sync/SyncButton'
 import { clock, hoursSince } from './sync/sync-model'
-import { getSyncSnapshot, onSyncEnd, reconnect, useSyncSnapshot } from './sync/sync-store'
+import { getSyncSnapshot, onSyncEnd, reconnect, useCoarseNow, useSyncState } from './sync/sync-store'
 import { showSyncErrorToast, showSyncedToast } from './sync/sync-toasts'
 import type { BoardMenuHandlers } from './tabs/BoardMenus'
 import { ConfirmDialogs, type PendingConfirm } from './tabs/ConfirmDialogs'
-import { ManageTabsDialog, type ManageTab } from './tabs/ManageTabsDialog'
+import type { ManageTab } from './tabs/ManageTabsDialog'
 import { TabRow } from './tabs/TabRow'
 import { cardIdsFor, namesInUse, uniqueName, type DashboardState, type Person } from './tabs/board-state'
 import { useDashboard } from './tabs/use-dashboard'
+import { storeMidnight } from './period'
+import { AddCardsDialog, CardSettings, DefaultBoardDialog, DownloadDialog, ManageTabsDialog, MetricWindow, NewBoardLibrary, ShareDialog, preloadDashboardDialogs } from './lazy-dialogs'
 import type { AppId, Metric } from './types'
 
 // Dashboard board panel (Figma wRr8cpImqSXbIgk0XhNj7a: base 17:889, tabs 136:20976, Manage tabs
@@ -126,10 +123,14 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
   const isAdmin = currentUserRole === 'admin'
   const me = userFullName(user)
   const open = openBoard ?? state.boards[state.tabs[0]]
-  const live = useLiveDashboard(warehouse, { id: open?.id ?? '', period: open?.period ?? '7d', compare: open?.compare ?? 'previous', metricIds: (open?.cards ?? []).map((c) => c.metricId) })
+  const linkView = useLinkView()
+  // Measure the dates on screen: the viewer's own pick (or a link's) wins over the board's saved ones (SH-23).
+  const viewing = open && linkView.dates?.boardId === open.id ? linkView.dates : open
+  const live = useLiveDashboard(warehouse, { id: open?.id ?? '', period: viewing?.period ?? '7d', compare: viewing?.compare ?? 'previous', metricIds: (open?.cards ?? []).map((c) => c.metricId) })
   useBoardStatus(warehouse, open?.id ?? '', !!open && !open.draft)
 
   const [renamingId, setRenamingId] = useState<string | null>(null)
+  useEffect(() => preloadDashboardDialogs(), [])
   const [manage, setManage] = useState<{ open: boolean; tab: ManageTab }>({ open: false, tab: 'tabs' })
   const [confirm, setConfirm] = useState<PendingConfirm>(null)
   const [visibleCount, setVisibleCount] = useState(6)
@@ -224,7 +225,10 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
   }, [editing])
 
   // ── Sync (04-sync-rules.md) ───────────────────────────────────────────────
-  const sync = useSyncSnapshot()
+  // Real sync changes only: the 10 s clock re-renders the small parts that show "N min ago", not the board.
+  const sync = useSyncState()
+  const clockNow = useCoarseNow()
+  const now = Math.max(sync.now, clockNow)
   const [sourcesOpen, setSourcesOpen] = useState(false)
   // How a sync ended, as a toast when the board on screen doesn't already say so (SY-29, SY-30).
   // The listener reads the latest board and list through a ref, set after each render.
@@ -256,7 +260,6 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
   })
 
   // ── Share and export (09-share-export-rules.md) ─────────────────────────────────────
-  const linkView = useLinkView()
   const [share, setShare] = useState<{ open: boolean; start: ShareStart }>({ open: false, start: 'people' })
   const [downloadOpen, setDownloadOpen] = useState(false)
   // The workspace's default board for new members (11 DT-8): the warehouse keeps it.
@@ -410,8 +413,8 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
   // Dates that aren't the board's own: Reset (and Save for board for editors) beside the period (SH-23).
   const own = linkView.dates?.boardId === openBoard.id && (linkView.dates.period !== openBoard.period || linkView.dates.compare !== openBoard.compare) ? linkView.dates : null
   const dates = own ?? { period: openBoard.period, compare: openBoard.compare }
-  const midnight = new Date(sync.now)
-  midnight.setHours(0, 0, 0, 0)
+  // The store's midnight: its app hasn't synced "today" when the last sync was before the store's day began.
+  const midnight = storeMidnight(warehouse.timezone, new Date(now))
 
   // How a card reads (CR-18 – CR-29): its body, its app's dot, a shimmer while it syncs, its days
   // and its health.
@@ -427,7 +430,7 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
       firstSyncRunning: firstSync,
       unmeasured: !!metric.unmeasured,
       // On Today, an app that hasn't synced since yesterday has nothing for today (CR-26).
-      todayEmpty: dates.period === 'today' && apps.some((x) => x.a?.syncedAt != null && x.a.syncedAt < midnight.getTime()),
+      todayEmpty: dates.period === 'today' && apps.some((x) => x.a?.syncedAt != null && x.a.syncedAt < midnight),
     })
     // The worse dot; hovering it names the app(s) and how old the numbers are (CR-25).
     const failed = apps.filter((x) => x.a?.state === 'failed')
@@ -435,7 +438,7 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
     const tips = failed.length
       ? failed.map((x) => `${x.a.name} sync failed · numbers from ${x.a.syncedAt == null ? 'its first sync' : clock(x.a.syncedAt)}`)
       : behind.map((x) => {
-          const h = hoursSince(x.a.syncedAt, sync.now)
+          const h = hoursSince(x.a.syncedAt, now)
           return `${x.a.name} hasn’t synced in ${h} hour${h === 1 ? '' : 's'} · numbers from ${x.a.syncedAt == null ? 'its first sync' : clock(x.a.syncedAt)}`
         })
     const chart = openBoard.cards.find((c) => c.metricId === metricId)?.chart
@@ -469,12 +472,12 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
     ? openBoard.cards.map((c) => metrics.get(c.metricId)).filter((x): x is Metric => !!x && x.id !== windowMetric.id && x.apps.some((a) => windowMetric.apps.includes(a)))
     : []
   const notReady = (what: string) => toast.info(`${what} isn’t ready yet`, { id: 'dashboard-not-ready' })
-  const stampText = stamp(openBoard.label, dates.period, dates.compare, me)
+  const stampText = stamp(openBoard.label, dates.period, dates.compare, me, live.data?.today)
   // Numbers: one CSV, then the dialog closes; no toast, the file is the confirmation (SH-36, SH-37).
   const downloadNumbers = async (ids: string[]) => {
     const title = ids.length === 1 ? metrics.get(ids[0])?.label ?? openBoard.label : openBoard.label
-    const csv = numbersCsv({ title, metrics: ids.map((id) => metrics.get(id)).filter((x): x is Metric => !!x), period: dates.period, compare: dates.compare, by: me })
-    saveFile(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `${fileBase(title, dates.period)}.csv`)
+    const csv = numbersCsv({ title, metrics: ids.map((id) => metrics.get(id)).filter((x): x is Metric => !!x), period: dates.period, compare: dates.compare, by: me, on: live.data?.today })
+    saveFile(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `${fileBase(title, dates.period, live.data?.today)}.csv`)
     setDownloadOpen(false)
   }
   const noAccess = linkView.noAccess
@@ -866,7 +869,7 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
       />
       {/* The board drawn off screen for its image (SH-33, SH-34). */}
       {shot > 0 && (
-        <div aria-hidden data-file={fileBase(openBoard.label, dates.period)} style={{ position: 'fixed', left: 0, top: 0, transform: 'translateX(-200vw)', pointerEvents: 'none' }}>
+        <div aria-hidden data-file={fileBase(openBoard.label, dates.period, live.data?.today)} style={{ position: 'fixed', left: 0, top: 0, transform: 'translateX(-200vw)', pointerEvents: 'none' }}>
           <BoardSnapshot ref={shotRef} cards={openBoard.cards} cardView={(id) => cardView(id, true)} stamp={stampText} />
         </div>
       )}
@@ -881,62 +884,5 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
       />
     </div>
     </DashboardDataProvider>
-  )
-}
-
-/** The panel every state of the screen sits in (Figma base 17:889). */
-function Frame({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-[var(--neutral-50)] py-2.5 pr-2.5">
-      <section aria-label="Dashboard" className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[var(--layout-radius)] border border-solid border-[var(--border-default)] bg-[var(--dashboard-panel-bg)]">
-        <div className="mx-auto box-border w-full max-w-[1232px] px-4 pt-[15px]">{children}</div>
-      </section>
-    </div>
-  )
-}
-
-const QUIET_BUTTON = 'h-8 cursor-pointer rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-3.5 text-[13px] text-[var(--dashboard-figure)] no-underline outline-none hover:bg-[var(--neutral-100)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]'
-
-/** Something the warehouse didn't answer, with Try again (CR-21). */
-function Problem({ text, onRetry }: { text: string; onRetry: () => void }) {
-  return (
-    <div data-board-failed className="flex min-h-[240px] flex-col items-center justify-center gap-3 rounded-xl text-[13px] leading-[17px] text-[var(--dashboard-figure)]">
-      <p className="m-0">{text}</p>
-      {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the white Try again of Figma 170:47131 (1px #D3CEC8, 8px radius, 32px) */}
-      <button type="button" onClick={onRetry} className={QUIET_BUTTON}>Try again</button>
-    </div>
-  )
-}
-
-/** No warehouse yet: one is made when the organization connects its store. */
-function NoStore() {
-  return (
-    <div data-no-store className="flex min-h-[320px] flex-col items-center justify-center gap-3 text-center text-[13px] leading-5 text-[var(--dashboard-figure)]">
-      <p className="m-0 text-[15px] font-medium">Connect your store to see its numbers</p>
-      <p className="m-0 max-w-[360px] text-[var(--dashboard-label)]">Your dashboard builds itself once Shopify or another store is connected. The first sync takes a few minutes.</p>
-      { }
-      <a href={ORG_CONNECTORS_ROUTE} className={cn(QUIET_BUTTON, 'flex items-center')}>Connect an app</a>
-    </div>
-  )
-}
-
-/** Every board was deleted or left. */
-function EmptyBoardList() {
-  return <div className="flex min-h-[240px] items-center justify-center text-[13px] text-[var(--dashboard-label)]">No boards yet.</div>
-}
-
-/** Plain card skeletons, no names or numbers (08 NB-21, NB-31). */
-function Skeleton() {
-  return (
-    <div className="@container" data-skeleton aria-hidden>
-      <ul className="m-0 grid list-none auto-rows-[156px] grid-cols-1 gap-4 p-0 @lg:grid-cols-2 @min-[60rem]:grid-cols-4">
-        {[4, 1, 1, 1, 1].map((span, i) => (
-          <li key={i} className="relative rounded-xl bg-[var(--dashboard-card-bg)] shadow-[var(--dashboard-card-shadow)]" style={{ gridColumn: span === 4 ? '1 / -1' : undefined }}>
-            <span className="dashboard-shape-shimmer absolute left-4 top-4 h-4 w-24 rounded-md" />
-            <span className="dashboard-shape-shimmer absolute bottom-[18px] left-4 h-7 w-28 rounded-md" />
-          </li>
-        ))}
-      </ul>
-    </div>
   )
 }

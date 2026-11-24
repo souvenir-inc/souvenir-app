@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useOrgIdentity } from '@/context/org-context'
 import { Warehouse, type MeasureRequest } from '@/lib/api/warehouse'
 import { orgScope, queryKeys } from '@/lib/query-keys'
-import { chartWindow, comparedWindow, isoDate, periodWindow, type Window } from '../period'
+import { chartWindow, comparedWindow, isoDate, periodWindow, wallClock, type Window } from '../period'
 import { bindSync, setStatus } from '../sync/sync-store'
 import { Apps } from './apps'
 import { Metrics, weeksWindow } from './metrics'
@@ -15,11 +15,13 @@ const SYNCING_POLL_MS = 5_000
 
 /** The open warehouse, its apps and its metrics as the open board's dates read them. */
 export class DashboardData {
-  constructor(readonly warehouse: Warehouse, readonly apps: Apps, readonly metrics: Metrics) {}
+  /** `today`: the store's day (wallClock), for windows, exports and the date picker. */
+  constructor(readonly warehouse: Warehouse, readonly apps: Apps, readonly metrics: Metrics, readonly today: Date) {}
 
-  /** Metric names this warehouse can put on a board. */
+  private namesCache: Set<string> | undefined
+  /** Metric names this warehouse can put on a board (worked out once per data). */
   get names(): Set<string> {
-    return new Set(this.metrics.all.map((m) => m.id))
+    return (this.namesCache ??= new Set(this.metrics.all.map((m) => m.id)))
   }
 }
 
@@ -54,15 +56,16 @@ export function useCatalog(warehouse: Warehouse) {
   })
 }
 
-/** Today, moved on at midnight so a board left open overnight reads the new day's windows. */
-function useToday(): Date {
-  const [today, setToday] = useState(() => new Date())
+/** Today on the store's clock, moved on at the store's midnight so a board left open overnight reads the new day. */
+function useToday(timeZone: string): Date {
+  const [today, setToday] = useState(() => wallClock(timeZone))
   useEffect(() => {
+    // How long until the store's next midnight, on its own clock (plus a second to be past it).
     const next = new Date(today)
     next.setHours(24, 0, 1, 0)
-    const timer = setTimeout(() => setToday(new Date()), next.getTime() - Date.now())
+    const timer = setTimeout(() => setToday(wallClock(timeZone)), next.getTime() - wallClock(timeZone).getTime())
     return () => clearTimeout(timer)
-  }, [today])
+  }, [today, timeZone])
   return today
 }
 
@@ -84,7 +87,7 @@ const request = (metrics: string[], w: Window, grain: MeasureRequest['grain']): 
 export function useLiveDashboard(warehouse: Warehouse, open: OpenBoard) {
   const { orgId } = useOrgIdentity()
   const org = orgScope(orgId)
-  const today = useToday()
+  const today = useToday(warehouse.timezone)
   const catalog = useCatalog(warehouse)
   const scorecards = useQuery({
     queryKey: queryKeys.warehouse.scorecards(org, warehouse.id),
@@ -98,10 +101,12 @@ export function useLiveDashboard(warehouse: Warehouse, open: OpenBoard) {
   const before = comparedWindow(period, open.compare)
   const chartBefore = comparedWindow(chart, open.compare)
   // A request that isn't made (no comparison) still gets its own key, named after its slot.
+  // The totals ask for every metric (metrics: []), so they start with the catalog, not after it;
+  // the board's own series need the catalog to know which of its metrics exist.
   const measure = (slot: string, body: MeasureRequest | null, enabled = true) => ({
     queryKey: queryKeys.warehouse.measure(org, warehouse.id, body ?? { off: slot }),
     queryFn: ({ signal }: { signal: AbortSignal }) => warehouse.measure(body!, signal),
-    enabled: enabled && body !== null && catalog.isSuccess,
+    enabled: enabled && body !== null && (body.metrics.length === 0 || catalog.isSuccess),
     staleTime: MINUTE,
   })
   const total = useQuery(measure('total', request([], period, 'total')))
@@ -116,7 +121,7 @@ export function useLiveDashboard(warehouse: Warehouse, open: OpenBoard) {
         catalog: catalog.data, scorecards: scorecards.data, apps,
         total: total.data, totalBefore: totalBefore.data, daily: daily.data, dailyBefore: dailyBefore.data, weekly: weekly.data,
         chart, chartBefore, compare: open.compare, today,
-      }))
+      }), today)
     : null
   const queries = [catalog, scorecards, total, totalBefore, daily, dailyBefore, weekly]
   return {

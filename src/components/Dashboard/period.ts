@@ -29,6 +29,29 @@ export const isoDate = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 
 export const fromIsoDate = (s: string) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d) }
 
 export const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate())
+
+/**
+ * The time on the store's clock, as a Date whose local fields read that time: the warehouse counts
+ * days in its own zone, so "today" and every window are worked out on its clock, not the viewer's.
+ */
+export function wallClock(timeZone: string | undefined, at: Date = new Date()): Date {
+  if (!timeZone) return at
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric',
+    }).formatToParts(at)
+    const n = (type: string) => Number(parts.find((p) => p.type === type)?.value)
+    return new Date(n('year'), n('month') - 1, n('day'), n('hour'), n('minute'), n('second'))
+  } catch {
+    return at // an unknown zone: the viewer's clock rather than nothing
+  }
+}
+
+/** The instant the store's day began (its midnight), for comparing with real times such as a last sync. */
+export function storeMidnight(timeZone: string | undefined, at: Date = new Date()): number {
+  const wall = wallClock(timeZone, at)
+  return at.getTime() - (wall.getTime() - startOfDay(wall).getTime())
+}
 export const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n)
 
 export const isCustom = (id: string) => id.startsWith('custom:')
@@ -69,8 +92,10 @@ export function chartWindow(id: string, today: Date): Window {
 /** The days a window is compared with: the same number of days before, or the same days last year (DT-7). */
 export function comparedWindow(w: Window, compare: string): Window | null {
   if (compare === 'none') return null
-  if (compare === 'last-year') return { from: yearBefore(w.from), to: yearBefore(w.to) }
   const n = rangeDays(w.from, w.to)
+  // Last year: from the same date, for the same number of days, so a window across 29 Feb still
+  // compares day for day (25 Feb – 2 Mar 2028 with 25 Feb – 3 Mar 2027, 7 days each).
+  if (compare === 'last-year') { const from = yearBefore(w.from); return { from, to: addDays(from, n - 1) } }
   return { from: addDays(w.from, -n), to: addDays(w.to, -n) }
 }
 
@@ -99,5 +124,8 @@ export function rangeSummary(from: Date, to: Date, compare: string): string {
 /** What the comparison is called beside "This period" (DT-7). */
 export const compareName = (compare: string) => (compare === 'last-year' ? 'Same period last year' : 'Previous period')
 
-/** The same day a year before. */
-export const yearBefore = (d: Date) => new Date(d.getFullYear() - 1, d.getMonth(), d.getDate())
+/** The same day a year before; 29 Feb becomes 28 Feb (not 1 Mar). */
+export const yearBefore = (d: Date) => {
+  const lastOfMonth = new Date(d.getFullYear() - 1, d.getMonth() + 1, 0).getDate()
+  return new Date(d.getFullYear() - 1, d.getMonth(), Math.min(d.getDate(), lastOfMonth))
+}

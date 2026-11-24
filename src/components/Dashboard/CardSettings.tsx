@@ -47,7 +47,7 @@ export function CardSettings({ card, ...rest }: CardSettingsProps) {
 }
 
 function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, onChart, onDuplicate, onRemove }: Omit<CardSettingsProps, 'card' | 'onClose'> & { card: BoardCard }) {
-  const { metrics, apps } = useDashboardData()
+  const { metrics, apps, today } = useDashboardData()
   const { user } = useAuth()
   const metric = metrics.get(card.metricId)
   const [changing, setChanging] = useState(false)
@@ -88,13 +88,13 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
     }
   }
 
-  const file = fileBase(metric.label, period)
+  const file = fileBase(metric.label, period, today)
   const downloadNumbers = () => {
     setBusy('numbers')
     setFailed(null)
     window.setTimeout(() => {
       setBusy(null)
-      const csv = numbersCsv({ title: metric.label, metrics: [metric], period, compare, by: userFullName(user) })
+      const csv = numbersCsv({ title: metric.label, metrics: [metric], period, compare, by: userFullName(user), on: today })
       saveFile(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `${file}.csv`)
     }, 900)
   }

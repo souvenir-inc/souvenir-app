@@ -22,6 +22,12 @@ interface UndoEntry {
 export type RenameResult = { ok: true; name: string } | { ok: false; error: 'empty' }
 
 /** The warehouse keeps boards under the id the app chose. */
+/** How long after the last change the boards are written: long enough to fold a drag into one write. */
+const SAVE_DELAY_MS = 800
+/** A refused write is tried again after 5 s, then twice as long each time, up to a minute. */
+const SAVE_RETRY_MS = 5_000
+const SAVE_RETRY_MAX_MS = 60_000
+
 const newId = () => crypto.randomUUID()
 
 /** A board the viewer makes: theirs, and open for everyone in the workspace to view until they say otherwise. */
@@ -32,13 +38,51 @@ export function useDashboard(initial: DashboardState, store: BoardStore, measura
   const history = useRef<UndoEntry[]>([])
   const keySeq = useRef(0)
 
-  // Every change lands in the warehouse; a refused write says so rather than pretending it saved.
+  // Every change lands in the warehouse, a moment after the last one: a drag or a run of edits is
+  // one write, not one per step. Leaving the page or the tab writes at once. A refused write says
+  // so rather than pretending it saved.
+  // A refused write is tried again on its own (5 s, 10 s, 20 s… up to a minute) until it lands.
+  const latest = useRef({ state, measurable })
+  /** A change that hasn't been written yet. */
+  const waiting = useRef(false)
+  const retry = useRef<number | undefined>(undefined)
+  const failures = useRef(0)
+  const writeNow = () => {
+    window.clearTimeout(retry.current)
+    if (!waiting.current) return
+    waiting.current = false
+    store.save(latest.current.state, latest.current.measurable).then(
+      () => { failures.current = 0 },
+      (error: unknown) => {
+        console.error('[dashboard] saving boards failed', error)
+        waiting.current = true
+        failures.current += 1
+        toast.error('Couldn’t save your boards. Trying again…', { id: 'dashboard-save' })
+        retry.current = window.setTimeout(writeNow, Math.min(SAVE_RETRY_MAX_MS, SAVE_RETRY_MS * 2 ** (failures.current - 1)))
+      },
+    )
+  }
   useEffect(() => {
-    store.save(state, measurable).catch((error: unknown) => {
-      console.error('[dashboard] saving boards failed', error)
-      toast.error('Couldn’t save your boards. Your last change may be lost on reload.', { id: 'dashboard-save' })
-    })
+    latest.current = { state, measurable }
+    waiting.current = true
+    const timer = window.setTimeout(writeNow, SAVE_DELAY_MS)
+    const onHide = () => { if (document.visibilityState === 'hidden') writeNow() }
+    window.addEventListener('pagehide', writeNow)
+    document.addEventListener('visibilitychange', onHide)
+    return () => {
+      window.removeEventListener('pagehide', writeNow)
+      document.removeEventListener('visibilitychange', onHide)
+      window.clearTimeout(timer)
+    }
+    // writeNow reads only refs and the store, so an older copy of it is as good as the latest.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, store, measurable])
+  // Leaving the dashboard writes a change still waiting, once, and nothing when everything is saved
+  // (so signing out, which leaves the board, doesn't send writes without a session).
+  useEffect(() => () => {
+    window.clearTimeout(retry.current)
+    if (waiting.current) store.save(latest.current.state, latest.current.measurable).catch(() => {})
+  }, [store])
 
   // Boards past 30 days in Recently deleted are gone for good (TAB-43).
   useEffect(() => { dispatch({ type: 'purge-expired', now: Date.now() }) }, [])
