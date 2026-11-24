@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { formatMetricValue } from '../format'
 import { changeLabel, dayMonth, formatExact, weekdayDayMonth } from '../series'
 import type { Metric, Series } from '../types'
+import { ChartGhost } from '../CardEmpty'
 import { Readout, useSize, type ReadoutContent } from './Readout'
 
 // A card's line (05-cards-reading-rules.md):
@@ -36,9 +37,8 @@ export function LineChart({ metric, series, variant, target, className }: LineCh
   return (
     <div ref={ref} className={cn('relative', className)} data-chart={variant} onPointerLeave={() => setHover(null)}>
       {series.daysWithData < 2 ? (
-        <p className="m-0 flex h-full items-center text-[13px] leading-5 text-[var(--dashboard-muted)]">
-          Not enough days with data to show a trend
-        </p>
+        // Too little history for a line: a faint stand-in, saying how much there is so far.
+        <ChartGhost bars={false} className="h-full" caption={series.daysWithData === 0 ? 'No days with data yet' : '1 day of data so far'} note={full ? 'The chart fills in as more data syncs.' : undefined} />
       ) : width > 0 ? (
         <Plot metric={metric} series={series} full={full} target={target} width={width} height={height} hover={hover} onHover={setHover} />
       ) : null}

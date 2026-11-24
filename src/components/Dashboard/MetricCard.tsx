@@ -12,6 +12,7 @@ import { SourceMark } from './icons'
 import { useDashboardData } from './live/dashboard-data'
 import { compareName } from './period'
 import type { App, CardSize, Metric } from './types'
+import { CardEmptyState, ChartGhost, emptyAction, emptyDetail, type EmptyKind } from './CardEmpty'
 
 // One metric card (Figma 17:889, 05-cards-reading-rules.md). What it shows follows its size (CR-1):
 //   sm       3×1  288×156  the number and its change
@@ -90,6 +91,8 @@ export function MetricCard({ metric, size, view, dragging = false, editing = fal
   const marks = metric.apps.slice(0, 2).map((id) => apps.get(id)).filter((a): a is App => !!a)
   const body = view?.body ?? 'numbers'
   const openable = !!onOpen && !editing && opens(body)
+  // The legend only names a chart that is actually drawn (not the stand-in for too little history).
+  const drawn = body === 'numbers' && metric.amount !== null && (bars ? metric.weekly.filter((w) => w.value != null).length >= 2 : metric.series.daysWithData >= 2)
   const tall = TALL.includes(size)
   const wide = WIDE.includes(size)
   const change = metric.change ? `${metric.change.direction === 'up' ? 'up' : 'down'} ${metric.change.label}` : 'no comparison'
@@ -126,8 +129,8 @@ export function MetricCard({ metric, size, view, dragging = false, editing = fal
       {/* Top right: the legend (wide charts), then the app logo(s). In edit mode the remove badge and
           the resize arc sit on the card's corners, drawn by BoardGrid (Figma 2.5). */}
       <div className="absolute right-4 top-4 flex h-5 items-center gap-3">
-        {body === 'numbers' && size === 'lg' && bars && <Legend items={[['soft', 'Week in progress']]} />}
-        {body === 'numbers' && size === 'full-lg' && (bars ? <Legend items={[['soft', 'Week in progress']]} /> : <Legend items={[['ink', 'This period'], ['previous', compareName(metric.series.compare)]]} />)}
+        {drawn && size === 'lg' && bars && <Legend items={[['soft', 'Week in progress']]} />}
+        {drawn && size === 'full-lg' && (bars ? <Legend items={[['soft', 'Week in progress']]} /> : <Legend items={[['ink', 'This period'], ['previous', compareName(metric.series.compare)]]} />)}
         {!metric.unmeasured && marks.length > 0 && (
           <span className="flex items-center gap-1.5">
             {marks.map((app) => <SourceMark key={app.id} app={app} className="block size-3.5" />)}
@@ -137,6 +140,7 @@ export function MetricCard({ metric, size, view, dragging = false, editing = fal
 
       <Body
         metric={metric} bars={bars} size={size} view={view} body={body} tall={tall} wide={wide} index={index}
+        appNames={metric.apps.map((id) => apps.get(id)?.name).filter((n): n is string => !!n)}
         onRetry={onRetry} onRemove={onRemove}
       />
 
@@ -153,11 +157,13 @@ interface BodyProps {
   tall: boolean
   wide: boolean
   index: number
+  /** The apps the metric reads, by name, for the empty state ("Shopify is doing a first sync"). */
+  appNames: string[]
   onRetry?: () => void
   onRemove?: () => void
 }
 
-function Body({ metric, bars, size, view, body, tall, wide, index, onRetry, onRemove }: BodyProps) {
+function Body({ metric, bars, size, view, body, tall, wide, index, appNames, onRetry, onRemove }: BodyProps) {
   const reduceMotion = useReducedMotion()
   const chartBox = chartBoxFor(size, bars)
   const figureAt = tall ? 'top-11' : view?.health && body === 'numbers' && !tall ? 'bottom-[46px]' : 'bottom-4'
@@ -172,8 +178,25 @@ function Body({ metric, bars, size, view, body, tall, wide, index, onRetry, onRe
     )
   }
 
+  // No number to show: one empty state, with a faint chart where the chart goes (see CardEmpty).
+  const empty = (kind: EmptyKind) => (
+    <>
+      {chartBox && <ChartGhost bars={bars} className={chartBox} />}
+      <CardEmptyState
+        kind={kind}
+        compact={size === 'sm'}
+        detail={emptyDetail(kind, { apps: appNames, reason: metric.unmeasured })}
+        action={emptyAction(kind, { canEdit: !!view?.canEdit, onRetry, onRemove })}
+        className={cn('absolute left-4 right-4', tall ? 'top-12' : 'bottom-4')}
+      />
+    </>
+  )
   if (body !== 'numbers' && body !== 'today-empty') {
-    return <EmptyBody body={body} reason={metric.unmeasured} canEdit={!!view?.canEdit} onRetry={onRetry} onRemove={onRemove} tall={tall} />
+    const kind: EmptyKind = body === 'no-data-yet' ? 'first-sync'
+      : body === 'couldnt-load' ? 'couldnt-load'
+      : body === 'removed' ? 'removed'
+      : !metric.custom && metric.apps.length === 0 ? 'needs-app' : 'no-data'
+    return empty(kind)
   }
 
   if (body === 'today-empty') {
@@ -188,14 +211,7 @@ function Body({ metric, bars, size, view, body, tall, wide, index, onRetry, onRe
 
   const series = metric.series
   // Measured, but nothing at all in these dates: say so once, instead of a "—" over an empty chart.
-  if (metric.amount === null && series.daysWithData === 0 && !view?.chartLoading) {
-    return (
-      <div className={cn('absolute left-4 flex flex-col items-start gap-0.5', figureAt)}>
-        <p className="m-0 text-[28px] font-medium leading-8 text-[var(--dashboard-muted)]">—</p>
-        <p className="m-0 text-[12px] leading-4 text-[var(--dashboard-muted)]">No data for these dates</p>
-      </div>
-    )
-  }
+  if (metric.amount === null && series.daysWithData === 0 && !view?.chartLoading) return empty('no-dates')
   return (
     <m.div
       initial={reduceMotion ? false : { opacity: 0 }}
@@ -233,40 +249,6 @@ function chartBoxFor(size: CardSize, bars: boolean): string | null {
     case 'full': return 'absolute bottom-4 left-[320px] right-4 top-[52px]'
     default: return 'absolute bottom-4 left-4 right-4 top-24'
   }
-}
-
-const EMPTY_TEXT: Record<Exclude<CardBody, 'loading' | 'numbers' | 'today-empty'>, string> = {
-  removed: 'This metric was removed.',
-  'no-data-yet': 'No data yet',
-  'couldnt-load': 'Couldn’t load.',
-  'no-data': 'No data',
-}
-
-/** Empty, failed and locked cards (CR-20 – CR-23): one line where the number goes, and maybe a link. */
-function EmptyBody({ body, reason, canEdit, onRetry, onRemove, tall }: { body: CardBody; reason: string | null; canEdit: boolean; onRetry?: () => void; onRemove?: () => void; tall: boolean }) {
-  const where = cn('absolute left-4 flex flex-col items-start gap-1 text-[13px] leading-[17px] text-[var(--dashboard-figure)]', tall ? 'top-11' : 'bottom-4')
-  const text = EMPTY_TEXT[body as keyof typeof EMPTY_TEXT]
-  // Try again is for everyone; Remove card only for people who can edit (CR-20, CR-22).
-  const action = body === 'couldnt-load' ? { label: 'Try again', run: onRetry } : canEdit ? { label: 'Remove card', run: onRemove } : null
-  return (
-    <div className={where}>
-      {/* No data says why on hover: the warehouse's reason this store can't measure it (CR-22). */}
-      <Tooltip content={reason} disabled={body !== 'no-data' || !reason} side="top" align="start">
-        <p className="m-0">{text}</p>
-      </Tooltip>
-      {action?.run && (
-        // eslint-disable-next-line no-restricted-syntax -- ds-allow: the card's underlined text action (Figma 170:89079)
-        <button
-          type="button"
-          data-no-drag
-          onClick={(e) => { e.stopPropagation(); action.run?.() }}
-          className="cursor-pointer rounded-sm border-0 bg-transparent p-0 text-[13px] leading-[17px] text-[var(--dashboard-figure)] underline underline-offset-2 outline-none hover:text-[var(--dashboard-label)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]"
-        >
-          {action.label}
-        </button>
-      )}
-    </div>
-  )
 }
 
 /** The title, cut with "…" and shown in full on hover when it doesn't fit (CR-9). */

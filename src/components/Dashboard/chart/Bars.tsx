@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { formatMetricValue, niceMax } from '../format'
 import { changeLabel, dayMonth, formatExact, weekInfo } from '../series'
 import type { Metric } from '../types'
+import { ChartGhost } from '../CardEmpty'
 import { Readout, useSize, type ReadoutContent } from './Readout'
 
 // Weekly bars for a sum or count (05-cards-reading-rules.md CR-2, CR-11):
@@ -21,7 +22,11 @@ export function WeeklyBars({ metric, variant, className }: { metric: Metric; var
   const [ref, { width, height }] = useSize<HTMLDivElement>()
   const [hover, setHover] = useState<number | null>(null)
   const full = variant === 'full'
-  const weeks = metric.weekly
+  // Weeks before the first one with data aren't drawn: a store connected two weeks ago shows two
+  // bars, not three empty slots and two bars. Under two weeks with data, there's no chart to draw yet.
+  const withData = metric.weekly.filter((w) => w.value != null).length
+  const offset = Math.max(0, metric.weekly.findIndex((w) => w.value != null))
+  const weeks = metric.weekly.slice(offset)
   const n = weeks.length
   const plotW = full ? width - TICKS_W : width
   const plotH = Math.max(0, full ? height - LABELS_H : height)
@@ -29,8 +34,7 @@ export function WeeklyBars({ metric, variant, className }: { metric: Metric; var
   const values = weeks.map((w) => Math.max(0, w.value ?? 0))
   const top = Math.max(...values, 0)
   const max = full ? (top > 0 ? niceMax(top) : 1) : top * 1.13 || 1
-  // Every week empty: say so rather than draw axes with no bars.
-  const empty = weeks.every((w) => w.value == null)
+  const sparse = withData < 2
   const band = plotW / n
   const barW = full ? 44 : 36
   const cx = (i: number) => (full ? band * i + band / 2 : n === 1 ? plotW / 2 : barW / 2 + (i * (plotW - barW)) / (n - 1))
@@ -44,10 +48,10 @@ export function WeeklyBars({ metric, variant, className }: { metric: Metric; var
   }
   return (
     <div ref={ref} className={cn('relative', className)} data-chart={`bars-${variant}`} onPointerLeave={() => setHover(null)}>
-      {empty && (
-        <p data-chart-empty className="m-0 flex h-full items-center text-[13px] leading-5 text-[var(--dashboard-muted)]">No weeks with data yet</p>
+      {sparse && (
+        <ChartGhost bars className="h-full" caption={withData === 0 ? 'No weeks with data yet' : '1 week of data so far'} note="The chart fills in as more data syncs." />
       )}
-      {!empty && width > 0 && height > 0 && (
+      {!sparse && width > 0 && height > 0 && (
         <svg width={width} height={height} className="block overflow-visible" aria-hidden>
           {full && (top > 0 ? [0, max / 2, max] : [0]).map((t) => (
             <g key={t}>
@@ -75,7 +79,7 @@ export function WeeklyBars({ metric, variant, className }: { metric: Metric; var
         </svg>
       )}
       {hover != null && (
-        <Readout content={weekReadout(metric, hover)} x={cx(hover) + (cx(hover) > width / 2 ? -barW / 2 : barW / 2)} y={y(Math.max(0, weeks[hover].value ?? 0))} width={width} height={height} />
+        <Readout content={weekReadout(metric, hover + offset)} x={cx(hover) + (cx(hover) > width / 2 ? -barW / 2 : barW / 2)} y={y(Math.max(0, weeks[hover].value ?? 0))} width={width} height={height} />
       )}
     </div>
   )

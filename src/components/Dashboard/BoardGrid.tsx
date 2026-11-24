@@ -13,6 +13,7 @@ import { MetricCard, SIZE_LABEL, type CardView, type GripProps } from './MetricC
 import { useDashboardData } from './live/dashboard-data'
 import type { BoardCard, CardSize } from './types'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { CardEmptyState, emptyAction, emptyDetail } from './CardEmpty'
 
 // The card grid (Figma "grid", 1200 wide): four 288px columns, 156px rows, 16px gaps. A medium
 // card spans two columns, a large one two columns and two rows. On the 4-column design grid each
@@ -365,14 +366,16 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
                 style={{ ['--gc' as string]: `${card.x + 1} / span ${dims(card.size).w}`, ['--gr' as string]: `${card.y + 1} / span ${dims(card.size).h}` }}
                 className={cn('relative min-w-0 rounded-xl', SPAN[card.size], '@min-[60rem]:[grid-column:var(--gc)]! @min-[60rem]:[grid-row:var(--gr)]!')}
               >
-                <article data-card-body="removed" aria-label="Removed metric" className="relative flex size-full flex-col justify-end gap-1 overflow-clip rounded-xl bg-[var(--dashboard-card-bg)] p-4 text-[13px] leading-[17px] text-[var(--dashboard-figure)] shadow-[var(--dashboard-card-shadow)]">
-                  <p className="m-0">This metric was removed.</p>
-                  {canEdit && (
-                    // eslint-disable-next-line no-restricted-syntax -- ds-allow: the card's underlined text action (Figma 170:89079), as in MetricCard's EmptyBody
-                    <button type="button" data-no-drag onClick={() => (editing ? onRemove(card.metricId) : onRemoveEmpty?.(card.metricId))} className="cursor-pointer self-start rounded-sm border-0 bg-transparent p-0 text-[13px] leading-[17px] text-[var(--dashboard-figure)] underline underline-offset-2 outline-none hover:text-[var(--dashboard-label)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]">
-                      Remove card
-                    </button>
-                  )}
+                <article data-card-body="removed" aria-label="Removed metric" className="relative size-full overflow-clip rounded-xl bg-[var(--dashboard-card-bg)] shadow-[var(--dashboard-card-shadow)]">
+                  {/* Its name is gone with it; the id it was saved under says which card this was. */}
+                  <h3 className="absolute left-4 right-4 top-4 m-0 truncate text-[13px] font-medium leading-5 text-[var(--dashboard-faint)]">{card.metricId.replace(/#d+$/, '').replace(/_/g, ' ')}</h3>
+                  <CardEmptyState
+                    kind="removed"
+                    compact={card.size === 'sm'}
+                    detail={emptyDetail('removed', { apps: [] })}
+                    action={emptyAction('removed', { canEdit, onRemove: () => (editing ? onRemove(card.metricId) : onRemoveEmpty?.(card.metricId)) })}
+                    className="absolute bottom-4 left-4 right-4"
+                  />
                 </article>
               </li>
             )
