@@ -13,7 +13,7 @@ import { barsBySize, type CardView } from './MetricCard'
 import { useDashboardData } from './live/dashboard-data'
 import { Metrics } from './live/metrics'
 import { BoardSnapshot } from './share/BoardSnapshot'
-import { consumeDownloadFail, fileBase, nodeToPng, numbersCsv, saveFile } from './share/export'
+import { fileBase, nodeToPng, numbersCsv, saveFile } from './share/export'
 import type { BoardCard, Metric } from './types'
 
 // A card's own settings (Figma 19:6354, 19:6807; S-8's look 174:56384; 10-cards-reference-rules.md
@@ -94,7 +94,6 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
     setFailed(null)
     window.setTimeout(() => {
       setBusy(null)
-      if (consumeDownloadFail()) { setFailed('numbers'); return }
       const csv = numbersCsv({ title: metric.label, metrics: [metric], period, compare, by: userFullName(user) })
       saveFile(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `${file}.csv`)
     }, 900)
@@ -106,7 +105,7 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
     // The card drawn off screen once its numbers have faded in, then into a PNG (S-9b).
     window.setTimeout(() => {
       const node = shotRef.current
-      const job = !node || consumeDownloadFail() ? Promise.reject(new Error('no image')) : nodeToPng(node)
+      const job = node ? nodeToPng(node) : Promise.reject(new Error('no image'))
       job.then(
         (blob) => { saveFile(blob, `${file}.png`); setBusy(null); setShooting(false) },
         () => { setBusy(null); setShooting(false); setFailed('image') },

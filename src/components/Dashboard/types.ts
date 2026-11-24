@@ -18,7 +18,7 @@ export interface App {
  */
 export type CardSize = 'sm' | 'sm-tall' | 'md' | 'lg' | 'full' | 'full-lg'
 
-export type MetricFormat = 'number' | 'currency' | 'percent'
+export type MetricFormat = 'number' | 'currency' | 'percent' | 'ratio'
 
 export interface MetricChange {
   /** Already formatted, e.g. "6.1%". */

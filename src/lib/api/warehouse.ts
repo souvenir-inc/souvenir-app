@@ -5,6 +5,7 @@ import { WAREHOUSE_ENDPOINT } from '@/lib/config'
 import { apiFetchJson, apiFetchVoid } from './client'
 import {
   attachedConnectionSchema,
+  boardDraftSchema,
   boardSchema,
   boardStatusSchema,
   connectionStateSchema,
@@ -12,22 +13,25 @@ import {
   metricDraftSchema,
   metricEntrySchema,
   scorecardSchema,
+  slackChannelsSchema,
   tableRowsSchema,
   tableSummarySchema,
   warehouseSummarySchema,
   type AttachedConnection,
   type Board,
+  type BoardDraft,
   type BoardRequest,
   type BoardStatus,
   type ConnectionState,
   type CustomMetric,
   type MeasureRequest,
   type Measurement,
-  type MetricChatMessage,
+  type DraftMessage,
   type MetricDraft,
   type MetricEntry,
   type Scorecard,
   type ScorecardRequest,
+  type SlackChannels,
   type TableRows,
   type TableSummary,
   type WarehouseRequest,
@@ -50,12 +54,15 @@ export class Warehouse {
   readonly name: string
   readonly timezone: string
   readonly connections: AttachedConnection[]
+  /** The board members open on until they arrange their own. */
+  readonly defaultBoard: string | null
 
   constructor(wire: WarehouseSummaryWire) {
     this.id = wire.id
     this.name = wire.name
     this.timezone = wire.timezone
     this.connections = wire.connections
+    this.defaultBoard = wire.defaultBoard
   }
 
   static async list(signal?: AbortSignal): Promise<Warehouse[]> {
@@ -74,6 +81,11 @@ export class Warehouse {
   /** Every organization connection with a lake, for any warehouse to read. */
   static async connectable(signal?: AbortSignal): Promise<AttachedConnection[]> {
     return call(z.array(attachedConnectionSchema), `${WAREHOUSE_ENDPOINT}/connections`, { signal })
+  }
+
+  /** Where a board can be posted: the channels Souvenir is in, when the organization has Slack. */
+  static async slackChannels(signal?: AbortSignal): Promise<SlackChannels> {
+    return call(slackChannelsSchema, `${WAREHOUSE_ENDPOINT}/slack/channels`, { signal })
   }
 
   get url(): string {
@@ -101,7 +113,7 @@ export class Warehouse {
   }
 
   /** One turn of the metric conversation; nothing is kept until the proposed metric is put. */
-  async draftMetric(messages: MetricChatMessage[], signal?: AbortSignal): Promise<MetricDraft> {
+  async draftMetric(messages: DraftMessage[], signal?: AbortSignal): Promise<MetricDraft> {
     return call(metricDraftSchema, `${this.url}/metrics/draft`, json('POST', { messages }, signal))
   }
 
@@ -135,6 +147,25 @@ export class Warehouse {
 
   async deleteBoard(id: string): Promise<void> {
     await apiFetchVoid(`${this.url}/boards/${id}`, { method: 'DELETE' })
+  }
+
+  /** Admins only: the board members open on, one everyone in the organization can see; null clears it. */
+  async setDefaultBoard(board: string | null): Promise<Warehouse> {
+    return new Warehouse(await call(warehouseSummarySchema, `${this.url}/default-board`, json('PUT', { board })))
+  }
+
+  /** One turn of the conversation about a new board; nothing is kept until the board is put. */
+  async draftBoard(messages: DraftMessage[], signal?: AbortSignal): Promise<BoardDraft> {
+    return call(boardDraftSchema, `${this.url}/boards/draft`, json('POST', { messages }, signal))
+  }
+
+  /** The board's picture into a Slack channel, with a line of text above it. */
+  async postToSlack(id: string, image: Blob, filename: string, channelId: string, text: string): Promise<void> {
+    const body = new FormData()
+    body.append('image', image, filename)
+    body.append('channelId', channelId)
+    body.append('text', text)
+    await apiFetchVoid(`${this.url}/boards/${id}/slack`, { method: 'POST', body })
   }
 
   async boardStatus(id: string, signal?: AbortSignal): Promise<BoardStatus> {

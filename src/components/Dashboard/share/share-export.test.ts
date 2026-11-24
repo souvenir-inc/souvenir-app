@@ -1,50 +1,66 @@
 import { describe, expect, it } from 'vitest'
 import { metrics, TODAY } from '../live/live-fixtures'
 import { fileBase, numbersCsv, stamp } from './export'
-import { ME, boardLink, cantSeeOn, datesLabel, linkCaption, loseCount, matches, outsideEmail, roleFor, sortGrants, type Share } from './share-model'
+import { People, boardLink, datesLabel, linkCaption, roleFor, type Share } from './share-model'
 
-// 09-share-export-rules.md
-const mine: Share = { owner: ME, grants: [], general: { to: 'none' } }
+// 09-share-export-rules.md, with a five-person workspace.
+const people = new People([
+  { id: 'u-owner', name: 'Avery Stone', email: 'avery@example.com' },
+  { id: 'u-gr1', name: 'Grace Kim', email: 'grace@example.com' },
+  { id: 'u-gr2', name: 'Greg Alvarez', email: 'greg@example.com' },
+  { id: 'u-sam', name: 'Sam Lee', email: 'sam@example.com' },
+  { id: 'u-noname', name: '', email: 'ops@example.com' },
+], 'u-owner', 'Example Co')
+const mine: Share = { ownerId: 'u-owner', grants: [], general: 'none' }
 
-describe('adding people (SH-10, SH-13)', () => {
-  it('lists teams first, then people, by any word of the name', () => {
-    expect(matches('gr', mine, []).map((m) => m.member.name)).toEqual(['Growth team', 'Grace Kim', 'Greg Alvarez'])
+describe('the workspace’s people', () => {
+  it('names the viewer as you, and someone who left the workspace plainly', () => {
+    expect(people.displayName('u-owner')).toBe('Avery Stone (you)')
+    expect(people.displayName('u-sam')).toBe('Sam Lee')
+    expect(people.name('u-gone')).toBe('A former member')
   })
-  it('matches by email too, and leaves out who is picked', () => {
-    expect(matches('priya@', mine, []).map((m) => m.member.id)).toEqual(['priya'])
-    expect(matches('gr', mine, ['grace']).map((m) => m.member.id)).toEqual(['growth-team', 'greg'])
-  })
-  it('shows the role of someone who already has access', () => {
-    const sh: Share = { ...mine, grants: [{ id: 'greg', role: 'edit' }] }
-    expect(matches('greg', sh, [])[0].has).toBe('edit')
-    expect(matches('dev', sh, [])[0].has).toBe('owner')
-  })
-  it('knows an email from outside the workspace', () => {
-    expect(outsideEmail('anna@northwind.co')).toBe('anna@northwind.co')
-    expect(outsideEmail('sam@lumenco.com')).toBeNull()
-    expect(outsideEmail('Jordan')).toBeNull()
+  it('gives initials and falls back to the email for a member with no name', () => {
+    expect(people.get('u-gr1')?.initials).toBe('GK')
+    expect(people.get('u-noname')).toMatchObject({ name: 'ops@example.com', initials: 'O' })
   })
 })
 
-describe('access (SH-1, SH-12, SH-16, SH-19)', () => {
-  it('names who can’t see a metric on the board, teams opened up', () => {
-    expect(cantSeeOn(['priya'], ['contribution-margin', 'revenue']).map((x) => x.person.name)).toEqual(['Priya Nair'])
-    expect(cantSeeOn(['finance-team'], ['contribution-margin']).map((x) => x.person.id)).toEqual(['priya'])
-    expect(cantSeeOn(['priya'], ['revenue'])).toEqual([])
+describe('adding people (SH-10, SH-13)', () => {
+  it('finds people by the start of any word of the name', () => {
+    expect(people.matches('gr', mine, []).map((m) => m.person.name)).toEqual(['Grace Kim', 'Greg Alvarez'])
+    expect(people.matches('kim', mine, []).map((m) => m.person.name)).toEqual(['Grace Kim'])
   })
-  it('gives the highest of their own, their team’s and the workspace’s role', () => {
-    const sh: Share = { owner: ME, grants: [{ id: 'growth-team', role: 'view' }, { id: 'sam', role: 'edit' }], general: { to: 'none' } }
-    expect(roleFor(sh, 'sam')).toBe('edit')
-    expect(roleFor(sh, 'grace')).toBe('view')
-    expect(roleFor(sh, 'maya')).toBeNull()
-    expect(roleFor({ ...sh, general: { to: 'workspace', role: 'view' } }, 'maya')).toBe('view')
-    expect(roleFor(sh, ME)).toBe('owner')
+  it('matches by email too, and leaves out who is picked', () => {
+    expect(people.matches('sam@', mine, []).map((m) => m.person.id)).toEqual(['u-sam'])
+    expect(people.matches('gr', mine, ['u-gr1']).map((m) => m.person.id)).toEqual(['u-gr2'])
+  })
+  it('shows the role of someone who already has access', () => {
+    const share: Share = { ...mine, grants: [{ userId: 'u-gr1', role: 'edit' }] }
+    expect(people.matches('grace', share, [])[0].has).toBe('edit')
+    expect(people.matches('avery', share, [])[0].has).toBe('owner')
+  })
+  it('knows an email from outside the workspace', () => {
+    expect(people.outsideEmail('new@elsewhere.com')).toBe('new@elsewhere.com')
+    expect(people.outsideEmail('Sam@Example.com')).toBeNull()
+    expect(people.outsideEmail('sam')).toBeNull()
+  })
+})
+
+describe('access (SH-1, SH-16, SH-19)', () => {
+  it('gives the higher of their own and the workspace’s role', () => {
+    const share: Share = { ownerId: 'u-owner', grants: [{ userId: 'u-sam', role: 'edit' }], general: 'view' }
+    expect(roleFor(share, 'u-owner')).toBe('owner')
+    expect(roleFor(share, 'u-sam')).toBe('edit')
+    expect(roleFor(share, 'u-gr1')).toBe('view')
+    expect(roleFor({ ...share, general: 'none' }, 'u-gr1')).toBeNull()
   })
   it('counts who loses access going back to Only people added', () => {
-    expect(loseCount({ owner: ME, grants: [{ id: 'growth-team', role: 'view' }, { id: 'priya', role: 'view' }], general: { to: 'workspace', role: 'view' } })).toBe(8)
+    expect(people.loseCount({ ...mine, general: 'view' })).toBe(4)
+    expect(people.loseCount({ ownerId: 'u-owner', grants: [{ userId: 'u-sam', role: 'view' }], general: 'view' })).toBe(3)
   })
-  it('lists teams first, then people by name', () => {
-    expect(sortGrants([{ id: 'sam', role: 'view' }, { id: 'growth-team', role: 'view' }, { id: 'priya', role: 'view' }]).map((g) => g.id)).toEqual(['growth-team', 'priya', 'sam'])
+  it('lists people by name', () => {
+    const grants = [{ userId: 'u-sam', role: 'view' as const }, { userId: 'u-gr2', role: 'view' as const }, { userId: 'u-gr1', role: 'edit' as const }]
+    expect(people.sortGrants(grants).map((g) => g.userId)).toEqual(['u-gr1', 'u-gr2', 'u-sam'])
   })
 })
 

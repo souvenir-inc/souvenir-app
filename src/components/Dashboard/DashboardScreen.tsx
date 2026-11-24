@@ -4,10 +4,10 @@ import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 're
 import { m } from 'framer-motion'
 import { TriangleAlert } from 'lucide-react'
 import { toast } from 'sonner'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { userFullName, useAuth } from '@/context/auth-context'
 import { useOrg, useOrgMembers } from '@/context/org-context'
-import type { Warehouse } from '@/lib/api/warehouse'
+import { Warehouse } from '@/lib/api/warehouse'
 import { orgScope, queryKeys } from '@/lib/query-keys'
 import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
 import { cn } from '@/lib/utils'
@@ -19,16 +19,15 @@ import { DefaultBoardDialog } from './DefaultBoardDialog'
 import { EmptyBoard } from './EmptyBoard'
 import { BoardSnapshot } from './share/BoardSnapshot'
 import { DownloadDialog } from './share/DownloadDialog'
-import { consumeDownloadFail, fileBase, nodeToPng, numbersCsv, saveFile, seedDownloadFail, stamp } from './share/export'
+import { fileBase, nodeToPng, numbersCsv, saveFile, stamp } from './share/export'
 import { leaveNoAccess, seedLinkFromQuery, setViewDates, useLinkView } from './share/link-view'
 import { NoAccess } from './share/NoAccess'
 import { ShareDialog, type ShareStart } from './share/ShareDialog'
-import { boardLink, periodLabel } from './share/share-model'
-import { copyText, seedShareFromQuery } from './share/share-store'
+import { boardLink, copyText, periodLabel } from './share/share-model'
 import { Spinner } from './sync/Spinner'
 import type { Way } from './NewBoardChooser'
 import { NewBoardLibrary, type LibraryPick } from './NewBoardLibrary'
-import { TEMPLATES, draftFor, hasTopic, measurable, starterState, templateFor, toBoardCards } from './templates'
+import { TEMPLATES, measurable, starterState, templateFor, toBoardCards } from './templates'
 import { landingSize } from './catalog'
 import { BoardGrid } from './BoardGrid'
 import { cardBody, flagged, healthPill, reasonOf } from './card-states'
@@ -60,7 +59,6 @@ import type { AppId, Metric } from './types'
 // sync come from the organization's warehouse (live/).
 
 const BASE_PAD = 16 // space under the cards (pb-4)
-const DRAFT_MS = 2_500 // the stand-in AI's answer (08 NB-21)
 const AVATARS = 6
 
 /** The organization's warehouse, its catalog and the viewer's boards; then the board screen. */
@@ -79,7 +77,8 @@ function Loaded({ warehouse }: { warehouse: Warehouse }) {
   const { members } = useOrgMembers()
   const viewer = user?.auth0Id ?? ''
   const org = orgScope(orgId)
-  const store = useMemo(() => new BoardStore(warehouse, viewer), [warehouse, viewer])
+  // One store for the screen's life (it is keyed by the warehouse): it remembers what it last wrote.
+  const [store] = useState(() => new BoardStore(warehouse, viewer))
   const catalog = useQuery({
     queryKey: queryKeys.warehouse.catalog(org, warehouse.id),
     queryFn: ({ signal }) => warehouse.metrics(signal),
@@ -105,17 +104,19 @@ function Loaded({ warehouse }: { warehouse: Warehouse }) {
     if (boards.data.tabs.length) return boards.data
     // A warehouse with no boards yet gets the starter boards (NB-32).
     const apps = new Apps(warehouse.connections)
-    return starterState(new Metrics({ catalog: catalog.data, scorecards: [], apps, chart: { from: new Date(), to: new Date() }, chartBefore: null, compare: 'none', today: new Date() }), () => crypto.randomUUID())
-  }, [boards.data, catalog.data, warehouse])
+    return starterState(new Metrics({ catalog: catalog.data, scorecards: [], apps, chart: { from: new Date(), to: new Date() }, chartBefore: null, compare: 'none', today: new Date() }), () => crypto.randomUUID(), viewer)
+  }, [boards.data, catalog.data, warehouse, viewer])
   if (catalog.isError || boards.isError) {
     return <Frame><Problem text="Couldn’t load your boards." onRetry={() => { void catalog.refetch(); void boards.refetch() }} /></Frame>
   }
   if (!initial) return <Frame><Skeleton /></Frame>
-  return <Board warehouse={warehouse} initial={initial} store={store} names={names} />
+  return <Board warehouse={warehouse} initial={initial} store={store} names={names} viewer={viewer} />
 }
 
-function Board({ warehouse, initial, store, names }: { warehouse: Warehouse; initial: DashboardState; store: BoardStore; names: Set<string> }) {
-  const api = useDashboard(initial, store, names)
+function Board({ warehouse, initial, store, names, viewer }: { warehouse: Warehouse; initial: DashboardState; store: BoardStore; names: Set<string>; viewer: string }) {
+  const api = useDashboard(initial, store, names, viewer)
+  const queryClient = useQueryClient()
+  const { orgId } = useOrg()
   const { state, openBoard } = api
   const panelId = useId()
   const { user } = useAuth()
@@ -169,11 +170,9 @@ function Board({ warehouse, initial, store, names }: { warehouse: Warehouse; ini
   // /dashboard?board=<id> opens that board (TAB-61); the URL follows the open board.
   useEffect(() => {
     const q = new URLSearchParams(window.location.search)
-    seedShareFromQuery({ slack: q.get('slack'), copy: q.get('copy') })
-    seedDownloadFail(q.get('download'))
     // A link: a board you can't see shows the no-access page; one you can opens on the link's dates,
     // and is added as the last tab when it isn't in your tabs (09 SH-23, SH-24).
-    const id = seedLinkFromQuery({ board: q.get('board'), period: q.get('period'), compare: q.get('compare') })
+    const id = seedLinkFromQuery({ board: q.get('board'), period: q.get('period'), compare: q.get('compare') }, (boardId) => !!state.boards[boardId])
     if (id && state.hidden.includes(id)) api.apply([{ type: 'show', id, index: state.tabs.length, open: true }])
     else if (id) api.open(id)
     // Read once, on arrival.
@@ -258,9 +257,19 @@ function Board({ warehouse, initial, store, names }: { warehouse: Warehouse; ini
   const linkView = useLinkView()
   const [share, setShare] = useState<{ open: boolean; start: ShareStart }>({ open: false, start: 'people' })
   const [downloadOpen, setDownloadOpen] = useState(false)
-  // The workspace's default board for new members (11 DT-8, stand-in: in memory).
+  // The workspace's default board for new members (11 DT-8): the warehouse keeps it.
   const [defaultOpen, setDefaultOpen] = useState(false)
-  const [defaultBoard, setDefaultBoard] = useState(state.tabs[0] ?? '')
+  const saveDefaultBoard = async (id: string) => {
+    setDefaultOpen(false)
+    try {
+      const saved = await warehouse.setDefaultBoard(id)
+      queryClient.setQueryData<Warehouse[]>(queryKeys.warehouse.list(orgScope(orgId)), (list) => list?.map((w) => (w.id === saved.id ? saved : w)))
+      toast(`New members start on ${state.boards[id]?.label ?? 'this board'}`, { duration: 6000 })
+    } catch (error) {
+      console.error('[dashboard] saving the default board failed', error)
+      toast.error('Couldn’t save the default board.', { id: 'dashboard-default' })
+    }
+  }
   // The dates a board is looked at on: a link's, or a viewer's own, else the board's (SH-2, SH-23).
   const datesFor = (id: string) => {
     const d = linkView.dates?.boardId === id ? linkView.dates : state.boards[id]
@@ -288,7 +297,7 @@ function Board({ warehouse, initial, store, names }: { warehouse: Warehouse; ini
     const t = window.setTimeout(() => {
       const node = shotRef.current
       const name = node?.parentElement?.dataset.file ?? 'board'
-      const job = !node || consumeDownloadFail() ? Promise.reject(new Error('no image')) : nodeToPng(node)
+      const job = node ? nodeToPng(node) : Promise.reject(new Error('no image'))
       job.then(
         (blob) => { if (gone) return; saveFile(blob, `${name}.png`); toast.dismiss('dashboard-image'); setShot(0) },
         () => {
@@ -336,31 +345,35 @@ function Board({ warehouse, initial, store, names }: { warehouse: Warehouse; ini
   // One draft at a time (NB-20). Dropped if its board goes (a ⌘Z past it, say). Adjusted while rendering.
   const [draft, setDraft] = useState<Draft | null>(null)
   if (draft && !state.boards[draft.boardId]) setDraft(null)
-  // The stand-in AI answers 2.5 s after each try (NB-21 – NB-23, NB-28, NB-29).
+  // Each try asks the drafter with the conversation so far; a late answer to an old try is dropped
+  // (NB-21 – NB-23, NB-28, NB-29).
   const drafting = draft?.phase === 'drafting' ? draft : null
   useEffect(() => {
     if (!drafting) return
-    const { boardId, request, run } = drafting
-    const t = window.setTimeout(() => {
-      const settle = (patch: Partial<Draft>, board: Parameters<typeof api.apply>[0]) => {
-        api.apply(board)
-        setDraft((d) => (d && d.run === run ? { ...d, ...patch } : d))
-      }
-      if (!live.data) {
-        settle({ phase: 'failed' }, [{ type: 'update-board', id: boardId, patch: { label: 'Draft', cards: [], initialCards: [] } }])
-        return
-      }
-      const res = draftFor(request, live.data.metrics)
-      if (res.status === 'empty') {
-        settle({ phase: 'empty', reason: res.reason }, [{ type: 'update-board', id: boardId, patch: { label: 'Draft', cards: [], initialCards: [] } }])
-        return
-      }
-      const cards = toBoardCards(res.cards)
-      const label = uniqueName(res.name, namesInUse(stateRef.current, boardId))
-      settle({ phase: 'ready', leftOut: res.leftOut }, [{ type: 'update-board', id: boardId, patch: { label, cards, initialCards: cards, period: res.period, compare: res.compare } }])
-    }, DRAFT_MS)
-    return () => window.clearTimeout(t)
-    // One timer per try: the run number changes on every try.
+    const { boardId, messages, run } = drafting
+    const stop = new AbortController()
+    const settle = (patch: Partial<Draft>, board: Parameters<typeof api.apply>[0]) => {
+      if (stop.signal.aborted) return
+      api.apply(board)
+      setDraft((d) => (d && d.run === run ? { ...d, ...patch } : d))
+    }
+    const empty: Parameters<typeof api.apply>[0] = [{ type: 'update-board', id: boardId, patch: { label: 'Draft', cards: [], initialCards: [] } }]
+    warehouse.draftBoard(messages, stop.signal).then(
+      (answer) => {
+        const said = [...messages, { role: 'assistant' as const, content: answer.reply }]
+        if (!answer.board) { settle({ phase: 'empty', reply: answer.reply, messages: said }, empty); return }
+        const cards = toBoardCards(answer.board.cards.map((c) => ({ metricId: c.metric, size: c.size })))
+        const label = uniqueName(answer.board.name, namesInUse(stateRef.current, boardId))
+        settle({ phase: 'ready', reply: answer.reply, messages: said }, [{ type: 'update-board', id: boardId, patch: { label, cards, initialCards: cards, period: answer.board.period, compare: answer.board.compare } }])
+      },
+      (error: unknown) => {
+        if (stop.signal.aborted) return
+        console.error('[dashboard] drafting a board failed', error)
+        settle({ phase: 'failed' }, empty)
+      },
+    )
+    return () => stop.abort()
+    // One request per try: the run number changes on every try.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [drafting?.run])
   // Leaving or reloading drops a draft: the browser asks first (NB-30).
@@ -456,16 +469,12 @@ function Board({ warehouse, initial, store, names }: { warehouse: Warehouse; ini
   const notReady = (what: string) => toast.info(`${what} isn’t ready yet`, { id: 'dashboard-not-ready' })
   const stampText = stamp(openBoard.label, dates.period, dates.compare, me)
   // Numbers: one CSV, then the dialog closes; no toast, the file is the confirmation (SH-36, SH-37).
-  const downloadNumbers = (ids: string[]) => new Promise<void>((resolve, reject) => {
-    window.setTimeout(() => {
-      if (consumeDownloadFail()) { reject(new Error('failed')); return }
-      const title = ids.length === 1 ? metrics.get(ids[0])?.label ?? openBoard.label : openBoard.label
-      const csv = numbersCsv({ title, metrics: ids.map((id) => metrics.get(id)).filter((x): x is Metric => !!x), period: dates.period, compare: dates.compare, by: me })
-      saveFile(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `${fileBase(title, dates.period)}.csv`)
-      setDownloadOpen(false)
-      resolve()
-    }, 900)
-  })
+  const downloadNumbers = async (ids: string[]) => {
+    const title = ids.length === 1 ? metrics.get(ids[0])?.label ?? openBoard.label : openBoard.label
+    const csv = numbersCsv({ title, metrics: ids.map((id) => metrics.get(id)).filter((x): x is Metric => !!x), period: dates.period, compare: dates.compare, by: me })
+    saveFile(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `${fileBase(title, dates.period)}.csv`)
+    setDownloadOpen(false)
+  }
   const noAccess = linkView.noAccess
 
   // The picker's Add: at the end, in the order picked, each at the size that suits it (AC-16 – AC-18).
@@ -581,13 +590,14 @@ function Board({ warehouse, initial, store, names }: { warehouse: Warehouse; ini
       // A new request replaces the draft in its own tab (NB-24).
       const b = state.boards[draft.boardId]
       api.apply([{ type: 'update-board', id: draft.boardId, patch: { label: draft.phase === 'ready' && b ? b.label : 'Drafting…' } }, { type: 'open', id: draft.boardId }])
-      setDraft({ ...draft, request, phase: 'drafting', leftOut: [], reason: undefined, run: draft.run + 1 })
+      setDraft({ ...draft, phase: 'drafting', reply: undefined, messages: [...draft.messages, { role: 'user', content: request }], run: draft.run + 1 })
       return
     }
     const r = api.addBoard({ label: 'Drafting…', cards: [], period: '7d', compare: 'previous', draft: true }, false)
-    setDraft({ boardId: r.id, request, phase: 'drafting', openBefore: state.openId, leftOut: [], run: 1 })
+    setDraft({ boardId: r.id, request, phase: 'drafting', openBefore: state.openId, messages: [{ role: 'user', content: request }], run: 1 })
   }
-  const redraft = (change: string) => { if (draft) sendDraft(hasTopic(change) ? change : `${draft.request}, ${change}`) }
+  // A change is the next turn of the same conversation: the drafter has what came before (NB-24).
+  const redraft = (change: string) => { if (draft) sendDraft(change) }
   // Discard, and Stop while drafting (NB-27): no confirm, not in Recently deleted, Undo brings it back.
   const discardDraft = () => {
     if (!draft) return
@@ -691,7 +701,7 @@ function Board({ warehouse, initial, store, names }: { warehouse: Warehouse; ini
               {here && !noAccess && <div className="mb-4"><DraftLine draft={here} /></div>}
               <div className="empty:hidden mb-4"><SyncBanners boardId={openBoard.id} apps={boardApps} /></div>
               {noAccess ? (
-                <NoAccess label={noAccess.label} owner={noAccess.owner} onBack={() => { leaveNoAccess(); api.open(state.tabs[0]) }} />
+                <NoAccess onBack={() => { leaveNoAccess(); api.open(state.tabs[0]) }} />
               ) : here?.phase === 'drafting' && openBoard.cards.length === 0 ? (
                 // Plain card skeletons: a draft being made (NB-21).
                 <Skeleton />
@@ -826,26 +836,22 @@ function Board({ warehouse, initial, store, names }: { warehouse: Warehouse; ini
         board={openBoard}
         period={dates.period}
         compare={dates.compare}
-        isAdmin={isAdmin}
         cardView={(id) => cardView(id, true)}
         stamp={stampText}
+        onChange={(access) => api.apply([{ type: 'update-board', id: openBoard.id, patch: access }])}
         onClose={() => setShare((s) => ({ ...s, open: false }))}
         onPosted={(channel) => {
           setShare((s) => ({ ...s, open: false }))
-          toast(`Posted to #${channel}`, { duration: 6000, action: { label: 'Open in Slack', onClick: () => notReady('Open in Slack') } })
+          toast(`Posted to #${channel}`, { duration: 6000 })
         }}
-        onNotReady={notReady}
       />
       <DefaultBoardDialog
         open={defaultOpen}
-        boards={[...tabs, ...hidden].filter((b) => !b.draft)}
-        current={defaultBoard}
+        // New members have to be able to see it: boards open to the workspace only (DT-8).
+        boards={[...tabs, ...hidden].filter((b) => !b.draft && b.general !== 'none')}
+        current={warehouse.defaultBoard ?? ''}
         onClose={() => setDefaultOpen(false)}
-        onSave={(id) => {
-          setDefaultOpen(false)
-          setDefaultBoard(id)
-          toast(`New members start on ${state.boards[id]?.label ?? 'this board'}`, { duration: 6000 })
-        }}
+        onSave={(id) => { void saveDefaultBoard(id) }}
       />
       <DownloadDialog
         open={downloadOpen}

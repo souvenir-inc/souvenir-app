@@ -3,7 +3,7 @@ import { addDays, isoDate, rangeDays, type Window } from '../period'
 import type { AppId, Day, Health, Metric, MetricChange, MetricFormat, Series, Week } from '../types'
 import type { Apps } from './apps'
 
-const FORMAT: Record<Unit, MetricFormat> = { money: 'currency', count: 'number', ratio: 'percent' }
+const FORMAT: Record<Unit, MetricFormat> = { money: 'currency', count: 'number', percent: 'percent', ratio: 'ratio' }
 const WEEKS = 5
 
 /** What the warehouse measured for the board's dates; anything not yet back is undefined. */
@@ -35,7 +35,7 @@ const compact = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFra
 const cents = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const whole = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
 
-/** The card's figure: "$48.2k", "$86.40", "558", "24.8k", "4.32%". */
+/** The card's figure: "$48.2k", "$86.40", "558", "24.8k", "4.32%", "3.09". */
 export function figure(amount: number | null, format: MetricFormat): string {
   if (amount === null) return '—'
   const big = Math.abs(amount) >= 1000
@@ -43,6 +43,7 @@ export function figure(amount: number | null, format: MetricFormat): string {
   switch (format) {
     case 'currency': return `$${big ? short : cents.format(amount)}`
     case 'percent': return `${Math.abs(amount) < 10 ? cents.format(amount) : amount.toFixed(1)}%`
+    case 'ratio': return big ? short : cents.format(amount)
     default: return big ? short : whole.format(amount)
   }
 }
@@ -69,7 +70,7 @@ export class Metrics {
   }
 
   private read(entry: MetricEntry, r: Readings): Metric {
-    const scale = entry.unit === 'ratio' ? 100 : 1
+    const scale = entry.unit === 'percent' ? 100 : 1
     const format = FORMAT[entry.unit]
     const scaled = (v: number | null | undefined) => (v === undefined || v === null ? null : v * scale)
     const value = (m: Measurement | undefined, start: string) => scaled(m?.periods.find((p) => p.start === start)?.values[entry.name])

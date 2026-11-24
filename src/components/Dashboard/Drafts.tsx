@@ -5,6 +5,7 @@ import { ArrowUp, Sparkles, X } from 'lucide-react'
 import { Button, IconButton } from '@/components/ui'
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
+import type { DraftMessage } from '@/lib/api/warehouse'
 import { SourceLogo } from './icons'
 import { Spinner } from './sync/Spinner'
 import { useDashboardData } from './live/dashboard-data'
@@ -21,12 +22,15 @@ const DIAL = 'bg-gradient-to-b from-[var(--dashboard-tab-active-from)] to-[var(-
 export type DraftPhase = 'drafting' | 'ready' | 'failed' | 'empty'
 export interface Draft {
   boardId: string
+  /** What was asked first; later turns change it. */
   request: string
   phase: DraftPhase
   /** The board open before it, for Discard and Stop (NB-27). */
   openBefore: string
-  leftOut: string[]
-  reason?: string
+  /** The conversation so far: each request, and what came back. */
+  messages: DraftMessage[]
+  /** What the drafter said last: what the board shows and what it left out, or why there is none. */
+  reply?: string
   /** Bumped on every try, so a late answer to an old try is dropped. */
   run: number
 }
@@ -125,7 +129,7 @@ export function DraftLine({ draft }: { draft: Draft }) {
       <Sparkles aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="text-[var(--dashboard-figure)]" />
       <span className="font-medium text-[var(--dashboard-figure)]">Draft, not saved</span>
       <span>· From {quote}</span>
-      {draft.phase === 'ready' && draft.leftOut.length > 0 && <span data-left-out>· Left out: {draft.leftOut.join('; ')}</span>}
+      {draft.phase === 'ready' && draft.reply && <span data-draft-reply>· {draft.reply}</span>}
     </p>
   )
 }
@@ -137,9 +141,9 @@ export function DraftProblem({ draft, onTryAgain, onChange, onConnect }: { draft
   return (
     <div data-draft-problem={draft.phase} className="flex min-h-[240px] flex-col items-center justify-center gap-1 rounded-xl text-center">
       <p className="m-0 text-[14px] font-medium leading-5 text-[var(--dashboard-figure)]">
-        {failed ? 'The draft didn’t come through' : 'Nothing in this request can be measured for this store yet'}
+        {failed ? 'The draft didn’t come through' : 'No board yet'}
       </p>
-      <p className="m-0 max-w-[440px] text-[13px] leading-5 text-[var(--dashboard-label)]">{failed ? 'Try again in a moment. Nothing was saved.' : draft.reason}</p>
+      <p className="m-0 max-w-[440px] text-[13px] leading-5 text-[var(--dashboard-label)]">{failed ? 'Try again in a moment. Nothing was saved.' : draft.reply}</p>
       <div className="mt-3 flex gap-2">
         {failed ? <Button size="sm" onClick={onTryAgain}>Try again</Button> : <Button size="sm" onClick={onChange}>Change request</Button>}
         {failed ? <Button size="sm" variant="outline" onClick={onChange}>Change request</Button> : <Button size="sm" variant="outline" onClick={onConnect}>Connect an app</Button>}

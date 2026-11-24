@@ -4,6 +4,7 @@
 // The state is the contract a backend will need: every board you can see, your tab order, the
 // boards you've hidden, the boards you deleted (kept 30 days) and the open board.
 
+import type { General, Grant } from '@/lib/api/warehouse'
 import { dims, firstFit, fitAtEnd, flowCards, pack, resize, toItems, withItems } from '../grid-layout'
 import type { BoardCard, CardSize } from '../types'
 
@@ -28,8 +29,12 @@ export interface Board {
   access: Access
   /** Set when someone else owns the board and shared it with you (TAB-50). */
   sharedBy?: Person
-  /** Every member of the workspace sees it; otherwise only its owner. */
-  shared: boolean
+  /** The member who made it. */
+  ownerId: string
+  /** What everyone in the workspace may do with it; none leaves it to its owner and the people added. */
+  general: General
+  /** People added one by one. */
+  grants: Grant[]
   /** An Ask the AI draft, not saved yet: a sparkle on its tab (08 NB-21). */
   draft?: boolean
 }

@@ -24,7 +24,10 @@ export type RenameResult = { ok: true; name: string } | { ok: false; error: 'emp
 /** The warehouse keeps boards under the id the app chose. */
 const newId = () => crypto.randomUUID()
 
-export function useDashboard(initial: DashboardState, store: BoardStore, measurable: Set<string>) {
+/** A board the viewer makes: theirs, and open for everyone in the workspace to view until they say otherwise. */
+const mine = (viewer: string) => ({ access: 'owner' as const, ownerId: viewer, general: 'view' as const, grants: [], sharedBy: undefined })
+
+export function useDashboard(initial: DashboardState, store: BoardStore, measurable: Set<string>, viewer: string) {
   const [state, dispatch] = useReducer(boardReducer, initial)
   const history = useRef<UndoEntry[]>([])
   const keySeq = useRef(0)
@@ -113,7 +116,7 @@ export function useDashboard(initial: DashboardState, store: BoardStore, measura
   const createBoard = (): string => {
     const id = newId()
     const label = uniqueName('Untitled board', namesInUse(state))
-    const b: Board = { id, label, cards: [], initialCards: [], period: '7d', compare: 'previous', access: 'owner', shared: false }
+    const b: Board = { id, label, cards: [], initialCards: [], period: '7d', compare: 'previous', ...mine(viewer) }
     const prevOpen = state.openId
     dispatch({ type: 'add-board', board: b, index: state.tabs.length, open: true })
     record([{ type: 'remove-board', id }, { type: 'open', id: prevOpen }])
@@ -129,7 +132,7 @@ export function useDashboard(initial: DashboardState, store: BoardStore, measura
     const base = cleanName(name ?? src.label) || src.label
     const label = uniqueName(`${base.slice(0, MAX_NAME - ' copy'.length).trimEnd()} copy`, namesInUse(state))
     // The copy is yours to edit and isn't shared (TAB-37).
-    const copy: Board = { ...src, id: copyId, label, access: 'owner', sharedBy: undefined, shared: false, initialCards: src.cards }
+    const copy: Board = { ...src, id: copyId, label, ...mine(viewer), initialCards: src.cards }
     const at = state.tabs.indexOf(id)
     const prevOpen = state.openId
     dispatch({ type: 'add-board', board: copy, index: at < 0 ? state.tabs.length : at + 1, open: true })
@@ -264,7 +267,7 @@ export function useDashboard(initial: DashboardState, store: BoardStore, measura
   ) => {
     const id = newId()
     const label = uniqueName(fields.label, namesInUse(state))
-    const b: Board = { id, label, cards: fields.cards, initialCards: fields.cards, period: fields.period, compare: fields.compare, access: 'owner', shared: false, draft: fields.draft }
+    const b: Board = { id, label, cards: fields.cards, initialCards: fields.cards, period: fields.period, compare: fields.compare, ...mine(viewer), draft: fields.draft }
     const add: BoardAction = { type: 'add-board', board: b, index: state.tabs.length, open: true }
     if (!undoable) { dispatch(add); return { id, label, undo: () => {} } }
     const undoIt = change([add], [{ type: 'remove-board', id }, { type: 'open', id: state.openId }])

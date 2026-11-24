@@ -10,11 +10,12 @@ const layout = (over: Partial<Layout> = {}): Layout => ({
   position: 0, hidden: false, deletedAt: null, ...over,
 })
 
-const saved = (id: string, name: string, createdBy: string, l: Layout, shared = false): SavedBoard =>
-  ({ id, name, layout: l, metrics: ['revenue'], shared, createdBy, updatedAt: '2025-11-14T09:00:00Z' })
+const saved = (id: string, name: string, createdBy: string, l: Layout, role: SavedBoard['role'] = createdBy === VIEWER ? 'owner' : 'view'): SavedBoard =>
+  ({ id, name, layout: l, metrics: ['revenue'], general: 'view', grants: [], createdBy, updatedAt: '2025-11-14T09:00:00Z', role })
 
-function warehouseWith(boards: SavedBoard[]) {
+function warehouseWith(boards: SavedBoard[], defaultBoard: string | null = null) {
   return {
+    defaultBoard,
     boards: vi.fn(async () => boards),
     putBoard: vi.fn(async (id: string) => boards.find((b) => b.id === id)!),
     deleteBoard: vi.fn(async () => {}),
@@ -31,7 +32,7 @@ describe('BoardStore', () => {
       saved('a', 'First', VIEWER, layout({ position: 0 })),
       saved('h', 'Hidden', VIEWER, layout({ position: 2, hidden: true })),
       saved('d', 'Deleted', VIEWER, layout({ position: 3, deletedAt: 1000 })),
-      saved('s', 'Shared', OTHER, layout(), true),
+      saved('s', 'Shared', OTHER, layout({ position: 4, hidden: true })),
     ])
     store = new BoardStore(api as unknown as Warehouse, VIEWER)
   })
@@ -44,7 +45,7 @@ describe('BoardStore', () => {
     expect(state.deleted).toEqual([{ id: 'd', deletedAt: 1000 }])
     expect(state.openId).toBe('a')
     expect(state.boards.a.access).toBe('owner')
-    expect(state.boards.s).toMatchObject({ access: 'view', shared: true, sharedBy: { name: 'Another member' } })
+    expect(state.boards.s).toMatchObject({ access: 'view', ownerId: OTHER, general: 'view', sharedBy: { name: 'Another member' } })
   })
 
   it('writes nothing back when nothing changed', async () => {
@@ -82,6 +83,45 @@ describe('BoardStore', () => {
     await expect(store.save(next, new Set(['revenue']))).rejects.toThrow('403')
     await store.save(next, new Set(['revenue']))
     expect(api.putBoard).toHaveBeenCalledTimes(2)
+  })
+
+  it('someone who can edit saves the cards and leaves the board where its owner keeps it', async () => {
+    api = warehouseWith([saved('e', 'Team board', OTHER, layout({ position: 7, hidden: true }), 'edit')])
+    store = new BoardStore(api as unknown as Warehouse, VIEWER)
+    const state = await store.load(new Map())
+    expect(state.tabs).toEqual(['e'])
+    await store.save(state, new Set(['revenue']))
+    expect(api.putBoard).not.toHaveBeenCalled()
+    const cards = [{ metricId: 'revenue', size: 'full' as const, x: 0, y: 0 }]
+    await store.save({ ...state, boards: { e: { ...state.boards.e, cards } } }, new Set(['revenue']))
+    const sent = api.putBoard.mock.calls[0][1] as unknown as { layout: Layout }
+    expect(sent.layout).toMatchObject({ cards, position: 7, hidden: true, deletedAt: null })
+    // Leaving it takes it off their tabs; the board stays its owner's.
+    await store.save({ ...state, boards: {}, tabs: [] }, new Set(['revenue']))
+    expect(api.deleteBoard).not.toHaveBeenCalled()
+  })
+
+  it('a member with no boards of their own opens on the workspace’s default board', async () => {
+    api = warehouseWith([saved('x', 'Ads', OTHER, layout()), saved('y', 'Store overview', OTHER, layout())], 'y')
+    const fresh = await new BoardStore(api as unknown as Warehouse, VIEWER).load(new Map())
+    expect(fresh.tabs).toEqual(['y', 'x'])
+    expect(fresh.openId).toBe('y')
+    api = warehouseWith([saved('mine', 'Mine', VIEWER, layout()), saved('y', 'Store overview', OTHER, layout())], 'y')
+    expect((await new BoardStore(api as unknown as Warehouse, VIEWER).load(new Map())).openId).toBe('mine')
+  })
+
+  it('a board its owner deleted is gone for everyone else at once', async () => {
+    api = warehouseWith([saved('gone', 'Old', OTHER, layout({ deletedAt: 1000 })), saved('y', 'Store overview', OTHER, layout())])
+    const state = await new BoardStore(api as unknown as Warehouse, VIEWER).load(new Map())
+    expect(state.tabs).toEqual(['y'])
+    expect(state.boards.gone).toBeUndefined()
+  })
+
+  it('who sees a board is saved with it', async () => {
+    const state = await store.load(new Map())
+    const grants = [{ userId: OTHER, role: 'edit' as const }]
+    await store.save({ ...state, boards: { ...state.boards, a: { ...state.boards.a, general: 'none', grants } } }, new Set(['revenue']))
+    expect(api.putBoard.mock.calls[0][1]).toMatchObject({ general: 'none', grants })
   })
 
   it('refuses a layout it doesn’t recognise instead of drawing a broken board', async () => {

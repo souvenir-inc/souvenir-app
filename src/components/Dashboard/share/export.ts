@@ -90,8 +90,3 @@ export async function nodeToPng(node: HTMLElement): Promise<Blob> {
   }
   return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('no image'))), 'image/png'))
 }
-
-// `?download=fail` fails the next try (image or numbers), once (SH-35, SH-36).
-let failNext = false
-export const seedDownloadFail = (v: string | null) => { failNext = v === 'fail' }
-export const consumeDownloadFail = () => { const f = failNext; failNext = false; return f }

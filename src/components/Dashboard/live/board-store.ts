@@ -26,13 +26,19 @@ export const layoutSchema = z.object({
 
 export type Layout = z.infer<typeof layoutSchema>
 
+type Place = Pick<Layout, 'position' | 'hidden' | 'deletedAt'>
+
 /**
  * The boards of one warehouse, as the viewer sees them. Loads them into the dashboard's state and
- * writes back what changed: the viewer's own boards only, since only a board's maker changes it.
+ * writes back what changed: the viewer's own boards, and the cards and dates of boards they can
+ * edit. Where a board sits (tab order, hidden, deleted) is its owner's, so an editor sends it back
+ * as it came.
  */
 export class BoardStore {
   /** Board id → the request last written, to send only what changed. */
   private readonly written = new Map<string, string>()
+  /** Where each board someone else owns sits in its owner's tabs. */
+  private readonly places = new Map<string, Place>()
   private queue: Promise<void> = Promise.resolve()
 
   constructor(private readonly warehouse: Warehouse, private readonly viewer: string) {}
@@ -43,12 +49,18 @@ export class BoardStore {
     const read = saved.map((wire) => ({ wire, layout: layoutSchema.parse(wire.layout) }))
     const own = read.filter((b) => b.wire.createdBy === this.viewer).sort((a, b) => a.layout.position - b.layout.position)
     const others = read.filter((b) => b.wire.createdBy !== this.viewer)
-    for (const { wire, layout } of own) this.written.set(wire.id, canonical({ name: wire.name, layout, metrics: wire.metrics, shared: wire.shared }))
-    const boards = Object.fromEntries(read.map(({ wire, layout }) => [wire.id, this.boardOf(wire, layout, people)]))
-    const tabs = [
-      ...own.filter((b) => !b.layout.hidden && b.layout.deletedAt === null).map((b) => b.wire.id),
-      ...others.map((b) => b.wire.id),
-    ]
+    for (const { wire, layout } of read) {
+      if (wire.role !== 'view') this.written.set(wire.id, canonical({ name: wire.name, layout, metrics: wire.metrics, general: wire.general, grants: wire.grants }))
+      if (wire.role !== 'owner') this.places.set(wire.id, { position: layout.position, hidden: layout.hidden, deletedAt: layout.deletedAt })
+    }
+    // Someone else's board its owner has since deleted isn't shown; the rest follow the viewer's own.
+    const shown = read.filter((b) => b.wire.role === 'owner' || b.layout.deletedAt === null)
+    const boards = Object.fromEntries(shown.map(({ wire, layout }) => [wire.id, this.boardOf(wire, layout, people)]))
+    const theirs = others.filter((b) => b.layout.deletedAt === null).map((b) => b.wire.id)
+    const mine = own.filter((b) => !b.layout.hidden && b.layout.deletedAt === null).map((b) => b.wire.id)
+    // Until a member arranges boards of their own, they open on the workspace's default board.
+    const first = mine.length === 0 && this.warehouse.defaultBoard !== null && theirs.includes(this.warehouse.defaultBoard) ? [this.warehouse.defaultBoard] : []
+    const tabs = [...first, ...mine, ...theirs.filter((id) => !first.includes(id))]
     return {
       boards,
       tabs,
@@ -58,22 +70,27 @@ export class BoardStore {
     }
   }
 
-  /** Writes the viewer's boards that changed since the last write and deletes the ones that went; one write at a time. */
+  /** Writes the boards the viewer may change that did change, and deletes their own that went; one write at a time. */
   save(state: DashboardState, measurable: Set<string>): Promise<void> {
     const next = new Map<string, BoardRequest>()
     // Place among the viewer's own boards: tabs, then hidden, then Recently deleted.
     const places = [...state.tabs, ...state.hidden, ...state.deleted.map((d) => d.id)]
       .filter((id) => state.boards[id]?.access === 'owner' && !state.boards[id].draft)
-    places.forEach((id, position) => {
-      const board = state.boards[id]
-      const deleted = state.deleted.find((d) => d.id === id)
-      const layout: Layout = {
-        cards: board.cards, initialCards: board.initialCards, period: board.period, compare: layoutSchema.shape.compare.parse(board.compare),
-        position, hidden: state.hidden.includes(id), deletedAt: deleted?.deletedAt ?? null,
-      }
-      const metrics = [...new Set(board.cards.map((c) => Metrics.base(c.metricId)))].filter((name) => measurable.has(name))
-      next.set(id, { name: board.label, layout, metrics, shared: board.shared })
+    const requestOf = (board: Board, place: Place): BoardRequest => ({
+      name: board.label,
+      layout: { cards: board.cards, initialCards: board.initialCards, period: board.period, compare: layoutSchema.shape.compare.parse(board.compare), ...place } satisfies Layout,
+      metrics: [...new Set(board.cards.map((c) => Metrics.base(c.metricId)))].filter((name) => measurable.has(name)),
+      general: board.general,
+      grants: board.grants,
     })
+    places.forEach((id, position) => {
+      const deleted = state.deleted.find((d) => d.id === id)
+      next.set(id, requestOf(state.boards[id], { position, hidden: state.hidden.includes(id), deletedAt: deleted?.deletedAt ?? null }))
+    })
+    for (const board of Object.values(state.boards)) {
+      const place = this.places.get(board.id)
+      if (board.access === 'edit' && place) next.set(board.id, requestOf(board, place))
+    }
     const job = async () => {
       for (const [id, request] of next) {
         const text = canonical(request)
@@ -83,7 +100,8 @@ export class BoardStore {
       }
       for (const id of [...this.written.keys()]) {
         if (next.has(id)) continue
-        await this.warehouse.deleteBoard(id)
+        // Their own board that went is deleted; one they could edit and left stays its owner's.
+        if (!this.places.has(id)) await this.warehouse.deleteBoard(id)
         this.written.delete(id)
       }
     }
@@ -92,7 +110,6 @@ export class BoardStore {
   }
 
   private boardOf(wire: SavedBoard, layout: Layout, people: Map<string, Person>): Board {
-    const owner = wire.createdBy === this.viewer
     return {
       id: wire.id,
       label: wire.name,
@@ -100,14 +117,17 @@ export class BoardStore {
       initialCards: layout.initialCards,
       period: layout.period,
       compare: layout.compare,
-      access: owner ? 'owner' : 'view',
-      sharedBy: owner ? undefined : people.get(wire.createdBy),
-      shared: wire.shared,
+      access: wire.role,
+      sharedBy: wire.role === 'owner' ? undefined : people.get(wire.createdBy),
+      ownerId: wire.createdBy,
+      general: wire.general,
+      grants: wire.grants,
     }
   }
 }
 
 /** One spelling per request: the layout in the schema's key order, metrics sorted. */
 function canonical(request: BoardRequest): string {
-  return JSON.stringify({ ...request, layout: layoutSchema.parse(request.layout), metrics: [...request.metrics].sort() })
+  const grants = [...request.grants].sort((a, b) => a.userId.localeCompare(b.userId))
+  return JSON.stringify({ name: request.name, layout: layoutSchema.parse(request.layout), metrics: [...request.metrics].sort(), general: request.general, grants })
 }

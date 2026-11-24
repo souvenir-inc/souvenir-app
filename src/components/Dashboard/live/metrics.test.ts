@@ -12,10 +12,13 @@ describe('Metrics from the warehouse', () => {
     expect(m.get('aov')?.value).toBe('$86.38')
   })
 
-  it('shows a ratio unit as a percentage', () => {
+  it('shows a percent as a percentage and a ratio as the plain multiple', () => {
     expect(m.get('refund_rate')?.format).toBe('percent')
     expect(m.get('refund_rate')?.amount).toBeCloseTo(4.32)
     expect(m.get('refund_rate')?.value).toBe('4.32%')
+    expect(m.get('mer')?.format).toBe('ratio')
+    expect(m.get('mer')?.value).toBe('3.09')
+    expect(m.get('platform_roas')?.value).toBe('2.60')
   })
 
   it('a card id with a copy number reads its metric', () => {

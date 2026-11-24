@@ -1,6 +1,6 @@
 // New board (docs-v2/dashboard/08-new-board-rules.md): the templates, what a template leaves out in
-// this store, the first visit's starter boards, and the stand-in "AI" drafter. Pure: the screen
-// passes in the warehouse's metrics.
+// this store, and the first visit's starter boards. Pure: the screen passes in the warehouse's
+// metrics. Ask the AI drafts on the server (Warehouse.draftBoard).
 
 import { flowCards } from './grid-layout'
 import type { Metrics } from './live/metrics'
@@ -97,7 +97,7 @@ const FALLBACKS = ['gross_sales', 'cancellation_rate', 'refunds', 'discounts', '
  * The starter boards for a warehouse with none (NB-32, NB-33): Store overview always, and each other
  * board whose lead metric this store can measure. A card it can't measure gives way to a store one.
  */
-export function starterState(metrics: Metrics, newId: () => string): DashboardState {
+export function starterState(metrics: Metrics, newId: () => string, owner: string): DashboardState {
   const boards: Record<string, Board> = {}
   const tabs: string[] = []
   for (const [i, starter] of STARTERS.entries()) {
@@ -109,49 +109,11 @@ export function starterState(metrics: Metrics, newId: () => string): DashboardSt
       .filter((c): c is TemplateCard => c.metricId !== undefined)
     const laid = flowCards(cards)
     const id = newId()
-    boards[id] = { id, label: starter.label, cards: laid, initialCards: laid, period: starter.period, compare: 'previous', access: 'owner', shared: false }
+    boards[id] = { id, label: starter.label, cards: laid, initialCards: laid, period: starter.period, compare: 'previous', access: 'owner', ownerId: owner, general: 'view', grants: [] }
     tabs.push(id)
   }
   return { boards, tabs, hidden: [], deleted: [], openId: tabs[0] }
 }
 
-// ── The stand-in AI drafter (NB-20 – NB-29) ────────────────────────────────────────
-
-export type DraftResult =
-  | { status: 'ready'; name: string; period: string; compare: string; cards: TemplateCard[]; leftOut: string[] }
-  | { status: 'empty'; reason: string }
-
-const TOPICS: { test: RegExp; name: string; cards: TemplateCard[] }[] = [
-  { test: /\b(ads?|paid|roas|meta|spend)\b/, name: 'Paid ads', cards: [
-    card('ad_spend', 'full'), card('platform_roas'), card('platform_cpa'), card('ctr'), card('mer'),
-  ] },
-  { test: /\b(margin|profit|costs?)\b/, name: 'Where my margin goes', cards: [
-    card('contribution', 'full'), card('net_sales'), card('shipping_cost'), card('processing_fees'), card('discounts'),
-  ] },
-  { test: /\b(check-?in|store|sales|orders|revenue)\b/, name: 'Store check-in', cards: [
-    card('revenue', 'full'), card('orders'), card('aov'), card('new_customers'), card('refund_rate'),
-  ] },
-]
-
-/** Whether a request names a topic of its own (a change that does replaces the draft's topic, NB-24). */
-export const hasTopic = (text: string) => TOPICS.some((t) => t.test.test(text.toLowerCase()))
-
-/** A draft from a request (stand-in for the AI): measurable metrics only, the rest named with why (NB-23, NB-29). */
-export function draftFor(request: string, metrics: Metrics): DraftResult {
-  const q = request.toLowerCase()
-  const pick = TOPICS.find((t) => t.test.test(q)) ?? TOPICS[2]
-  const used = templateFor(pick.cards, metrics)
-  const leftOut = used.leftOut.map((id) => {
-    const m = metrics.get(id)
-    return m ? `${m.label}: ${m.unmeasured ?? 'no connected app records it'}` : id
-  })
-  if (!used.cards.length) return { status: 'empty', reason: leftOut.join(' ') }
-  const period = /\b(morning|today|daily|every day)\b/.test(q) ? 'today' : /\bmonth/.test(q) ? '30d' : '7d'
-  const compare = /last year/.test(q) ? 'last-year' : 'previous'
-  const cadence = /\bmorning\b/.test(q) ? ', every morning' : /\bmonday\b/.test(q) ? ', every Monday' : ''
-  const name = pick === TOPICS[2] && /\bweekly\b/.test(q) ? 'Weekly check-in' : pick.name
-  return { status: 'ready', name: `${name}${cadence}`, period, compare, cards: used.cards, leftOut }
-}
-
-/** The three examples under the box (NB-20). */
+/** The three examples under Ask the AI's box (NB-20). */
 export const AI_EXAMPLES = ['My paid ads every morning', 'Where my margin goes', 'Weekly store check-in']

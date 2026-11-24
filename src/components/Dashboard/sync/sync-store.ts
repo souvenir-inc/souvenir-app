@@ -81,7 +81,7 @@ export function onSyncEnd(l: (e: SyncEnd) => void): () => void {
 
 /** The board whose status this store shows, and the warehouse its syncs go to. */
 export function bindSync(next: { warehouse: Warehouse; boardId: string } | null) {
-  if (target?.boardId === next?.boardId && target?.warehouse === next?.warehouse) return
+  if (target?.boardId === next?.boardId && target?.warehouse.id === next?.warehouse.id) return
   target = next
   set({ apps: {} })
 }

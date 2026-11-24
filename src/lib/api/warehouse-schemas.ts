@@ -3,7 +3,8 @@ import { z } from 'zod'
 // Wire schemas for /warehouse as souvenir-server serializes them (services/warehouse/schemas.py).
 // Metric definitions follow souvenir-warehouse's warehouse/query/metrics.py.
 
-export const unitSchema = z.enum(['money', 'count', 'ratio'])
+// percent: a share or rate kept as a fraction (0.04 is 4%). ratio: a multiple or a score.
+export const unitSchema = z.enum(['money', 'count', 'percent', 'ratio'])
 export const grainSchema = z.enum(['day', 'week', 'month', 'total'])
 
 export const feedStateSchema = z.object({
@@ -25,6 +26,8 @@ export const warehouseSummarySchema = z.object({
   name:        z.string(),
   timezone:    z.string(),
   connections: z.array(attachedConnectionSchema),
+  /** The board members open on until they arrange their own. */
+  defaultBoard: z.string().nullable(),
 })
 
 export const warehouseRequestSchema = z.object({
@@ -100,7 +103,7 @@ export const customMetricSchema = z.object({
   verified:    z.boolean(),
 })
 
-export const metricChatMessageSchema = z.object({
+export const draftMessageSchema = z.object({
   role:    z.enum(['user', 'assistant']),
   content: z.string().min(1),
 })
@@ -146,17 +149,46 @@ export const scorecardSchema = scorecardRequestSchema.extend({
   updatedAt: z.string(),
 })
 
+export const roleSchema = z.enum(['view', 'edit'])
+/** What every member of the organization may do with a board; none leaves it to its maker and the people added. */
+export const generalSchema = z.enum(['none', 'view', 'edit'])
+
+export const grantSchema = z.object({
+  userId: z.string().min(1),
+  role:   roleSchema,
+})
+
 export const boardRequestSchema = z.object({
   name:    z.string().min(1),
   layout:  z.record(z.string(), z.unknown()),
   metrics: z.array(z.string()),
-  shared:  z.boolean(),
+  general: generalSchema,
+  grants:  z.array(grantSchema),
 })
 
 export const boardSchema = boardRequestSchema.extend({
   id:        z.string(),
   createdBy: z.string(),
   updatedAt: z.string(),
+  /** What the viewer may do with it. */
+  role:      z.enum(['owner', 'edit', 'view']),
+})
+
+export const draftedBoardSchema = z.object({
+  name:    z.string().min(1).max(40),
+  period:  z.enum(['today', 'yesterday', '7d', '30d', '60d', '90d']),
+  compare: z.enum(['previous', 'last-year', 'none']),
+  cards:   z.array(z.object({ metric: z.string(), size: z.enum(['sm', 'sm-tall', 'md', 'lg', 'full', 'full-lg']) })).min(1),
+})
+
+export const boardDraftSchema = z.object({
+  reply: z.string(),
+  board: draftedBoardSchema.nullable(),
+})
+
+export const slackChannelsSchema = z.object({
+  connected: z.boolean(),
+  channels:  z.array(z.object({ id: z.string(), name: z.string() })),
 })
 
 export const columnSchema = z.object({ name: z.string(), type: z.string() })
@@ -186,7 +218,7 @@ export type BoardStatus = z.infer<typeof boardStatusSchema>
 export type Definition = z.infer<typeof definitionSchema>
 export type MetricEntry = z.infer<typeof metricEntrySchema>
 export type CustomMetric = z.infer<typeof customMetricSchema>
-export type MetricChatMessage = z.infer<typeof metricChatMessageSchema>
+export type DraftMessage = z.infer<typeof draftMessageSchema>
 export type MetricDraft = z.infer<typeof metricDraftSchema>
 export type MeasureRequest = z.infer<typeof measureRequestSchema>
 export type Measurement = z.infer<typeof measurementSchema>
@@ -194,5 +226,10 @@ export type ScorecardRequest = z.infer<typeof scorecardRequestSchema>
 export type Scorecard = z.infer<typeof scorecardSchema>
 export type BoardRequest = z.infer<typeof boardRequestSchema>
 export type Board = z.infer<typeof boardSchema>
+export type Role = z.infer<typeof roleSchema>
+export type General = z.infer<typeof generalSchema>
+export type Grant = z.infer<typeof grantSchema>
+export type BoardDraft = z.infer<typeof boardDraftSchema>
+export type SlackChannels = z.infer<typeof slackChannelsSchema>
 export type TableSummary = z.infer<typeof tableSummarySchema>
 export type TableRows = z.infer<typeof tableRowsSchema>

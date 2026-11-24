@@ -20,6 +20,7 @@ export function formatExact(value: number, format: MetricFormat): string {
   switch (format) {
     case 'currency': return `$${Math.abs(value) >= 1000 ? whole.format(value) : cents.format(value)}`
     case 'percent': return `${cents.format(value)}%`
+    case 'ratio': return cents.format(value)
     default: return whole.format(value)
   }
 }
