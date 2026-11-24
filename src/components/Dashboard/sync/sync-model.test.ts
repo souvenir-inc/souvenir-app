@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { META, SHOP, connectionState } from '../live/live-fixtures'
+import { META, SHOP, connectionState } from '../__fixtures__/live'
 import { AppSync, appNames, banners, buttonState, footerText, hoverText, sortApps } from './sync-model'
 
 // 04-sync-rules.md, read off the warehouse's board status.

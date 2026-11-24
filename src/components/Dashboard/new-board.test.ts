@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { CONNECTIONS, TOTAL, metrics } from './live/live-fixtures'
+import { CONNECTIONS, TOTAL, metrics } from './__fixtures__/live'
 import { Apps } from './live/apps'
 import { boardReducer, type Board } from './tabs/board-state'
 import { TEMPLATES, measurable, starterState, templateFor, toBoardCards } from './templates'

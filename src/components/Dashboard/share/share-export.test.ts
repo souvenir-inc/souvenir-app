@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { metrics, TODAY } from '../live/live-fixtures'
+import { metrics, TODAY } from '../__fixtures__/live'
 import { fileBase, numbersCsv, stamp } from './export'
 import { People, boardLink, datesLabel, linkCaption, roleFor, type Share } from './share-model'
 

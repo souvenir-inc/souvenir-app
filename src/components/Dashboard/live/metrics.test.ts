@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DAILY_BEFORE, META, SHOP, TODAY, metrics } from './live-fixtures'
+import { DAILY_BEFORE, META, SHOP, TODAY, metrics } from '../__fixtures__/live'
 import { Metrics, figure, weeksWindow } from './metrics'
 
 describe('Metrics from the warehouse', () => {

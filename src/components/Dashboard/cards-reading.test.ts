@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { cardBody, flagged, healthPill, opens, reasonOf } from './card-states'
 import { pickDates, readoutFor } from './chart/LineChart'
 import { weekReadout } from './chart/Bars'
-import { DAILY, DAILY_BEFORE, metrics } from './live/live-fixtures'
+import { DAILY, DAILY_BEFORE, metrics } from './__fixtures__/live'
 import { formatExact, weekInfo } from './series'
 
 const m = metrics()

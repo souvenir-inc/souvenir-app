@@ -44,6 +44,28 @@ export function useWarehouses() {
   })
 }
 
+/** The warehouse's metric catalog; the one query both the screen and the open board read. */
+export function useCatalog(warehouse: Warehouse) {
+  const { orgId } = useOrgIdentity()
+  return useQuery({
+    queryKey: queryKeys.warehouse.catalog(orgScope(orgId), warehouse.id),
+    queryFn: ({ signal }) => warehouse.metrics(signal),
+    staleTime: 5 * MINUTE,
+  })
+}
+
+/** Today, moved on at midnight so a board left open overnight reads the new day's windows. */
+function useToday(): Date {
+  const [today, setToday] = useState(() => new Date())
+  useEffect(() => {
+    const next = new Date(today)
+    next.setHours(24, 0, 1, 0)
+    const timer = setTimeout(() => setToday(new Date()), next.getTime() - Date.now())
+    return () => clearTimeout(timer)
+  }, [today])
+  return today
+}
+
 /** The board on screen: its dates, and the metrics its cards read. */
 export interface OpenBoard {
   id: string
@@ -62,12 +84,8 @@ const request = (metrics: string[], w: Window, grain: MeasureRequest['grain']): 
 export function useLiveDashboard(warehouse: Warehouse, open: OpenBoard) {
   const { orgId } = useOrgIdentity()
   const org = orgScope(orgId)
-  const [today] = useState(() => new Date())
-  const catalog = useQuery({
-    queryKey: queryKeys.warehouse.catalog(org, warehouse.id),
-    queryFn: ({ signal }) => warehouse.metrics(signal),
-    staleTime: 5 * MINUTE,
-  })
+  const today = useToday()
+  const catalog = useCatalog(warehouse)
   const scorecards = useQuery({
     queryKey: queryKeys.warehouse.scorecards(org, warehouse.id),
     queryFn: ({ signal }) => warehouse.scorecards(signal),
@@ -79,17 +97,18 @@ export function useLiveDashboard(warehouse: Warehouse, open: OpenBoard) {
   const chart = chartWindow(open.period, today)
   const before = comparedWindow(period, open.compare)
   const chartBefore = comparedWindow(chart, open.compare)
-  const measure = (body: MeasureRequest | null, enabled = true) => ({
-    queryKey: queryKeys.warehouse.measure(org, warehouse.id, body ?? {}),
+  // A request that isn't made (no comparison) still gets its own key, named after its slot.
+  const measure = (slot: string, body: MeasureRequest | null, enabled = true) => ({
+    queryKey: queryKeys.warehouse.measure(org, warehouse.id, body ?? { off: slot }),
     queryFn: ({ signal }: { signal: AbortSignal }) => warehouse.measure(body!, signal),
     enabled: enabled && body !== null && catalog.isSuccess,
     staleTime: MINUTE,
   })
-  const total = useQuery(measure(request([], period, 'total')))
-  const totalBefore = useQuery(measure(before && request([], before, 'total')))
-  const daily = useQuery(measure(request(onBoard, chart, 'day'), onBoard.length > 0))
-  const dailyBefore = useQuery(measure(chartBefore && request(onBoard, chartBefore, 'day'), onBoard.length > 0))
-  const weekly = useQuery(measure(request(onBoard, weeksWindow(today), 'week'), onBoard.length > 0))
+  const total = useQuery(measure('total', request([], period, 'total')))
+  const totalBefore = useQuery(measure('totalBefore', before && request([], before, 'total')))
+  const daily = useQuery(measure('daily', request(onBoard, chart, 'day'), onBoard.length > 0))
+  const dailyBefore = useQuery(measure('dailyBefore', chartBefore && request(onBoard, chartBefore, 'day'), onBoard.length > 0))
+  const weekly = useQuery(measure('weekly', request(onBoard, weeksWindow(today), 'week'), onBoard.length > 0))
 
   const apps = new Apps(warehouse.connections)
   const data = catalog.data && scorecards.data

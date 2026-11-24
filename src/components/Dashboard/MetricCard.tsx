@@ -45,7 +45,7 @@ export interface GripProps {
   onKeyDown: (e: React.KeyboardEvent) => void
 }
 
-/** How a card reads right now, worked out by the screen (sync, scenarios, health). */
+/** How a card reads right now, worked out by the screen (sync, health). */
 export interface CardView {
   body: CardBody
   /** The card's own chart: weekly bars or the trend (10 CS-6). Unset, the size's default. */

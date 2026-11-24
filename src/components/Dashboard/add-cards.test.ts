@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { ROLE_METRICS, catalogOf, groupOf, landingSize, matchOf, nameList } from './catalog'
 import { fitAtEnd, toItems } from './grid-layout'
-import { apps, metrics } from './live/live-fixtures'
+import { apps, metrics } from './__fixtures__/live'
 import { Metrics } from './live/metrics'
 import { addCardsAtEnd, cardIdsFor } from './tabs/board-state'
 import type { BoardCard } from './types'

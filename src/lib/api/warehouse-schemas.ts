@@ -9,7 +9,9 @@ export const grainSchema = z.enum(['day', 'week', 'month', 'total'])
 
 export const feedStateSchema = z.object({
   category:     z.string(),
-  status:       z.enum(['queued', 'building', 'syncing', 'ready', 'failed', 'reconnect', 'not_applicable']),
+  // Free text on the wire (queued, building, syncing, ready, failed, reconnect, not_applicable today):
+  // a new status must not fail the whole warehouse list.
+  status:       z.string(),
   error:        z.string().nullable(),
   lastSyncedAt: z.string().nullable(),
 })
@@ -27,7 +29,7 @@ export const warehouseSummarySchema = z.object({
   timezone:    z.string(),
   connections: z.array(attachedConnectionSchema),
   /** The board members open on until they arrange their own. */
-  defaultBoard: z.string().nullable(),
+  defaultBoard: z.string().nullable().default(null),
 })
 
 export const warehouseRequestSchema = z.object({
@@ -58,9 +60,9 @@ export const boardStatusSchema = z.object({
 export const aggregateSchema = z.object({
   kind:   z.enum(['sum', 'count']),
   table:  z.string(),
-  column: z.string().nullable(),
+  column: z.string().nullable().default(null), // absent for count
   day:    z.string(),
-  where:  z.string().nullable(),
+  where:  z.string().nullable().default(null),
 })
 
 export type Aggregate = z.infer<typeof aggregateSchema>

@@ -2,8 +2,8 @@
 // custom metric and a scorecard. Shapes follow souvenir-server services/warehouse/schemas.py.
 
 import type { AttachedConnection, ConnectionState, Measurement, MetricEntry, Scorecard } from '@/lib/api/warehouse'
-import { Apps } from './apps'
-import { Metrics, type Readings } from './metrics'
+import { Apps } from '../live/apps'
+import { Metrics, type Readings } from '../live/metrics'
 
 export const SHOP = '11111111-1111-4111-8111-111111111111'
 export const META = '22222222-2222-4222-8222-222222222222'

@@ -40,7 +40,7 @@ describe('Warehouse', () => {
       {
         name: 'revenue', label: 'Revenue', unit: 'money', description: '', category: 'store',
         value: { kind: 'sum', table: 'orders', column: 'total', day: 'created_at', where: null },
-        overridden: false, createdBy: null, verified: true,
+        overridden: false, verified: false, createdBy: null, verified: true,
       },
       {
         name: 'shipping_share', label: 'Shipping share', unit: 'ratio', description: '', category: 'custom',
@@ -115,8 +115,25 @@ describe('Warehouse', () => {
     expect((init.body as FormData).get('channelId')).toBe('C1')
   })
 
-  it('rejects a state the server does not send', async () => {
-    apiFetchJson.mockResolvedValue({ ...summary, connections: [{ ...summary.connections[0], feeds: [{ ...summary.connections[0].feeds[0], status: 'done' }] }] })
-    await expect(Warehouse.get(ID)).rejects.toThrow()
+  it('keeps a feed status it does not know yet (free text in the API spec)', async () => {
+    apiFetchJson.mockResolvedValue({ ...summary, connections: [{ ...summary.connections[0], feeds: [{ ...summary.connections[0].feeds[0], status: 'paused' }] }] })
+    const got = await Warehouse.get(ID)
+    expect(got.connections[0].feeds[0].status).toBe('paused')
+  })
+
+  it('reads a count metric that leaves out column and where (API spec Aggregate)', async () => {
+    apiFetchJson.mockResolvedValue([{
+      name: 'orders', label: 'Orders', unit: 'count', description: '', category: 'sales',
+      value: { kind: 'count', table: 'orders', day: 'created_at' }, overridden: false, verified: false, createdBy: null,
+    }])
+    const [entry] = await new Warehouse(summary).metrics()
+    expect(entry.value).toMatchObject({ kind: 'count', column: null, where: null })
+  })
+
+  it('reads a summary without defaultBoard as no default', async () => {
+    const bare: Partial<typeof summary> = { ...summary }
+    delete bare.defaultBoard
+    apiFetchJson.mockResolvedValue(bare)
+    expect((await Warehouse.get(ID)).defaultBoard).toBeNull()
   })
 })

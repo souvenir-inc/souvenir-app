@@ -37,7 +37,7 @@ import { NeedsAttention, type AttentionItem } from './NeedsAttention'
 import { PeriodMenu, SharedByAvatar } from './BoardHeader'
 import { Apps } from './live/apps'
 import { BoardStore } from './live/board-store'
-import { DashboardDataProvider, useBoardStatus, useLiveDashboard, useWarehouses } from './live/dashboard-data'
+import { DashboardDataProvider, useBoardStatus, useCatalog, useLiveDashboard, useWarehouses } from './live/dashboard-data'
 import { Metrics } from './live/metrics'
 import { SyncBanners } from './sync/SyncBanners'
 import { SyncButton } from './sync/SyncButton'
@@ -63,27 +63,28 @@ const AVATARS = 6
 
 /** The organization's warehouse, its catalog and the viewer's boards; then the board screen. */
 export function DashboardScreen() {
+  const { user, isHydrated, refreshUser } = useAuth()
+  const viewer = user?.auth0Id ?? ''
   const warehouses = useWarehouses()
   const warehouse = warehouses.data?.[0]
   if (warehouses.isError) return <Frame><Problem text="Couldn’t load the dashboard." onRetry={() => { void warehouses.refetch() }} /></Frame>
   if (!warehouses.data) return <Frame><Skeleton /></Frame>
   if (!warehouse) return <Frame><NoStore /></Frame>
-  return <Loaded key={warehouse.id} warehouse={warehouse} />
+  // Boards are read as the viewer, so wait for who that is; once auth has settled without one, say so.
+  if (!viewer) {
+    if (!isHydrated) return <Frame><Skeleton /></Frame>
+    return <Frame><Problem text="Couldn’t load your boards." onRetry={() => { void refreshUser() }} /></Frame>
+  }
+  return <Loaded key={`${warehouse.id}:${viewer}`} warehouse={warehouse} viewer={viewer} />
 }
 
-function Loaded({ warehouse }: { warehouse: Warehouse }) {
-  const { user } = useAuth()
+function Loaded({ warehouse, viewer }: { warehouse: Warehouse; viewer: string }) {
   const { orgId } = useOrg()
-  const { members } = useOrgMembers()
-  const viewer = user?.auth0Id ?? ''
+  const { members, membersLoading } = useOrgMembers()
   const org = orgScope(orgId)
-  // One store for the screen's life (it is keyed by the warehouse): it remembers what it last wrote.
+  // One store for the screen's life (keyed by warehouse and viewer): it remembers what it last wrote.
   const [store] = useState(() => new BoardStore(warehouse, viewer))
-  const catalog = useQuery({
-    queryKey: queryKeys.warehouse.catalog(org, warehouse.id),
-    queryFn: ({ signal }) => warehouse.metrics(signal),
-    staleTime: 5 * 60_000,
-  })
+  const catalog = useCatalog(warehouse)
   // Read once: from here the screen owns the boards and writes them back (tabs/use-dashboard.ts).
   const boards = useQuery({
     queryKey: queryKeys.warehouse.boards(org, warehouse.id),
@@ -94,7 +95,8 @@ function Loaded({ warehouse }: { warehouse: Warehouse }) {
       }]))
       return store.load(people, signal)
     },
-    enabled: !!viewer,
+    // Read once, so only after the members are in: owners and avatars come from them.
+    enabled: !membersLoading,
     staleTime: Infinity,
     gcTime: 0,
   })
