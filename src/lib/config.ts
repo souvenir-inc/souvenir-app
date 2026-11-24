@@ -249,6 +249,10 @@ export const PERSONA_SHARES_DASHBOARD_ENDPOINT = withBase('/persona-shares/dashb
 export const PERSONA_SHARE_DETAIL_ENDPOINT     = (id: string) => withBase(`/persona-shares/${id}`)
 export const PERSONA_SHARE_ACCEPT_ENDPOINT     = (id: string) => withBase(`/persona-shares/${id}/accept`)
 
+// ── Warehouse ─────────────────────────────────────────────────────────────────
+// The org's warehouses; everything else is under /warehouse/{id}.
+export const WAREHOUSE_ENDPOINT = withBase('/warehouse')
+
 // ── Connectors ────────────────────────────────────────────────────────────────
 export const CONNECTORS_ENDPOINT            = withBase('/connectors')
 // Every category the catalog files apps under, most used first.
