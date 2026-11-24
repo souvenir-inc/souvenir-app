@@ -3,6 +3,7 @@
 **Date:** 2026-11-24
 **Area:** `back-end/services/warehouse/` (`router.py`, `schemas.py`, `client.py`), `core/config.py`
 **Reference:** the API spec `front-end/docs-v2/dashboard-api.yaml`
+**Tracked in:** souvenir-server#628 (the full ticket, including the security items)
 **Found by:** a read-only review of the back-end code against the front end and the spec. Nothing below has been reproduced against a running server.
 
 The dashboard's calls all reach a matching route, and the data shapes mostly line up. The issues below are about safety, error handling and the spec falling behind the code. The front end has already been made tolerant where it could be (it accepts any sync status, count metrics without `column`/`where`, and a summary without `defaultBoard`).
@@ -11,27 +12,7 @@ The dashboard's calls all reach a matching route, and the data shapes mostly lin
 
 ## Security
 
-### BE-1. Creating or renaming a warehouse doesn't check the organization (high)
-- **Where:** `router.py` `putWarehouse` (`PUT /warehouse/{warehouseId}`, ~line 148).
-- **Problem:** this is the only per-warehouse route that skips `warehouseFor`. It forwards the PUT for any id, with the caller's `organization_id` attached.
-- **Risk:** if the warehouse service upserts by id, a member could overwrite or take over another organization's warehouse.
-- **Spec:** says a warehouse of another organization gets 404 "Warehouse not found".
-- **Fix:** if the id already exists, it must belong to the caller's organization; otherwise return 404. Creating under a new id stays allowed.
-
-### BE-2. Most writes have no role check (decision needed)
-- **Where:** only `PUT /{id}/default-board` checks for admin (~line 160).
-- **Open to any member, and to `service` principals:**
-  - creating, renaming and deleting a warehouse
-  - `POST /{id}/sync`
-  - creating, editing and deleting metrics
-  - creating, editing and deleting scorecards
-- **Spec:** says nothing about roles.
-- **Decision needed:** which of these should be admin-only. At minimum, deleting a warehouse and deleting library-overriding metrics look like admin actions. Please write the decision into the spec.
-
-### BE-3. Metric and table names go into the upstream URL unescaped (medium)
-- **Where:** `DELETE /{id}/metrics/{name}` (~line 200) and `GET /{id}/tables/{name}` (~line 293).
-- **Problem:** the decoded path parameter is put straight into the warehouse URL. A name containing `?`, `#` or `/` can add query parameters or change the upstream path.
-- **Fix:** URL-encode the name with `quote(name, safe="")` before building the upstream path. Alternatively, check it against the metric-name pattern `^[a-z][a-z0-9_]*$`, and a similar pattern for table names.
+BE-1 to BE-3 (organization check, role checks, path escaping) are tracked privately in souvenir-server#628, not in this public repo.
 
 ---
 
@@ -56,6 +37,11 @@ The dashboard's calls all reach a matching route, and the data shapes mostly lin
 - **Where:** `router.py` ~line 54: "Join an organization first".
 - **Problem:** the front end can't tell this apart from a failed load without parsing the message text.
 - **Fix:** use a distinct status or a machine-readable code, and note it in the spec.
+
+### BE-9. Boards need a version so concurrent edits don't overwrite each other
+- **Where:** `PUT /{id}/boards/{boardId}` takes the whole board and replaces it; there is no version or ETag.
+- **Problem:** two people editing the same board: the last write wins, silently. The front end now saves on its own (800 ms after a change, on leaving the board, and retrying after a failure), so a stale copy can overwrite newer work without anyone pressing anything.
+- **Fix:** return a version (or `updatedAt` as an ETag) with each board, accept `If-Match` on PUT, and answer 409 when it no longer matches. The front end will then offer Reload or Overwrite.
 
 ---
 
