@@ -70,6 +70,10 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
   const used = template ? templateFor(template.cards, metrics) : null
   const laid = used ? toBoardCards(used.cards) : board?.cards ?? []
   const leftOut = (used?.leftOut ?? []).map((id) => metrics.get(id)).filter((m) => !!m)
+  // Connect opens the app that would fill them when one app fills them all; otherwise the catalog.
+  const fills = leftOut.map((m) => m.connectWith ?? [])
+  const connectApp = fills.length > 0 ? fills[0].find((slug) => fills.every((slugs) => slugs.includes(slug))) : undefined
+  const connectHref = connectApp ? `${ORG_CONNECTORS_ROUTE}?connector=${encodeURIComponent(connectApp)}` : ORG_CONNECTORS_ROUTE
   const name = template?.name ?? board?.label ?? ''
   const period = template?.period ?? board?.period ?? '7d'
   const compare = template?.compare ?? board?.compare ?? 'previous'
@@ -173,7 +177,7 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
                     {leftOut.length === 1 ? '1 card is left out' : `${leftOut.length} cards are left out`}: this store doesn’t measure {leftOut.length === 1 ? 'it' : 'them'} yet
                   </p>
                   { }
-                  <a href={ORG_CONNECTORS_ROUTE} className={cn('flex shrink-0 items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1 pl-2.5 pr-3 text-[length:var(--font-size-body-sm)] font-medium leading-[18px] text-[var(--dashboard-figure)] no-underline shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}>
+                  <a href={connectHref} data-connect-app={connectApp} className={cn('flex shrink-0 items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1 pl-2.5 pr-3 text-[length:var(--font-size-body-sm)] font-medium leading-[18px] text-[var(--dashboard-figure)] no-underline shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}>
                     <Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />Connect
                   </a>
                 </div>

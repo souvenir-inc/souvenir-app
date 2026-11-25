@@ -122,13 +122,22 @@ export const measureRequestSchema = z.object({
   grain:   grainSchema,
 })
 
+/** Why a metric can’t be measured yet: connect an app, wait for its first sync, or fix a failing sync. */
+export const unavailableSchema = z.object({
+  // Free text on the wire: a code added later must not fail the whole measurement.
+  code:       z.string(),
+  reason:     z.string(),
+  /** Connector slugs that would fill it, pre-built apps first; empty unless code is no_connection. */
+  connectors: z.array(z.string()).default([]),
+})
+
 export const measurementSchema = z.object({
   grain:       grainSchema,
   start:       z.iso.date(),
   end:         z.iso.date(),
   timezone:    z.string(),
   periods:     z.array(z.object({ start: z.iso.date(), values: z.record(z.string(), z.number().nullable()) })),
-  unavailable: z.record(z.string(), z.string()),
+  unavailable: z.record(z.string(), unavailableSchema),
 })
 
 export const scorecardRowSchema = z.object({
@@ -160,7 +169,7 @@ export const grantSchema = z.object({
   role:   roleSchema,
 })
 
-export const boardRequestSchema = z.object({
+const boardContentSchema = z.object({
   name:    z.string().min(1),
   layout:  z.record(z.string(), z.unknown()),
   metrics: z.array(z.string()),
@@ -168,12 +177,38 @@ export const boardRequestSchema = z.object({
   grants:  z.array(grantSchema),
 })
 
-export const boardSchema = boardRequestSchema.extend({
+/** A board as its owner keeps it; from anyone else who may edit it, only the layout and metrics are taken. */
+export const boardRequestSchema = boardContentSchema.extend({
+  /** Its owner has put it away: nobody else sees it until they take it back; DELETE removes it for good. */
+  deleted: z.boolean(),
+  /** The updatedAt last read; a board someone changed since is refused with 409, and null overwrites. */
+  version: z.string().nullable(),
+})
+
+/** Where the viewer keeps a board, and its place among their boards in that state. */
+export const placementSchema = z.object({
+  state:    z.enum(['tabs', 'hidden', 'left']),
+  position: z.number().int(),
+})
+
+export const boardSchema = boardContentSchema.extend({
   id:        z.string(),
   createdBy: z.string(),
+  /** Its version, sent back with a change. */
   updatedAt: z.string(),
   /** What the viewer may do with it. */
   role:      z.enum(['owner', 'edit', 'view']),
+  /** Null until the viewer places it. */
+  placement: placementSchema.nullable().default(null),
+  /** When its owner put it away; only they still see it. */
+  deletedAt: z.string().nullable().default(null),
+})
+
+/** The viewer’s own tabs, hidden boards and boards they left, each in their order. A board sits in one list. */
+export const arrangementSchema = z.object({
+  tabs:   z.array(z.string()),
+  hidden: z.array(z.string()),
+  left:   z.array(z.string()),
 })
 
 export const draftedBoardSchema = z.object({
@@ -224,10 +259,13 @@ export type DraftMessage = z.infer<typeof draftMessageSchema>
 export type MetricDraft = z.infer<typeof metricDraftSchema>
 export type MeasureRequest = z.infer<typeof measureRequestSchema>
 export type Measurement = z.infer<typeof measurementSchema>
+export type Unavailable = z.infer<typeof unavailableSchema>
 export type ScorecardRequest = z.infer<typeof scorecardRequestSchema>
 export type Scorecard = z.infer<typeof scorecardSchema>
 export type BoardRequest = z.infer<typeof boardRequestSchema>
 export type Board = z.infer<typeof boardSchema>
+export type Placement = z.infer<typeof placementSchema>
+export type Arrangement = z.infer<typeof arrangementSchema>
 export type Role = z.infer<typeof roleSchema>
 export type General = z.infer<typeof generalSchema>
 export type Grant = z.infer<typeof grantSchema>

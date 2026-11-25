@@ -220,7 +220,8 @@ function EmptyTab({ text, action }: { text: string; action?: [string, () => void
 function Sources({ apps: ids, unmeasured }: { apps: AppId[]; unmeasured: string | null }) {
   const s = useSyncSnapshot()
   const { apps } = useDashboardData()
-  if (unmeasured) return <EmptyTab text={`No connected app records this metric: ${unmeasured}.`} />
+  // The reason says which: no app fills it, its first sync is still running, or its sync is failing.
+  if (unmeasured) return <EmptyTab text={`This store can’t measure it yet: ${unmeasured}.`} />
   if (!ids.length) return <EmptyTab text="Built from this workspace’s own definition." />
   return (
     <ul className="m-0 flex list-none flex-col p-0">

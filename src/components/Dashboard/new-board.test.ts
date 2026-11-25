@@ -8,7 +8,7 @@ import { TEMPLATES, measurable, starterState, templateFor, toBoardCards } from '
 const tpl = (id: string) => TEMPLATES.find((t) => t.id === id)!
 const ids = () => { let n = 0; return () => `board-${++n}` }
 /** The same store with Meta Ads disconnected: the warehouse can't measure anything built on ads. */
-const NO_ADS = 'needs ad_insights, which no connection in this store fills'
+const NO_ADS = { code: 'no_connection', reason: 'needs ad_insights, which no connection in this store fills', connectors: ['metaads'] }
 const shopifyOnly = () => metrics({
   apps: new Apps(CONNECTIONS.slice(0, 1)),
   total: { ...TOTAL, unavailable: { ...TOTAL.unavailable, ...Object.fromEntries(['ad_spend', 'platform_roas', 'platform_cpa', 'mer', 'net_after_ads'].map((n) => [n, NO_ADS])) } },

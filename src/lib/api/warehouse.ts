@@ -17,6 +17,7 @@ import {
   tableRowsSchema,
   tableSummarySchema,
   warehouseSummarySchema,
+  type Arrangement,
   type AttachedConnection,
   type Board,
   type BoardDraft,
@@ -147,6 +148,11 @@ export class Warehouse {
 
   async deleteBoard(id: string): Promise<void> {
     await apiFetchVoid(`${this.url}/boards/${id}`, { method: 'DELETE' })
+  }
+
+  /** Where the viewer keeps the boards they see, replacing what they had; nobody else’s tabs change. */
+  async arrange(arrangement: Arrangement): Promise<void> {
+    await apiFetchVoid(`${this.url}/arrangement`, json('PUT', arrangement))
   }
 
   /** Admins only: the board members open on, one everyone in the organization can see; null clears it. */

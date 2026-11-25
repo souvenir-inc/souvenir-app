@@ -76,9 +76,12 @@ export function useDashboard(initial: DashboardState, store: BoardStore, measura
         const status = error instanceof ApiError ? error.status : 0
         if (status >= 400 && status < 500 && status !== 408 && status !== 429) {
           failures.current = 0
-          // 409: the default board can't be made private (new members open on it).
+          // 409 is one of two things: the default board can't be made private (new members open on
+          // it), or someone else changed the board since it was read (its version), so nothing was written.
+          const defaultBoard = status === 409 && error instanceof ApiError && /default board/i.test(`${error.rawMessage ?? ''} ${error.message}`)
           toast.error(status === 403 ? 'You can’t change this board any more.'
-            : status === 409 ? 'The default board stays open to the workspace. Pick another default first.'
+            : defaultBoard ? 'The default board stays open to the workspace. Pick another default first.'
+            : status === 409 ? 'Someone else changed this board since you opened it, so your last change wasn’t saved.'
             : 'Couldn’t save your last change.', {
             id: 'dashboard-save',
             description: 'Reload to see the boards as they are now.',

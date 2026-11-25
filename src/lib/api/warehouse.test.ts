@@ -57,13 +57,14 @@ describe('Warehouse', () => {
     apiFetchJson.mockResolvedValue({
       grain: 'total', start: '2026-10-15', end: '2026-11-15', timezone: 'America/New_York',
       periods: [{ start: '2026-10-15', values: { revenue: 1200.5, refund_rate: null } }],
-      unavailable: { sessions: 'No connection fills site_sessions' },
+      unavailable: { sessions: { code: 'no_connection', reason: 'No connection fills site_sessions', connectors: ['microsoft_clarity'] } },
     })
     const request = { metrics: ['revenue'], start: '2026-10-15', end: '2026-11-15', grain: 'total' as const }
     const measurement = await new Warehouse(summary).measure(request)
     expect(apiFetchJson).toHaveBeenCalledWith(`${WAREHOUSE_ENDPOINT}/${ID}/metrics`,
       { method: 'POST', body: JSON.stringify(request), signal: undefined })
     expect(measurement.periods[0].values.refund_rate).toBeNull()
+    expect(measurement.unavailable.sessions).toMatchObject({ code: 'no_connection', connectors: ['microsoft_clarity'] })
   })
 
   it('reads board status with the viewer-owned reconnect flag', async () => {
@@ -82,9 +83,16 @@ describe('Warehouse', () => {
     apiFetchJson.mockResolvedValue([{
       id: 'b1', name: 'Store overview', layout: {}, metrics: ['revenue'], general: 'view',
       grants: [{ userId: 'auth0|other', role: 'edit' }], createdBy: 'auth0|maker', updatedAt: '2026-11-21T19:48:51Z', role: 'edit',
+      placement: { state: 'tabs', position: 2 }, deletedAt: null,
     }])
     const [board] = await new Warehouse(summary).boards()
-    expect(board).toMatchObject({ general: 'view', role: 'edit', grants: [{ userId: 'auth0|other', role: 'edit' }] })
+    expect(board).toMatchObject({ general: 'view', role: 'edit', grants: [{ userId: 'auth0|other', role: 'edit' }], placement: { state: 'tabs', position: 2 }, deletedAt: null })
+  })
+
+  it('keeps the viewer’s own arrangement of boards', async () => {
+    const arrangement = { tabs: ['b1'], hidden: ['b2'], left: ['b3'] }
+    await new Warehouse(summary).arrange(arrangement)
+    expect(apiFetchVoid).toHaveBeenCalledWith(`${WAREHOUSE_ENDPOINT}/${ID}/arrangement`, { method: 'PUT', body: JSON.stringify(arrangement), signal: undefined })
   })
 
   it('names the default board and comes back as the warehouse with it', async () => {

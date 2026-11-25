@@ -86,6 +86,8 @@ export interface Metric {
   weekly: Week[]
   /** Why this store can't measure it, when it can't (CR-22). */
   unmeasured: string | null
+  /** Connector slugs that would let this store measure it, pre-built apps first; empty when connecting isn't the fix. */
+  connectWith?: string[]
   health: Health | null
 }
 

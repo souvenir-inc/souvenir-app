@@ -55,7 +55,7 @@ const days = (from: number, values: (number | null)[], metric: string) =>
 export const TOTAL: Measurement = {
   grain: 'total', start: '2025-11-08', end: '2025-11-14', timezone: 'America/New_York',
   periods: [{ start: '2025-11-08', values: { revenue: 48200, orders: 558, aov: 86.38, refund_rate: 0.0432, cancellation_rate: 0.018, ad_spend: 15600, platform_roas: 2.6, platform_cpa: 24.1, mer: 3.09, net_after_ads: 32600 } }],
-  unavailable: { shipping_cost: 'needs shipments, which no connection in this store fills' },
+  unavailable: { shipping_cost: { code: 'no_connection', reason: 'needs shipments, which no connection in this store fills', connectors: ['shiphero'] } },
 }
 
 export const TOTAL_BEFORE: Measurement = {

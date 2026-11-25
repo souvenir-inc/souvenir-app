@@ -118,7 +118,8 @@ export class Metrics {
       change: changeOf(amount, before, upIsGood, series.comparable),
       series,
       weekly: this.weeks(r, (m, day) => charted(m, isoDate(day))),
-      unmeasured: r.total?.unavailable[entry.name] ?? null,
+      unmeasured: r.total?.unavailable[entry.name]?.reason ?? null,
+      connectWith: r.total?.unavailable[entry.name]?.connectors ?? [],
       health: row && amount !== null ? healthOf(amount, row.target * scale, row.direction, row.tolerance, format) : null,
     }
   }
