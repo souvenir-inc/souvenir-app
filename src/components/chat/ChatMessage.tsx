@@ -231,7 +231,14 @@ export function ChatMessage({
   );
   // Work renders as reasoning blocks when the turn reasoned and reasoning is
   // shown; otherwise only its tool rows show, as the plain activities list.
-  const tracesReasoning = showReasoning && Boolean(message.thinking);
+  // Reasoning can be in the timeline alone, with no `thinking` text beside it.
+  const tracesReasoning = showReasoning && (Boolean(message.thinking) || (message.reasoningTimeline ?? []).some((item) => item.kind === "reasoning"));
+  // Tool rows the timeline never placed (a message with activities but no timeline, or an older
+  // one that missed some): shown before the answer as the plain list, rather than not at all.
+  const unplacedActivities = useMemo(() => {
+    const placed = new Set((message.reasoningTimeline ?? []).flatMap((item) => (item.kind === "activity" ? [item.activityId] : [])));
+    return (message.activities ?? []).filter((activity) => !placed.has(activity.id));
+  }, [message.reasoningTimeline, message.activities]);
   // Every stretch of answer text: completion waits until each has been revealed.
   const textParts = parts.filter((part) => part.kind === "text");
 
@@ -374,6 +381,7 @@ export function ChatMessage({
             Text always renders via ContentRenderer so that markdown, links,
             code, math, and citation chips are handled uniformly. */}
         <div ref={contentRef}>
+          {unplacedActivities.length > 0 && <StandaloneActivitiesBlock activities={unplacedActivities} />}
           {parts.map((part, index) => {
             const isLastPart = index === parts.length - 1;
             if (part.kind === "text") {

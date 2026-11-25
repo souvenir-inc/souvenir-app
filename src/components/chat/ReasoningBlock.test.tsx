@@ -105,8 +105,7 @@ describe('ReasoningContent', () => {
     )
     const sectionsWithTool = renderToStaticMarkup(
       <ReasoningContent
-        thinkingContent=""
-        reasoningSections={[{ heading: 'Clarifying the topic', body: 'Hidden body.' }]}
+        thinkingContent={'**Clarifying the topic**\nHidden body.'}
         activities={[{ id: 'a-1', type: 'tool-call', label: 'Query data', status: 'done' }]}
         isStreaming={false}
       />,
@@ -289,9 +288,6 @@ describe('ReasoningContent', () => {
     const html = renderToStaticMarkup(
       <ReasoningBlock
         thinkingContent="**Identifying execution issues**\nThe reasoning body."
-        reasoningSections={[
-          { heading: 'Identifying execution issues', body: 'The reasoning body.' },
-        ]}
         activities={[
           { id: 'a-1', type: 'web-search', label: 'Searching the web', status: 'executing' },
         ]}

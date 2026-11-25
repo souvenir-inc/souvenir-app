@@ -54,6 +54,11 @@ describe("toUIMessage", () => {
     expect("steps" in ui).toBe(false)
   })
 
+  it("turns a saved search's sources into the answer's web citations", () => {
+    const ui = toUIMessage({ ...base, sources: [{ title: "Paris", url: "https://www.paris.fr/population" }] })
+    expect(ui.webCitations).toEqual([{ title: "Paris", url: "https://www.paris.fr/population", domain: "paris.fr" }])
+  })
+
   it("reads a turn saved without steps as its text alone", () => {
     const ui = toUIMessage({ ...base, thinking: "plan" })
     expect(ui.activities).toBeUndefined()

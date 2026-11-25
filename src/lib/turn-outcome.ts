@@ -23,6 +23,8 @@ export interface TurnOutcomeInput {
   end: TurnEnd
   /** Every content delta of the turn, raw (may start with a <think> block). */
   rawContent: string
+  /** Visible answer from earlier stretches of the same run, shown before this one's. */
+  priorContent?: string
   /** Reasoning from the reasoning events, which wins over <think> text. */
   reasoningText?: string
   /** User-facing copy for an `error` end. */
@@ -51,11 +53,14 @@ export function placeErrorNotice(
 export function resolveTurnOutcome({
   end,
   rawContent,
+  priorContent = '',
   reasoningText,
   error,
   hasOtherOutput,
 }: TurnOutcomeInput): TurnOutcome {
-  const { visibleText, thinkingText, thinkingOpen } = extractThinkingContent(rawContent)
+  const extracted = extractThinkingContent(rawContent)
+  const { thinkingText, thinkingOpen } = extracted
+  const visibleText = priorContent + extracted.visibleText
   const thinking = reasoningText || thinkingText || undefined
   const nothingShown = !visibleText && !hasOtherOutput
 

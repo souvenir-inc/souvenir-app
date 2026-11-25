@@ -12,6 +12,7 @@ import { STREAM_FIXTURES } from './stream-fixtures'
 import { processStreamEvents } from './stream-events'
 import { createStreamTurn, finishTurn, type StreamEventContext, type StreamTurn } from './stream-turn'
 import { SESSION_EXPIRED_MESSAGE } from './stream-errors'
+import { handleToolComplete, handleToolExecuting, handleToolFinished } from './tool-events'
 
 const toast = vi.hoisted(() => vi.fn())
 const shareToast = vi.hoisted(() => vi.fn())
@@ -161,6 +162,50 @@ describe('stream events', () => {
     expect(reply.reasoningTimeline?.map((item) => item.id)).toEqual(['text-0', 'activity-1', 'text-2'])
     expect(messageParts(reply.reasoningTimeline!, reply.content).map((part) => part.kind === 'text' ? part.content : part.kind))
       .toEqual(['Before the question.', 'work', 'After the answer.'])
+  })
+
+  it('reads a <think> block at the start of a later stretch as reasoning, not answer', () => {
+    turn = createStreamTurn({ id: 'loading-1', role: 'assistant', content: 'Before.', created_at: '', chat_id: 'chat-1' })
+    const reply = play([
+      { type: 'RUN_STARTED', threadId: 'chat-1', runId: 'run-1' },
+      { type: 'TEXT_MESSAGE_CONTENT', messageId: 'm1', delta: '<think>Hidden reasoning</think>' },
+      { type: 'TEXT_MESSAGE_CONTENT', messageId: 'm1', delta: 'Answer' },
+      { type: 'RUN_FINISHED', threadId: 'chat-1', runId: 'run-1' },
+    ])
+    expect(reply.content).toBe('Before.\n\nAnswer')
+    expect(reply.content).not.toContain('think')
+    expect(reply.thinking).toBe('Hidden reasoning')
+  })
+
+  it('places a later stretch after an earlier reply that has no text marker', () => {
+    turn = createStreamTurn({
+      id: 'loading-1', role: 'assistant', content: 'Before.', created_at: '', chat_id: 'chat-1',
+      reasoningTimeline: [{ kind: 'activity', id: 'activity-0', activityId: 'call-0', at: 1, endAt: 2 }],
+    })
+    const reply = play([
+      { type: 'RUN_STARTED', threadId: 'chat-1', runId: 'run-1' },
+      { type: 'CUSTOM', name: 'reasoning_body', value: { content: 'Thinking again.', round_index: 0 } },
+      { type: 'TEXT_MESSAGE_CONTENT', messageId: 'm1', delta: 'After.' },
+      { type: 'RUN_FINISHED', threadId: 'chat-1', runId: 'run-1' },
+    ])
+    expect(messageParts(reply.reasoningTimeline!, reply.content).map((part) => part.kind === 'text' ? part.content : part.kind))
+      .toEqual(['work', 'Before.', 'work', 'After.'])
+  })
+
+  it('keeps a second same-name call findable when the first completes', () => {
+    handleToolExecuting(ctx, turn, { content: 'search', tool_call: { name: 'search', tool_call_id: 'a' } })
+    handleToolExecuting(ctx, turn, { content: 'search', tool_call: { name: 'search', tool_call_id: 'b' } })
+    handleToolComplete(ctx, turn, { content: 'search', tool_call: { name: 'search', tool_call_id: 'a' } })
+    expect(turn.toolCallIdByName.get('search')).toBe('b')
+    handleToolComplete(ctx, turn, { content: 'search', tool_call: { name: 'search', tool_call_id: 'b' } })
+    expect(turn.toolCallIdByName.has('search')).toBe(false)
+  })
+
+  it('keeps the duration tool_complete gave when tool_finished has no timestamps', () => {
+    handleToolExecuting(ctx, turn, { content: 'lookup', tool_call: { name: 'lookup', tool_call_id: 'lk' } })
+    handleToolComplete(ctx, turn, { content: 'lookup', tool_call: { name: 'lookup', tool_call_id: 'lk', duration_s: 1.5 } })
+    handleToolFinished(ctx, turn, { tool_call_id: 'lk', failed: false })
+    expect(messages[1].activities?.[0]).toMatchObject({ id: 'lk', status: 'done', durationS: 1.5 })
   })
 
   it('follows a tool call from streamed arguments to done', () => {

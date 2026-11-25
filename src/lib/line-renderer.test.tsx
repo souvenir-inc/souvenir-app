@@ -19,6 +19,14 @@ describe("LineRenderer inline math vs. currency prose", () => {
     expect(html).not.toContain("katex")
   })
 
+  it("renders a formula that follows a currency range", () => {
+    const html = renderToStaticMarkup(<LineRenderer content="Budget $50K–$80K; use $x^2$." />)
+
+    expect(html).toContain("$50K–$80K; use")
+    expect(html).toContain("katex")
+    expect(html).not.toContain("$x^2$")
+  })
+
   it("still renders real inline math via KaTeX", () => {
     const html = renderToStaticMarkup(<LineRenderer content="The formula is $E=mc^2$ for energy." />)
 

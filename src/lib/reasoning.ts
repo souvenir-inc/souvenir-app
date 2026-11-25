@@ -266,9 +266,11 @@ export function messageParts(timeline: ReasoningTimelineItem[], content: string)
   for (const item of timeline) {
     if (item.kind === 'text') {
       const start = textIndex === 0 ? 0 : item.start
-      const text = content.slice(start, starts[textIndex + 1] ?? content.length).trim()
+      // Trimmed only to tell whether it is empty: leading indentation can be Markdown (a code block).
+      // The line breaks that separate one stretch from the next are not the answer's, though.
+      const text = content.slice(start, starts[textIndex + 1] ?? content.length).replace(/^\n+|\s+$/g, '')
       textIndex += 1
-      if (text) parts.push({ kind: 'text', id: item.id, content: text })
+      if (text.trim()) parts.push({ kind: 'text', id: item.id, content: text })
       continue
     }
     const last = parts[parts.length - 1]

@@ -176,7 +176,9 @@ export function handleToolComplete(ctx: StreamEventContext, turn: StreamTurn, pa
   const toolCallId = asString(toolCall?.tool_call_id) ?? (toolName ? turn.toolCallIdByName.get(toolName) : undefined)
   const hadError = toolName ? turn.erroredToolNames.has(toolName) : false
   if (toolName) {
-    turn.toolCallIdByName.delete(toolName)
+    // Only this call's mapping: a second call to the same tool may own the name by now, and
+    // its progress events still need to find its row.
+    if (!toolCallId || turn.toolCallIdByName.get(toolName) === toolCallId) turn.toolCallIdByName.delete(toolName)
     turn.erroredToolNames.delete(toolName)
   }
 
@@ -202,7 +204,8 @@ export function handleToolFinished(ctx: StreamEventContext, turn: StreamTurn, pa
     ...patchActivity(toolCallId, (a) => ({
       ...a,
       status: parsed.failed === true ? "error" as const : "done" as const,
-      durationS,
+      // With no timestamps to measure by, keep the duration tool_complete reported.
+      durationS: durationS ?? a.durationS,
       ...(results.length > 0 ? { results } : {}),
     }))(msg),
     reasoningTimeline: turn.reasoning.timeline(),

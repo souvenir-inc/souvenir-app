@@ -210,7 +210,12 @@ function renderInlineSegment(text: string, sourceStart: number, prefix: string, 
       if (isLikelyInlineMath(m[11])) {
         nodes.push(renderKatex(m[11], false, key))
       } else {
-        nodes.push(...renderHighlightedText(m[0], sourceStart + m.index, key, ctx))
+        // Only the opening `$` is literal (a price). The closing one may open a formula
+        // ("$50K–$80K; use $x^2$"), so matching starts again right after it.
+        nodes.push(...renderHighlightedText("$", sourceStart + m.index, key, ctx))
+        last = m.index + 1
+        re.lastIndex = last
+        continue
       }
     } else if (m[13] !== undefined) {
       // \(inline math\) — LaTeX \(...\) delimiter, render with KaTeX

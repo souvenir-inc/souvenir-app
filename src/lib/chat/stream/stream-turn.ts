@@ -30,7 +30,10 @@ export interface StreamEventContext {
 
 /** One turn's bookkeeping, shared by the event handlers and the hook. */
 export interface StreamTurn {
+  /** This stretch's content deltas, raw (a leading <think> block is still in them). */
   assistantContent: string
+  /** The visible answer earlier stretches of the run left, with its separator; this stretch's text follows it. */
+  priorContent: string
   reasoning: ReasoningAccumulator
   streamFinished: boolean
   /** The turn ended with an error (shown as the reply or as a notice below it). */
@@ -62,10 +65,19 @@ export interface StreamTurn {
 
 /** `prior` is the reply as earlier stretches of the same run left it; this turn's text and trace are added after it. */
 export function createStreamTurn(prior?: UIMessage): StreamTurn {
-  const assistantContent = prior?.content ? `${prior.content}\n\n` : ""
+  // Kept apart from this stretch's own deltas: a <think> block only counts as reasoning at the
+  // start of the text it opens, so this stretch is parsed on its own and then added after it.
+  const priorContent = prior?.content ? `${prior.content}\n\n` : ""
+  // A reply saved without text markers still has its text: it gets one, after its work (how such a
+  // reply already renders), so this stretch's work and text are placed after it, not before it.
+  const priorTimeline = prior?.reasoningTimeline ?? []
+  const seed = priorContent && !priorTimeline.some((item) => item.kind === "text")
+    ? [...priorTimeline, { kind: "text" as const, id: "text-prior", start: 0 }]
+    : priorTimeline
   return {
-    assistantContent,
-    reasoning: createReasoningAccumulator(prior?.reasoningTimeline),
+    assistantContent: "",
+    priorContent,
+    reasoning: createReasoningAccumulator(seed),
     streamFinished: false,
     turnFailed: false,
     terminalErrorSeen: false,
@@ -78,7 +90,7 @@ export function createStreamTurn(prior?: UIMessage): StreamTurn {
     promptMarkerIds: new Set(),
     toolCallIds: new Set(),
     eventAt: undefined,
-    answerLength: assistantContent.length,
+    answerLength: priorContent.length,
   }
 }
 
@@ -95,6 +107,7 @@ export function finishTurn(ctx: StreamEventContext, turn: StreamTurn, end: TurnE
   const outcome = resolveTurnOutcome({
     end,
     rawContent: turn.assistantContent,
+    priorContent: turn.priorContent,
     reasoningText: turn.reasoning.text(),
     error,
     hasOtherOutput: turn.receivedRenderableOutput,

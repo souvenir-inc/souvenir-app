@@ -54,6 +54,9 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
   const [showApiForm,  setShowApiForm]  = useState(false)
   const abortedRef  = useRef(false)
   const answeredRef = useRef(false)
+  // Stops the sign-in under way, if any (set by handleOAuth, run when the card unmounts).
+  const cancelSignInRef = useRef<(() => void) | null>(null)
+  useEffect(() => () => { cancelSignInRef.current?.(); cancelSignInRef.current = null }, [])
   // The "already connected" check and the sign-in poll can both call finish; only
   // one answer may be in flight, or the backend gets it twice.
   const respondingRef = useRef(pendingAtMount !== undefined)
@@ -206,6 +209,13 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
       else ended = link
       waiting.abort()
     })
+    // Leaving the chat mid-sign-in stops this card waiting on it: the Zapier wait has no timeout,
+    // so nothing else would. The popup is left open: the person may be part-way through signing
+    // in there, and the app connects all the same (the card checks for that when it comes back).
+    cancelSignInRef.current?.()
+    let left = false
+    const cancel = () => { left = true; waiting.abort(); stopListening() }
+    cancelSignInRef.current = cancel
 
     // initData carries per-tenant OAuth credentials (Shopify client_id/secret);
     // undefined for plain OAuth.
@@ -245,7 +255,8 @@ export function ConnectPromptCard({ prompt, onDecided, onAnswered }: ConnectProm
       })
       .finally(() => {
         stopListening()
-        popup?.close()
+        if (!left) popup?.close()
+        if (cancelSignInRef.current === cancel) cancelSignInRef.current = null
       })
   }, [prompt, finish])
 

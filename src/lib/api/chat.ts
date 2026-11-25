@@ -28,7 +28,7 @@ import { parseSteps } from "@/lib/chat/steps";
 import { extractThinkingContent } from "@/lib/parsers/content-parser";
 import { INCOMPLETE_ANSWER_MESSAGE } from "@/lib/turn-outcome";
 import { EMPTY_TURN_MESSAGE } from "@/lib/model-error";
-import { isPromptEvent, parsePrompt } from "@/lib/api/prompts";
+import { isPromptEvent, parsePrompt, type Prompt } from "@/lib/api/prompts";
 import { parseRun } from "@/lib/chat/run";
 import { INTERRUPTED_MESSAGE } from "@/lib/turn-outcome";
 
@@ -306,8 +306,10 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
   const userText = raw.input ?? raw.prompt;
   const aiText = raw.output ?? raw.response;
 
-  // Paired format - has both user input and AI output in one row
-  if (userText || aiText) {
+  // Paired format - has both user input and AI output in one row. Told by the fields being
+  // there, not by their text: a file-only turn saves both as "" and is still a pair (its
+  // upload, and a run or card still going, would otherwise be read as one empty user row).
+  if (userText != null || aiText != null) {
     const messages: Message[] = [];
     const sources = parseSources(raw);
     const allFileAtts = normalizeFileAttachments(raw);
@@ -340,16 +342,7 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
     const imageLinks = Array.isArray(raw.image_links)
       ? (raw.image_links.filter((u): u is string => typeof u === "string" && u.length > 0))
       : undefined;
-    // History is boundary data: `prompts` has been seen as a non-array, and an entry
-    // as null. Either would throw here and reject the whole page of history, losing
-    // every message on it, so both are checked before the shape is relied on.
-    const prompts = (Array.isArray(raw.prompts) ? raw.prompts : []).flatMap((entry) => {
-      if (typeof entry !== "object" || entry === null) return [];
-      const event: unknown = (entry as { event?: unknown }).event;
-      if (typeof event !== "string" || !isPromptEvent(event)) return [];
-      const prompt = parsePrompt(event, entry);
-      return prompt ? [prompt] : [];
-    });
+    const prompts = parsePrompts(raw.prompts);
     const run = parseRun(raw.run);
     const hasAssistantPayload = Boolean(aiText) || assistantAtts.length > 0 || (imageLinks && imageLinks.length > 0);
     if (hasAssistantPayload) {
@@ -372,7 +365,7 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
         prompts: prompts.length > 0 ? prompts : undefined,
         run,
       });
-    } else if (userText || uploadedAtts.length > 0) {
+    } else if (userText || uploadedAtts.length > 0 || run || prompts.length > 0) {
       // The turn finished with no answer saved (e.g. reasoning or tools only):
       // keep a placeholder so it does not vanish and can still be regenerated.
       messages.push({
@@ -407,6 +400,8 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
     : undefined;
 
   const run = role === "assistant" ? parseRun(raw.run) : undefined;
+  // A reply saved on its own row keeps its cards too, as in the paired format.
+  const prompts = role === "assistant" ? parsePrompts(raw.prompts) : [];
   return [{
     id: baseId,
     role,
@@ -422,8 +417,23 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
     file_attachments: fileAttachments.length > 0 ? fileAttachments : undefined,
     image_links: imageLinks && imageLinks.length > 0 ? imageLinks : undefined,
     // As in the paired format: a stopped turn's run is what marks it "Generation stopped".
-    ...(role === "assistant" ? { run } : {}),
+    ...(role === "assistant" ? { run, ...(prompts.length > 0 ? { prompts } : {}) } : {}),
   }];
+}
+
+/**
+ * The prompt cards saved with a turn. History is boundary data: `prompts` has been seen as a
+ * non-array, and an entry as null. Either would throw and reject the whole page of history,
+ * losing every message on it, so both are checked before the shape is relied on.
+ */
+function parsePrompts(raw: unknown): Prompt[] {
+  return (Array.isArray(raw) ? (raw as unknown[]) : []).flatMap((entry) => {
+    if (typeof entry !== "object" || entry === null) return [];
+    const event: unknown = (entry as { event?: unknown }).event;
+    if (typeof event !== "string" || !isPromptEvent(event)) return [];
+    const prompt = parsePrompt(event, entry);
+    return prompt ? [prompt] : [];
+  });
 }
 
 /**
