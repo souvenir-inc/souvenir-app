@@ -44,3 +44,18 @@ describe('what a period is compared with (DT-7)', () => {
     expect(comparedWindow(periodWindow('7d', TODAY), 'none')).toBeNull()
   })
 })
+
+describe('validPeriod / validCompare (links and URLs)', () => {
+  it('takes presets and real custom ranges in order', async () => {
+    const { validPeriod, validCompare } = await import('./period')
+    expect(validPeriod('7d')).toBe(true)
+    expect(validPeriod('custom:2025-10-01:2025-10-31')).toBe(true)
+    expect(validPeriod('custom:2025-10-31:2025-10-01')).toBe(false)
+    expect(validPeriod('custom:2025-02-31:2025-03-01')).toBe(false)
+    expect(validPeriod('custom:x:y')).toBe(false)
+    expect(validPeriod('15d')).toBe(false)
+    expect(validPeriod(null)).toBe(false)
+    expect(validCompare('last-year')).toBe(true)
+    expect(validCompare('nope')).toBe(false)
+  })
+})

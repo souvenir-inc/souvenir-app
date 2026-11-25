@@ -162,7 +162,6 @@ export const CHAT_SAVE_TO_DRIVE_ENDPOINT = (attachmentId: string) =>
 export const MODELS_ENDPOINT = withBase("/llm/models");
 export const MODELS_ALL_ENDPOINT = withBase("/llm/models/all");
 export const MODELS_BLOCK_ENDPOINT = withBase("/llm/models/block");
-export const MODELS_TEST_ENDPOINT = withBase("/llm/models/test");
 
 // ── Personas ─────────────────────────────────────────────────────────────────
 export const PERSONAS_ENDPOINT = withBase("/persona");

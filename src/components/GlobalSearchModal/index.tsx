@@ -16,6 +16,7 @@ import { TabItem } from '@/components/TabItem'
 import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { resultCountMessage } from '@/lib/search/global-search'
+import { PINS_ENABLED } from '@/lib/feature-flags'
 
 import {
   SHADOW_MODAL,
@@ -153,7 +154,8 @@ const FILTER_TABS: { value: FilterValue; label: string }[] = [
   { value: 'agent-chat',   label: 'Agent Chats' },
   { value: 'project',      label: 'Projects' },
   { value: 'persona',      label: 'Agents' },
-  { value: 'pin',          label: 'Pins' },
+  // Pins are hidden while their feature flag is off: no tab, no ?searchType=pin.
+  ...(PINS_ENABLED ? [{ value: 'pin' as const, label: 'Pins' }] : []),
   { value: 'page',         label: 'Pages' },
 ]
 
@@ -332,7 +334,7 @@ export function GlobalSearchModal({
                 <InputField
                   ref={inputRef}
                   fluid
-                  placeholder="Search chats, agent chats, projects, pins…"
+                  placeholder={PINS_ENABLED ? 'Search chats, agent chats, projects, pins…' : 'Search chats, agent chats, projects, agents…'}
                   leftIcon={<SearchOneIcon size={16} color="var(--neutral-400)" />}
                   value={query}
                   onChange={handleQueryChange}

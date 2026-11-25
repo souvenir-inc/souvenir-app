@@ -1,6 +1,7 @@
 "use client";
 
 import { apiFetch, apiFetchJson, ApiError, friendlyApiError } from "./client";
+import { forgetChatSettings } from "@/lib/chat/chat-settings-storage";
 import {
   API_BASE_URL,
   CHATS_ENDPOINT,
@@ -191,6 +192,8 @@ export async function deleteChat(chatId: string): Promise<void> {
       "Failed to delete chat",
     );
   }
+  // Nor its settings on this device (the attached agent, web search).
+  forgetChatSettings(chatId);
   // Its history must not outlive it: Undo restores the chat but not this entry,
   // so the restored chat reloads from the server rather than from a stale copy.
   dropChatHistory(chatId);

@@ -9,6 +9,7 @@ import { revokeShare } from '@/lib/api/persona-shares'
 import { forgetShare } from '@/lib/share/share-queries'
 import { AGENTS_NEW_ROUTE, AGENT_EDIT_ROUTE } from '@/lib/routes'
 import Tabs from '@/components/Tabs'
+import { RouteState } from '@/components/RouteState'
 import { EMPTY_FILTERS } from './_hooks/use-agent-filters'
 import { AgentsToolbar } from './_components/AgentsToolbar'
 import { AgentsGrid, agentGridWidth, useAgentGridColumns } from './_components/AgentsGrid'
@@ -35,7 +36,7 @@ type TabId = 'my-personas' | 'super-links'
 import { useAgentsPage } from './_hooks/use-agents-page'
 
 function PersonasPageInner() {
-  const { push, viewer, activeTab, setActiveTab, detailsId, openDetails, closeDetails, queryClient, isLoading, personas, setPersonas, draftAvatarMap, draftTagsMap, deleteTarget, setDeleteTarget, changeModelTarget, setChangeModelTarget, fixModelsOpen, setFixModelsOpen, fixModelsMounted, selectedShareId, setSelectedShareId, shareTarget, setShareTarget, versionToPersona, shares, selectedDrawerLink, personaByRepoId, activeShareRepoIds, visibilityForPersona, createdByForPersona, resolveModelName, modelUnavailableReason, isDraftLike, visiblePersonas, unavailableAgents, personasScrollRef, dashboard, sharesLoading, dashboardRefreshing, handleRefreshDashboard, slRange, setSlRange, slDays, receivedShares, receivedLoading, search, setSearch, sort, setSort, filters, setFilters, activeFilterCount, toggleFilter, uniqueModelNames, filtered, pausingIds, handleDelete, handleCopyAndEdit, handleUseInChat, handleUseTeamSharedInChat, handleUseReceivedShareInChat, handlePauseToggle } = useAgentsPage()
+  const { push, viewer, activeTab, setActiveTab, detailsId, openDetails, closeDetails, queryClient, isLoading, personasFailed, refetchPersonas, personas, setPersonas, draftAvatarMap, draftTagsMap, deleteTarget, setDeleteTarget, changeModelTarget, setChangeModelTarget, fixModelsOpen, setFixModelsOpen, fixModelsMounted, selectedShareId, setSelectedShareId, shareTarget, setShareTarget, versionToPersona, shares, selectedDrawerLink, personaByRepoId, activeShareRepoIds, visibilityForPersona, createdByForPersona, resolveModelName, modelUnavailableReason, isDraftLike, visiblePersonas, unavailableAgents, personasScrollRef, dashboard, sharesLoading, dashboardRefreshing, handleRefreshDashboard, slRange, setSlRange, slDays, receivedShares, receivedLoading, search, setSearch, sort, setSort, filters, setFilters, activeFilterCount, toggleFilter, uniqueModelNames, filtered, pausingIds, handleDelete, handleCopyAndEdit, handleUseInChat, handleUseTeamSharedInChat, handleUseReceivedShareInChat, handlePauseToggle } = useAgentsPage()
 
   // On My Agents the header spans exactly the card columns, so when the details panel drops the
   // grid to fewer (centred) columns the tabs, title and toolbar line up with the cards' edges.
@@ -153,7 +154,17 @@ function PersonasPageInner() {
           </div>
 
           {/* ── Persona grid ── */}
-          {activeTab === 'my-personas' && (
+          {/* A list that didn't load says so, with Try again, rather than "create your first agent". */}
+          {activeTab === 'my-personas' && personasFailed && personas.length === 0 && (
+            <RouteState
+              tone="alert"
+              headingLevel="h2"
+              heading="Couldn’t load your agents"
+              body="Check your connection and try again."
+              actions={<Button variant="outline" onClick={() => { void refetchPersonas() }}>Try again</Button>}
+            />
+          )}
+          {activeTab === 'my-personas' && !(personasFailed && personas.length === 0) && (
             <AgentsGrid
               scrollRef={personasScrollRef}
               isLoading={isLoading}

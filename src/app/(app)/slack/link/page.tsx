@@ -8,6 +8,7 @@ import { ApiError } from '@/lib/api/client'
 import { linkSlackIdentity, disconnectSlackIdentity } from '@/lib/api/slack'
 import { useAuth } from '@/context/auth-context'
 import { ONBOARDING_TEAM_PROFILE_ROUTE, ROOT_ROUTE } from '@/lib/routes'
+import { slackUrl } from '@/lib/https-url'
 
 type PageState =
   | 'linking'
@@ -84,8 +85,11 @@ function SlackLinkContent() {
         // post as them. So this is not a success page yet: hand them straight
         // on, and let the ?authorized=1 return leg above declare success.
         if (authorizationUrl) {
+          // Only ever on to Slack's own consent screen.
+          const next = slackUrl(authorizationUrl)
+          if (!next) throw new Error('Slack sign-in link was not a Slack address')
           setPageState('authorizing')
-          window.location.assign(authorizationUrl)
+          window.location.assign(next)
           return
         }
         setPageState('linked')

@@ -2,6 +2,7 @@ import { z } from 'zod'
 import type { Board as SavedBoard, BoardRequest, Warehouse } from '@/lib/api/warehouse'
 import type { Board, DashboardState, Person } from '../tabs/board-state'
 import { Metrics } from './metrics'
+import { validCompare } from '../period'
 
 const cardSchema = z.object({
   metricId: z.string(),
@@ -97,7 +98,7 @@ export class BoardStore {
       .filter((id) => state.boards[id]?.access === 'owner' && !state.boards[id].draft)
     const requestOf = (board: Board, place: Place): BoardRequest => ({
       name: board.label,
-      layout: { cards: board.cards, initialCards: board.initialCards, period: board.period, compare: layoutSchema.shape.compare.parse(board.compare), ...place } satisfies Layout,
+      layout: { cards: board.cards, initialCards: board.initialCards, period: board.period, compare: validCompare(board.compare) ? board.compare : 'previous', ...place } satisfies Layout,
       metrics: [...new Set(board.cards.map((c) => Metrics.base(c.metricId)))].filter((name) => measurable.has(name)),
       general: board.general,
       grants: board.grants,

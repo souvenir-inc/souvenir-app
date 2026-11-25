@@ -55,7 +55,11 @@ export function buildSearchIndex(sources: SearchSources): SearchIndex {
   for (const c of sources.projectChats) chatNameById.set(c.id, untitledChat(c.title))
   for (const c of sources.agentChats) chatNameById.set(c.id, untitledChat(c.title))
 
-  const chats: Entry[] = sources.chats.map(c => ({
+  // GET /chats lists every chat, project and agent chats included; those are listed once, in their
+  // own group (with the project or agent beside them), not a second time as plain chats.
+  const listedElsewhere = new Set([...sources.projectChats, ...sources.agentChats].map(c => c.id))
+  const projectChatIds = new Set(sources.projectChats.map(c => c.id))
+  const chats: Entry[] = sources.chats.filter(c => !listedElsewhere.has(c.id)).map(c => ({
     text:   [lower(c.title)],
     result: { id: c.id, type: 'chat', title: untitledChat(c.title) },
   }))
@@ -68,7 +72,7 @@ export function buildSearchIndex(sources: SearchSources): SearchIndex {
     }
   })
 
-  const agentChats: Entry[] = sources.agentChats.map(c => {
+  const agentChats: Entry[] = sources.agentChats.filter(c => !projectChatIds.has(c.id)).map(c => {
     const personaName = personaNameById.get(c.personaId)
     return {
       text:   [lower(c.title)],

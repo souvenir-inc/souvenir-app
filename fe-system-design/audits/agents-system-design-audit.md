@@ -1,5 +1,7 @@
 # Agents Feature: System Design Audit
 
+> **Note (2026-11-25):** The legacy editor files named here (`configure/instructions`, `configure/layout`, `configure/context`) are deleted; `agents/configure/page.tsx` is a redirect and editing lives in `agents/[personaId]/edit`. Current status: [re-audit](./reaudit-2026-11-25.md).
+
 Scope: `app/(app)/agents` (list, new, templates, published, `[personaId]/edit`), `app/(app)/agent/configure` (legacy multi-tab editor: instructions, profile, knowledge, connectors, sharing), `components/AgentEditor`, `AgentsPanel`, `AgentShareModal`, `ChangeAgentModelModal`, `FixAgentModelsModal`, `PersonaCard`, `lib/api/personas.ts`, `lib/queries/personas.ts`, `lib/agent-*.ts`, `hooks/use-agent-*`.
 Method: structural scan (sizes, greps, key sections), not a line-by-line review. Items marked (verify) need a closer look.
 Scoring: 1 = applied, 0.5 = partial, 0 = absent, applicable principles only.

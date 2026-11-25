@@ -66,6 +66,13 @@ describe('schedule permissions and prompt', () => {
     expect(schedulePrompt(data, false)).toContain('I want to create a schedule called "Digest".')
     expect(schedulePrompt(data, true)).toContain('Updated frequency: Daily • 09:00 (UTC)')
   })
+
+  it('an update that leaves an inexpressible trigger alone does not ask Task to change it', () => {
+    const prompt = schedulePrompt({ name: 'Watch', instructions: 'Check', frequency: 'Every 5 minutes', frequencyUnchanged: true }, true)
+    expect(prompt).not.toContain('Updated frequency')
+    expect(prompt).not.toContain('Every 5 minutes')
+    expect(prompt).toContain('Keep the current schedule timing as it is.')
+  })
 })
 
 describe('next-run display across DST (America/New_York)', () => {

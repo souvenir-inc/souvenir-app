@@ -69,6 +69,22 @@ export function customRange(id: string): Window | null {
   return { from: fromIsoDate(a), to: fromIsoDate(b) }
 }
 
+const CUSTOM_ID = /^custom:(\d{4}-\d{2}-\d{2}):(\d{4}-\d{2}-\d{2})$/
+
+/** A real date written as YYYY-MM-DD (not 2025-02-31). */
+const realDay = (s: string) => { const d = fromIsoDate(s); return !Number.isNaN(d.getTime()) && isoDate(d) === s }
+
+/** A period id the board can read: a preset, or a custom range of two real days in order. Links and URLs are checked with it. */
+export function validPeriod(id: string | null | undefined): id is string {
+  if (!id) return false
+  if (PERIODS.some((p) => p.id === id)) return true
+  const m = CUSTOM_ID.exec(id)
+  return !!m && realDay(m[1]) && realDay(m[2]) && m[1] <= m[2]
+}
+
+/** A comparison the board can read. */
+export const validCompare = (id: string | null | undefined): id is 'previous' | 'last-year' | 'none' => COMPARISONS.some((c) => c.id === id)
+
 /** Days in a window, both ends counted. */
 export const rangeDays = (from: Date, to: Date) => Math.round((startOfDay(to).getTime() - startOfDay(from).getTime()) / DAY) + 1
 

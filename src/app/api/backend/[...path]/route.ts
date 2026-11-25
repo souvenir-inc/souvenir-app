@@ -50,6 +50,8 @@ const STRIP_RESPONSE_HEADERS = new Set([
   "transfer-encoding",
   "connection",
   "keep-alive",
+  // The backend's cookies are its own: set on our origin they would ride along on every request here.
+  "set-cookie",
 ])
 
 async function handler(
@@ -57,8 +59,13 @@ async function handler(
   ctx: { params: Promise<{ path: string[] }> },
 ): Promise<Response> {
   const { path } = await ctx.params
+  // Segments arrive decoded: "%2E%2E", "%3F" or "%23" would become "..", "?" or "#" in the
+  // backend URL, so each is encoded again, and a "." or ".." segment is refused outright.
+  if (path.some((segment) => segment === "." || segment === "..")) {
+    return new Response(JSON.stringify({ detail: "Invalid path" }), { status: 400, headers: { "Content-Type": "application/json" } })
+  }
   const search = new URL(req.url).search
-  const target = `${UPSTREAM}/${path.join("/")}${search}`
+  const target = `${UPSTREAM}/${path.map(encodeURIComponent).join("/")}${search}`
 
   const headers: Record<string, string> = {}
   for (const [key, value] of req.headers.entries()) {

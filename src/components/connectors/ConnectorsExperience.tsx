@@ -10,7 +10,7 @@ import { useDeleteCustomApi, useUnlinkAccount } from '@/lib/connectors/connector
 import { connectorDetailQuery, linkedConnectorsQuery, mergeCatalog } from '@/lib/connectors/connector-queries'
 import { queryKeys } from '@/lib/query-keys'
 import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
-import { forgetReturn, rememberReturn, safeReturnPath } from '@/lib/connector-return'
+import { forgetReturn, safeReturnPath } from '@/lib/connector-return'
 import type { ConnectorPick } from '@/lib/api/recommendations'
 import type { SetupFlowResult } from '@/lib/useConnectorSetupFlow'
 import { ConnectionsView } from './ConnectionsView'
@@ -225,14 +225,11 @@ export function ConnectorsExperience({ initialSearch = '' }: { initialSearch?: s
   useEffect(() => { if (urlNeedsReset) router.replace(ORG_CONNECTORS_ROUTE, { scroll: false }) }, [urlNeedsReset, router])
 
   // `?return=<path>`: where the person came from (the dashboard's Reconnect). Kept for the visit, as
-  // the view's own URL changes drop it. A sign-in that leaves the page (Shopify, MCP apps) finds it in
-  // session storage when it lands back; one in a popup goes back from here when it succeeds.
+  // the view's own URL changes drop it. A sign-in that leaves the page (Shopify, MCP apps) remembers
+  // it just before it goes (the setup flow does that, not this page: a popup copies the page's
+  // session storage when it opens, and would follow it itself); one in a popup goes back from here
+  // when it succeeds.
   const [returnTo, setReturnTo] = useState(() => safeReturnPath(searchParams.get('return')))
-  useEffect(() => {
-    if (returnTo && openParam) rememberReturn(openParam, returnTo)
-  }, [returnTo, openParam])
-  // Leaving the page in the app (not to a sign-in) ends the visit: nothing to come back to.
-  useEffect(() => () => forgetReturn(), [])
 
   const handleSetupConnected = useCallback((_result: SetupFlowResult) => {
     setSetupOpen(false)
@@ -336,6 +333,7 @@ export function ConnectorsExperience({ initialSearch = '' }: { initialSearch?: s
           initialAccount={setupAccount}
           cancel={() => setSetupOpen(false)}
           onConnected={handleSetupConnected}
+          returnTo={setupMode === 'reconnect' ? returnTo : null}
         />
       )}
 

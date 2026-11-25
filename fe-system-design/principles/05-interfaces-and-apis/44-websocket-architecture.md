@@ -241,6 +241,6 @@ export async function GET(req: Request) {
 
 ### In this codebase
 Measured with a quick scan of `src/` (not a full audit):
-- **No WebSocket usage was found.** Real-time behaviour (chat and agent streaming) uses **Server-Sent Events** through the Node-runtime route handlers `src/app/api/chat/route.ts`, `src/app/api/persona-chat/route.ts` and the streaming proxy `src/app/api/backend/[...path]/route.ts` (`maxDuration` 800), with SSE parsing and schemas in `src/lib/api-client.ts` and `src/lib/api/sse-schemas.ts`. For one-directional model output this is the right transport and avoids the hosting limits of WebSockets.
+- **No WebSocket usage was found.** Real-time behaviour (chat and agent streaming) uses **Server-Sent Events** through the Node-runtime route handlers `src/app/api/chat/route.ts` and the streaming proxy `src/app/api/backend/[...path]/route.ts` (`maxDuration` 800), with SSE parsing and schemas in `src/lib/api-client.ts` and `src/lib/api/sse-schemas.ts`. For one-directional model output this is the right transport and avoids the hosting limits of WebSockets.
 - Before adding WebSockets (for example live collaboration or presence), confirm the hosting model supports long-lived connections, and prefer a provider-based `RealtimeProvider` with `useSubscription` hooks as shown above so components never touch the socket.
 - The existing SSE client logic is a good candidate for the same provider-and-hook structure (one place for reconnect, validation and cancellation), see principle 40.

@@ -73,6 +73,7 @@ import { buildAgentCardMessages } from "@/lib/agent-card-messages";
 import { StarterList, StarterListSkeleton } from "@/components/StarterSuggestions";
 import { useRecommendationsState } from "@/hooks/use-recommendations";
 import { PENDING_PERSONA_KEY } from '@/lib/storage-keys'
+import { loadChatSettings, saveChatSettings } from '@/lib/chat/chat-settings-storage'
 import { FileDropOverlay } from "@/components/chat/FileDropOverlay";
 
 
@@ -80,23 +81,9 @@ import { FileDropOverlay } from "@/components/chat/FileDropOverlay";
 // Settings (webSearch, persona) are stored per-chatId so each chat remembers
 // its own state and navigating between chats never bleeds settings across.
 
-interface ChatSettings {
-  webSearch: boolean;
-  persona: SelectedPersonaInfo | null;
-}
-
 const NEVER_RAN = Symbol("chat-url-effect-not-run");
 
-function loadChatSettings(chatId: string): ChatSettings | null {
-  try {
-    const raw = localStorage.getItem(`souvenir_chat_${chatId}`);
-    return raw ? (JSON.parse(raw) as ChatSettings) : null;
-  } catch { return null; }
-}
-
-function saveChatSettings(chatId: string, settings: ChatSettings): void {
-  try { localStorage.setItem(`souvenir_chat_${chatId}`, JSON.stringify(settings)); } catch {}
-}
+// Kept by lib/chat/chat-settings-storage (validated, capped, no agent instructions, cleared on sign-out).
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 

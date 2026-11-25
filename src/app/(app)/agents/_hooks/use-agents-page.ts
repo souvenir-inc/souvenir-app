@@ -20,7 +20,6 @@ import type { AIModel } from '@/types/ai-model'
 import { AGENTS_SEE_ALL_EVENT } from '@/hooks/use-sidebar-events'
 import { type PersonaShare } from '@/lib/api/persona-shares'
 import { personaSharesQuery } from '@/lib/share/share-queries'
-import { personaTagsKey, personaProfileKey } from '@/lib/storage-keys'
 import { AGENTS_ROUTE } from '@/lib/routes'
 import { useAgentFilters } from '../_hooks/use-agent-filters'
 import { resolveModelName as resolveModelNameFor } from '../_lib/agent-models'
@@ -42,6 +41,8 @@ import { toDrawerLink } from '../_lib/super-links'
 
 const EMPTY_PERSONAS: Persona[] = []
 const EMPTY_UNPUBLISHED: Record<string, boolean> = {}
+const EMPTY_AVATAR_OVERRIDES: Record<string, string> = {}
+const EMPTY_TAG_OVERRIDES: Record<string, string[]> = {}
 
 type TabId = 'my-personas' | 'super-links'
 const TAB_IDS: TabId[] = ['my-personas', 'super-links']
@@ -84,10 +85,13 @@ export function useAgentsPage() {
 
   // Re-sync any time the URL's ?tab= changes from outside a click on this
   // page's own Tabs (Back/Forward, or a link landing here with a tab param).
-  useEffect(() => {
-    const urlTab = parseTabParam(searchParams.get('tab'))
-    setActiveTabState(prev => (prev === urlTab ? prev : urlTab))
-  }, [searchParams])
+  // Adjusted while rendering (not in an effect), so there's no extra render with the old tab.
+  const urlTab = parseTabParam(searchParams.get('tab'))
+  const [seenUrlTab, setSeenUrlTab] = useState(urlTab)
+  if (urlTab !== seenUrlTab) {
+    setSeenUrlTab(urlTab)
+    setActiveTabState(urlTab)
+  }
 
   // Sets the tab AND keeps the URL's ?tab= in sync, so the current tab
   // survives a reload/back-nav and links to this page can target a specific
@@ -134,36 +138,16 @@ export function useAgentsPage() {
   // fetchPersonas()). bustPersonasCache() — called by every mutation — refetches it
   // while this page is mounted, and the 30s freshness window covers plain navigation.
   const queryClient = useQueryClient()
-  const { data: personasData, isLoading } = usePersonas()
+  const { data: personasData, isLoading, isError: personasFailed, refetch: refetchPersonas } = usePersonas()
   const personas = personasData ?? EMPTY_PERSONAS
   // Optimistic local edits (pause, delete, model change) patch the shared cache.
   const setPersonas = useCallback((update: (prev: Persona[]) => Persona[]) => {
     queryClient.setQueryData<Persona[]>(PERSONAS_QUERY_KEY, prev => (prev ? update(prev) : prev))
   }, [queryClient])
-  // Avatar/tag overrides from sessionStorage (current-session edits) with localStorage as the
-  // cross-session fallback for tags. Only non-empty values are kept so stale empty arrays never
-  // shadow real API data via the ?? operator.
-  const { draftAvatarMap, draftTagsMap } = useMemo(() => {
-    const avatarOverrides: Record<string, string>   = {}
-    const tagOverrides:    Record<string, string[]> = {}
-    for (const p of personas) {
-      try {
-        const raw = sessionStorage.getItem(personaProfileKey(p.id))
-        const draft = JSON.parse(raw ?? 'null') as Record<string, unknown> | null
-        const draftAvatar = draft?.avatarUrl as string | undefined
-        let   draftTags   = draft?.personaTags as string[] | undefined
-        if (!Array.isArray(draftTags) || draftTags.length === 0) {
-          try {
-            const lsTags = JSON.parse(localStorage.getItem(personaTagsKey(p.id)) ?? 'null') as string[] | null
-            if (Array.isArray(lsTags) && lsTags.length > 0) draftTags = lsTags
-          } catch { /* ignore */ }
-        }
-        if (typeof draftAvatar === 'string' && draftAvatar) avatarOverrides[p.id] = draftAvatar
-        if (Array.isArray(draftTags) && draftTags.length > 0) tagOverrides[p.id]  = draftTags
-      } catch { /* ignore quota / parse errors */ }
-    }
-    return { draftAvatarMap: avatarOverrides, draftTagsMap: tagOverrides }
-  }, [personas])
+  // No more draft overrides: the legacy editor that wrote them to session/local storage is gone, so
+  // what's left there is old and would hide the agent's real avatar and tags. The API's are used.
+  const draftAvatarMap = EMPTY_AVATAR_OVERRIDES
+  const draftTagsMap = EMPTY_TAG_OVERRIDES
   const unpublishedMap = EMPTY_UNPUBLISHED
   const [deleteTarget,  setDeleteTarget]  = useState<Persona | null>(null)
   const [changeModelTarget, setChangeModelTarget] = useState<Persona | null>(null)
@@ -373,6 +357,9 @@ export function useAgentsPage() {
     if (!persona) {
       toast.info('That agent is no longer in your library.')
     } else if (modelUnavailableReason(persona.modelId) && patchableVersionId(persona)) {
+      // A one-off reaction to a link, once its data is in: it also toasts and rewrites the URL,
+      // so it stays an effect.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setChangeModelTarget(persona)
     } else {
       toast.success(`${persona.name} is already on an available model.`)
@@ -398,5 +385,5 @@ export function useAgentsPage() {
     onDeleted: (id) => setReceivedShares(prev => prev.filter(sh => sh.persona_repo_id !== id)),
   })
 
-  return { push, replace, searchParams, closePinboard, currentUserRole, members, user, viewerUserId, personaOwnerMap, viewer, activeTab, setActiveTabState, setActiveTab, detailsId, openDetails, closeDetails, queryClient, personasData, isLoading, personas, setPersonas, draftAvatarMap, draftTagsMap, unpublishedMap, deleteTarget, setDeleteTarget, changeModelTarget, setChangeModelTarget, fixModelsOpen, setFixModelsOpen, fixModelsMounted, setFixModelsMounted, modelsForNameLookup, setModelsForNameLookup, modelCatalogSettled, setModelCatalogSettled, filterSharesLoadedRef, sharesQ, allSharesForFilter, selectedShareId, setSelectedShareId, shareTarget, setShareTarget, versionToPersona, shares, selectedDrawerLink, personaByRepoId, activeShareRepoIds, visibilityForPersona, createdByForPersona, modelIdToName, resolveModelName, modelIdToBlocked, devNotificationsVersion, modelUnavailableReason, isDraftLike, visiblePersonas, unavailableAgents, fixModelId, personasScrollRef, dashboard, sharesLoading, dashboardRefreshing, handleRefreshDashboard, slRange, setSlRange, slDays, receivedShares, setReceivedShares, receivedLoading, search, setSearch, sort, setSort, filters, setFilters, activeFilterCount, toggleFilter, uniqueModelNames, filtered, pausingIds, handleDelete, handleCopyAndEdit, handleUseInChat, handleUseTeamSharedInChat, handleUseReceivedShareInChat, handlePauseToggle }
+  return { push, replace, searchParams, closePinboard, currentUserRole, members, user, viewerUserId, personaOwnerMap, viewer, activeTab, setActiveTabState, setActiveTab, detailsId, openDetails, closeDetails, queryClient, personasData, isLoading, personasFailed, refetchPersonas, personas, setPersonas, draftAvatarMap, draftTagsMap, unpublishedMap, deleteTarget, setDeleteTarget, changeModelTarget, setChangeModelTarget, fixModelsOpen, setFixModelsOpen, fixModelsMounted, setFixModelsMounted, modelsForNameLookup, setModelsForNameLookup, modelCatalogSettled, setModelCatalogSettled, filterSharesLoadedRef, sharesQ, allSharesForFilter, selectedShareId, setSelectedShareId, shareTarget, setShareTarget, versionToPersona, shares, selectedDrawerLink, personaByRepoId, activeShareRepoIds, visibilityForPersona, createdByForPersona, modelIdToName, resolveModelName, modelIdToBlocked, devNotificationsVersion, modelUnavailableReason, isDraftLike, visiblePersonas, unavailableAgents, fixModelId, personasScrollRef, dashboard, sharesLoading, dashboardRefreshing, handleRefreshDashboard, slRange, setSlRange, slDays, receivedShares, setReceivedShares, receivedLoading, search, setSearch, sort, setSort, filters, setFilters, activeFilterCount, toggleFilter, uniqueModelNames, filtered, pausingIds, handleDelete, handleCopyAndEdit, handleUseInChat, handleUseTeamSharedInChat, handleUseReceivedShareInChat, handlePauseToggle }
 }

@@ -1,4 +1,5 @@
 "use client";
+import { httpsUrl } from "@/lib/https-url";
 
 import {
   STRIPE_CHECKOUT_ENDPOINT,
@@ -340,7 +341,7 @@ function normalizeUserProfile(raw: unknown): UserProfile {
         : null,
     connections: Array.isArray(root.connections) ? root.connections : [],
     billing_portal_url:
-      typeof root.billing_portal_url === "string" ? root.billing_portal_url : null,
+      httpsUrl(root.billing_portal_url),
     created_at: typeof root.created_at === "string" ? root.created_at : null,
     active: typeof root.active === "boolean" ? root.active : null,
     org_id: typeof root.org_id === "string" ? root.org_id : null,
@@ -554,13 +555,15 @@ export async function createCheckoutSession(
     | CheckoutSessionResponse
     | { detail?: string; error?: string };
 
-  if (!response.ok || !("checkout_url" in data)) {
+  // Followed with window.location: only an https link is.
+  const checkoutUrl = "checkout_url" in data ? httpsUrl(data.checkout_url) : null;
+  if (!response.ok || !checkoutUrl) {
     const detail = "detail" in data ? data.detail : undefined;
     const error = "error" in data ? data.error : undefined;
     throw new BillingActionError(detail || error || "Failed to create checkout session.", response.status);
   }
 
-  return data;
+  return { ...(data as CheckoutSessionResponse), checkout_url: checkoutUrl };
 }
 
 /** POST /stripe/plan — change an existing Teams subscription in place. */
@@ -585,8 +588,8 @@ export async function openBillingPortal(): Promise<string> {
   const response = await apiFetch(STRIPE_PORTAL_ENDPOINT, { method: "POST" });
   const data: unknown = await response.json().catch(() => null);
   if (!response.ok) throw new BillingActionError(errorReason(data, "Could not open billing portal."), response.status);
-  const url = (data as { portal_url?: unknown } | null)?.portal_url;
-  if (typeof url !== "string" || !url) throw new BillingActionError("Billing portal returned no link.", response.status);
+  const url = httpsUrl((data as { portal_url?: unknown } | null)?.portal_url);
+  if (!url) throw new BillingActionError("Billing portal returned no link.", response.status);
   return url;
 }
 

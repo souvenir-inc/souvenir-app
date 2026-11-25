@@ -25,6 +25,7 @@ import { normalizePct } from "@/lib/utils/format-utils";
 import { AUTH_LOGIN_ROUTE, AUTH_LOGOUT_ROUTE } from "@/lib/routes";
 import { isLoggingOut, markLoggingOut } from "@/lib/auth/logout-state";
 import { clearOrgIdCache, clearSearchRecents, clearSessionTiming } from "@/lib/storage-keys";
+import { clearChatSettings } from "@/lib/chat/chat-settings-storage";
 import { getQueryClient } from "@/lib/query-client";
 import { clearUserScopedCache } from "@/lib/query-invalidation";
 import { queryKeys } from "@/lib/query-keys";
@@ -284,6 +285,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearOrgIdCache();
     clearSearchRecents();
     clearSessionTiming();
+    clearChatSettings();
     clearSelection();
     clearUserScopedCache(getQueryClient());
   };
@@ -317,6 +319,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearSessionTiming();
     clearSearchRecents();
     clearOrgIdCache();
+    clearChatSettings();
     // Other tabs share the cleared session cookie but still hold a token in
     // memory, so tell them to sign out too.
     broadcastLogout();

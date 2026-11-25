@@ -1,3 +1,4 @@
+import { httpsUrl } from "@/lib/https-url";
 import { z } from "zod";
 import { planSchema } from "./plan";
 
@@ -70,8 +71,9 @@ export const invoiceSchema = z.object({
   currency: z.string().nullish().transform((value) => value ?? "usd"),
   status: z.string().nullish().transform((value) => value ?? null),
   created: invoiceDateSchema,
-  invoice_url: z.string().nullish().transform((value) => value ?? null),
-  invoice_pdf: z.string().nullish().transform((value) => value ?? null),
+  // Opened in a new tab: only an https link is kept (see httpsUrl).
+  invoice_url: z.string().nullish().transform((value) => httpsUrl(value)),
+  invoice_pdf: z.string().nullish().transform((value) => httpsUrl(value)),
 });
 
 export function parseInvoices(raw: unknown): InvoiceWire[] {

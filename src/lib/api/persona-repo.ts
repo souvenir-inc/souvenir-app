@@ -16,6 +16,7 @@ import {
   bustPersonasCache,
 } from "./persona-cache";
 import { getQueryClient } from "@/lib/query-client";
+import { parseList } from "./project-schemas";
 import {
   personaRepoSchema,
   personaVersionListItemSchema,
@@ -307,8 +308,10 @@ export const personaReposQuery = () => ({
     retry: false,
     queryFn: async ({ signal }: { signal?: AbortSignal }) => {
       const raw = await apiFetchJson<unknown>(PERSONAS_ENDPOINT, { signal })
+      // Row by row: one agent the schema doesn't recognise is left out (and logged), not a reason
+      // for the whole list to fail.
       return new PersonaRepoCollection(
-        personaRepoSchema.array().parse(raw).map(wire => new PersonaRepo(wire)),
+        parseList(personaRepoSchema, raw, 'agents').map(wire => new PersonaRepo(wire)),
       )
     },
 })

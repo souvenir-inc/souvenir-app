@@ -50,6 +50,21 @@ describe("chat proxy validation", () => {
     expect(fetch).not.toHaveBeenCalled()
   })
 
+  it.each([
+    ["eleven files", Array.from({ length: 11 }, (_, i) => new File(["x"], `f${i}.txt`)), "Attach at most 10 files"],
+    ["a file over 30 MB", [new File([new Uint8Array(30 * 1024 * 1024 + 1)], "big.pdf")], "Each file must be 30 MB or smaller"],
+  ])("refuses %s with a 413 before calling the backend", async (_name, files, message) => {
+    const fetch = vi.fn()
+    vi.stubGlobal("fetch", fetch)
+    const form = new FormData()
+    form.set("input", "hi")
+    for (const file of files) form.append("files", file)
+    const response = await POST(new Request("http://localhost/api/chat", { method: "POST", body: form }) as NextRequest)
+    expect(response.status).toBe(413)
+    expect(await response.json()).toEqual({ error: { code: "payload_too_large", message } })
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
   it("returns a JSON 401 without a session token", async () => {
     const { auth0 } = await import("@/lib/auth0")
     vi.mocked(auth0.getAccessToken).mockRejectedValueOnce(new Error("missing_session"))

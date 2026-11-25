@@ -17,7 +17,7 @@ import { EmptyBoard } from './EmptyBoard'
 import { EmptyBoardList, Frame, NoStore, Problem, Skeleton } from './DashboardStates'
 import { BoardSnapshot } from './share/BoardSnapshot'
 import { fileBase, nodeToPng, numbersCsv, saveFile, stamp } from './share/export'
-import { leaveNoAccess, seedLinkFromQuery, setViewDates, useLinkView } from './share/link-view'
+import { leaveNoAccess, resetLinkView, seedLinkFromQuery, setViewDates, useLinkView } from './share/link-view'
 import { NoAccess } from './share/NoAccess'
 import type { ShareStart } from './share/ShareDialog'
 import { boardLink, copyText, periodLabel } from './share/share-model'
@@ -38,7 +38,7 @@ import { Metrics } from './live/metrics'
 import { SyncBanners } from './sync/SyncBanners'
 import { SyncButton } from './sync/SyncButton'
 import { clock, hoursSince } from './sync/sync-model'
-import { getSyncSnapshot, onSyncEnd, reconnect, useCoarseNow, useSyncState } from './sync/sync-store'
+import { getSyncSnapshot, onSyncEnd, reconnect, resetSyncStore, useCoarseNow, useSyncState } from './sync/sync-store'
 import { showSyncErrorToast, showSyncedToast } from './sync/sync-toasts'
 import type { BoardMenuHandlers } from './tabs/BoardMenus'
 import { ConfirmDialogs, type PendingConfirm } from './tabs/ConfirmDialogs'
@@ -78,6 +78,9 @@ export function DashboardScreen() {
 }
 
 function Loaded({ warehouse, viewer }: { warehouse: Warehouse; viewer: string }) {
+  // Leaving the dashboard ends this visit's link view and sync state: coming back from the sidebar
+  // starts clean, not on an old "No access" page or another warehouse's banners.
+  useEffect(() => () => { resetLinkView(); resetSyncStore() }, [])
   const { orgId } = useOrg()
   const { members, membersLoading } = useOrgMembers()
   const org = orgScope(orgId)

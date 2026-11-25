@@ -1,5 +1,7 @@
 # Decisions for review
 
+> **Note (2026-11-25):** `.github/workflows/ci.yml` is not on `ds-dev` (only on the backup branch), and `src/types/api.generated.ts` is a proposal, not a file. Current status: [re-audit](./reaudit-2026-11-25.md).
+
 Choices made (or left open) while implementing the audits' Phases 3–4. Each has options; **bold** is what the code does today. Reply with the letter you want, and I'll switch it where it differs.
 
 | # | Feature | Decision | Status |

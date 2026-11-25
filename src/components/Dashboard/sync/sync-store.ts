@@ -126,6 +126,12 @@ export function bindSync(next: { warehouse: Warehouse; boardId: string } | null)
   set({ apps: {} })
 }
 
+/** Leaving the dashboard: what this visit started, finished or dismissed doesn't carry into the next (another warehouse, say). */
+export function resetSyncStore() {
+  target = null
+  set({ apps: {}, started: {}, recent: [], dismissed: [] })
+}
+
 /** A board status from the warehouse: the apps' states, and the end of any sync this viewer started. */
 export function setStatus(boardId: string, status: BoardStatus) {
   if (target?.boardId !== boardId) return

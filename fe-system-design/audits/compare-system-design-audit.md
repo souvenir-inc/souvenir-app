@@ -1,5 +1,7 @@
 # Compare Feature: System Design Audit
 
+> **Note (2026-11-25):** The Compare modal (`components/compare/CompareModels.tsx`, `context/compare-context.tsx`, `lib/compare/*`) was deleted on 2026-10-31; only the dev-only `app/(app)/compare/CompareLab.tsx` remains. Every item below is obsolete. Current status: [re-audit](./reaudit-2026-11-25.md).
+
 > **Status (Oct 14 2026): Phase 1 done; Phase 2 done (items 1, 2, 4 approved and done Oct 14).** Phases 3–4 open.
 >
 > Done (Phase 1):

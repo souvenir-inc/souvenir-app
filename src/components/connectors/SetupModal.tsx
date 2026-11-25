@@ -86,7 +86,7 @@ function setupFormSchema(existingNames: string[], required: string[]) {
 }
 
 export function SetupModal({
-  catalog, orgId, mode, initialAccount, cancel, onConnected,
+  catalog, orgId, mode, initialAccount, cancel, onConnected, returnTo,
 }: {
   catalog: ConnectorCatalog
   /** Null when the viewer is in no workspace — nobody to share with. */
@@ -95,6 +95,8 @@ export function SetupModal({
   initialAccount?: ConnectorConnection
   cancel: () => void
   onConnected: (result: SetupFlowResult) => void
+  /** Where a sign-in that leaves the page comes back to (see useConnectorSetupFlow). */
+  returnTo?: string | null
 }) {
   const reconnecting = mode === 'reconnect'
 
@@ -103,6 +105,7 @@ export function SetupModal({
     connectorName: catalog.name,
     connectorProvider: catalog.provider,
     onConnected,
+    returnTo,
   })
 
   // What this link may name and share is whatever row it produces, and only a

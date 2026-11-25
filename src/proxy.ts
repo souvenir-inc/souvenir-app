@@ -169,5 +169,9 @@ export const config = {
     // would trigger a /users/me fetch each. Middleware runs before route
     // handlers, so it must be skipped here entirely.
     "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|dispatch|.*\\..*).*)",
+    // Every route handler, dotted or not: the pattern above skips any path with a dot so files get
+    // through, which also skipped /api/backend/openapi.json, /api/backend/v1.0/… and so on, past the
+    // session and cross-site checks the "api" case gives every handler.
+    "/api/:path*",
   ],
 };

@@ -1,5 +1,7 @@
 # Organizations: System Design Audit
 
+> **Note (2026-11-25):** `org/layout.tsx` is now `app/(app)/settings/(shell)/(org)/layout.tsx`. Current status: [re-audit](./reaudit-2026-11-25.md).
+
 > **Status (Oct 14 2026): Phase 1 done; Phase 2 done except the backend items (2.4 multi-org, 2.5 paging); the three-context split (2.2) done Oct 14. Phase 3 items 1, 3, 4 done (Oct 14); 2 and 5 open.** Phase 4 open.
 >
 > Done (Phase 1):

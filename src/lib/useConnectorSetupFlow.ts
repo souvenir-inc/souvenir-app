@@ -22,6 +22,7 @@ import {
   ConnectorCatalog,
 } from '@/lib/api/connectors'
 import { isApiProviderConnector, opensInCurrentTab, isZapierProviderConnector, waitForZapierAuthId, zapierConnectHref } from '@/lib/connectorProvider'
+import { rememberReturn } from '@/lib/connector-return'
 
 export type SetupState = 'idle' | 'opening' | 'polling' | 'submitting' | 'error'
 
@@ -35,9 +36,11 @@ interface UseConnectorSetupFlowArgs {
   connectorName: string
   connectorProvider?: string | null
   onConnected: (result: SetupFlowResult) => void
+  /** Where to come back to once a sign-in that leaves the page lands back (the dashboard's Reconnect). */
+  returnTo?: string | null
 }
 
-export function useConnectorSetupFlow({ connectorSlug, connectorName, connectorProvider, onConnected }: UseConnectorSetupFlowArgs) {
+export function useConnectorSetupFlow({ connectorSlug, connectorName, connectorProvider, onConnected, returnTo }: UseConnectorSetupFlowArgs) {
   const [state, setState] = useState<SetupState>('idle')
   const [error, setError] = useState<ConnectErrorInfo | null>(null)
   const abortedRef = useRef(false)
@@ -128,6 +131,9 @@ export function useConnectorSetupFlow({ connectorSlug, connectorName, connectorP
           if (shared || accountLabel) {
             toast.info(`Finish authorizing ${connectorName}, then set its name and sharing from the account's settings.`)
           }
+          // Remembered only now, as the page leaves: written any earlier, a popup opened from this
+          // tab would copy it with the rest of the session storage and follow it itself.
+          if (returnTo) rememberReturn(connectorSlug, returnTo)
           window.location.href = url
           return
         }

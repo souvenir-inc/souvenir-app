@@ -35,8 +35,9 @@ export function schedulePrompt(data: ScheduleEditData, isEdit: boolean): string 
     isEdit ? `I want to update the schedule "${data.name}".` : `I want to create a schedule called "${data.name}".`,
     ``,
     `${isEdit ? 'Updated instructions' : 'Instructions'}: ${data.instructions}`,
-    `${isEdit ? 'Updated frequency' : 'Frequency'}: ${data.frequency}`,
-    ...(data.timezone ? [`Timezone: ${data.timezone}`] : []),
+    // A trigger left as it is isn't mentioned, so Task doesn't take it as a change.
+    ...(isEdit && data.frequencyUnchanged ? ['Keep the current schedule timing as it is.'] : [`${isEdit ? 'Updated frequency' : 'Frequency'}: ${data.frequency}`]),
+    ...(data.timezone && !data.frequencyUnchanged ? [`Timezone: ${data.timezone}`] : []),
   ].join('\n')
 }
 

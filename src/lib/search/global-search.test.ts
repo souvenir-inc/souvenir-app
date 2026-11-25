@@ -36,6 +36,16 @@ describe('searchIndex', () => {
     expect(results.find(r => r.id === 'pin1')?.subtitle).toBe('in Revenue in Q3')
   })
 
+  it('lists a project or agent chat once, in its own group, though GET /chats returns it too', () => {
+    const both = buildSearchIndex({
+      ...SOURCES,
+      chats: [...SOURCES.chats, { id: 'pc1', title: 'Revenue in Q3' }, { id: 'ac1', title: 'Ask about revenue' }],
+    })
+    const hits = searchIndex(both, 'revenue').map(r => `${r.type}:${r.id}`)
+    expect(hits.filter(h => h.endsWith(':pc1'))).toEqual(['chat:pc1'])
+    expect(hits.filter(h => h.endsWith(':ac1'))).toEqual(['agent-chat:ac1'])
+  })
+
   it('returns nothing for a blank query', () => {
     expect(searchIndex(index, '   ')).toEqual([])
   })

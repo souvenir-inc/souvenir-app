@@ -29,6 +29,27 @@ describe("backend proxy", () => {
     expect(res.headers.get("X-Request-Id")).toBe(sent["X-Request-Id"])
   })
 
+  it("encodes each path segment again, so a decoded ?, # or / can't change the backend URL", async () => {
+    const fetch = vi.fn().mockResolvedValue(new Response("{}"))
+    vi.stubGlobal("fetch", fetch)
+    await GET(new Request("http://localhost/api/backend/x") as NextRequest, ctx("users", "auth0|a?b#c/d", "items"))
+    expect(fetch.mock.calls[0][0]).toMatch(/\/users\/auth0%7Ca%3Fb%23c%2Fd\/items$/)
+  })
+
+  it("refuses . and .. segments", async () => {
+    const fetch = vi.fn()
+    vi.stubGlobal("fetch", fetch)
+    const res = await GET(new Request("http://localhost/api/backend/x") as NextRequest, ctx("chats", "..", "admin"))
+    expect(res.status).toBe(400)
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it("does not pass the backend's cookies on to our origin", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("{}", { headers: { "set-cookie": "upstream=1" } })))
+    const res = await GET(new Request("http://localhost/api/backend/chats") as NextRequest, ctx("chats"))
+    expect(res.headers.get("set-cookie")).toBeNull()
+  })
+
   it("streams SSE with buffering disabled and drops content-length/encoding", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("data: x\n\n", {
       headers: { "content-type": "text/event-stream", "content-length": "9", "content-encoding": "gzip" },

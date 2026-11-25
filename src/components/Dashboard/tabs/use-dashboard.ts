@@ -53,7 +53,9 @@ export function useDashboard(initial: DashboardState, store: BoardStore, measura
     window.clearTimeout(retry.current)
     if (!waiting.current) return
     waiting.current = false
-    store.save(latest.current.state, latest.current.measurable).then(
+    // Started in a promise, so anything save throws while building its requests lands in the
+    // handling below (a toast and a retry) instead of escaping the timer with the change lost.
+    Promise.resolve().then(() => store.save(latest.current.state, latest.current.measurable)).then(
       () => { failures.current = 0 },
       (error: unknown) => {
         // A board shared with the viewer was deleted or unshared since they loaded it: nothing was

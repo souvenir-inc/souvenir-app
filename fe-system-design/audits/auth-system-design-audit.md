@@ -1,5 +1,7 @@
 # Auth: System Design Audit
 
+> **Note (2026-11-25):** `app/auth/access-token/route.ts` no longer exists: the Auth0 v4 SDK serves `/auth/access-token` itself. Current status: [re-audit](./reaudit-2026-11-25.md).
+
 Scope: `proxy.ts` (326, Next 16 proxy, formerly middleware: session gate plus onboarding gate), `proxy.test.ts`, `lib/auth0.ts`, `app/auth/[auth0]`, `app/auth/access-token`, `app/auth/logout`, `context/auth-context.tsx` (356), `lib/jwt-utils.ts` (103), `lib/api/client.ts` (297, token injection and 401 recovery), `lib/api-client.ts`, `lib/http-errors.ts`, `lib/onboarding-access.ts`, `lib/roles.ts`, `app/api/backend/[...path]`, CSP/header config in `next.config.ts`. About 2,200 lines.
 Method: `proxy.ts`, `auth0.ts`, route handlers, `jwt-utils`, the token parts of `auth-context` and `api/client` read; config checked by grep. Items marked (verify) need a closer look.
 Scoring: 1 = applied, 0.5 = partial, 0 = absent, applicable principles only.

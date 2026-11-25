@@ -13,8 +13,8 @@ export function usePersonas() {
   return useQuery({
     queryKey: PERSONAS_QUERY_KEY,
     queryFn: loadPersonas,
-    // The old code never retried a failed list fetch — keep that.
-    retry: false,
+    // The app's usual retries (a dropped request is tried again; a 4xx isn't). A list that still
+    // fails shows as failed, with Try again, not as "no agents yet".
   });
 }
 

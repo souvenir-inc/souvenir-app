@@ -1,5 +1,7 @@
 # Bundle Performance Fix Plan (with before and after)
 
+> **Note (2026-11-25):** `lib/katex-lazy.ts` was not done (KaTeX still loads with chat, by decision); the budget script is `scripts/perf-bundle.mjs` with `perf-budget.json`. Current status: [re-audit](./reaudit-2026-11-25.md).
+
 Goal: remove the heavy libraries from the main (initial) JavaScript of the chat page and every authenticated page, then keep it that way with budgets.
 Basis: a fresh production build (`ANALYZE=true next build --webpack`, Oct 10 2026, exit 0) plus reading the import chains.
 

@@ -193,6 +193,6 @@ const toProjectCard = (p: InternalProject): ProjectCard => ({
 ### In this codebase
 Measured with a quick scan of `src/` (not a full audit):
 - `src/app/api/backend/[...path]/route.ts` is a **same-origin streaming proxy** to the back-end (Node runtime, `maxDuration` 800, drops hop-by-hop headers and the session `cookie`, forwards a Bearer token, passes the upstream body straight through so SSE is not buffered). It replaced a `next.config.ts` rewrite that buffered chunked responses. This is a pass-through proxy, not yet a composing BFF.
-- `src/app/api/chat/route.ts` and `src/app/api/persona-chat/route.ts` are named routes for the streaming chat paths.
+- `src/app/api/chat/route.ts` is the named route for streaming chat (agents included; `/api/persona-chat` was folded into it).
 - `src/proxy.ts` (Next.js 16 proxy, formerly middleware) calls the back-end `/users/me` to gate onboarding, with a per-user positive cache so each prefetched link no longer costs a backend call.
 - Screens that currently make several client calls on mount (dashboards, settings, billing and plan pages) are candidates for a server data function that fans out with `Promise.all` and returns a DTO; the proxy can stay for streaming and generic calls.

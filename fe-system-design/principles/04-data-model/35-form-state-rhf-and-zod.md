@@ -236,5 +236,5 @@ if (!res.ok) {
 
 ### In this codebase
 - `react-hook-form` and `@hookform/resolvers` are **not installed**. `zod` (^4.4) is installed and used for schemas in `src/lib/agui/schemas.ts`, `src/lib/api/billing-schemas.ts` and `src/lib/api/sse-schemas.ts`, and `safeParse` appears in `src/app/api/template/[uuid]/route.ts`.
-- Forms are few and hand-built, for example `src/components/ConnectorRequestModal/index.tsx`, `src/components/connectors/CustomApiModal.tsx` and `src/components/RequestDemoModal/index.tsx`. Check whether they use controlled `useState` per field and hand-written validation that a shared Zod schema could replace.
+- Forms are few and hand-built, for example `src/components/connectors/CustomApiModal.tsx` and `src/components/RequestDemoModal/index.tsx`. Check whether they use controlled `useState` per field and hand-written validation that a shared Zod schema could replace.
 - No `useActionState` or Server Actions (`"use server"`) are in use; the app talks to a separate backend. A form's schema can still be shared with the request-body type, and RHF should be added only when a form grows large enough (field arrays, dependent fields) to justify a new dependency.

@@ -1,5 +1,7 @@
 # Frontend Features
 
+> **Note (2026-11-25):** The agent sizes and file names below are from Oct 14; the legacy editor files they name are deleted. Current sizes are in `audits/reaudit-2026-11-25.md`. Current status: [re-audit](./audits/reaudit-2026-11-25.md).
+
 Inferred from the route structure in `src/app` and component names in `src/components`. Not yet verified against page code.
 
 ## Core

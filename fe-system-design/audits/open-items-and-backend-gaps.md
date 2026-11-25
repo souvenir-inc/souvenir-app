@@ -2,7 +2,7 @@
 
 One place for what is still open after each audit's fixes, and what only the backend can do. Each audit's own Status block has the detail; this file is the roll-up. Updated as Phase 2 progresses.
 
-Last updated: Oct 14 2026.
+Last updated: Oct 14 2026. **Nov 25 2026:** a full re-audit re-checked every item here; the current open list (safe front-end work, decisions, backend gaps) is in [reaudit-2026-11-25.md](./reaudit-2026-11-25.md).
 
 ## Shared foundation (Phase 2, Step 0)
 

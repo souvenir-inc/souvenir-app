@@ -7,6 +7,7 @@
 import type { General, Grant } from '@/lib/api/warehouse'
 import { dims, firstFit, fitAtEnd, flowCards, pack, resize, toItems, withItems } from '../grid-layout'
 import type { BoardCard, CardSize } from '../types'
+import { validCompare, validPeriod } from '../period'
 
 export type Access = 'owner' | 'edit' | 'view'
 
@@ -363,7 +364,11 @@ export function boardReducer(s: DashboardState, a: BoardAction): DashboardState 
     case 'set-dates': {
       const b = s.boards[a.id]
       if (!b) return s
-      return { ...s, boards: { ...s.boards, [a.id]: { ...b, period: a.period ?? b.period, compare: a.compare ?? b.compare } } }
+      // Only dates the board can read: one from a hand-edited link is ignored rather than saved.
+      const period = validPeriod(a.period) ? a.period : b.period
+      const compare = validCompare(a.compare) ? a.compare : b.compare
+      if (period === b.period && compare === b.compare) return s
+      return { ...s, boards: { ...s.boards, [a.id]: { ...b, period, compare } } }
     }
     case 'purge-expired': {
       const expired = s.deleted.filter((d) => daysLeft(d.deletedAt, a.now) <= 0).map((d) => d.id)

@@ -110,8 +110,14 @@ describe('fetchPersonas', () => {
     expect(apiFetchJson).toHaveBeenCalledTimes(1)
   })
 
-  it('rejects a response that does not match the backend schema', async () => {
+  // Row by row: one agent the schema doesn't recognise is left out, the rest still show.
+  it('leaves out an agent that does not match the backend schema', async () => {
     apiFetchJson.mockResolvedValueOnce([{ id: 'repo-1', name: 'Sales Agent' }])
+    await expect(fetchPersonas()).resolves.toEqual([])
+  })
+
+  it('rejects a response that is not a list', async () => {
+    apiFetchJson.mockResolvedValueOnce({ detail: 'nope' })
     await expect(fetchPersonas()).rejects.toThrow()
   })
 

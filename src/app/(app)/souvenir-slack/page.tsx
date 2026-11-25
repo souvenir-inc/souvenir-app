@@ -13,6 +13,7 @@ import type { SlackStatus } from '@/lib/api/slack'
 import { SlackWorkspaceConfig } from './SlackWorkspaceConfig'
 import { SlackAdminOnly, SlackNotConnected } from './SlackEmptyState'
 import styles from './slack-config.module.css'
+import { slackUrl } from '@/lib/https-url'
 
 export default function SouvenirSlackPage() {
   const { orgId, orgReady, orgRole } = useOrg()
@@ -47,7 +48,9 @@ export default function SouvenirSlackPage() {
     if (!isAdmin || !workspace || updating || removing) return
     setUpdating(true)
     try {
-      const url = await getSlackInstallUrl(workspace.teamId)
+      // Only ever on to Slack's own install screen.
+      const url = slackUrl(await getSlackInstallUrl(workspace.teamId))
+      if (!url) throw new Error('Could not start Slack permission update')
       window.location.assign(url)
     } catch (err) {
       setUpdating(false)
