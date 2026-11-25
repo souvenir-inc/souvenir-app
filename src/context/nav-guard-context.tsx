@@ -207,18 +207,18 @@ export function NavGuardModal() {
         onInteractOutside={(e) => { if (isSaving) e.preventDefault() }}
         style={{
           backgroundColor: 'var(--modal-bg)',
-          padding: 24,
-          gap: 20,
+          padding: 'var(--space-6)',
+          gap: 'var(--space-5)',
           boxShadow: 'var(--shadow-4)',
         }}
       >
         <div>
           <DialogTitle>{message.title}</DialogTitle>
-          <DialogDescription style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: '8px 0 0' }}>
+          <DialogDescription style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 'var(--space-2) 0 0' }}>
             {message.description}
           </DialogDescription>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
           <Button variant="secondary" size="sm" disabled={isSaving} onClick={cancelLeave}>
             Stay
           </Button>

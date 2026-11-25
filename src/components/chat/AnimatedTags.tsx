@@ -48,14 +48,14 @@ export function AnimatedTags({ data, onComplete, animate = true }: { data: TagsD
 
   return (
     <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18 }} style={{ fontFamily: "var(--font-body)" }}>
-      {data.title && <div style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-600)", marginBottom: 'var(--space-2)', textTransform: "uppercase", letterSpacing: "0.5px" }}>{data.title}</div>}
+      {data.title && <div style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-600)", marginBottom: 'var(--space-2)', textTransform: "uppercase", letterSpacing: "var(--tracking-wider)" }}>{data.title}</div>}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 'var(--space-1-5)' }}>
         {data.tags.slice(0, revealedTags).map((tag, i) => {
           const pal = tagPalette(tag.color, i, isLight);
           return (
             <m.span key={tag.label} initial={{ scale: 0.55, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
               transition={{ type: "spring", stiffness: 420, damping: 22 }}>
-              <span style={{ display: "inline-flex", alignItems: "center", background: pal.bg, border: `1px solid ${pal.border}`, color: pal.text, borderRadius: 99, padding: "var(--space-0-5) var(--space-2-5)", fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-body-sm)' }}>
+              <span style={{ display: "inline-flex", alignItems: "center", background: pal.bg, border: `1px solid ${pal.border}`, color: pal.text, borderRadius: 'var(--radius-full)', padding: "var(--space-0-5) var(--space-2-5)", fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-body-sm)' }}>
                 {tag.label}
               </span>
             </m.span>

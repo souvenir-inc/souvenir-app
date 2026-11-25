@@ -228,7 +228,7 @@ function NotificationRow({ notification: n, unread, onSelect, onMarkRead, onMark
         gap:             'var(--space-2-5)',
         width:           '100%',
         boxSizing:       'border-box',
-        padding:         '8px 26px 8px 8px',
+        padding:         'var(--notification-row-padding)',
         borderRadius:    'var(--radius-md)',
         cursor:          'pointer',
         userSelect:      'none',

@@ -195,7 +195,7 @@ export const TeamSwitcher = React.forwardRef<HTMLDivElement, TeamSwitcherProps>(
                 padding:        'var(--space-0-5)',
                 flexShrink:     0,
                 background:     'linear-gradient(180deg, var(--neutral-white) 0%, var(--neutral-50) 100%)',
-                boxShadow:      '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4)',
+                boxShadow:      'var(--team-switcher-avatar-shadow)',
               }}
             >
               <ArrowDownOneIcon size={16} color="var(--neutral-500)" />
@@ -245,7 +245,7 @@ export const TeamSwitcher = React.forwardRef<HTMLDivElement, TeamSwitcherProps>(
                   />
                 </div>
 
-                <Divider decorative style={{ margin: 'var(--space-1) 0', borderColor: 'rgba(59,54,50,0.1)' }} />
+                <Divider decorative style={{ margin: 'var(--space-1) 0', borderColor: 'var(--neutral-800-10)' }} />
 
                 {/* Teams section header */}
                 <p style={{
@@ -254,7 +254,7 @@ export const TeamSwitcher = React.forwardRef<HTMLDivElement, TeamSwitcherProps>(
                   fontSize:      'var(--font-size-caption)',
                   lineHeight:    'var(--line-height-small)',
                   color:         'var(--neutral-400)',
-                  letterSpacing: '0.06em',
+                  letterSpacing: 'var(--tracking-caps)',
                   textTransform: 'uppercase',
                   padding:       'var(--space-1) var(--space-2) var(--space-0-5)',
                   margin:        0,

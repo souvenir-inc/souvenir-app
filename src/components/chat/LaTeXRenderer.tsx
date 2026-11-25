@@ -43,7 +43,7 @@ export const renderBoldInlineContent = (
             backgroundColor: "var(--neutral-100)",
             padding: "var(--space-0-5) var(--space-1)",
             fontFamily: "var(--font-code)",
-            fontSize: "0.875em",
+            fontSize: "var(--latex-inline-size)",
           }}
         >
           {match[6]}

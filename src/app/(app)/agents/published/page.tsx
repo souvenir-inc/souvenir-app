@@ -153,7 +153,7 @@ function PersonaPublishedContent() {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: 76,
+              gap: 'var(--agent-published-gap)',
               position: 'relative',
               paddingBottom: 'var(--space-9)',
             }}
@@ -168,7 +168,7 @@ function PersonaPublishedContent() {
                 transform: 'translate(-50%, 0)',
                 width: 716,
                 height: 586,
-                borderRadius: 28,
+                borderRadius: 'var(--radius-3xl)',
                 filter: 'blur(108px)',
                 mixBlendMode: 'hard-light',
                 background:
@@ -197,7 +197,7 @@ function PersonaPublishedContent() {
                   position: 'relative',
                   width: 152,
                   height: 152,
-                  borderRadius: 32,
+                  borderRadius: 'var(--radius-4xl)',
                   flexShrink: 0,
                   overflow: 'hidden',
                   boxShadow:
@@ -253,7 +253,7 @@ function PersonaPublishedContent() {
               style={{
                 display:        'flex',
                 flexDirection:  'column',
-                gap:            14,
+                gap:            'var(--space-3)',
                 alignItems:     'center',
                 position:       'relative',
                 zIndex:         1,
@@ -261,7 +261,7 @@ function PersonaPublishedContent() {
                 // the outer column's gap:76 (shared with the spacing before the
                 // action-button row further down) is too wide for just this
                 // pairing, so this overrides only its own top offset.
-                marginTop:      -48,
+                marginTop:      'calc(var(--space-9) * -1)',
               }}
             >
               {/* Own bordered card — separates "What's next" + Super Link

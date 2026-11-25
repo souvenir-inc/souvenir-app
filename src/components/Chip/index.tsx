@@ -201,8 +201,8 @@ export function Chip(
             position:        'relative',
             display:         'inline-flex',
             alignItems:      'center',
-            padding:         '2px',
-            borderRadius:    '6px',
+            padding:         'var(--space-0-5)',
+            borderRadius:    'var(--radius-sm)',
             // backgroundColor goes on the element itself - avoids z-index stacking
             // issue where an absolute overlay div would render above inline children
             backgroundColor: cfg.bg,

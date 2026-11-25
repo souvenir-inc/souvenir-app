@@ -58,12 +58,12 @@ function Download({ board, period, compare, onClose, onImage, onNumbers }: Omit<
       hideClose
       aria-describedby={undefined}
       data-download-dialog
-      style={{ width: 'min(520px, calc(100vw - 32px))', maxWidth: 'none', maxHeight: 'calc(100dvh - 96px)', borderRadius: 16, padding: 0, background: 'var(--dashboard-card-bg)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+      style={{ width: 'min(520px, calc(100vw - 32px))', maxWidth: 'none', maxHeight: 'calc(100dvh - 96px)', borderRadius: 'var(--radius-2xl)', padding: 0, background: 'var(--dashboard-card-bg)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
     >
       <div className="relative flex shrink-0 items-center px-5 pb-3 pt-5">
-        <DialogTitle className="min-w-0 truncate pr-8 text-[16px] font-semibold leading-6 text-[var(--dashboard-figure)]">Download “{board.label}”</DialogTitle>
+        <DialogTitle className="min-w-0 truncate pr-8 text-[length:var(--font-size-body-lg)] font-semibold leading-6 text-[var(--dashboard-figure)]">Download “{board.label}”</DialogTitle>
         <DialogClose asChild>
-          <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-4 size-7 rounded-[8px]" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
+          <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-4 size-7 rounded-md" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
         </DialogClose>
       </div>
 
@@ -87,22 +87,22 @@ function Download({ board, period, compare, onClose, onImage, onNumbers }: Omit<
                 FOCUS,
               )}
             >
-              <span className="flex items-center gap-1.5 text-[14px] font-medium leading-5 text-[var(--dashboard-figure)]"><Icon aria-hidden size={15} strokeWidth={1.5} absoluteStrokeWidth />{label}</span>
-              <span className="pl-[21px] text-[12px] leading-4 text-[var(--dashboard-label)]">{line}</span>
+              <span className="flex items-center gap-1.5 text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--dashboard-figure)]"><Icon aria-hidden size={15} strokeWidth={1.5} absoluteStrokeWidth />{label}</span>
+              <span className="pl-[21px] text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">{line}</span>
             </button>
           ))}
         </div>
 
         {kind === 'numbers' && (
           <>
-            <p className="m-0 text-[12px] font-medium leading-4 text-[var(--dashboard-label)]">Cards</p>
+            <p className="m-0 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-label)]">Cards</p>
             <ul data-download-cards className="m-0 grid list-none grid-cols-2 gap-x-4 gap-y-1 p-0">
               {ids.map((id) => {
                 const m = metrics.get(id)
                 const on = ticked.includes(id)
                 return (
                   <li key={id}>
-                    <label data-card-option={id} className="flex h-7 cursor-pointer items-center gap-2 text-[13px] leading-5 text-[var(--dashboard-figure)]">
+                    <label data-card-option={id} className="flex h-7 cursor-pointer items-center gap-2 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-figure)]">
                       {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a native checkbox in the card list */}
                       <input
                         type="checkbox"
@@ -116,11 +116,11 @@ function Download({ board, period, compare, onClose, onImage, onNumbers }: Omit<
                 )
               })}
             </ul>
-            <p className="m-0 text-[12px] leading-4 text-[var(--dashboard-label)]">
+            <p className="m-0 text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">
               One sheet for {datesLabel(period, compare)}: a row per day, each card’s figure{compare === 'none' ? '' : ' with its comparison beside it'}.
             </p>
             {failed && (
-              <p role="alert" data-download-failed className="m-0 flex items-center gap-1.5 text-[12px] leading-4 text-[var(--dashboard-error)]">
+              <p role="alert" data-download-failed className="m-0 flex items-center gap-1.5 text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-error)]">
                 <TriangleAlert aria-hidden size={12} strokeWidth={1.5} absoluteStrokeWidth />Couldn’t download the numbers. Try again.
               </p>
             )}

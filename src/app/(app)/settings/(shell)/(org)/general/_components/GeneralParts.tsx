@@ -97,10 +97,10 @@ export function CardHeader({
       borderBottom: '1px solid var(--neutral-100)',
       // Symmetric top/bottom — was '12px 24px 24px', which left the title
       // cramped against the card's top border compared to the space below it.
-      padding:      '24px',
+      padding:      'var(--space-6)',
       display:      'flex',
       alignItems:   'flex-start',
-      gap:          12,
+      gap:          'var(--space-3)',
     }}>
       <div style={{ flex: '1 0 0', minWidth: 0 }}>
         <p style={{

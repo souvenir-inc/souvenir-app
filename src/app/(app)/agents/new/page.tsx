@@ -62,7 +62,7 @@ const PROBLEM_MESSAGE = {
 
 function Centered({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 35, alignItems: 'center', width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--agents-new-gap)', alignItems: 'center', width: '100%' }}>
       {children}
     </div>
   )
@@ -124,7 +124,7 @@ function PurposeStep({
         <p
           id="agent-purpose-suggestions"
           style={{
-            margin: '8px 0 -4px', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)',
+            margin: 'var(--space-2) 0 calc(var(--space-1) * -1)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)',
             fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)',
           }}
         >

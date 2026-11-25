@@ -160,7 +160,7 @@ function TeamsWorkspacePreview() {
               borderRadius: "var(--radius-md)",
               background: "linear-gradient(180deg, var(--neutral-700) 0%, var(--neutral-900) 100%)",
               boxShadow:
-                "0px 0px 0px 1px black, 0px 1px 1px rgba(59,54,50,0.1), 0px 1.5px 3px rgba(59,54,50,0.4)",
+                "var(--welcome-cta-shadow)",
             }}
           >
             {/* Globe / Souvenir mark */}
@@ -290,16 +290,16 @@ function TeamsWorkspacePreview() {
 
 function SouvenirWordmark() {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "11.5px" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "var(--welcome-wordmark-gap)" }}>
       <SouvenirLogo size={40} alt="Souvenir" style={{ display: "inline-block" }} />
       <span
         style={{
           fontFamily: "var(--font-title)",
           fontWeight: 'var(--font-weight-regular)',
-          fontSize: "34px",
+          fontSize: "var(--welcome-title-size)",
           lineHeight: 'var(--leading-none)',
           color: "var(--static-black)",
-          letterSpacing: "0.34px",
+          letterSpacing: "var(--tracking-wide)",
         }}
       >
         Souvenir

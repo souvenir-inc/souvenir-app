@@ -170,7 +170,7 @@ export default function OnboardingImportPage() {
               fontSize: "var(--font-size-body)",
               lineHeight: 'var(--line-height-body)',
               color: "var(--legacy-0a0a0a)",
-              letterSpacing: "0.07px",
+              letterSpacing: "var(--tracking-normal)",
             }}
           >
             Universal prompt - works with any AI tool

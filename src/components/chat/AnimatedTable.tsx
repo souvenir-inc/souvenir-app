@@ -20,7 +20,7 @@ function renderTableCell(cell: TableCellValue, badgeMap?: TableData["badgeMap"])
       <span style={{
         display: "inline-flex", alignItems: "center",
         background: cell.bg, color: cell.color, border: `1px solid ${cell.border ?? cell.bg}`,
-        borderRadius: 99, padding: "var(--space-0-5) var(--space-2)", fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-small)', whiteSpace: "nowrap",
+        borderRadius: 'var(--radius-full)', padding: "var(--space-0-5) var(--space-2)", fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-small)', whiteSpace: "nowrap",
       }}>
         {cell.label}
       </span>
@@ -32,7 +32,7 @@ function renderTableCell(cell: TableCellValue, badgeMap?: TableData["badgeMap"])
         {cell.badge && (
           <span style={{
             display: "inline-flex", marginTop: 'var(--space-1)', background: cell.badge.bg, color: cell.badge.color,
-            border: `1px solid ${cell.badge.border ?? cell.badge.bg}`, borderRadius: 99,
+            border: `1px solid ${cell.badge.border ?? cell.badge.bg}`, borderRadius: 'var(--radius-full)',
             padding: "var(--space-0-5) var(--space-1-5)", fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', lineHeight: "var(--line-height-small)",
           }}>
             {cell.badge.label}
@@ -48,13 +48,13 @@ function renderTableCell(cell: TableCellValue, badgeMap?: TableData["badgeMap"])
       <span style={{
         display: "inline-flex", alignItems: "center",
         background: bs.bg, color: bs.color, border: `1px solid ${bs.border ?? bs.bg}`,
-        borderRadius: 99, padding: "var(--space-0-5) var(--space-2)", fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-small)', whiteSpace: "nowrap",
+        borderRadius: 'var(--radius-full)', padding: "var(--space-0-5) var(--space-2)", fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-small)', whiteSpace: "nowrap",
       }}>
         {strVal}
       </span>
     );
   }
-  if (strVal === "✓") return <span style={{ color: "var(--green-600)", fontWeight: 700 }}>{"✓"}</span>;
+  if (strVal === "✓") return <span style={{ color: "var(--green-600)", fontWeight: 'var(--font-weight-bold)' }}>{"✓"}</span>;
   if (strVal === "-") return <span style={{ color: "var(--neutral-300)", fontWeight: 'var(--font-weight-regular)' }}>-</span>;
   return strVal;
 }
@@ -192,7 +192,7 @@ export function AnimatedTable({ data, onComplete, animate = true }: { data: Tabl
               aria-sort={data.sortable ? (sortCol === ci ? (sortDir === "asc" ? "ascending" : "descending") : "none") : undefined}
               style={{
                 padding: isCompact ? "6px 12px" : "9px 14px",
-                fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)", fontSize: 'var(--font-size-body)', letterSpacing: "0.1px",
+                fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)", fontSize: 'var(--font-size-body)', letterSpacing: "var(--tracking-normal)",
                 borderLeft: (!isMinimal && !isHoverable) ? (ci > 0 ? "1px solid var(--neutral-800-10)" : "none") : "none",
                 cursor: data.sortable ? "pointer" : "default",
                 userSelect: "none", display: "flex", alignItems: "center", gap: 'var(--space-1)',
@@ -231,7 +231,7 @@ export function AnimatedTable({ data, onComplete, animate = true }: { data: Tabl
                       {isMixed && ci === 0 ? (
                         <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)', width: "100%" }}>
                           <div style={{ height: 11, width: `${skelW(ri, ci)}%`, background: "var(--neutral-800-10)", borderRadius: 'var(--radius-xs)', animation: `kaya-skeleton-pulse 1.4s ease-in-out infinite`, animationDelay: `${(ri + ci) * 0.06}s` }} />
-                          <div style={{ height: 8, width: `${skelW(ri, ci) * 0.6}%`, background: "rgba(59,54,50,0.05)", borderRadius: 'var(--radius-xs)', animation: `kaya-skeleton-pulse 1.4s ease-in-out infinite`, animationDelay: `${(ri + ci) * 0.06 + 0.1}s` }} />
+                          <div style={{ height: 8, width: `${skelW(ri, ci) * 0.6}%`, background: "var(--neutral-800-05)", borderRadius: 'var(--radius-xs)', animation: `kaya-skeleton-pulse 1.4s ease-in-out infinite`, animationDelay: `${(ri + ci) * 0.06 + 0.1}s` }} />
                         </div>
                       ) : (
                         <div style={{ height: skelH, width: `${skelW(ri, ci)}%`, background: "var(--neutral-800-10)", borderRadius: 'var(--radius-xs)', animation: `kaya-skeleton-pulse 1.4s ease-in-out infinite`, animationDelay: `${(ri + ci) * 0.06}s` }} />
@@ -295,7 +295,7 @@ export function AnimatedTable({ data, onComplete, animate = true }: { data: Tabl
             </span>
             <button onClick={copyMarkdown} style={{
               display: "flex", alignItems: "center", gap: 'var(--space-1)', padding: "var(--space-0-5) var(--space-2)",
-              borderRadius: 'var(--radius-sm)', border: "1px solid rgba(82,75,71,0.12)",
+              borderRadius: 'var(--radius-sm)', border: "var(--widget-border)",
               background: "transparent", cursor: "pointer", fontSize: 'var(--font-size-small)', color: "var(--neutral-500)",
               fontFamily: "inherit", transition: "all var(--duration-fast)",
             }}

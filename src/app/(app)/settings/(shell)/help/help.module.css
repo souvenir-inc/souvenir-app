@@ -56,7 +56,7 @@
 
 .tile:hover:not(:disabled) {
   border-color: var(--neutral-300);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--help-tile-hover-shadow);
 }
 
 .tile:focus-visible {

@@ -169,7 +169,7 @@ function EditAgentContent() {
     }
     return (
       <AgentPageShell>
-        <div role="status" aria-live="polite" style={{ display: 'flex', justifyContent: 'center', paddingTop: 80 }}>
+        <div role="status" aria-live="polite" style={{ display: 'flex', justifyContent: 'center', paddingTop: 'var(--page-top-inset)' }}>
           <Spinner size={24} />
         </div>
       </AgentPageShell>

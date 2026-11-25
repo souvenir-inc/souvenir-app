@@ -168,7 +168,7 @@ export function AvatarCarousel({
                   style={{
                     position: 'absolute', right: -5, bottom: -5, width: 16, height: 16, borderRadius: '50%',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    backgroundColor: choice.colors[1], color: '#fff', boxShadow: '0 0 0 2px var(--neutral-50)',
+                    backgroundColor: choice.colors[1], color: 'var(--static-white)', boxShadow: '0 0 0 2px var(--neutral-50)',
                   }}
                 >
                   <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

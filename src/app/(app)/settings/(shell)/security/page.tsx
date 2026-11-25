@@ -34,19 +34,19 @@ function GreenBadge({ children }: { children: React.ReactNode }) {
       display:         'inline-flex',
       alignItems:      'center',
       justifyContent:  'center',
-      padding:         2,
-      borderRadius:    6,
+      padding:         'var(--space-0-5)',
+      borderRadius:    'var(--radius-sm)',
       backgroundColor: 'var(--green-50)',
-      boxShadow:       '0px 1px 1.5px 0px rgba(17,25,1,0.2), 0px 0px 0px 1px rgba(128,183,7,0.5), inset 0px 1px 0px 0px rgba(247,254,230,0.7), inset 0px -1px 0px 0px rgba(128,183,7,0.1)',
+      boxShadow:       'var(--color-tag-Green-shadow), var(--color-tag-Green-inner-shadow)',
       flexShrink:      0,
     }}>
       <span style={{
         fontFamily: 'var(--font-body)',
-        fontWeight: 500,
-        fontSize: 12,
-        lineHeight: '16px',
+        fontWeight: 'var(--font-weight-medium)',
+        fontSize: 'var(--font-size-small)',
+        lineHeight: 'var(--line-height-small)',
         color:      'var(--green-800)',
-        padding:    '0 2px',
+        padding:    '0 var(--space-0-5)',
         whiteSpace: 'nowrap',
       }}>
         {children}
@@ -61,19 +61,19 @@ function BrownBadge({ children }: { children: React.ReactNode }) {
       display:         'inline-flex',
       alignItems:      'center',
       justifyContent:  'center',
-      padding:         2,
-      borderRadius:    6,
+      padding:         'var(--space-0-5)',
+      borderRadius:    'var(--radius-sm)',
       backgroundColor: 'var(--brown-100)',
-      boxShadow:       '0px 1px 1.5px 0px rgba(20,12,5,0.2), 0px 0px 0px 1px rgba(126,84,53,0.5), inset 0px 1px 0px 0px rgba(250,241,235,0.7), inset 0px -1px 0px 0px rgba(126,84,53,0.1)',
+      boxShadow:       'var(--color-tag-Brown-shadow), var(--color-tag-Brown-inner-shadow)',
       flexShrink:      0,
     }}>
       <span style={{
         fontFamily: 'var(--font-body)',
-        fontWeight: 500,
-        fontSize: 12,
-        lineHeight: '16px',
+        fontWeight: 'var(--font-weight-medium)',
+        fontSize: 'var(--font-size-small)',
+        lineHeight: 'var(--line-height-small)',
         color:      'var(--brown-700)',
-        padding:    '0 2px',
+        padding:    '0 var(--space-0-5)',
         whiteSpace: 'nowrap',
       }}>
         {children}
@@ -88,19 +88,19 @@ function YellowBadge({ children }: { children: React.ReactNode }) {
       display:         'inline-flex',
       alignItems:      'center',
       justifyContent:  'center',
-      padding:         2,
-      borderRadius:    6,
+      padding:         'var(--space-0-5)',
+      borderRadius:    'var(--radius-sm)',
       backgroundColor: 'var(--yellow-100)',
-      boxShadow:       '0px 1px 1.5px 0px rgba(20,16,5,0.2), 0px 0px 0px 1px rgba(143,116,39,0.5), inset 0px 1px 0px 0px rgba(250,246,235,0.7), inset 0px -1px 0px 0px rgba(143,116,39,0.1)',
+      boxShadow:       'var(--color-tag-Yellow-shadow), var(--color-tag-Yellow-inner-shadow)',
       flexShrink:      0,
     }}>
       <span style={{
         fontFamily: 'var(--font-body)',
-        fontWeight: 500,
-        fontSize: 12,
-        lineHeight: '16px',
+        fontWeight: 'var(--font-weight-medium)',
+        fontSize: 'var(--font-size-small)',
+        lineHeight: 'var(--line-height-small)',
         color:      'var(--yellow-700)',
-        padding:    '0 2px',
+        padding:    '0 var(--space-0-5)',
         whiteSpace: 'nowrap',
       }}>
         {children}
@@ -115,8 +115,8 @@ function SecurityCard({ children }: { children: React.ReactNode }) {
   return (
     <div style={{
       border:       '1px solid var(--border-default)',
-      borderRadius: 16,
-      boxShadow:    '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+      borderRadius: 'var(--radius-2xl)',
+      boxShadow:    'var(--shadow-soft)',
       overflow:     'hidden',
     }}>
       {children}
@@ -132,16 +132,16 @@ function CardHeader({ title, subtitle, right }: {
   return (
     <div style={{
       borderBottom:  '1px solid var(--neutral-100)',
-      padding:       '12px 24px 24px',
+      padding:       'var(--space-3) var(--space-6) var(--space-6)',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-1-5)' }}>
         <div style={{ flex: '1 0 0', minWidth: 0 }}>
           {typeof title === 'string' ? (
             <p style={{
               fontFamily:   'var(--font-body)',
-              fontWeight:   500,
-              fontSize:     16,
-              lineHeight:   '22px',
+              fontWeight:   'var(--font-weight-medium)',
+              fontSize:     'var(--font-size-body-lg)',
+              lineHeight:   'var(--line-height-body)',
               color:        'var(--neutral-900)',
               margin:       0,
               overflow:     'hidden',
@@ -156,9 +156,9 @@ function CardHeader({ title, subtitle, right }: {
       </div>
       <p style={{
         fontFamily:   'var(--font-body)',
-        fontWeight:   400,
-        fontSize:     14,
-        lineHeight:   '22px',
+        fontWeight:   'var(--font-weight-regular)',
+        fontSize:     'var(--font-size-body)',
+        lineHeight:   'var(--line-height-body)',
         color:        'var(--neutral-500)',
         margin:       0,
         overflow:     'hidden',
@@ -181,16 +181,16 @@ function GhostButton({ children, onClick }: { children: React.ReactNode; onClick
         display:         'inline-flex',
         alignItems:      'center',
         justifyContent:  'center',
-        padding:         '5px 8px',
-        borderRadius:    8,
+        padding:         'var(--settings-preview-chip-padding)',
+        borderRadius:    'var(--radius-md)',
         border:          'none',
         cursor:          'pointer',
         backgroundColor: 'transparent',
-        boxShadow:       '0px 0px 0px 1px rgba(59,54,50,0.3)',
+        boxShadow:       'var(--settings-preview-ring)',
         fontFamily:      'var(--font-body)',
-        fontWeight:      500,
-        fontSize:        14,
-        lineHeight:      '22px',
+        fontWeight:      'var(--font-weight-medium)',
+        fontSize:        'var(--font-size-body)',
+        lineHeight:      'var(--line-height-body)',
         color:           'var(--neutral-700)',
         whiteSpace:      'nowrap',
         flexShrink:      0,
@@ -220,8 +220,8 @@ function SessionRow({
     <div style={{
       display:      'flex',
       alignItems:   'center',
-      gap:          16,
-      padding:      '12px 24px 24px',
+      gap:          'var(--space-4)',
+      padding:      'var(--space-3) var(--space-6) var(--space-6)',
       borderBottom: divider ? '1px solid var(--neutral-100)' : undefined,
     }}>
       {/* Device icon */}
@@ -229,10 +229,10 @@ function SessionRow({
         display:         'flex',
         alignItems:      'center',
         justifyContent:  'center',
-        padding:         8,
-        borderRadius:    8,
+        padding:         'var(--space-2)',
+        borderRadius:    'var(--radius-md)',
         backgroundColor: 'var(--neutral-200)',
-        boxShadow:       '0px 0px 0px 1px rgba(59,54,50,0.3)',
+        boxShadow:       'var(--settings-preview-ring)',
         flexShrink:      0,
       }}>
         <DeviceIcon />
@@ -242,9 +242,9 @@ function SessionRow({
       <div style={{ flex: '1 0 0', minWidth: 0 }}>
         <p style={{
           fontFamily: 'var(--font-body)',
-          fontWeight: 500,
-          fontSize:   14,
-          lineHeight: '22px',
+          fontWeight: 'var(--font-weight-medium)',
+          fontSize:   'var(--font-size-body)',
+          lineHeight: 'var(--line-height-body)',
           color:      'var(--neutral-900)',
           margin:     0,
         }}>
@@ -252,14 +252,14 @@ function SessionRow({
         </p>
         <div style={{
           display:    'flex',
-          gap:        6,
+          gap:        'var(--space-1-5)',
           alignItems: 'center',
         }}>
           <span style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 400,
-            fontSize: 12,
-            lineHeight: '16px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: 'var(--font-size-small)',
+            lineHeight: 'var(--line-height-small)',
             color:      'var(--neutral-500)',
             whiteSpace: 'nowrap',
           }}>
@@ -267,9 +267,9 @@ function SessionRow({
           </span>
           <span style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 400,
-            fontSize: 12,
-            lineHeight: '16px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: 'var(--font-size-small)',
+            lineHeight: 'var(--line-height-small)',
             color:      'var(--neutral-500)',
             whiteSpace: 'nowrap',
           }}>
@@ -288,9 +288,9 @@ function SessionRow({
           display:         'flex',
           alignItems:      'center',
           justifyContent:  'center',
-          padding:         6,
-          borderRadius:    8,
-          border:          '0.727px solid rgba(59,54,50,0.3)',
+          padding:         'var(--space-1-5)',
+          borderRadius:    'var(--radius-md)',
+          border:          'var(--settings-preview-border)',
           cursor:          'pointer',
           backgroundColor: 'transparent',
           flexShrink:      0,
@@ -330,21 +330,21 @@ export default function SecurityPage() {
         display:        'flex',
         alignItems:     'flex-start',
         justifyContent: 'center',
-        paddingTop:     64,
-        paddingBottom:  48,
+        paddingTop:     'var(--space-10)',
+        paddingBottom:  'var(--space-9)',
       }}
     >
       {/* Horizontal padding lives here, not on the scrolling element above —
           keeps the scrollbar flush with the container's edge. */}
-      <div style={{ width: '100%', maxWidth: 908, padding: '0 24px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ width: '100%', maxWidth: 908, padding: '0 var(--space-6)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
 
         {/* ── Page header ── */}
-        <div style={{ paddingLeft: 4, marginBottom: 4 }}>
+        <div style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)' }}>
           <h1 style={{
             fontFamily:   'var(--font-title)',
-            fontWeight:   400,
-            fontSize:     24,
-            lineHeight:   '32px',
+            fontWeight:   'var(--font-weight-regular)',
+            fontSize:     'var(--font-size-heading)',
+            lineHeight:   'var(--line-height-heading)',
             color:        'var(--neutral-900)',
             margin:       0,
             overflow:     'hidden',
@@ -355,9 +355,9 @@ export default function SecurityPage() {
           </h1>
           <p style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 400,
-            fontSize:   14,
-            lineHeight: '22px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize:   'var(--font-size-body)',
+            lineHeight: 'var(--line-height-body)',
             color:      'var(--neutral-500)',
             margin:     0,
           }}>
@@ -371,25 +371,25 @@ export default function SecurityPage() {
             title="Two-factor authentication"
             subtitle="Add an extra layer of security to your account by requiring a verification code at sign-in."
           />
-          <div style={{ padding: '12px 24px' }}>
+          <div style={{ padding: 'var(--space-3) var(--space-6)' }}>
             <div style={{
               backgroundColor: 'var(--neutral-white)',
-              borderRadius:    8,
+              borderRadius:    'var(--radius-md)',
               boxShadow:       '0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
-              padding:         12,
+              padding:         'var(--space-3)',
               display:         'flex',
               alignItems:      'center',
-              gap:             12,
+              gap:             'var(--space-3)',
             }}>
               {/* Left: status + description */}
-              <div style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)' }}>
                   <YellowBadge>Not enabled</YellowBadge>
                   <span style={{
                     fontFamily: 'var(--font-body)',
-                    fontWeight: 500,
-                    fontSize: 12,
-                    lineHeight: '16px',
+                    fontWeight: 'var(--font-weight-medium)',
+                    fontSize: 'var(--font-size-small)',
+                    lineHeight: 'var(--line-height-small)',
                     color:      'var(--yellow-500)',
                   }}>
                     Recommended
@@ -397,9 +397,9 @@ export default function SecurityPage() {
                 </div>
                 <p style={{
                   fontFamily: 'var(--font-body)',
-                  fontWeight: 400,
-                  fontSize: 12,
-                  lineHeight: '16px',
+                  fontWeight: 'var(--font-weight-regular)',
+                  fontSize: 'var(--font-size-small)',
+                  lineHeight: 'var(--line-height-small)',
                   color:      'var(--neutral-500)',
                   margin:     0,
                 }}>
@@ -412,16 +412,16 @@ export default function SecurityPage() {
                 display:         'inline-flex',
                 alignItems:      'center',
                 justifyContent:  'center',
-                padding:         '6px 10px 8px',
-                borderRadius:    10,
+                padding:         'var(--space-1-5) var(--space-2-5) var(--space-2)',
+                borderRadius:    'var(--radius-lg)',
                 border:          'none',
                 cursor:          'pointer',
                 background:      'linear-gradient(to bottom, var(--neutral-700), var(--neutral-900))',
                 boxShadow:       '0px 0px 0px 1px black, 0px 1.091px 1.091px 0px rgba(59,54,50,0.1), 0px 1.455px 3.127px 0px rgba(59,54,50,0.4), inset 0px 1px 0.364px 0px color-mix(in srgb, var(--static-white) 30%, transparent), inset 0px -2.182px 0.364px 0px #120c08, inset 0px -2.545px 4px -2.182px color-mix(in srgb, var(--static-white) 50%, transparent)',
                 fontFamily:      'var(--font-body)',
-                fontWeight:      500,
-                fontSize:        14,
-                lineHeight:      '22px',
+                fontWeight:      'var(--font-weight-medium)',
+                fontSize:        'var(--font-size-body)',
+                lineHeight:      'var(--line-height-body)',
                 color:           'var(--neutral-50)',
                 whiteSpace:      'nowrap',
                 flexShrink:      0,
@@ -438,28 +438,28 @@ export default function SecurityPage() {
             title="Password"
             subtitle="Manage the password used to sign in to your Souvenir account."
           />
-          <div style={{ padding: '12px 24px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+          <div style={{ padding: 'var(--space-3) var(--space-6)', display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
             {/* Password field + badge */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               {/* Masked password display */}
               <div style={{
                 width:           327,
                 height:          36,
                 backgroundColor: 'var(--field-surface)',
-                borderRadius:    10,
+                borderRadius:    'var(--radius-lg)',
                 boxShadow:       '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
                 display:         'flex',
                 alignItems:      'center',
-                padding:         '0 12px',
+                padding:         '0 var(--space-3)',
                 flexShrink:      0,
               }}>
                 <span style={{
                   fontFamily: 'var(--font-body)',
-                  fontWeight: 400,
-                  fontSize:   14,
-                  lineHeight: '22px',
+                  fontWeight: 'var(--font-weight-regular)',
+                  fontSize:   'var(--font-size-body)',
+                  lineHeight: 'var(--line-height-body)',
                   color:      'var(--neutral-500)',
-                  letterSpacing: '0.04em',
+                  letterSpacing: 'var(--tracking-wider)',
                 }}>
                   ••••••••••••••••
                 </span>
@@ -473,16 +473,16 @@ export default function SecurityPage() {
               display:         'inline-flex',
               alignItems:      'center',
               justifyContent:  'center',
-              padding:         '6px 10px 8px',
-              borderRadius:    10,
+              padding:         'var(--space-1-5) var(--space-2-5) var(--space-2)',
+              borderRadius:    'var(--radius-lg)',
               border:          'none',
               cursor:          'pointer',
               backgroundColor: 'var(--field-surface)',
               boxShadow:       '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100), inset 0px -2.182px 0.364px 0px var(--neutral-100)',
               fontFamily:      'var(--font-body)',
-              fontWeight:      500,
-              fontSize:        14,
-              lineHeight:      '22px',
+              fontWeight:      'var(--font-weight-medium)',
+              fontSize:        'var(--font-size-body)',
+              lineHeight:      'var(--line-height-body)',
               color:           'var(--neutral-700)',
               whiteSpace:      'nowrap',
               flexShrink:      0,
@@ -496,12 +496,12 @@ export default function SecurityPage() {
         <SecurityCard>
           <CardHeader
             title={
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                 <span style={{
                   fontFamily:   'var(--font-body)',
-                  fontWeight:   500,
-                  fontSize:     16,
-                  lineHeight:   '22px',
+                  fontWeight:   'var(--font-weight-medium)',
+                  fontSize:     'var(--font-size-body-lg)',
+                  lineHeight:   'var(--line-height-body)',
                   color:        'var(--neutral-900)',
                   overflow:     'hidden',
                   textOverflow: 'ellipsis',
@@ -538,18 +538,18 @@ export default function SecurityPage() {
           <div style={{
             display:    'flex',
             alignItems: 'center',
-            gap:        16,
-            padding:    '12px 24px',
+            gap:        'var(--space-4)',
+            padding:    'var(--space-3) var(--space-6)',
           }}>
             {/* Google icon button */}
             <div style={{
               display:         'flex',
               alignItems:      'center',
               justifyContent:  'center',
-              padding:         8,
-              borderRadius:    10,
+              padding:         'var(--space-2)',
+              borderRadius:    'var(--radius-lg)',
               backgroundColor: 'transparent',
-              boxShadow:       '0px 0px 0px 1px rgba(59,54,50,0.3)',
+              boxShadow:       'var(--settings-preview-ring)',
               flexShrink:      0,
             }}>
               <GoogleIcon />
@@ -559,9 +559,9 @@ export default function SecurityPage() {
             <div style={{ flex: '1 0 0', minWidth: 0 }}>
               <p style={{
                 fontFamily: 'var(--font-body)',
-                fontWeight: 500,
-                fontSize:   14,
-                lineHeight: '22px',
+                fontWeight: 'var(--font-weight-medium)',
+                fontSize:   'var(--font-size-body)',
+                lineHeight: 'var(--line-height-body)',
                 color:      'var(--neutral-900)',
                 margin:     0,
               }}>
@@ -569,9 +569,9 @@ export default function SecurityPage() {
               </p>
               <p style={{
                 fontFamily: 'var(--font-body)',
-                fontWeight: 400,
-                fontSize: 12,
-                lineHeight: '16px',
+                fontWeight: 'var(--font-weight-regular)',
+                fontSize: 'var(--font-size-small)',
+                lineHeight: 'var(--line-height-small)',
                 color:      'var(--neutral-500)',
                 margin:     0,
                 whiteSpace: 'nowrap',
@@ -587,17 +587,17 @@ export default function SecurityPage() {
               display:         'inline-flex',
               alignItems:      'center',
               justifyContent:  'center',
-              padding:         '5px 8px',
-              borderRadius:    8,
+              padding:         'var(--settings-preview-chip-padding)',
+              borderRadius:    'var(--radius-md)',
               border:          'none',
               cursor:          'pointer',
               position:        'relative',
               backgroundColor: 'var(--field-surface)',
               boxShadow:       '0px 1.091px 1.091px 0px rgba(24,2,2,0.05), 0px 1.455px 3.127px 0px rgba(24,2,2,0.15), 0px 0px 0px 1px var(--red-100), inset 0px -2.182px 0.364px 0px var(--red-100)',
               fontFamily:      'var(--font-body)',
-              fontWeight:      500,
-              fontSize:        14,
-              lineHeight:      '22px',
+              fontWeight:      'var(--font-weight-medium)',
+              fontSize:        'var(--font-size-body)',
+              lineHeight:      'var(--line-height-body)',
               color:           'var(--red-700)',
               whiteSpace:      'nowrap',
               flexShrink:      0,

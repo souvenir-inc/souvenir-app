@@ -76,7 +76,7 @@
   border-radius: 50%;
   background: var(--neutral-900);
   color: var(--neutral-white);
-  box-shadow: 0 6px 18px -6px rgba(38, 33, 30, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: var(--context-overview-cta-shadow);
 }
 
 .core::after {

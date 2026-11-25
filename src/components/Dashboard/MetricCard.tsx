@@ -203,8 +203,8 @@ function Body({ metric, bars, size, view, body, tall, wide, index, appNames, onR
     // On Today, an app that hasn't synced today: a dash, never a 0 (CR-26).
     return (
       <div className={cn('absolute left-4 flex items-end gap-2', figureAt)}>
-        <p className="m-0 text-[28px] font-medium leading-8 text-[var(--dashboard-muted)]">—</p>
-        <p className="m-0 pb-1.5 text-[12px] leading-4 text-[var(--dashboard-muted)]">{wide ? 'No data for today yet' : 'No data yet'}</p>
+        <p className="m-0 text-[length:var(--font-size-heading-xl)] font-medium leading-8 text-[var(--dashboard-muted)]">—</p>
+        <p className="m-0 pb-1.5 text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-muted)]">{wide ? 'No data for today yet' : 'No data yet'}</p>
       </div>
     )
   }
@@ -229,7 +229,7 @@ function Body({ metric, bars, size, view, body, tall, wide, index, appNames, onR
         <span aria-hidden data-chart-loading className={cn('dashboard-shape-shimmer rounded-lg opacity-40', chartBox)} />
       )}
       {chartBox && !view?.chartLoading && view?.chartFailed && (
-        <p data-chart-failed className={cn('m-0 flex items-center justify-center text-center text-[12px] leading-4 text-[var(--dashboard-muted)]', chartBox)}>Couldn’t load the chart</p>
+        <p data-chart-failed className={cn('m-0 flex items-center justify-center text-center text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-muted)]', chartBox)}>Couldn’t load the chart</p>
       )}
       {chartBox && !view?.chartLoading && !view?.chartFailed && (
         bars && size !== 'sm-tall' && size !== 'full'
@@ -262,7 +262,7 @@ function Title({ text, muted = false }: { text: string; muted?: boolean }) {
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
-  const h = <h3 ref={ref} className={cn('m-0 min-w-0 truncate text-[13px] font-medium leading-5', muted ? 'text-[var(--dashboard-faint)]' : 'text-[var(--dashboard-label)]')}>{text}</h3>
+  const h = <h3 ref={ref} className={cn('m-0 min-w-0 truncate text-[length:var(--font-size-body-sm)] font-medium leading-5', muted ? 'text-[var(--dashboard-faint)]' : 'text-[var(--dashboard-label)]')}>{text}</h3>
   return <Tooltip content={text} side="top" align="start" disabled={!cut}>{h}</Tooltip>
 }
 
@@ -288,7 +288,7 @@ function Legend({ items }: { items: [keyof typeof LEGEND_DOT, string][] }) {
   return (
     <div className="flex items-center gap-4">
       {items.map(([k, t]) => (
-        <span key={t} className="flex items-center gap-1.5 whitespace-nowrap text-[12px] leading-4 text-[var(--dashboard-muted)]">
+        <span key={t} className="flex items-center gap-1.5 whitespace-nowrap text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-muted)]">
           <span aria-hidden className={LEGEND_DOT[k]} />{t}
         </span>
       ))}
@@ -309,11 +309,11 @@ const PILL_DOT: Record<HealthPill['tone'], string> = {
 export function HealthPillView({ pill, withTarget }: { pill: HealthPill; withTarget: boolean }) {
   return (
     <>
-      <span data-health={pill.tone} className={cn('flex h-6 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl border border-solid pl-2 pr-2.5 text-[12px] leading-4', PILL[pill.tone])}>
+      <span data-health={pill.tone} className={cn('flex h-6 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl border border-solid pl-2 pr-2.5 text-[length:var(--font-size-small)] leading-4', PILL[pill.tone])}>
         <span aria-hidden className={cn('size-1.5 rounded-full', PILL_DOT[pill.tone])} />
         {pill.text}
       </span>
-      {withTarget && pill.target && <span className="min-w-0 truncate text-[12px] leading-4 text-[var(--dashboard-muted)]">{pill.target}</span>}
+      {withTarget && pill.target && <span className="min-w-0 truncate text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-muted)]">{pill.target}</span>}
     </>
   )
 }
@@ -323,13 +323,13 @@ function Figure({ metric, syncing, inlinePill, className }: { metric: Metric; sy
   const Arrow = change?.direction === 'up' ? ArrowUp : ArrowDown
   return (
     <div className={cn('absolute left-4 flex items-baseline gap-2', inlinePill && 'right-4 min-w-0', className)}>
-      <p data-syncing={syncing || undefined} className={cn('m-0 whitespace-nowrap text-[28px] font-medium leading-8 tracking-[-0.56px] text-[var(--dashboard-figure)]', syncing && 'dashboard-shimmer-text')}>
+      <p data-syncing={syncing || undefined} className={cn('m-0 whitespace-nowrap text-[length:var(--font-size-heading-xl)] font-medium leading-8 tracking-[-0.56px] text-[var(--dashboard-figure)]', syncing && 'dashboard-shimmer-text')}>
         {metric.value}
       </p>
       {change ? (
         <p
           className={cn(
-            'm-0 flex items-center gap-0.5 whitespace-nowrap text-[12px] font-medium leading-4',
+            'm-0 flex items-center gap-0.5 whitespace-nowrap text-[length:var(--font-size-small)] font-medium leading-4',
             change.sentiment === 'positive' ? 'text-[var(--dashboard-positive)]' : 'text-[var(--dashboard-negative)]',
           )}
         >
@@ -340,7 +340,7 @@ function Figure({ metric, syncing, inlinePill, className }: { metric: Metric; sy
         </p>
       ) : (
         // No comparison, or the period before is mostly empty: no change to show (CR-24).
-        <p className="m-0 whitespace-nowrap text-[12px] leading-4 text-[var(--dashboard-muted)]">No comparison</p>
+        <p className="m-0 whitespace-nowrap text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-muted)]">No comparison</p>
       )}
       {/* On a narrow card the target text gives way first, cut with an ellipsis. */}
       {inlinePill && <span className="flex min-w-0 items-center gap-2 self-center overflow-hidden pl-1"><HealthPillView pill={inlinePill} withTarget /></span>}

@@ -125,7 +125,7 @@
   .visibility {
     grid-column: 1;
     grid-row: 2;
-    padding-right: 112px;
+    padding-right: var(--account-row-actions-inset);
   }
 
   .permission {

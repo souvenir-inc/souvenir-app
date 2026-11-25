@@ -38,7 +38,7 @@ describe("LineRenderer inline math vs. currency prose", () => {
       <LineRenderer content={"**Clarifying context**\n\nChecking the source."} variant="reasoning" />,
     )
 
-    expect(html).toContain("font-size:14px")
+    expect(html).toContain("font-size:var(--font-size-body)")
     expect(html).toContain("line-height:var(--line-height-body)")
     expect(html).toContain("height:8px")
     // Same colours as before in light (#524B47 body, #26211E heading (--neutral-900 now)) — the body is

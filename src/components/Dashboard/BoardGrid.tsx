@@ -368,7 +368,7 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
               >
                 <article data-card-body="removed" aria-label="Removed metric" className="relative size-full overflow-clip rounded-xl bg-[var(--dashboard-card-bg)] shadow-[var(--dashboard-card-shadow)]">
                   {/* Its name is gone with it; the id it was saved under says which card this was. */}
-                  <h3 className="absolute left-4 right-4 top-4 m-0 truncate text-[13px] font-medium leading-5 text-[var(--dashboard-faint)]">{card.metricId.replace(/#d+$/, '').replace(/_/g, ' ')}</h3>
+                  <h3 className="absolute left-4 right-4 top-4 m-0 truncate text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-faint)]">{card.metricId.replace(/#d+$/, '').replace(/_/g, ' ')}</h3>
                   <CardEmptyState
                     kind="removed"
                     compact={card.size === 'sm'}

@@ -115,7 +115,7 @@ function BarChart({ attrs, bars }: { attrs: ChartAttrs; bars: BarDatum[] }) {
                 <m.div
                   initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }}
                   transition={{ delay: i * 0.1 + 0.55, duration: 0.2 }}
-                  style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-700)", marginBottom: 'var(--space-1)', lineHeight: 1 }}>
+                  style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-700)", marginBottom: 'var(--space-1)', lineHeight: 'var(--leading-none)' }}>
                   {formatNum(bar.value)}{attrs.yLabel ? "" : ""}
                 </m.div>
                 <m.div
@@ -238,7 +238,7 @@ function PieChart({ attrs, slices }: { attrs: ChartAttrs; slices: SliceDatum[] }
             <div style={{ width: 10, height: 10, borderRadius: 'var(--radius-xs)', background: arc.color, flexShrink: 0 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-700)", lineHeight: "var(--line-height-small)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{arc.label}</div>
-              <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", lineHeight: "15px" }}>{formatNum(arc.value)} <span style={{ opacity: 0.6 }}>· {Math.round(arc.pct * 100)}%</span></div>
+              <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", lineHeight: "var(--chart-label-line-height)" }}>{formatNum(arc.value)} <span style={{ opacity: 0.6 }}>· {Math.round(arc.pct * 100)}%</span></div>
             </div>
           </m.div>
         ))}
@@ -344,7 +344,7 @@ function LineChart({ attrs, points }: { attrs: ChartAttrs; points: PointDatum[] 
           <polyline points={pts} fill="none" stroke={color} strokeWidth={1.5}
             pathLength={1} strokeDasharray="1"
             strokeDashoffset={revealed ? 0 : 1} strokeLinecap="round" strokeLinejoin="round"
-            style={{ transition: "stroke-dashoffset 0.9s cubic-bezier(0.16,1,0.3,1)" }} />
+            style={{ transition: "stroke-dashoffset 0.9s cubic-bezier(0.16,1,0.3,1)" /* ds-keep: the chart line draws in */ }} />
 
           {/* Dots */}
           {points.map((p, i) => {
@@ -392,7 +392,7 @@ function LineChart({ attrs, points }: { attrs: ChartAttrs; points: PointDatum[] 
               exit={{ opacity: 0, y: 4, scale: 0.96 }}
               transition={{ duration: 0.12 }}
               style={{ position: "absolute", top: -8, left: Math.max(4, Math.min(tooltipLeft, containerWidth - tooltipWidth - 4)), width: tooltipWidth, background: "var(--neutral-900)", borderRadius: 'var(--radius-md)', padding: "var(--space-1-5) var(--space-2-5)", pointerEvents: "none", zIndex: 'var(--z-raised)', boxShadow: "var(--shadow-3)" }}>
-              <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)', letterSpacing: "0.3px" }}>
+              <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)', letterSpacing: "var(--tracking-wide)" }}>
                 {String(points[hoverIdx]?.x ?? "")}
               </div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 'var(--space-2)' }}>
@@ -476,7 +476,7 @@ function HistogramChart({ attrs, values }: { attrs: ChartAttrs; values: number[]
           const skip = Math.ceil(bins.length / 8)
           if (i % skip !== 0 && i !== bins.length - 1) return <div key={`spacer-${bin.rangeStart}`} style={{ flex: 1 }} />
           return (
-            <div key={`label-${bin.rangeStart}`} style={{ flex: 1, textAlign: "center", fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", lineHeight: "14px" }}>
+            <div key={`label-${bin.rangeStart}`} style={{ flex: 1, textAlign: "center", fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", lineHeight: "var(--chart-tick-line-height)" }}>
               {formatNum(bin.rangeStart)}
             </div>
           )

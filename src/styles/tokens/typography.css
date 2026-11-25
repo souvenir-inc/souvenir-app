@@ -16,6 +16,19 @@
   --font-weight-regular:  400;
   --font-weight-medium:   500;
   --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  /* Letter-spacing (approved 2026-11-25). em, so it scales with the text it spaces. */
+  --tracking-display:   -0.045em; /* large display numerals */
+  --tracking-tight:     -0.01em;
+  --tracking-normal:    0;
+  --tracking-wide:      0.02em;
+  --tracking-wider:     0.04em;
+  --tracking-caps:      0.06em;   /* small uppercase labels */
+  --tracking-caps-wide: 0.08em;
+
+  /* Half step between small (12) and body-sm (13): chips and compact labels. */
+  --font-size-label:    12.5px;
 
   /* ── Type scale ───────────────────────────────────────────────────────────── */
   --font-size-display:  40px;

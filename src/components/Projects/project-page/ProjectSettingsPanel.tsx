@@ -125,7 +125,7 @@ export function ProjectSettingsPanel({ project, ownerName, canEdit, canLeave, ca
   return (
     // The panel's full height: blocks scroll, Leave / Delete stay pinned at the bottom.
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div className="kaya-scrollbar kaya-no-gutter" style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', margin: '-12px -4px 0', padding: '0 var(--space-1)' }}>
+      <div className="kaya-scrollbar kaya-no-gutter" style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', margin: 'calc(var(--space-3) * -1) calc(var(--space-1) * -1) 0', padding: '0 var(--space-1)' }}>
         {/* Name, description and tags, each labelled; the Edit button at the bottom changes them. */}
         <div style={BLOCK}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)' }}>

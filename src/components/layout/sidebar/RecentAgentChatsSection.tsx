@@ -79,13 +79,13 @@ export function RecentAgentChatsSection() {
           animate={shown ? 'open' : 'closed'}
           initial="closed"
           variants={sectionStaggerVariants}
-          style={{ paddingTop: "4px", display: "flex", flexDirection: "column", gap: "4px" }}
+          style={{ paddingTop: "var(--space-1)", display: "flex", flexDirection: "column", gap: "var(--space-1)" }}
         >
           {isLoading && Array.from({ length: 3 }).map((_, i) => (
             <SidebarMenuSkeleton key={i} index={i} fluid />
           ))}
           {!isLoading && allChats.length === 0 && (
-            <div style={{ padding: "8px 6px", fontFamily: "var(--font-body)", fontSize: "var(--font-size-caption)", color: "var(--neutral-400)" }}>
+            <div style={{ padding: "var(--space-2) var(--space-1-5)", fontFamily: "var(--font-body)", fontSize: "var(--font-size-caption)", color: "var(--neutral-400)" }}>
               No agent chats yet
             </div>
           )}

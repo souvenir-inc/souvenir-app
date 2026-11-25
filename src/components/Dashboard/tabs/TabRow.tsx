@@ -16,7 +16,7 @@ import type { RenameResult } from './use-dashboard'
 //   Mouse      click opens on release; double-click the open tab renames; right-click opens its menu
 //   Drag       tabs stay put, the place dims, a copy follows, a blue line marks the drop (TAB-30 – TAB-35)
 
-const SEGMENT = 'relative flex h-8 shrink-0 items-center rounded-full px-3.5 text-[14px] font-medium leading-5 tracking-[-0.07px] whitespace-nowrap'
+const SEGMENT = 'relative flex h-8 shrink-0 items-center rounded-full px-3.5 text-[length:var(--font-size-body)] font-medium leading-5 tracking-[-0.07px] whitespace-nowrap'
 const FOCUS_RING = 'outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-0 focus-visible:outline-[var(--focus-ring)]'
 const TAB_MAX = 220     // TAB-3
 const DRAG_START = 4    // TAB-35
@@ -495,7 +495,7 @@ export function RenameField({ initial, onCommit, onDone, onValueChange }: Rename
             else if (e.key === 'Escape') { e.preventDefault(); finish() }
           }}
           onBlur={() => commit(true)}
-          className="col-start-1 row-start-1 w-full min-w-0 border-0 bg-transparent p-0 text-[14px] font-medium leading-5 tracking-[-0.07px] text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
+          className="col-start-1 row-start-1 w-full min-w-0 border-0 bg-transparent p-0 text-[length:var(--font-size-body)] font-medium leading-5 tracking-[-0.07px] text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
         />
       </div>
       {error && <NameError id="board-name-error" className="absolute left-0 top-[calc(100%+6px)] z-20" />}
@@ -511,7 +511,7 @@ export function NameError({ id, className }: { id?: string; className?: string }
       role="alert"
       className={cn(
         'm-0 flex items-center gap-1.5 whitespace-nowrap rounded-md border border-solid border-[var(--dashboard-error-border)] bg-[var(--dashboard-error-bg)] py-1 pl-2 pr-2.5',
-        'text-[12px] font-medium leading-4 text-[var(--dashboard-error)] shadow-[var(--shadow-soft)]',
+        'text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-error)] shadow-[var(--shadow-soft)]',
         className,
       )}
     >

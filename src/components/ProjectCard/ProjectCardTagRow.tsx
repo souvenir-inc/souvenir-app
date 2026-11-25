@@ -51,7 +51,7 @@ export function ProjectCardTagRow({ tags }: { tags: Array<{ label: string; color
   if (tags.length === 0) return null
 
   return (
-    <div style={{ position: 'relative', margin: '10px -1px 0', flexShrink: 0 }}>
+    <div style={{ position: 'relative', margin: 'var(--space-2-5) calc(var(--space-px) * -1) 0', flexShrink: 0 }}>
       <div
         ref={rowRef}
         onMouseDown={onMouseDown}

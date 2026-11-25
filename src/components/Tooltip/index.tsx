@@ -200,7 +200,7 @@ export function Tooltip({
           justifyContent:  'center',
           flexDirection:   maxWidth ? 'column' : undefined,
           overflow:        'hidden',
-          borderRadius:    '6px',
+          borderRadius:    'var(--radius-sm)',
           padding:         maxWidth ? '6px 8px' : '4px 6px',
           maxWidth:        cssMaxWidth,
           maxHeight:       maxHeight,
@@ -209,7 +209,7 @@ export function Tooltip({
           pointerEvents:   'none',
           opacity:          entered ? 1 : 0,
           transform:        `translate(${translateX}px, ${translateY}px)`,
-          transition:       'opacity 150ms, transform 150ms cubic-bezier(0.16,1,0.3,1)',
+          transition:       'opacity var(--duration-fast), transform var(--duration-fast) cubic-bezier(0.16,1,0.3,1)',
         }}
       >
         <span

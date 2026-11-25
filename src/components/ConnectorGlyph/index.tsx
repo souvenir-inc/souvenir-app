@@ -71,7 +71,7 @@ export function ConnectorGlyph({ slug, name, logoUrl, size = 24, className, styl
         backgroundColor: `hsl(${hue} 60% 90%)`,
         color: `hsl(${hue} 60% 35%)`,
         fontFamily: 'var(--font-body)',
-        fontWeight: 700,
+        fontWeight: 'var(--font-weight-bold)',
         fontSize: Math.round(size * 0.45),
         flexShrink: 0,
         userSelect: 'none',

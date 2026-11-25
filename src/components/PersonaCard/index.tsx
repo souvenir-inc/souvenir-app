@@ -652,7 +652,7 @@ function PersonaCardInner({
               <Tooltip content={description} disabled={!description} maxWidth={280}><p
                 className={animateHover ? 'persona-card-desc-reading' : undefined}
                 style={{
-                  margin:           '8px 0 0',
+                  margin:           'var(--space-2) 0 0',
                   // Always two lines tall, so every card's action row lines up whatever the description length.
                   minHeight:        'calc(2 * var(--line-height-caption))',
                   fontFamily:       'var(--font-body)',

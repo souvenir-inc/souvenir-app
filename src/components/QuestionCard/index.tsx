@@ -79,7 +79,7 @@ const isFocusIdle = () =>
   (document.activeElement == null || document.activeElement === document.body)
 
 const VISUALLY_HIDDEN: React.CSSProperties = {
-  position: 'absolute', width: 1, height: 1, padding: 0, margin: -1,
+  position: 'absolute', width: 1, height: 1, padding: 0, margin: 'calc(var(--space-px) * -1)',
   overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap', border: 0,
 }
 
@@ -269,7 +269,7 @@ function InfoCardBody({ options, selected, onSelect }: {
                 fontFamily: 'var(--font-body)',
                 fontWeight: 'var(--font-weight-semibold)',
                 fontSize:   'var(--font-size-caption)',
-                lineHeight: '11px',
+                lineHeight: 'var(--question-card-meta-line-height)',
                 display:    'block',
                 textAlign:  'center',
                 color:      'var(--neutral-white)',
@@ -552,7 +552,7 @@ export function QuestionCard(
                         fontFamily:  'var(--font-body)',
                         fontWeight:  isCurrent ? 700 : 'var(--font-weight-medium)',
                         fontSize:    'var(--font-size-caption)',
-                        lineHeight:  '11px',
+                        lineHeight:  'var(--question-card-meta-line-height)',
                         display:     'block',
                         color:       isCurrent ? 'var(--neutral-white)' : isPast ? BLUE : 'var(--neutral-400)',
                         userSelect:  'none',
@@ -643,7 +643,7 @@ export function QuestionCard(
 
 
         {/* ── Wide section - options + footer, extends to 10px from card edges ─ */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', marginLeft: -10, marginRight: -10 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', marginLeft: 'calc(var(--space-2-5) * -1)', marginRight: 'calc(var(--space-2-5) * -1)' }}>
 
           {/* ─ Options - rank is NEVER inside AnimatePresence (required for Reorder drag) */}
           {type === 'rank' ? (

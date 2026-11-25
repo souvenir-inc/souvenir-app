@@ -69,15 +69,15 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
       hideClose
       aria-describedby={undefined}
       data-metric-window={metric.id}
-      style={{ width: 760, maxWidth: 'calc(100vw - 32px)', height: 760, maxHeight: 'calc(100dvh - 64px)', borderRadius: 16, boxShadow: 'var(--dashboard-window-shadow)', padding: 0, background: 'var(--dashboard-card-bg)' }}
+      style={{ width: 760, maxWidth: 'calc(100vw - 32px)', height: 760, maxHeight: 'calc(100dvh - 64px)', borderRadius: 'var(--radius-2xl)', boxShadow: 'var(--dashboard-window-shadow)', padding: 0, background: 'var(--dashboard-card-bg)' }}
     >
       <div className="flex min-h-0 flex-1 flex-col">
         <header className="relative shrink-0 border-0 border-b border-solid border-[var(--neutral-200)] px-7 pb-[18px] pt-7">
           <DialogTitle className="text-[15px] font-medium leading-5 text-[var(--neutral-800)]">{metric.label}</DialogTitle>
-          <p className="m-0 mt-1 text-[12px] leading-4 text-[var(--dashboard-muted)]">{periodLabel}</p>
-          <div className="mt-[10px] flex items-end gap-3.5">
+          <p className="m-0 mt-1 text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-muted)]">{periodLabel}</p>
+          <div className="mt-[var(--space-2-5)] flex items-end gap-3.5">
             <p className="m-0 text-[44px] font-normal leading-[52px] tracking-[-0.88px] text-[var(--dashboard-figure)]">{metric.value}</p>
-            <p className="m-0 flex items-center gap-0.5 pb-2 text-[13px] leading-5">
+            <p className="m-0 flex items-center gap-0.5 pb-2 text-[length:var(--font-size-body-sm)] leading-5">
               {comparable ? (
                 <>
                   <Arrow aria-hidden size={13} strokeWidth={1.75} absoluteStrokeWidth className={good ? 'text-[var(--dashboard-positive)]' : 'text-[var(--dashboard-negative)]'} />
@@ -90,7 +90,7 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
           <div className="absolute right-5 top-[18px] flex items-center gap-2">
             <AddToBoard metric={metric} boards={boards} onPick={onAddToBoard} />
             <DialogClose asChild>
-              <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="size-7 rounded-[8px]" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
+              <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="size-7 rounded-md" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
             </DialogClose>
           </div>
         </header>
@@ -112,7 +112,7 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
                 setTab(next)
                 ;(e.currentTarget.parentElement?.querySelectorAll<HTMLElement>('[role=tab]')[TABS.indexOf(next)])?.focus()
               }}
-              className={cn('flex cursor-pointer flex-col gap-2 border-0 bg-transparent p-0 pt-2 text-[13px] leading-[17px]', tab === t ? 'font-medium text-[var(--dashboard-figure)]' : 'text-[var(--dashboard-muted)] hover:text-[var(--dashboard-figure)]', FOCUS)}
+              className={cn('flex cursor-pointer flex-col gap-2 border-0 bg-transparent p-0 pt-2 text-[length:var(--font-size-body-sm)] leading-[17px]', tab === t ? 'font-medium text-[var(--dashboard-figure)]' : 'text-[var(--dashboard-muted)] hover:text-[var(--dashboard-figure)]', FOCUS)}
             >
               {t}
               <span aria-hidden className={cn('h-0.5 w-full rounded-[1px]', tab === t ? 'bg-[var(--dashboard-figure)]' : 'bg-transparent')} />
@@ -127,7 +127,7 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
                 <p className="m-0 text-[15px] leading-5 text-[var(--dashboard-figure)]">
                   {change ? `${change.direction === 'up' ? 'Up' : 'Down'} ${change.label} on ${lastYear ? 'the same days last year' : `the previous ${n} days`}` : 'Nothing to compare with yet'}
                 </p>
-                <div role="radiogroup" aria-label="Show as" className="flex shrink-0 gap-0.5 rounded-[10px] bg-[var(--dashboard-hover-band)] p-[3px]">
+                <div role="radiogroup" aria-label="Show as" className="flex shrink-0 gap-0.5 rounded-lg bg-[var(--dashboard-hover-band)] p-[3px]">
                   {(['Chart', 'Table'] as const).map((k) => (
                     // eslint-disable-next-line no-restricted-syntax -- ds-allow: the Chart | Table switch (Figma 170:75722)
                     <button
@@ -136,24 +136,24 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
                       role="radio"
                       aria-checked={(k === 'Table') === table}
                       onClick={() => setTable(k === 'Table')}
-                      className={cn('cursor-pointer rounded-[7px] border-0 px-2.5 py-1 text-[12px] leading-4', (k === 'Table') === table ? 'bg-[var(--dashboard-card-bg)] font-medium text-[var(--dashboard-figure)] shadow-[var(--dashboard-control-shadow)]' : 'bg-transparent text-[var(--dashboard-muted)]', FOCUS)}
+                      className={cn('cursor-pointer rounded-[7px] border-0 px-2.5 py-1 text-[length:var(--font-size-small)] leading-4', (k === 'Table') === table ? 'bg-[var(--dashboard-card-bg)] font-medium text-[var(--dashboard-figure)] shadow-[var(--dashboard-control-shadow)]' : 'bg-transparent text-[var(--dashboard-muted)]', FOCUS)}
                     >
                       {k}
                     </button>
                   ))}
                 </div>
               </div>
-              <div className="mt-[18px] flex items-center gap-5 text-[12px] leading-4">
+              <div className="mt-[18px] flex items-center gap-5 text-[length:var(--font-size-small)] leading-4">
                 <span className="flex items-center gap-1.5 text-[var(--dashboard-label)]"><span aria-hidden className="h-0.5 w-2.5 rounded-[1px] bg-[var(--dashboard-chart-ink)]" />{periodLabel}<strong className="font-medium text-[var(--dashboard-figure)]">{metric.value}</strong></span>
                 {comparable && metric.previous !== null && <span className="flex items-center gap-1.5 text-[var(--dashboard-label)]"><span aria-hidden className="h-0.5 w-2.5 rounded-[1px] bg-[var(--dashboard-chart-previous)]" />Previous {n} days<strong className="font-medium text-[var(--dashboard-figure)]">{formatMetricValue(metric.previous, metric.format)}</strong></span>}
                 {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the legend's underlined text link (Figma 170:75736) */}
-                <button type="button" onClick={() => onNotReady('Targets')} className={cn('cursor-pointer border-0 bg-transparent p-0 text-[12px] text-[var(--dashboard-figure)] underline underline-offset-2', FOCUS)}>Set a target</button>
+                <button type="button" onClick={() => onNotReady('Targets')} className={cn('cursor-pointer border-0 bg-transparent p-0 text-[length:var(--font-size-small)] text-[var(--dashboard-figure)] underline underline-offset-2', FOCUS)}>Set a target</button>
               </div>
               {!table && <LineChart metric={metric} series={series} variant="full" className="mt-6 h-[264px]" />}
               {table && (
-                <table className="mt-5 w-full border-collapse text-[13px] leading-5">
+                <table className="mt-5 w-full border-collapse text-[length:var(--font-size-body-sm)] leading-5">
                   <thead>
-                    <tr className="text-left text-[12px] text-[var(--dashboard-muted)]">
+                    <tr className="text-left text-[length:var(--font-size-small)] text-[var(--dashboard-muted)]">
                       <th className="py-2 font-normal">Day</th><th className="py-2 text-right font-normal">This period</th><th className="py-2 text-right font-normal">{lastYear ? 'Last year' : compareName('previous')}</th><th className="py-2 text-right font-normal">Change</th>
                     </tr>
                   </thead>
@@ -182,7 +182,7 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
               ? <div className="flex items-center gap-2"><HealthPillView pill={view.health} withTarget /></div>
               : <EmptyTab text="This metric has no target yet." action={['Set a target', () => onNotReady('Targets')]} />
           )}
-          {tab === 'Definition' && <p className="m-0 max-w-[560px] text-[14px] leading-[22px] text-[var(--dashboard-figure)]">{metric.definition || 'No definition for this metric yet.'}</p>}
+          {tab === 'Definition' && <p className="m-0 max-w-[560px] text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--dashboard-figure)]">{metric.definition || 'No definition for this metric yet.'}</p>}
           {tab === 'Sources' && <Sources apps={metric.apps} unmeasured={metric.unmeasured} />}
           {tab === 'Other related' && (
             related.length ? (
@@ -190,7 +190,7 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
                 {related.map((r) => (
                   <li key={r.id}>
                     {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a full-width row that opens another metric in this window */}
-                    <button type="button" onClick={() => onOpenMetric(r.id)} className={cn('flex w-full cursor-pointer items-center justify-between rounded-lg border-0 bg-transparent px-2.5 py-2 text-left text-[13px] leading-5 hover:bg-[var(--dashboard-hover-band)]', FOCUS)}>
+                    <button type="button" onClick={() => onOpenMetric(r.id)} className={cn('flex w-full cursor-pointer items-center justify-between rounded-lg border-0 bg-transparent px-2.5 py-2 text-left text-[length:var(--font-size-body-sm)] leading-5 hover:bg-[var(--dashboard-hover-band)]', FOCUS)}>
                       <span className="text-[var(--dashboard-figure)]">{r.label}</span>
                       <span className="text-[var(--dashboard-muted)]">{r.value}</span>
                     </button>
@@ -207,11 +207,11 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
 
 function EmptyTab({ text, action }: { text: string; action?: [string, () => void] }) {
   return (
-    <div className="flex flex-col items-start gap-2 text-[13px] leading-5 text-[var(--dashboard-muted)]">
+    <div className="flex flex-col items-start gap-2 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-muted)]">
       <p className="m-0">{text}</p>
       {action && (
         // eslint-disable-next-line no-restricted-syntax -- ds-allow: underlined text action
-        <button type="button" onClick={action[1]} className={cn('cursor-pointer border-0 bg-transparent p-0 text-[13px] text-[var(--dashboard-figure)] underline underline-offset-2', FOCUS)}>{action[0]}</button>
+        <button type="button" onClick={action[1]} className={cn('cursor-pointer border-0 bg-transparent p-0 text-[length:var(--font-size-body-sm)] text-[var(--dashboard-figure)] underline underline-offset-2', FOCUS)}>{action[0]}</button>
       )}
     </div>
   )
@@ -231,8 +231,8 @@ function Sources({ apps: ids, unmeasured }: { apps: AppId[]; unmeasured: string 
         return (
           <li key={app.id} className="flex h-10 items-center gap-2.5 border-0 border-b border-solid border-[var(--neutral-200)] last:border-b-0">
             <SourceLogo app={app} className="size-4 shrink-0" />
-            <span className="flex-1 text-[13px] text-[var(--dashboard-figure)]">{app.name}</span>
-            <span className={cn('text-[12px]', state === 'failed' ? 'text-[var(--dashboard-sync-failed)]' : 'text-[var(--dashboard-muted)]')}>{when}</span>
+            <span className="flex-1 text-[length:var(--font-size-body-sm)] text-[var(--dashboard-figure)]">{app.name}</span>
+            <span className={cn('text-[length:var(--font-size-small)]', state === 'failed' ? 'text-[var(--dashboard-sync-failed)]' : 'text-[var(--dashboard-muted)]')}>{when}</span>
           </li>
         )
       })}
@@ -254,7 +254,7 @@ function AddToBoard({ metric, boards, onPick }: { metric: Metric; boards: Board[
         <button
           type="button"
           data-add-to-board
-          className={cn('flex h-9 cursor-pointer items-center gap-1 rounded-[10px] border border-solid border-[var(--dashboard-hover-band)] bg-[var(--dashboard-card-bg)] pl-2.5 pr-3 text-[14px] font-medium leading-[22px] text-[var(--dashboard-figure)] shadow-[var(--dashboard-control-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}
+          className={cn('flex h-9 cursor-pointer items-center gap-1 rounded-lg border border-solid border-[var(--dashboard-hover-band)] bg-[var(--dashboard-card-bg)] pl-2.5 pr-3 text-[length:var(--font-size-body)] font-medium leading-[var(--line-height-body)] text-[var(--dashboard-figure)] shadow-[var(--dashboard-control-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}
         >
           <Plus aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth />Add to board
         </button>
@@ -264,10 +264,10 @@ function AddToBoard({ metric, boards, onPick }: { metric: Metric; boards: Board[
         // Inside the window, so the dialog doesn't treat the menu as outside it.
         portal={false}
         aria-label="Add to board"
-        style={{ width: 260, boxShadow: 'var(--dashboard-popover-shadow)', borderRadius: 12 }}
+        style={{ width: 260, boxShadow: 'var(--dashboard-popover-shadow)', borderRadius: 'var(--radius-xl)' }}
       >
         <div role="menu" aria-label="Your boards" className="flex flex-col p-1.5">
-          <p className="m-0 py-1.5 pl-2.5 text-[12px] font-medium leading-4 text-[var(--neutral-700)]">Your boards</p>
+          <p className="m-0 py-1.5 pl-2.5 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--neutral-700)]">Your boards</p>
           {boards.map((b) => (
             // eslint-disable-next-line no-restricted-syntax -- ds-allow: a board row of the Add to board menu (Figma 170:81328)
             <button
@@ -276,12 +276,12 @@ function AddToBoard({ metric, boards, onPick }: { metric: Metric; boards: Board[
               role="menuitem"
               data-board-option={b.id}
               onClick={() => { setOpen(false); onPick(b.id) }}
-              className={cn('flex h-9 w-full cursor-pointer items-center gap-2.5 rounded-lg border-0 bg-transparent px-2.5 text-left text-[13px] leading-5 text-[var(--dashboard-figure)] hover:bg-[var(--dashboard-sync-bg)] focus-visible:bg-[var(--dashboard-sync-bg)]', FOCUS)}
+              className={cn('flex h-9 w-full cursor-pointer items-center gap-2.5 rounded-lg border-0 bg-transparent px-2.5 text-left text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-figure)] hover:bg-[var(--dashboard-sync-bg)] focus-visible:bg-[var(--dashboard-sync-bg)]', FOCUS)}
             >
               <LayoutGrid aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0 text-[var(--dashboard-label)]" />
               <span className="min-w-0 flex-1 truncate">{b.label}</span>
               {b.cards.some((c) => Metrics.base(c.metricId) === metric.id) && (
-                <span className="shrink-0 rounded-full bg-[var(--dashboard-sync-bg)] px-2 py-0.5 text-[11px] font-medium leading-4 text-[var(--neutral-700)]">Already on it</span>
+                <span className="shrink-0 rounded-full bg-[var(--dashboard-sync-bg)] px-2 py-0.5 text-[length:var(--font-size-caption)] font-medium leading-4 text-[var(--neutral-700)]">Already on it</span>
               )}
             </button>
           ))}

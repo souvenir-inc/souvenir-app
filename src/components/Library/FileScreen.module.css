@@ -6,7 +6,7 @@
   min-height: 0;
   display: flex;
   background: var(--neutral-50);
-  border-radius: 19px;
+  border-radius: var(--file-screen-radius);
   overflow: hidden;
 }
 
@@ -23,7 +23,7 @@
   flex: 1;
   min-width: 0;
   box-sizing: border-box;
-  padding: 64px 32px 120px;
+  padding: var(--file-screen-padding);
 }
 
 /* Reserves the info card's width inside the scroller. It snaps; the page glides to its new place (FLIP). */
@@ -110,10 +110,10 @@
   margin: 0 auto;
   min-height: 560px;
   box-sizing: border-box;
-  padding: 56px 64px;
+  padding: var(--file-screen-page-padding);
   background: var(--card-bg);
   border-radius: var(--radius-xs);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--file-screen-page-shadow);
 }
 
 .pageTitle {
@@ -122,7 +122,7 @@
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-heading-md);
   line-height: var(--line-height-heading-md);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--tracking-tight);
   color: var(--neutral-900);
   overflow-wrap: anywhere;
 }
@@ -254,7 +254,7 @@
   gap: var(--space-2-5);
   min-height: 36px;
   padding: 0 var(--space-2);
-  margin: 0 -8px;
+  margin: 0 calc(var(--space-2) * -1);
   border-radius: var(--radius-lg);
   font-family: var(--font-body);
   font-size: var(--font-size-body);
@@ -406,7 +406,7 @@
   .slide {
     position: static;
     width: auto;
-    margin: 0 16px 96px;
+    margin: var(--file-screen-slide-margin);
     transform: none !important;
   }
   .info {

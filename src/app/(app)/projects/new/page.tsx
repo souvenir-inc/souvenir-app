@@ -77,7 +77,7 @@ function NewProjectPageInner() {
         width:         '100%',
         height:        '100%',
         overflowY:     'auto',
-        paddingTop:    80,
+        paddingTop:    'var(--page-top-inset)',
         paddingBottom: 'var(--space-8)',
         boxSizing:     'border-box',
       }}
@@ -232,7 +232,7 @@ function NewProjectPageInner() {
                 background:   'var(--field-surface)',
                 border:       '1px solid var(--neutral-300)',
                 borderRadius: 'var(--radius-lg)',
-                boxShadow:    '0px 1px 1.5px 0px rgba(82,75,71,0.12)',
+                boxShadow:    'var(--project-form-field-shadow)',
                 outline:      'none',
                 resize:       'none',
                 width:        '100%',
@@ -247,7 +247,7 @@ function NewProjectPageInner() {
               }}
               onBlur={(e) => {
                 Object.assign(e.currentTarget.style, {
-                  boxShadow:   '0px 1px 1.5px 0px rgba(82,75,71,0.12)',
+                  boxShadow:   'var(--project-form-field-shadow)',
                   borderColor: 'var(--neutral-300)',
                 })
               }}

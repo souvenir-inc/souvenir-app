@@ -68,7 +68,7 @@ export function XmlMetrics({ xml }: { xml: string }) {
                 data={metric.spark}
                 height={48}
                 color={TREND_PALETTE[metric.trend]}
-                style={{ margin: "4px -8px -4px", width: "calc(100% + 16px)" }}
+                style={{ margin: "var(--space-1) calc(var(--space-2) * -1) calc(var(--space-1) * -1)", width: "calc(100% + 16px)" }}
               />
             )}
           />

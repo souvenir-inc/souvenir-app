@@ -410,7 +410,7 @@ export function TabsList({
           style={{
             position:   'relative',
             display:    'flex',
-            gap:        '4px',
+            gap:        'var(--space-1)',
             alignItems: 'center',
             ...(fluid  && { flex: '1 0 0' }),
             ...(!fluid && { flexShrink: 0 }),

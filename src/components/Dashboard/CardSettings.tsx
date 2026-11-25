@@ -120,29 +120,29 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
       hideClose
       aria-describedby={undefined}
       data-card-settings={card.metricId}
-      style={{ width: 'min(460px, calc(100vw - 32px))', maxWidth: 'none', maxHeight: 'calc(100dvh - 96px)', borderRadius: 12, padding: 0, background: 'var(--dashboard-card-bg)', display: 'flex', flexDirection: 'column' }}
+      style={{ width: 'min(460px, calc(100vw - 32px))', maxWidth: 'none', maxHeight: 'calc(100dvh - 96px)', borderRadius: 'var(--radius-xl)', padding: 0, background: 'var(--dashboard-card-bg)', display: 'flex', flexDirection: 'column' }}
       onEscapeKeyDown={(e) => { if (changing) { e.preventDefault(); setChanging(false); setQuery('') } }}
     >
       <div className="relative flex shrink-0 items-center px-5 pb-3 pt-5">
-        <DialogTitle className="min-w-0 truncate pr-8 text-[16px] font-semibold leading-6 text-[var(--dashboard-figure)]">{metric.label}</DialogTitle>
+        <DialogTitle className="min-w-0 truncate pr-8 text-[length:var(--font-size-body-lg)] font-semibold leading-6 text-[var(--dashboard-figure)]">{metric.label}</DialogTitle>
         <DialogClose asChild>
-          <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-4 size-7 rounded-[8px]" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
+          <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-4 size-7 rounded-md" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
         </DialogClose>
       </div>
 
       <div className="kaya-scrollbar flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-5 pb-5">
         <div className="flex items-center justify-between">
-          <p className="m-0 text-[12px] font-medium leading-4 text-[var(--dashboard-label)]">Metric</p>
+          <p className="m-0 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-label)]">Metric</p>
           {changing && (
             // eslint-disable-next-line no-restricted-syntax -- ds-allow: Keep this metric, a text link (Figma 19:7214)
-            <button type="button" onClick={() => { setChanging(false); setQuery('') }} className={cn('cursor-pointer rounded-sm border-0 bg-transparent p-0 text-[12px] font-medium leading-4 text-[var(--dashboard-figure)] underline underline-offset-2', FOCUS)}>
+            <button type="button" onClick={() => { setChanging(false); setQuery('') }} className={cn('cursor-pointer rounded-sm border-0 bg-transparent p-0 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-figure)] underline underline-offset-2', FOCUS)}>
               Keep this metric
             </button>
           )}
         </div>
         {changing ? (
           <div data-metric-search className="flex flex-col gap-1">
-            <div className="flex h-10 items-center gap-2 rounded-[10px] border border-solid border-[var(--dashboard-way-border)] bg-[var(--dashboard-card-bg)] px-3">
+            <div className="flex h-10 items-center gap-2 rounded-lg border border-solid border-[var(--dashboard-way-border)] bg-[var(--dashboard-card-bg)] px-3">
               <Search aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0 text-[var(--dashboard-label)]" />
               {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the catalog search in card settings (Figma 19:7214) */}
               <input
@@ -155,11 +155,11 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); setActive(0) }}
                 onKeyDown={onKey}
-                className="h-full min-w-0 flex-1 border-0 bg-transparent text-[14px] text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
+                className="h-full min-w-0 flex-1 border-0 bg-transparent text-[length:var(--font-size-body)] text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
               />
             </div>
             <ul id="card-metrics" role="listbox" aria-label="Metrics" className="kaya-scrollbar m-0 max-h-[240px] list-none overflow-y-auto p-0">
-              {list.length === 0 && <li className="px-2 py-2 text-[13px] text-[var(--dashboard-label)]">No metrics match “{query.trim()}”.</li>}
+              {list.length === 0 && <li className="px-2 py-2 text-[length:var(--font-size-body-sm)] text-[var(--dashboard-label)]">No metrics match “{query.trim()}”.</li>}
               {list.map((m) => {
                 const can = m.id === current || pickable(m)
                 const on = choosable[active]?.id === m.id
@@ -175,8 +175,8 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
                     className={cn('flex items-center gap-2 rounded-lg px-2 py-1.5', can ? 'cursor-pointer hover:bg-[var(--dashboard-sync-bg)]' : 'cursor-default opacity-50', (on || m.id === current) && 'bg-[var(--dashboard-sync-bg)]')}
                   >
                     <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="truncate text-[14px] leading-5 text-[var(--dashboard-figure)]">{m.label}</span>
-                      <span className="truncate text-[12px] leading-4 text-[var(--dashboard-label)]">{groupOf(m, apps)}</span>
+                      <span className="truncate text-[length:var(--font-size-body)] leading-5 text-[var(--dashboard-figure)]">{m.label}</span>
+                      <span className="truncate text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">{groupOf(m, apps)}</span>
                     </span>
                     {m.id === current && <Check aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}
                   </li>
@@ -185,14 +185,14 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
             </ul>
           </div>
         ) : (
-          <div className="flex h-10 items-center gap-2 rounded-[10px] border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-panel-bg)] pl-3 pr-1">
-            <span data-metric-name className="min-w-0 flex-1 truncate text-[14px] text-[var(--dashboard-figure)]">{metric.label}</span>
+          <div className="flex h-10 items-center gap-2 rounded-lg border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-panel-bg)] pl-3 pr-1">
+            <span data-metric-name className="min-w-0 flex-1 truncate text-[length:var(--font-size-body)] text-[var(--dashboard-figure)]">{metric.label}</span>
             <Button variant="outline" size="sm" data-change-metric onClick={() => setChanging(true)}>Change</Button>
           </div>
         )}
 
-        <p className="m-0 pt-2 text-[12px] font-medium leading-4 text-[var(--dashboard-label)]">Chart</p>
-        <div role="radiogroup" aria-label="Chart" data-chart={bars ? 'bars' : 'trend'} className="flex w-fit gap-0.5 rounded-[10px] bg-[var(--dashboard-hover-band)] p-[3px]">
+        <p className="m-0 pt-2 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-label)]">Chart</p>
+        <div role="radiogroup" aria-label="Chart" data-chart={bars ? 'bars' : 'trend'} className="flex w-fit gap-0.5 rounded-lg bg-[var(--dashboard-hover-band)] p-[3px]">
           {(['trend', 'bars'] as const).map((k) => {
             const on = (k === 'bars') === bars
             return (
@@ -205,7 +205,7 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
                 data-chart-option={k}
                 onClick={() => { if (!on) onChart(k) }}
                 className={cn(
-                  'rounded-[7px] border-0 px-2.5 py-1 text-[13px] leading-5',
+                  'rounded-[7px] border-0 px-2.5 py-1 text-[length:var(--font-size-body-sm)] leading-5',
                   on ? 'bg-[var(--dashboard-card-bg)] font-medium text-[var(--dashboard-figure)] shadow-[var(--dashboard-control-shadow)]' : 'bg-transparent text-[var(--dashboard-muted)]',
                   'cursor-pointer',
                   FOCUS,
@@ -228,7 +228,7 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
           <Button variant="outline" size="sm" data-card-action="remove" leftIcon={<Trash2 aria-hidden strokeWidth={1.5} absoluteStrokeWidth />} onClick={onRemove}>Remove</Button>
         </div>
         {failed && (
-          <p role="alert" data-card-download-failed className="m-0 flex items-center gap-1.5 pt-1 text-[12px] leading-4 text-[var(--dashboard-error)]">
+          <p role="alert" data-card-download-failed className="m-0 flex items-center gap-1.5 pt-1 text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-error)]">
             <TriangleAlert aria-hidden size={12} strokeWidth={1.5} absoluteStrokeWidth />
             {failed === 'numbers' ? 'Couldn’t download the numbers. Try again.' : 'Couldn’t download the image.'}
           </p>

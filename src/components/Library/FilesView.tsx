@@ -17,7 +17,7 @@ import { FileTable } from './FileTable/FileTable'
 import { FileTableSkeleton } from './LibrarySkeletons'
 import { NoFilesYet } from './NoFilesYet'
 
-const visuallyHidden: React.CSSProperties = { position: 'absolute', width: 1, height: 1, margin: -1, padding: 0, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap', border: 0 }
+const visuallyHidden: React.CSSProperties = { position: 'absolute', width: 1, height: 1, margin: 'calc(var(--space-px) * -1)', padding: 0, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap', border: 0 }
 
 type FilesViewProps = { query: LibraryQuery; setQuery: SetLibraryQuery; isPending: boolean }
 

@@ -29,11 +29,11 @@ export default function GlobalError({
         style={{
           margin: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center',
           justifyContent: 'center', gap: 'var(--space-3, 12px)', padding: 'var(--space-7, 32px)', textAlign: 'center',
-          fontFamily: 'system-ui, sans-serif', background: '#fff', color: '#1a1a1a',
+          fontFamily: 'system-ui, sans-serif', background: 'var(--static-white, #ffffff)', color: '#1a1a1a', // ds-keep: renders without the app stylesheet (replaces the root layout)
         }}
       >
         <h1 style={{ margin: 0, fontSize: 'var(--font-size-heading, 24px)', fontWeight: 'var(--font-weight-medium, 500)' }}>Something went wrong</h1>
-        <p style={{ margin: 0, fontSize: 'var(--font-size-body, 14px)', color: '#555' }}>
+        <p style={{ margin: 0, fontSize: 'var(--font-size-body, 14px)', color: '#555' /* ds-keep: renders without the app stylesheet */ }}>
           Souvenir could not load. Try again, or sign in again if it keeps happening.
         </p>
         <div style={{ display: 'flex', gap: 'var(--space-2, 8px)', marginTop: 'var(--space-2, 8px)' }}>

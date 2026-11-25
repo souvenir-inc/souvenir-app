@@ -88,7 +88,7 @@ export function Slider({
       style={{
         display:       'flex',
         flexDirection: 'column',
-        gap:           8,
+        gap:           'var(--space-2)',
         width:         fluid ? '100%' : 240,
         ...style,
       }}
@@ -133,7 +133,7 @@ export function Slider({
             position:        'relative',
             flexGrow:        1,
             height:          trackHeight,
-            borderRadius:    999,
+            borderRadius:    'var(--radius-full)',
             backgroundColor: trackColor,
             overflow:        'hidden',
           }}
@@ -143,7 +143,7 @@ export function Slider({
               position:        'absolute',
               height:          '100%',
               backgroundColor: fillColor,
-              borderRadius:    999,
+              borderRadius:    'var(--radius-full)',
             }}
           />
         </SliderPrimitive.Track>
@@ -170,9 +170,9 @@ export function Slider({
                   style={{
                     width:           PIP_SIZE,
                     height:          PIP_SIZE,
-                    borderRadius:    999,
+                    borderRadius:    'var(--radius-full)',
                     backgroundColor: active ? 'var(--neutral-700)' : 'var(--neutral-300)',
-                    transition:      'background-color 120ms ease',
+                    transition:      'background-color var(--duration-fast) ease',
                   }}
                 />
               )
@@ -214,8 +214,8 @@ export function Slider({
                   transform:       'translateX(-50%)',
                   display:         'inline-flex',
                   alignItems:      'center',
-                  padding:         '4px 6px',
-                  borderRadius:    6,
+                  padding:         'var(--space-1) var(--space-1-5)',
+                  borderRadius:    'var(--radius-sm)',
                   backgroundImage: 'linear-gradient(180deg, var(--tooltip-bg-from) 0%, var(--tooltip-bg-to) 100%)',
                   boxShadow:       'var(--shadow-tooltip)',
                   whiteSpace:      'nowrap',

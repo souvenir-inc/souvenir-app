@@ -95,7 +95,7 @@ function Share({ startOn, board, period, compare, cardView, stamp, isDefault = f
       aria-describedby={undefined}
       data-share-dialog
       data-step={step}
-      style={{ width: 'min(520px, calc(100vw - 32px))', maxWidth: 'none', maxHeight: 'calc(100dvh - 96px)', borderRadius: 16, padding: 0, background: 'var(--dashboard-card-bg)', display: 'flex', flexDirection: 'column', overflow: 'visible' }}
+      style={{ width: 'min(520px, calc(100vw - 32px))', maxWidth: 'none', maxHeight: 'calc(100dvh - 96px)', borderRadius: 'var(--radius-2xl)', padding: 0, background: 'var(--dashboard-card-bg)', display: 'flex', flexDirection: 'column', overflow: 'visible' }}
       // Esc closes the matches or an open menu first, not the dialog (SH-10).
       onEscapeKeyDown={(e) => {
         const menu = document.querySelector('[data-share-dialog] [data-role-menu], [data-share-dialog] [data-general-menu], [data-share-dialog] [aria-label="Channels"]')
@@ -109,9 +109,9 @@ function Share({ startOn, board, period, compare, cardView, stamp, isDefault = f
       ) : (
         <>
           <div className="relative flex shrink-0 items-center px-5 pb-3 pt-5">
-            <DialogTitle className="min-w-0 truncate pr-8 text-[16px] font-semibold leading-6 text-[var(--dashboard-figure)]">Share “{board.label}”</DialogTitle>
+            <DialogTitle className="min-w-0 truncate pr-8 text-[length:var(--font-size-body-lg)] font-semibold leading-6 text-[var(--dashboard-figure)]">Share “{board.label}”</DialogTitle>
             <DialogClose asChild>
-              <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-4 size-7 rounded-[8px]" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
+              <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-4 size-7 rounded-md" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
             </DialogClose>
           </div>
 
@@ -122,14 +122,14 @@ function Share({ startOn, board, period, compare, cardView, stamp, isDefault = f
                 onInvite={(ids, role) => onChange({ grants: [...share.grants.filter((g) => !ids.includes(g.userId)), ...ids.map((userId) => ({ userId, role }))] })}
               />
             ) : (
-              <p data-share-readonly className="m-0 pb-1 text-[13px] leading-5 text-[var(--dashboard-label)]">Only {people.name(share.ownerId)} can change who has access.</p>
+              <p data-share-readonly className="m-0 pb-1 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-label)]">Only {people.name(share.ownerId)} can change who has access.</p>
             )}
-            <p className="m-0 pb-1 pt-4 text-[12px] font-medium leading-4 text-[var(--dashboard-label)]">People with access</p>
+            <p className="m-0 pb-1 pt-4 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-label)]">People with access</p>
           </div>
 
           {/* Only the people list scrolls (SH-9). */}
           <ul data-share-people className="kaya-scrollbar m-0 min-h-0 flex-1 list-none overflow-y-auto px-5 py-0">
-            <PersonRow people={people} id={share.ownerId} right={<span className="pr-1 text-[13px] text-[var(--dashboard-label)]">Owner</span>} />
+            <PersonRow people={people} id={share.ownerId} right={<span className="pr-1 text-[length:var(--font-size-body-sm)] text-[var(--dashboard-label)]">Owner</span>} />
             {people.sortGrants(share.grants).map((g) => (
               <PersonRow
                 key={g.userId}
@@ -145,21 +145,21 @@ function Share({ startOn, board, period, compare, cardView, stamp, isDefault = f
                       onChange({ grants: share.grants.filter((x) => x.userId !== g.userId) })
                     }}
                   />
-                ) : <span className="pr-1 text-[13px] text-[var(--dashboard-label)]">{ROLE_TEXT[g.role].label}</span>}
+                ) : <span className="pr-1 text-[length:var(--font-size-body-sm)] text-[var(--dashboard-label)]">{ROLE_TEXT[g.role].label}</span>}
               />
             ))}
           </ul>
 
           <div className="shrink-0 px-5">
             {removed && (
-              <p data-share-removed role="status" className="m-0 flex items-center gap-2 py-2 text-[13px] leading-5 text-[var(--dashboard-label)]">
+              <p data-share-removed role="status" className="m-0 flex items-center gap-2 py-2 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-label)]">
                 {removed.name} no longer has access.
                 {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: an inline Undo (Figma 170:78020) */}
-                <button type="button" onClick={() => { onChange({ grants: removed.grants }); setRemoved(null) }} className={cn('cursor-pointer rounded-sm border-0 bg-transparent p-0 text-[13px] font-medium text-[var(--dashboard-figure)] underline underline-offset-2', FOCUS)}>Undo</button>
+                <button type="button" onClick={() => { onChange({ grants: removed.grants }); setRemoved(null) }} className={cn('cursor-pointer rounded-sm border-0 bg-transparent p-0 text-[length:var(--font-size-body-sm)] font-medium text-[var(--dashboard-figure)] underline underline-offset-2', FOCUS)}>Undo</button>
               </p>
             )}
             <span aria-hidden className="mt-2 block h-px bg-[var(--neutral-200)]" />
-            <p className="m-0 pb-2 pt-3 text-[12px] font-medium leading-4 text-[var(--dashboard-label)]">General access</p>
+            <p className="m-0 pb-2 pt-3 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-label)]">General access</p>
             <GeneralAccess people={people} share={share} editable={owner} isDefault={isDefault} onChange={(general) => onChange({ general })} />
 
             {linkFailed && (
@@ -171,12 +171,12 @@ function Share({ startOn, board, period, compare, cardView, stamp, isDefault = f
                   value={link}
                   ref={(el) => { el?.select() }}
                   onFocus={(e) => e.currentTarget.select()}
-                  className="h-9 w-full rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-panel-bg)] px-3 text-[13px] text-[var(--dashboard-figure)] outline-none focus:border-[var(--dashboard-way-border)]"
+                  className="h-9 w-full rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-panel-bg)] px-3 text-[length:var(--font-size-body-sm)] text-[var(--dashboard-figure)] outline-none focus:border-[var(--dashboard-way-border)]"
                 />
-                <p role="alert" className="m-0 text-[12px] leading-4 text-[var(--dashboard-error)]">Couldn’t copy the link. Press ⌘C to copy it.</p>
+                <p role="alert" className="m-0 text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-error)]">Couldn’t copy the link. Press ⌘C to copy it.</p>
               </div>
             )}
-            {caption && !linkFailed && <p data-link-caption className="m-0 pt-3 text-[12px] leading-4 text-[var(--dashboard-label)]">{linkCaption(period, compare)}</p>}
+            {caption && !linkFailed && <p data-link-caption className="m-0 pt-3 text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">{linkCaption(period, compare)}</p>}
           </div>
 
           <div className="mt-4 flex shrink-0 items-center gap-2 border-t border-solid border-[var(--neutral-200)] px-5 py-4">
@@ -216,8 +216,8 @@ function PersonRow({ people, id, right }: { people: People; id: string; right: R
     <li data-person={id} className="flex min-h-12 items-center gap-2.5 py-1.5">
       <Avatar member={m} />
       <span className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-[14px] font-medium leading-5 text-[var(--dashboard-figure)]">{people.displayName(id)}</span>
-        {m && <span className="truncate text-[12px] leading-4 text-[var(--dashboard-label)]">{m.email}</span>}
+        <span className="truncate text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--dashboard-figure)]">{people.displayName(id)}</span>
+        {m && <span className="truncate text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">{m.email}</span>}
       </span>
       {right}
     </li>
@@ -238,31 +238,31 @@ function RoleMenu({ value, label, onChange, onRemove, compact = false }: { value
           type="button"
           aria-label={`${label}: ${ROLE_TEXT[value].label}`}
           data-role-trigger
-          className={cn('flex h-7 shrink-0 cursor-pointer items-center gap-1 rounded-md border-0 bg-transparent px-1.5 text-[13px] leading-5 text-[var(--neutral-700)] hover:bg-[var(--dashboard-sync-bg)] data-[state=open]:bg-[var(--dashboard-sync-bg)]', compact && 'h-6', FOCUS)}
+          className={cn('flex h-7 shrink-0 cursor-pointer items-center gap-1 rounded-md border-0 bg-transparent px-1.5 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--neutral-700)] hover:bg-[var(--dashboard-sync-bg)] data-[state=open]:bg-[var(--dashboard-sync-bg)]', compact && 'h-6', FOCUS)}
         >
           {ROLE_TEXT[value].label}<ChevronDown aria-hidden size={12} strokeWidth={1.5} absoluteStrokeWidth />
         </button>
       </PopoverTrigger>
       <PopoverContent
         side="bottom" align="end" sideOffset={4} collisionPadding={8} variant="dropdown" maxHeight={false} portal={false}
-        style={{ width: 220, boxShadow: 'var(--dashboard-popover-shadow)', borderRadius: 12 }}
+        style={{ width: 220, boxShadow: 'var(--dashboard-popover-shadow)', borderRadius: 'var(--radius-xl)' }}
       >
         <div role="menu" aria-label={label} data-role-menu className="flex flex-col p-1.5">
           {(['view', 'edit'] as const).map((r) => (
             // eslint-disable-next-line no-restricted-syntax -- ds-allow: a role with its line (Figma 170:77629)
             <button key={r} type="button" role="menuitemradio" aria-checked={value === r} onClick={() => { setOpen(false); onChange(r) }} className={MENU_ITEM}>
-              <span className="flex w-full items-center text-[13px] font-medium leading-5 text-[var(--dashboard-figure)]">
+              <span className="flex w-full items-center text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)]">
                 {ROLE_TEXT[r].label}
                 {value === r && <Check aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="ml-auto" />}
               </span>
-              <span className="text-[12px] leading-4 text-[var(--dashboard-label)]">{ROLE_TEXT[r].line}</span>
+              <span className="text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">{ROLE_TEXT[r].line}</span>
             </button>
           ))}
           {onRemove && (
             <>
               <span aria-hidden className="mx-1 my-1 h-px bg-[var(--neutral-200)]" />
               {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: Remove access in red (Figma 170:77629) */}
-              <button type="button" role="menuitem" onClick={() => { setOpen(false); onRemove() }} className={cn(MENU_ITEM, 'text-[13px] font-medium leading-5 text-[var(--dashboard-error)]')}>Remove access</button>
+              <button type="button" role="menuitem" onClick={() => { setOpen(false); onRemove() }} className={cn(MENU_ITEM, 'text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-error)]')}>Remove access</button>
             </>
           )}
         </div>
@@ -287,42 +287,42 @@ function GeneralAccess({ people, share, editable, isDefault, onChange }: { peopl
           <PopoverRoot open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the general access trigger (Figma 170:58430) */}
-              <button type="button" data-general-trigger className={cn('flex cursor-pointer items-center gap-1 rounded-md border-0 bg-transparent p-0 text-[14px] font-medium leading-5 text-[var(--dashboard-figure)]', FOCUS)}>
+              <button type="button" data-general-trigger className={cn('flex cursor-pointer items-center gap-1 rounded-md border-0 bg-transparent p-0 text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--dashboard-figure)]', FOCUS)}>
                 {title}<ChevronDown aria-hidden size={12} strokeWidth={1.5} absoluteStrokeWidth />
               </button>
             </PopoverTrigger>
             <PopoverContent
               side="bottom" align="start" sideOffset={4} collisionPadding={8} variant="dropdown" maxHeight={false} portal={false}
-              style={{ width: 260, boxShadow: 'var(--dashboard-popover-shadow)', borderRadius: 12 }}
+              style={{ width: 260, boxShadow: 'var(--dashboard-popover-shadow)', borderRadius: 'var(--radius-xl)' }}
             >
               <div role="menu" aria-label="General access" data-general-menu className="flex flex-col p-1.5">
                 {/* The default board can't be made private: new members open on it (the warehouse refuses it too). */}
                 {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a general access choice (Figma 170:78449) */}
                 <button type="button" role="menuitemradio" aria-checked={!everyone} aria-disabled={everyone && isDefault} data-default-locked={everyone && isDefault ? '' : undefined} onClick={() => { if (everyone && isDefault) return; setOpen(false); onChange('none') }} className={cn(MENU_ITEM, everyone && isDefault && 'cursor-not-allowed opacity-60')}>
-                  <span className="flex w-full items-center text-[13px] font-medium leading-5 text-[var(--dashboard-figure)]">Only people added{!everyone && <Check aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="ml-auto" />}</span>
+                  <span className="flex w-full items-center text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)]">Only people added{!everyone && <Check aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="ml-auto" />}</span>
                   {/* Going back shows who loses access first (SH-19). */}
-                  <span data-lose-count={everyone && !isDefault ? lose : undefined} className={cn('text-[12px] leading-4', everyone && !isDefault ? 'text-[var(--dashboard-error)]' : 'text-[var(--dashboard-label)]')}>
+                  <span data-lose-count={everyone && !isDefault ? lose : undefined} className={cn('text-[length:var(--font-size-small)] leading-4', everyone && !isDefault ? 'text-[var(--dashboard-error)]' : 'text-[var(--dashboard-label)]')}>
                     {everyone && isDefault ? 'New members open on this board. Pick another default board first.'
                       : everyone ? `${lose} ${lose === 1 ? 'person loses' : 'people lose'} access` : 'Only the people above can open this board'}
                   </span>
                 </button>
                 {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a general access choice (Figma 170:78449) */}
                 <button type="button" role="menuitemradio" aria-checked={everyone} onClick={() => { setOpen(false); if (!everyone) onChange('view') }} className={MENU_ITEM}>
-                  <span className="flex w-full items-center text-[13px] font-medium leading-5 text-[var(--dashboard-figure)]">Everyone at {people.workspace}{everyone && <Check aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="ml-auto" />}</span>
-                  <span className="text-[12px] leading-4 text-[var(--dashboard-label)]">Anyone in the workspace can open this board</span>
+                  <span className="flex w-full items-center text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)]">Everyone at {people.workspace}{everyone && <Check aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="ml-auto" />}</span>
+                  <span className="text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">Anyone in the workspace can open this board</span>
                 </button>
               </div>
             </PopoverContent>
           </PopoverRoot>
         ) : (
-          <span className="text-[14px] font-medium leading-5 text-[var(--dashboard-figure)]">{title}</span>
+          <span className="text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--dashboard-figure)]">{title}</span>
         )}
-        <span className="text-[12px] leading-4 text-[var(--dashboard-label)]">{line}</span>
+        <span className="text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">{line}</span>
       </span>
       {share.general !== 'none' && (
         editable
           ? <RoleMenu value={share.general} label="Everyone’s role" onChange={onChange} />
-          : <span className="pr-1 text-[13px] text-[var(--dashboard-label)]">{ROLE_TEXT[share.general].label}</span>
+          : <span className="pr-1 text-[length:var(--font-size-body-sm)] text-[var(--dashboard-label)]">{ROLE_TEXT[share.general].label}</span>
       )}
     </div>
   )
@@ -378,13 +378,13 @@ function AddPeople({ people, share, onListOpen, onInvite }: { people: People; sh
     <div className="relative">
       <div className="flex items-start gap-2">
         <div
-          className="flex min-h-10 min-w-0 flex-1 cursor-text flex-wrap items-center gap-1.5 rounded-[10px] border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1.5 pl-2 pr-1 focus-within:border-[var(--dashboard-way-border)]"
+          className="flex min-h-10 min-w-0 flex-1 cursor-text flex-wrap items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1.5 pl-2 pr-1 focus-within:border-[var(--dashboard-way-border)]"
           onClick={() => inputRef.current?.focus()}
         >
           {picked.map((id) => {
             const m = people.get(id)
             return (
-              <span key={id} data-chip={id} className="flex h-6 items-center gap-1.5 rounded-md bg-[var(--dashboard-chip-bg)] pl-1.5 pr-1 text-[13px] leading-5 text-[var(--dashboard-figure)]">
+              <span key={id} data-chip={id} className="flex h-6 items-center gap-1.5 rounded-md bg-[var(--dashboard-chip-bg)] pl-1.5 pr-1 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-figure)]">
                 <span aria-hidden className="flex size-4 items-center justify-center rounded-full text-[8px] font-medium" style={{ background: m?.color }}>{m?.initials}</span>
                 {m?.name}
                 {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a chip's × (Figma 170:70828) */}
@@ -406,7 +406,7 @@ function AddPeople({ people, share, onListOpen, onInvite }: { people: People; sh
             value={query}
             onChange={(e) => { setQuery(e.target.value); setActive(0); setClosed(false) }}
             onKeyDown={onKey}
-            className="h-6 min-w-[80px] flex-1 border-0 bg-transparent px-1 text-[14px] leading-5 text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
+            className="h-6 min-w-[80px] flex-1 border-0 bg-transparent px-1 text-[length:var(--font-size-body)] leading-5 text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
           />
           <RoleMenu value={role} label="Role for new people" onChange={setPickRole} compact />
         </div>
@@ -417,11 +417,11 @@ function AddPeople({ people, share, onListOpen, onInvite }: { people: People; sh
         <div id="share-matches" role="listbox" aria-label="Matches" data-share-matches className="absolute inset-x-0 top-[calc(100%+4px)] z-10 max-h-[280px] overflow-y-auto rounded-xl border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] p-1.5 shadow-[var(--dashboard-popover-shadow)]">
           {outside ? (
             <div data-outside className="flex flex-col items-start gap-1 px-2.5 py-2">
-              <p className="m-0 text-[13px] font-medium leading-5 text-[var(--dashboard-figure)]">{outside} isn’t in {people.workspace}</p>
-              <p className="m-0 text-[12px] leading-4 text-[var(--dashboard-label)]">Boards can be shared with workspace members only. An admin can invite them to the workspace first.</p>
+              <p className="m-0 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)]">{outside} isn’t in {people.workspace}</p>
+              <p className="m-0 text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">Boards can be shared with workspace members only. An admin can invite them to the workspace first.</p>
             </div>
           ) : found.length === 0 ? (
-            <p data-no-match className="m-0 px-2.5 py-2 text-[13px] leading-5 text-[var(--dashboard-label)]">No one at {people.workspace} matches ‘{query.trim()}’</p>
+            <p data-no-match className="m-0 px-2.5 py-2 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-label)]">No one at {people.workspace} matches ‘{query.trim()}’</p>
           ) : (
             found.map((m) => {
               const on = pickable[active]?.person.id === m.person.id
@@ -438,10 +438,10 @@ function AddPeople({ people, share, onListOpen, onInvite }: { people: People; sh
                 >
                   <Avatar member={m.person} />
                   <span className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-[13px] font-medium leading-5 text-[var(--dashboard-figure)]">{m.person.name}</span>
-                    <span className="truncate text-[12px] leading-4 text-[var(--dashboard-label)]">{m.person.email}</span>
+                    <span className="truncate text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)]">{m.person.name}</span>
+                    <span className="truncate text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">{m.person.email}</span>
                   </span>
-                  {m.has && <span className="text-[12px] text-[var(--dashboard-label)]">{m.has === 'owner' ? 'Owner' : ROLE_TEXT[m.has].label}</span>}
+                  {m.has && <span className="text-[length:var(--font-size-small)] text-[var(--dashboard-label)]">{m.has === 'owner' ? 'Owner' : ROLE_TEXT[m.has].label}</span>}
                 </div>
               )
             })
@@ -503,18 +503,18 @@ function SlackStep({ board, period, compare, cardView, stamp, link, people, onBa
   return (
     <>
       <div className="relative flex shrink-0 items-center gap-1.5 px-4 pb-3 pt-5">
-        <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Back to people" onClick={onBack} className="size-7 rounded-[8px]" icon={<ArrowLeft strokeWidth={1.5} absoluteStrokeWidth />} />
-        <DialogTitle className="text-[16px] font-semibold leading-6 text-[var(--dashboard-figure)]">Post to Slack</DialogTitle>
+        <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Back to people" onClick={onBack} className="size-7 rounded-md" icon={<ArrowLeft strokeWidth={1.5} absoluteStrokeWidth />} />
+        <DialogTitle className="text-[length:var(--font-size-body-lg)] font-semibold leading-6 text-[var(--dashboard-figure)]">Post to Slack</DialogTitle>
         <DialogClose asChild>
-          <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-4 size-7 rounded-[8px]" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
+          <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-4 size-7 rounded-md" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
         </DialogClose>
       </div>
 
       {slack.isLoading ? (
-        <p role="status" className="m-0 px-5 pb-5 text-[13px] leading-5 text-[var(--dashboard-label)]">Looking for your Slack channels…</p>
+        <p role="status" className="m-0 px-5 pb-5 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-label)]">Looking for your Slack channels…</p>
       ) : slack.isError ? (
         <div data-slack-failed className="flex flex-col items-start gap-1 px-5 pb-5">
-          <p role="alert" className="m-0 text-[13px] leading-5 text-[var(--dashboard-error)]">Couldn’t reach Slack.</p>
+          <p role="alert" className="m-0 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-error)]">Couldn’t reach Slack.</p>
           <Button size="sm" variant="outline" className="mt-2" onClick={() => { void slack.refetch() }}>Try again</Button>
         </div>
       ) : !slack.data?.connected || !channel ? (
@@ -522,10 +522,10 @@ function SlackStep({ board, period, compare, cardView, stamp, link, people, onBa
         // The second also covers a person whose Slack account isn't linked to Souvenir yet: the
         // warehouse lists no channels for them either, and can't say which of the two it is.
         <div data-slack-off className="flex flex-col items-start gap-1 px-5 pb-5">
-          <p className="m-0 text-[14px] font-medium leading-5 text-[var(--dashboard-figure)]">
+          <p className="m-0 text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--dashboard-figure)]">
             {slack.data?.connected ? 'No Slack channel you and Souvenir are both in' : 'Connect Slack to post boards to a channel'}
           </p>
-          <p className="m-0 text-[13px] leading-5 text-[var(--dashboard-label)]">
+          <p className="m-0 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-label)]">
             {slack.data?.connected
               ? 'Boards go only to channels you’re both in. Invite Souvenir to one of yours, or link your Slack account to Souvenir if you haven’t.'
               : 'You’ll pick the channel each time you post.'}
@@ -539,21 +539,21 @@ function SlackStep({ board, period, compare, cardView, stamp, link, people, onBa
       ) : (
         <>
           <div className="kaya-scrollbar min-h-0 flex-1 overflow-y-auto px-5">
-            <p className="m-0 pb-1.5 text-[12px] font-medium leading-4 text-[var(--dashboard-label)]">Channel</p>
+            <p className="m-0 pb-1.5 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-label)]">Channel</p>
             <PopoverRoot open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the channel select (Figma 171:94068) */}
-                <button type="button" data-channel={channel.name} className={cn('flex h-10 w-full cursor-pointer items-center gap-1.5 rounded-[10px] border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-3 text-left text-[14px] leading-5 text-[var(--dashboard-figure)]', FOCUS)}>
+                <button type="button" data-channel={channel.name} className={cn('flex h-10 w-full cursor-pointer items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-3 text-left text-[length:var(--font-size-body)] leading-5 text-[var(--dashboard-figure)]', FOCUS)}>
                   <Hash aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="text-[var(--dashboard-label)]" />
                   <span className="flex-1">{channel.name}</span>
                   <ChevronDown aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="text-[var(--dashboard-label)]" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent side="bottom" align="start" sideOffset={4} variant="dropdown" maxHeight={false} portal={false} style={{ width: 'var(--radix-popover-trigger-width)', boxShadow: 'var(--dashboard-popover-shadow)', borderRadius: 12 }}>
+              <PopoverContent side="bottom" align="start" sideOffset={4} variant="dropdown" maxHeight={false} portal={false} style={{ width: 'var(--radix-popover-trigger-width)', boxShadow: 'var(--dashboard-popover-shadow)', borderRadius: 'var(--radius-xl)' }}>
                 <div role="listbox" aria-label="Channels" className="flex max-h-[240px] flex-col overflow-y-auto p-1.5">
                   {channels.map((c) => (
                     // eslint-disable-next-line no-restricted-syntax -- ds-allow: a channel row
-                    <button key={c.id} type="button" role="option" aria-selected={c.id === channel.id} onClick={() => { setPicked(c.id); setOpen(false) }} className={cn('flex h-8 w-full shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2.5 text-left text-[13px] text-[var(--dashboard-figure)] hover:bg-[var(--dashboard-sync-bg)]', FOCUS)}>
+                    <button key={c.id} type="button" role="option" aria-selected={c.id === channel.id} onClick={() => { setPicked(c.id); setOpen(false) }} className={cn('flex h-8 w-full shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2.5 text-left text-[length:var(--font-size-body-sm)] text-[var(--dashboard-figure)] hover:bg-[var(--dashboard-sync-bg)]', FOCUS)}>
                       <Hash aria-hidden size={13} strokeWidth={1.5} absoluteStrokeWidth className="text-[var(--dashboard-label)]" />{c.name}
                       {c.id === channel.id && <Check aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="ml-auto" />}
                     </button>
@@ -562,14 +562,14 @@ function SlackStep({ board, period, compare, cardView, stamp, link, people, onBa
               </PopoverContent>
             </PopoverRoot>
 
-            <p className="m-0 pb-1.5 pt-4 text-[12px] font-medium leading-4 text-[var(--dashboard-label)]">Preview</p>
+            <p className="m-0 pb-1.5 pt-4 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-label)]">Preview</p>
             <div data-slack-preview className="flex flex-col gap-2 rounded-xl border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-slack-preview)] p-3">
-              <p className="m-0 flex items-center gap-2 text-[13px] leading-5">
-                <span aria-hidden className="flex size-6 items-center justify-center rounded-md bg-[var(--neutral-900)] text-[11px] font-semibold text-[var(--dashboard-tab-active-text)]">S</span>
+              <p className="m-0 flex items-center gap-2 text-[length:var(--font-size-body-sm)] leading-5">
+                <span aria-hidden className="flex size-6 items-center justify-center rounded-md bg-[var(--neutral-900)] text-[length:var(--font-size-caption)] font-semibold text-[var(--dashboard-tab-active-text)]">S</span>
                 <span className="font-semibold text-[var(--dashboard-figure)]">Souvenir</span>
-                <span className="text-[12px] text-[var(--dashboard-label)]">now</span>
+                <span className="text-[length:var(--font-size-small)] text-[var(--dashboard-label)]">now</span>
               </p>
-              <p className="m-0 text-[13px] leading-5 text-[var(--dashboard-figure)]">
+              <p className="m-0 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-figure)]">
                 {sharer} shared <strong className="font-semibold">{board.label}</strong> · {datesLabel(period, compare)}
               </p>
               <div aria-label="Board image" role="img" className="overflow-hidden rounded-lg border border-solid border-[var(--neutral-200)]" style={{ width, height: fullHeight * scale }}>
@@ -577,14 +577,14 @@ function SlackStep({ board, period, compare, cardView, stamp, link, people, onBa
                   <BoardSnapshot cards={board.cards} cardView={cardView} stamp={stamp} />
                 </div>
               </div>
-              <span className="w-fit max-w-full truncate text-[12px] leading-4 text-[var(--dashboard-label)] underline">{link}</span>
+              <span className="w-fit max-w-full truncate text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)] underline">{link}</span>
             </div>
             {/* The picture itself, at full size and off screen (the preview above is scaled down). */}
             <div aria-hidden style={{ position: 'fixed', left: 0, top: 0, transform: 'translateX(-200vw)', pointerEvents: 'none' }}>
               <BoardSnapshot ref={shotRef} cards={board.cards} cardView={cardView} stamp={stamp} />
             </div>
             {failed && (
-              <p role="alert" data-slack-failed className="m-0 flex items-center gap-1.5 pt-2.5 text-[12px] leading-4 text-[var(--dashboard-error)]">
+              <p role="alert" data-slack-failed className="m-0 flex items-center gap-1.5 pt-2.5 text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-error)]">
                 <TriangleAlert aria-hidden size={12} strokeWidth={1.5} absoluteStrokeWidth />{failed}
               </p>
             )}

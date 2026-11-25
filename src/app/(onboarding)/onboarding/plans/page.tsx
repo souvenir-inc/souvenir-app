@@ -130,7 +130,7 @@ function YellowBadge({ children }: { children: React.ReactNode }) {
       display: 'inline-flex', alignItems: 'center', padding: 'var(--space-0-5) var(--space-1-5)', borderRadius: 'var(--radius-sm)',
       backgroundColor: 'var(--yellow-100)', color: 'var(--yellow-700)',
       fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)', whiteSpace: 'nowrap',
-      boxShadow: '0px 1px 1.5px rgba(20,16,5,0.2), 0px 0px 0px 1px rgba(143,116,39,0.5), inset 0px 1px 0px rgba(250,246,235,0.7), inset 0px -1px 0px rgba(143,116,39,0.1)',
+      boxShadow: 'var(--color-tag-Yellow-shadow), var(--color-tag-Yellow-inner-shadow)',
     }}>
       {children}
     </span>
@@ -513,7 +513,7 @@ function OnboardingPlansContent() {
 
                 {/* Team features */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-                  <div style={{ display: 'flex', gap: 78, alignItems: 'flex-start' }}>
+                  <div style={{ display: 'flex', gap: 'var(--onboarding-plans-section-gap)', alignItems: 'flex-start' }}>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                       <SectionLabel>Team collaboration</SectionLabel>
                       <FeatureItem label="Unlimited members" />
@@ -525,7 +525,7 @@ function OnboardingPlansContent() {
                     </div>
                   </div>
                   <Divider />
-                  <div style={{ display: 'flex', gap: 78, alignItems: 'flex-start' }}>
+                  <div style={{ display: 'flex', gap: 'var(--onboarding-plans-section-gap)', alignItems: 'flex-start' }}>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                       <SectionLabel>Governance &amp; guardrails · org panel</SectionLabel>
                       <FeatureItem label="Data ownership &amp; scope" />
@@ -554,7 +554,7 @@ function OnboardingPlansContent() {
                 <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>Usage billed after each monthly cycle at 1.15 × service cost. No base fee.</p>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-                <div style={{ display: 'flex', gap: 92, alignItems: 'flex-start' }}>
+                <div style={{ display: 'flex', gap: 'var(--onboarding-plans-pair-gap)', alignItems: 'flex-start' }}>
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     <SectionLabel>Team collaboration</SectionLabel>
                     <FeatureItem label="$0 monthly base fee" />
@@ -565,7 +565,7 @@ function OnboardingPlansContent() {
                   </div>
                 </div>
                 <Divider />
-                <div style={{ display: 'flex', gap: 53, alignItems: 'flex-start' }}>
+                <div style={{ display: 'flex', gap: 'var(--onboarding-plans-compact-gap)', alignItems: 'flex-start' }}>
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     <SectionLabel>Enterprise security</SectionLabel>
                     <FeatureItem label="SSO &amp; SAML" />
@@ -578,7 +578,7 @@ function OnboardingPlansContent() {
                   </div>
                 </div>
                 <Divider />
-                <div style={{ display: 'flex', gap: 78, alignItems: 'flex-start' }}>
+                <div style={{ display: 'flex', gap: 'var(--onboarding-plans-section-gap)', alignItems: 'flex-start' }}>
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                     <SectionLabel>White-glove &amp; support</SectionLabel>
                     <FeatureItem label="Onboarding &amp; training" />
@@ -629,7 +629,7 @@ function OnboardingPlansContent() {
                 </div>
 
                 {/* Welcome gift card */}
-                <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 'var(--space-3) var(--space-4) var(--space-3) var(--space-3)', borderRadius: 'var(--radius-xl)', backgroundColor: 'var(--neutral-100)', boxShadow: '0px 1.091px 1.091px rgba(59,54,50,0.05), 0px 1.455px 3.127px rgba(38,33,30,0.15)' }}>
+                <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 'var(--space-3) var(--space-4) var(--space-3) var(--space-3)', borderRadius: 'var(--radius-xl)', backgroundColor: 'var(--neutral-100)', boxShadow: 'var(--onboarding-plans-card-shadow)' }}>
                   <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
                     <TokenSquare />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>

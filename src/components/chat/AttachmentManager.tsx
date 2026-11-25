@@ -450,7 +450,7 @@ export function AttachmentManager({
                       lineHeight:      'var(--leading-none)',
                       padding:         "var(--space-0-5) var(--space-0-5)",
                       borderRadius:    "var(--radius-xs)",
-                      letterSpacing:   "0.02em",
+                      letterSpacing:   "var(--tracking-wide)",
                     }}
                   >
                     {attachment.error ? "Failed" : typeLabel}

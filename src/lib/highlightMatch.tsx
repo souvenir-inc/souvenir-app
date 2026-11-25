@@ -19,7 +19,7 @@ export function highlightTerms(text: string, query: string): React.ReactNode {
   let at = 0
   ranges.forEach(([start, end], i) => {
     if (start > at) parts.push(text.slice(at, start))
-    parts.push(<strong key={i} style={{ fontWeight: 600, color: 'var(--neutral-900)' }}>{text.slice(start, end)}</strong>)
+    parts.push(<strong key={i} style={{ fontWeight: 'var(--font-weight-semibold)', color: 'var(--neutral-900)' }}>{text.slice(start, end)}</strong>)
     at = end
   })
   if (at < text.length) parts.push(text.slice(at))
@@ -35,9 +35,9 @@ export function highlightMatch(text: string, query: string, variant: HighlightVa
 
   const match = text.slice(idx, idx + lowerQuery.length)
   const matched = variant === 'background' ? (
-    <mark style={{ background: 'var(--yellow-100)', color: 'inherit', borderRadius: 2 }}>{match}</mark>
+    <mark style={{ background: 'var(--yellow-100)', color: 'inherit', borderRadius: 'var(--radius-xs)' }}>{match}</mark>
   ) : (
-    <strong style={{ fontWeight: 600, color: 'var(--neutral-900)' }}>{match}</strong>
+    <strong style={{ fontWeight: 'var(--font-weight-semibold)', color: 'var(--neutral-900)' }}>{match}</strong>
   )
 
   return (

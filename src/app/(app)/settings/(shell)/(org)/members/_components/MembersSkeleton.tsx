@@ -53,7 +53,7 @@ export function MembersPageSkeleton() {
         {/* Team Members table card */}
         <div style={{ borderRadius: 'var(--radius-2xl)', border: '1px solid var(--border-default)', backgroundColor: 'var(--legacy-f9f5f1)', boxShadow: SHADOW_CARD, overflow: 'hidden', width: '100%', padding: 'var(--space-3) 0' }}>
           {/* Toolbar: title left, search icon + "Invite members" right */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', height: 69, padding: '12px 23px 0 24px', boxSizing: 'border-box', borderBottom: ROW_BORDER }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', height: 69, padding: 'var(--members-toolbar-padding)', boxSizing: 'border-box', borderBottom: ROW_BORDER }}>
             <Line lh={32} width={114} height={15} />
             <div style={{ flex: '1 0 0' }} />
             <SkeletonBlock width={32} height={32} radius={8} />

@@ -13,7 +13,7 @@ export function AnimatedCard({ data, onComplete }: { data: CardData; onComplete:
     <m.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
       style={{ background: "var(--neutral-white)", border: "1px solid var(--neutral-100)", borderRadius: 'var(--radius-xl)', padding: "var(--space-4) var(--space-4)" }}>
       {data.badge && (
-        <div style={{ display: "inline-flex", fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: "0.4px", textTransform: "uppercase", color: data.badgeColor ?? "var(--brown-700)", background: `${data.badgeColor ?? "var(--brown-700)"}12`, border: `1px solid ${data.badgeColor ?? "var(--brown-700)"}20`, borderRadius: 'var(--radius-sm)', padding: "var(--space-0-5) var(--space-2)", marginBottom: 'var(--space-2-5)' }}>
+        <div style={{ display: "inline-flex", fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", color: data.badgeColor ?? "var(--brown-700)", background: `${data.badgeColor ?? "var(--brown-700)"}12`, border: `1px solid ${data.badgeColor ?? "var(--brown-700)"}20`, borderRadius: 'var(--radius-sm)', padding: "var(--space-0-5) var(--space-2)", marginBottom: 'var(--space-2-5)' }}>
           {data.badge}
         </div>
       )}

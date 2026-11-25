@@ -85,8 +85,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(38, 33, 30, 0.55);
-  color: #fff;
+  background: var(--avatar-upload-scrim);
+  color: var(--static-white);
   font-family: var(--font-body);
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-caption);
@@ -220,7 +220,7 @@
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-caption);
   line-height: var(--line-height-small);
-  letter-spacing: 0.02em;
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   color: var(--neutral-600);
 }

@@ -48,7 +48,7 @@ export function NeedsAttention({ items, onOpenMetric }: { items: AttentionItem[]
         type="button"
         data-needs-attention={tone}
         aria-label={words}
-        className={cn('flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2.5 text-[13px] font-medium leading-5 text-[var(--dashboard-figure)] transition-colors duration-fast hover:bg-[var(--dashboard-tabs-track)]', open && 'bg-[var(--dashboard-tabs-track)]', FOCUS)}
+        className={cn('flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2.5 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)] transition-colors duration-fast hover:bg-[var(--dashboard-tabs-track)]', open && 'bg-[var(--dashboard-tabs-track)]', FOCUS)}
       >
         <span aria-hidden className={cn('size-[7px] rounded-full', DOT[tone])} />
         {narrow ? items.length : words}
@@ -62,12 +62,12 @@ export function NeedsAttention({ items, onOpenMetric }: { items: AttentionItem[]
       <PopoverContent
         side="bottom" align="end" sideOffset={6} collisionPadding={8} variant="dropdown" maxHeight={false}
         aria-label="Needs attention"
-        style={{ width: 360, maxWidth: 'calc(100vw - 16px)', boxShadow: 'var(--dashboard-list-shadow)', border: '1px solid var(--dashboard-list-border)', borderRadius: 12 }}
+        style={{ width: 360, maxWidth: 'calc(100vw - 16px)', boxShadow: 'var(--dashboard-list-shadow)', border: '1px solid var(--dashboard-list-border)', borderRadius: 'var(--radius-xl)' }}
       >
         <div className="flex flex-col p-1.5">
           <div className="flex items-center gap-1.5 px-2.5 py-2">
-            <span className="text-[13px] font-medium leading-4 text-[var(--neutral-700)]">Needs attention</span>
-            <span className="rounded-md bg-[var(--dashboard-sync-bg)] px-1.5 py-px text-[11px] font-medium leading-[14px] text-[var(--neutral-700)]">{items.length}</span>
+            <span className="text-[length:var(--font-size-body-sm)] font-medium leading-4 text-[var(--neutral-700)]">Needs attention</span>
+            <span className="rounded-md bg-[var(--dashboard-sync-bg)] px-1.5 py-px text-[length:var(--font-size-caption)] font-medium leading-[14px] text-[var(--neutral-700)]">{items.length}</span>
           </div>
           <div className="relative">
             <ul aria-label="Flagged metrics" className={cn('m-0 list-none p-0', items.length > 7 && 'dashboard-thin-scroll max-h-[357px] overflow-y-auto')}>
@@ -82,10 +82,10 @@ export function NeedsAttention({ items, onOpenMetric }: { items: AttentionItem[]
                   >
                     <span aria-hidden className={cn('size-[7px] shrink-0 rounded-full', DOT[it.tone])} />
                     <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="truncate text-[13px] font-medium leading-4 text-[var(--dashboard-figure)]">{it.label}</span>
-                      <span className="truncate text-[12px] leading-4 text-[var(--dashboard-muted)]">{it.boards} · {it.reason}</span>
+                      <span className="truncate text-[length:var(--font-size-body-sm)] font-medium leading-4 text-[var(--dashboard-figure)]">{it.label}</span>
+                      <span className="truncate text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-muted)]">{it.boards} · {it.reason}</span>
                     </span>
-                    <span className="shrink-0 text-[13px] leading-4 text-[var(--dashboard-figure)]">{it.value}</span>
+                    <span className="shrink-0 text-[length:var(--font-size-body-sm)] leading-4 text-[var(--dashboard-figure)]">{it.value}</span>
                   </button>
                 </li>
               ))}

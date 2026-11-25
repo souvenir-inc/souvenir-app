@@ -190,7 +190,7 @@ export const FlatSidebar = React.forwardRef<HTMLDivElement, FlatSidebarProps>(
       <>
       {/* The open drawer sits one step above its own scrim, so the scrim dims the page
           behind it without covering (and swallowing taps on) the navigation. */}
-      {overlay && <div aria-hidden data-testid="sidebar-scrim" onClick={closeDrawer} style={{ position: 'fixed', inset: 0, zIndex: 'var(--z-overlay)', backgroundColor: 'rgba(0, 0, 0, 0.32)' }} />}
+      {overlay && <div aria-hidden data-testid="sidebar-scrim" onClick={closeDrawer} style={{ position: 'fixed', inset: 0, zIndex: 'var(--z-overlay)', backgroundColor: 'var(--drawer-scrim)' }} />}
       <div
         ref={ref}
         role="navigation"

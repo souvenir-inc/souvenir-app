@@ -111,7 +111,7 @@ export function TabItem(
           border:         'none',
           cursor:         isDisabled ? 'not-allowed' : 'pointer',
           position:       'relative',
-          transition:     'background-color 150ms, box-shadow 150ms',
+          transition:     'background-color var(--duration-fast), box-shadow var(--duration-fast)',
         }}
         {...props}
       >

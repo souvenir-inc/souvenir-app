@@ -111,7 +111,7 @@ export function AgentsGrid({
             alignItems: 'center',
             justifyContent: 'center',
             gap: 'var(--space-3)',
-            padding: '80px 24px',
+            padding: 'var(--agents-empty-padding)',
           }}>
             <p role="status" style={{
               fontFamily: 'var(--font-body)',

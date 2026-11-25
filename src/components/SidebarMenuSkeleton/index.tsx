@@ -43,9 +43,9 @@ export const SidebarMenuSkeleton = React.forwardRef<HTMLDivElement, SidebarMenuS
         style={{
           display:    'flex',
           alignItems: 'center',
-          gap:        '8px',
-          padding:    '6px',
-          borderRadius: '8px',
+          gap:        'var(--space-2)',
+          padding:    'var(--space-1-5)',
+          borderRadius: 'var(--radius-md)',
           width:      fluid ? '100%' : '217px',
           flexShrink: 0,
         }}
@@ -54,13 +54,13 @@ export const SidebarMenuSkeleton = React.forwardRef<HTMLDivElement, SidebarMenuS
         {showIcon && (
           <div
             className="kaya-skeleton"
-            style={{ width: '20px', height: '20px', borderRadius: '6px' }}
+            style={{ width: '20px', height: '20px', borderRadius: 'var(--radius-sm)' }}
           />
         )}
 
         <div
           className="kaya-skeleton"
-          style={{ flex: 1, maxWidth: width, height: '10px', borderRadius: '4px' }}
+          style={{ flex: 1, maxWidth: width, height: '10px', borderRadius: 'var(--radius-xs)' }}
         />
       </div>
     )

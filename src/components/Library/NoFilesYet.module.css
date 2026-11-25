@@ -6,7 +6,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px 24px 10vh;
+  padding: var(--library-empty-padding);
   text-align: center;
 }
 
@@ -27,7 +27,7 @@
   justify-content: center;
   width: 72px;
   height: 80px;
-  margin-left: -36px;
+  margin-left: var(--library-empty-art-overlap);
   border-radius: var(--radius-xl);
   background: var(--card-bg);
   box-shadow: 0 1px 2px rgba(38, 33, 30, 0.06), 0 6px 16px -6px rgba(38, 33, 30, 0.18), 0 0 0 1px var(--neutral-100);

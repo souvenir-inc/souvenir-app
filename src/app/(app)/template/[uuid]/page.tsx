@@ -47,7 +47,7 @@ export default async function TemplatePage({
         <h1 className="m-0 font-[family-name:var(--font-title)] text-lg leading-[26px] font-normal text-[var(--neutral-900)]">
           {title}
         </h1>
-        <span className="text-[13px] leading-5 text-[var(--neutral-500)]">
+        <span className="text-[length:var(--font-size-body-sm)] leading-5 text-[var(--neutral-500)]">
           Built {formatBuilt(template.created_at)} · {formatBytes(template.byte_size)}
         </span>
       </header>

@@ -63,13 +63,13 @@ function Describe({ initial, onSend }: Omit<AskAIDialogProps, 'open'>) {
       hideClose
       aria-describedby={undefined}
       data-ask-ai
-      style={{ width: 'min(640px, calc(100vw - 32px))', maxWidth: 'none', borderRadius: 16, padding: 0, background: 'var(--dashboard-card-bg)' }}
+      style={{ width: 'min(640px, calc(100vw - 32px))', maxWidth: 'none', borderRadius: 'var(--radius-2xl)', padding: 0, background: 'var(--dashboard-card-bg)' }}
       onOpenAutoFocus={(e) => { e.preventDefault(); const b = boxRef.current; if (b) { b.focus(); b.setSelectionRange(b.value.length, b.value.length) } }}
     >
       <div className="relative flex flex-col gap-4 p-5">
-        <DialogTitle className="text-[16px] font-semibold leading-6 text-[var(--dashboard-figure)]">Describe the board you want</DialogTitle>
+        <DialogTitle className="text-[length:var(--font-size-body-lg)] font-semibold leading-6 text-[var(--dashboard-figure)]">Describe the board you want</DialogTitle>
         <DialogClose asChild>
-          <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-3.5 size-7 rounded-[8px]" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
+          <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-3.5 size-7 rounded-md" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
         </DialogClose>
         {/* The box, with Make a draft inside it (greyed until there's text). */}
         <div className="relative h-[120px] rounded-xl border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] focus-within:border-[var(--dashboard-way-border)]">
@@ -82,7 +82,7 @@ function Describe({ initial, onSend }: Omit<AskAIDialogProps, 'open'>) {
             onChange={(e) => setText(e.target.value)}
             // Enter sends, Shift+Enter adds a line (NB-20).
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send() } }}
-            className="kaya-scrollbar block size-full resize-none rounded-xl border-0 bg-transparent px-3.5 pb-12 pt-3 text-[14px] leading-[22px] text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
+            className="kaya-scrollbar block size-full resize-none rounded-xl border-0 bg-transparent px-3.5 pb-12 pt-3 text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
           />
           <Button size="sm" data-make-draft disabled={!text.trim()} onClick={send} className="absolute bottom-2.5 right-2.5" leftIcon={<ArrowUp aria-hidden strokeWidth={1.5} absoluteStrokeWidth />}>
             Make a draft
@@ -97,14 +97,14 @@ function Describe({ initial, onSend }: Omit<AskAIDialogProps, 'open'>) {
               type="button"
               data-example
               onClick={() => { setText(ex); boxRef.current?.focus() }}
-              className={cn('h-7 cursor-pointer rounded-full border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-panel-bg)] px-3 text-[13px] leading-5 text-[var(--neutral-700)] hover:bg-[var(--dashboard-hover-band)]', FOCUS)}
+              className={cn('h-7 cursor-pointer rounded-full border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-panel-bg)] px-3 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--neutral-700)] hover:bg-[var(--dashboard-hover-band)]', FOCUS)}
             >
               {ex}
             </button>
           ))}
         </div>
         <span aria-hidden className="h-px bg-[var(--neutral-200)]" />
-        <p data-drafts-from className="m-0 flex items-center gap-2 text-[12px] leading-4 text-[var(--dashboard-label)]">
+        <p data-drafts-from className="m-0 flex items-center gap-2 text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">
           Drafts from
           <span className="flex items-center gap-1">{apps.map((a) => <SourceLogo key={a.id} app={a} className="size-4" />)}</span>
         </p>
@@ -119,13 +119,13 @@ export function DraftLine({ draft }: { draft: Draft }) {
   const quote = `“${draft.request}”`
   if (draft.phase === 'drafting') {
     return (
-      <p data-draft-line role="status" className="m-0 flex items-center gap-2 text-[13px] leading-5 text-[var(--dashboard-label)]">
+      <p data-draft-line role="status" className="m-0 flex items-center gap-2 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-label)]">
         <Spinner size={14} />Drafting a board for {quote}…
       </p>
     )
   }
   return (
-    <p data-draft-line className="m-0 flex min-w-0 flex-wrap items-center gap-x-1.5 text-[13px] leading-5 text-[var(--dashboard-label)]">
+    <p data-draft-line className="m-0 flex min-w-0 flex-wrap items-center gap-x-1.5 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-label)]">
       <Sparkles aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="text-[var(--dashboard-figure)]" />
       <span className="font-medium text-[var(--dashboard-figure)]">Draft, not saved</span>
       <span>· From {quote}</span>
@@ -140,10 +140,10 @@ export function DraftProblem({ draft, onTryAgain, onChange, onConnect }: { draft
   const failed = draft.phase === 'failed'
   return (
     <div data-draft-problem={draft.phase} className="flex min-h-[240px] flex-col items-center justify-center gap-1 rounded-xl text-center">
-      <p className="m-0 text-[14px] font-medium leading-5 text-[var(--dashboard-figure)]">
+      <p className="m-0 text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--dashboard-figure)]">
         {failed ? 'The draft didn’t come through' : 'No board yet'}
       </p>
-      <p className="m-0 max-w-[440px] text-[13px] leading-5 text-[var(--dashboard-label)]">{failed ? 'Try again in a moment. Nothing was saved.' : draft.reply}</p>
+      <p className="m-0 max-w-[440px] text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-label)]">{failed ? 'Try again in a moment. Nothing was saved.' : draft.reply}</p>
       <div className="mt-3 flex gap-2">
         {failed ? <Button size="sm" onClick={onTryAgain}>Try again</Button> : <Button size="sm" onClick={onChange}>Change request</Button>}
         {failed ? <Button size="sm" variant="outline" onClick={onChange}>Change request</Button> : <Button size="sm" variant="outline" onClick={onConnect}>Connect an app</Button>}
@@ -165,13 +165,13 @@ interface DraftBarProps {
 
 export function DraftBar({ draft, onStop, onRedraft, onEdit, onDiscard, onKeep }: DraftBarProps) {
   const [change, setChange] = useState('')
-  const segment = cn('flex h-9 cursor-pointer items-center rounded-full border-0 bg-transparent px-3.5 text-[13px] font-medium leading-5 text-[var(--dashboard-figure)] transition-colors duration-fast hover:bg-[var(--neutral-100)]', FOCUS)
+  const segment = cn('flex h-9 cursor-pointer items-center rounded-full border-0 bg-transparent px-3.5 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)] transition-colors duration-fast hover:bg-[var(--neutral-100)]', FOCUS)
   const bar = 'absolute bottom-5 right-5 z-30 flex max-w-[calc(100%-40px)] items-center gap-0.5 rounded-full bg-[var(--dashboard-card-bg)] p-1 shadow-[var(--dashboard-popover-shadow)]'
 
   if (draft.phase === 'drafting') {
     return (
       <div data-dashboard-fab data-draft-bar="drafting" role="toolbar" aria-label="Draft" className={bar}>
-        <span role="status" className="flex h-9 items-center gap-2 pl-3 pr-2 text-[13px] font-medium leading-5 text-[var(--dashboard-label)]"><Spinner size={14} />Drafting…</span>
+        <span role="status" className="flex h-9 items-center gap-2 pl-3 pr-2 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-label)]"><Spinner size={14} />Drafting…</span>
         <span aria-hidden className="mx-0.5 h-4 w-px bg-[var(--neutral-200)]" />
         {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a segment of the draft bar (Figma 170:79963) */}
         <button type="button" className={segment} onClick={onStop}>Stop</button>
@@ -189,7 +189,7 @@ export function DraftBar({ draft, onStop, onRedraft, onEdit, onDiscard, onKeep }
             value={change}
             onChange={(e) => setChange(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && change.trim()) { e.preventDefault(); onRedraft(change.trim()); setChange('') } }}
-            className="h-9 w-[220px] min-w-0 shrink rounded-full border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-panel-bg)] px-3.5 text-[13px] leading-5 text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)] focus:border-[var(--dashboard-way-border)]"
+            className="h-9 w-[220px] min-w-0 shrink rounded-full border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-panel-bg)] px-3.5 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)] focus:border-[var(--dashboard-way-border)]"
           />
           {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a segment of the draft bar */}
           <button type="button" className={segment} onClick={onEdit}>Edit</button>
@@ -199,7 +199,7 @@ export function DraftBar({ draft, onStop, onRedraft, onEdit, onDiscard, onKeep }
       <button type="button" className={segment} onClick={onDiscard}>Discard</button>
       {draft.phase === 'ready' && (
         // eslint-disable-next-line no-restricted-syntax -- ds-allow: the dark Keep board segment (Figma 171:89377)
-        <button type="button" onClick={onKeep} className={cn('flex h-9 cursor-pointer items-center whitespace-nowrap rounded-full border-0 px-[18px] text-[13px] font-medium leading-5', DIAL, FOCUS)}>
+        <button type="button" onClick={onKeep} className={cn('flex h-9 cursor-pointer items-center whitespace-nowrap rounded-full border-0 px-[18px] text-[length:var(--font-size-body-sm)] font-medium leading-5', DIAL, FOCUS)}>
           Keep board
         </button>
       )}

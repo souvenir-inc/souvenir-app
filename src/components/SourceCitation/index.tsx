@@ -103,7 +103,7 @@ function ConnectorLogoBox({ connector: _connector, title, url }: { connector?: s
 // ── Divider ────────────────────────────────────────────────────────────────────
 
 function Divider() {
-  return <div style={{ height: 1, backgroundColor: 'var(--neutral-200)', margin: '0 -14px' }} />
+  return <div style={{ height: 1, backgroundColor: 'var(--neutral-200)', margin: 'var(--citation-divider-bleed)' }} />
 }
 
 // ── SourceCardContent ──────────────────────────────────────────────────────────
@@ -369,7 +369,7 @@ function SourceCard({ source }: { source: SourceItem; index: number }) {
     flexDirection:   'row',
     alignItems:      'center',
     gap:             'var(--space-2)',
-    // secondary Button sm: py-[5px] px-[8px]
+    // secondary Button sm: py-[5px] px-[var(--space-2)]
     padding:         'var(--space-1) var(--space-2)',
     borderRadius:    'var(--radius-md)',
     backgroundColor: 'var(--button-secondary-bg)',

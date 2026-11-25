@@ -177,7 +177,7 @@ export function AgentDetailsBody({ repoId, canEdit, onClose }: { repoId: string;
   return (
     <>
       {/* 6px of padding all round: the blue focus ring extends ~5px and the panel's scroll area clips overflow. The -6px margin hands the space back, so fields line up with the other panels' 8px edge. */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-1-5)', margin: -6 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-1-5)', margin: 'calc(var(--space-1-5) * -1)' }}>
         {isLoading || (repo && record && !draft) ? (
           <div role="status" aria-live="polite" style={{ display: 'flex', justifyContent: 'center', paddingTop: 'var(--space-8)' }}><Spinner size={22} /></div>
         ) : !repo || !record || !draft || !baseline ? (

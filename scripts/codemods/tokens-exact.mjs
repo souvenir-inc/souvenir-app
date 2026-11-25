@@ -324,21 +324,27 @@ function main() {
 const args = process.argv.slice(2);
 const dry = args.includes("--dry");
 const files = [];
-// Never touched: the primitive layer (exact pixels on purpose), token files, hidden features (plan D6),
-// generated art (D7), the hidden settings previews and the out-of-scope old Sidebar.
-const SKIP = [
+// Held back on 2026-11-17: the primitive layer (exact pixels on purpose), the hidden settings previews
+// and the old Sidebar. --include-held lets the exact pass (which changes no pixels) cover them too;
+// it is ignored with --snap.
+const INCLUDE_HELD = args.includes("--include-held") && !SNAP;
+const HELD = [
   /src\/components\/ui\//,
   /src\/components\/(Checkbox|Popover|Slider|Switch|Tabs|Tooltip)\//,
+  /settings\/\(shell\)\/(files|notifications|preferences|security)\//,
+  /src\/components\/(Sidebar|SidebarMenuItem|SidebarProjectsSection|SidebarMenuSkeleton)\//,
+  /src\/components\/layout\/ChatHistoryItem\.tsx$/,
+  /src\/components\/layout\/sidebar\/(PersonaChatItem|ProjectChatItem|RecentsSection|StarredSection|ProjectsSection|PersonasSectionIndividual|RecentAgentChatsSection)\.tsx$/,
+];
+// Never touched: token files, hidden features (plan D6), generated art (D7); and HELD unless asked.
+const SKIP = [
+  ...(INCLUDE_HELD ? [] : HELD),
   /src\/styles\/tokens\//,
   /src\/components\/(Pin|PinCategory|PinCommentField|PinInsert|PinSkeleton|Pinboard|PinboardExpanded|PinboardHeader|PinboardSkeleton|HighlightCard|HighlightMark|HighlightPanel)\//,
   /src\/components\/layout\/HighlightSidebar\.tsx$/,
   /src\/lib\/pin-markdown\.tsx$/,
   /src\/components\/PersonaCard\/(scenes|job-scenes|AnimatedPersonaAvatar)\.tsx$/,
   /src\/components\/(CardBrandLogo|ModelIcon|SouvenirLogo|ConnectorGlyph|ThemedLlmIcon)\//,
-  /settings\/\(shell\)\/(files|notifications|preferences|security)\//,
-  /src\/components\/(Sidebar|SidebarMenuItem|SidebarProjectsSection|SidebarMenuSkeleton)\//,
-  /src\/components\/layout\/ChatHistoryItem\.tsx$/,
-  /src\/components\/layout\/sidebar\/(PersonaChatItem|ProjectChatItem|RecentsSection|StarredSection|ProjectsSection|PersonasSectionIndividual|RecentAgentChatsSection)\.tsx$/,
 ];
 const walk = (p) => {
   if (!insideRepo(p)) { console.warn(`skipped (outside the repository): ${p}`); return; }

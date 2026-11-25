@@ -339,7 +339,7 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
           backgroundColor: 'color-mix(in srgb, var(--blue-600) 6%, transparent)',
           borderRadius: 'var(--radius-lg)',
           padding: 'var(--space-2-5) var(--space-3)',
-          boxShadow: '0px 0px 0px 1px rgba(13,110,178,0.15)',
+          boxShadow: 'var(--share-accept-note-ring)',
         }}
       >
         <p

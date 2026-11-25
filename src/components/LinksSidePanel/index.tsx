@@ -68,7 +68,7 @@ export function LinksSidePanel({
                 minWidth:        18,
                 height:          18,
                 padding:         '0 var(--space-1-5)',
-                borderRadius:    99,
+                borderRadius:    'var(--radius-full)',
                 backgroundColor: 'var(--neutral-100)',
                 color:           'var(--neutral-700)',
                 fontFamily:      'var(--font-body)',
@@ -98,7 +98,7 @@ export function LinksSidePanel({
               overscrollBehaviorY: 'contain',
               minHeight:           0,
               padding:             'var(--space-1) var(--space-1)',
-              margin:              '-4px -4px',
+              margin:              'calc(var(--space-1) * -1) calc(var(--space-1) * -1)',
             }}
           >
             {links.map(link => (

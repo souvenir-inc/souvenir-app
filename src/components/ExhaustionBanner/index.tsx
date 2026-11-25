@@ -30,7 +30,7 @@ export function ExhaustionBanner({ children }: { children?: React.ReactNode }) {
     <div
       style={{
         width:           '100%',
-        borderRadius:    28,
+        borderRadius:    'var(--radius-3xl)',
         backgroundColor: 'color-mix(in srgb, var(--warning-600) 10%, transparent)',
         border:          '1px solid color-mix(in srgb, var(--warning-600) 18%, transparent)',
         padding:         '0 var(--space-1) var(--space-1)',
@@ -44,7 +44,7 @@ export function ExhaustionBanner({ children }: { children?: React.ReactNode }) {
           alignItems:     'center',
           justifyContent: 'space-between',
           gap:            'var(--space-2)',
-          padding:        '4px 4% 8px',
+          padding:        'var(--exhaustion-banner-padding)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)' }}>

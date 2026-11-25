@@ -78,7 +78,7 @@ function Scoreboard({ runs, steps }: { runs: Record<Side, Run>; steps: Record<Si
         display: "flex", flexDirection: "column", gap: 'var(--space-2-5)', padding: "var(--space-4) var(--space-4)", borderRadius: 'var(--radius-2xl)',
         backgroundColor: "var(--neutral-white)", border: "1px solid var(--neutral-100)", boxShadow: "var(--shadow-surface-card)",
       }}>
-        <span style={{ fontSize: 'var(--font-size-caption)', letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--neutral-500)", fontWeight: 'var(--font-weight-medium)' }}>{label}</span>
+        <span style={{ fontSize: 'var(--font-size-caption)', letterSpacing: "var(--tracking-caps-wide)", textTransform: "uppercase", color: "var(--neutral-500)", fontWeight: 'var(--font-weight-medium)' }}>{label}</span>
         <span style={{ fontFamily: "var(--font-title)", fontSize: 'var(--font-size-heading-md)', lineHeight: "var(--line-height-heading-md)", color: "var(--neutral-900)" }}>{verdict}</span>
         {SIDES.map(({ side, name, color }) => {
           const value = side === "old" ? oldValue : newValue;
@@ -186,7 +186,7 @@ export function CompareLab() {
           </div>
 
           {!task && (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 'var(--space-6)', paddingTop: "8vh" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 'var(--space-6)', paddingTop: "var(--compare-lab-top)" }}>
               <InitialPrompts />
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 'var(--space-2-5)', width: "100%", maxWidth: 900 }}>
                 {FLOWS.map((flow) => (
@@ -262,7 +262,7 @@ export function CompareLab() {
                         ["Cost", run.done ? fmtUsd(run.routeCost + (run.runCost ?? 0)) : "—"],
                       ].map(([label, value]) => (
                         <div key={label} style={{ display: "flex", flexDirection: "column", gap: 'var(--space-0-5)' }}>
-                          <span style={{ fontSize: 'var(--font-size-caption)', letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--neutral-500)", fontWeight: 'var(--font-weight-medium)' }}>{label}</span>
+                          <span style={{ fontSize: 'var(--font-size-caption)', letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--neutral-500)", fontWeight: 'var(--font-weight-medium)' }}>{label}</span>
                           <span style={{ fontFamily: "var(--font-code)", fontSize: 'var(--font-size-body-sm)', color: "var(--neutral-900)" }}>{value}</span>
                         </div>
                       ))}

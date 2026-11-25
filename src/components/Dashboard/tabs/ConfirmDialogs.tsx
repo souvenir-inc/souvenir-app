@@ -36,7 +36,7 @@ export function ConfirmDialogs({ pending, onCancel, onConfirm }: ConfirmDialogsP
           <DialogTitle>{copy.title}</DialogTitle>
           <DialogDescription>{copy.body}</DialogDescription>
         </DialogHeader>
-        <DialogFooter style={{ paddingTop: 20 }}>
+        <DialogFooter style={{ paddingTop: 'var(--space-5)' }}>
           <Button variant="secondary" onClick={onCancel}>Cancel</Button>
           <Button variant="danger" onClick={() => pending && onConfirm(pending.kind, pending.board.id)}>{copy.action}</Button>
         </DialogFooter>

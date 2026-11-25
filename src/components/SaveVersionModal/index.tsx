@@ -38,7 +38,7 @@ function TagChip({ label, selected, onToggle }: { label: string; selected: boole
         display:         'flex',
         alignItems:      'center',
         padding:         'var(--space-1-5) var(--space-3)',
-        borderRadius:    100,
+        borderRadius:    'var(--radius-full)',
         border:          selected ? '1px solid var(--blue-400)' : '1px solid var(--border-default)',
         backgroundColor: selected
           ? 'var(--blue-50)'
@@ -112,7 +112,7 @@ export function SaveVersionModal({
             <DialogTitle style={undefined} className="m-0 font-[family-name:var(--font-title)] text-xl font-normal leading-7 text-[var(--legacy-1a1916)]">
               What changed?
             </DialogTitle>
-            <DialogDescription style={undefined} className="m-0 font-[family-name:var(--font-body)] text-sm font-normal leading-[22px] text-[var(--neutral-500)]">
+            <DialogDescription style={undefined} className="m-0 font-[family-name:var(--font-body)] text-sm font-normal leading-[var(--line-height-body)] text-[var(--neutral-500)]">
               Tag this version to track what you updated.
             </DialogDescription>
           </div>

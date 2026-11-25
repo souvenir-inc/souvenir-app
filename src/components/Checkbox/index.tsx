@@ -58,7 +58,7 @@ function Checkbox(
         outlineOffset: '2px',
         outlineColor:  isFocused ? 'var(--focus-ring)' : 'transparent',
         transform:     isPressed && !disabled ? 'scale(0.9)' : undefined,
-        transition:    'outline-color 150ms, transform 100ms ease-out',
+        transition:    'outline-color var(--duration-fast), transform var(--duration-instant) ease-out',
       }}
     >
     <CheckboxPrimitive.Root

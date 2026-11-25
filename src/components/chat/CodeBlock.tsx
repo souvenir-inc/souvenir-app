@@ -183,7 +183,7 @@ function HighlightedCodeBlock({ language, value, elementKey, highlights, sourceO
               fontSize: "var(--font-size-small)",
               fontWeight: "var(--font-weight-semibold)",
               textTransform: "uppercase",
-              letterSpacing: "0.05em",
+              letterSpacing: "var(--tracking-wider)",
               color: "var(--neutral-600)",
             }}
           >

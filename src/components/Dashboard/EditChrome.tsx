@@ -57,7 +57,7 @@ export function ResizeArc({ label, size, grip, active }: { label: string; size: 
       onPointerDown={grip.onPointerDown}
       onKeyDown={grip.onKeyDown}
       className={cn(
-        'group/arc absolute -bottom-1 -right-1 z-10 hidden size-[34px] cursor-nwse-resize touch-none rounded-br-[16px] @min-[60rem]:block',
+        'group/arc absolute -bottom-1 -right-1 z-10 hidden size-[34px] cursor-nwse-resize touch-none rounded-br-2xl @min-[60rem]:block',
         FOCUS,
       )}
     >
@@ -87,7 +87,7 @@ export function LandingSlot({ size }: { size: CardSize }) {
       <svg className="pointer-events-none absolute inset-[0.5px] h-[calc(100%-1px)] w-[calc(100%-1px)] overflow-visible" fill="none">
         <rect x="0" y="0" width="100%" height="100%" rx="11.5" stroke="var(--dashboard-slot-line)" strokeDasharray="6 5" />
       </svg>
-      <span className="absolute -top-[26px] left-3 flex h-[22px] items-center whitespace-nowrap rounded-full bg-[var(--dashboard-figure)] px-2 text-[12px] font-medium leading-[18px] text-[var(--dashboard-toast-action-text)]">
+      <span className="absolute -top-[26px] left-3 flex h-[22px] items-center whitespace-nowrap rounded-full bg-[var(--dashboard-figure)] px-2 text-[length:var(--font-size-small)] font-medium leading-[18px] text-[var(--dashboard-toast-action-text)]">
         {SIZE_NAME[size]}
       </span>
     </div>

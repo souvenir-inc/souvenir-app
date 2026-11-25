@@ -90,19 +90,19 @@ export default function EnhancePanel({ flow, value }: { flow: EnhanceFlow; value
                   overscrollBehaviorY: 'contain',
                   display:             'flex',
                   flexDirection:       'column',
-                  gap:                 16,
+                  gap:                 'var(--space-4)',
                   // This scroll area clips overflow, which cut off the left edge of the custom input and
                   // its blue focus ring. 8px of padding gives the ring room; the matching negative
                   // margin eats into the panel's own 20px padding, so nothing shifts.
-                  padding:             8,
-                  margin:              -8,
+                  padding:             'var(--space-2)',
+                  margin:              'calc(var(--space-2) * -1)',
                 }}
               >
               {state.phase === 'scanning' && (
                 <>
                   <EnhanceScanningState />
                   {state.waiting && (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)', marginTop: -16 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'calc(var(--space-4) * -1)' }}>
                       {state.slow && (
                         <p role="status" style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-600)', textAlign: 'center' }}>
                           Still working on it — this can take a little while.
@@ -233,7 +233,7 @@ function QAStep({
           margin:        0,
           fontFamily:    'var(--font-body)',
           fontSize: 'var(--font-size-small)',
-          letterSpacing: '0.03em',
+          letterSpacing: 'var(--tracking-wide)',
           textTransform: 'uppercase',
           color:         'var(--color-enhance-step-label)',
         }}>

@@ -33,7 +33,7 @@ export const BoardSnapshot = forwardRef<HTMLDivElement, BoardSnapshotProps>(func
       ref={ref}
       data-board-snapshot
       className={className}
-      style={{ width: columns * COLUMN + (columns - 1) * 16 + 32, padding: 16, background: 'var(--dashboard-panel-bg)', boxSizing: 'border-box', ...style }}
+      style={{ width: columns * COLUMN + (columns - 1) * 16 + 32, padding: 'var(--space-4)', background: 'var(--dashboard-panel-bg)', boxSizing: 'border-box', ...style }}
     >
       <ul className="m-0 grid list-none gap-4 p-0" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, 156px)` }}>
         {cards.map((c, i) => {
@@ -47,7 +47,7 @@ export const BoardSnapshot = forwardRef<HTMLDivElement, BoardSnapshotProps>(func
           )
         })}
       </ul>
-      <p data-stamp className="m-0 mt-3 text-[11px] leading-4 text-[var(--dashboard-label)]">{stamp}</p>
+      <p data-stamp className="m-0 mt-3 text-[length:var(--font-size-caption)] leading-4 text-[var(--dashboard-label)]">{stamp}</p>
     </div>
   )
 })

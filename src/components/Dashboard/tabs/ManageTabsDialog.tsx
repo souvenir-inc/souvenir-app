@@ -122,7 +122,7 @@ function ManageTabsBody({
       size="md"
       hideClose
       // Fixed 480 × 560, centred; under 624 px tall it keeps 32 px top and bottom (MT-1).
-      style={{ width: 480, height: 560, maxHeight: 'calc(100dvh - 64px)', background: 'var(--neutral-50)', borderRadius: 20 }}
+      style={{ width: 480, height: 560, maxHeight: 'calc(100dvh - 64px)', background: 'var(--neutral-50)', borderRadius: 'var(--radius-2xl)' }}
       aria-describedby={undefined}
       // Esc in a rename field cancels the rename, not the dialog (MT-6). The dialog hears Esc
       // first (on the document, capturing), so it stands aside while a name field has focus.
@@ -135,7 +135,7 @@ function ManageTabsBody({
           <DialogTitle>Manage tabs</DialogTitle>
           {/* × where the Figma draws it: its icon on the line ⋯ and Save end on (MT-1, MT-3). */}
           <DialogClose asChild>
-            <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute -right-0.5 top-0 size-7 rounded-[8px]"
+            <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute -right-0.5 top-0 size-7 rounded-md"
               icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
           </DialogClose>
         </div>
@@ -164,8 +164,8 @@ function ManageTabsBody({
             >
               <span className="flex items-baseline gap-[5px] whitespace-nowrap leading-[18px]">
                 {/* The 2 px line is the width of the label, not the count (MT-14). */}
-                <span className={cn("relative text-[13px] font-medium after:absolute after:inset-x-0 after:-bottom-2 after:h-0.5 after:rounded-[1px] after:content-['']", tab === key ? 'text-[var(--dashboard-figure)] after:bg-[var(--dashboard-figure)]' : 'text-[var(--dashboard-muted)] hover:text-[var(--dashboard-figure)]')}>{text}</span>
-                {n > 0 && <span className="text-[12px] text-[var(--dashboard-faint)]">{n}</span>}
+                <span className={cn("relative text-[length:var(--font-size-body-sm)] font-medium after:absolute after:inset-x-0 after:-bottom-2 after:h-0.5 after:rounded-[1px] after:content-['']", tab === key ? 'text-[var(--dashboard-figure)] after:bg-[var(--dashboard-figure)]' : 'text-[var(--dashboard-muted)] hover:text-[var(--dashboard-figure)]')}>{text}</span>
+                {n > 0 && <span className="text-[length:var(--font-size-small)] text-[var(--dashboard-faint)]">{n}</span>}
               </span>
               <span aria-hidden className="h-0.5" />
             </button>
@@ -251,14 +251,14 @@ function ManageTabsBody({
                     const left = daysLeft(d.deletedAt, now)
                     return (
                       <div key={d.id} tabIndex={0} className={cn(ROW, 'pl-2')} aria-label={`${b.label}, ${left} ${left === 1 ? 'day' : 'days'} left`}>
-                        <span className="min-w-0 flex-1 truncate text-[14px] font-medium leading-5 text-[var(--neutral-700)]">{b.label}</span>
-                        <span className="shrink-0 text-[12px] leading-4 text-[var(--dashboard-faint)]">{left} {left === 1 ? 'day' : 'days'} left</span>
+                        <span className="min-w-0 flex-1 truncate text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--neutral-700)]">{b.label}</span>
+                        <span className="shrink-0 text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-faint)]">{left} {left === 1 ? 'day' : 'days'} left</span>
                         {/* A borderless Restore whose label ends on the right edge (MT-10). */}
                         <Button
                           variant="ghost" size="xs"
                           leftIcon={<RotateCcw strokeWidth={1.5} absoluteStrokeWidth />}
                           onClick={() => onRestore(d.id)}
-                          className="h-6 gap-1 rounded-md bg-transparent pl-1.5 pr-[7px] text-[12px] font-medium shadow-none [font-family:var(--font-body)] text-[var(--dashboard-figure)] [&_svg]:size-3"
+                          className="h-6 gap-1 rounded-md bg-transparent pl-1.5 pr-[7px] text-[length:var(--font-size-small)] font-medium shadow-none [font-family:var(--font-body)] text-[var(--dashboard-figure)] [&_svg]:size-3"
                         >
                           Restore
                         </Button>
@@ -275,16 +275,16 @@ function ManageTabsBody({
           {tab === 'tabs' && (
             <Button
               variant="outline" size="sm" leftIcon={<Plus strokeWidth={1.5} absoluteStrokeWidth />} onClick={newBoard}
-              className="h-[30px] gap-1.5 rounded-lg border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] px-2.5 text-[13px] font-medium [font-family:var(--font-body)] text-[var(--dashboard-figure)] [&_svg]:size-4"
+              className="h-[30px] gap-1.5 rounded-lg border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] px-2.5 text-[length:var(--font-size-body-sm)] font-medium [font-family:var(--font-body)] text-[var(--dashboard-figure)] [&_svg]:size-4"
             >
               New board
             </Button>
           )}
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={onClose}
-              className="h-[30px] rounded-lg bg-transparent px-3 text-[13px] font-medium shadow-none [font-family:var(--font-body)] text-[var(--neutral-700)]">Cancel</Button>
+              className="h-[30px] rounded-lg bg-transparent px-3 text-[length:var(--font-size-body-sm)] font-medium shadow-none [font-family:var(--font-body)] text-[var(--neutral-700)]">Cancel</Button>
             <Button size="sm" onClick={() => { onSave(draft); onClose() }}
-              className="h-[30px] rounded-lg px-3.5 text-[13px] font-medium [font-family:var(--font-body)]">Save</Button>
+              className="h-[30px] rounded-lg px-3.5 text-[length:var(--font-size-body-sm)] font-medium [font-family:var(--font-body)]">Save</Button>
           </div>
         </div>
       </div>
@@ -297,7 +297,7 @@ function ManageTabsBody({
 /** An info icon and one line on what the tab holds (Hidden, Recently deleted). */
 function Helper({ children }: { children: React.ReactNode }) {
   return (
-    <p className="m-0 flex items-center gap-1.5 pl-[7px] pr-2 text-[13px] leading-[18px] text-[var(--dashboard-muted)]">
+    <p className="m-0 flex items-center gap-1.5 pl-[7px] pr-2 text-[length:var(--font-size-body-sm)] leading-[18px] text-[var(--dashboard-muted)]">
       <Info aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0" />
       {children}
     </p>
@@ -307,7 +307,7 @@ function Helper({ children }: { children: React.ReactNode }) {
 function RowName({ board, label, muted, onDoubleClick }: { board: Board; label: string; muted?: boolean; onDoubleClick?: () => void }) {
   return (
     <span className="flex min-w-0 flex-1 items-center gap-2" onDoubleClick={onDoubleClick}>
-      <span className={cn('min-w-0 truncate text-[14px] font-medium leading-5', muted ? 'text-[var(--dashboard-faint)]' : 'text-[var(--neutral-700)]')}>{label}</span>
+      <span className={cn('min-w-0 truncate text-[length:var(--font-size-body)] font-medium leading-5', muted ? 'text-[var(--dashboard-faint)]' : 'text-[var(--neutral-700)]')}>{label}</span>
       {board.sharedBy && <SharedTag by={board.sharedBy.name} muted={muted} />}
     </span>
   )
@@ -325,7 +325,7 @@ export function SharedTag({ by, muted }: { by: string; muted?: boolean }) {
         tabIndex={0}
         aria-label={`Shared by ${by}`}
         className={cn(
-          'inline-flex h-5 shrink-0 items-center gap-1 rounded-full pl-1.5 pr-2 text-[12px] font-medium leading-4',
+          'inline-flex h-5 shrink-0 items-center gap-1 rounded-full pl-1.5 pr-2 text-[length:var(--font-size-small)] font-medium leading-4',
           muted ? 'bg-[var(--dashboard-tag-bg-muted)] text-[var(--dashboard-faint)]' : 'bg-[var(--dashboard-tag-bg)] text-[var(--dashboard-label)]',
           FOCUS,
         )}
@@ -382,10 +382,10 @@ function InlineRename({ initial, onCommit, onDone }: { initial: string; onCommit
           }
         }}
         onBlur={() => commit(true)}
-        className="h-full min-w-0 flex-1 border-0 bg-transparent p-0 text-[14px] font-medium leading-5 text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
+        className="h-full min-w-0 flex-1 border-0 bg-transparent p-0 text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
       />
       {error && (
-        <span id="manage-name-error" role="alert" className="flex shrink-0 items-center gap-1 text-[12px] font-medium leading-4 text-[var(--dashboard-error)]">
+        <span id="manage-name-error" role="alert" className="flex shrink-0 items-center gap-1 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-error)]">
           <TriangleAlert aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />
           Add a board name
         </span>
@@ -526,7 +526,7 @@ function RowList({ ids, visibleCount, onMove, labelOf, renderRow }: RowListProps
       {drag && (
         <div
           aria-hidden
-          className="pointer-events-none fixed z-[var(--z-tooltip)] flex h-8 items-center gap-2.5 rounded-md border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] pl-2 pr-3 text-[14px] font-medium leading-5 text-[var(--neutral-700)] shadow-[var(--dashboard-tab-lifted-shadow)]"
+          className="pointer-events-none fixed z-[var(--z-tooltip)] flex h-8 items-center gap-2.5 rounded-md border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] pl-2 pr-3 text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--neutral-700)] shadow-[var(--dashboard-tab-lifted-shadow)]"
           style={{ left: drag.x - 12, top: drag.y - 16 }}
         >
           <GripVertical size={16} strokeWidth={1.5} absoluteStrokeWidth className="text-[var(--neutral-400)]" />

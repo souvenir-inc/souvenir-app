@@ -19,7 +19,7 @@ export default function BrowserVerifyPage() {
     return () => setOpenedView(null)
   }, [])
   return (
-    <main style={{ width: 960, margin: 'var(--space-6) auto', fontFamily: 'sans-serif' }}>
+    <main style={{ width: 960, margin: 'var(--space-6) auto', fontFamily: 'var(--font-body)' }}>
       <p id="state">{session.status} · control={String(session.control)} · frame={session.frame ? 'set' : 'none'}</p>
       <BrowserScreen session={session} expanded={expanded} onExpandedChange={setExpanded} />
     </main>

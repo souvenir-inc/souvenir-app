@@ -79,7 +79,7 @@ function HtmlFrame({ html, title }: { html: string; title: string }) {
         referrerPolicy="no-referrer"
         srcDoc={srcDoc}
         onLoad={measure}
-        style={{ display: 'block', width: '100%', height, border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', background: '#fff' }}
+        style={{ display: 'block', width: '100%', height, border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', background: 'var(--static-white)' }}
       />
     </div>
   )

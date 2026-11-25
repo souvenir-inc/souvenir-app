@@ -76,7 +76,7 @@ export function SectionHeader({ label }: { label: string }) {
         fontWeight:    'var(--font-weight-semibold)',
         lineHeight:    'var(--line-height-caption)',
         color:         'var(--neutral-400)',
-        letterSpacing: '0.06em',
+        letterSpacing: 'var(--tracking-caps)',
         textTransform: 'uppercase',
       }}
     >

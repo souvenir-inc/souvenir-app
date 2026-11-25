@@ -753,6 +753,28 @@ Left on purpose (needs a design call, not a token): focus halos (`0 0 0 3px` in 
 
 Result: typography literals 503 → 345; total style values wired 89.9% → **91.1%**. tsc clean; unit suite the same 13 pre-existing failures (one assertion and one snapshot recorded `22px`, now `var(--line-height-body)`, the same value). What's left in typography is mostly line heights more than 2px from any step (11–12px badges, 26px, 0.9) and font-size/weight literals in skipped files.
 
+### Status 2026-11-25: every style value on a token
+
+Style values on tokens went from **90.6% to 100%** (1,224 literals → 0), with no visual change on the 42 route screens and the 18 dashboard screens (light and dark), compared pixel for pixel before and after each step. 23 values stay literal on purpose, each marked `ds-keep: <reason>` (keyframe stops, the error page that renders without the stylesheet, long decorative transitions), and 58 keyframe animations keep their own timing (counted apart).
+
+Second step, approved the same day: a letter-spacing scale (`--tracking-display/-tight/-normal/-wide/-wider/-caps/-caps-wide` in typography.css; values snap to it), `--font-weight-bold`, swaps to tokens that change in dark mode (tag-button shadows, chart track tints), and a token for every remaining value at its exact current value: shared steps where several components use it (`--space-px`, `--radius-hairline`, `--radius-3xl` 28px, `--radius-4xl` 32px, `--font-size-label` 12.5px, `--page-top-inset`), else a component token in the "Component values" section of semantic.css, named for what it styles. The mapping is recorded in `scripts/codemods/component-tokens.mjs`. The letter-spacing snaps and dark-mode swaps sit in chat widgets and hidden pages the screenshot set doesn't cover; they're checked by tests, not screenshots.
+
+First step (90.6% → 98.1%):
+
+What was done:
+
+- `tokens-exact.mjs` on all of `src`; new `--include-held` flag runs the exact pass (no pixel changes) on the areas held back on 2026-11-17 too: the primitive layer, the hidden settings previews and the old Sidebar (it is live: LeftSidebar and SettingsSidebar render it). `--snap` stays off for them.
+- New `tailwind-tokens.mjs`: Tailwind bracket values equal to a token (`text-[13px]` → `text-[length:var(--font-size-body-sm)]`, `rounded-[8px]` → `rounded-md`, `p-[8px]`, `leading-[20px]`, `font-[500]`). `text-body-sm` is not used for these, because it also sets a line height.
+- New `token-match.mjs` + `token-swap.mjs`: shadows and colours equal to a token after normalising, including multi-layer shadows as a run of tokens. Only tokens whose dark value equals their light one are used; feature tokens (`--dashboard-*`) only inside their feature.
+- New `value-map.mjs`: negative on-scale spacing (`calc(var(--space-2) * -1)`), rem sizes, unitless line heights, pill radii 99/100px → `--radius-full`.
+- Snap pass per Appendix B on feature code. Not on chat answer prose (markdown-utils, line-renderer, content-renderer: reverted, per the rule above) or the dashboard toasts (Figma values).
+- UI transitions at 150ms in the primitives → `--duration-fast`.
+- `ds-scan.mjs` made accurate: inline values are read whole (commas inside `color-mix()`/`rgba()`/gradients no longer cut a value short, which had counted token-built values as literals); computed expressions (`TRACK_W / 2`) count as dynamic and `0 auto` as neutral; keyframe animations are counted apart (they keep their timing); `ds-keep: <reason>` is honoured and reported as "kept"; new `--list=<category>` prints every remaining literal with its files.
+
+The 248 left after the first step (letter-spacing, bold, one-off shadows, layout spacing, effect colours) were all mapped in the second step above.
+
+Element counters above the 2026-11-18 baseline (new code since, mostly the dashboard): raw buttons 212 → 274, raw inputs 62 → 70, `role="dialog"` 6 → 9, Tailwind bracket values 42 → 199 (mostly widths, heights and positions, which have no tokens). `ds:check` fails on these until they are moved onto primitives.
+
 ---
 
 ## Phase 7 — Lock it in

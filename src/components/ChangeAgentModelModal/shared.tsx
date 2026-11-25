@@ -106,7 +106,7 @@ export function ModalHeader({ title, subtitle, left, right }: {
     <div style={{ padding: 'var(--space-5) var(--space-5) var(--space-4)', borderBottom: '1px solid var(--neutral-100)', position: 'relative', flexShrink: 0 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', paddingRight: 'var(--space-7)' }}>
         {left}
-        <p style={{ margin: 0, fontFamily: 'var(--font-title)', fontSize: '1.5rem', fontWeight: 'var(--font-weight-regular)', lineHeight: '2rem', color: 'var(--neutral-900)' }}>
+        <p style={{ margin: 0, fontFamily: 'var(--font-title)', fontSize: 'var(--font-size-heading)', fontWeight: 'var(--font-weight-regular)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)' }}>
           {title}
         </p>
       </div>

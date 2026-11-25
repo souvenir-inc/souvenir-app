@@ -15,12 +15,12 @@ export function Frame({ children }: { children: React.ReactNode }) {
   )
 }
 
-const QUIET_BUTTON = 'h-8 cursor-pointer rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-3.5 text-[13px] text-[var(--dashboard-figure)] no-underline outline-none hover:bg-[var(--neutral-100)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]'
+const QUIET_BUTTON = 'h-8 cursor-pointer rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-3.5 text-[length:var(--font-size-body-sm)] text-[var(--dashboard-figure)] no-underline outline-none hover:bg-[var(--neutral-100)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]'
 
 /** Something the warehouse didn't answer, with Try again (CR-21). */
 export function Problem({ text, onRetry }: { text: string; onRetry: () => void }) {
   return (
-    <div data-board-failed className="flex min-h-[240px] flex-col items-center justify-center gap-3 rounded-xl text-[13px] leading-[17px] text-[var(--dashboard-figure)]">
+    <div data-board-failed className="flex min-h-[240px] flex-col items-center justify-center gap-3 rounded-xl text-[length:var(--font-size-body-sm)] leading-[17px] text-[var(--dashboard-figure)]">
       <p className="m-0">{text}</p>
       {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the white Try again of Figma 170:47131 (1px #D3CEC8, 8px radius, 32px) */}
       <button type="button" onClick={onRetry} className={QUIET_BUTTON}>Try again</button>
@@ -31,7 +31,7 @@ export function Problem({ text, onRetry }: { text: string; onRetry: () => void }
 /** No warehouse yet: one is made when the organization connects its store. */
 export function NoStore() {
   return (
-    <div data-no-store className="flex min-h-[320px] flex-col items-center justify-center gap-3 text-center text-[13px] leading-5 text-[var(--dashboard-figure)]">
+    <div data-no-store className="flex min-h-[320px] flex-col items-center justify-center gap-3 text-center text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-figure)]">
       <p className="m-0 text-[15px] font-medium">Connect your store to see its numbers</p>
       <p className="m-0 max-w-[360px] text-[var(--dashboard-label)]">Your dashboard builds itself once Shopify or another store is connected. The first sync takes a few minutes.</p>
       { }
@@ -42,7 +42,7 @@ export function NoStore() {
 
 /** Every board was deleted or left. */
 export function EmptyBoardList() {
-  return <div className="flex min-h-[240px] items-center justify-center text-[13px] text-[var(--dashboard-label)]">No boards yet.</div>
+  return <div className="flex min-h-[240px] items-center justify-center text-[length:var(--font-size-body-sm)] text-[var(--dashboard-label)]">No boards yet.</div>
 }
 
 /** Plain card skeletons, no names or numbers (08 NB-21, NB-31). */

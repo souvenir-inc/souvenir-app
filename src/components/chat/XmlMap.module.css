@@ -6,7 +6,7 @@
 
 .card {
   overflow: hidden;
-  border: 1px solid rgba(82, 75, 71, 0.12);
+  border: var(--widget-border);
   border-radius: var(--radius-md);
   background: var(--neutral-white);
   box-shadow: var(--shadow-soft);
@@ -93,7 +93,7 @@
   line-height: var(--line-height-caption);
   text-overflow: ellipsis;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tracking-caps);
   white-space: nowrap;
 }
 
@@ -193,7 +193,7 @@
 
 .barTrack {
   overflow: hidden;
-  background: rgba(82, 75, 71, 0.09);
+  background: var(--map-bar-track);
 }
 
 .barFill {
@@ -227,7 +227,7 @@
   min-height: 370px;
   overflow: hidden;
   place-items: center;
-  border: 1px solid rgba(82, 75, 71, 0.12);
+  border: var(--widget-border);
   border-radius: var(--radius-md);
   background: var(--neutral-50);
 }
@@ -252,7 +252,7 @@
   border: 1px solid color-mix(in srgb, var(--neutral-700) 10%, transparent);
   border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--static-white) 84%, transparent);
-  box-shadow: 0 2px 8px rgba(82, 75, 71, 0.08);
+  box-shadow: var(--map-chip-shadow);
   color: var(--neutral-600);
   font-family: var(--font-body);
   font-size: var(--font-size-caption);
@@ -261,13 +261,13 @@
 .mapPane :global(.maplibregl-ctrl-group) {
   overflow: hidden;
   border-radius: var(--radius-md);
-  box-shadow: 0 1px 4px rgba(38, 33, 30, 0.18);
+  box-shadow: var(--map-control-shadow);
 }
 
 .mapPane :global(.maplibregl-popup-content) {
   border-radius: var(--radius-md);
   padding: var(--space-2) var(--space-2-5);
-  box-shadow: 0 6px 20px rgba(38, 33, 30, 0.16);
+  box-shadow: var(--map-popup-shadow);
 }
 
 @container (max-width: 620px) {

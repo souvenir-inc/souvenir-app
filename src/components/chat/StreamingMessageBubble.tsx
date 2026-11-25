@@ -64,7 +64,7 @@ export function StreamCursor() {
         width:           2,
         height:          '1em',
         background:      'var(--neutral-400)',
-        borderRadius:    1,
+        borderRadius:    'var(--radius-hairline)',
         marginLeft:      'var(--space-0-5)',
         verticalAlign:   'text-bottom',
       }}

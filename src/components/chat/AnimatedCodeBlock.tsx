@@ -83,9 +83,9 @@ export function AnimatedCodeBlock({ data, onComplete, animate = true }: { data: 
   return (
     <m.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}>
       {data.caption && <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-500)", marginBottom: 'var(--space-1-5)' }}>{data.caption}</div>}
-      <div style={{ background: "#1E1A17", borderRadius: 'var(--radius-lg)', overflow: "hidden", boxShadow: "0px 0px 0px 1px color-mix(in srgb, var(--static-black) 90%, transparent), 0px 1px 1px rgba(59,54,50,0.12), 0px 2px 4px rgba(59,54,50,0.28)" }}>
+      <div style={{ background: "var(--widget-code-bg)", borderRadius: 'var(--radius-lg)', overflow: "hidden", boxShadow: "0px 0px 0px 1px color-mix(in srgb, var(--static-black) 90%, transparent), 0px 1px 1px rgba(59,54,50,0.12), 0px 2px 4px rgba(59,54,50,0.28)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-1-5) var(--space-2-5) var(--space-1-5) var(--space-3)", borderBottom: "1px solid color-mix(in srgb, var(--static-white) 5.5%, transparent)", background: "linear-gradient(180deg, color-mix(in srgb, var(--neutral-700) 30%, transparent) 0%, color-mix(in srgb, var(--neutral-900) 30%, transparent) 100%)" }}>
-          <span style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-medium)', letterSpacing: "0.4px", color: "color-mix(in srgb, var(--neutral-200) 55%, transparent)", fontFamily: "var(--font-code, monospace)", textTransform: "uppercase" }}>
+          <span style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-medium)', letterSpacing: "var(--tracking-wider)", color: "color-mix(in srgb, var(--neutral-200) 55%, transparent)", fontFamily: "var(--font-code, monospace)", textTransform: "uppercase" }}>
             {data.language ?? "code"}
           </span>
           <m.button onClick={() => { navigator.clipboard.writeText(data.code).catch(() => {}); setCopied(true); setTimeout(() => setCopied(false), 1800); }}
@@ -127,7 +127,7 @@ export function AnimatedCodeBlock({ data, onComplete, animate = true }: { data: 
           ))}
           {!streamDone && (
             <m.span animate={{ opacity: [0.2, 1, 0.2] }} transition={{ duration: 0.7, repeat: Infinity }}
-              style={{ display: "inline-block", width: 7, height: 14, background: "var(--brown-700)", borderRadius: 1, verticalAlign: "middle", marginLeft: 'var(--space-7)' }} />
+              style={{ display: "inline-block", width: 7, height: 14, background: "var(--brown-700)", borderRadius: 'var(--radius-hairline)', verticalAlign: "middle", marginLeft: 'var(--space-7)' }} />
           )}
         </pre>
         <AnimatePresence initial={false}>

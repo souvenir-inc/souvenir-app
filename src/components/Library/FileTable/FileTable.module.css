@@ -29,7 +29,7 @@
 
 /* Hover rounds the row and hides its divider, so the highlight reads as one soft pill. */
 .row:hover {
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--file-row-hover-bg);
   border-radius: var(--radius-xl);
 }
 

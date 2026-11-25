@@ -111,7 +111,7 @@ export function ShareAgentPanel({ repoId, invites: showInvites = true, askLimit 
           <>
             <div style={{ ...BOX_STYLE, display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-1-5) var(--space-1-5) var(--space-1-5) var(--space-3)' }}>
               <Tooltip content={linkUrl} maxWidth={280}>
-                <span className="min-w-0 flex-1 truncate font-[family-name:var(--font-code)] text-[13px] text-[var(--neutral-800)]">
+                <span className="min-w-0 flex-1 truncate font-[family-name:var(--font-code)] text-[length:var(--font-size-body-sm)] text-[var(--neutral-800)]">
                   {linkUrl.replace(/^https?:\/\//, '')}
                 </span>
               </Tooltip>

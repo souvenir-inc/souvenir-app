@@ -1,5 +1,5 @@
 .back {
-  margin: 0 0 24px -8px;
+  margin: 0 0 var(--space-6) calc(var(--space-2) * -1);
 }
 
 .header {

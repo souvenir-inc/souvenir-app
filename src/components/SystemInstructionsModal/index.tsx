@@ -89,7 +89,7 @@ export function SystemInstructionsModal({
         {/* ── Header ── */}
         <div className="flex shrink-0 items-center gap-3 px-5 pb-4 pt-5">
           {/* Icon badge */}
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-[var(--neutral-50)] shadow-[0px_1px_1.5px_0px_rgba(82,75,71,0.12),0px_0px_0px_1px_var(--neutral-100)]">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[var(--neutral-50)] shadow-[0px_1px_1.5px_0px_rgba(82,75,71,0.12),0px_0px_0px_1px_var(--neutral-100)]">
             <PenOneIcon size={18} animated />
           </div>
 
@@ -119,7 +119,7 @@ export function SystemInstructionsModal({
               modal's edge. Stretches to fill the scroll container so the
               textarea below can in turn flex to fill this. */}
           <div className="flex min-h-0 flex-[1_1_0] flex-col gap-3.5 px-5">
-            <DialogDescription style={undefined} className={`${muted} text-[13px] leading-5 text-[var(--neutral-500)]`}>
+            <DialogDescription style={undefined} className={`${muted} text-[length:var(--font-size-body-sm)] leading-5 text-[var(--neutral-500)]`}>
               Set context for every chat in this project.
             </DialogDescription>
 
@@ -131,7 +131,7 @@ export function SystemInstructionsModal({
                 placeholder="e.g. Always respond in British English. Format all code in TypeScript. Be concise and avoid filler phrases..."
                 autoFocus
                 disabled={saving}
-                className={`kaya-scrollbar ${muted.replace('m-0 ', '')} box-border min-h-[220px] w-full flex-[1_1_0] resize-none rounded-xl border border-[var(--border-default)] bg-[var(--field-surface)] px-3.5 py-3 text-sm leading-[22px] text-[var(--legacy-1a1714)] shadow-[0px_1px_1.5px_0px_rgba(82,75,71,0.08)] outline-none focus:border-[var(--blue-400)] focus:shadow-[0px_0px_0px_3px_rgba(74,131,191,0.25),0px_1px_1.5px_0px_rgba(82,75,71,0.12)]`}
+                className={`kaya-scrollbar ${muted.replace('m-0 ', '')} box-border min-h-[220px] w-full flex-[1_1_0] resize-none rounded-xl border border-[var(--border-default)] bg-[var(--field-surface)] px-3.5 py-3 text-sm leading-[var(--line-height-body)] text-[var(--legacy-1a1714)] shadow-[0px_1px_1.5px_0px_rgba(82,75,71,0.08)] outline-none focus:border-[var(--blue-400)] focus:shadow-[0px_0px_0px_3px_rgba(74,131,191,0.25),0px_1px_1.5px_0px_rgba(82,75,71,0.12)]`}
               />
               <p className={`${muted} text-right text-xs leading-4 text-[var(--neutral-400)]`}>
                 {draft.length} / {maxLength}

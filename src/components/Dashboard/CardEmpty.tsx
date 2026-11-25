@@ -67,7 +67,7 @@ export function emptyAction(kind: EmptyKind, opts: { canEdit: boolean; onRetry?:
   return null
 }
 
-const LINK = 'cursor-pointer rounded-sm border-0 bg-transparent p-0 text-[13px] font-medium leading-[17px] text-[var(--dashboard-figure)] underline underline-offset-2 outline-none hover:text-[var(--dashboard-label)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]'
+const LINK = 'cursor-pointer rounded-sm border-0 bg-transparent p-0 text-[length:var(--font-size-body-sm)] font-medium leading-[17px] text-[var(--dashboard-figure)] underline underline-offset-2 outline-none hover:text-[var(--dashboard-label)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]'
 
 /**
  * The empty state itself, placed where the number goes. `compact` (the small 3×1 card) keeps it to
@@ -82,9 +82,9 @@ export function CardEmptyState({ kind, detail, action, compact, className }: { k
         <span aria-hidden className={cn('flex size-6 shrink-0 items-center justify-center rounded-md bg-[var(--dashboard-chart-area)]', tone)}>
           <Icon size={14} strokeWidth={1.75} absoluteStrokeWidth />
         </span>
-        <span className="text-[14px] font-medium leading-5 text-[var(--dashboard-figure)]">{HEADLINE[kind]}</span>
+        <span className="text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--dashboard-figure)]">{HEADLINE[kind]}</span>
       </span>
-      {!compact && <p className="m-0 line-clamp-2 text-[12px] leading-4 text-[var(--dashboard-label)]">{detail}</p>}
+      {!compact && <p className="m-0 line-clamp-2 text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">{detail}</p>}
       {compact && <span className="sr-only">{detail}</span>}
       {action && (action.href
         ? <a href={action.href} data-no-drag onClick={(e) => e.stopPropagation()} className={cn(LINK, 'mt-0.5')}>{action.label}</a>
@@ -106,7 +106,7 @@ export function ChartGhost({ bars, caption, note, className }: { bars: boolean; 
         {bars ? (
           <div className="absolute inset-x-0 bottom-0 top-2 flex items-end justify-around gap-[8%] px-[4%]">
             {GHOST_BARS.map((h, i) => (
-              <span key={i} className="w-full max-w-11 rounded-t-[4px] bg-[var(--dashboard-chart-soft)] opacity-35" style={{ height: `${h * 100}%` }} />
+              <span key={i} className="w-full max-w-11 rounded-t-xs bg-[var(--dashboard-chart-soft)] opacity-35" style={{ height: `${h * 100}%` }} />
             ))}
           </div>
         ) : (
@@ -117,8 +117,8 @@ export function ChartGhost({ bars, caption, note, className }: { bars: boolean; 
         <span className="absolute inset-x-0 bottom-0 border-t border-dashed border-[var(--dashboard-chart-soft)]" />
         {caption && (
           <span className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 text-center">
-            <span className="rounded-md bg-[var(--dashboard-card-bg)] px-2 py-0.5 text-[12px] font-medium leading-4 text-[var(--dashboard-label)] shadow-[0_0_0_4px_var(--dashboard-card-bg)]">{caption}</span>
-            {note && <span className="rounded-md bg-[var(--dashboard-card-bg)] px-2 text-[11px] leading-4 text-[var(--dashboard-muted)]">{note}</span>}
+            <span className="rounded-md bg-[var(--dashboard-card-bg)] px-2 py-0.5 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-label)] shadow-[0_0_0_4px_var(--dashboard-card-bg)]">{caption}</span>
+            {note && <span className="rounded-md bg-[var(--dashboard-card-bg)] px-2 text-[length:var(--font-size-caption)] leading-4 text-[var(--dashboard-muted)]">{note}</span>}
           </span>
         )}
       </div>

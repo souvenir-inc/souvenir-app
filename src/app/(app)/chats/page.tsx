@@ -554,7 +554,7 @@ function ChatsPageInner() {
                   </p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', marginTop: 'var(--space-0-5)', flexWrap: 'wrap' }}>
                     <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-400)' }}>
-                      Shared by <span style={{ fontWeight: 700, color: 'var(--neutral-700)' }}>{item.sharedByName ?? 'someone'}</span>
+                      Shared by <span style={{ fontWeight: 'var(--font-weight-bold)', color: 'var(--neutral-700)' }}>{item.sharedByName ?? 'someone'}</span>
                     </span>
                     <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-300)' }}>·</span>
                     <Badge label="Read-only" color="Red" />

@@ -144,10 +144,10 @@ function renderInlineSegment(text: string, sourceStart: number, prefix: string, 
 
     if (m[1] !== undefined) {
       // **bold**
-      nodes.push(<strong key={key} style={{ fontWeight: 600, color: ctx.emphasisColor }}>{renderHighlightedText(m[1], sourceStart + m.index + 2, key, ctx)}</strong>)
+      nodes.push(<strong key={key} style={{ fontWeight: 'var(--font-weight-semibold)', color: ctx.emphasisColor }}>{renderHighlightedText(m[1], sourceStart + m.index + 2, key, ctx)}</strong>)
     } else if (m[2] !== undefined) {
       // __bold__
-      nodes.push(<strong key={key} style={{ fontWeight: 600, color: ctx.emphasisColor }}>{renderHighlightedText(m[2], sourceStart + m.index + 2, key, ctx)}</strong>)
+      nodes.push(<strong key={key} style={{ fontWeight: 'var(--font-weight-semibold)', color: ctx.emphasisColor }}>{renderHighlightedText(m[2], sourceStart + m.index + 2, key, ctx)}</strong>)
     } else if (m[3] !== undefined) {
       // *italic*
       nodes.push(<em key={key}>{renderHighlightedText(m[3], sourceStart + m.index + 1, key, ctx)}</em>)
@@ -161,11 +161,11 @@ function renderInlineSegment(text: string, sourceStart: number, prefix: string, 
           key={key}
           style={{
             fontFamily: "var(--font-code)",
-            fontSize: "13px",
+            fontSize: "var(--font-size-body-sm)",
             background: "var(--neutral-800-10)",
             color: "var(--neutral-900)",
-            borderRadius: "4px",
-            padding: "1px 5px",
+            borderRadius: "var(--radius-xs)",
+            padding: "var(--prose-code-padding)",
             border: "1px solid var(--neutral-700-12)",
             whiteSpace: "pre",
           }}
@@ -480,7 +480,7 @@ function parseBlocks(content: string, sourceOffset = 0): Block[] {
 
 const TEXT: React.CSSProperties = {
   fontFamily: "var(--font-body)",
-  fontSize: "16px",
+  fontSize: "var(--font-size-body-lg)",
   // Chat prose keeps its own ladder (--prose-*), not the UI scale (plan, Appendix B): 26px.
   lineHeight: 'var(--prose-line-body)',
   color: "var(--neutral-800)",
@@ -491,7 +491,7 @@ const TEXT: React.CSSProperties = {
 
 const REASONING_TEXT: React.CSSProperties = {
   ...TEXT,
-  fontSize: "14px",
+  fontSize: "var(--font-size-body)",
   lineHeight: 'var(--line-height-body)',
   color: "var(--neutral-700)",
 }
@@ -550,11 +550,11 @@ export function LineRenderer({ content, webCitations, highlights, sourceOffset =
             key={k}
             style={{
               ...textStyle,
-              fontWeight: 600,
+              fontWeight: 'var(--font-weight-semibold)',
               fontSize: HEADING_SIZE[block.level],
               lineHeight: "30px", // ds-keep: chat prose headings, not the UI scale (no --prose-* step for 30px)
               color: "var(--neutral-900)",
-              margin: "8px 0 2px",
+              margin: "var(--space-2) 0 var(--space-0-5)",
             }}
           >
             {inline(block.text, k)}
@@ -584,8 +584,8 @@ export function LineRenderer({ content, webCitations, highlights, sourceOffset =
             className="kaya-scrollbar"
             style={{
               overflowX: "auto",
-              margin: "12px 0",
-              borderRadius: "8px",
+              margin: "var(--space-3) 0",
+              borderRadius: "var(--radius-md)",
               border: "1px solid var(--border-default)",
             }}
           >
@@ -593,7 +593,7 @@ export function LineRenderer({ content, webCitations, highlights, sourceOffset =
               style={{
                 width: "100%",
                 borderCollapse: "collapse",
-                fontSize: "14px",
+                fontSize: "var(--font-size-body)",
                 lineHeight: 'var(--line-height-body)',
                 fontFamily: "var(--font-body)",
               }}
@@ -604,10 +604,10 @@ export function LineRenderer({ content, webCitations, highlights, sourceOffset =
                     <th
                       key={hi}
                       style={{
-                        padding: "10px 14px",
+                        padding: "var(--prose-table-cell-padding)",
                         textAlign: "left",
-                        fontWeight: 600,
-                        fontSize: "13px",
+                        fontWeight: 'var(--font-weight-semibold)',
+                        fontSize: "var(--font-size-body-sm)",
                         color: "var(--neutral-700)",
                         borderBottom: "1px solid var(--border-default)",
                         whiteSpace: "nowrap",
@@ -625,7 +625,7 @@ export function LineRenderer({ content, webCitations, highlights, sourceOffset =
                       <td
                         key={ci}
                         style={{
-                          padding: "10px 14px",
+                          padding: "var(--prose-table-cell-padding)",
                           borderBottom: "1px solid var(--neutral-100)",
                           color: "var(--neutral-800)",
                           verticalAlign: "top",
@@ -649,11 +649,11 @@ export function LineRenderer({ content, webCitations, highlights, sourceOffset =
             key={k}
             style={{
               margin: `0 0 ${blockGap}`,
-              paddingLeft: "20px",
+              paddingLeft: "var(--prose-list-indent)",
               listStyleType: "disc",
               display: "flex",
               flexDirection: "column",
-              gap: "5px",
+              gap: "var(--prose-list-gap)",
             }}
           >
             {block.items.map((item, ii) => (
@@ -671,11 +671,11 @@ export function LineRenderer({ content, webCitations, highlights, sourceOffset =
             start={block.start}
             style={{
               margin: `0 0 ${blockGap}`,
-              paddingLeft: "22px",
+              paddingLeft: "var(--space-5)",
               listStyleType: "decimal",
               display: "flex",
               flexDirection: "column",
-              gap: "5px",
+              gap: "var(--prose-list-gap)",
             }}
           >
             {block.items.map((item, ii) => (
@@ -693,7 +693,7 @@ export function LineRenderer({ content, webCitations, highlights, sourceOffset =
             style={{
               border: "none",
               borderTop: "1px solid var(--border-default)",
-              margin: "16px 0",
+              margin: "var(--space-4) 0",
             }}
           />
         )
@@ -704,7 +704,7 @@ export function LineRenderer({ content, webCitations, highlights, sourceOffset =
             key={k}
             style={{
               margin: `0 0 ${blockGap}`,
-              paddingLeft: "12px",
+              paddingLeft: "var(--space-3)",
               borderLeft: "2.5px solid var(--border-default)",
               color: "var(--neutral-600)",
               fontStyle: "italic",

@@ -37,7 +37,7 @@ function StepStatusIcon({ status }: { status: AgentStep['status'] }) {
         justifyContent:  'center',
         flexShrink:      0,
       }}>
-        <div style={{ width: 4, height: 1.5, backgroundColor: 'var(--neutral-300)', borderRadius: 1 }} />
+        <div style={{ width: 4, height: 1.5, backgroundColor: 'var(--neutral-300)', borderRadius: 'var(--radius-hairline)' }} />
       </div>
     )
   }
@@ -153,7 +153,7 @@ export function LoopHistoryCard({
           background:      headerHovered ? 'var(--neutral-50)' : 'none',
           border:          'none',
           padding:         'var(--space-1) var(--space-1-5)',
-          margin:          '-4px -6px',
+          margin:          'calc(var(--space-1) * -1) calc(var(--space-1-5) * -1)',
           borderRadius:    'var(--radius-md)',
           cursor:          'pointer',
           width:           'calc(100% + 12px)',

@@ -32,7 +32,7 @@ function SharedReply({ message }: { message: SharedChatMessage }) {
   const sources = useMemo(() => deriveCitationsFromSources(output), [output])
   const citations = sources.citations.length > 0 ? sources.citations : undefined
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', paddingRight: '10%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', paddingRight: 'var(--chat-share-answer-inset)' }}>
       {message.reasoning && (
         <ReasoningBlock
           thinkingContent={message.reasoning}

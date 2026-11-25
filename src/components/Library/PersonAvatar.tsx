@@ -86,7 +86,7 @@ export function AccessAvatars({ file, viewerId }: { file: LibraryFile; viewerId:
           <span
             aria-hidden="true"
             style={{
-              marginLeft: -6, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 24, height: 24, padding: '0 var(--space-1)',
+              marginLeft: 'calc(var(--space-1-5) * -1)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 24, height: 24, padding: '0 var(--space-1)',
               borderRadius: 'var(--radius-xl)', background: tintGradient('var(--neutral-100)'), color: 'var(--neutral-700)', boxShadow: `${HAIRLINE}, 0 0 0 2px var(--card-bg)`,
               fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-caption)', boxSizing: 'border-box',
             }}

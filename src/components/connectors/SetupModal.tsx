@@ -233,9 +233,9 @@ export function SetupModal({
 
       {flow.state === 'error' && flow.error && (
         <div role="alert" className="mt-2">
-          <p className="m-0 text-[13px] text-[var(--red-600)]">{flow.error.message}</p>
+          <p className="m-0 text-[length:var(--font-size-body-sm)] text-[var(--red-600)]">{flow.error.message}</p>
           {flow.error.recovery === 'ask_admin' && (
-            <p className={`${muted} mt-1 text-[13px]`}>Ask a workspace admin to enable or set up {catalog.name}.</p>
+            <p className={`${muted} mt-1 text-[length:var(--font-size-body-sm)]`}>Ask a workspace admin to enable or set up {catalog.name}.</p>
           )}
         </div>
       )}

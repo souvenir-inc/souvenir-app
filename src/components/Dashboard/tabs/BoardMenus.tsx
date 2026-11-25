@@ -27,7 +27,7 @@ export interface BoardMenuHandlers {
 
 /** Keyboard hint at the end of a row ("⌥←"). Takes and ignores the slot's `size`. */
 function Shortcut({ keys }: { keys: string; size?: number }) {
-  return <span aria-hidden className="text-[12px] leading-4 text-[var(--neutral-400)]">{keys}</span>
+  return <span aria-hidden className="text-[length:var(--font-size-small)] leading-4 text-[var(--neutral-400)]">{keys}</span>
 }
 
 /** "Shared by <name>" with the sharer's avatar, at the foot of a shared board's menu (TAB-52). */
@@ -37,7 +37,7 @@ export function SharedByFooter({ board }: { board: Board }) {
     // The owner at the foot (Figma 402:65680): a 16 px avatar, then “Shared by” and the name in Medium.
     <div className="mt-1 flex items-center gap-2.5 border-0 border-t border-solid border-[var(--neutral-100)] px-2 pb-1 pt-2">
       <PersonAvatar initials={board.sharedBy.initials} color={board.sharedBy.color} size={16} />
-      <span className="text-[12px] leading-[17px] text-[var(--dashboard-muted)]">
+      <span className="text-[length:var(--font-size-small)] leading-[17px] text-[var(--dashboard-muted)]">
         Shared by <span className="font-medium text-[var(--neutral-700)]">{board.sharedBy.name}</span>
       </span>
     </div>

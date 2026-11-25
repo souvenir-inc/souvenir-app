@@ -26,6 +26,7 @@ const SKIP_FILE = [
   /^src\/components\/(Pin|PinCategory|PinCommentField|PinInsert|PinSkeleton|Pinboard|PinboardExpanded|PinboardHeader|PinboardSkeleton|HighlightCard|HighlightMark|HighlightPanel)\//,
   /^src\/components\/layout\/HighlightSidebar\.tsx$/,
   /^src\/lib\/pin-markdown\.tsx$/,
+  /^src\/components\/chat\/PinMentionDropdown\.tsx$/,
 ];
 // Scanned for elements, but their colours and values are illustration, not UI (plan D7).
 const ART_FILE = [
@@ -60,7 +61,42 @@ const NEUTRAL = /^["'`]?(inherit|initial|unset|none|auto|transparent|currentColo
  *  so `.a{padding:16px;margin:8px;}` gives both. */
 export function cssDeclarations(source) {
   const decls = [];
-  for (const m of source.matchAll(/(?:^|[;{\s])([a-z-]+)\s*:\s*([^;{}]+)(?=;)/g)) if (!m[1].startsWith("--")) decls.push([m[1], m[2]]);
+  for (const m of source.matchAll(/(?:^|[;{\s])([a-z-]+)\s*:\s*([^;{}]+)(?=;)/g)) {
+    if (m[1].startsWith("--")) continue;
+    const after = m.index + m[0].length;
+    const lineEnd = source.indexOf("\n", after);
+    decls.push([m[1], m[2], source.slice(after, lineEnd < 0 ? undefined : lineEnd).includes(KEEP)]);
+  }
+  return decls;
+}
+
+/**
+ * Key/value pairs of an inline style object's body. A value runs to the next comma at the top level,
+ * so `color-mix(in srgb, var(--a) 40%, transparent)`, gradients and multi-part shadows are read whole
+ * (cutting at the first comma counted token-built values as literals).
+ */
+export function inlineDeclarations(body) {
+  const decls = [];
+  const re = /([a-zA-Z]+)\s*:\s*/g;
+  let m;
+  while ((m = re.exec(body))) {
+    let i = re.lastIndex;
+    let depth = 0;
+    let quote = null;
+    for (; i < body.length; i++) {
+      const ch = body[i];
+      if (quote) { if (ch === quote && body[i - 1] !== "\\") quote = null; continue; }
+      if (ch === '"' || ch === "'" || ch === "`") { quote = ch; continue; }
+      if (ch === "(" || ch === "[" || ch === "{") depth++;
+      else if (ch === ")" || ch === "]" || ch === "}") { if (depth === 0) break; depth--; }
+      else if ((ch === "," || ch === "\n") && depth === 0) break;
+    }
+    const value = body.slice(re.lastIndex, i).trim();
+    const lineEnd = body.indexOf("\n", i);
+    const kept = body.slice(i, lineEnd < 0 ? undefined : lineEnd).includes(KEEP) || value.includes(KEEP);
+    if (value) decls.push([m[1], value.replace(KEEP, "").trim(), kept]);
+    re.lastIndex = i + 1;
+  }
   return decls;
 }
 
@@ -68,9 +104,18 @@ function classify(value, isCss = false) {
   const v = value.trim();
   if (/var\(--/.test(v)) return "token";
   if (NEUTRAL.test(v)) return "neutral";
+  // Centering and resets made only of neutral parts ("0 auto", "auto 0", "0 !important").
+  if (/^["'`]?(0|0px|auto)(\s+(0|0px|auto))*(\s*!important)?["'`]?$/i.test(v)) return "neutral";
+  // Keyword resets that carry no design value: `transparent !important`, `normal` (line height),
+  // and a placeholder border that only reserves its width (`1px solid transparent`).
+  if (/^["'`]?(transparent|currentColor|inherit|none|normal)(\s*!important)?["'`]?$/i.test(v)) return "neutral";
+  if (/^["'`]?\d+(\.\d+)?px\s+solid\s+transparent["'`]?$/i.test(v)) return "neutral";
   if (isCss) return "literal";
   if (/^[A-Z_][A-Z0-9_]*(\.[\w.]+)?$/.test(v) || /^(tokens?|theme)\./.test(v)) return "token";
   if (/^[a-zA-Z_$][\w$.]*$/.test(v) || /\?/.test(v) || /\$\{/.test(v) || /\(/.test(v) && !/^["'`]/.test(v) && !/^(rgba?|hsla?|calc|cubic-bezier)\(/.test(v)) return "dynamic";
+  // An unquoted expression with a name in it (`TRACK_W / 2`, `size * 0.64`, `-EDGE`, `MARGINS[tag]`)
+  // is computed in code, not a hard-coded value.
+  if (!/^["'`]/.test(v) && /[A-Za-z_$]/.test(v)) return "dynamic";
   return "literal";
 }
 
@@ -99,7 +144,16 @@ function listFiles(dir, out = []) {
 
 const count = (s, re) => (s.match(re) || []).length;
 const tagCount = (s, tag) => count(s, new RegExp("<" + tag.replace(".", "\\.") + "(?=[\\s>/])", "g"));
-const stripComments = (s) => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'`])\/\/.*$/gm, "$1");
+// A `ds-keep: <reason>` comment marks a value that stays literal on purpose (a framer-motion layout
+// radius, a keyframe loop…). It survives comment stripping as a marker, so the value on its line is
+// counted as "kept": listed, but neither wired nor hard-coded.
+const KEEP = "__DS_KEEP__";
+/** Every literal value seen, per category, for `--list=<category>`. */
+const LITERALS = {};
+const stripComments = (s) => s
+  .replace(/\/\*\s*ds-keep[\s\S]*?\*\//g, KEEP)
+  .replace(/\/\/\s*ds-keep.*$/gm, KEEP)
+  .replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'`])\/\/.*$/gm, "$1");
 
 function scan() {
   const counts = {};
@@ -127,14 +181,18 @@ function scan() {
       if (isCss) {
         decls.push(...cssDeclarations(source));
       } else if (isTsx) {
-        for (const block of source.matchAll(/style=\{\{([\s\S]*?)\}\}/g))
-          for (const m of block[1].matchAll(/([a-zA-Z]+)\s*:\s*([^,\n}]+)/g)) decls.push([m[1], m[2]]);
+        for (const block of source.matchAll(/style=\{\{([\s\S]*?)\}\}/g)) decls.push(...inlineDeclarations(block[1]));
       }
-      for (const [prop, value] of decls) {
+      for (const [prop, value, kept] of decls) {
         const category = Object.keys(CATEGORIES).find((c) => CATEGORIES[c].test(prop));
+        if (category && kept) { add(`kept.${category}`, file); continue; }
+        // A keyframe animation keeps its own timing (plan: "animations, which loop, keep their timing");
+        // only transitions belong on the duration scale. Counted apart, like local z-index.
+        if (category === "motion" && /^animation$/.test(prop) && classify(value, isCss) === "literal") { add("keyframe.motion", file); continue; }
         // z-index -1…9 orders siblings inside one component; page layers (10+) must use the --z-* scale.
         const local = category === "zIndex" && /^["'`]?(-1|\d)["'`]?$/.test(value.trim());
         if (category === "color" && contentColour) continue;
+        if (category && !local && classify(value, isCss) === "literal") (LITERALS[category] ||= []).push({ file, prop, value: value.trim() });
         if (category) add(`${local ? "local" : classify(value, isCss)}.${category}`, file);
       }
       if (!contentColour) add("colorLiteral.hex", file, count(source, /#[0-9a-fA-F]{3,8}(?![0-9a-zA-Z_-])/g));
@@ -178,6 +236,9 @@ function summary(counts) {
   }
   lines.push(`  ${"TOTAL".padEnd(16)}${String(tTok).padStart(7)}${String(tLit).padStart(10)}${pct(tTok, tTok + tLit).padStart(8)}${pct(tLit, tTok + tLit).padStart(12)}`);
   lines.push(`  (not counted: ${g("local.zIndex")} z-index values -1…9, sibling order inside one component)`);
+  if (g("keyframe.motion")) lines.push(`  (not counted: ${g("keyframe.motion")} keyframe animations, which keep their own timing)`);
+  const keptCats = Object.keys(CATEGORIES).filter((c) => g(`kept.${c}`));
+  if (keptCats.length) lines.push(`  (kept on purpose with ds-keep, not counted: ${keptCats.map((c) => `${c} ${g(`kept.${c}`)}`).join(", ")})`);
   lines.push(`\nColour literals    hex ${g("colorLiteral.hex")} · rgb()/rgba() ${g("colorLiteral.rgb")}`);
   lines.push(`Inline style blocks ${g("styleBlocks")} · className ${g("classNames")} · Tailwind arbitrary values ${g("twArbitrary")}`);
 
@@ -238,7 +299,15 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const args = process.argv.slice(2);
   const { counts, byFile } = scan();
   const top = args.find((a) => a.startsWith("--top="));
-  if (args.includes("--json")) console.log(JSON.stringify(counts, null, 2));
+  const list = args.find((a) => a.startsWith("--list="));
+  if (list) {
+    // Every hard-coded value of one category (e.g. --list=shadow), most common first, with where it is.
+    const rows = LITERALS[list.slice(7)] || [];
+    const groups = new Map();
+    for (const r of rows) { const k = `${r.prop}: ${r.value}`; (groups.get(k) || groups.set(k, []).get(k)).push(r.file); }
+    for (const [k, fs_] of [...groups].sort((a, b) => b[1].length - a[1].length)) console.log(`${String(fs_.length).padStart(4)}× ${k}\n        ${[...new Set(fs_)].join(", ")}`);
+    console.log(`${rows.length} literal ${list.slice(7)} values`);
+  } else if (args.includes("--json")) console.log(JSON.stringify(counts, null, 2));
   else if (top) {
     const key = top.slice(6);
     const rows = Object.entries(byFile[key] || {}).sort((a, b) => b[1] - a[1]).slice(0, Number(args.find((a) => a.startsWith("--limit="))?.slice(8) ?? 30));

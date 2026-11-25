@@ -129,7 +129,7 @@ function CustomCard({ onClick, disabled }: { onClick: () => void; disabled?: boo
         background: hovered ? 'var(--neutral-50)' : 'var(--neutral-white)',
         border: `1px dashed ${hovered ? 'var(--neutral-400)' : 'var(--neutral-300)'}`,
         borderRadius: 'var(--radius-2xl)',
-        padding: '16px 17px',
+        padding: 'var(--agent-template-card-padding)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         width: GRID_WIDTH,
         boxShadow: hovered
@@ -206,7 +206,7 @@ function RecommendedGrid({
           <div className="kaya-skeleton" style={{ width: 'min(100%, 620px)', height: 14, borderRadius: 'var(--radius-xs)' }} />
         </div>
         <div style={GRID_STYLE}>
-          {[0, 1, 2, 3, 4, 5].map(i => <div key={i} className="kaya-skeleton" style={{ width: CARD_WIDTH, height: CARD_HEIGHT, borderRadius: 15 }} />)}
+          {[0, 1, 2, 3, 4, 5].map(i => <div key={i} className="kaya-skeleton" style={{ width: CARD_WIDTH, height: CARD_HEIGHT, borderRadius: 'var(--agent-template-card-radius)' }} />)}
         </div>
       </div>
     )

@@ -80,7 +80,7 @@ export function DeleteAgentDialog({
                 padding:         'var(--space-0-5) var(--space-2) var(--space-0-5) var(--space-1-5)',
                 borderRadius:    'var(--radius-sm)',
                 backgroundColor: 'var(--red-400-10)',
-                boxShadow:       '0px 0px 0px 1px rgba(238,48,48,0.22)',
+                boxShadow:       'var(--danger-chip-ring)',
               }}
             >
               <AlertCircleIcon size={13} color="var(--red-500)" />
@@ -91,7 +91,7 @@ export function DeleteAgentDialog({
                   fontSize:      'var(--font-size-caption)',
                   lineHeight:    'var(--line-height-small)',
                   color:         'var(--red-600)',
-                  letterSpacing: '0.02em',
+                  letterSpacing: 'var(--tracking-wide)',
                   textTransform: 'uppercase',
                 }}
               >

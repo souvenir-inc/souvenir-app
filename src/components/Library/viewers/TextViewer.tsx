@@ -49,7 +49,7 @@ export default function TextViewer({ pages, citePage, passage }: TextViewerProps
               outline: index === citedIndex && !split ? '3px solid var(--color-tag-Yellow-text)' : 'none', outlineOffset: 2,
             }}
           >
-            <h3 style={{ margin: '0 0 var(--space-2)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)', textTransform: 'uppercase', letterSpacing: 0.4 }}>{page.label}</h3>
+            <h3 style={{ margin: '0 0 var(--space-2)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-wider)' }}>{page.label}</h3>
             <p style={{ margin: 0, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-900)' }}>
               {marked ? (
                 <>

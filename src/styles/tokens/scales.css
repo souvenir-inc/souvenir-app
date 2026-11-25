@@ -19,6 +19,10 @@
   --radius-xl:   12px;
   --radius-2xl:  16px;
   --radius-full: 9999px;
+  --radius-hairline: 1px;  /* caret and cursor bars */
+  --radius-3xl:      28px;
+  --radius-4xl:      32px;
+  --space-px:        1px;  /* hairline overlaps, visually-hidden elements */
 
   /* ── Spacing: half steps ─────────────────────────────────────────────────────
      The 4px scale in primitives.css skips 2, 6 and 10, which are among the

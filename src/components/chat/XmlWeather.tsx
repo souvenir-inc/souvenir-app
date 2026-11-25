@@ -200,7 +200,7 @@ function WeatherMeta({ icon, children }: { icon: React.ReactNode; children: Reac
         borderRadius: 'var(--radius-full)',
         color: "var(--neutral-700)",
         background: "rgba(var(--surface-rgb), 0.60)",
-        border: "1px solid rgba(255,255,255,0.72)",
+        border: "var(--weather-chip-border)",
         backdropFilter: "blur(8px)",
       }}
     >
@@ -313,7 +313,7 @@ export function XmlWeather({ xml }: { xml: string }) {
           style={{
             position: "relative",
             minHeight: 188,
-            padding: "24px clamp(20px, 4vw, 30px)",
+            padding: "var(--weather-card-padding)",
             display: "flex",
             alignItems: "stretch",
             overflow: "hidden",
@@ -354,7 +354,7 @@ export function XmlWeather({ xml }: { xml: string }) {
                 fontSize: "var(--font-size-eyebrow)",
                 lineHeight: "var(--line-height-eyebrow)",
                 fontWeight: 'var(--font-weight-semibold)',
-                letterSpacing: "0.12em",
+                letterSpacing: "var(--tracking-caps-wide)",
                 textTransform: "uppercase",
                 color: palette.ink,
                 opacity: 0.82,
@@ -367,16 +367,16 @@ export function XmlWeather({ xml }: { xml: string }) {
               <span
                 style={{
                   fontFamily: "var(--font-title)",
-                  fontSize: "clamp(46px, 9vw, 68px)",
-                  lineHeight: 0.9,
-                  letterSpacing: "-0.045em",
+                  fontSize: "var(--weather-temp-size)",
+                  lineHeight: 'var(--weather-temp-line-height)',
+                  letterSpacing: "var(--tracking-display)",
                   fontWeight: "var(--font-weight-medium)",
                   color: "var(--neutral-900)",
                   fontVariantNumeric: "tabular-nums",
                 }}
               >
                 {weather.current.temp}
-                <span style={{ fontSize: "0.42em", letterSpacing: "-0.01em", verticalAlign: "top", marginLeft: 'var(--space-0-5)' }}>{weather.unit}</span>
+                <span style={{ fontSize: "var(--weather-unit-size)", letterSpacing: "var(--tracking-tight)", verticalAlign: "top", marginLeft: 'var(--space-0-5)' }}>{weather.unit}</span>
               </span>
               <span style={{ ...captionStyle, color: palette.ink, fontWeight: 'var(--font-weight-semibold)', paddingBottom: 'var(--space-1)' }}>
                 {conditionLabel(weather.current.condition) || "Current"}

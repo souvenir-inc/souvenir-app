@@ -41,7 +41,7 @@ export function AnimatedPieChart({ data, onComplete, animate = true }: { data: P
   return (
     <div style={{ background: "var(--neutral-white)", border: "1px solid var(--brown-50)", borderRadius: 'var(--radius-xl)', padding: "var(--space-4) var(--space-5)" }}>
       {data.title && <div style={{ fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)", marginBottom: 'var(--space-1)' }}>{data.title}</div>}
-      <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-300)", fontWeight: 'var(--font-weight-medium)', textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 'var(--space-4)' }}>pie chart</div>
+      <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-300)", fontWeight: 'var(--font-weight-medium)', textTransform: "uppercase", letterSpacing: "var(--tracking-wider)", marginBottom: 'var(--space-4)' }}>pie chart</div>
       <div style={{ display: "flex", justifyContent: "center", marginBottom: 'var(--space-5)' }}>
         <svg width={220} height={220} viewBox="0 0 220 220" style={{ display: "block", maxWidth: "100%" }}>
           <circle r={R} cx={CX} cy={CY} fill="none" stroke="color-mix(in srgb, var(--neutral-800) 7%, transparent)" strokeWidth={SW} />

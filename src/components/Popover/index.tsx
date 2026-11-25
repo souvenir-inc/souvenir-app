@@ -138,7 +138,7 @@ function EdgeFade({ edge, visible }: EdgeFadeProps) {
             maskImage:          `linear-gradient(${inwardDir}, black 0%, transparent 100%)`,
             WebkitMaskImage:    `linear-gradient(${inwardDir}, black 0%, transparent 100%)`,
             opacity:            visible ? 1 : 0,
-            transition:         'opacity 150ms ease',
+            transition:         'opacity var(--duration-fast) ease',
             pointerEvents:      'none',
             zIndex:             1,
           }}
@@ -152,7 +152,7 @@ function EdgeFade({ edge, visible }: EdgeFadeProps) {
           height:          40,
           background:      `linear-gradient(${inwardDir}, var(--popover-bg) 0%, transparent 100%)`,
           opacity:         visible ? 1 : 0,
-          transition:      'opacity 150ms ease',
+          transition:      'opacity var(--duration-fast) ease',
           pointerEvents:   'none',
           zIndex:          1,
         }}

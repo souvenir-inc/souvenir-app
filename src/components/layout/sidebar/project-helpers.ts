@@ -18,7 +18,7 @@ export const NO_CHATS_YET_STYLE: React.CSSProperties = {
   height:     32,
   display:    'flex',
   alignItems: 'center',
-  padding:    '0 8px',
+  padding:    '0 var(--space-2)',
   fontFamily: 'var(--font-body)',
   fontSize:   'var(--font-size-caption)',
   color:      'var(--neutral-400)',

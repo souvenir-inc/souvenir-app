@@ -220,7 +220,7 @@ export const SidebarProjectsSection = React.forwardRef<HTMLDivElement, SidebarPr
       <div
         ref={ref}
         className={cn(className)}
-        style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: fluid ? '100%' : '237px' }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', width: fluid ? '100%' : '237px' }}
         {...props}
       >
         {/* ── Header row — clicking opens the project; icon click toggles the list ── */}
@@ -239,12 +239,12 @@ export const SidebarProjectsSection = React.forwardRef<HTMLDivElement, SidebarPr
             alignItems:      'center',
             justifyContent:  'space-between',
             overflow:        'hidden',
-            borderRadius:    '10px',
+            borderRadius:    'var(--radius-lg)',
             width:           '100%',
-            paddingLeft:     '6px',
-            paddingRight:    '6px',
-            paddingTop:      '5px',
-            paddingBottom:   '5px',
+            paddingLeft:     'var(--space-1-5)',
+            paddingRight:    'var(--space-1-5)',
+            paddingTop:      'var(--sidebar-project-row-padding-y)',
+            paddingBottom:   'var(--sidebar-project-row-padding-y)',
             backgroundColor: (isEditing || isActive) ? 'var(--sidebar-menu-item-hover-bg)' : 'transparent',
             boxShadow:       isEditing
                                ? '0px 0px 0px 1px var(--focus-ring)'
@@ -254,7 +254,7 @@ export const SidebarProjectsSection = React.forwardRef<HTMLDivElement, SidebarPr
             userSelect:      'none',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, minWidth: 0, flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0, minWidth: 0, flex: 1 }}>
             {/* ── Icon — click toggles expand/collapse ── */}
             {icon !== null && (
               <div
@@ -358,7 +358,7 @@ export const SidebarProjectsSection = React.forwardRef<HTMLDivElement, SidebarPr
           </div>
 
           {!isEditing && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexShrink: 0 }}>
               {badge}
               {showExpandArrow && (
                 <m.div
@@ -379,7 +379,7 @@ export const SidebarProjectsSection = React.forwardRef<HTMLDivElement, SidebarPr
                     height:          '20px',
                     borderRadius:    '4px',
                     backgroundColor: 'var(--neutral-white)',
-                    boxShadow:       '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4)',
+                    boxShadow:       'var(--team-switcher-avatar-shadow)',
                     flexShrink:      0,
                     cursor:          'pointer',
                     color:           'var(--neutral-600)',
@@ -435,7 +435,7 @@ export const SidebarProjectsSection = React.forwardRef<HTMLDivElement, SidebarPr
                   paddingLeft:   icon === null ? '6px' : '22px',
                   display:       'flex',
                   flexDirection: 'column',
-                  gap:           '4px',
+                  gap:           'var(--space-1)',
                 }}
               >
                 {showTreeLine && (

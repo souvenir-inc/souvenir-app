@@ -76,7 +76,7 @@ export function CardTitle({ children }: { children: React.ReactNode }) {
         lineHeight: "var(--line-height-display)",
         color: "var(--legacy-1a1916)",
         margin: 0,
-        letterSpacing: "-0.01em",
+        letterSpacing: "var(--tracking-tight)",
       }}
     >
       {children}

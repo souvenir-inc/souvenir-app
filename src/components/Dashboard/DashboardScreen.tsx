@@ -688,7 +688,7 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
                 <NeedsAttention items={attention} onOpenMetric={setWindowFor} />
                 {own && (
                   // The link's dates, not the board's (SH-23): back to the board's, or keep them for it.
-                  <span data-own-dates className="flex items-center gap-0.5 text-[13px] leading-5">
+                  <span data-own-dates className="flex items-center gap-0.5 text-[length:var(--font-size-body-sm)] leading-5">
                     {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a quiet text action beside the period (Period row P-5) */}
                     <button type="button" onClick={() => setViewDates(null)} className="h-8 cursor-pointer rounded-lg border-0 bg-transparent px-2 text-[var(--neutral-700)] hover:bg-[var(--dashboard-sync-bg)]">Reset</button>
                     {openBoard.access !== 'view' && (

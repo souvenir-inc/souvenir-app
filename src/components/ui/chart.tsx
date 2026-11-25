@@ -38,7 +38,7 @@ export function ChartContainer({ config, className, style, children, ...props }:
       <div
         data-slot="chart"
         className={cn(
-          'relative w-full min-w-0 text-[12px] leading-4',
+          'relative w-full min-w-0 text-[length:var(--font-size-small)] leading-4',
           // recharts draws its own focus outline on the svg; the card already shows focus.
           '[&_.recharts-surface]:outline-none [&_.recharts-wrapper]:outline-none',
           className,
@@ -67,7 +67,7 @@ export function ChartTooltipContent({ active, payload, label, valueFormatter, hi
   const config = useChartConfig()
   if (!active || !payload?.length) return null
   return (
-    <div className="pointer-events-none min-w-[120px] rounded-lg bg-[var(--popover-bg)] px-2.5 py-2 text-[12px] leading-4 shadow-[var(--shadow-popover)]">
+    <div className="pointer-events-none min-w-[120px] rounded-lg bg-[var(--popover-bg)] px-2.5 py-2 text-[length:var(--font-size-small)] leading-4 shadow-[var(--shadow-popover)]">
       {!hideLabel && label != null && <p className="m-0 mb-1 font-medium text-[var(--neutral-900)]">{label}</p>}
       <div className="flex flex-col gap-1">
         {payload.map((item) => {

@@ -74,7 +74,7 @@ function AvatarStack({ members, count }: { members: InvitedMember[]; count: numb
       {count > shown.length && (
         <span
           style={{
-            marginLeft: -8,
+            marginLeft: 'calc(var(--space-2) * -1)',
             minWidth: 24,
             height: 24,
             padding: "0 var(--space-1)",
@@ -116,7 +116,7 @@ function WorkspaceCard({
         width: "100%",
         minHeight: 101,
         padding: "var(--space-4) var(--space-5)",
-        borderRadius: 11.5,
+        borderRadius: 'var(--onboarding-join-card-radius)',
         backgroundColor: "var(--neutral-white)",
         boxSizing: "border-box",
         boxShadow: "0px 0px 0px 1px var(--blue-600)",

@@ -422,7 +422,7 @@ function ProjectPanelSidebar() {
             display:        "flex",
             alignItems:     "center",
             justifyContent: "space-between",
-            gap:            8,
+            gap:            'var(--space-2)',
             // The panel starts at the window's top (the card starts 11px lower), so 19px of padding puts
             // its title and close button on the TopBar's 19–51px band, as the left sidebar's header is.
             minHeight:      51,

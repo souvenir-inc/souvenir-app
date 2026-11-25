@@ -25,8 +25,8 @@ function RecentsList({ activeChatId, onSelectChat, chatHistory }: SectionProps) 
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "4px",
-          padding: "4px 0",
+          gap: "var(--space-1)",
+          padding: "var(--space-1) 0",
         }}
       >
         {Array.from({ length: 5 }).map((_, i) => (
@@ -40,7 +40,7 @@ function RecentsList({ activeChatId, onSelectChat, chatHistory }: SectionProps) 
     return (
       <div
         style={{
-          padding: "8px 6px",
+          padding: "var(--space-2) var(--space-1-5)",
           fontFamily: "var(--font-body)",
           fontSize: "var(--font-size-caption)",
           color: "var(--neutral-400)",
@@ -56,7 +56,7 @@ function RecentsList({ activeChatId, onSelectChat, chatHistory }: SectionProps) 
       animate="open"
       initial="closed"
       variants={sectionStaggerVariants}
-      style={{ display: "flex", flexDirection: "column", gap: "4px" }}
+      style={{ display: "flex", flexDirection: "column", gap: "var(--space-1)" }}
     >
       {chats.map((chat) => (
         <m.div key={chat.id} variants={sectionItemVariants}>
@@ -107,7 +107,7 @@ export function RecentsSection(props: SectionProps) {
         onAnimationStart={(def) => { if (def === "closed") setOverflow("hidden"); }}
         onAnimationComplete={(def) => { if (def === "open") setOverflow("visible"); }}
       >
-        <div style={{ paddingTop: "4px" }}>
+        <div style={{ paddingTop: "var(--space-1)" }}>
           <RecentsList {...props} />
         </div>
       </m.div>

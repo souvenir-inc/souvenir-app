@@ -57,7 +57,7 @@ function SizePill({
         border: "none",
         cursor: "pointer",
         outline: "none",
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "var(--static-white)",
         boxShadow: selected
           ? "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1.5px var(--neutral-900)"
           : "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)",

@@ -159,7 +159,7 @@ function NoteRow({ note, open, onToggle, onForget }: {
             transition={{ duration: 0.2, ease: 'easeOut' }}
             style={{ overflow: 'hidden' }}
           >
-            <div className={styles.note} style={{ padding: '4px 24px 18px 44px' }}>
+            <div className={styles.note} style={{ padding: 'var(--memory-item-detail-padding)' }}>
               <MarkdownRenderer content={note.content} />
             </div>
           </m.div>
@@ -402,7 +402,7 @@ export function MemorySection({ title, hint, orgId, query }: { title: string; hi
                     minWidth:        20,
                     height:          20,
                     padding:         '0 var(--space-1-5)',
-                    borderRadius:    99,
+                    borderRadius:    'var(--radius-full)',
                     backgroundColor: 'var(--neutral-100)',
                     color:           'var(--neutral-600)',
                     fontFamily:      BODY,

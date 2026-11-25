@@ -161,7 +161,7 @@ export function SuperLink(
           style={{
             display:       'flex',
             flexDirection: 'column',
-            gap:           31,
+            gap:           'var(--super-link-gap)',
           }}
         >
 
@@ -181,7 +181,7 @@ export function SuperLink(
                   fontSize:      'var(--font-size-body-lg)',  // 14px
                   fontWeight:    'var(--font-weight-medium)',
                   lineHeight:    'var(--leading-normal)',
-                  letterSpacing: '0.07px',
+                  letterSpacing: 'var(--tracking-normal)',
                   color:         'var(--neutral-950)',
                   whiteSpace:    'nowrap',
                 }}

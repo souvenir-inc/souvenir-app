@@ -17,7 +17,7 @@
   background: var(--neutral-100);
   border: 1px solid color-mix(in srgb, var(--neutral-500) 16%, transparent);
   animation: igp-reveal var(--paint-ms) cubic-bezier(0.12, 0.65, 0.3, 1) forwards;
-  transition: --c1 2.5s ease, --c2 2.5s ease, --c3 2.5s ease, --c4 2.5s ease;
+  transition: --c1 2.5s ease, --c2 2.5s ease, --c3 2.5s ease, --c4 2.5s ease; /* ds-keep: the preview's slow colour drift */
 }
 
 /* ── Unpainted canvas: faint dotted texture, breathing ──────────────────── */
@@ -49,7 +49,7 @@
   inset: -15%;
   filter: blur(30px);
   transform: scale(1.08);
-  transition: filter 3s ease, transform 3s ease;
+  transition: filter 3s ease, transform 3s ease; /* ds-keep: the preview's slow reveal */
 }
 .card[data-stage="1"] .wash { filter: blur(20px); transform: scale(1.05); }
 .card[data-stage="2"] .wash { filter: blur(12px); transform: scale(1.02); }
@@ -73,7 +73,7 @@
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   animation: igp-grain 0.45s steps(3) infinite;
-  transition: opacity 3s ease;
+  transition: opacity 3s ease; /* ds-keep: the preview's slow reveal */
 }
 .card[data-stage="1"] .grain { opacity: 0.4; }
 .card[data-stage="2"] .grain { opacity: 0.26; }
@@ -125,7 +125,7 @@
   background: color-mix(in srgb, var(--static-black) 45%, transparent);
   backdrop-filter: blur(8px);
   color: var(--static-white);
-  font-size: 12.5px;
+  font-size: var(--font-size-label);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-small);
   overflow: hidden;

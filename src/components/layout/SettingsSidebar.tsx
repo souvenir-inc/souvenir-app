@@ -293,7 +293,7 @@ export function SettingsSidebar() {
         backgroundColor: 'var(--neutral-50)',
         flexShrink:      0,
         overflow:        'hidden',
-        ...(isNarrow ? { boxShadow: '4px 0 24px rgba(0, 0, 0, 0.16)' } : null),
+        ...(isNarrow ? { boxShadow: 'var(--settings-drawer-shadow)' } : null),
       }}
     >
       {/* ── Title row — fixed ── */}

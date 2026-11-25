@@ -57,7 +57,7 @@ export function NewBoardChooser({ onPick, onClose, ignore, className }: NewBoard
       data-new-board-chooser
       className={cn('flex w-[526px] max-w-[calc(100vw-32px)] flex-col gap-2 rounded-xl border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-3 pb-2 pt-3 shadow-[var(--dashboard-chooser-shadow)]', className)}
     >
-      <p className="m-0 text-[14px] font-semibold leading-[22px] text-[var(--dashboard-figure)]">What do you want to start with?</p>
+      <p className="m-0 text-[length:var(--font-size-body)] font-semibold leading-[var(--line-height-body)] text-[var(--dashboard-figure)]">What do you want to start with?</p>
       <div className="flex gap-2">
         {([
           ['template', 'Template', <LayoutTemplate key="i" />, <TemplateArt key="a" />],
@@ -78,7 +78,7 @@ export function NewBoardChooser({ onPick, onClose, ignore, className }: NewBoard
             )}
           >
             <span aria-hidden className="relative block h-[76px] w-full overflow-hidden rounded-lg bg-[var(--dashboard-hover-band)]">{art}</span>
-            <span className="flex items-center gap-1.5 text-[14px] font-medium leading-5 text-[var(--dashboard-figure)] [&_svg]:size-4 [&_svg]:stroke-[1.5]">{icon}{label}</span>
+            <span className="flex items-center gap-1.5 text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--dashboard-figure)] [&_svg]:size-4 [&_svg]:stroke-[1.5]">{icon}{label}</span>
           </button>
         ))}
       </div>
@@ -89,7 +89,7 @@ export function NewBoardChooser({ onPick, onClose, ignore, className }: NewBoard
         data-copy
         onClick={() => onPick('copy')}
         onKeyDown={(e) => { if (e.key === 'ArrowUp') { e.preventDefault(); ref.current?.querySelector<HTMLElement>('[data-way]')?.focus() } }}
-        className={cn('flex w-full cursor-pointer items-center gap-2 rounded-lg border-0 bg-transparent px-2 py-1 text-left text-[14px] font-medium leading-[22px] text-[var(--neutral-700)] hover:bg-[var(--dashboard-hover-band)] focus-visible:bg-[var(--dashboard-hover-band)]', FOCUS)}
+        className={cn('flex w-full cursor-pointer items-center gap-2 rounded-lg border-0 bg-transparent px-2 py-1 text-left text-[length:var(--font-size-body)] font-medium leading-[var(--line-height-body)] text-[var(--neutral-700)] hover:bg-[var(--dashboard-hover-band)] focus-visible:bg-[var(--dashboard-hover-band)]', FOCUS)}
       >
         <Copy aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth />
         <span className="flex-1">Copy a board</span>
@@ -99,7 +99,7 @@ export function NewBoardChooser({ onPick, onClose, ignore, className }: NewBoard
   )
 }
 
-const tile = 'absolute rounded-[4px] border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)]'
+const tile = 'absolute rounded-xs border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)]'
 
 /** A wide card over four small ones: a template's layout in miniature. Also used on the empty board. */
 export function TemplateArt() {

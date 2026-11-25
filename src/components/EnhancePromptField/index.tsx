@@ -158,7 +158,7 @@ export function EnhancePromptField(
             style={{
               display:       'flex',
               flexDirection: 'column',
-              gap:           25,
+              gap:           'var(--enhance-field-gap)',
               padding:       'var(--space-3)',
               boxSizing:     'border-box',
             }}

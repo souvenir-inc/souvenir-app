@@ -40,7 +40,7 @@ export function AgentShareModal({ open, onClose, repoId, agentName }: AgentShare
                 <p className="m-0 mb-1 font-[family-name:var(--font-title)] text-2xl leading-8 font-normal text-[var(--neutral-900)]">Share agent</p>
               </DialogTitle>
               <DialogDescription asChild>
-                <p className="m-0 truncate text-sm leading-[22px] text-[var(--neutral-500)]">{agentName}</p>
+                <p className="m-0 truncate text-sm leading-[var(--line-height-body)] text-[var(--neutral-500)]">{agentName}</p>
               </DialogDescription>
             </div>
             <DialogClose asChild>

@@ -52,7 +52,7 @@ export function XmlFunnel({ xml }: { xml: string }) {
         borderRadius: 'var(--radius-2xl)',
         border: "1px solid color-mix(in srgb, var(--brown-700) 16%, transparent)",
         background: "linear-gradient(135deg, var(--brown-50) 0%, var(--neutral-50) 52%, var(--brown-50) 100%)",
-        boxShadow: "0 10px 28px rgba(82, 75, 71, 0.09), 0 2px 4px rgba(82, 75, 71, 0.07)",
+        boxShadow: "var(--funnel-card-shadow)",
         overflow: "hidden",
       }}
     >

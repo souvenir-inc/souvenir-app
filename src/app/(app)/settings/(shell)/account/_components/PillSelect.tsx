@@ -79,22 +79,22 @@ export function PillSelect<T extends string>({
           display:         'flex',
           alignItems:      'center',
           justifyContent:  'space-between',
-          gap:             8,
+          gap:             'var(--space-2)',
           // minWidth (not a fixed width) — a fixed 100px truncated/cramped
           // longer values (model names, especially once an icon eats into
           // the same space); this keeps the compact Tone trigger's size but
           // lets the button grow for whatever content actually needs it.
           minWidth:        100,
-          padding:         '5px 8px',
-          borderRadius:    8,
+          padding:         'var(--space-1) var(--space-2)',
+          borderRadius:    'var(--radius-md)',
           border:          'none',
           backgroundColor: 'var(--field-surface)',
           boxShadow:       '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)',
           cursor:          pending ? 'not-allowed' : 'pointer',
           opacity:         pending ? 0.6 : 1,
           fontFamily:      'var(--font-body)',
-          fontWeight:      500,
-          fontSize:        14,
+          fontWeight:      'var(--font-weight-medium)',
+          fontSize:        'var(--font-size-body)',
           lineHeight:      'var(--line-height-body)',
           color:           'var(--neutral-700)',
         }}

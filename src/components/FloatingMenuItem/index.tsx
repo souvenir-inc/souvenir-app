@@ -109,7 +109,7 @@ export function FloatingMenuItem(
           position:      'relative',
           display:       'flex',
           alignItems:    'center',
-          borderRadius:  '8px',
+          borderRadius:  'var(--radius-md)',
           overflow:      'hidden',
           paddingTop:    0,
           paddingBottom: 0,
@@ -118,7 +118,7 @@ export function FloatingMenuItem(
           opacity:       disabled ? 0.7 : 1,
           cursor:        disabled ? 'not-allowed' : 'pointer',
           // Outlined like the outline Button beside it (e.g. Share): field fill, 1px border, darker on hover.
-          transition:    'box-shadow 150ms, border-color 150ms',
+          transition:    'box-shadow var(--duration-fast), border-color var(--duration-fast)',
           userSelect:    'none',
           // Transparent: an item takes the menu's own colour; only hover / selected add a fill.
           background:    'transparent',

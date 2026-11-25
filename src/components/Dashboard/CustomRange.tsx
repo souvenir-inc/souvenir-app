@@ -63,11 +63,11 @@ export function CustomRange({ period, compare, onApply, onClose, className }: Cu
     const cells: (Date | null)[] = [...Array(lead).fill(null), ...Array.from({ length: count }, (_, i) => new Date(first.getFullYear(), first.getMonth(), i + 1))]
     return (
       <div className="flex w-[280px] flex-col gap-2" data-month={first.getMonth() + 1}>
-        <p className="m-0 h-6 text-[13px] font-medium leading-6 text-[var(--dashboard-figure)]">
+        <p className="m-0 h-6 text-[length:var(--font-size-body-sm)] font-medium leading-6 text-[var(--dashboard-figure)]">
           {first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
         </p>
         <div role="grid" aria-label={first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })} className="grid grid-cols-7 gap-y-1">
-          {WEEKDAYS.map((w, i) => <span key={i} aria-hidden className="flex h-6 items-center justify-center text-[11px] font-medium text-[var(--dashboard-faint)]">{w}</span>)}
+          {WEEKDAYS.map((w, i) => <span key={i} aria-hidden className="flex h-6 items-center justify-center text-[length:var(--font-size-caption)] font-medium text-[var(--dashboard-faint)]">{w}</span>)}
           {cells.map((d, i) => {
             if (!d) return <span key={i} />
             const t = d.getTime()
@@ -91,7 +91,7 @@ export function CustomRange({ period, compare, onApply, onClose, className }: Cu
                   onClick={() => pick(d)}
                   onPointerEnter={() => setHover(d)}
                   className={cn(
-                    'flex size-8 items-center justify-center rounded-lg border-0 p-0 text-[13px] leading-5',
+                    'flex size-8 items-center justify-center rounded-lg border-0 p-0 text-[length:var(--font-size-body-sm)] leading-5',
                     isEnd ? 'bg-[var(--dashboard-figure)] font-medium text-[var(--dashboard-toast-action-text)]' : 'bg-transparent text-[var(--dashboard-figure)]',
                     future ? 'cursor-default text-[var(--dashboard-faint)] opacity-50' : !isEnd && 'cursor-pointer hover:bg-[var(--dashboard-hover-band)]',
                     isEnd && 'cursor-pointer',
@@ -132,7 +132,7 @@ export function CustomRange({ period, compare, onApply, onClose, className }: Cu
         {month(right)}
       </div>
       <div className="flex items-center gap-2">
-        <p data-range-summary className="m-0 min-w-0 flex-1 truncate text-[12px] leading-4 text-[var(--dashboard-label)]">
+        <p data-range-summary className="m-0 min-w-0 flex-1 truncate text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">
           {lo && hi && to ? rangeSummary(lo, hi, compare) : from ? 'Pick the last day' : 'Pick the first day'}
         </p>
         <Button variant="ghost" size="sm" onClick={onClose}>Cancel</Button>

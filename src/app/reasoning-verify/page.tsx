@@ -110,7 +110,7 @@ export default function ReasoningVerify() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--neutral-100)', fontFamily: 'var(--font-body)' }}>
       <div style={{ flex: 1, padding: 'var(--space-9) var(--space-8)', minWidth: 0 }}>
-        <div style={{ fontSize: 'var(--font-size-caption)', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--neutral-200)', marginBottom: 'var(--space-6)' }}>
+        <div style={{ fontSize: 'var(--font-size-caption)', letterSpacing: 'var(--tracking-caps-wide)', textTransform: 'uppercase', color: 'var(--neutral-200)', marginBottom: 'var(--space-6)' }}>
           Reasoning verify — {STATES[active].label}
         </div>
         <div style={{ maxWidth: 720 }} data-testid="reasoning-host">
@@ -120,7 +120,7 @@ export default function ReasoningVerify() {
       </div>
 
       <div style={{ width: 260, flexShrink: 0, borderLeft: '1px solid var(--neutral-100)', padding: 'var(--space-9) var(--space-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
-        <div style={{ fontSize: 'var(--font-size-caption)', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--neutral-200)', marginBottom: 'var(--space-2)' }}>
+        <div style={{ fontSize: 'var(--font-size-caption)', letterSpacing: 'var(--tracking-caps-wide)', textTransform: 'uppercase', color: 'var(--neutral-200)', marginBottom: 'var(--space-2)' }}>
           State
         </div>
         {(Object.keys(STATES) as StateKey[]).map((key) => (

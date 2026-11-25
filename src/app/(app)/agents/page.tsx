@@ -79,7 +79,7 @@ function PersonasPageInner() {
           margin: '0 auto',
           display: 'flex',
           flexDirection: 'column',
-          gap: 41,
+          gap: 'var(--agents-page-gap)',
         }}>
 
           {/* ── Header + Tabs + Toolbar ── */}

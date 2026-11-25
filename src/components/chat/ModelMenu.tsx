@@ -327,13 +327,13 @@ export function ModelMenu({ onClose }: ModelMenuProps = {}) {
                   // being clipped flush against the scroll container's own
                   // edges — same reason PresetModelSelectorDialog's model
                   // list padds its scroll div.
-                  padding:              '3px 2px 3px 3px',
+                  padding:              'var(--space-0-5) var(--space-0-5) var(--space-0-5) var(--space-0-5)',
                   // The bar sat ~14px in from the panel's right edge: this div's
                   // own padding, plus the scrollbar, plus the section's 8px.
                   // Pulling the scroll box out into that section padding puts the
                   // bar near the edge where it belongs, and gives the rows back
                   // the width it was taking.
-                  marginRight:          '-5px',
+                  marginRight:          'var(--model-menu-scroll-bleed)',
                 }}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: `${MODEL_ROW_GAP}px` }}>

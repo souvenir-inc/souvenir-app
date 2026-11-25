@@ -134,7 +134,7 @@ function PopoverAction({
             style={{
               position:        'absolute',
               inset:           '-0.73px',
-              borderRadius:    '8.73px',
+              borderRadius:    'var(--selection-popover-radius)',
               filter:          'blur(7.273px)',
               backgroundImage: HOVER_GLOW_GRADIENT,
             }}
@@ -282,13 +282,13 @@ export function SelectionPopover({
             // though this popover is portaled to document.body. Selecting
             // text near the bottom of the message list, close to the
             // composer, should never let this toolbar float over it.
-            zIndex:          0,
+            zIndex:          'var(--z-base)',
             display:         'flex',
             flexDirection:   'row',
             alignItems:      'center',
-            gap:             2,
-            padding:         '4px',
-            borderRadius:    12,
+            gap:             'var(--space-0-5)',
+            padding:         'var(--space-1)',
+            borderRadius:    'var(--radius-xl)',
             backgroundColor: BG,
             boxShadow:       SHADOW_OUTER,
           }}

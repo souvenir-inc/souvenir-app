@@ -19,7 +19,7 @@
   background: var(--neutral-white);
   box-shadow: 0 1px 2px color-mix(in srgb, var(--static-black) 6%, transparent);
   font-family: var(--font-body);
-  font-size: 12.5px;
+  font-size: var(--font-size-label);
   line-height: var(--line-height-small);
   color: var(--neutral-700);
   white-space: nowrap;
@@ -57,7 +57,7 @@ button.chip:focus-visible { outline: 2px solid var(--focus-ring); outline-offset
   left: 50%;
   width: 4px;
   height: 4px;
-  margin-left: -2px;
+  margin-left: calc(var(--space-0-5) * -1);
   border-radius: 50%;
   background: var(--blue-500);
   box-shadow: 0 0 4px var(--blue-500);

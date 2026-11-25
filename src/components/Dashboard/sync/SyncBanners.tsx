@@ -51,7 +51,7 @@ function Shell({ kind, children, onClose, ...rest }: { kind: keyof typeof LOOK; 
     <div
       role={kind === 'failed' ? 'alert' : 'status'}
       data-sync-banner={kind}
-      className={cn('flex min-h-11 items-center gap-2.5 rounded-[10px] border border-solid py-[5px] pl-3.5 pr-2', LOOK[kind])}
+      className={cn('flex min-h-11 items-center gap-2.5 rounded-lg border border-solid py-[5px] pl-3.5 pr-2', LOOK[kind])}
       {...rest}
     >
       {children}
@@ -83,7 +83,7 @@ function Names({ ids }: { ids: AppId[] }) {
   )
 }
 
-const TEXT = 'min-w-0 flex-1 text-[13px] leading-5 text-[var(--dashboard-figure)]'
+const TEXT = 'min-w-0 flex-1 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-figure)]'
 
 function ProblemBanner({ banner: b, boardId }: { banner: Banner; boardId: string }) {
   const s = useSyncSnapshot()
@@ -168,7 +168,7 @@ function BannerAction({ tone, disabled, onClick, icon, tooltip = null, children 
           disabled={disabled}
           onClick={onClick}
           className={cn(
-            'flex h-7 cursor-pointer items-center gap-1 rounded-md border-0 bg-transparent px-1.5 text-[13px] font-medium leading-5 transition-[background-color,opacity] duration-fast',
+            'flex h-7 cursor-pointer items-center gap-1 rounded-md border-0 bg-transparent px-1.5 text-[length:var(--font-size-body-sm)] font-medium leading-5 transition-[background-color,opacity] duration-fast',
             'hover:bg-[var(--dashboard-row-hover)] disabled:pointer-events-none disabled:opacity-50',
             tone === 'failed' ? 'text-[var(--dashboard-sync-failed)]' : 'text-[var(--dashboard-sync-behind)]',
             FOCUS,

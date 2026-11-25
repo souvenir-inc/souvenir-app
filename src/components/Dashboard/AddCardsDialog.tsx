@@ -138,7 +138,7 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
       hideClose
       aria-describedby={undefined}
       data-add-cards
-      style={{ width: 'min(800px, calc(100vw - 304px))', minWidth: 'min(720px, calc(100vw - 32px))', height: 690, maxHeight: 'calc(100dvh - 64px)', borderRadius: 16, padding: 0, background: 'var(--neutral-50)' }}
+      style={{ width: 'min(800px, calc(100vw - 304px))', minWidth: 'min(720px, calc(100vw - 32px))', height: 690, maxHeight: 'calc(100dvh - 64px)', borderRadius: 'var(--radius-2xl)', padding: 0, background: 'var(--neutral-50)' }}
       onOpenAutoFocus={(e) => { e.preventDefault(); searchRef.current?.focus() }}
       // Esc clears a search first; a second Esc closes (AC-12, AC-15).
       onEscapeKeyDown={(e) => { if (query) { e.preventDefault(); clearSearch() } }}
@@ -146,14 +146,14 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
     >
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="relative flex h-[60px] shrink-0 items-end px-6 pb-3.5">
-          <DialogTitle className="text-[16px] font-semibold leading-6 text-[var(--dashboard-figure)]">Add cards</DialogTitle>
+          <DialogTitle className="text-[length:var(--font-size-body-lg)] font-semibold leading-6 text-[var(--dashboard-figure)]">Add cards</DialogTitle>
           <DialogClose asChild>
-            <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-3.5 size-7 rounded-[8px]" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
+            <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-3.5 size-7 rounded-md" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
           </DialogClose>
         </div>
 
         {/* The search field, with the cursor in it (AC-3, AC-13). */}
-        <div className="mx-6 flex h-10 shrink-0 items-center gap-2 rounded-[10px] border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] pl-3 pr-2.5 shadow-[var(--dashboard-field-shadow)] focus-within:border-[var(--dashboard-list-border)]">
+        <div className="mx-6 flex h-10 shrink-0 items-center gap-2 rounded-lg border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] pl-3 pr-2.5 shadow-[var(--dashboard-field-shadow)] focus-within:border-[var(--dashboard-list-border)]">
           <Search aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0 text-[var(--dashboard-muted)]" />
           {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the borderless text field inside the drawn search box (Figma 170:45419) */}
           <input
@@ -162,7 +162,7 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
             onChange={(e) => { setQuery(e.target.value); setFocus(0) }}
             placeholder="Search metrics"
             aria-label="Search metrics"
-            className="h-full min-w-0 flex-1 border-0 bg-transparent p-0 text-[14px] leading-[22px] text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-muted)]"
+            className="h-full min-w-0 flex-1 border-0 bg-transparent p-0 text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-muted)]"
           />
           {query && (
             // eslint-disable-next-line no-restricted-syntax -- ds-allow: the search field's clear (Figma "clear search", 16px x-circle)
@@ -191,13 +191,13 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
           <div ref={listRef} role="listbox" aria-multiselectable aria-label="Metrics" className="dashboard-thin-scroll flex min-w-0 flex-1 flex-col gap-0.5 overflow-y-auto pr-1">
             {rows.length === 0 && lines.every((l) => l.kind !== 'callout') ? (
               // No match (AC-15).
-              <div className="flex flex-col items-center gap-3 pt-16 text-[14px] leading-5 text-[var(--dashboard-label)]">
+              <div className="flex flex-col items-center gap-3 pt-16 text-[length:var(--font-size-body)] leading-5 text-[var(--dashboard-label)]">
                 <p className="m-0">No metrics match “{query.trim()}”.</p>
                 {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the outlined Clear search of Figma 170:55881 */}
-                <button type="button" onClick={clearSearch} className={cn('h-8 cursor-pointer rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-3 text-[13px] font-medium text-[var(--dashboard-figure)] shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}>Clear search</button>
+                <button type="button" onClick={clearSearch} className={cn('h-8 cursor-pointer rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-3 text-[length:var(--font-size-body-sm)] font-medium text-[var(--dashboard-figure)] shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}>Clear search</button>
               </div>
             ) : lines.map((l, i) => {
-              if (l.kind === 'heading') return <p key={`h${i}`} className="m-0 px-2.5 pb-1.5 pt-2.5 text-[11px] font-semibold leading-4 tracking-[0.6px] text-[var(--dashboard-muted)] first:pt-1">{l.text}</p>
+              if (l.kind === 'heading') return <p key={`h${i}`} className="m-0 px-2.5 pb-1.5 pt-2.5 text-[length:var(--font-size-caption)] font-semibold leading-4 tracking-[0.6px] text-[var(--dashboard-muted)] first:pt-1">{l.text}</p>
               if (l.kind === 'gap') return <span key={`g${i}`} aria-hidden className="shrink-0" style={{ height: l.size }} />
               if (l.kind === 'callout') return <CallOut key="callout" count={l.count} />
               rowIndex += 1
@@ -230,10 +230,10 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
                   <span className={cn('flex shrink-0 items-center gap-[3px]', !can && 'opacity-45')}>
                     {m.custom ? <CustomMark /> : marks.map((app) => <SourceLogo key={app.id} app={app} className="size-4" />)}
                   </span>
-                  <span title={m.label} className={cn('min-w-0 flex-1 truncate text-[14px] leading-[22px] text-[var(--dashboard-figure)]', picked && 'font-medium', !can && 'opacity-45')}>
+                  <span title={m.label} className={cn('min-w-0 flex-1 truncate text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--dashboard-figure)]', picked && 'font-medium', !can && 'opacity-45')}>
                     <Highlight text={m.label} match={l.match} />
                   </span>
-                  {tag && <span className="shrink-0 rounded-full bg-[var(--dashboard-sync-bg)] px-2 py-0.5 text-[11px] font-medium leading-4 text-[var(--neutral-700)]">{tag}</span>}
+                  {tag && <span className="shrink-0 rounded-full bg-[var(--dashboard-sync-bg)] px-2 py-0.5 text-[length:var(--font-size-caption)] font-medium leading-4 text-[var(--neutral-700)]">{tag}</span>}
                 </div>
               )
             })}
@@ -243,15 +243,15 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
         {/* Footer: what's picked on the left; Cancel and Add on the right (AC-11). */}
         <div className="flex h-16 shrink-0 items-center gap-3 border-0 border-t border-solid border-[var(--neutral-200)] px-6">
           {picks.length > 0 && (
-            <p data-picked className="m-0 flex shrink-0 items-center gap-2 text-[14px] leading-[22px]">
+            <p data-picked className="m-0 flex shrink-0 items-center gap-2 text-[length:var(--font-size-body)] leading-[var(--line-height-body)]">
               <span className="font-medium text-[var(--dashboard-figure)]">{picks.length} picked</span>
               {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the footer's quiet text link (Figma 170:64075) */}
-              <button type="button" onClick={() => setPicks([])} className={cn('cursor-pointer rounded-sm border-0 bg-transparent p-0 text-[14px] text-[var(--dashboard-label)] hover:text-[var(--dashboard-figure)]', FOCUS)}>Clear</button>
+              <button type="button" onClick={() => setPicks([])} className={cn('cursor-pointer rounded-sm border-0 bg-transparent p-0 text-[length:var(--font-size-body)] text-[var(--dashboard-label)] hover:text-[var(--dashboard-figure)]', FOCUS)}>Clear</button>
             </p>
           )}
           {already.length > 0 && <span aria-hidden className="h-4 w-px shrink-0 bg-[var(--neutral-200)]" />}
           {already.length > 0 && (
-            <p data-already className="m-0 min-w-0 truncate text-[13px] leading-5 text-[var(--dashboard-label)]">
+            <p data-already className="m-0 min-w-0 truncate text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-label)]">
               {nameList(already)} {already.length === 1 ? 'is' : 'are'} already on this board
             </p>
           )}
@@ -266,7 +266,7 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
 }
 
 function RailHeading({ children, first = false }: { children: React.ReactNode; first?: boolean }) {
-  return <p className={cn('m-0 pl-2.5 text-[11px] font-semibold leading-4 tracking-[0.6px] text-[var(--dashboard-muted)]', first ? 'py-1.5' : 'pb-1.5 pt-2.5')}>{children}</p>
+  return <p className={cn('m-0 pl-2.5 text-[length:var(--font-size-caption)] font-semibold leading-4 tracking-[0.6px] text-[var(--dashboard-muted)]', first ? 'py-1.5' : 'pb-1.5 pt-2.5')}>{children}</p>
 }
 
 function RailItem({ icon, label, selected, onClick }: { icon: React.ReactElement<{ size?: number }>; label: string; selected: boolean; onClick: () => void }) {
@@ -278,7 +278,7 @@ function RailItem({ icon, label, selected, onClick }: { icon: React.ReactElement
       onClick={onClick}
       title={label}
       className={cn(
-        'flex h-9 w-full shrink-0 cursor-pointer items-center gap-2 rounded-lg border border-solid px-2.5 text-left text-[14px] leading-[22px]',
+        'flex h-9 w-full shrink-0 cursor-pointer items-center gap-2 rounded-lg border border-solid px-2.5 text-left text-[length:var(--font-size-body)] leading-[var(--line-height-body)]',
         selected ? 'border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] font-medium text-[var(--dashboard-figure)] shadow-[var(--dashboard-lift-shadow)]' : 'border-transparent bg-transparent text-[var(--neutral-700)] hover:bg-[var(--dashboard-hover-band)]',
         FOCUS,
       )}
@@ -313,18 +313,18 @@ function Highlight({ text, match }: { text: string; match?: { at: number; length
 /** Metrics no connected app feeds (AC-8): Connect goes to Connectors, where apps are linked. */
 function CallOut({ count }: { count: number }) {
   return (
-    <div data-callout className="flex h-14 shrink-0 items-center gap-3 rounded-[10px] border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] p-2.5">
+    <div data-callout className="flex h-14 shrink-0 items-center gap-3 rounded-lg border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] p-2.5">
       <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-panel-bg)] text-[var(--dashboard-label)]">
         <Plug aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth />
       </span>
       <span className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-[14px] font-medium leading-5 text-[var(--dashboard-figure)]">Not measured here yet</span>
-        <span className="truncate text-[12px] leading-4 text-[var(--dashboard-label)]">{count} metric{count === 1 ? '' : 's'} need an app this store hasn’t connected</span>
+        <span className="truncate text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--dashboard-figure)]">Not measured here yet</span>
+        <span className="truncate text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">{count} metric{count === 1 ? '' : 's'} need an app this store hasn’t connected</span>
       </span>
       { }
       <a
         href={ORG_CONNECTORS_ROUTE}
-        className={cn('flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1.5 pl-2.5 pr-3 text-[13px] font-medium leading-[18px] text-[var(--dashboard-figure)] no-underline shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}
+        className={cn('flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1.5 pl-2.5 pr-3 text-[length:var(--font-size-body-sm)] font-medium leading-[18px] text-[var(--dashboard-figure)] no-underline shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}
       >
         <Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />Connect
       </a>
@@ -335,7 +335,7 @@ function CallOut({ count }: { count: number }) {
 /** A custom metric's mark: Σ on a small soft tile (Figma "Logo16 / Custom", 170:38000). */
 function CustomMark() {
   return (
-    <span aria-hidden className="flex size-4 shrink-0 items-center justify-center rounded-[4px] bg-[var(--dashboard-sync-bg)] text-[var(--dashboard-label)]">
+    <span aria-hidden className="flex size-4 shrink-0 items-center justify-center rounded-xs bg-[var(--dashboard-sync-bg)] text-[var(--dashboard-label)]">
       <Sigma size={11} strokeWidth={1.75} absoluteStrokeWidth />
     </span>
   )

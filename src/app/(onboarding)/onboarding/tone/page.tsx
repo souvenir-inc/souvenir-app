@@ -72,7 +72,7 @@ function ToneCard({
             fontWeight: 'var(--font-weight-regular)',
             fontSize: "var(--font-size-heading-sm)",
             color: "var(--neutral-white-90)",
-            letterSpacing: "0.5px",
+            letterSpacing: "var(--tracking-wider)",
           }}
         >
           {symbol}

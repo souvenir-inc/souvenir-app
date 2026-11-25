@@ -124,7 +124,7 @@ export function SpeedDial({ board, startOpen, onAddCards, onNewBoard, onEditBoar
                   onClick={() => { if (a.key !== 'more' && a.key !== 'new') setMode('closed'); a.run() }}
                   className={cn('group/dial flex cursor-pointer items-center gap-2 rounded-full border-0 bg-transparent p-0', FOCUS)}
                 >
-                  <span className="flex h-7 items-center whitespace-nowrap rounded-lg bg-[var(--dashboard-card-bg)] px-2.5 text-[13px] font-medium leading-5 text-[var(--dashboard-figure)] shadow-[var(--dashboard-raised-shadow)] transition-colors duration-fast group-hover/dial:bg-[var(--neutral-100)]">
+                  <span className="flex h-7 items-center whitespace-nowrap rounded-lg bg-[var(--dashboard-card-bg)] px-2.5 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)] shadow-[var(--dashboard-raised-shadow)] transition-colors duration-fast group-hover/dial:bg-[var(--neutral-100)]">
                     {a.label}
                   </span>
                   <span className="flex size-9 items-center justify-center rounded-full bg-[var(--dashboard-card-bg)] text-[var(--neutral-700)] shadow-[var(--dashboard-raised-shadow)] transition-colors duration-fast group-hover/dial:bg-[var(--neutral-100)]">
@@ -166,7 +166,7 @@ interface EditBarProps {
 
 export function EditBar({ onAddCards, onNewBoard, onDone }: EditBarProps) {
   const [choosing, setChoosing] = useState(false)
-  const segment = cn('flex h-9 cursor-pointer items-center gap-1.5 rounded-full border-0 bg-transparent pl-3 pr-3.5 text-[13px] font-medium leading-5 text-[var(--dashboard-figure)] transition-colors duration-fast hover:bg-[var(--neutral-100)]', FOCUS)
+  const segment = cn('flex h-9 cursor-pointer items-center gap-1.5 rounded-full border-0 bg-transparent pl-3 pr-3.5 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)] transition-colors duration-fast hover:bg-[var(--neutral-100)]', FOCUS)
   return (
     <div
       data-dashboard-fab
@@ -196,7 +196,7 @@ export function EditBar({ onAddCards, onNewBoard, onDone }: EditBarProps) {
       <button
         type="button"
         onClick={onDone}
-        className={cn('flex h-9 cursor-pointer items-center rounded-full border-0 px-[18px] text-[13px] font-medium leading-5', DIAL, FOCUS)}
+        className={cn('flex h-9 cursor-pointer items-center rounded-full border-0 px-[18px] text-[length:var(--font-size-body-sm)] font-medium leading-5', DIAL, FOCUS)}
       >
         Done
       </button>

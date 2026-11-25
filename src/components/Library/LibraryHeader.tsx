@@ -124,7 +124,7 @@ export function LibraryHeader({ query, setQuery }: LibraryHeaderProps) {
   const showListTools = !searching && query.tab !== 'suggested'
   return (
     // Side padding eases off on phones so the tab row (Shared) fits.
-    <header style={{ display: 'flex', flexDirection: 'column', padding: '28px clamp(8px, 4vw, 40px) 13px', flexShrink: 0 }}>
+    <header style={{ display: 'flex', flexDirection: 'column', padding: 'var(--library-header-padding)', flexShrink: 0 }}>
       {/* In a narrow window the tools wrap under the title, right-aligned, instead of pushing the page sideways. */}
       <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-4)', rowGap: 'var(--space-2)', minHeight: 36, padding: '0 var(--space-2)' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-3)', flex: 'none' }}>

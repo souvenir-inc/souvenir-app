@@ -19,10 +19,10 @@ export function showSyncErrorToast({ names, rest, onReconnect }: { names: string
     <div
       role="alert"
       data-sync-toast="error"
-      className="flex w-max max-w-[calc(100vw-32px)] items-center gap-2.5 rounded-[10px] border border-solid border-[var(--dashboard-toast-border)] bg-[var(--dashboard-card-bg)] py-2 pl-3.5 pr-1.5 shadow-[var(--dashboard-toast-shadow)]"
+      className="flex w-max max-w-[calc(100vw-32px)] items-center gap-2.5 rounded-lg border border-solid border-[var(--dashboard-toast-border)] bg-[var(--dashboard-card-bg)] py-2 pl-3.5 pr-1.5 shadow-[var(--dashboard-toast-shadow)]"
     >
       <TriangleAlert aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0 text-[var(--dashboard-sync-failed)]" />
-      <p className="m-0 min-w-0 text-[13px] leading-5 text-[var(--dashboard-label)]">
+      <p className="m-0 min-w-0 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-label)]">
         <span className="text-[var(--dashboard-figure)]"><span className="font-medium">{lead}{more ? ` & ${more}` : ''}</span> {verb}</span>
         {' '}• {rest}
       </p>
@@ -31,7 +31,7 @@ export function showSyncErrorToast({ names, rest, onReconnect }: { names: string
         <button
           type="button"
           onClick={() => { toast.dismiss(id); onReconnect() }}
-          className={cn('shrink-0 cursor-pointer rounded-md border-0 bg-[var(--dashboard-figure)] px-2.5 py-1 text-[13px] font-medium leading-5 text-[var(--dashboard-card-bg)] transition-opacity duration-fast hover:opacity-90', FOCUS)}
+          className={cn('shrink-0 cursor-pointer rounded-md border-0 bg-[var(--dashboard-figure)] px-2.5 py-1 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-card-bg)] transition-opacity duration-fast hover:opacity-90', FOCUS)}
         >
           Reconnect
         </button>

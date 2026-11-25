@@ -423,7 +423,7 @@ export function BrowserScreen({ session, expanded, onExpandedChange }: BrowserSc
   // In the panel the screen sits in the same card as the Context tab's sections.
   // A real border, not an inset box-shadow, so the screen inside can't paint over it.
   // borderRadius stays a number: framer-motion's layout animation corrects px radii, not var().
-  const THUMB_LOOK: React.CSSProperties = { borderRadius: 16, backgroundColor: 'var(--card-bg)', border: '1px solid var(--neutral-200)', boxSizing: 'border-box' } // ds-keep
+  const THUMB_LOOK: React.CSSProperties = { borderRadius: 'var(--radius-2xl)', backgroundColor: 'var(--card-bg)', border: '1px solid var(--neutral-200)', boxSizing: 'border-box' } // ds-keep
   const cardPlacement: React.CSSProperties =
     phase === 'full'      ? { position: 'fixed', zIndex: Z_BACKDROP + 1, ...fullFrame(windowSize, aspect), borderRadius: 16, backgroundColor: 'var(--neutral-white)', boxShadow: 'var(--shadow-4)' }
     : phase === 'returning' ? { position: 'fixed', zIndex: Z_BACKDROP + 1, ...returnRect, ...THUMB_LOOK }

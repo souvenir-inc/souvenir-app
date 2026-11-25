@@ -146,7 +146,7 @@ export function DialogContent({ size = 'md', hideClose = false, bare = false, ov
             aria-label="Close"
             style={{
               position: 'absolute', top: 14, right: 14, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: 28, height: 28, border: 'none', background: 'transparent', borderRadius: 8, cursor: 'pointer',
+              width: 28, height: 28, border: 'none', background: 'transparent', borderRadius: 'var(--radius-md)', cursor: 'pointer',
               color: 'var(--neutral-500)',
             }}
           >
@@ -160,14 +160,14 @@ export function DialogContent({ size = 'md', hideClose = false, bare = false, ov
 
 export function DialogHeader({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={className} style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '24px 24px 0', paddingRight: 56 }} {...props}>
+    <div className={className} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', padding: 'var(--space-6) var(--space-6) 0', paddingRight: 'var(--dialog-header-close-inset)' }} {...props}>
       {children}
     </div>
   )
 }
 
 const SR_ONLY: React.CSSProperties = {
-  position: 'absolute', width: 1, height: 1, padding: 0, margin: -1,
+  position: 'absolute', width: 1, height: 1, padding: 0, margin: 'calc(var(--space-px) * -1)',
   overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0,
 }
 
@@ -197,7 +197,7 @@ export function DialogDescription({ children, ...props }: React.ComponentPropsWi
 
 export function DialogBody({ children, className, style, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={className} style={{ padding: '16px 24px', overflowY: 'auto', minHeight: 0, ...style }} {...props}>
+    <div className={className} style={{ padding: 'var(--space-4) var(--space-6)', overflowY: 'auto', minHeight: 0, ...style }} {...props}>
       {children}
     </div>
   )
@@ -207,7 +207,7 @@ export function DialogFooter({ children, className, style, ...props }: React.HTM
   return (
     <div
       className={className}
-      style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, padding: '0 24px 24px', ...style }}
+      style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)', padding: '0 var(--space-6) var(--space-6)', ...style }}
       {...props}
     >
       {children}

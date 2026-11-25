@@ -41,7 +41,7 @@ export function AnimatedSteps({ data, onComplete, animate = true }: { data: Step
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
                 <m.div initial={{ scale: 0 }} animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 400, damping: 25, delay: 0.04 }}
-                  style={{ width: 24, height: 24, borderRadius: "50%", background: "var(--brown-700)", color: "var(--neutral-white)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 'var(--font-size-caption)', fontWeight: 700, flexShrink: 0 }}>
+                  style={{ width: 24, height: 24, borderRadius: "50%", background: "var(--brown-700)", color: "var(--neutral-white)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 'var(--font-size-caption)', fontWeight: 'var(--font-weight-bold)', flexShrink: 0 }}>
                   {i + 1}
                 </m.div>
                 {i < data.steps.length - 1 && (

@@ -107,15 +107,15 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
       hideClose
       aria-describedby={undefined}
       data-new-board-library
-      style={{ width: 'min(1080px, calc(100vw - 32px))', maxWidth: 'none', height: 'min(760px, calc(100dvh - 64px))', borderRadius: 16, padding: 0, background: 'var(--dashboard-card-bg)', overflow: 'hidden' }}
+      style={{ width: 'min(1080px, calc(100vw - 32px))', maxWidth: 'none', height: 'min(760px, calc(100dvh - 64px))', borderRadius: 'var(--radius-2xl)', padding: 0, background: 'var(--dashboard-card-bg)', overflow: 'hidden' }}
       onOpenAutoFocus={(e) => { e.preventDefault(); listRef.current?.querySelector<HTMLElement>(`[data-row="${CSS.escape(picked)}"]`)?.focus() }}
       onKeyDown={onKey}
     >
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="relative flex h-14 shrink-0 items-center border-b border-solid border-[var(--neutral-200)] px-5">
-          <DialogTitle className="text-[16px] font-semibold leading-6 text-[var(--dashboard-figure)]">New board</DialogTitle>
+          <DialogTitle className="text-[length:var(--font-size-body-lg)] font-semibold leading-6 text-[var(--dashboard-figure)]">New board</DialogTitle>
           <DialogClose asChild>
-            <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-3.5 size-7 rounded-[8px]" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
+            <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-3.5 size-7 rounded-md" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
           </DialogClose>
         </div>
 
@@ -124,7 +124,7 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
           <div ref={listRef} role="listbox" aria-label="Start from" className="kaya-scrollbar flex w-[248px] shrink-0 flex-col gap-4 overflow-y-auto bg-[var(--dashboard-hover-band)] px-3 py-4">
             {groups.filter((g) => g.rows.length).map((g) => (
               <div key={g.heading} role="group" aria-label={g.heading} className="flex flex-col gap-0.5">
-                <p className="m-0 px-2 pb-1 text-[11px] font-medium uppercase leading-4 tracking-[0.04em] text-[var(--dashboard-faint)]">{g.heading}</p>
+                <p className="m-0 px-2 pb-1 text-[length:var(--font-size-caption)] font-medium uppercase leading-4 tracking-[0.04em] text-[var(--dashboard-faint)]">{g.heading}</p>
                 {g.rows.map((r) => {
                   const on = r.key === picked
                   return (
@@ -139,7 +139,7 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
                       onClick={() => setPicked(r.key)}
                       onDoubleClick={go}
                       className={cn(
-                        'flex h-8 w-full cursor-pointer items-center gap-2 rounded-lg border border-solid px-2 text-left text-[13px] leading-5',
+                        'flex h-8 w-full cursor-pointer items-center gap-2 rounded-lg border border-solid px-2 text-left text-[length:var(--font-size-body-sm)] leading-5',
                         on ? 'border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] font-medium text-[var(--dashboard-figure)]' : 'border-transparent bg-transparent text-[var(--neutral-700)] hover:bg-[var(--dashboard-card-bg)]',
                         FOCUS,
                       )}
@@ -158,8 +158,8 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
           {/* Right: the selected one (NB-8). */}
           <div className="kaya-scrollbar flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto px-6 py-5">
             <div className="flex flex-col gap-1">
-              <h2 data-library-name className="m-0 text-[18px] font-semibold leading-7 text-[var(--dashboard-figure)]">{name}</h2>
-              <p data-library-dates className="m-0 flex items-center gap-1.5 text-[13px] leading-5 text-[var(--dashboard-label)]">
+              <h2 data-library-name className="m-0 text-[length:var(--font-size-heading-sm)] font-semibold leading-7 text-[var(--dashboard-figure)]">{name}</h2>
+              <p data-library-dates className="m-0 flex items-center gap-1.5 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-label)]">
                 <Calendar aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />
                 <span className="font-medium text-[var(--dashboard-figure)]">{periodLabel}</span>
                 {compare !== 'none' && <span>• {compareLabel?.menuLabel ?? compareLabel?.label}</span>}
@@ -169,15 +169,15 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
             {leftOut.length > 0 && (
               <div data-library-callout className="flex flex-col gap-2 rounded-xl border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-panel-bg)] p-3">
                 <div className="flex items-center gap-2.5">
-                  <p className="m-0 min-w-0 flex-1 text-[13px] font-medium leading-5 text-[var(--dashboard-figure)]">
+                  <p className="m-0 min-w-0 flex-1 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)]">
                     {leftOut.length === 1 ? '1 card is left out' : `${leftOut.length} cards are left out`}: this store doesn’t measure {leftOut.length === 1 ? 'it' : 'them'} yet
                   </p>
                   { }
-                  <a href={ORG_CONNECTORS_ROUTE} className={cn('flex shrink-0 items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1 pl-2.5 pr-3 text-[13px] font-medium leading-[18px] text-[var(--dashboard-figure)] no-underline shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}>
+                  <a href={ORG_CONNECTORS_ROUTE} className={cn('flex shrink-0 items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1 pl-2.5 pr-3 text-[length:var(--font-size-body-sm)] font-medium leading-[18px] text-[var(--dashboard-figure)] no-underline shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}>
                     <Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />Connect
                   </a>
                 </div>
-                <ul className="m-0 flex list-none flex-col gap-1 p-0 text-[12px] leading-4 text-[var(--dashboard-label)]">
+                <ul className="m-0 flex list-none flex-col gap-1 p-0 text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">
                   {leftOut.map((m) => <li key={m.id}><span className="text-[var(--dashboard-figure)]">{m.label}</span> · {m.unmeasured ?? 'no connected app records it'}</li>)}
                 </ul>
               </div>
@@ -203,7 +203,7 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
                     style={{ gridColumn: `${c.x + 1} / span ${w}`, gridRow: `${c.y + 1} / span ${h}` }}
                   >
                     <span className="flex min-w-0 items-center gap-1.5">
-                      <span className="min-w-0 flex-1 truncate text-[14px] font-medium leading-5 text-[var(--dashboard-figure)]">{m.label}</span>
+                      <span className="min-w-0 flex-1 truncate text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--dashboard-figure)]">{m.label}</span>
                       {marks.map((a) => <SourceLogo key={a.id} app={a} className="size-3.5 shrink-0" />)}
                     </span>
                     <span aria-hidden className="block h-3 w-16 rounded-full bg-[var(--dashboard-outline-bar)]" />

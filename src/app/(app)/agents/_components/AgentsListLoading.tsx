@@ -28,7 +28,7 @@ export function AgentsListLoading() {
       }}
     >
       <div style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', paddingTop: 'var(--space-7)', paddingBottom: 'var(--space-6)', boxSizing: 'border-box' }}>
-        <div style={{ width: '100%', maxWidth: 991, padding: '0 var(--space-3)', boxSizing: 'border-box', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 41 }}>
+        <div style={{ width: '100%', maxWidth: 991, padding: '0 var(--space-3)', boxSizing: 'border-box', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--agents-page-gap)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             {/* Tabs: the My Agents / Super Links segmented control */}
             <Skeleton width={217} height={46} radius={14} />

@@ -30,14 +30,14 @@
   color: var(--neutral-700);
   font-family: var(--font-body);
   font-size: var(--font-size-body);
-  font-weight: 450;
+  font-weight: var(--slack-config-weight-light);
   text-align: left;
   cursor: pointer;
   transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
 }
 
 .railItem:hover { background: var(--neutral-100); color: var(--neutral-900); }
-.railItemActive { background: var(--neutral-100); color: var(--neutral-900); font-weight: 550; }
+.railItemActive { background: var(--neutral-100); color: var(--neutral-900); font-weight: var(--slack-config-weight-strong); }
 
 .railIcon {
   display: grid;
@@ -59,7 +59,7 @@
 .search {
   width: 100%;
   height: 34px;
-  padding: 0 10px 0 31px;
+  padding: var(--slack-config-search-padding);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   outline: none;
@@ -68,7 +68,7 @@
   font-family: var(--font-body);
   font-size: var(--font-size-body-sm);
 }
-.search:focus { border-color: var(--neutral-400); box-shadow: 0 0 0 3px rgba(114, 105, 98, 0.08); }
+.search:focus { border-color: var(--neutral-400); box-shadow: var(--slack-config-focus-ring); }
 
 .workspaceLabel {
   display: flex;
@@ -80,8 +80,8 @@
   color: var(--neutral-500);
   font-family: var(--font-body);
   font-size: var(--font-size-caption);
-  font-weight: 650;
-  letter-spacing: .04em;
+  font-weight: var(--slack-config-weight-heavy);
+  letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
 }
 
@@ -105,7 +105,7 @@
 
 .content {
   min-width: 0;
-  padding: 30px 34px 38px;
+  padding: var(--slack-config-content-padding);
 }
 
 .contentInner {
@@ -122,7 +122,7 @@
   margin: 0;
   color: var(--neutral-900);
   font-family: var(--font-title);
-  font-size: 21px;
+  font-size: var(--slack-config-heading-size);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-heading-md);
 }
@@ -154,9 +154,9 @@
 .metaPill { max-width: 210px; overflow: hidden; padding: var(--space-1) var(--space-2); border: 1px solid var(--border-default); border-radius: var(--radius-full); background: var(--neutral-white); color: var(--neutral-600); font: 500 11px/16px var(--font-body); text-overflow: ellipsis; white-space: nowrap; }
 
 .channelGroups { display: flex; flex-direction: column; gap: var(--space-3); }
-.channelGroup { overflow: hidden; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--neutral-white); box-shadow: 0 1px 2px rgba(82, 75, 71, .03); }
-.groupHeader { padding: 17px 20px 16px; background: var(--neutral-100); }
-.groupKicker { margin: 0 0 var(--space-0-5); color: var(--neutral-500); font: 650 10px/15px var(--font-body); letter-spacing: .06em; text-transform: uppercase; }
+.channelGroup { overflow: hidden; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--neutral-white); box-shadow: var(--slack-config-card-shadow); }
+.groupHeader { padding: var(--slack-config-card-padding); background: var(--neutral-100); }
+.groupKicker { margin: 0 0 var(--space-0-5); color: var(--neutral-500); font: 650 10px/15px var(--font-body); letter-spacing: var(--tracking-caps); text-transform: uppercase; }
 .groupTitle { margin: 0; color: var(--neutral-900); font: 600 15px/21px var(--font-body); }
 .groupDescription { margin: var(--space-0-5) 0 0; color: var(--neutral-500); font: 400 12px/18px var(--font-body); }
 .channelGroup .section { padding: var(--space-4) var(--space-5); border-top: 1px solid var(--neutral-150, var(--neutral-100)); }
@@ -182,7 +182,7 @@
   font-size: var(--font-size-body);
   transition: border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
 }
-.field:focus { border-color: var(--neutral-400); box-shadow: 0 0 0 3px rgba(114, 105, 98, 0.08); }
+.field:focus { border-color: var(--neutral-400); box-shadow: var(--slack-config-focus-ring); }
 .textarea { min-height: 118px; padding: var(--space-2-5) var(--space-2-5); line-height: var(--leading-normal); resize: vertical; }
 .textarea { margin-top: var(--space-3); }
 .modelPicker { width: 100%; margin-top: var(--space-3); }
@@ -205,7 +205,7 @@
   transition: border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease, background-color var(--duration-fast) ease;
 }
 .modelSelectTrigger:hover { border-color: var(--neutral-300); background: var(--neutral-100); }
-.modelSelectTrigger:focus-visible { border-color: var(--neutral-400); box-shadow: 0 0 0 3px rgba(114, 105, 98, 0.08); }
+.modelSelectTrigger:focus-visible { border-color: var(--neutral-400); box-shadow: var(--slack-config-focus-ring); }
 .modelSelectIdentity { display: flex; min-width: 0; align-items: center; gap: var(--space-2); }
 .modelSelectCopy { display: flex; min-width: 0; flex-direction: column; }
 .modelSelectLabel { overflow: hidden; color: var(--neutral-900); font: 500 13px/18px var(--font-body); text-overflow: ellipsis; white-space: nowrap; }
@@ -238,7 +238,7 @@
 }
 .listRowMain { display: flex; min-width: 0; align-items: center; gap: var(--space-2-5); }
 .connectorIcon { display: grid; width: 28px; height: 28px; flex: 0 0 28px; place-items: center; border: 1px solid var(--neutral-100); border-radius: var(--radius-md); background: var(--neutral-50); }
-.listPrimary { overflow: hidden; color: var(--neutral-900); font-family: var(--font-body); font-size: var(--font-size-body-sm); font-weight: 550; text-overflow: ellipsis; white-space: nowrap; }
+.listPrimary { overflow: hidden; color: var(--neutral-900); font-family: var(--font-body); font-size: var(--font-size-body-sm); font-weight: var(--slack-config-weight-strong); text-overflow: ellipsis; white-space: nowrap; }
 .listSecondary { overflow: hidden; margin-top: var(--space-0-5); color: var(--neutral-500); font-family: var(--font-body); font-size: var(--font-size-small); text-overflow: ellipsis; white-space: nowrap; }
 .rowActions { display: inline-flex; flex: 0 0 auto; align-items: center; gap: var(--space-1-5); }
 
@@ -284,7 +284,7 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-2xl);
   background: var(--neutral-white);
-  box-shadow: 0 1px 2px rgba(82, 75, 71, 0.04);
+  box-shadow: var(--slack-config-panel-shadow);
 }
 
 .connectionBar {
@@ -311,14 +311,14 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-6);
-  padding: 56px 32px 48px;
+  padding: var(--slack-config-empty-padding);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-2xl);
   background: var(--card-bg, var(--neutral-white));
   text-align: center;
 }
 .emptyPair { display: flex; align-items: center; }
-.emptyTile { display: grid; width: 60px; height: 60px; place-items: center; border: 1px solid var(--border-default); border-radius: var(--radius-2xl); background: var(--neutral-50); box-shadow: 0 2px 6px -2px rgba(82, 75, 71, 0.18); }
+.emptyTile { display: grid; width: 60px; height: 60px; place-items: center; border: 1px solid var(--border-default); border-radius: var(--radius-2xl); background: var(--neutral-50); box-shadow: var(--slack-config-empty-icon-shadow); }
 .emptyLink { width: 44px; height: 0; border-top: 2px dashed var(--neutral-300); }
 .emptyHeading { display: flex; max-width: 460px; flex-direction: column; gap: var(--space-2); }
 .emptyHeroTitle { margin: 0; color: var(--neutral-900); font-family: var(--font-title); font-size: var(--font-size-heading); font-weight: var(--font-weight-regular); line-height: var(--line-height-heading); }
@@ -327,7 +327,7 @@
 .emptyBenefit { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1-5); padding: var(--space-4); border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--neutral-50); text-align: left; }
 .emptyBenefitIcon { display: grid; width: 32px; height: 32px; place-items: center; margin-bottom: var(--space-1); border-radius: var(--radius-lg); background: var(--card-bg, var(--neutral-white)); box-shadow: 0 0 0 1px var(--neutral-200); color: var(--neutral-700); }
 .emptyBenefitTitle { margin: 0; color: var(--neutral-900); font-family: var(--font-body); font-size: var(--font-size-body-sm); font-weight: var(--font-weight-semibold); line-height: var(--line-height-body-sm); }
-.emptyBenefitCopy { margin: 0; color: var(--neutral-600); font-family: var(--font-body); font-size: 12.5px; line-height: var(--line-height-body-sm); }
+.emptyBenefitCopy { margin: 0; color: var(--neutral-600); font-family: var(--font-body); font-size: var(--font-size-label); line-height: var(--line-height-body-sm); }
 .emptyActions { display: flex; flex-direction: column; align-items: center; gap: var(--space-2-5); }
 .emptyNote { margin: 0; color: var(--neutral-500); font-family: var(--font-body); font-size: var(--font-size-small); line-height: var(--line-height-small); }
 

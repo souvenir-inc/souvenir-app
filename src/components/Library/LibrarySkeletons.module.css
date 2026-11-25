@@ -23,7 +23,7 @@
 }
 
 .avatar + .avatar {
-  margin-left: -6px;
+  margin-left: calc(var(--space-1-5) * -1);
 }
 
 .nameCell {
@@ -112,7 +112,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-7);
-  padding: 15px 40px 120px;
+  padding: var(--library-suggested-padding);
   overflow: hidden;
   min-height: 0;
   flex: 1 1 0;
@@ -131,7 +131,7 @@
   min-width: 0;
   height: 168px;
   box-sizing: border-box;
-  padding: 15px 17px 13px;
+  padding: var(--library-card-skeleton-padding);
 }
 
 .cardIcon {

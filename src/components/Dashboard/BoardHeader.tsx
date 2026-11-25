@@ -41,7 +41,7 @@ export function PeriodMenu({ period, compare, onChange }: PeriodMenuProps) {
           type="button"
           aria-label={`Period: ${periodLabel}, ${compareLabel}`}
           className={cn(
-            'flex h-8 cursor-pointer items-center gap-1.5 rounded-full border-0 bg-transparent px-2.5 text-[13px] leading-5',
+            'flex h-8 cursor-pointer items-center gap-1.5 rounded-full border-0 bg-transparent px-2.5 text-[length:var(--font-size-body-sm)] leading-5',
             'transition-colors duration-fast hover:bg-[var(--dashboard-tabs-track)]',
             open && 'bg-[var(--dashboard-tabs-track)]',
             FOCUS,

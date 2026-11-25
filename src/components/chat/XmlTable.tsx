@@ -143,7 +143,7 @@ function AnimatedTable({ data, animate = true }: { data: ParsedTable; animate?: 
         {headers.length > 0 && (
           <div style={{ display: "grid", gridTemplateColumns: gridCols, background: "var(--neutral-800-05)", borderBottom: "1px solid var(--neutral-100)" }}>
             {headers.map((h, ci) => (
-              <div key={ci} style={{ padding: "var(--space-2) var(--space-3)", fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)", fontSize: 'var(--font-size-body)', letterSpacing: "0.1px", borderLeft: ci > 0 ? "1px solid var(--neutral-800-10)" : "none" }}>
+              <div key={ci} style={{ padding: "var(--space-2) var(--space-3)", fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)", fontSize: 'var(--font-size-body)', letterSpacing: "var(--tracking-normal)", borderLeft: ci > 0 ? "1px solid var(--neutral-800-10)" : "none" }}>
                 {h}
               </div>
             ))}

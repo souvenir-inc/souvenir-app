@@ -25,7 +25,7 @@ export function ChipTooltip({ title, detail, lines = [], hints = [] }: ChipToolt
   const hasBody = Boolean(detail) || lines.length > 0
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', textAlign: 'left', minWidth: 176, padding: 'var(--space-1) var(--space-1) var(--space-0-5)', fontWeight: REGULAR }}>
-      <div style={{ fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', fontWeight: STRONG, letterSpacing: '0.01em' }}>{title}</div>
+      <div style={{ fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', fontWeight: STRONG, letterSpacing: 'var(--tracking-normal)' }}>{title}</div>
 
       {hasBody && (
         <>
@@ -64,8 +64,8 @@ export function ChipTooltip({ title, detail, lines = [], hints = [] }: ChipToolt
                       fontSize: 'var(--font-size-small)',
                       lineHeight: 'var(--leading-none)',
                       borderRadius: 'var(--radius-sm)',
-                      background: 'color-mix(in srgb, currentColor 12%, transparent)',
-                      boxShadow: 'inset 0 -1px 0 color-mix(in srgb, currentColor 22%, transparent)',
+                      background: 'var(--chip-tooltip-bg)',
+                      boxShadow: 'var(--chip-tooltip-underline)',
                     }}
                   >
                     {key.trim()}

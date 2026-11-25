@@ -12,7 +12,7 @@ function BarChartShell({ title, variant, children }: { title?: string; variant: 
   return (
     <div style={{ background: "var(--neutral-white)", border: "1px solid var(--brown-50)", borderRadius: 'var(--radius-xl)', padding: "var(--space-4) var(--space-4) var(--space-3)" }}>
       {title && <div style={{ fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)", marginBottom: 'var(--space-1)' }}>{title}</div>}
-      <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-300)", fontWeight: 'var(--font-weight-medium)', textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 'var(--space-3)' }}>
+      <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-300)", fontWeight: 'var(--font-weight-medium)', textTransform: "uppercase", letterSpacing: "var(--tracking-wider)", marginBottom: 'var(--space-3)' }}>
         {variant} chart
       </div>
       {children}
@@ -71,7 +71,7 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
               return (
                 <div key={bar.label} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%", justifyContent: "flex-end" }}>
                   <m.div initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ delay: i * 0.1 + 0.55, duration: 0.2 }}
-                    style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-700)", marginBottom: 'var(--space-1)', lineHeight: 1 }}>
+                    style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-700)", marginBottom: 'var(--space-1)', lineHeight: 'var(--leading-none)' }}>
                     {bar.value}{data.unit ?? ""}
                   </m.div>
                   <m.div initial={{ scaleY: 0 }} animate={{ scaleY: revealed ? 1 : 0 }}
@@ -103,7 +103,7 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
             return (
               <div key={bar.label} style={{ display: "flex", alignItems: "center", gap: 'var(--space-2-5)' }}>
                 <div style={{ width: 120, fontSize: 'var(--font-size-small)', color: "var(--neutral-700)", textAlign: "right", flexShrink: 0, lineHeight: "var(--line-height-small)" }}>{bar.label}</div>
-                <div style={{ flex: 1, position: "relative", height: 24, background: "rgba(59,54,50,0.05)", borderRadius: 'var(--radius-xs)', overflow: "hidden" }}>
+                <div style={{ flex: 1, position: "relative", height: 24, background: "var(--neutral-800-05)", borderRadius: 'var(--radius-xs)', overflow: "hidden" }}>
                   <m.div initial={{ scaleX: 0 }} animate={{ scaleX: revealed ? 1 : 0 }}
                     transition={{ type: "spring", stiffness: 120, damping: 20, delay: i * 0.08 }}
                     style={{ position: "absolute", inset: 0, width: `${pct * 100}%`, background: color, borderRadius: 'var(--radius-xs)', transformOrigin: "left" }} />
@@ -231,7 +231,7 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
                     <m.div key={ds.label} initial={{ flex: 0 }} animate={{ flex: revealed ? pct : 0 }}
                       transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: gi * 0.1 + di * 0.04 }}
                       style={{ background: color, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", minHeight: pct > 8 ? 16 : 0 }}>
-                      {pct > 8 && <span style={{ fontSize: 'var(--font-size-small)', color: "color-mix(in srgb, var(--static-white) 85%, transparent)", fontWeight: 'var(--font-weight-semibold)', lineHeight: 1 }}>{Math.round(pct)}%</span>}
+                      {pct > 8 && <span style={{ fontSize: 'var(--font-size-small)', color: "color-mix(in srgb, var(--static-white) 85%, transparent)", fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--leading-none)' }}>{Math.round(pct)}%</span>}
                     </m.div>
                   );
                 })}
@@ -266,7 +266,7 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
           <div style={{ position: "absolute", top: halfH, left: 0, right: 0, height: 1, background: "var(--neutral-800-30)", zIndex: 1 }} />
           {[-1, 1].map((side) => (
             <m.div key={side} initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: 0.4, delay: 0.1 }}
-              style={{ position: "absolute", top: halfH - side * halfH * 0.5, left: 0, right: 0, height: 1, background: "rgba(59,54,50,0.05)", pointerEvents: "none" }} />
+              style={{ position: "absolute", top: halfH - side * halfH * 0.5, left: 0, right: 0, height: 1, background: "var(--neutral-800-05)", pointerEvents: "none" }} />
           ))}
           <div style={{ position: "absolute", inset: 0, display: "flex", gap: 'var(--space-2-5)' }}>
             {data.bars.map((bar, i) => {
@@ -290,7 +290,7 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
                     )}
                   </div>
                   <m.div initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ delay: i * 0.1 + 0.55, duration: 0.2 }}
-                    style={{ position: "absolute", top: halfH - 8, left: "50%", transform: "translateX(-50%)", fontSize: 'var(--font-size-small)', fontWeight: 700, color, lineHeight: "var(--line-height-small)", background: "var(--neutral-white)", padding: "0 var(--space-0-5)", borderRadius: 'var(--radius-xs)', zIndex: 2 }}>
+                    style={{ position: "absolute", top: halfH - 8, left: "50%", transform: "translateX(-50%)", fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-bold)', color, lineHeight: "var(--line-height-small)", background: "var(--neutral-white)", padding: "0 var(--space-0-5)", borderRadius: 'var(--radius-xs)', zIndex: 2 }}>
                     {bar.value > 0 ? "+" : ""}{bar.value}
                   </m.div>
                 </div>

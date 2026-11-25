@@ -246,7 +246,7 @@ function ProjectsPageInner() {
         height:         '100%',
         overflowY:      'auto',
         overflowX:      'hidden',
-        paddingTop:     35,
+        paddingTop:     'var(--projects-page-top)',
         paddingBottom:  'var(--space-8)',
         boxSizing:      'border-box',
       }}

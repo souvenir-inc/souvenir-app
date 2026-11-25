@@ -222,9 +222,9 @@ export function MoveToProjectModal({
           <p style={{
             margin:     0,
             fontFamily: 'var(--font-title)',
-            fontSize:   '1.5rem',
+            fontSize:   'var(--font-size-heading)',
             fontWeight: 'var(--font-weight-regular)',
-            lineHeight: '2rem',
+            lineHeight: 'var(--line-height-heading)',
             color:      'var(--neutral-900)',
           }}>
             Move to project

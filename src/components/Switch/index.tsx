@@ -175,7 +175,7 @@ function Switch(
         outlineWidth:  '2px',
         outlineOffset: '2px',
         outlineColor:  isFocused ? 'var(--focus-ring)' : 'transparent',
-        transition:    'outline-color 150ms',
+        transition:    'outline-color var(--duration-fast)',
       }}
     >
     <SwitchPrimitive.Root

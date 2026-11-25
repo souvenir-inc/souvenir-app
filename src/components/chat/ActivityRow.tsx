@@ -242,7 +242,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
                 fontSize: 'var(--font-size-small)',
                 fontWeight: 'var(--font-weight-semibold)',
                 color: "var(--neutral-600)",
-                letterSpacing: "0.4px",
+                letterSpacing: "var(--tracking-wider)",
                 background: "color-mix(in srgb, var(--neutral-800) 8%, transparent)",
                 borderRadius: 'var(--radius-xs)',
                 padding: "var(--space-0-5) var(--space-1)",
@@ -294,7 +294,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
                 maxHeight: 240, overflowY: "auto",
                 fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--leading-normal)', color: "var(--neutral-600)",
                 whiteSpace: "pre-wrap", wordBreak: "break-word",
-                background: "rgba(59,54,50,0.04)", borderRadius: 'var(--radius-md)',
+                background: "color-mix(in srgb, var(--neutral-800) 4%, transparent)", borderRadius: 'var(--radius-md)',
               }}
             >
               {activity.output}
@@ -338,7 +338,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
                     textDecoration: "none",
                     borderRadius: 'var(--radius-sm)',
                     padding: "var(--space-0-5) var(--space-1)",
-                    margin: "0 -4px",
+                    margin: "0 calc(var(--space-1) * -1)",
                     color: "inherit",
                     transition: "background var(--duration-fast)",
                   }}
@@ -365,7 +365,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
 
       {/* Progress message (for tool_progress / docx_progress) */}
       {isActive && activity.progressMessage && (
-        <div style={{ paddingLeft: 44, fontSize: 'var(--font-size-body-sm)', color: "var(--neutral-300)", fontStyle: "italic", paddingTop: 'var(--space-1)' }}>
+        <div style={{ paddingLeft: 'var(--activity-row-detail-indent)', fontSize: 'var(--font-size-body-sm)', color: "var(--neutral-300)", fontStyle: "italic", paddingTop: 'var(--space-1)' }}>
           {activity.progressMessage}
         </div>
       )}

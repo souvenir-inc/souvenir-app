@@ -94,14 +94,14 @@ export function OrgBadge(
     <span
       aria-hidden
       style={{
-        width: 16, height: 16, borderRadius: 4, flexShrink: 0,
+        width: 16, height: 16, borderRadius: 'var(--radius-xs)', flexShrink: 0,
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         // Square uses the colour's dark text tone; white letter — the tag pair is
         // designed as text-on-bg so contrast holds across all colours.
         backgroundColor: textToken,
         color: 'var(--neutral-white)',
         fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)',
-        fontSize: '9px', lineHeight: 'var(--leading-none)',
+        fontSize: 'var(--font-size-caption)', lineHeight: 'var(--leading-none)',
       }}
     >
       {monogram || <LogoIcon size={12} color="var(--neutral-white)" />}

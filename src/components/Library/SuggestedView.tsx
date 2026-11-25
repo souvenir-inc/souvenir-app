@@ -117,7 +117,7 @@ export function SuggestedView() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-7)', padding: '15px 40px 120px', overflowY: 'auto', overflowX: 'hidden', minHeight: 0, flex: '1 1 0' }} className={`kaya-scrollbar ${styles.page}`}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-7)', padding: 'var(--library-suggested-padding)', overflowY: 'auto', overflowX: 'hidden', minHeight: 0, flex: '1 1 0' }} className={`kaya-scrollbar ${styles.page}`}>
       {view.recent.length > 0 && (
         <section aria-labelledby="suggested-recent" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 32 }}>

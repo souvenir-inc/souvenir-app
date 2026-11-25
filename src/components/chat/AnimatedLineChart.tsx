@@ -85,7 +85,7 @@ export function AnimatedLineChart({ data, onComplete, animate = true }: { data: 
                 <m.polygon points={areaPts} fill={`${color}10`} stroke="none" initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ delay: 0.35, duration: 0.4 }} />
                 <polyline points={pts} fill="none" stroke={color} strokeWidth={1.5} pathLength={1} strokeDasharray="1"
                   strokeDashoffset={revealed ? 0 : 1} strokeLinecap="round" strokeLinejoin="round"
-                  style={{ transition: "stroke-dashoffset 1.1s cubic-bezier(0.16,1,0.3,1)" }} />
+                  style={{ transition: "stroke-dashoffset 1.1s cubic-bezier(0.16,1,0.3,1)" /* ds-keep: the chart line draws in */ }} />
                 {line.points.map((p, i) => {
                   const { x, y } = toSVG(i, p.y);
                   const isHovered = hoverIdx === i;
@@ -113,8 +113,8 @@ export function AnimatedLineChart({ data, onComplete, animate = true }: { data: 
         <AnimatePresence initial={false}>
           {hoverIdx !== null && tooltipItems.length > 0 && (
             <m.div key="tooltip" initial={{ opacity: 0, y: 4, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 4, scale: 0.96 }} transition={{ duration: 0.12 }}
-              style={{ position: "absolute", top: -8, left: tooltipLeft, width: tooltipWidth, background: "#26211E", borderRadius: 'var(--radius-md)', padding: "var(--space-1-5) var(--space-2-5)", pointerEvents: "none", zIndex: 'var(--z-raised)', boxShadow: "var(--shadow-3)" }}>
-              <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)', letterSpacing: "0.3px" }}>{data.lines[0]?.points[hoverIdx]?.x}</div>
+              style={{ position: "absolute", top: -8, left: tooltipLeft, width: tooltipWidth, background: "var(--chart-tooltip-bg)", borderRadius: 'var(--radius-md)', padding: "var(--space-1-5) var(--space-2-5)", pointerEvents: "none", zIndex: 'var(--z-raised)', boxShadow: "var(--shadow-3)" }}>
+              <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)', letterSpacing: "var(--tracking-wide)" }}>{data.lines[0]?.points[hoverIdx]?.x}</div>
               {tooltipItems.map((item, ti) => (
                 <div key={item.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 'var(--space-2)', marginTop: ti > 0 ? 3 : 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)' }}>

@@ -56,7 +56,7 @@ export function ChatComposerArea({
       style={{
         // 5px + the card's 3px inset = 8px from the composer to the card's bottom edge, the same 8px
         // the TopBar keeps from the card's top.
-        padding: "16px 16px 5px",
+        padding: "var(--space-4) var(--space-4) var(--space-1)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
