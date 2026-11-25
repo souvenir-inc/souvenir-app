@@ -28,6 +28,14 @@ export type Layout = z.infer<typeof layoutSchema>
 
 type Place = Pick<Layout, 'position' | 'hidden' | 'deletedAt'>
 
+/** Boards the viewer could edit that were deleted or unshared since they loaded: nothing was written to them. */
+export class BoardsGoneError extends Error {
+  constructor(readonly ids: string[]) {
+    super(`${ids.length === 1 ? 'A board was' : 'Boards were'} deleted or unshared`)
+    this.name = 'BoardsGoneError'
+  }
+}
+
 /**
  * The boards of one warehouse, as the viewer sees them. Loads them into the dashboard's state and
  * writes back what changed: the viewer's own boards, and the cards and dates of boards they can
@@ -106,6 +114,33 @@ export class BoardStore {
     const job = async () => {
       const failed: unknown[] = []
       const attempt = async (write: () => Promise<void>) => { try { await write() } catch (error) { failed.push(error) } }
+      // Someone else's board is read again before it is written. Writing one its owner has since
+      // deleted would make it again, as the editor's; and the owner's name, sharing and tab place
+      // are sent back as they are now (the warehouse refuses an editor's write that changes them, and
+      // an older copy would undo the owner's moves).
+      const theirs = [...next].filter(([id, request]) => this.places.has(id) && this.written.get(id) !== canonical(request))
+      const gone: string[] = []
+      if (theirs.length > 0) {
+        await attempt(async () => {
+          const fresh = new Map((await this.warehouse.boards()).map((b) => [b.id, b]))
+          for (const [id, request] of theirs) {
+            const now = fresh.get(id)
+            const layout = now ? layoutSchema.safeParse(now.layout) : undefined
+            if (!now || now.role === 'view' || !layout?.success || layout.data.deletedAt !== null) {
+              next.delete(id)
+              this.places.delete(id)
+              this.written.delete(id)
+              gone.push(id)
+              continue
+            }
+            const place = { position: layout.data.position, hidden: layout.data.hidden, deletedAt: null }
+            this.places.set(id, place)
+            next.set(id, { ...request, name: now.name, general: now.general, grants: now.grants, layout: { ...request.layout, ...place } })
+          }
+        })
+        // The list couldn't be read: their boards wait for the next save rather than go out unchecked.
+        if (failed.length) for (const [id] of theirs) next.delete(id)
+      }
       for (const [id, request] of next) {
         const text = canonical(request)
         if (this.written.get(id) === text) continue
@@ -117,6 +152,7 @@ export class BoardStore {
         await attempt(async () => { if (!this.places.has(id)) await this.warehouse.deleteBoard(id); this.written.delete(id) })
       }
       if (failed.length) throw failed[0]
+      if (gone.length) throw new BoardsGoneError(gone)
     }
     this.queue = this.queue.then(job, job)
     return this.queue

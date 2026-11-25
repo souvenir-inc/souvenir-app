@@ -239,15 +239,17 @@ export async function syncApps(ids: AppId[]): Promise<void> {
  * started (`?open=<slug>&account=<id>&reconnect=1`). Given several apps, the first of the viewer's
  * own that needs signing in again.
  */
-export function reconnectHref(id: AppId): string {
+export function reconnectHref(id: AppId, from?: string): string {
   const a = snap.apps[id]
   if (!a) return ORG_CONNECTORS_ROUTE
-  return `${ORG_CONNECTORS_ROUTE}?open=${encodeURIComponent(a.slug)}&account=${encodeURIComponent(a.id)}&reconnect=1`
+  // `return`: the page to come back to once the sign-in ends (the board the person was on).
+  const back = from ? `&return=${encodeURIComponent(from)}` : ''
+  return `${ORG_CONNECTORS_ROUTE}?open=${encodeURIComponent(a.slug)}&account=${encodeURIComponent(a.id)}&reconnect=1${back}`
 }
 
 export function reconnect(ids: AppId[]) {
   const id = ids.find((i) => snap.apps[i]?.needsReconnect && snap.apps[i]?.yours) ?? ids.find((i) => snap.apps[i]?.yours)
-  window.location.assign(id ? reconnectHref(id) : ORG_CONNECTORS_ROUTE)
+  window.location.assign(id ? reconnectHref(id, `${window.location.pathname}${window.location.search}`) : ORG_CONNECTORS_ROUTE)
 }
 
 /** × on a banner: hidden on this board until its key changes (SY-20). */

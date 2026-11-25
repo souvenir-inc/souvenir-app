@@ -7,6 +7,7 @@ import { PopoverContent, PopoverRoot, PopoverTrigger } from '@/components/Popove
 import { Button, IconButton } from '@/components/ui'
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { useOrgIdentity } from '@/context/org-context'
+import { ApiError } from '@/lib/api/client'
 import { Warehouse } from '@/lib/api/warehouse'
 import { orgScope, queryKeys } from '@/lib/query-keys'
 import { ORG_SOUVENIR_SLACK_ROUTE } from '@/lib/routes'
@@ -46,6 +47,8 @@ interface ShareDialogProps {
   /** Cards as they read now, for the Slack picture. */
   cardView: (metricId: string) => CardView | undefined
   stamp: string
+  /** The board new members open on: it stays open to the workspace until another is picked. */
+  isDefault?: boolean
   /** The owner changed who has access. */
   onChange: (access: { general?: General; grants?: Grant[] }) => void
   onClose: () => void
@@ -60,7 +63,7 @@ export function ShareDialog({ open, ...rest }: ShareDialogProps) {
   )
 }
 
-function Share({ startOn, board, period, compare, cardView, stamp, onChange, onClose, onPosted }: Omit<ShareDialogProps, 'open'>) {
+function Share({ startOn, board, period, compare, cardView, stamp, isDefault = false, onChange, onClose, onPosted }: Omit<ShareDialogProps, 'open'>) {
   const people = usePeople()
   const share: BoardShare = { ownerId: board.ownerId, grants: board.grants, general: board.general }
   const owner = board.access === 'owner'
@@ -157,7 +160,7 @@ function Share({ startOn, board, period, compare, cardView, stamp, onChange, onC
             )}
             <span aria-hidden className="mt-2 block h-px bg-[var(--neutral-200)]" />
             <p className="m-0 pb-2 pt-3 text-[12px] font-medium leading-4 text-[var(--dashboard-label)]">General access</p>
-            <GeneralAccess people={people} share={share} editable={owner} onChange={(general) => onChange({ general })} />
+            <GeneralAccess people={people} share={share} editable={owner} isDefault={isDefault} onChange={(general) => onChange({ general })} />
 
             {linkFailed && (
               <div data-link-failed className="mt-3 flex flex-col gap-1.5">
@@ -268,7 +271,7 @@ function RoleMenu({ value, label, onChange, onRemove, compact = false }: { value
   )
 }
 
-function GeneralAccess({ people, share, editable, onChange }: { people: People; share: BoardShare; editable: boolean; onChange: (general: General) => void }) {
+function GeneralAccess({ people, share, editable, isDefault, onChange }: { people: People; share: BoardShare; editable: boolean; isDefault: boolean; onChange: (general: General) => void }) {
   const [open, setOpen] = useState(false)
   const everyone = share.general !== 'none'
   const title = everyone ? `Everyone at ${people.workspace}` : 'Only people added'
@@ -293,12 +296,14 @@ function GeneralAccess({ people, share, editable, onChange }: { people: People; 
               style={{ width: 260, boxShadow: 'var(--dashboard-popover-shadow)', borderRadius: 12 }}
             >
               <div role="menu" aria-label="General access" data-general-menu className="flex flex-col p-1.5">
+                {/* The default board can't be made private: new members open on it (the warehouse refuses it too). */}
                 {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a general access choice (Figma 170:78449) */}
-                <button type="button" role="menuitemradio" aria-checked={!everyone} onClick={() => { setOpen(false); onChange('none') }} className={MENU_ITEM}>
+                <button type="button" role="menuitemradio" aria-checked={!everyone} aria-disabled={everyone && isDefault} data-default-locked={everyone && isDefault ? '' : undefined} onClick={() => { if (everyone && isDefault) return; setOpen(false); onChange('none') }} className={cn(MENU_ITEM, everyone && isDefault && 'cursor-not-allowed opacity-60')}>
                   <span className="flex w-full items-center text-[13px] font-medium leading-5 text-[var(--dashboard-figure)]">Only people added{!everyone && <Check aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="ml-auto" />}</span>
                   {/* Going back shows who loses access first (SH-19). */}
-                  <span data-lose-count={everyone ? lose : undefined} className={cn('text-[12px] leading-4', everyone ? 'text-[var(--dashboard-error)]' : 'text-[var(--dashboard-label)]')}>
-                    {everyone ? `${lose} ${lose === 1 ? 'person loses' : 'people lose'} access` : 'Only the people above can open this board'}
+                  <span data-lose-count={everyone && !isDefault ? lose : undefined} className={cn('text-[12px] leading-4', everyone && !isDefault ? 'text-[var(--dashboard-error)]' : 'text-[var(--dashboard-label)]')}>
+                    {everyone && isDefault ? 'New members open on this board. Pick another default board first.'
+                      : everyone ? `${lose} ${lose === 1 ? 'person loses' : 'people lose'} access` : 'Only the people above can open this board'}
                   </span>
                 </button>
                 {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a general access choice (Figma 170:78449) */}
@@ -462,7 +467,8 @@ function SlackStep({ board, period, compare, cardView, stamp, link, people, onBa
   const [picked, setPicked] = useState<string | null>(null)
   const channel = channels.find((c) => c.id === picked) ?? channels[0]
   const [posting, setPosting] = useState(false)
-  const [failed, setFailed] = useState(false)
+  /** Why the last post didn't go, as the person reads it; null when it did (or none was tried). */
+  const [failed, setFailed] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
   // The picture that's posted: the board at full size, drawn off screen.
   const shotRef = useRef<HTMLDivElement>(null)
@@ -475,7 +481,7 @@ function SlackStep({ board, period, compare, cardView, stamp, link, people, onBa
   const post = async () => {
     if (!channel || !shotRef.current) return
     setPosting(true)
-    setFailed(false)
+    setFailed(null)
     try {
       const image = await nodeToPng(shotRef.current)
       const text = `${sharer} shared *${board.label}* · ${datesLabel(period, compare)}\n${link}`
@@ -484,7 +490,13 @@ function SlackStep({ board, period, compare, cardView, stamp, link, people, onBa
     } catch (error) {
       console.error('[dashboard] posting to Slack failed', error)
       setPosting(false)
-      setFailed(true)
+      const status = error instanceof ApiError ? error.status : 0
+      // 403: the person or Souvenir has left that channel since the list was read. 409: Slack was
+      // disconnected from the organization. Either way the channel list is read again.
+      if (status === 403 || status === 409) void slack.refetch()
+      setFailed(status === 403 ? `You or Souvenir are no longer in #${channel.name}. Pick another channel.`
+        : status === 409 ? 'Slack is no longer connected to your organization.'
+        : `Couldn’t post to #${channel.name}. Try again.`)
     }
   }
 
@@ -506,13 +518,21 @@ function SlackStep({ board, period, compare, cardView, stamp, link, people, onBa
           <Button size="sm" variant="outline" className="mt-2" onClick={() => { void slack.refetch() }}>Try again</Button>
         </div>
       ) : !slack.data?.connected || !channel ? (
-        // Slack isn't installed, or Souvenir isn't in any channel yet (SH-27).
+        // Slack isn't installed, or there's no channel both the person and Souvenir are in (SH-27).
+        // The second also covers a person whose Slack account isn't linked to Souvenir yet: the
+        // warehouse lists no channels for them either, and can't say which of the two it is.
         <div data-slack-off className="flex flex-col items-start gap-1 px-5 pb-5">
           <p className="m-0 text-[14px] font-medium leading-5 text-[var(--dashboard-figure)]">
-            {slack.data?.connected ? 'Add Souvenir to a Slack channel to post boards there' : 'Connect Slack to post boards to a channel'}
+            {slack.data?.connected ? 'No Slack channel you and Souvenir are both in' : 'Connect Slack to post boards to a channel'}
           </p>
-          <p className="m-0 text-[13px] leading-5 text-[var(--dashboard-label)]">You’ll pick the channel each time you post.</p>
-          {!slack.data?.connected && (
+          <p className="m-0 text-[13px] leading-5 text-[var(--dashboard-label)]">
+            {slack.data?.connected
+              ? 'Boards go only to channels you’re both in. Invite Souvenir to one of yours, or link your Slack account to Souvenir if you haven’t.'
+              : 'You’ll pick the channel each time you post.'}
+          </p>
+          {slack.data?.connected ? (
+            <Button size="sm" variant="outline" className="mt-3" onClick={() => { void slack.refetch() }}>Check again</Button>
+          ) : (
             <Button size="sm" className="mt-3" onClick={() => { window.location.assign(ORG_SOUVENIR_SLACK_ROUTE) }}>Connect Slack</Button>
           )}
         </div>
@@ -565,7 +585,7 @@ function SlackStep({ board, period, compare, cardView, stamp, link, people, onBa
             </div>
             {failed && (
               <p role="alert" data-slack-failed className="m-0 flex items-center gap-1.5 pt-2.5 text-[12px] leading-4 text-[var(--dashboard-error)]">
-                <TriangleAlert aria-hidden size={12} strokeWidth={1.5} absoluteStrokeWidth />Couldn’t post to #{channel.name}. Try again.
+                <TriangleAlert aria-hidden size={12} strokeWidth={1.5} absoluteStrokeWidth />{failed}
               </p>
             )}
           </div>

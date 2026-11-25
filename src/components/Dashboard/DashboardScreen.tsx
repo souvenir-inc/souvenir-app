@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { userFullName, useAuth } from '@/context/auth-context'
 import { useOrg, useOrgMembers } from '@/context/org-context'
+import { ApiError } from '@/lib/api/client'
 import { Warehouse } from '@/lib/api/warehouse'
 import { orgScope, queryKeys } from '@/lib/query-keys'
 import { cn } from '@/lib/utils'
@@ -274,7 +275,9 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
       toast(`New members start on ${state.boards[id]?.label ?? 'this board'}`, { duration: 6000 })
     } catch (error) {
       console.error('[dashboard] saving the default board failed', error)
-      toast.error('Couldn’t save the default board.', { id: 'dashboard-default' })
+      // 422: the board isn't open to the whole workspace (made private since the list was shown).
+      const refused = error instanceof ApiError && error.status === 422
+      toast.error(refused ? 'Only a board everyone in the workspace can open can be the default.' : 'Couldn’t save the default board.', { id: 'dashboard-default' })
     }
   }
   // The dates a board is looked at on: a link's, or a viewer's own, else the board's (SH-2, SH-23).
@@ -850,6 +853,7 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
         compare={dates.compare}
         cardView={(id) => cardView(id, true)}
         stamp={stampText}
+        isDefault={warehouse.defaultBoard === openBoard.id}
         onChange={(access) => api.apply([{ type: 'update-board', id: openBoard.id, patch: access }])}
         onClose={() => setShare((s) => ({ ...s, open: false }))}
         onPosted={(channel) => {

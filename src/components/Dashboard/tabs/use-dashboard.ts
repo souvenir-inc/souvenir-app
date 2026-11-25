@@ -3,7 +3,7 @@
 import { useEffect, useReducer, useRef } from 'react'
 import { toast } from 'sonner'
 import { ApiError } from '@/lib/api/client'
-import type { BoardStore } from '../live/board-store'
+import { BoardsGoneError, type BoardStore } from '../live/board-store'
 import type { BoardCard, CardSize } from '../types'
 import {
   MAX_NAME,
@@ -56,13 +56,28 @@ export function useDashboard(initial: DashboardState, store: BoardStore, measura
     store.save(latest.current.state, latest.current.measurable).then(
       () => { failures.current = 0 },
       (error: unknown) => {
+        // A board shared with the viewer was deleted or unshared since they loaded it: nothing was
+        // written to it (writing would have made it again). Everything else saved.
+        if (error instanceof BoardsGoneError) {
+          failures.current = 0
+          toast.error(error.ids.length === 1 ? 'This board was deleted or is no longer shared with you.' : 'Some boards were deleted or are no longer shared with you.', {
+            id: 'dashboard-save',
+            description: 'Your last change to it wasn’t saved. Reload to see the boards as they are now.',
+            action: { label: 'Reload', onClick: () => window.location.reload() },
+            duration: Infinity,
+          })
+          return
+        }
         console.error('[dashboard] saving boards failed', error)
         // Refused for good (no access any more, a board that's gone, an invalid change): trying again
         // won't help. Say so and offer a reload, which shows the boards as the server has them.
         const status = error instanceof ApiError ? error.status : 0
         if (status >= 400 && status < 500 && status !== 408 && status !== 429) {
           failures.current = 0
-          toast.error(status === 403 ? 'You can’t change this board any more.' : 'Couldn’t save your last change.', {
+          // 409: the default board can't be made private (new members open on it).
+          toast.error(status === 403 ? 'You can’t change this board any more.'
+            : status === 409 ? 'The default board stays open to the workspace. Pick another default first.'
+            : 'Couldn’t save your last change.', {
             id: 'dashboard-save',
             description: 'Reload to see the boards as they are now.',
             action: { label: 'Reload', onClick: () => window.location.reload() },

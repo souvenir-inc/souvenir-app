@@ -10,6 +10,7 @@ import { useDeleteCustomApi, useUnlinkAccount } from '@/lib/connectors/connector
 import { connectorDetailQuery, linkedConnectorsQuery, mergeCatalog } from '@/lib/connectors/connector-queries'
 import { queryKeys } from '@/lib/query-keys'
 import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
+import { forgetReturn, rememberReturn, safeReturnPath } from '@/lib/connector-return'
 import type { ConnectorPick } from '@/lib/api/recommendations'
 import type { SetupFlowResult } from '@/lib/useConnectorSetupFlow'
 import { ConnectionsView } from './ConnectionsView'
@@ -223,10 +224,25 @@ export function ConnectorsExperience({ initialSearch = '' }: { initialSearch?: s
   const urlNeedsReset = !loading && !!openParam && !invalidView && view === 'connections'
   useEffect(() => { if (urlNeedsReset) router.replace(ORG_CONNECTORS_ROUTE, { scroll: false }) }, [urlNeedsReset, router])
 
+  // `?return=<path>`: where the person came from (the dashboard's Reconnect). Kept for the visit, as
+  // the view's own URL changes drop it. A sign-in that leaves the page (Shopify, MCP apps) finds it in
+  // session storage when it lands back; one in a popup goes back from here when it succeeds.
+  const [returnTo, setReturnTo] = useState(() => safeReturnPath(searchParams.get('return')))
+  useEffect(() => {
+    if (returnTo && openParam) rememberReturn(openParam, returnTo)
+  }, [returnTo, openParam])
+  // Leaving the page in the app (not to a sign-in) ends the visit: nothing to come back to.
+  useEffect(() => () => forgetReturn(), [])
+
   const handleSetupConnected = useCallback((_result: SetupFlowResult) => {
     setSetupOpen(false)
     void fetchAll()
-  }, [fetchAll])
+    if (setupMode === 'reconnect' && returnTo) {
+      setReturnTo(null)
+      forgetReturn()
+      router.push(returnTo)
+    }
+  }, [fetchAll, setupMode, router, returnTo])
 
   // Throws on failure so ConfirmModal stays open and toasts the error.
   const confirmDeleteApi = useCallback(async () => {

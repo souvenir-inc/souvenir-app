@@ -48,6 +48,28 @@ export function figure(amount: number | null, format: MetricFormat): string {
   }
 }
 
+// The warehouse returns every day and week of the range, with 0 where there were no rows, so
+// a store that connected last week reads as weeks of zeros and then its data. The first period
+// in which any of the measured metrics is non-zero is where the store's data starts; periods
+// before it are "no data yet" rather than zero. Zeros after it are real (a day with no refunds).
+const dataStarts = new WeakMap<Measurement, string | null>()
+
+/** The first period start with any recorded value, or null when nothing in it is non-zero. */
+export function firstRecorded(m: Measurement): string | null {
+  if (!dataStarts.has(m)) {
+    const first = m.periods.find((p) => Object.values(p.values).some((v) => v !== null && v !== 0))
+    dataStarts.set(m, first?.start ?? null)
+  }
+  return dataStarts.get(m) ?? null
+}
+
+/** Whether a period of this reading comes before the store's data starts. */
+export function beforeData(m: Measurement | undefined, start: string): boolean {
+  if (!m) return false
+  const first = firstRecorded(m)
+  return first === null || start < first
+}
+
 /** Every metric in the catalog as the board's dates read it; `get` takes a card id ("revenue#2"). */
 export class Metrics {
   readonly all: Metric[]
@@ -74,11 +96,13 @@ export class Metrics {
     const format = FORMAT[entry.unit]
     const scaled = (v: number | null | undefined) => (v === undefined || v === null ? null : v * scale)
     const value = (m: Measurement | undefined, start: string) => scaled(m?.periods.find((p) => p.start === start)?.values[entry.name])
+    // A chart's days and weeks: those before the store recorded anything read as "no data yet".
+    const charted = (m: Measurement | undefined, start: string) => (beforeData(m, start) ? null : value(m, start))
     const amount = scaled(r.total?.periods[0]?.values[entry.name])
     const before = scaled(r.totalBefore?.periods[0]?.values[entry.name])
     const row = r.scorecards.flatMap((card) => card.rows).find((x) => x.metric === entry.name)
     const upIsGood = row?.direction !== 'down'
-    const series = this.series(r, (m, day) => value(m, isoDate(day)))
+    const series = this.series(r, (m, day) => charted(m, isoDate(day)))
     return {
       id: entry.name,
       label: entry.label,
@@ -93,7 +117,7 @@ export class Metrics {
       value: figure(amount, format),
       change: changeOf(amount, before, upIsGood, series.comparable),
       series,
-      weekly: this.weeks(r, (m, day) => value(m, isoDate(day))),
+      weekly: this.weeks(r, (m, day) => charted(m, isoDate(day))),
       unmeasured: r.total?.unavailable[entry.name] ?? null,
       health: row && amount !== null ? healthOf(amount, row.target * scale, row.direction, row.tolerance, format) : null,
     }

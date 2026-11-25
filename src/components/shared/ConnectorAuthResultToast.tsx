@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { toConnector } from '@/lib/connector'
 import { announceLinkResult } from '@/lib/connectorProvider'
+import { takeReturn } from '@/lib/connector-return'
 
 /**
  * Native MCP connector OAuth callbacks redirect back into the app with
@@ -37,6 +38,14 @@ function ConnectorAuthResultToastInner() {
     }
 
     announceLinkResult(slug, link)
+
+    // A sign-in started elsewhere (the dashboard's Reconnect) goes back there, whatever its result:
+    // the toast above says how it went.
+    const back = takeReturn(slug)
+    if (back) {
+      router.replace(back)
+      return
+    }
 
     const next = new URLSearchParams(searchParams.toString())
     next.delete('connector')

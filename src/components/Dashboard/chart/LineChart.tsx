@@ -38,7 +38,7 @@ export function LineChart({ metric, series, variant, target, className }: LineCh
     <div ref={ref} className={cn('relative', className)} data-chart={variant} onPointerLeave={() => setHover(null)}>
       {series.daysWithData < 2 ? (
         // Too little history for a line: a faint stand-in, saying how much there is so far.
-        <ChartGhost bars={false} className="h-full" caption={series.daysWithData === 0 ? 'No days with data yet' : '1 day of data so far'} note={full ? 'The chart fills in as more data syncs.' : undefined} />
+        <ChartGhost bars={false} className="h-full" caption={series.daysWithData === 0 ? 'Nothing recorded on these days' : '1 day of data so far'} note={full ? 'The chart fills in as more data syncs.' : undefined} />
       ) : width > 0 ? (
         <Plot metric={metric} series={series} full={full} target={target} width={width} height={height} hover={hover} onHover={setHover} />
       ) : null}

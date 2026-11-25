@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { DAILY_BEFORE, META, SHOP, TODAY, metrics } from '../__fixtures__/live'
-import { Metrics, figure, weeksWindow } from './metrics'
+import type { Measurement } from '@/lib/api/warehouse'
+import { Metrics, beforeData, figure, firstRecorded, weeksWindow } from './metrics'
 
 describe('Metrics from the warehouse', () => {
   const m = metrics()
@@ -102,5 +103,26 @@ describe('figures', () => {
     expect(figure(24800, 'number')).toBe('24.8k')
     expect(figure(13.12, 'percent')).toBe('13.1%')
     expect(figure(null, 'number')).toBe('—')
+  })
+})
+
+describe('Periods before the store has data', () => {
+  const reading = (rows: Array<[string, number | null]>): Measurement =>
+    ({ grain: 'day', start: rows[0][0], end: rows[rows.length - 1][0], timezone: 'UTC', periods: rows.map(([start, v]) => ({ start, values: { revenue: v, refunds: 0 } })), unavailable: {} })
+
+  it('reads the zeros the warehouse fills in before the first recorded value as no data', () => {
+    const m = reading([['2025-11-10', 0], ['2025-11-11', 0], ['2025-11-12', 120], ['2025-11-13', 0]])
+    expect(firstRecorded(m)).toBe('2025-11-12')
+    expect(beforeData(m, '2025-11-11')).toBe(true)
+    expect(beforeData(m, '2025-11-12')).toBe(false)
+    // A zero after the data starts is a real zero.
+    expect(beforeData(m, '2025-11-13')).toBe(false)
+  })
+
+  it('a reading with nothing recorded at all is no data throughout', () => {
+    const m = reading([['2025-11-10', 0], ['2025-11-11', null]])
+    expect(firstRecorded(m)).toBeNull()
+    expect(beforeData(m, '2025-11-11')).toBe(true)
+    expect(beforeData(undefined, '2025-11-11')).toBe(false)
   })
 })

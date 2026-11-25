@@ -109,6 +109,33 @@ describe('BoardStore', () => {
     expect(api.deleteBoard).not.toHaveBeenCalled()
   })
 
+  it('an editor’s save sends the owner’s current name, sharing and place, read just before it', async () => {
+    const boards = [saved('e', 'Team board', OTHER, layout({ position: 7 }), 'edit')]
+    api = warehouseWith(boards)
+    store = new BoardStore(api as unknown as Warehouse, VIEWER)
+    const state = await store.load(new Map())
+    // The owner renames it, shares it with someone else, and moves it, after the editor loaded it.
+    boards[0] = { ...boards[0], name: 'Renamed', grants: [...boards[0].grants, { userId: 'auth0|third', role: 'view' }], layout: layout({ position: 2, hidden: true }) }
+    const cards = [{ metricId: 'revenue', size: 'full' as const, x: 0, y: 0 }]
+    await store.save({ ...state, boards: { e: { ...state.boards.e, cards } } }, new Set(['revenue']))
+    expect(api.putBoard.mock.calls[0][1]).toMatchObject({ name: 'Renamed', grants: boards[0].grants, layout: { cards, position: 2, hidden: true, deletedAt: null } })
+  })
+
+  it('never writes a board its owner deleted or unshared since it loaded, and says which', async () => {
+    const boards = [saved('e', 'Team board', OTHER, layout(), 'edit'), saved('f', 'Other team board', OTHER, layout(), 'edit')]
+    api = warehouseWith(boards)
+    store = new BoardStore(api as unknown as Warehouse, VIEWER)
+    const state = await store.load(new Map())
+    api.boards.mockResolvedValue([{ ...boards[1], layout: layout({ deletedAt: 5 }) }])
+    const cards = [{ metricId: 'revenue', size: 'full' as const, x: 0, y: 0 }]
+    const edited = { ...state, boards: { e: { ...state.boards.e, cards }, f: { ...state.boards.f, cards } } }
+    await expect(store.save(edited, new Set(['revenue']))).rejects.toMatchObject({ name: 'BoardsGoneError', ids: ['e', 'f'] })
+    expect(api.putBoard).not.toHaveBeenCalled()
+    // And it stays unwritten on later saves.
+    await store.save(edited, new Set(['revenue']))
+    expect(api.putBoard).not.toHaveBeenCalled()
+  })
+
   it('a member with no boards of their own opens on the workspace’s default board', async () => {
     api = warehouseWith([saved('x', 'Ads', OTHER, layout()), saved('y', 'Store overview', OTHER, layout())], 'y')
     const fresh = await new BoardStore(api as unknown as Warehouse, VIEWER).load(new Map())

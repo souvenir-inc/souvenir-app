@@ -129,7 +129,11 @@ export function SetupModal({
   const form = useZodForm<SetupFormValues>(schema, {
     name: reconnecting ? (initialAccount?.nickname ?? '') : '',
     visibility: reconnecting ? (initialAccount?.visibility ?? 'private') : 'private',
-    credentials: {},
+    // Reconnecting a store: its shop is the account's own (a Shopify account is named by its
+    // shop domain), so it's filled in rather than asked for again. Secrets never are.
+    credentials: reconnecting && initialAccount?.accountIdentifier && fields.some(f => f.name === 'shop')
+      ? { shop: initialAccount.accountIdentifier }
+      : {},
   })
   const { name, visibility, credentials } = form.values
   const duplicate = Boolean(form.errors.name)
