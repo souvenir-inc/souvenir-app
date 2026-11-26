@@ -7,6 +7,7 @@ import { CancelOneIcon } from "@strange-huge/icons";
 import { LeftSidebar } from "./LeftSidebar";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { RightSidebar } from "./RightSidebar";
+import { OfflineFrame } from "@/components/SyncStatus/OfflineBar";
 import { HighlightSidebar } from "./HighlightSidebar";
 import { TopBar } from "./TopBar";
 import { TopBarSlotsProvider } from "./TopBarSlots";
@@ -152,18 +153,21 @@ export function AppLayout({
   // navigation.
   if (isSettingsPage) {
     return (
+      <OfflineFrame>
       <div
         style={{
           display:         'flex',
           alignItems:      'stretch',
           width:           '100%',
-          height:          '100svh',
+          flex:            '1 1 0',
+          minHeight:       0,
           backgroundColor: 'var(--neutral-white)',
         }}
       >
         {children}
         <AppDialogs />
       </div>
+      </OfflineFrame>
     )
   }
 
@@ -171,12 +175,14 @@ export function AppLayout({
   // or floating chat tools.
   if (isTemplatePage || isSchedulesPage) {
     return (
+      <OfflineFrame>
       <div
         style={{
           display:         'flex',
           alignItems:      'stretch',
           width:           '100%',
-          height:          '100svh',
+          flex:            '1 1 0',
+          minHeight:       0,
           backgroundColor: 'var(--neutral-white)',
         }}
       >
@@ -196,16 +202,19 @@ export function AppLayout({
         </main>
         <AppDialogs />
       </div>
+      </OfflineFrame>
     )
   }
 
   return (
+    <OfflineFrame>
     <div
       style={{
         display:         "flex",
         alignItems:      "stretch",
         width:           "100%",
-        height:          "100svh",
+        flex:            "1 1 0",
+        minHeight:       0,
         backgroundColor: "var(--neutral-white)",
       }}
     >
@@ -356,6 +365,7 @@ export function AppLayout({
       {/* ── Global dialogs ── */}
       <AppDialogs />
     </div>
+    </OfflineFrame>
   );
 }
 

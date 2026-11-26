@@ -68,7 +68,16 @@ if (isDev) {
 }
 
 const nextConfig: NextConfig = {
-  reactCompiler: true,
+  // NEXT_DEV_LOW_MEM=1 (npm run dev:lowmem) compiles only "use memo" files with the React Compiler in dev (none today,
+  // so in effect it is off there): its Babel helper processes add ~1.4 GB at the first compile. Production builds
+  // always use the full compiler.
+  reactCompiler: isDev && process.env.NEXT_DEV_LOW_MEM === "1" ? { compilationMode: "annotation" } : true,
+  // Lets the lead build a new version beside the running one (NEXT_DIST_DIR=.next-b) and swap with no downtime.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
+  // isomorphic-dompurify loads jsdom, which reads its own stylesheet from disk at runtime. Bundled into a server
+  // chunk that path breaks (ENOENT .next/browser/default-stylesheet.css on /chat in a production build), so Node
+  // loads it from node_modules instead.
+  serverExternalPackages: ["isomorphic-dompurify"],
 
   // Next.js 16's proxy (formerly middleware) auto-buffers/clones every
   // request body it sees so both proxy and the route handler can read it —
@@ -85,6 +94,11 @@ const nextConfig: NextConfig = {
   // upload UI itself already allowed through.
   experimental: {
     proxyClientMaxBodySize: '320mb',
+    // Turbopack's dev disk cache, on by default since 16.1, has no memory eviction before 16.3. Restoring a stale
+    // cache (here, a week old with 31 commits on top) kept Turbopack busy until its forced 5-minute snapshot, then the
+    // idle dev server's heap grew to 8 GB and crashed (vercel/next.js#91396, #96093). Off, it holds ~150 MB idle.
+    // The cost is a cold compile after each restart. Remove this once on Next >= 16.3, which adds eviction.
+    turbopackFileSystemCacheForDev: false,
   },
 
   ...(hasDesignSystemSibling

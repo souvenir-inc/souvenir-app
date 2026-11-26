@@ -1,5 +1,6 @@
 'use client'
 
+import { UsageTabs } from '@/components/layout/UsageTabs'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
@@ -269,6 +270,8 @@ export default function UsagePage() {
             Your spend this period, split by Slack, Automations, and Chat.
           </p>
         </div>
+
+        <UsageTabs />
 
         <Card title="Where your credits went" meta={periodLabel && <p className={styles.cardMeta}>{periodLabel}</p>}>
           <div className={styles.split}>

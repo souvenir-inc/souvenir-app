@@ -1,6 +1,8 @@
 // Number formatting for the Home page. Everything goes through Intl so locale-aware grouping and
 // currency symbols come for free; the page never hand-writes "$1.9M" style strings.
 
+import { readNumberStyle } from '@/lib/number-style'
+
 const LOCALE = 'en-US'
 
 /** $8,900 / $385.27 — two decimals below $1,000, whole dollars above. */
@@ -11,8 +13,14 @@ export function formatCurrency(value: number, currency = 'USD'): string {
   }).format(value)
 }
 
-/** $1.9M / $8.4k — compact from $1,000 up (lower-case k, as the design writes it), else formatCurrency. */
+/**
+ * $1.9M / $8.4k — compact from $1,000 up (lower-case k, as the design writes it), else formatCurrency. With "How
+ * numbers show" set to Exact (Settings → Data → Preferences) it writes every cent instead: $48,213.07.
+ */
 export function formatCurrencyCompact(value: number, currency = 'USD'): string {
+  if (readNumberStyle() === 'exact') {
+    return new Intl.NumberFormat(LOCALE, { style: 'currency', currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value)
+  }
   if (Math.abs(value) < 1_000) return formatCurrency(value, currency)
   return new Intl.NumberFormat(LOCALE, {
     style: 'currency', currency, notation: 'compact', maximumFractionDigits: 1,

@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import { SettingsPageShell } from '@/components/SettingsPageShell'
 import { PhaseBadge, PhasePlaceholder } from './SettingsParts'

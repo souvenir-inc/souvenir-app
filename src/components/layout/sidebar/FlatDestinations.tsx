@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useGuardedRouter } from "@/context/nav-guard-context";
 import { CalendarThreeIcon, FolderLibraryIcon, LinkSixIcon, QuillWriteTwoIcon, UserAiIcon } from "@strange-huge/icons";
-import { House, LayoutDashboard } from "lucide-react";
+import { House, LayoutDashboard, type LucideIcon } from "lucide-react";
 import { FlatSidebarRow, FlatSidebarSlackConnector } from "@/components/ui";
 import { useOrg } from "@/context/org-context";
 import { DASHBOARD_ROUTE, HOME_ROUTE, ORG_SOUVENIR_SLACK_ROUTE, AGENTS_ROUTE, SCHEDULES_ROUTE, LIBRARY_ROUTE, ORG_CONNECTORS_ROUTE } from "@/lib/routes";
@@ -13,6 +13,13 @@ import { DASHBOARD_ROUTE, HOME_ROUTE, ORG_SOUVENIR_SLACK_ROUTE, AGENTS_ROUTE, SC
 // navigate straight to their pages rather than expanding an inline tree; see
 // the open question in docs/features/sidebar-current-state-audit.md and the
 // migration plan about confirming this against design before this ships.
+
+// FlatSidebarRow hands its icon a `triggered` hover flag for the animated
+// @strange-huge icons. Lucide icons don't take it and would write it onto the
+// <svg> as an attribute (React warns), so this wrapper leaves it out.
+function LucideRowIcon({ icon: Icon }: { icon: LucideIcon; triggered?: boolean }) {
+  return <Icon size={20} strokeWidth={1.75} aria-hidden />
+}
 
 interface FlatDestinationsProps {
   onNewChat: () => void
@@ -30,11 +37,11 @@ export function FlatDestinations({ onNewChat, newChatSelected, collapsed = false
   return (
     <>
       <FlatSidebarRow
-        collapsed={collapsed} variant="default" icon={<House size={20} strokeWidth={1.75} aria-hidden />} label="Home"
+        collapsed={collapsed} variant="default" icon={<LucideRowIcon icon={House} />} label="Home"
         selected={pathname === HOME_ROUTE} href={HOME_ROUTE} onClick={() => push(HOME_ROUTE)}
       />
       <FlatSidebarRow
-        collapsed={collapsed} variant="default" icon={<LayoutDashboard size={20} strokeWidth={1.75} aria-hidden />} label="Dashboard"
+        collapsed={collapsed} variant="default" icon={<LucideRowIcon icon={LayoutDashboard} />} label="Dashboard"
         selected={pathname.startsWith(DASHBOARD_ROUTE)} href={DASHBOARD_ROUTE} onClick={() => push(DASHBOARD_ROUTE)}
       />
       <FlatSidebarRow collapsed={collapsed} variant="default" icon={<QuillWriteTwoIcon size={20} animated />} label="New" selected={newChatSelected} onClick={onNewChat} />

@@ -1,0 +1,2590 @@
+/* Boards: a snapped 12-column grid of metric cards, in Home's language. Hairline borders, 16px corners,
+   figures in the Home strip's type, everything else quiet. Colours are tokens, so dark mode follows. */
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* ── Needs attention: flagged metrics across every board ─────────────────── */
+
+.attention {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.attentionTitle {
+  flex-shrink: 0;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-600);
+  white-space: nowrap;
+}
+
+.attentionChips {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.attentionChips::-webkit-scrollbar {
+  display: none;
+}
+
+.attentionChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--neutral-100);
+  font: inherit;
+  font-size: 13px;
+  color: var(--neutral-800);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.attentionChip:hover {
+  background: var(--neutral-200);
+}
+
+.attentionChip:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.attentionDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: var(--warning-500);
+}
+
+.attentionChip[data-level='red'] .attentionDot {
+  background: var(--danger-500);
+}
+
+.attentionLabel {
+  color: var(--neutral-900);
+}
+
+.attentionValue {
+  color: var(--neutral-600);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Board tabs, the + and its actions, the edit bar, toasts (6D; Figma "Header · Tabs", 6D-1/2/4) ─────── */
+
+/* The board's own colours, named once (the 6D capsule and the dark segment aren't in the token set). */
+.boardTabs,
+.dial,
+.editBar,
+.boardToast,
+.empty {
+  --cv-capsule: #EFEBE7;
+  --cv-tab-ink: var(--neutral-600);
+  --cv-tab-hover: #E5E0DA;
+  --cv-tab-pressed: #DCD6CF;
+  --cv-dark: linear-gradient(180deg, #524B47 0%, #26211E 100%);
+  --cv-on-dark: #F7F2ED;
+  --cv-surface: #FFFFFF;
+  --cv-surface-hover: var(--neutral-100);
+  --cv-hairline: var(--neutral-200);
+  --cv-rename-border: #D3CEC8;
+  --cv-focus: var(--blue-600);
+  --cv-float-shadow: 0 0 0 1px rgb(38 33 30 / 0.08), 0 4px 8px -2px rgb(38 33 30 / 0.06), 0 16px 32px -8px rgb(38 33 30 / 0.14);
+  --cv-bar-shadow: 0 0 0 1px rgb(38 33 30 / 0.08), 0 2px 4px rgb(38 33 30 / 0.06), 0 12px 28px -6px rgb(38 33 30 / 0.18);
+}
+
+:global(:root[data-theme='dark']) .boardTabs,
+:global(:root[data-theme='dark']) .dial,
+:global(:root[data-theme='dark']) .editBar,
+:global(:root[data-theme='dark']) .boardToast,
+:global(:root[data-theme='dark']) .empty {
+  --cv-capsule: var(--neutral-100);
+  --cv-tab-hover: var(--neutral-200);
+  --cv-tab-pressed: var(--neutral-300);
+  --cv-dark: var(--neutral-900);
+  --cv-on-dark: var(--neutral-50);
+  --cv-surface: var(--neutral-white);
+  --cv-surface-hover: var(--neutral-100);
+  --cv-rename-border: var(--neutral-300);
+}
+
+/* A newly added card's ring and "New" badge (Floating actions · New badge, every state). */
+.cell {
+  --cv-new: #3A6FE0;
+  --cv-new-bg: #EAF0FE;
+  --cv-new-text: #2F5FD0;
+}
+
+:global(:root[data-theme='dark']) .cell {
+  --cv-new-bg: color-mix(in srgb, #3A6FE0 24%, transparent);
+  --cv-new-text: #9DB8F6;
+}
+
+.boardTabs {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+/* The grey capsule (D39): 36 high, 2 around the segments; the open board is a dark segment that slides (D85). */
+.tabTrack {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 2px;
+  border-radius: 9999px;
+  background: var(--cv-capsule);
+}
+
+.tabTrack[data-dragging] {
+  user-select: none;
+}
+
+.tabHighlight {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 0;
+  border-radius: 9999px;
+  background: var(--cv-dark);
+  pointer-events: none;
+}
+
+.tabHighlight[data-animate] {
+  transition: transform 200ms ease-out, width 200ms ease-out;
+}
+
+.boardTabItem {
+  position: relative;
+  display: flex;
+  flex: 0 1 auto;
+  min-width: 48px;
+}
+
+.boardTabItem[data-dragging] {
+  opacity: 0.4;
+}
+
+/* A segment: 32 high, the name in 14 Medium with 14 each side, up to 220 (states board 142:21922). */
+.boardTab {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  flex: 1 1 auto;
+  justify-content: center;
+  min-width: 0;
+  max-width: 220px;
+  height: 32px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: -0.005em;
+  color: var(--cv-tab-ink);
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: pan-y;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.boardTabName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.boardTab:hover {
+  background: var(--cv-tab-hover);
+  color: var(--neutral-900);
+}
+
+.boardTab:active {
+  background: var(--cv-tab-pressed);
+}
+
+/* The open board: a white name on the dark segment under it; pointing at it changes nothing. */
+.boardTab[aria-current='page'],
+.boardTab[aria-current='page']:hover,
+.boardTab[aria-current='page']:active {
+  background: transparent;
+  color: var(--cv-on-dark);
+}
+
+/* "6 more": 12 on its right for the chevron. */
+.boardTabMore {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  box-sizing: border-box;
+  padding: 0 12px 0 14px;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: -0.005em;
+  color: var(--cv-tab-ink);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.boardTabMore:hover,
+.boardTabMore[aria-expanded='true'] {
+  background: var(--cv-tab-hover);
+  color: var(--neutral-900);
+}
+
+.boardTabMore[data-drop-target] {
+  box-shadow: inset 0 0 0 1.5px var(--neutral-900);
+}
+
+.renameWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Renaming: white with a fine border, the name selected. */
+.boardTabInput {
+  height: 32px;
+  max-width: 220px;
+  box-sizing: border-box;
+  padding: 0 13px;
+  border: 1px solid var(--cv-rename-border, #D3CEC8);
+  border-radius: 9999px;
+  background: var(--cv-surface, #FFFFFF);
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: -0.005em;
+  color: var(--neutral-900);
+  outline: none;
+}
+
+.boardTabInput[aria-invalid],
+.manageInput[aria-invalid] {
+  border-color: var(--red-500);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red-500) 18%, transparent);
+}
+
+.renameError {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 4px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--red-500);
+  white-space: nowrap;
+}
+
+/* Keyboard focus: a 2 px blue ring on the segment, the open one too. */
+.boardTab:focus-visible,
+.boardTabMore:focus-visible {
+  outline: 2px solid var(--cv-focus);
+  outline-offset: 0;
+}
+
+/* The board's actions: a dark + in the panel's bottom-right corner, 20 inside it (the panel sits 10 from the
+   window), the actions lifting above it, 8 apart. */
+.dial {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  z-index: 40;
+  width: 44px;
+  height: 44px;
+}
+
+.dialMain {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--cv-dark);
+  color: var(--cv-on-dark);
+  box-shadow: var(--cv-float-shadow);
+  cursor: pointer;
+}
+
+.dialMain:focus-visible,
+.dialItem:focus-visible,
+.editBarItem:focus-visible,
+.editBarDone:focus-visible {
+  outline: 2px solid var(--cv-focus);
+  outline-offset: 2px;
+}
+
+.dialList {
+  position: absolute;
+  right: 4px;
+  bottom: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dialRow {
+  animation: dialIn 160ms ease-out both;
+}
+
+/* A named action: the label pill 8 left of a white 36 circle; the whole row is the button. */
+.dialItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.dialLabel {
+  height: 28px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: var(--cv-surface);
+  box-shadow: var(--cv-float-shadow);
+  font-size: 13px;
+  line-height: 28px;
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-900);
+  white-space: nowrap;
+}
+
+.dialCircle {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  background: var(--cv-surface);
+  box-shadow: var(--cv-float-shadow);
+  color: var(--neutral-700);
+  transition: background-color 150ms ease;
+}
+
+.dialItem:hover .dialCircle,
+.dialItem:hover .dialLabel {
+  background: var(--cv-surface-hover);
+}
+
+/* Someone else is editing this board: Edit board and Add metrics stay in place, greyed. */
+.dialItem[data-locked] {
+  cursor: default;
+}
+
+.dialItem[data-locked] .dialCircle,
+.dialItem[data-locked] .dialLabel,
+.dialItem[data-locked]:hover .dialCircle,
+.dialItem[data-locked]:hover .dialLabel {
+  background: var(--cv-surface);
+  color: var(--neutral-400);
+}
+
+@keyframes dialIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* The board menu opens from More, above the ×: anchored on the + itself. */
+/* A flex box, so no line box lifts the point off the + (the menu's bottom sits 8 above the +, as in 6D-5). */
+.dialMenuAnchor {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  pointer-events: none;
+}
+
+.dialMenuPoint {
+  display: block;
+  width: 44px;
+  height: 44px;
+}
+
+/* Edit mode: the + gives way to a white bar at the bottom centre of the panel (Dev, 20 Nov: "move it to middle of
+   the screen"). BoardActions sets `left` to the panel's centre; 50% of the window until it has. */
+.editBar {
+  position: fixed;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 44px;
+  box-sizing: border-box;
+  padding: 4px 4px 4px 6px;
+  border-radius: 9999px;
+  background: var(--cv-surface);
+  box-shadow: var(--cv-bar-shadow);
+}
+
+.editBarItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0 14px 0 12px;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-900);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.editBarItem:hover {
+  background: var(--cv-surface-hover);
+}
+
+/* Undo and Redo: round 32 px icon buttons on the soft fill, like the sync button (Dev, 19 Nov: "our icon button is
+   round"), named by their tooltips; always there, greyed when there's nothing to undo or redo (Figma "Edit mode ·
+   every control state"). */
+.editBarIcon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: #F0ECE8;
+  color: var(--neutral-900);
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.editBarIcon:hover:not(:disabled) {
+  background: #E9E4DF;
+}
+
+.editBarIcon:disabled {
+  cursor: default;
+}
+
+.editBarIcon:disabled svg {
+  opacity: 0.35;
+}
+
+:global(:root[data-theme='dark']) .editBarIcon { background: var(--neutral-100); }
+:global(:root[data-theme='dark']) .editBarIcon:hover:not(:disabled) { background: var(--neutral-200); }
+
+/* The bar's + icons are a step lighter than the words (INK6). Cancel has no icon, so even padding. */
+.editBarItem > svg {
+  color: var(--neutral-600);
+}
+
+.editBarCancel {
+  padding: 0 14px;
+}
+
+.editBarIcon:focus-visible {
+  outline: 2px solid var(--cv-focus);
+  outline-offset: 2px;
+}
+
+.editBarSeparator {
+  width: 1px;
+  height: 16px;
+  background: var(--cv-hairline);
+}
+
+.editBarDone {
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--cv-dark);
+  font: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: var(--font-weight-medium);
+  color: var(--cv-on-dark);
+  cursor: pointer;
+}
+
+/* Saving (Figma "Save failed · trying again"): a spinner before the word, the button held until the save answers. */
+.editBarDone[data-saving] {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 14px;
+  cursor: default;
+}
+
+.editBarDone[data-saving] svg {
+  animation: editSpin 900ms linear infinite;
+}
+
+@keyframes editSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* Keys for the card in hand (Figma "Keyboard · moving a card"): a white pill above the bar, each key a small chip. */
+.keyHint {
+  position: fixed;
+  left: 50%;
+  bottom: 84px;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border: 1px solid var(--neutral-200);
+  border-radius: 12px;
+  background: var(--neutral-white);
+  box-shadow: 0 1px 1.5px rgb(82 74 71 / 0.12), 0 6px 16px -4px rgb(38 33 31 / 0.10);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-700);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.keyHint kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 12px;
+  height: 22px;
+  box-sizing: border-box;
+  padding: 1px 6px;
+  border: 1px solid var(--neutral-200);
+  border-radius: 5px;
+  background: var(--neutral-100);
+  font: inherit;
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-900);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editBarDone[data-saving] svg { animation: none; }
+}
+
+/* Where toasts sit next to the + or the edit bar lives in app/globals.css (Toast): a selector with no local class
+   fails the production build's CSS-modules check. */
+
+/* Sonner's own toast box steps aside for a board toast, which draws itself. */
+:global(.kds-toast):has(> .boardToast) {
+  right: 0;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+:global(:root[data-theme='dark'] [data-sonner-toast].kds-toast):has(> .boardToast) {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* A board toast: one line, white, a hairline, an icon, the message with the board's name in Medium, one dark action, ×. */
+.boardToast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  min-height: 46px;
+  padding: 8px 6px 8px 14px;
+  border: 1px solid #E7E2DC;
+  border-radius: 10px;
+  background: var(--cv-surface);
+  box-shadow: 0 8px 24px rgb(38 33 30 / 0.12), 0 1px 2px rgb(38 33 30 / 0.06);
+  color: var(--neutral-900);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.boardToastIcon {
+  flex-shrink: 0;
+  color: var(--neutral-600);
+}
+
+.boardToastIcon[data-tone='error'] {
+  color: var(--red-600);
+}
+
+.boardToastText {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.boardToastText strong {
+  font-weight: var(--font-weight-medium);
+}
+
+.boardToastAction {
+  flex-shrink: 0;
+  height: 28px;
+  box-sizing: border-box;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--neutral-900);
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  color: #FFFFFF;
+  cursor: pointer;
+}
+
+.boardToastClose {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--neutral-500);
+  cursor: pointer;
+}
+
+.boardToastClose:hover {
+  background: var(--neutral-100);
+  color: var(--neutral-900);
+}
+
+.boardToastAction:focus-visible,
+.boardToastClose:focus-visible {
+  outline: 2px solid var(--cv-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialRow {
+    animation: none;
+  }
+}
+
+/* Where a dragged tab will land (D86): a 2 px blue line with an 8 px dot; the other tabs stay put. */
+.dropLine {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  z-index: 2;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--blue-600);
+  pointer-events: none;
+}
+
+.dropLine::before,
+.manageDropLine::before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--blue-600);
+}
+
+.dropLine::before {
+  top: -4px;
+  left: -3px;
+}
+
+.moreList {
+  display: contents;
+}
+
+.moreList [data-drop='before'] {
+  box-shadow: inset 0 2px 0 var(--blue-600);
+}
+
+.moreList [data-drop='after'] {
+  box-shadow: inset 0 -2px 0 var(--blue-600);
+}
+
+/* The copy of a tab or row that follows the pointer while dragging: flat, not rotated. */
+.dragChip {
+  position: fixed;
+  z-index: 10000;
+  max-width: 220px;
+  overflow: hidden;
+  padding: 5px 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 9999px;
+  background: var(--neutral-white);
+  box-shadow: 0 6px 16px rgb(0 0 0 / 0.12);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-900);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* A tab's menu opens from a point under the tab's bottom-left corner. */
+/* A flex box, so no line box pushes the point below the tab (the menu sits 8 under it, T-3c). */
+.menuAnchor {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  width: 0;
+  height: 0;
+}
+
+.menuAnchorPoint {
+  display: block;
+  width: 1px;
+  height: 1px;
+}
+
+.menuKey {
+  flex-shrink: 0;
+  font: inherit;
+  font-size: 13px;
+  font-weight: var(--font-weight-regular, 400);
+  color: var(--bm-hidden, #8C847E);
+}
+
+.menuFoot {
+  margin: 4px 0 0;
+  padding: 8px 10px 4px;
+  border-top: 1px solid var(--border-default);
+  font-size: 12px;
+  color: var(--neutral-500);
+}
+
+.menuFoot strong {
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-700);
+}
+
+/* ── The board's menus (BoardMenu.tsx; Figma "menu · board options" and its kin) ──
+   A white card, 1 hairline, r 12, 7 inside; rows 28 high and 4 apart; a separator is 9 with its line at 4. */
+.bMenu {
+  --bm-surface: #FFFFFF;
+  --bm-hover: var(--neutral-100);
+  --bm-ink: var(--neutral-700);
+  --bm-icon: var(--neutral-600);
+  --bm-hidden: #8C847E;
+  --bm-button-hover: #EAE6E1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: calc(100vw - 16px);
+  padding: 7px;
+  border: 1px solid var(--neutral-200);
+  border-radius: 12px;
+  background: var(--bm-surface);
+  box-shadow: 0 8px 24px rgb(38 33 30 / 0.12), 0 1px 2px rgb(38 33 30 / 0.06);
+  font-family: var(--font-body);
+  outline: none;
+}
+
+:global(:root[data-theme='dark']) .bMenu {
+  --bm-surface: var(--neutral-white);
+  --bm-hidden: var(--neutral-400);
+  --bm-button-hover: var(--neutral-200);
+}
+
+.bItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  height: 28px;
+  padding: 3px 6px 3px 8px;
+  border-radius: 6px;
+  color: var(--bm-ink);
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+
+.bItem[data-highlighted],
+.bItem[data-state='open'],
+.bItem[data-current] {
+  background: var(--bm-hover);
+}
+
+.bItem[data-disabled] {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.bItem[data-danger] {
+  --bm-ink: var(--red-600);
+  --bm-icon: var(--red-600);
+}
+
+.bItem[data-muted] {
+  --bm-ink: var(--bm-hidden);
+  --bm-icon: var(--bm-hidden);
+}
+
+/* A row with a button at its end (the eye-off on a hidden board) keeps 2 above and below it. */
+.bItem:has(.allBoardsShow) {
+  padding: 2px 4.67px 2px 8px;
+}
+
+.bItem:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.bIcon {
+  flex-shrink: 0;
+  color: var(--bm-icon);
+}
+
+.bLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bChevron {
+  flex-shrink: 0;
+  margin-right: 3px;
+  color: var(--neutral-700);
+}
+
+.bSeparator {
+  flex-shrink: 0;
+  height: 1px;
+  margin: 4px 0;
+  background: rgb(59 54 50 / 0.15);
+}
+
+:global(:root[data-theme='dark']) .bSeparator {
+  background: var(--neutral-200);
+}
+
+/* "ALL BOARDS": SemiBold 11/16, 0.6 apart, 22 high with 4 above and 2 below. */
+.bHeading {
+  padding: 4px 0 2px 8px;
+  color: var(--neutral-500);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: var(--font-weight-semibold, 600);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.bSub {
+  transform-origin: var(--radix-dropdown-menu-content-transform-origin);
+  animation: bSubIn 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes bSubIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bSub { animation: none; }
+}
+
+/* All boards: a hidden board greyed, with an eye-off that shows it again (D87). */
+.allBoardsShow {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  color: var(--neutral-600);
+  cursor: pointer;
+}
+
+.allBoardsShow:hover {
+  background: var(--bm-button-hover);
+}
+
+/* The "Shared" mark after a shared board's name (D95; Figma Tag / Shared 470:61198): flat and borderless, the
+   text colour at 7% so it stays a step darker than a hovered row (Dev: "no definetly not white bg"). */
+.sharedTag {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  box-sizing: border-box;
+  padding: 0 7px 0 6px;
+  border: 0;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--neutral-900) 7%, transparent);
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  color: var(--neutral-600);
+  outline: none;
+}
+
+.sharedTag[data-muted] {
+  background: color-mix(in srgb, var(--neutral-900) 4%, transparent);
+  color: var(--neutral-400);
+}
+
+.sharedTag:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+/* ── Manage tabs (D91–D95; Figma 415:64464): one size, three views, Save and Cancel ── */
+
+/* Manage tabs (Figma 374:61494): 480 × 560, 16 above and below, 8 at the sides, 16 between the title, the views,
+   the list and the footer. */
+.manage {
+  gap: 16px;
+  box-sizing: border-box;
+  padding: 16px 8px;
+}
+
+.manageHead {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  height: 28px;
+  padding: 0 0 0 6px;
+}
+
+.manageTitle {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--neutral-900);
+}
+
+.manageClose {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--neutral-600);
+  cursor: pointer;
+}
+
+.manageIcon,
+.manageGrip {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--neutral-500);
+  cursor: pointer;
+}
+
+.manageClose:hover {
+  background: var(--neutral-200);
+  color: var(--neutral-900);
+}
+
+/* Under the pointer or with its menu open: #EAE6E1, a step past the row's own #EFEBE7. */
+.manageIcon:hover,
+.manageIcon[aria-expanded='true'] {
+  background: var(--mt-button-hover, #EAE6E1);
+  color: var(--neutral-900);
+}
+
+/* The eye on a row reads a step darker than its ⋯. */
+.manageIcon[data-eye] {
+  color: var(--neutral-600);
+}
+
+.manageIcon:disabled {
+  opacity: 0.4;
+  cursor: default;
+  background: transparent;
+}
+
+.manageGrip {
+  width: 16px;
+  color: var(--mt-grip, #A39B94);
+  cursor: grab;
+  touch-action: none;
+}
+
+.manageViews {
+  display: flex;
+  flex-shrink: 0;
+  gap: 20px;
+  padding: 0 8px;
+}
+
+/* A view: its name and count, then a 2 px line 6 below when it's the one open. */
+.manageView {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  box-sizing: border-box;
+  height: 27px;
+  padding: 0 0 7px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-500);
+  cursor: pointer;
+}
+
+.manageView[aria-selected='true'] {
+  border-bottom-color: var(--neutral-900);
+  color: var(--neutral-900);
+}
+
+.manageCount {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+  color: #8C847E;
+}
+
+.manageBody {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.manageBody::before,
+.manageBody::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  height: 24px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.manageBody::before {
+  top: 0;
+  background: linear-gradient(var(--neutral-white), transparent);
+}
+
+.manageBody::after {
+  bottom: 0;
+  background: linear-gradient(transparent, var(--neutral-white));
+}
+
+.manageBody[data-fade-top]::before,
+.manageBody[data-fade-bottom]::after {
+  opacity: 1;
+}
+
+.manageList {
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* "Boards you deleted stay here for 30 days.": Regular 13/18 after a 14 info icon, 10 above the rows. */
+.manageHelper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding: 0 8px 0 6.75px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-500);
+}
+
+.manageRowWrap {
+  display: flex;
+  flex-direction: column;
+}
+
+/* A row: 32 high, the grip 3 from the left, the name in 14 Medium, the eye and ⋯ 2 from the right. */
+.manageRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0 2px 0 3px;
+  border-radius: 6px;
+}
+
+.manageRow:hover,
+.manageRow[data-open] {
+  background: var(--mt-row-hover, #EFEBE7);
+}
+
+.manageRow[data-dragging] {
+  opacity: 0.4;
+}
+
+.manageName {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-700);
+}
+
+.manageNameText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.manageRow[data-muted] .manageName {
+  color: var(--mt-hidden, #8C847E);
+}
+
+:global(:root[data-theme='dark']) .manage {
+  --mt-button-hover: var(--neutral-200);
+  --mt-grip: var(--neutral-400);
+  --mt-row-hover: var(--neutral-100);
+  --mt-hidden: var(--neutral-400);
+}
+
+.manageMeta {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: var(--font-weight-regular, 400);
+  color: #8C847E;
+}
+
+:global(:root[data-theme='dark']) .manageMeta {
+  color: var(--neutral-400);
+}
+
+/* A deleted board: 8 in, 4 above and below; the name, the days left, then Restore at the row's end. */
+.manageRow[data-deleted] {
+  padding: 4px 0 4px 8px;
+}
+
+.manageActions {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.manageInput {
+  flex: 1 1 auto;
+  height: 26px;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0 8px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--neutral-white);
+  font: inherit;
+  font-size: 14px;
+  color: var(--neutral-900);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-ring) 25%, transparent);
+}
+
+.manageName .renameWrap,
+.manageRow > .renameWrap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.manageRow > .renameWrap .renameError {
+  position: static;
+  margin-left: 8px;
+}
+
+.manageRowEnd {
+  height: 1px;
+  margin: 4px 8px;
+  border: 0;
+  background: var(--border-default);
+}
+
+.manageRestore {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 3px 7.25px 3px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-900);
+  cursor: pointer;
+}
+
+.manageRestore svg {
+  color: var(--neutral-700);
+}
+
+.manageRestore:hover {
+  background: #EAE6E1;
+}
+
+:global(:root[data-theme='dark']) .manageRestore:hover {
+  background: var(--neutral-200);
+}
+
+.manageEmpty {
+  margin: 0;
+  padding: 16px 8px;
+  font-size: 14px;
+  color: var(--neutral-500);
+}
+
+.manageDropLine {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--blue-600);
+  pointer-events: none;
+}
+
+.manageDropLine::before {
+  top: -3px;
+  left: -4px;
+}
+
+.manageFoot {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 8px;
+}
+
+.manageFootEnd {
+  display: inline-flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* The footer's buttons: 30 high, 13 Medium. New board white with a hairline; Cancel plain; Save dark. */
+.manageButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-700);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.manageButton:hover {
+  background: var(--neutral-100);
+}
+
+.manageButton[data-kind='new'] {
+  padding: 6px 10px;
+  border: 1px solid var(--neutral-200);
+  background: #FFFFFF;
+  color: var(--neutral-900);
+}
+
+.manageButton[data-kind='new'] svg {
+  color: var(--neutral-700);
+}
+
+.manageButton[data-kind='new']:hover {
+  background: var(--neutral-50);
+}
+
+.manageButton[data-kind='save'] {
+  padding: 6px 14px;
+  background: var(--neutral-900);
+  color: #F7F2ED;
+}
+
+.manageButton[data-kind='save']:hover {
+  background: #463F3A;
+}
+
+.manageButton:focus-visible {
+  outline: 2px solid var(--blue-600);
+  outline-offset: 2px;
+}
+
+.manageClose:focus-visible,
+.manageIcon:focus-visible,
+.manageGrip:focus-visible,
+.manageView:focus-visible,
+.manageRestore:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabHighlight[data-animate] { transition: none; }
+}
+
+/* ── Diagnose (?focus=) ─────────────────────────────────────────────────── */
+
+.diagnoseHead {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  margin-left: -8px;
+  padding: 0 10px 0 8px;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--neutral-600);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.back:hover {
+  background: var(--neutral-100);
+  color: var(--neutral-900);
+}
+
+.back svg {
+  transition: transform 150ms ease;
+}
+
+.back:hover svg {
+  transform: translateX(-2px);
+}
+
+.back:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.diagnoseTitleRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+}
+
+.diagnoseTitles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.diagnoseTitle {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: var(--font-weight-regular);
+  letter-spacing: -0.01em;
+  color: var(--neutral-black);
+}
+
+.diagnoseLede {
+  margin: 0;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  color: var(--neutral-600);
+}
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.inputsHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.inputsTitle {
+  margin: 0;
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-body-lg);
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-800);
+}
+
+.inputsNote {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--neutral-500);
+}
+
+/* ── Grid ───────────────────────────────────────────────────────────────── */
+
+.grid {
+  --row: 156px;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-rows: var(--row);
+  grid-auto-flow: row dense;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cell {
+  grid-column: span var(--cols, 3);
+  grid-row: span var(--rows, 1);
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+}
+
+.cell[data-dragging] {
+  z-index: 20;
+}
+
+@media (max-width: 1100px) {
+  .cell[data-size^='3x'] { grid-column: span 6; }
+  .cell[data-size^='6x'],
+  .cell[data-size^='12x'] { grid-column: span 12; }
+}
+
+@media (max-width: 640px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .cell { grid-column: 1 / -1 !important; }
+}
+
+/* ── Stretch, edit mode (iOS home-screen style) ──────────────────────────── */
+
+/* The card's frame. In its grid slot normally; while it resizes (or grows into a size picked from the menu) it
+   floats above the grid at its own size in px, set from BoardGrid, then springs back into its slot. */
+.stretch {
+  position: relative;
+  height: 100%;
+}
+
+.stretch[data-floating] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 4;
+}
+
+.cell[data-resizing] {
+  z-index: 20;
+}
+
+.cell[data-resizing] .card {
+  border-color: var(--neutral-300, var(--border-default));
+  box-shadow:
+    0 1px 2px var(--neutral-800-05, rgba(0, 0, 0, 0.04)),
+    0 16px 40px -10px rgba(38, 33, 30, 0.22);
+}
+
+.cell[data-editing] {
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.cell[data-editing][data-dragging] {
+  cursor: grabbing;
+}
+
+/* In edit mode the card is one object: its charts stop taking clicks. */
+.cell[data-editing] .body {
+  pointer-events: none;
+}
+
+.cell[data-editing] .head {
+  cursor: inherit;
+}
+
+.remove {
+  /* × at the card's top right, 12 in from its corner, where the app marks sit while reading (Figma "Edit mode ·
+     every control state": white, 24 px, radius 6, a hairline ring; the soft fill under the pointer). */
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: var(--neutral-white);
+  color: var(--neutral-600);
+  box-shadow: 0 0 0 1px rgb(38 33 30 / 0.06), 0 1px 2px rgb(38 33 30 / 0.10);
+  cursor: pointer;
+  animation: badgeIn 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.remove:hover {
+  background: #F0ECE8;
+}
+
+:global(:root[data-theme='dark']) .remove:hover {
+  background: var(--neutral-100);
+}
+
+/* The × takes the top-right corner, so the app marks step aside while editing. */
+.cell[data-editing] .sources {
+  visibility: hidden;
+}
+
+/* ── Resize: one visible handle, every side live ──
+   The iOS arc at the bottom-right corner, tracing the card's own corner on its border, is the only thing drawn.
+   The other sides and corners are invisible zones straddling the border that only change the cursor. At rest the
+   arc is quiet; held, it goes solid and a touch thicker. */
+.handle {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--neutral-900);
+  opacity: 0.4;
+  cursor: nwse-resize;
+  touch-action: none;
+  animation: badgeIn 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 150ms ease;
+}
+
+/* Quiet on every card, clear on the one under the pointer, solid while held: so edit mode doesn't look busy. */
+.cell[data-editing] .handle { opacity: 0.16; }
+.cell[data-editing]:hover .handle,
+.cell[data-editing]:focus-within .handle,
+.cell[data-dragging] .handle,
+.cell[data-lifted] .handle { opacity: 0.5; }
+.cell[data-editing] .handle:hover { opacity: 0.85; }
+.handle[data-active],
+.cell[data-editing] .handle[data-active] { opacity: 1; }
+
+/* Drawn 6px in from the zone's far corner, so it lands on the card's border line. */
+.arc {
+  overflow: visible;
+  stroke-width: 4;
+  transition: stroke-width 150ms ease;
+}
+
+.handle[data-active] .arc { stroke-width: 5; }
+
+.zone {
+  position: absolute;
+  z-index: 2;
+  touch-action: none;
+}
+
+.zone[data-edge='n'],
+.zone[data-edge='s'] { left: 24px; right: 24px; height: 12px; cursor: ns-resize; }
+.zone[data-edge='n'] { top: -6px; }
+.zone[data-edge='s'] { bottom: -6px; right: 34px; }
+
+.zone[data-edge='e'],
+.zone[data-edge='w'] { top: 24px; bottom: 24px; width: 12px; cursor: ew-resize; }
+.zone[data-edge='e'] { right: -6px; bottom: 34px; }
+.zone[data-edge='w'] { left: -6px; }
+
+.zone[data-edge='nw'] { top: -6px; left: -6px; width: 24px; height: 24px; cursor: nwse-resize; }
+.zone[data-edge='sw'] { bottom: -6px; left: -6px; width: 24px; height: 24px; cursor: nesw-resize; }
+
+/* Held, to resize or to drag: the card's border lights up. */
+.cell[data-resizing] .card,
+.cell[data-editing][data-dragging] .card,
+.cell[data-lifted] .card {
+  border-color: var(--neutral-900);
+}
+
+/* Lifted with Space: held like a drag, but it stays in its slot and moves with the arrow keys. */
+.cell[data-lifted] {
+  z-index: 20;
+}
+
+.cell[data-lifted] .card {
+  box-shadow: 0 16px 40px -10px rgb(38 33 30 / 0.22);
+}
+
+/* Keyboard focus on a card in edit mode: a 2 px blue ring around the whole card (Figma "Keyboard focus"). */
+.cell[data-editing] .body[data-clickable]:focus-visible {
+  outline: none;
+}
+
+.cell[data-editing]:has(.body[data-clickable]:focus-visible) .card {
+  outline: 2px solid var(--blue-600);
+  outline-offset: 2px;
+}
+
+/* Where the card being moved will land (Figma "Move · dragging a card"): its slot, dashed, with its size's name. */
+.grid[data-editing] {
+  position: relative;
+}
+
+.moveSlot {
+  position: absolute;
+  z-index: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 1.5px dashed var(--neutral-500);
+  border-radius: 19px;
+  background: color-mix(in srgb, var(--neutral-900) 4%, transparent);
+  pointer-events: none;
+  animation: landingIn 180ms ease-out;
+}
+
+.remove:focus-visible,
+.handle:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ── Where the card will land ──
+   Only while resizing: the snapped slot, divided into the grid's snap units (3 columns × 1 row), under the floating
+   card; and its dashed outline with the size's name above it, so the edge you're aiming for is always visible. */
+.landing {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--units), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--unit-rows), minmax(0, 1fr));
+  gap: 16px;
+  pointer-events: none;
+}
+
+.landingUnit {
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--neutral-900) 5%, transparent);
+  animation: landingIn 180ms ease-out;
+}
+
+.landingEdge {
+  position: absolute;
+  inset: -3px;
+  z-index: 5;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  border: 1.5px dashed var(--neutral-500);
+  border-radius: 19px;
+  pointer-events: none;
+  animation: landingIn 180ms ease-out;
+}
+
+.landingLabel {
+  margin-top: -11px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: var(--neutral-900);
+  color: var(--neutral-white);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+@keyframes landingIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes badgeIn {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 1100px) {
+  /* The grid reflows to fewer columns here, so sizes are picked from the card menu instead. */
+  .handle,
+  .zone { display: none; }
+}
+
+/* ── Card ───────────────────────────────────────────────────────────────── */
+
+.card {
+  box-sizing: border-box;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px 14px;
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  background: var(--neutral-white);
+  overflow: hidden;
+  transition: border-color 150ms ease, box-shadow 200ms ease;
+}
+
+.cell:hover .card,
+.cell:focus-within .card {
+  border-color: var(--neutral-300, var(--border-default));
+}
+
+.cell[data-dragging] .card {
+  border-color: var(--neutral-300, var(--border-default));
+  box-shadow:
+    0 1px 2px var(--neutral-800-05, rgba(0, 0, 0, 0.04)),
+    0 12px 32px -8px rgba(38, 33, 30, 0.18);
+}
+
+/* A card that just landed (Add metrics): a 1 px blue ring for 2 s that fades over the last 200 ms (Dev, 20 Nov,
+   option C). Its "New" badge stays until the board is next opened. */
+.cell[data-new] .card {
+  animation: arrive 2200ms linear;
+}
+
+@keyframes arrive {
+  0%, 90% { box-shadow: 0 0 0 1px var(--cv-new); }
+  100% { box-shadow: 0 0 0 1px transparent; }
+}
+
+/* "New", after the title of a card added on this visit: a pale blue pill with a blue dot. Not clickable. */
+.newBadge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  height: 18px;
+  box-sizing: border-box;
+  margin-left: 8px;
+  padding: 0 7px 0 6px;
+  border-radius: 9999px;
+  background: var(--cv-new-bg);
+  color: var(--cv-new-text);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.newBadge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--cv-new);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-height: 24px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.cell[data-dragging] .head {
+  cursor: grabbing;
+}
+
+/* The name, then its sync dot right after it (D49). */
+.titleGroup {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  margin-right: 8px;
+}
+
+.title {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--font-size-body);
+  line-height: 20px;
+  font-weight: var(--font-weight-regular);
+  color: var(--neutral-600);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The apps a card's numbers come from, beside the title, as on Home's metric strip. */
+.sources {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 8px;
+}
+
+.sourceLogo {
+  border-radius: 4px;
+}
+
+/* The scorecard's word on the number: a health pill and the target, one quiet row under the figure. */
+.healthLine {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 22px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* On a narrow card the marks sit at the far end of the number row, leaving the header to the title. */
+.figureMarks {
+  margin-left: auto;
+  align-self: center;
+  display: inline-flex;
+}
+
+.figureMarks .sources {
+  margin-right: 0;
+}
+
+.tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--neutral-500);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.tool:hover,
+.tool[data-state='open'] {
+  background: var(--neutral-100);
+  color: var(--neutral-900);
+}
+
+.tool:focus-visible,
+.pickRow:focus-visible,
+.kind:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ── Card body ──────────────────────────────────────────────────────────── */
+
+.body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.figureRow {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  min-width: 0;
+}
+
+.value {
+  font-size: 28px;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--neutral-black);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* The figure alone (small) or over the full chart reads larger; beside or above a sparkline, a touch smaller. */
+.body[data-layout='figure'] .value,
+.body[data-layout='figure-chart'] .value {
+  font-size: 32px;
+}
+
+/* A card whose body opens the metric up close: a pointer, and a light lift on hover. */
+.body[data-clickable] {
+  cursor: pointer;
+}
+
+.body[data-clickable]:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.cell:not([data-editing]):has(.body[data-clickable]:hover) .card {
+  border-color: var(--neutral-300, var(--border-default));
+  box-shadow:
+    0 1px 2px var(--neutral-800-05, rgba(0, 0, 0, 0.04)),
+    0 8px 20px -10px rgba(38, 33, 30, 0.16);
+}
+
+/* ── Size-adaptive layouts (see layoutOf in board.ts) ───────────────────── */
+
+.body {
+  animation: contentIn 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes contentIn {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Small: the number sits low, like an iOS widget's figure. */
+.body[data-layout='figure'] {
+  justify-content: flex-end;
+}
+
+/* Wide: the number on the left, a sparkline running beside it. */
+.side {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+}
+
+.sideFigure {
+  flex: 0 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sideChart {
+  flex: 1 1 0;
+  min-width: 96px;
+  padding-bottom: 2px;
+}
+
+.skeleton {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.delta[data-tone='good'] { color: var(--success-700); }
+.delta[data-tone='bad'] { color: var(--danger-600); }
+.delta[data-tone='flat'] { color: var(--neutral-500); }
+
+.versus {
+  margin-left: 4px;
+  color: var(--neutral-500);
+}
+
+.sparkSlot {
+  margin-top: auto;
+}
+
+.chartSlot {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0 -4px 0 0;
+}
+
+.caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--neutral-500);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.caption span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legendSwatch {
+  width: 10px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--neutral-900);
+}
+
+.legendSwatch[data-faded] {
+  background: var(--neutral-300);
+}
+
+.quiet {
+  margin: auto 0 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--neutral-500);
+}
+
+.state {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-600);
+}
+
+.stateTitle {
+  color: var(--neutral-800);
+}
+
+.linkButton {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: var(--neutral-900);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--neutral-300);
+  cursor: pointer;
+}
+
+.linkButton:hover {
+  text-decoration-color: currentColor;
+}
+
+.targetForm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.targetInput {
+  width: 96px;
+  height: 28px;
+  box-sizing: border-box;
+  padding: 0 8px;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  background: var(--neutral-white);
+  font: inherit;
+  font-size: 13px;
+  color: var(--neutral-900);
+  font-variant-numeric: tabular-nums;
+}
+
+.targetInput:focus {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+/* ── Empty board ────────────────────────────────────────────────────────── */
+
+/* A board with no cards: one line and Add cards, centred in the panel ("Empty board · no dot"). */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 590px;
+  color: var(--neutral-600);
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.empty p {
+  margin: 0;
+}
+
+/* ── Add a card ─────────────────────────────────────────────────────────── */
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.pickList {
+  max-height: min(52vh, 440px);
+  overflow-y: auto;
+  margin: 0 -8px;
+  padding: 0 8px;
+  overscroll-behavior: contain;
+}
+
+.pickGroup + .pickGroup {
+  margin-top: 12px;
+}
+
+.pickGroupTitle {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 6px 8px 4px;
+  background: var(--neutral-white);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-500);
+}
+
+.pickRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2px 12px;
+  width: 100%;
+  padding: 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.pickRow:hover {
+  background: var(--neutral-100-60, var(--neutral-100));
+}
+
+.pickRow[aria-selected='true'] {
+  background: var(--neutral-100);
+}
+
+.pickLabel {
+  font-size: var(--font-size-body);
+  line-height: 20px;
+  color: var(--neutral-900);
+}
+
+.pickDescription {
+  grid-column: 1;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--neutral-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pickTag {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  font-size: 12px;
+  color: var(--neutral-500);
+}
+
+.pickFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-default);
+}
+
+.kinds {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--neutral-100);
+}
+
+.kind {
+  height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--neutral-600);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.kind[aria-checked='true'] {
+  background: var(--neutral-white);
+  color: var(--neutral-900);
+  box-shadow: 0 0 0 1px var(--border-default), 0 1px 2px rgba(38, 33, 30, 0.06);
+}
+
+.noMatch {
+  margin: 0;
+  padding: 24px 8px;
+  color: var(--neutral-500);
+}
+
+@media (max-width: 760px) {
+  .bar { flex-wrap: wrap; }
+  .pickFooter { flex-direction: column; align-items: stretch; }
+  .kinds { overflow-x: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .tool, .pickRow { transition: none; }
+  .cell[data-new] .card,
+  .body,
+  .remove,
+  .handle,
+  .landingUnit,
+  .landingEdge { animation: none; }
+}
+
+.gridWrap {
+  min-width: 0;
+}
+
+/* ── Add cards: the count of picked metrics ─────────────────────────────── */
+
+.pickCount {
+  font-size: 13px;
+  color: var(--neutral-600);
+}
+
+/* ── A card's own settings (edit mode) ──────────────────────────────────── */
+
+.sheetSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sheetRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sheetLabel {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-500);
+}
+
+.sheetPick {
+  max-height: min(36vh, 280px);
+  overflow-y: auto;
+  margin: 0 -8px;
+  padding: 0 8px;
+  overscroll-behavior: contain;
+}
+
+.sheetActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.sheetError {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-danger, var(--neutral-800));
+}
+
+/* ── Versions and recently deleted ──────────────────────────────────────── */
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.historyRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2px 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.historyRow:last-child {
+  border-bottom: 0;
+}
+
+.historyWhen {
+  font-size: var(--font-size-body);
+  line-height: 20px;
+  color: var(--neutral-900);
+}
+
+.historyWhat {
+  grid-column: 1;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--neutral-500);
+}
+
+.historyRow > :last-child {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+}
+
+.historyNow {
+  font-size: 12px;
+  color: var(--neutral-500);
+}
+
+/* ── New board ──────────────────────────────────────────────────────────── */
+
+.newBoard {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 20px;
+  flex: 1;
+  min-height: 0;
+  padding-bottom: 16px;
+}
+
+.newBoardList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0 -8px;
+  padding: 0 8px;
+  overscroll-behavior: contain;
+}
+
+.newBoardList .pickGroupTitle {
+  margin-top: 10px;
+  padding-left: 10px;
+}
+
+.newBoardChoice {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.newBoardChoice:hover {
+  background: var(--neutral-100-60, var(--neutral-100));
+}
+
+.newBoardChoice[aria-pressed='true'] {
+  background: var(--neutral-100);
+}
+
+.newBoardChoice:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.newBoardName {
+  font-size: var(--font-size-body);
+  line-height: 20px;
+  color: var(--neutral-900);
+}
+
+.newBoardMeta {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--neutral-500);
+}
+
+.newBoardPane {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.newBoardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.newBoardTitle {
+  margin: 0 0 2px;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-black);
+}
+
+.newBoardForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 420px;
+}
+
+.newBoardMissing {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--neutral-600);
+}
+
+.newBoardMissing .linkButton {
+  display: inline;
+}
+
+.newBoardPreview {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 2px;
+  overscroll-behavior: contain;
+}
+
+@media (max-width: 760px) {
+  .newBoard { grid-template-columns: 1fr; }
+  .newBoardList { max-height: 200px; }
+  .sheetActions { grid-template-columns: 1fr; }
+}

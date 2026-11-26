@@ -1,5 +1,6 @@
 'use client'
 
+import { UsageTabs } from '@/components/layout/UsageTabs'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { DownloadOneIcon, InformationCircleIcon } from '@strange-huge/icons'
@@ -99,6 +100,8 @@ export default function OrgUsageAnalyticsPage() {
             <Button variant="default" size="sm" leftIcon={<DownloadOneIcon size={14} />} onClick={exportCsv} style={{ flexShrink: 0 }}>Export CSV</Button>
           )}
         </div>
+
+        <UsageTabs />
 
         {/* The window the feature chart covers — GET /organizations/{id}/plan/usage takes
             the same four, and picks days or weeks per range. */}

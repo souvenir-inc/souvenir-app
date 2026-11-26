@@ -11,6 +11,9 @@ import { orgScope, queryKeys } from '@/lib/query-keys'
 import { syncOf } from './present'
 
 const BUILDING_POLL_MS = 5_000
+// Sources sync about once a day, so a number fetched five minutes ago is still current. Clicking back into the
+// window doesn't refetch either: the header's refresh button does that on purpose.
+const WAREHOUSE_STALE_MS = 5 * 60_000
 
 /** A 404 is the workspace not existing yet, which is a state the page shows, not an error to retry. */
 function retryUnlessMissing(count: number, error: unknown): boolean {
@@ -24,7 +27,8 @@ export function useWorkspace() {
     queryFn: ({ signal }) => fetchWorkspace(signal),
     enabled: orgIdReady,
     retry: retryUnlessMissing,
-    staleTime: 60_000,
+    staleTime: WAREHOUSE_STALE_MS,
+    refetchOnWindowFocus: false,
     // A first sync is minutes; the page watches for it to land instead of asking for a reload.
     refetchInterval: query => (query.state.data && syncOf(query.state.data).state === 'building' ? BUILDING_POLL_MS : false),
   })
@@ -36,7 +40,8 @@ export function useMetricCatalog(enabled: boolean) {
     queryKey: queryKeys.warehouse.catalog(orgScope(orgId)),
     queryFn: ({ signal }) => fetchMetricCatalog(signal),
     enabled,
-    staleTime: 60_000,
+    staleTime: WAREHOUSE_STALE_MS,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -69,6 +74,7 @@ export function useMeasurement(request: MeasureRequest, enabled: boolean) {
     queryKey: queryKeys.warehouse.measure(orgScope(orgId), request),
     queryFn: ({ signal }) => measure(request, signal),
     enabled,
-    staleTime: 60_000,
+    staleTime: WAREHOUSE_STALE_MS,
+    refetchOnWindowFocus: false,
   })
 }

@@ -497,6 +497,20 @@ body {
   color:      var(--toast-cancel-text);
 }
 
+/* On a dashboard board, toasts sit just left of the + (or the edit bar), centred on it (the Tabs row, after the Sync
+   toast design). Kept here, not in Canvas.module.css: these selectors have no local class, which a CSS module can't
+   hold in a production build. */
+body:has([data-board-actions='dial']) [data-sonner-toaster][data-x-position='right'] {
+  right: 86px !important;
+  bottom: 29px !important;
+}
+
+/* In edit mode the bar sits at the bottom centre, so toasts keep to the corner. */
+body:has([data-board-actions='edit']) [data-sonner-toaster][data-x-position='right'] {
+  right: 30px !important;
+  bottom: 29px !important;
+}
+
 .kds-toast [data-content] { flex: 1 1 auto; min-width: 0; }
 .kds-toast [data-button],
 .kds-toast [data-cancel-button] { flex-shrink: 0; margin-left: auto; }

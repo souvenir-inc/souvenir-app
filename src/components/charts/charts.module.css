@@ -1,0 +1,184 @@
+/* The chart kit's chrome: sparkline dots, the shared tooltip, the bullet bar. Colours are theme tokens,
+   so dark mode follows theme.css like the rest of Home. */
+
+/* ── Sparkline ──────────────────────────────────────────────────────────── */
+
+.spark {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.sparkSvg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.sparkDot,
+.sparkEnd {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+.sparkEnd {
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  box-shadow: 0 0 0 2px var(--neutral-white);
+}
+
+/* ── Recharts frame ─────────────────────────────────────────────────────── */
+
+.trend {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Recharts focuses its surface on click; the card around it shows focus instead. */
+.trend :global(.recharts-surface:focus),
+.trend :global(.recharts-wrapper:focus) {
+  outline: none;
+}
+
+/* In a trend chart's place when fewer than two days have data: one plain line, centred. */
+.chartEmpty {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  font-size: var(--font-size-body);
+  color: var(--neutral-500);
+  text-align: center;
+}
+
+/* The latest value, written at the right end of a trend line, with a halo so it reads over the grid. */
+.lastValue {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  fill: var(--neutral-900);
+  font-variant-numeric: tabular-nums;
+  paint-order: stroke;
+  stroke: var(--neutral-white);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+/* ── Tooltip ────────────────────────────────────────────────────────────── */
+
+.tooltip {
+  min-width: 156px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--neutral-white);
+  box-shadow:
+    0 0 0 1px var(--border-default),
+    0 4px 12px -2px var(--neutral-900-15, rgba(38, 33, 30, 0.12));
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--neutral-900);
+  font-variant-numeric: tabular-nums;
+}
+
+.tooltipTitle {
+  margin-bottom: 4px;
+  color: var(--neutral-600);
+}
+
+.tooltipRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.tooltipRow[data-muted] {
+  color: var(--neutral-500);
+}
+
+.tooltipLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.tooltipSwatch {
+  width: 8px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.tooltipValue {
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.tooltipFooter {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-default);
+  text-align: right;
+}
+
+/* ── Target bullet ──────────────────────────────────────────────────────── */
+
+.bullet {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.bulletTrack {
+  position: relative;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--neutral-100);
+  box-shadow: inset 0 0 0 1px var(--border-default);
+}
+
+.bulletFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 9999px;
+  transition: width 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bulletTick {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--neutral-900);
+}
+
+.bulletScale {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--neutral-600);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bulletFill { transition: none; }
+}
+
+/* The space a lazily loaded chart holds until its code arrives. */
+.placeholder {
+  width: 100%;
+  border-radius: 8px;
+  background: linear-gradient(to bottom, transparent 0%, var(--neutral-100-60, var(--neutral-100)) 100%);
+}

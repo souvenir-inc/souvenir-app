@@ -9,6 +9,13 @@ export const ROOT_ROUTE = "/";
 export const CHAT_ROUTE = "/chat";
 export const HOME_ROUTE = "/home";
 export const DASHBOARD_ROUTE = "/dashboard";
+/** Old address for the boards; it redirects to the dashboard, which is the boards now. */
+export const DASHBOARD_BOARDS_ROUTE = "/dashboard/boards";
+export const DASHBOARD_METRICS_ROUTE = "/dashboard/metrics";
+/** One metric's page in the metric library. */
+export const dashboardMetricRoute = (name: string) => `${DASHBOARD_METRICS_ROUTE}/${encodeURIComponent(name)}`;
+/** The dashboard focused on one metric (opens the diagnose view for it). */
+export const dashboardBoardsFocusRoute = (name: string) => `${DASHBOARD_ROUTE}?focus=${encodeURIComponent(name)}`;
 export const CHATS_ROUTE = "/chats";
 export const AGENTS_ROUTE = "/agents";
 export const AGENTS_TEMPLATES_ROUTE = "/agents/templates";
@@ -68,6 +75,12 @@ export const SETTINGS_BILLING_ROUTE = "/settings/billing";
 // combined "Usage & Billing" page. This page is personal credit-consumption only.
 export const SETTINGS_USAGE_ROUTE = "/settings/usage";
 export const SETTINGS_MEMORY_ROUTE = "/settings/memory";
+/** Settings → Metrics: every metric's definition (name, description, formula). Readable by every member. */
+export const SETTINGS_METRICS_ROUTE = "/settings/metrics";
+/** Settings → Data → Preferences: how numbers show (rounded or exact) and the period every board opens on. */
+export const SETTINGS_DATA_PREFERENCES_ROUTE = "/settings/data-preferences";
+/** Settings → Data → Data rules: which orders count before any metric uses them, and which app feeds each kind of data. */
+export const SETTINGS_DATA_RULES_ROUTE = "/settings/data-rules";
 export const SETTINGS_BILLING_CHANGE_PLAN_ROUTE = "/settings/billing/change-plan";
 export const SETTINGS_BILLING_CONFIRMATION_ROUTE = "/settings/billing/confirmation";
 export const TEAM_INVITE_BASE_ROUTE = "/team-invite";

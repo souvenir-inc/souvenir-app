@@ -1,0 +1,527 @@
+/* The board header's sync status, to the Figma spec "Header · Sync button (final, 18 Nov)": the button and its
+   Data sources panel, the banners, card dots, the error toast, the offline bar. Values are the design's; a token
+   is used where it is the same colour. */
+
+/* ── The button (D41, D42): a soft round icon button, its status dot on the top-right corner ── */
+
+.button {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  background: #F0ECE8;
+  color: var(--neutral-700);
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.button:hover {
+  background: #E9E4DF;
+}
+
+/* Open: white with a hairline border, tied to the white panel under it (D48). */
+.button[data-open] {
+  background: #fff;
+  border-color: #D3CEC8;
+  box-shadow: 0 1px 2px rgba(38, 33, 30, 0.08);
+  color: var(--neutral-900);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--neutral-900);
+  outline-offset: 2px;
+}
+
+/* The button's spinner (while it syncs). */
+.buttonSpinner { flex-shrink: 0; }
+
+.buttonDot {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 2px #FAF9F7;
+  background: var(--success-700);
+}
+
+.buttonDot[data-state='behind'] { background: var(--warning-700); }
+.buttonDot[data-state='failed'] { background: #B42318; }
+.buttonDot[data-state='offline'] { background: #9C948E; }
+
+/* ── Data sources ── */
+
+.panel {
+  box-sizing: border-box;
+  width: 320px;
+  padding: 6px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgba(38, 33, 30, 0.08),
+    0 2px 4px rgba(38, 33, 30, 0.06),
+    0 12px 28px rgba(38, 33, 30, 0.18);
+  font-family: var(--font-body);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px 4px;
+  color: var(--neutral-700);
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  line-height: 16px;
+}
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 9999px;
+  background: #F0ECE8;
+  color: var(--neutral-700);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  line-height: 14px;
+}
+
+.empty {
+  margin: 0;
+  padding: 8px 10px;
+  color: var(--neutral-500);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+/* More than five apps: a fade over the fifth says the list goes on. */
+.list[data-scrolls] {
+  mask-image: linear-gradient(to bottom, #000 78%, transparent);
+}
+
+/* A list that scrolls takes keyboard focus; it shows. */
+.list:focus-visible {
+  outline: 2px solid var(--neutral-900);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* The fade would clip the ring: it drops while the list has keyboard focus. */
+.list[data-scrolls]:focus-visible { mask-image: none; }
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+}
+
+/* Catalog logos aren't all square (Shopify's is taller): fit each in the design's 16 × 16. */
+.row img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.rowName {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--neutral-900);
+  font-size: 13px;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowSpacer { flex: 1; }
+
+.rowStatus {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  color: var(--neutral-500);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.rowStatus[data-state='behind'] { color: var(--warning-700); font-weight: var(--font-weight-medium); }
+.rowStatus[data-state='failed'] { gap: 5px; color: #B42318; font-weight: var(--font-weight-medium); }
+
+/* The fix sits right after the app's name: a plug to reconnect. */
+.rowAction {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: #F0ECE8;
+  color: var(--neutral-700);
+  cursor: pointer;
+}
+
+.rowAction:hover:not([aria-disabled='true']) { background: #E9E4DF; color: var(--neutral-900); }
+.rowAction:focus-visible { outline: 2px solid var(--neutral-900); outline-offset: 1px; }
+/* Greyed with aria-disabled (still focusable, its hover says why). */
+.rowAction[aria-disabled='true'] { cursor: default; opacity: 0.5; }
+
+.rowActionWrap { display: inline-flex; flex-shrink: 0; }
+
+.spinner { color: var(--neutral-700); }
+
+.divider {
+  height: 1px;
+  margin: 6px 4px;
+  background: var(--neutral-200);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 10px 4px 4px;
+}
+
+.refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px 0 10px;
+  border: 0;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(38, 33, 30, 0.08), 0 1px 2px rgba(38, 33, 30, 0.06);
+  color: var(--neutral-900);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.refresh svg { color: var(--neutral-700); }
+.refresh:hover:not([aria-disabled='true']) { background: #F5F2EF; }
+.refresh[aria-disabled='true'] { cursor: default; opacity: 0.5; }
+.refresh:focus-visible { outline: 2px solid var(--neutral-900); outline-offset: 2px; }
+
+.footerText {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--neutral-500);
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.footerText[data-state='behind'] { color: var(--warning-700); font-weight: var(--font-weight-medium); }
+.footerText[data-state='failed'] { color: #B42318; font-weight: var(--font-weight-medium); }
+
+/* ── Banners (D48, D55): red above amber, one action and × each ── */
+
+.banners {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* The design puts banners 20 px under the header and the board 16 px under them; the page spaces its parts
+     28 px apart. */
+  margin: -8px 0 -12px;
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 7px 8px 7px 14px;
+  border: 1px solid #F1D9B5;
+  border-radius: 10px;
+  background: #FDF4E7;
+  color: var(--neutral-900);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.banner[data-kind='failed'] {
+  border-color: #F2CBC6;
+  background: #FDEFED;
+}
+
+.bannerIcon { flex-shrink: 0; color: var(--warning-700); }
+.banner[data-kind='failed'] .bannerIcon { color: #B42318; }
+
+/* What you started: grey while it syncs, green when it's done. */
+.banner[data-kind='syncing'] {
+  border-color: #E4E0DC;
+  background: #F5F2EF;
+}
+
+.banner[data-kind='synced'] {
+  border-color: #C9E7D3;
+  background: #EDF7F0;
+}
+
+.banner[data-kind='synced'] .bannerIcon { color: var(--success-700); }
+.bannerSpinner { color: #524B47; }
+
+.bannerText {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.bannerAction {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px 0 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #B42318;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.banner[data-kind='behind'] .bannerAction { color: var(--warning-700); }
+.bannerAction:hover:not([aria-disabled='true']) { text-decoration: underline; text-underline-offset: 3px; }
+.bannerAction:focus-visible { outline: 2px solid var(--neutral-900); outline-offset: 2px; }
+.bannerAction[aria-disabled='true'] { cursor: default; opacity: 0.5; }
+
+.bannerClose {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--neutral-500);
+  cursor: pointer;
+}
+
+.bannerClose:hover { background: rgba(38, 33, 30, 0.06); color: var(--neutral-900); }
+.bannerClose:focus-visible { outline: 2px solid var(--neutral-900); outline-offset: 1px; }
+
+/* App names one weight up; "2 more apps" underlined, its hover lists them. */
+.app { font-weight: var(--font-weight-medium); }
+
+.more {
+  font-weight: var(--font-weight-medium);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  cursor: default;
+}
+
+/* The part of a toast after its "•": quieter. */
+.muted { color: var(--neutral-600); }
+
+/* ── The error toast (design A): one line, white, a red icon, one dark action, × ── */
+
+/* The toaster's own frame (padding, ring, background) would draw a second box around this one: drop it, and let
+   the toast be as wide as its one line (up to the window), growing left from the toaster's right edge. */
+:global(.kds-toast):has(> .toast) {
+  right: 0;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+:global(:root[data-theme='dark'] [data-sonner-toast].kds-toast):has(> .toast) {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.toast {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  padding: 8px 6px 8px 14px;
+  border: 1px solid #E7E2DC;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(38, 33, 30, 0.12), 0 1px 2px rgba(38, 33, 30, 0.06);
+  color: var(--neutral-900);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.toastIcon { flex-shrink: 0; color: #B42318; }
+
+.toastText {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toastAction {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--neutral-900);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.toastAction:hover { background: var(--neutral-800); }
+.toastAction:focus-visible { outline: 2px solid var(--neutral-900); outline-offset: 2px; }
+
+/* ── Cards (D49, D50) ── */
+
+.cardDot {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  margin-left: 6px;
+  border-radius: 9999px;
+  vertical-align: middle;
+  background: var(--warning-700);
+}
+
+.cardDot[data-state='failed'] { background: #B42318; }
+
+/* Only card numbers shimmer while their app syncs. */
+.shimmer {
+  background: linear-gradient(90deg, var(--neutral-900) 35%, var(--neutral-300) 50%, var(--neutral-900) 65%);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 1.6s linear infinite;
+}
+
+@keyframes shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer { animation: none; color: var(--neutral-500); background: none; }
+  /* The spinners stand still: the arc stays as a loading mark beside its text (framer's rotation is inline). */
+  .spinner, .bannerSpinner, .buttonSpinner, .offlineSpinner { transform: none !important; }
+}
+
+/* ── Offline: a bar across the top of the window, on every page, that can't be closed (Figma "window bar"). It
+   sits in the layout and pushes the whole app down, so it never covers the sidebar or a page's header. ── */
+
+.offlineRegion { flex-shrink: 0; }
+
+.offline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+  /* 36 px in one line; on a phone the text wraps and the bar grows, clear of the screen's edges. */
+  min-height: 36px;
+  padding: 8px 16px;
+  text-align: center;
+  background: var(--neutral-900);
+  color: #F7F2ED;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.offline[data-state='back'] { background: var(--success-700); color: #fff; }
+
+.offlineRetry {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 16px;
+  color: #C9C2BC;
+}
+
+.offlineSpinner { color: #F7F2ED; }
+
+/* The window: the offline bar, then the page, which scrolls inside the frame. While the bar shows, a page that's
+   100vh tall scrolls by the bar's height. */
+.frame {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100svh;
+}
+
+.frameBody {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* A page grows with its content, as it did in the document; squeezed to its own min-height (100vh), a centred
+   page would push its top out of reach. AppLayout's roots set flex: 1 1 0 inline, so they still fill the frame. */
+.frameBody > * { flex-shrink: 0; }
+
+/* Standalone pages and onboarding: the document scrolls, as before the bar (keyboard scrolling works before any
+   click, and back/forward restores the position). The bar sticks to the top of the window. */
+.frameDocument { height: auto; min-height: 100svh; }
+.frameDocument > .frameBody { flex: 1 0 auto; overflow: visible; }
+.frameDocument > .offlineRegion { position: sticky; top: 0; z-index: 10; }
+
+/* Read by screen readers only: why a greyed control is greyed. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

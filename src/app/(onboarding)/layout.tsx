@@ -1,5 +1,6 @@
 import { OnboardingProvider } from "@/context/onboarding-context";
 import { WorkspaceOnboardingProvider } from "@/context/workspace-onboarding-context";
+import { OfflineFrame } from "@/components/SyncStatus/OfflineBar";
 
 // Both providers are mounted here: OnboardingProvider backs the previous
 // team-onboarding flow (still reachable at its existing routes until those are
@@ -8,7 +9,8 @@ import { WorkspaceOnboardingProvider } from "@/context/workspace-onboarding-cont
 export default function OnboardingGroupLayout({ children }: { children: React.ReactNode }) {
   return (
     <OnboardingProvider>
-      <WorkspaceOnboardingProvider>{children}</WorkspaceOnboardingProvider>
+      {/* Offline: the bar across the top of the window, as on every signed-in page. */}
+      <WorkspaceOnboardingProvider><OfflineFrame scroll="document">{children}</OfflineFrame></WorkspaceOnboardingProvider>
     </OnboardingProvider>
   );
 }

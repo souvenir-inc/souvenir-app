@@ -3,16 +3,14 @@
 import React, { useEffect, useState } from 'react'
 import { m } from 'framer-motion'
 import { usePathname } from 'next/navigation'
+import { ListFilter, Sigma, SlidersHorizontal } from 'lucide-react'
 import { ArrowLeftOneIcon, BrainTwoIcon, SidebarLeftIcon } from '@strange-huge/icons'
 import { useMobile } from '@/hooks/use-mobile'
-import { HugeiconsIcon } from '@hugeicons/react'
-import Logout01Icon from '@hugeicons/core-free-icons/Logout01Icon'
 import { SidebarMenuItem } from '@/components/SidebarMenuItem'
 import { SidebarMenuSkeleton } from '@/components/SidebarMenuSkeleton'
 import { IconButton } from '@/components/ui/button'
 import { AccountMenu } from '@/components/AccountMenu'
 import { Divider } from '@/components/Divider'
-import { Badge } from '@/components/Badge'
 import { RoleBadge } from '@/components/RoleBadge'
 import type { WorkspaceRole } from '@/components/RoleBadge'
 import { Tooltip } from '@/components/Tooltip'
@@ -21,8 +19,8 @@ import { useAuth } from '@/context/auth-context'
 import { useOrg } from '@/context/org-context'
 import type { CreditsDisplay } from '@/lib/api/plan'
 import { formatCredits } from '@/lib/format-credits'
-import { useGuardedRouter, useNavGuard } from '@/context/nav-guard-context'
-import { AUTH_LOGIN_ROUTE, SETTINGS_ACCOUNT_ROUTE, SETTINGS_USAGE_ROUTE, SETTINGS_MEMORY_ROUTE, SETTINGS_HELP_ROUTE, SETTINGS_REPORT_BUG_ROUTE, SETTINGS_FEATURE_REQUEST_ROUTE, CHAT_ROUTE, ORG_GENERAL_ROUTE, ORG_MEMBERS_ROUTE, ORG_PLANS_ROUTE, ORG_ANALYTICS_ROUTE, SETTINGS_LIBRARY_ROUTE, ORG_LIBRARY_ROUTE } from '@/lib/routes'
+import { useGuardedRouter } from '@/context/nav-guard-context'
+import { SETTINGS_ACCOUNT_ROUTE, SETTINGS_USAGE_ROUTE, SETTINGS_MEMORY_ROUTE, SETTINGS_HELP_ROUTE, CHAT_ROUTE, ORG_GENERAL_ROUTE, ORG_MEMBERS_ROUTE, ORG_PLANS_ROUTE, ORG_ANALYTICS_ROUTE, SETTINGS_LIBRARY_ROUTE, ORG_LIBRARY_ROUTE, SETTINGS_METRICS_ROUTE, SETTINGS_DATA_PREFERENCES_ROUTE, SETTINGS_DATA_RULES_ROUTE } from '@/lib/routes'
 import { LIBRARY_SETTINGS_ENABLED } from '@/lib/feature-flags'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 
@@ -34,12 +32,6 @@ import { Sheet, SheetContent } from '@/components/ui/sheet'
 // SettingsOneIcon used elsewhere), and 1:1 fidelity was the ask. `triggered`
 // is accepted-and-ignored so SidebarMenuItem's `cloneElement(icon, {
 // triggered })` doesn't warn about an unknown prop landing on a plain <img>.
-// Log out glyph, sized/aligned like the asset icons. `triggered` is accepted-and-ignored for the
-// same cloneElement reason as SidebarAssetIcon.
-function LogoutIcon({ triggered: _triggered }: { triggered?: boolean }) {
-  return <HugeiconsIcon icon={Logout01Icon} size={20} color="currentColor" strokeWidth={1.5} style={{ display: 'block' }} />
-}
-
 function SidebarAssetIcon({ src, triggered: _triggered }: { src: string; triggered?: boolean }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element -- static local icon, Next Image adds no value here
@@ -72,8 +64,8 @@ const sectionItemVariants = {
 function SettingsNavSkeleton() {
   const section = (labelWidth: number, rows: number) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <div style={{ padding: '5px 6px' }}>
-        <div className="kaya-skeleton" style={{ width: labelWidth, height: 14, borderRadius: 4 }} />
+      <div style={{ padding: '4px 6px' }}>
+        <div className="kaya-skeleton" style={{ width: labelWidth, height: 10, borderRadius: 4 }} />
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {Array.from({ length: rows }).map((_, i) => (
@@ -84,54 +76,90 @@ function SettingsNavSkeleton() {
   )
   return (
     <>
-      {section(64, 2)}
-      <Divider decorative style={{ margin: '8px 0' }} />
-      {section(90, 3)}
-      <Divider decorative style={{ margin: '8px 0' }} />
-      {section(120, 3)}
+      {section(56, 2)}
+      <Divider decorative style={GROUP_DIVIDER} />
+      {section(36, 3)}
+      <Divider decorative style={GROUP_DIVIDER} />
+      {section(72, 3)}
     </>
   )
 }
 
-// ── Settings v1.5 nav groups ──────────────────────────────────────────────────
-// PERSONAL: node 18:27786. "Connectors" (previously in this group under the
-// old design) has no home in the new Figma frame — the /settings/connectors
-// page it used to point at has been removed entirely; the main app sidebar's
-// own "Connectors" row (ORG_CONNECTORS_ROUTE, /connectors) is now the only
-// entry point, for every account type.
-const PERSONAL_ITEMS = [
+// ── Settings menu groups ──────────────────────────────────────────────────────
+// Grouped by what you set up (Metric Library design, Settings section, option A, Dev 25 Nov):
+// PERSONAL (you), DATA (what changes how numbers are counted and shown) and WORKSPACE (admins).
+// Help & Legal sits at the foot, above the account. Log out, Report a bug and Feature request
+// aren't settings: they live in the account menu and on the Help page.
+type NavItem = {
+  id: string
+  label: string
+  href: string
+  icon: React.ReactElement<{ triggered?: boolean }>
+  /** Other routes that light this item (the workspace view of Usage lights Usage). */
+  also?: string[]
+}
+
+// Lucide glyphs drawn at the asset icons' optical weight (20 px, 1.75 stroke).
+function LucideNavIcon({ icon: Icon, triggered: _triggered }: { icon: typeof Sigma; triggered?: boolean }) {
+  return <Icon size={20} strokeWidth={1.75} aria-hidden style={{ display: 'block' }} />
+}
+
+const PERSONAL_ITEMS: NavItem[] = [
   { id: 'account', label: 'Account', href: SETTINGS_ACCOUNT_ROUTE, icon: <SidebarAssetIcon src="/icons/settings-sidebar/account.svg" /> },
-  // Was a stand-in pointing at SETTINGS_BILLING_ROUTE until the dedicated
-  // Usage page (node 17-22980) existed — now points at its own route.
-  // Same glyph as WORKSPACE's Usage item below — one "Usage" icon, not two.
-  { id: 'usage',   label: 'Usage',   href: SETTINGS_USAGE_ROUTE,   icon: <SidebarAssetIcon src="/icons/settings-sidebar/usage-workspace.svg" /> },
-  { id: 'memory',  label: 'Memory',  href: SETTINGS_MEMORY_ROUTE,  icon: <BrainTwoIcon size={20} /> },
+  // One Usage page: your credits, and for admins a Workspace tab (the analytics page) on top.
+  { id: 'usage',   label: 'Usage',   href: SETTINGS_USAGE_ROUTE,   icon: <SidebarAssetIcon src="/icons/settings-sidebar/usage-workspace.svg" />, also: [ORG_ANALYTICS_ROUTE] },
+]
+
+// DATA: what every metric means, what counts, what Souvenir remembers, and how numbers show.
+// Metrics needs a workspace (the warehouse), so it shows only when there is one.
+const metricsItem: NavItem = { id: 'metrics', label: 'Metrics', href: SETTINGS_METRICS_ROUTE, icon: <LucideNavIcon icon={Sigma} /> }
+const dataRulesItem: NavItem = { id: 'data-rules', label: 'Data rules', href: SETTINGS_DATA_RULES_ROUTE, icon: <LucideNavIcon icon={ListFilter} /> }
+const DATA_ITEMS: NavItem[] = [
+  { id: 'memory',      label: 'Memory',      href: SETTINGS_MEMORY_ROUTE,           icon: <BrainTwoIcon size={20} /> },
+  { id: 'preferences', label: 'Preferences', href: SETTINGS_DATA_PREFERENCES_ROUTE, icon: <LucideNavIcon icon={SlidersHorizontal} /> },
   // Library: auto-save, AI use of files, storage. Off until NEXT_PUBLIC_ENABLE_LIBRARY_SETTINGS=true.
   ...(LIBRARY_SETTINGS_ENABLED ? [{ id: 'library', label: 'Library', href: SETTINGS_LIBRARY_ROUTE, icon: <SidebarAssetIcon src="/icons/settings-sidebar/library.svg" /> }] : []),
 ]
 
-// WORKSPACE: node 18:27793 (labelled "Organization" pre-v1.5). Admin only.
-const WORKSPACE_ITEMS = [
+// WORKSPACE: admins only. Audit log and Inventory (phase 2 placeholders) stay hidden; their pages
+// still exist at ORG_AUDIT_LOG_ROUTE / ORG_INVENTORY_ROUTE.
+const WORKSPACE_ITEMS: NavItem[] = [
   { id: 'general', label: 'General',         href: ORG_GENERAL_ROUTE, icon: <SidebarAssetIcon src="/icons/settings-sidebar/general.svg" /> },
   { id: 'members', label: 'Members',         href: ORG_MEMBERS_ROUTE, icon: <SidebarAssetIcon src="/icons/settings-sidebar/members.svg" /> },
   { id: 'plans',   label: 'Plans & Billing', href: ORG_PLANS_ROUTE,   icon: <SidebarAssetIcon src="/icons/settings-sidebar/plans-billing.svg" /> },
-  // "Usage" here maps to the same Analytics page as the old "Analytics" item —
-  // closest existing route to a workspace-level usage view. The old group's
-  // separate "Activity Log" (ORG_ACTIVITY_ROUTE) has no slot in the new design.
-  { id: 'usage',   label: 'Usage',           href: ORG_ANALYTICS_ROUTE, icon: <SidebarAssetIcon src="/icons/settings-sidebar/usage-workspace.svg" /> },
   // Workspace Library settings (Admin): auto-save default, AI use, file limits.
-  ...(LIBRARY_SETTINGS_ENABLED ? [{ id: 'library', label: 'Library', href: ORG_LIBRARY_ROUTE, icon: <SidebarAssetIcon src="/icons/settings-sidebar/library.svg" /> }] : []),
-  // Audit log and Inventory (phase 2 placeholders) are hidden for now; their pages still exist at
-  // ORG_AUDIT_LOG_ROUTE / ORG_INVENTORY_ROUTE.
+  ...(LIBRARY_SETTINGS_ENABLED ? [{ id: 'workspace-library', label: 'Library', href: ORG_LIBRARY_ROUTE, icon: <SidebarAssetIcon src="/icons/settings-sidebar/library.svg" /> }] : []),
 ]
 
-// HELP & SUPPORT: node 18:27804. New group — Help & Legal moves out of
-// PERSONAL; Report a bug moves out of the account-menu dropdown into the main
-// nav; Feature request is new (wired to the existing RequestFeatureModal).
-const HELP_ITEMS = [
-  { id: 'help', label: 'Help & Legal', href: SETTINGS_HELP_ROUTE, icon: <SidebarAssetIcon src="/icons/settings-sidebar/help-legal.svg" /> },
-]
+const HELP_ITEM: NavItem = { id: 'help', label: 'Help & Legal', href: SETTINGS_HELP_ROUTE, icon: <SidebarAssetIcon src="/icons/settings-sidebar/help-legal.svg" /> }
 
+// Group headers read as labels, not pages: small, spaced capitals in a lighter grey, with a line
+// above every group but the first (Dev, 25 Nov: "better design to distinguish between group headers
+// and sections").
+const GROUP_DIVIDER: React.CSSProperties = { margin: '10px 0 8px' }
+
+function GroupLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{
+      fontFamily:    'var(--font-body)',
+      fontWeight:    500,
+      fontSize:      11,
+      lineHeight:    '16px',
+      letterSpacing: '0.06em',
+      textTransform: 'uppercase',
+      color:         'var(--neutral-500)',
+      margin:        0,
+      padding:       '4px 6px',
+      whiteSpace:    'nowrap',
+    }}>
+      {children}
+    </p>
+  )
+}
+
+function isOn(item: NavItem, pathname: string): boolean {
+  return [item.href, ...(item.also ?? [])].some(href => pathname === href || pathname.startsWith(`${href}/`))
+}
 
 // Narrow screens: the settings nav opens as a left-side Sheet (Radix Dialog) with a scrim —
 // Escape / scrim click close it, focus is trapped inside and returns to the menu button.
@@ -165,8 +193,7 @@ export function SettingsSidebar() {
   const [drawerPath, setDrawerPath] = useState(pathname)
   if (drawerPath !== pathname) { setDrawerPath(pathname); setDrawerOpen(false) }
   // Escape, scrim click, focus trap and focus return are handled by the Radix Sheet below.
-  const { user, logout, isAuthenticated } = useAuth()
-  const { guardedNavigate } = useNavGuard()
+  const { user } = useAuth()
   const { orgId, org, plan, orgRole, currentUserRole, orgReady } = useOrg()
 
   // No-op for a click on the already-active nav item — avoids re-triggering
@@ -262,15 +289,12 @@ export function SettingsSidebar() {
     </Tooltip>
   ) : undefined
 
-  // WORKSPACE section's inline role chip (node 23:29814) — same role signal as
-  // roleBadge above but with the label shown, matching the Figma "Admin" chip.
-  // Figma's chip uses the blue/editor colour tokens under an "Admin" label —
-  // likely a copy-paste mismatch in the design (this codebase's RoleBadge
-  // consistently uses tan for admin, blue for editor elsewhere) — rendering
-  // the real per-viewer role+colour here rather than hardcoding the mismatch.
-  const workspaceSectionChip = orgId && displayRole ? (
-    <RoleBadge role={displayRole as WorkspaceRole} showLabel mode="solar" />
-  ) : undefined
+  const isAdmin = orgRole === 'admin'
+  const groups: { id: string; label: string; items: NavItem[] }[] = [
+    { id: 'personal', label: 'Personal', items: PERSONAL_ITEMS },
+    { id: 'data', label: 'Data', items: orgId ? [metricsItem, dataRulesItem, ...DATA_ITEMS] : DATA_ITEMS },
+    ...(orgId && isAdmin ? [{ id: 'workspace', label: 'Workspace', items: WORKSPACE_ITEMS }] : []),
+  ]
 
   return (
     <>
@@ -347,173 +371,59 @@ export function SettingsSidebar() {
         <div style={{ display: 'flex', flexDirection: 'column', padding: '0 16px' }}>
 
         {!orgReady ? <SettingsNavSkeleton /> : (
-        <>
-        {/* PERSONAL — node 18:27786 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <div style={{ padding: '5px 6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-            <p style={{
-              fontFamily: 'var(--font-body)',
-              fontWeight: 500,
-              fontSize:   14,
-              lineHeight: '22px',
-              color:      'var(--neutral-600)',
-              margin:     0,
-              whiteSpace: 'nowrap',
-            }}>
-              PERSONAL
-            </p>
-          </div>
-          <m.div
-            animate="open"
-            initial="closed"
-            variants={sectionStaggerVariants}
-            style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
-          >
-            {PERSONAL_ITEMS.map(item => (
-              <m.div key={item.id} variants={sectionItemVariants}>
-                <SidebarMenuItem
-                  fluid
-                  variant="default"
-                  icon={item.icon}
-                  label={item.label}
-                  selected={pathname === item.href}
-                  onClick={() => safeNavigate(item.href)}
-                />
-              </m.div>
-            ))}
-          </m.div>
-        </div>
-
-        <Divider decorative style={{ margin: '8px 0' }} />
-
-        {/* WORKSPACE — node 18:27793 (admin only; former /org/* admin pages) */}
-        {orgId && orgRole === 'admin' && (
-          <>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <div style={{ padding: '5px 6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-              <p style={{
-                fontFamily: 'var(--font-body)',
-                fontWeight: 500,
-                fontSize:   14,
-                lineHeight: '22px',
-                color:      'var(--neutral-600)',
-                margin:     0,
-                whiteSpace: 'nowrap',
-              }}>
-                WORKSPACE
-              </p>
-              {workspaceSectionChip}
-            </div>
-            <m.div
-              animate="open"
-              initial="closed"
-              variants={sectionStaggerVariants}
-              style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
-            >
-              {WORKSPACE_ITEMS.map(item => (
-                <m.div key={item.id} variants={sectionItemVariants}>
-                  <SidebarMenuItem
-                    fluid
-                    variant="default"
-                    icon={item.icon}
-                    label={item.label}
-                    trailing={'phase2' in item && item.phase2 ? <Badge label="Phase 2" color="Neutral" /> : undefined}
-                    selected={pathname === item.href || pathname.startsWith(`${item.href}/`)}
-                    onClick={() => safeNavigate(item.href)}
-                  />
+          groups.map((group, index) => (
+            <React.Fragment key={group.id}>
+              {index > 0 && <Divider decorative style={GROUP_DIVIDER} />}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <GroupLabel>{group.label}</GroupLabel>
+                <m.div
+                  animate="open"
+                  initial="closed"
+                  variants={sectionStaggerVariants}
+                  style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
+                >
+                  {group.items.map(item => (
+                    <m.div key={item.id} variants={sectionItemVariants}>
+                      <SidebarMenuItem
+                        fluid
+                        variant="default"
+                        icon={item.icon}
+                        label={item.label}
+                        selected={isOn(item, pathname)}
+                        onClick={() => safeNavigate(item.href)}
+                      />
+                    </m.div>
+                  ))}
                 </m.div>
-              ))}
-            </m.div>
-          </div>
-
-          <Divider decorative style={{ margin: '8px 0' }} />
-          </>
-        )}
-
-        {/* HELP & SUPPORT — node 18:27804 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <div style={{ padding: '5px 6px', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <p style={{
-              fontFamily: 'var(--font-body)',
-              fontWeight: 500,
-              fontSize:   14,
-              lineHeight: '22px',
-              color:      'var(--neutral-600)',
-              margin:     0,
-              whiteSpace: 'nowrap',
-            }}>
-              HELP & SUPPORT
-            </p>
-          </div>
-          <m.div
-            animate="open"
-            initial="closed"
-            variants={sectionStaggerVariants}
-            style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
-          >
-            {HELP_ITEMS.map(item => (
-              <m.div key={item.id} variants={sectionItemVariants}>
-                <SidebarMenuItem
-                  fluid
-                  variant="default"
-                  icon={item.icon}
-                  label={item.label}
-                  selected={pathname === item.href}
-                  onClick={() => safeNavigate(item.href)}
-                />
-              </m.div>
-            ))}
-            <m.div variants={sectionItemVariants}>
-              <SidebarMenuItem
-                fluid
-                variant="default"
-                icon={<SidebarAssetIcon src="/icons/settings-sidebar/report-bug.svg" />}
-                label="Report a bug"
-                selected={pathname === SETTINGS_REPORT_BUG_ROUTE}
-                onClick={() => safeNavigate(SETTINGS_REPORT_BUG_ROUTE)}
-              />
-            </m.div>
-            <m.div variants={sectionItemVariants}>
-              <SidebarMenuItem
-                fluid
-                variant="default"
-                icon={<SidebarAssetIcon src="/icons/settings-sidebar/feature-request.svg" />}
-                label="Feature request"
-                selected={pathname === SETTINGS_FEATURE_REQUEST_ROUTE}
-                onClick={() => safeNavigate(SETTINGS_FEATURE_REQUEST_ROUTE)}
-              />
-            </m.div>
-            <Divider decorative style={{ margin: '4px 0' }} />
-            <m.div variants={sectionItemVariants}>
-              <SidebarMenuItem
-                fluid
-                variant="default"
-                danger
-                icon={<LogoutIcon />}
-                label="Log out"
-                selected={false}
-                onClick={() => guardedNavigate(() => { if (isAuthenticated) { void logout() } else { push(AUTH_LOGIN_ROUTE) } })}
-              />
-            </m.div>
-          </m.div>
-        </div>
-        </>
+              </div>
+            </React.Fragment>
+          ))
         )}
 
         </div>
 
       </div>
 
-      {/* ── Account menu — fixed ── */}
+      {/* ── Help & Legal, then the account — fixed at the foot ── */}
       <div style={{
         flexShrink:      0,
         backgroundColor: 'var(--neutral-50)',
         paddingLeft:     10,
         paddingRight:    10,
-        paddingTop:      12,
+        paddingTop:      8,
         paddingBottom:   12,
         boxShadow:       '0px -34px 33.5px 0px var(--neutral-50)',
       }}>
+        <div style={{ padding: '0 6px 8px' }}>
+          <SidebarMenuItem
+            fluid
+            variant="default"
+            icon={HELP_ITEM.icon}
+            label={HELP_ITEM.label}
+            selected={isOn(HELP_ITEM, pathname)}
+            onClick={() => safeNavigate(HELP_ITEM.href)}
+          />
+        </div>
         {!user ? (
           <div style={{ padding: '8px 6px', display: 'flex', alignItems: 'center', gap: 8 }}>
             <div className="kaya-skeleton" style={{ width: 36, height: 36, borderRadius: 8, flexShrink: 0 }} />

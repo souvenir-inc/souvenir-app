@@ -244,8 +244,9 @@ export function SetupModal({
             waiting on auth is always safe to bail out of, and closing this
             modal fully aborts the poll (see useConnectorSetupFlow's cleanup
             effect). Without this, a user who closes the external OAuth
-            window has no way to escape "Waiting for auth…" except waiting
-            out the poll's timeout. */}
+            window has no way to escape the wait except sitting out the
+            poll's timeout. While it waits, the action keeps its label and
+            shows a spinner (D69: "the button text shouldn't change"). */}
         <Button variant="cancel" size="sm" onClick={cancel} disabled={flow.state === 'submitting'}>Cancel</Button>
         <Button
           size="sm"
@@ -253,7 +254,7 @@ export function SetupModal({
           loading={busy}
           onClick={submit}
         >
-          {flow.state === 'opening' ? 'Opening…' : flow.state === 'polling' ? 'Waiting for auth…' : flow.state === 'error' && flow.error?.recovery !== 'ask_admin' ? 'Try again' : reconnecting ? 'Reconnect' : `Continue to ${catalog.name}`}
+          {flow.state === 'error' && flow.error?.recovery !== 'ask_admin' ? 'Try again' : reconnecting ? 'Reconnect' : `Continue to ${catalog.name}`}
         </Button>
       </div>
     </Modal>

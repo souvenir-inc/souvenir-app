@@ -11,7 +11,7 @@ import { useProfileForm } from './_components/use-profile-form'
 // ── Settings v1.5 — Account page ─────────────────────────────────────────────
 // Figma: https://www.figma.com/design/EirgiIxJWDEeUNZnKwr3f8/Settings-v1.5?node-id=18-27466
 // Profile (edited and saved together, guarded on leave), Appearance and Response style (each saves
-// on pick). The cards live in ./_components.
+// on pick), and the dashboard's default period (saved in this browser). The cards live in ./_components.
 
 export default function AccountPage() {
   const { user, refreshUser } = useAuth()
@@ -34,7 +34,7 @@ function AccountPageContent({ user, refreshUser }: { user: AuthUser; refreshUser
         <div style={{ paddingLeft: 4, marginBottom: 4 }}>
           <h1 style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: 0 }}>Account</h1>
           <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-600)', margin: 0 }}>
-            Your profile, and how Souvenir looks and writes to you.
+            Your profile, and how Souvenir looks and writes to you
           </p>
         </div>
 

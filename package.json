@@ -6,6 +6,8 @@
     "load-secrets": "node scripts/load-secrets.mjs",
     "predev": "npm run load-secrets",
     "dev": "next dev",
+    "predev:lowmem": "npm run load-secrets",
+    "dev:lowmem": "node scripts/dev-lowmem.mjs",
     "prebuild": "npm run load-secrets",
     "build": "next build --webpack",
     "prestart": "npm run load-secrets",
@@ -21,6 +23,7 @@
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.19.0",
     "@base-ui/react": "^1.4.1",
+    "@floating-ui/dom": "^1.7.6",
     "@formspree/react": "^3.0.0",
     "@hugeicons/core-free-icons": "^4.1.2",
     "@hugeicons/react": "^1.1.6",
@@ -35,6 +38,7 @@
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@radix-ui/react-visually-hidden": "^1.2.3",
     "@strange-huge/icons": "github:strange-rock/strange-huge-icons",
     "@tanstack/react-query": "^5.101.4",
     "@tanstack/react-virtual": "^3.13.24",
@@ -68,6 +72,7 @@
     "remark-math": "^6.0.0",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.1",
+    "unified": "^11.0.5",
     "zod": "^4.4.3",
     "zustand": "^5.0.15"
   },

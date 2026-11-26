@@ -1,0 +1,175 @@
+/* The dashboard shell's header, one row (6D): on the left the open page's own controls (a board's tabs, through
+   HeaderSlot) and the "couldn't load" note; on the right the period and comparison (PeriodFilter), then the sync
+   button (its styles live in SyncStatus). Figma, at 1440: the row is 42 high, flush with the panel's padding (its
+   centre 21 below it), the cards or a sync banner start 17 below it, and cards sit 16 under a banner. */
+
+.page {
+  --page-pad: 40px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--page-pad) 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--neutral-900);
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+/* The header stays put while the board scrolls under it: no line, the cards fade out over 40 px beneath it, softly
+   blurred (Dev, 19 Nov: "remove the border and the progressive fadeout is the new way"). It spans the page's
+   padding too, so a card's shadow never shows beside it. */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  min-height: 42px;
+  /* 17 to the cards or a banner; banners and cards are 16 apart. */
+  margin: 0 calc(-1 * var(--page-pad)) 1px;
+  padding: 0 var(--page-pad);
+  /* The panel's own colour, which is a see-through tint (--color-surface-container) over the app's background
+     (--neutral-50): the same two layers here, so the header is solid and matches it exactly. */
+  background: linear-gradient(var(--color-surface-container) 0 0), var(--neutral-50);
+}
+
+/* The fade, only once the board has scrolled: at rest it would fade the first row of cards. */
+.header::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 40px;
+  /* The panel's colour, faded out by the mask: solid at the header, clear 40 px below, with the blur fading too. */
+  background: linear-gradient(var(--color-surface-container) 0 0), var(--neutral-50);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgb(0 0 0 / 0.55) 50%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, rgb(0 0 0 / 0.55) 50%, transparent 100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+
+.header[data-scrolled]::after {
+  opacity: 1;
+}
+
+.start {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.slot {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.slot:empty {
+  display: none;
+}
+
+/* The period's buttons, then 8 to the sync button (Figma: 1299 → 1307). */
+.end {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.navLink {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border-radius: 9999px;
+  color: var(--neutral-700);
+  font-size: var(--font-size-body);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.navLink:hover {
+  background: var(--neutral-100);
+  color: var(--neutral-900);
+}
+
+.navLink:focus-visible {
+  outline: 2px solid var(--neutral-900);
+  outline-offset: 2px;
+}
+
+.refresh {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--neutral-500);
+  cursor: pointer;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.refresh:hover {
+  background: var(--neutral-100);
+  color: var(--neutral-900);
+}
+
+.refresh:focus-visible {
+  outline: 2px solid var(--neutral-900);
+  outline-offset: 2px;
+}
+
+.refresh[data-spinning] {
+  color: var(--neutral-900);
+  cursor: progress;
+}
+
+.refresh[data-spinning] svg {
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .refresh[data-spinning] svg {
+    animation: none;
+  }
+}
+
+.note {
+  color: var(--neutral-600);
+}
+
+@media (max-width: 960px) {
+  .page {
+    --page-pad: 16px;
+    padding: 0 var(--page-pad) 40px;
+  }
+
+  .header {
+    flex-wrap: wrap;
+  }
+}

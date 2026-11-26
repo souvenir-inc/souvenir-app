@@ -1,0 +1,536 @@
+/* The header's period and comparison (Figma "Header · Period filter (final, 19 Nov)"; every state is on the states
+   board 456:61003). The colours not in the token set are the board's own, named once here. */
+
+.pair,
+.panel {
+  --pf-ink: var(--neutral-900);
+  --pf-muted: var(--neutral-500);
+  --pf-fill: #F0ECE8;          /* a row or day under the pointer; the picked band */
+  --pf-preview: #F6F4F1;       /* a preset's days while it's pointed at */
+  --pf-band-hover: #E2DDD8;    /* a day under the pointer inside the picked band */
+  --pf-solid-hover: var(--neutral-700);
+  --pf-today: var(--border-default);
+  --pf-future: #C2BAB3;
+  --pf-before: #B5ADA6;
+  --pf-line: var(--neutral-200);
+  --pf-apply-hover: #463F3A;
+  --pf-error: #B42318;
+  --pf-focus: var(--focus-ring);
+}
+
+/* ── The two buttons ── */
+
+.pair {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-body);
+}
+
+.trigger {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.trigger:hover,
+.trigger[data-open] {
+  background: var(--pf-fill);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--pf-focus);
+  outline-offset: 0;
+}
+
+/* A button: the caption (11) over the value (13 Medium) and a 12 chevron, 42 high (5 above and below). */
+.face {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 5px 8px 5px 10px;
+  text-align: left;
+}
+
+.caption {
+  color: var(--pf-muted);
+  font-size: 11px;
+  line-height: 12px;
+}
+
+.value {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--pf-ink);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.value[data-muted],
+.face[data-disabled] .value {
+  color: var(--pf-muted);
+}
+
+.face[data-disabled] .caption {
+  color: var(--neutral-400);
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--pf-muted);
+  transition: transform 150ms ease;
+}
+
+.chevron[data-open] {
+  transform: rotate(180deg);
+}
+
+/* A fine line between the two, 4 from each; it hides next to a filled button. */
+.divider {
+  width: 1px;
+  height: 24px;
+  margin: 0 4px;
+  background: var(--pf-line);
+  transition: opacity 150ms ease;
+}
+
+.trigger:hover + .divider,
+.pair:has(.trigger:hover + .divider) .divider,
+.pair:has(.divider + .trigger:hover) .divider,
+.pair[data-open] .divider {
+  opacity: 0;
+}
+
+.offline {
+  display: inline-flex;
+  align-items: center;
+  cursor: default;
+}
+
+/* ── The panel ── */
+
+.panel {
+  box-sizing: border-box;
+  max-width: calc(100vw - 32px);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgba(38, 33, 30, 0.08),
+    0 2px 4px rgba(38, 33, 30, 0.06),
+    0 12px 28px -6px rgba(38, 33, 30, 0.18);
+  color: var(--pf-ink);
+  font-family: var(--font-body);
+  font-size: 13px;
+  outline: none;
+}
+
+.body {
+  display: flex;
+  align-items: stretch;
+}
+
+.listColumn {
+  box-sizing: border-box;
+  width: 320px;
+  padding: 6px;
+}
+
+.body[data-calendar] .listColumn {
+  width: 321px;
+  border-left: 1px solid var(--pf-line);
+}
+
+/* ── Rows ── */
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--pf-ink);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.row:hover,
+.row:focus-visible {
+  background: var(--pf-fill);
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--pf-focus);
+  outline-offset: -2px;
+}
+
+.rowLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowDates {
+  flex-shrink: 0;
+  color: var(--pf-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* Selected: a tick, semibold text and dark dates; no fill, so it never looks like the row under the pointer (D100). */
+.row[data-selected] .rowLabel {
+  font-weight: 600;
+}
+
+.row[data-selected] .rowDates {
+  color: var(--pf-ink);
+}
+
+.tick {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 14px;
+}
+
+.row[data-reset] .rowLabel {
+  flex: 0 0 auto;
+}
+
+.row[data-reset] .rowDates {
+  flex: 1;
+  text-align: right;
+}
+
+.resetIcon {
+  flex-shrink: 0;
+  color: var(--neutral-700);
+}
+
+.rowDivider {
+  height: 1px;
+  margin: 6px 4px;
+  background: var(--pf-line);
+}
+
+/* ── From, To and the calendar ── */
+
+/* 441 high whatever the month, so the menu never jumps; the footer sits at its foot. */
+.calendarColumn {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 560px;
+  min-height: 441px;
+  padding: 14px 16px;
+}
+
+@media (max-width: 1279px) {
+  .calendarColumn { width: 356px; }
+}
+
+.fields {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fieldDash {
+  color: var(--pf-muted);
+}
+
+.field {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 150px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.field:hover {
+  border-color: var(--neutral-300);
+}
+
+.field:focus-within {
+  border-color: var(--pf-focus);
+  box-shadow: 0 0 0 1px var(--pf-focus);
+}
+
+.field[data-invalid] {
+  border-color: var(--pf-error);
+  box-shadow: none;
+}
+
+.fieldLabel {
+  flex-shrink: 0;
+  color: var(--pf-muted);
+  font-size: 12px;
+}
+
+.fieldInput {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--pf-ink);
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.fieldInput::placeholder {
+  color: var(--pf-future);
+}
+
+.months {
+  display: flex;
+  gap: 24px;
+  margin-top: 14px;
+}
+
+.month {
+  width: 252px;
+}
+
+.monthHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 28px;
+  margin-bottom: 2px;
+}
+
+.monthTitle {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.monthNav,
+.monthNavSpace {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.monthNav {
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--pf-ink);
+  cursor: pointer;
+}
+
+.monthNav:hover:not(:disabled) {
+  background: var(--pf-fill);
+}
+
+.monthNav:focus-visible {
+  outline: 2px solid var(--pf-focus);
+  outline-offset: 0;
+}
+
+.monthNav:disabled {
+  color: var(--pf-future);
+  cursor: default;
+}
+
+.grid {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 252px;
+}
+
+/* 20 high, then 2 to the first week (the cell's own 1 + 1 here). */
+.weekday {
+  height: 21px;
+  padding: 0 0 1px;
+  line-height: 20px;
+  vertical-align: top;
+  color: var(--pf-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* A cell is 36 × 34; the band runs behind the days, the ends sit on half of it. */
+.cell {
+  width: 36px;
+  height: 34px;
+  padding: 1px 0;
+  text-align: center;
+}
+
+.cell[data-preview="mid"] { background: var(--pf-preview) content-box; }
+.cell[data-preview="start"] { background: linear-gradient(to right, transparent 50%, var(--pf-preview) 50%) content-box; }
+.cell[data-preview="end"] { background: linear-gradient(to left, transparent 50%, var(--pf-preview) 50%) content-box; }
+
+.cell[data-range="mid"] { background: var(--pf-fill) content-box; }
+.cell[data-range="start"] { background: linear-gradient(to right, transparent 50%, var(--pf-fill) 50%) content-box; }
+.cell[data-range="end"] { background: linear-gradient(to left, transparent 50%, var(--pf-fill) 50%) content-box; }
+.cell[data-range="start"][data-preview="mid"],
+.cell[data-range="start"][data-preview="end"] { background: linear-gradient(to right, var(--pf-preview) 50%, var(--pf-fill) 50%) content-box; }
+.cell[data-range="end"][data-preview="mid"],
+.cell[data-range="end"][data-preview="start"] { background: linear-gradient(to left, var(--pf-preview) 50%, var(--pf-fill) 50%) content-box; }
+
+.day {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--pf-ink);
+  font: inherit;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.day:hover:not(:disabled) { background: var(--pf-fill); }
+.cell[data-range="mid"] .day:hover:not(:disabled) { background: var(--pf-band-hover); }
+
+.day[data-today] { box-shadow: inset 0 0 0 1px var(--pf-today); }
+
+.day[data-ring] { box-shadow: inset 0 0 0 1.5px var(--pf-ink); }
+
+.day[data-solid] {
+  background: var(--pf-ink);
+  color: #fff;
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.day[data-solid]:hover:not(:disabled) { background: var(--pf-solid-hover); }
+
+.day[data-before] { color: var(--pf-before); }
+
+.day:disabled {
+  color: var(--pf-future);
+  cursor: default;
+}
+
+.day:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--pf-focus);
+}
+
+.day[data-solid]:focus-visible {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--pf-focus);
+}
+
+.dataDot {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  margin-left: -1.5px;
+  border-radius: 9999px;
+  background: currentColor;
+}
+
+.dataNote {
+  margin: 8px 0 0;
+  color: var(--pf-muted);
+  font-size: 12px;
+}
+
+/* ── Footer ── */
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 16px;
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.footerText {
+  margin: 0;
+  color: var(--pf-muted);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.footerText[data-error] {
+  color: var(--pf-error);
+}
+
+.footerButtons {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+}
+
+.cancel,
+.apply {
+  height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 9999px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.cancel {
+  padding: 0 12px;
+  background: transparent;
+  color: var(--neutral-700);
+}
+
+.cancel:hover { background: var(--pf-fill); }
+
+.apply {
+  background: var(--pf-ink);
+  color: #fff;
+}
+
+.apply:hover:not(:disabled) { background: var(--pf-apply-hover); }
+
+.apply:disabled {
+  background: var(--pf-fill);
+  color: var(--pf-future);
+  cursor: default;
+}
+
+.cancel:focus-visible,
+.apply:focus-visible {
+  outline: 2px solid var(--pf-focus);
+  outline-offset: 2px;
+}
