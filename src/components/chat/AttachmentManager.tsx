@@ -364,8 +364,8 @@ export function AttachmentManager({
             msOverflowStyle:      "none",
             WebkitOverflowScrolling: "touch",
             borderRadius:         "var(--radius-md)",
-            outline:              isDragging ? "2px dashed var(--neutral-300)" : "none",
-            outlineOffset:        "2px",
+            outline:              isDragging ? "var(--focus-ring-width) dashed var(--neutral-300)" : "none",
+            outlineOffset:        "var(--focus-ring-offset)",
             minHeight:            "56px",
             transition:           "outline var(--duration-instant)",
           }}
@@ -400,7 +400,7 @@ export function AttachmentManager({
                     unoptimized
                     style={{
                       objectFit: "cover",
-                      filter: attachment.uploading || attachment.processing ? "blur(1.5px)" : "none",
+                      filter: attachment.uploading || attachment.processing ? "blur(var(--attachment-manager-blur))" : "none",
                       transition: "filter var(--duration-slow)",
                     }}
                   />

@@ -24,8 +24,8 @@ function Avatars({ count }: { count: number }) {
 function NameCell({ index }: { index: number }) {
   return (
     <div role="presentation" className={cx(styles.row, styles.nameCell)}>
-      <Skeleton width={32} height={32} radius={8} />
-      <Skeleton width={nameWidth(index)} height={14} radius={6} />
+      <Skeleton width={32} height={32} radius={"var(--radius-md)"} />
+      <Skeleton width={nameWidth(index)} height={14} radius={"var(--radius-sm)"} />
     </div>
   )
 }
@@ -36,19 +36,19 @@ export function LibraryHeaderSkeleton({ tools = true }: { tools?: boolean }) {
     <header aria-hidden="true" className={styles.header}>
       <div className={cx(styles.row, styles.headerBar)}>
         <div className={cx(styles.row, styles.gap12)}>
-          <Skeleton width={88} height={24} radius={8} />
-          <Skeleton width={84} height={14} radius={6} />
+          <Skeleton width={88} height={24} radius={"var(--radius-md)"} />
+          <Skeleton width={84} height={14} radius={"var(--radius-sm)"} />
         </div>
         <div className={styles.grow} />
         {tools && (
           <div className={cx(styles.row, styles.gap4)}>
-            <Skeleton width={240} height={36} radius={10} />
-            <Skeleton width={36} height={36} radius={10} />
+            <Skeleton width={240} height={36} radius={"var(--radius-lg)"} />
+            <Skeleton width={36} height={36} radius={"var(--radius-lg)"} />
           </div>
         )}
       </div>
       <div className={styles.tabs}>
-        <Skeleton width={216} height={36} radius={12} />
+        <Skeleton width={216} height={36} radius={"var(--radius-xl)"} />
       </div>
     </header>
   )
@@ -62,21 +62,21 @@ export function FileTableSkeleton({ rows = 9, kind = 'all' }: { rows?: number; k
     <div role="status" aria-busy="true" aria-label="Loading files" className={cx(tableStyles.container, styles.table)}>
       <div>
         <div className={cx(tableStyles.head, COLUMN_CLASS[kind])}>
-          <Skeleton width={44} height={12} radius={6} />
-          <span className={hide.access}><Skeleton width={48} height={12} radius={6} /></span>
-          {all && <span className={hide.source}><Skeleton width={52} height={12} radius={6} /></span>}
-          <Skeleton width={all ? 64 : 84} height={12} radius={6} />
-          <span className={hide.type}><Skeleton width={36} height={12} radius={6} /></span>
+          <Skeleton width={44} height={12} radius={"var(--radius-sm)"} />
+          <span className={hide.access}><Skeleton width={48} height={12} radius={"var(--radius-sm)"} /></span>
+          {all && <span className={hide.source}><Skeleton width={52} height={12} radius={"var(--radius-sm)"} /></span>}
+          <Skeleton width={all ? 64 : 84} height={12} radius={"var(--radius-sm)"} />
+          <span className={hide.type}><Skeleton width={36} height={12} radius={"var(--radius-sm)"} /></span>
           <span />
         </div>
         {Array.from({ length: rows }).map((_, index) => (
           <div key={index} className={cx(tableStyles.row, tableStyles.fixedRow, COLUMN_CLASS[kind])} style={{ opacity: fade(index) }}>
             <NameCell index={index} />
             <span className={hide.access}><Avatars count={1 + (index % 3 === 2 ? 1 : 0)} /></span>
-            {all && <span className={hide.source}><Skeleton width={64} height={14} radius={6} /></span>}
-            <Skeleton width={96} height={14} radius={6} />
-            <span className={hide.type}><Skeleton width={68} height={14} radius={6} /></span>
-            <Skeleton width={28} height={28} radius={8} />
+            {all && <span className={hide.source}><Skeleton width={64} height={14} radius={"var(--radius-sm)"} /></span>}
+            <Skeleton width={96} height={14} radius={"var(--radius-sm)"} />
+            <span className={hide.type}><Skeleton width={68} height={14} radius={"var(--radius-sm)"} /></span>
+            <Skeleton width={28} height={28} radius={"var(--radius-md)"} />
           </div>
         ))}
       </div>
@@ -90,19 +90,19 @@ export function TrashTableSkeleton({ rows = 4 }: { rows?: number }) {
     <div role="status" aria-busy="true" aria-label="Loading trash" className={cx(tableStyles.container, styles.table)}>
       <div>
         <div className={cx(tableStyles.head, tableStyles.colsTrash)}>
-          <Skeleton width={44} height={12} radius={6} />
-          <Skeleton width={60} height={12} radius={6} />
-          <span className={tableStyles.cSize}><Skeleton width={32} height={12} radius={6} /></span>
-          <span className={tableStyles.cDeleted}><Skeleton width={56} height={12} radius={6} /></span>
+          <Skeleton width={44} height={12} radius={"var(--radius-sm)"} />
+          <Skeleton width={60} height={12} radius={"var(--radius-sm)"} />
+          <span className={tableStyles.cSize}><Skeleton width={32} height={12} radius={"var(--radius-sm)"} /></span>
+          <span className={tableStyles.cDeleted}><Skeleton width={56} height={12} radius={"var(--radius-sm)"} /></span>
           <span />
         </div>
         {Array.from({ length: rows }).map((_, index) => (
           <div key={index} className={cx(tableStyles.row, tableStyles.fixedRow, tableStyles.colsTrash)} style={{ opacity: fade(index) }}>
             <NameCell index={index} />
-            <Skeleton width={56} height={14} radius={6} />
-            <span className={tableStyles.cSize}><Skeleton width={52} height={14} radius={6} /></span>
-            <span className={tableStyles.cDeleted}><Skeleton width={110} height={14} radius={6} /></span>
-            <Skeleton width={28} height={28} radius={8} />
+            <Skeleton width={56} height={14} radius={"var(--radius-sm)"} />
+            <span className={tableStyles.cSize}><Skeleton width={52} height={14} radius={"var(--radius-sm)"} /></span>
+            <span className={tableStyles.cDeleted}><Skeleton width={110} height={14} radius={"var(--radius-sm)"} /></span>
+            <Skeleton width={28} height={28} radius={"var(--radius-md)"} />
           </div>
         ))}
       </div>
@@ -113,8 +113,8 @@ export function TrashTableSkeleton({ rows = 4 }: { rows?: number }) {
 function SectionHead({ width, action }: { width: number; action?: boolean }) {
   return (
     <div className={cx(styles.row, styles.sectionHead)}>
-      <Skeleton width={width} height={18} radius={6} className={styles.sectionTitle} />
-      {action && <Skeleton width={64} height={28} radius={8} />}
+      <Skeleton width={width} height={18} radius={"var(--radius-sm)"} className={styles.sectionTitle} />
+      {action && <Skeleton width={64} height={28} radius={"var(--radius-md)"} />}
     </div>
   )
 }
@@ -124,10 +124,10 @@ function Tiles() {
     <div className={suggestedStyles.tileGrid}>
       {Array.from({ length: 3 }).map((_, index) => (
         <div key={index} className={styles.tile}>
-          <Skeleton width={32} height={32} radius={8} />
+          <Skeleton width={32} height={32} radius={"var(--radius-md)"} />
           <div className={styles.stack6}>
-            <Skeleton width="70%" height={14} radius={6} />
-            <Skeleton width="40%" height={12} radius={6} />
+            <Skeleton width="70%" height={14} radius={"var(--radius-sm)"} />
+            <Skeleton width="40%" height={12} radius={"var(--radius-sm)"} />
           </div>
         </div>
       ))}
@@ -146,7 +146,7 @@ export function SuggestedSkeleton() {
         <SectionHead width={56} action />
         <div className={cx(suggestedStyles.cardGrid, styles.cardGrid)}>
           {Array.from({ length: 5 }).map((_, index) => (
-            <Skeleton key={index} width="100%" height={168} radius={16} />
+            <Skeleton key={index} width="100%" height={168} radius={"var(--radius-2xl)"} />
           ))}
         </div>
       </section>
@@ -167,11 +167,11 @@ export function TrashHeaderSkeleton() {
   return (
     <header aria-hidden="true" className={trashStyles.header}>
       <div className={trashStyles.breadcrumb}>
-        <Skeleton width={72} height={24} radius={8} />
-        <Skeleton width={20} height={20} radius={6} />
-        <Skeleton width={64} height={24} radius={8} />
+        <Skeleton width={72} height={24} radius={"var(--radius-md)"} />
+        <Skeleton width={20} height={20} radius={"var(--radius-sm)"} />
+        <Skeleton width={64} height={24} radius={"var(--radius-md)"} />
       </div>
-      <Skeleton height={48} radius={12} className={styles.banner} />
+      <Skeleton height={48} radius={"var(--radius-xl)"} className={styles.banner} />
     </header>
   )
 }
@@ -181,22 +181,22 @@ export function FilePageSkeleton() {
   return (
     <div role="status" aria-busy="true" aria-label="Loading file" className={cx(fileStyles.viewer, fileStyles.viewerInfo)}>
       <div className={fileStyles.bar} aria-hidden="true">
-        <Skeleton width={240} height={36} radius={12} />
+        <Skeleton width={240} height={36} radius={"var(--radius-xl)"} />
         <span className={fileStyles.end}>
-          <Skeleton width={36} height={36} radius={12} />
-          <Skeleton width={84} height={36} radius={12} />
-          <Skeleton width={36} height={36} radius={12} />
-          <Skeleton width={36} height={36} radius={12} />
+          <Skeleton width={36} height={36} radius={"var(--radius-xl)"} />
+          <Skeleton width={84} height={36} radius={"var(--radius-xl)"} />
+          <Skeleton width={36} height={36} radius={"var(--radius-xl)"} />
+          <Skeleton width={36} height={36} radius={"var(--radius-xl)"} />
         </span>
       </div>
       <div className={cx(fileStyles.scroll, styles.clip)}>
         <div className={fileStyles.main}>
           <div className={fileStyles.page}>
-            <Skeleton width="48%" height={26} radius={8} />
-            <Skeleton width={96} height={12} radius={6} className={styles.meta} />
+            <Skeleton width="48%" height={26} radius={"var(--radius-md)"} />
+            <Skeleton width={96} height={12} radius={"var(--radius-sm)"} className={styles.meta} />
             <div className={styles.stack12}>
               {[92, 84, 96, 60, 88, 72, 90, 40].map((width, index) => (
-                <Skeleton key={index} width={`${width}%`} height={10} radius={6} />
+                <Skeleton key={index} width={`${width}%`} height={10} radius={"var(--radius-sm)"} />
               ))}
             </div>
           </div>
@@ -205,34 +205,34 @@ export function FilePageSkeleton() {
       </div>
       <div className={fileStyles.slide}><aside className={fileStyles.info} aria-hidden="true">
         <div className={fileStyles.infoHead}>
-          <Skeleton width={72} height={16} radius={6} />
+          <Skeleton width={72} height={16} radius={"var(--radius-sm)"} />
         </div>
         <div className={fileStyles.block}>
-          <Skeleton width="70%" height={16} radius={6} />
-          <Skeleton width="55%" height={12} radius={6} className={styles.below} />
+          <Skeleton width="70%" height={16} radius={"var(--radius-sm)"} />
+          <Skeleton width="55%" height={12} radius={"var(--radius-sm)"} className={styles.below} />
         </div>
         <div className={cx(fileStyles.block, styles.stack12)}>
           {[60, 40, 70, 70, 45, 35].map((width, index) => (
             <div key={index} className={styles.infoRow}>
-              <Skeleton width={56} height={14} radius={6} />
-              <Skeleton width={`${width}%`} height={14} radius={6} />
+              <Skeleton width={56} height={14} radius={"var(--radius-sm)"} />
+              <Skeleton width={`${width}%`} height={14} radius={"var(--radius-sm)"} />
             </div>
           ))}
         </div>
         <div className={fileStyles.block}>
-          <Skeleton width={80} height={14} radius={6} />
-          <Skeleton width="60%" height={12} radius={6} className={styles.below} />
+          <Skeleton width={80} height={14} radius={"var(--radius-sm)"} />
+          <Skeleton width="60%" height={12} radius={"var(--radius-sm)"} className={styles.below} />
         </div>
         <div className={fileStyles.block}>
-          <Skeleton width={110} height={14} radius={6} />
+          <Skeleton width={110} height={14} radius={"var(--radius-sm)"} />
           <div className={cx(styles.row, styles.person)}>
             <Skeleton width={28} height={28} radius="50%" />
-            <Skeleton width={96} height={14} radius={6} />
+            <Skeleton width={96} height={14} radius={"var(--radius-sm)"} />
           </div>
         </div>
       </aside></div>
       <div className={fileStyles.dock} aria-hidden="true">
-        <Skeleton width="min(560px, calc(100% - 48px))" height={52} radius={16} />
+        <Skeleton width="min(560px, calc(100% - 48px))" height={52} radius={"var(--radius-2xl)"} />
       </div>
     </div>
   )

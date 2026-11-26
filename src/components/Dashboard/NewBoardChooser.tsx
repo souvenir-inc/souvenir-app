@@ -115,7 +115,7 @@ export function TemplateArt() {
 
 function AiArt() {
   return (
-    <span className="absolute left-2 top-6 flex items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-2 py-1.5 text-[10px] leading-[14px] text-[var(--dashboard-faint)]">
+    <span className="absolute left-2 top-6 flex items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-2 py-1.5 text-[length:var(--dashboard-micro-size)] leading-[var(--dashboard-tag-line-height)] text-[var(--dashboard-faint)]">
       <Sparkles size={16} strokeWidth={1.5} absoluteStrokeWidth className="text-[var(--dashboard-figure)]" />Paid ads, every day
     </span>
   )

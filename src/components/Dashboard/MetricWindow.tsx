@@ -72,11 +72,11 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
       style={{ width: 760, maxWidth: 'calc(100vw - 32px)', height: 760, maxHeight: 'calc(100dvh - 64px)', borderRadius: 'var(--radius-2xl)', boxShadow: 'var(--dashboard-window-shadow)', padding: 0, background: 'var(--dashboard-card-bg)' }}
     >
       <div className="flex min-h-0 flex-1 flex-col">
-        <header className="relative shrink-0 border-0 border-b border-solid border-[var(--neutral-200)] px-7 pb-[18px] pt-7">
-          <DialogTitle className="text-[15px] font-medium leading-5 text-[var(--neutral-800)]">{metric.label}</DialogTitle>
+        <header className="relative shrink-0 border-0 border-b border-solid border-[var(--neutral-200)] px-7 pb-[var(--space-4-5)] pt-7">
+          <DialogTitle className="text-[length:var(--font-size-body-md)] font-medium leading-5 text-[var(--neutral-800)]">{metric.label}</DialogTitle>
           <p className="m-0 mt-1 text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-muted)]">{periodLabel}</p>
           <div className="mt-[var(--space-2-5)] flex items-end gap-3.5">
-            <p className="m-0 text-[44px] font-normal leading-[52px] tracking-[-0.88px] text-[var(--dashboard-figure)]">{metric.value}</p>
+            <p className="m-0 text-[length:var(--dashboard-metric-value-size)] font-normal leading-[var(--dashboard-metric-value-line-height)] tracking-[var(--dashboard-metric-value-tracking)] text-[var(--dashboard-figure)]">{metric.value}</p>
             <p className="m-0 flex items-center gap-0.5 pb-2 text-[length:var(--font-size-body-sm)] leading-5">
               {comparable ? (
                 <>
@@ -112,10 +112,10 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
                 setTab(next)
                 ;(e.currentTarget.parentElement?.querySelectorAll<HTMLElement>('[role=tab]')[TABS.indexOf(next)])?.focus()
               }}
-              className={cn('flex cursor-pointer flex-col gap-2 border-0 bg-transparent p-0 pt-2 text-[length:var(--font-size-body-sm)] leading-[17px]', tab === t ? 'font-medium text-[var(--dashboard-figure)]' : 'text-[var(--dashboard-muted)] hover:text-[var(--dashboard-figure)]', FOCUS)}
+              className={cn('flex cursor-pointer flex-col gap-2 border-0 bg-transparent p-0 pt-2 text-[length:var(--font-size-body-sm)] leading-[var(--dashboard-line-height-sm)]', tab === t ? 'font-medium text-[var(--dashboard-figure)]' : 'text-[var(--dashboard-muted)] hover:text-[var(--dashboard-figure)]', FOCUS)}
             >
               {t}
-              <span aria-hidden className={cn('h-0.5 w-full rounded-[1px]', tab === t ? 'bg-[var(--dashboard-figure)]' : 'bg-transparent')} />
+              <span aria-hidden className={cn('h-0.5 w-full rounded-hairline', tab === t ? 'bg-[var(--dashboard-figure)]' : 'bg-transparent')} />
             </button>
           ))}
         </div>
@@ -124,10 +124,10 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
           {tab === 'Trend' && (
             <>
               <div className="flex items-center justify-between gap-4">
-                <p className="m-0 text-[15px] leading-5 text-[var(--dashboard-figure)]">
+                <p className="m-0 text-[length:var(--font-size-body-md)] leading-5 text-[var(--dashboard-figure)]">
                   {change ? `${change.direction === 'up' ? 'Up' : 'Down'} ${change.label} on ${lastYear ? 'the same days last year' : `the previous ${n} days`}` : 'Nothing to compare with yet'}
                 </p>
-                <div role="radiogroup" aria-label="Show as" className="flex shrink-0 gap-0.5 rounded-lg bg-[var(--dashboard-hover-band)] p-[3px]">
+                <div role="radiogroup" aria-label="Show as" className="flex shrink-0 gap-0.5 rounded-lg bg-[var(--dashboard-hover-band)] p-[var(--space-0-75)]">
                   {(['Chart', 'Table'] as const).map((k) => (
                     // eslint-disable-next-line no-restricted-syntax -- ds-allow: the Chart | Table switch (Figma 170:75722)
                     <button
@@ -136,16 +136,16 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
                       role="radio"
                       aria-checked={(k === 'Table') === table}
                       onClick={() => setTable(k === 'Table')}
-                      className={cn('cursor-pointer rounded-[7px] border-0 px-2.5 py-1 text-[length:var(--font-size-small)] leading-4', (k === 'Table') === table ? 'bg-[var(--dashboard-card-bg)] font-medium text-[var(--dashboard-figure)] shadow-[var(--dashboard-control-shadow)]' : 'bg-transparent text-[var(--dashboard-muted)]', FOCUS)}
+                      className={cn('cursor-pointer rounded-[var(--dashboard-toggle-radius)] border-0 px-2.5 py-1 text-[length:var(--font-size-small)] leading-4', (k === 'Table') === table ? 'bg-[var(--dashboard-card-bg)] font-medium text-[var(--dashboard-figure)] shadow-[var(--dashboard-control-shadow)]' : 'bg-transparent text-[var(--dashboard-muted)]', FOCUS)}
                     >
                       {k}
                     </button>
                   ))}
                 </div>
               </div>
-              <div className="mt-[18px] flex items-center gap-5 text-[length:var(--font-size-small)] leading-4">
-                <span className="flex items-center gap-1.5 text-[var(--dashboard-label)]"><span aria-hidden className="h-0.5 w-2.5 rounded-[1px] bg-[var(--dashboard-chart-ink)]" />{periodLabel}<strong className="font-medium text-[var(--dashboard-figure)]">{metric.value}</strong></span>
-                {comparable && metric.previous !== null && <span className="flex items-center gap-1.5 text-[var(--dashboard-label)]"><span aria-hidden className="h-0.5 w-2.5 rounded-[1px] bg-[var(--dashboard-chart-previous)]" />Previous {n} days<strong className="font-medium text-[var(--dashboard-figure)]">{formatMetricValue(metric.previous, metric.format)}</strong></span>}
+              <div className="mt-[var(--space-4-5)] flex items-center gap-5 text-[length:var(--font-size-small)] leading-4">
+                <span className="flex items-center gap-1.5 text-[var(--dashboard-label)]"><span aria-hidden className="h-0.5 w-2.5 rounded-hairline bg-[var(--dashboard-chart-ink)]" />{periodLabel}<strong className="font-medium text-[var(--dashboard-figure)]">{metric.value}</strong></span>
+                {comparable && metric.previous !== null && <span className="flex items-center gap-1.5 text-[var(--dashboard-label)]"><span aria-hidden className="h-0.5 w-2.5 rounded-hairline bg-[var(--dashboard-chart-previous)]" />Previous {n} days<strong className="font-medium text-[var(--dashboard-figure)]">{formatMetricValue(metric.previous, metric.format)}</strong></span>}
                 {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the legend's underlined text link (Figma 170:75736) */}
                 <button type="button" onClick={() => onNotReady('Targets')} className={cn('cursor-pointer border-0 bg-transparent p-0 text-[length:var(--font-size-small)] text-[var(--dashboard-figure)] underline underline-offset-2', FOCUS)}>Set a target</button>
               </div>

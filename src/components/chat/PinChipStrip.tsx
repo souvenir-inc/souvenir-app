@@ -154,7 +154,7 @@ export function PinChipStrip({ children }: PinChipStripProps) {
                 backgroundColor: "var(--neutral-800-30)",
                 width:           `${thumbWidthPct}%`,
                 left:            `${thumbOffsetPct}%`,
-                transition:      isDragging ? "none" : "left 60ms",
+                transition:      isDragging ? "none" : "left var(--pin-chip-strip-duration)",
                 cursor:          isDragging ? "grabbing" : "grab",
               }}
               onMouseDown={handleThumbMouseDown}

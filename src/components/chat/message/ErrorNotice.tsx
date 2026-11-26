@@ -2,6 +2,7 @@
 
 import React from "react";
 import { m } from "framer-motion";
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── ErrorNotice - a failure below output that was already shown ───────────────
 // Styled after the connector-error card (AnimatedConnectorError).
@@ -38,7 +39,7 @@ export function ErrorNotice({ message, onRetry }: { message: string; onRetry?: (
       role="alert"
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: DURATION.moderate, ease: [0.16, 1, 0.3, 1] }}
       style={noticeStyle}
     >
       <span style={messageStyle}>

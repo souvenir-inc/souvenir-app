@@ -5,6 +5,7 @@ import { m, useReducedMotion } from 'framer-motion'
 import { RadioGroup as RadioGroupPrimitive } from '@base-ui/react/radio-group'
 import { Radio } from '@base-ui/react/radio'
 import { cn } from '@/lib/utils'
+import { SPRING } from "@/styles/tokens/motion"
 
 // SegmentedControl: a short, always-visible choice of one (2–5 options): a grey track with a white
 // pill that slides to the chosen segment. Radio semantics and arrow keys come from Base UI's
@@ -58,7 +59,7 @@ export function SegmentedControl<T extends string>({
       disabled={disabled}
       aria-label={aria['aria-label']}
       className={cn(
-        'flex flex-none rounded-md bg-[var(--neutral-100)] p-[3px]',
+        'flex flex-none rounded-md bg-[var(--neutral-100)] p-[var(--space-0-75)]',
         fluid && 'w-full',
         disabled && 'opacity-60',
         className,
@@ -86,7 +87,7 @@ export function SegmentedControl<T extends string>({
               <m.span
                 layoutId={pillId}
                 aria-hidden
-                transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 520, damping: 40 }}
+                transition={reduceMotion ? { duration: 0 } : { type: 'spring', ...SPRING.settle }}
                 className="absolute inset-0 rounded-sm bg-[var(--neutral-white)] shadow-[0_0_0_1px_var(--neutral-200),0_1px_2px_rgba(82,75,71,0.08)]"
               />
             )}

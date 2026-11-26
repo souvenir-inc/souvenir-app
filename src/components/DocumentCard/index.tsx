@@ -42,7 +42,7 @@ export function DocumentCard({ ref, name, type, sizeLabel, onRemove, onClick }: 
           padding:         'var(--space-3)',
           borderRadius:    'var(--radius-2xl)',
           background:      'var(--neutral-white)',
-          boxShadow:       '0px 4px 4px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
+          boxShadow:       'var(--document-card-shadow)',
           cursor:          onClick ? 'pointer' : 'default',
           boxSizing:       'border-box',
         }}

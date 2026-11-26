@@ -36,7 +36,7 @@ export function EmptyOverview() {
       <p className={styles.text}>Send a message and this fills in as Souvenir works.</p>
       <ul className={styles.legend}>
         {TRACKED.map(({ label, Icon, color }, i) => (
-          <li key={label} className={styles.item} style={{ '--chip-color': color, '--d': `${120 + i * 60}ms` } as React.CSSProperties}>
+          <li key={label} className={styles.item} style={{ '--chip-color': color, '--d': `${120 + i * 60}ms` /* ds-keep: keyframe stagger */ } as React.CSSProperties}>
             <span className={styles.dot} aria-hidden><Icon size={14} /></span>
             {label}
           </li>

@@ -660,7 +660,7 @@ function Board({ warehouse, initial, store, names, viewer }: { warehouse: Wareho
           <div
             ref={columnRef}
             className={cn(
-              'mx-auto box-border w-full min-w-0 max-w-[1232px] overflow-x-clip px-4 pt-[15px] [overflow-clip-margin:12px]',
+              'mx-auto box-border w-full min-w-0 max-w-[1232px] overflow-x-clip px-4 pt-[var(--dashboard-page-top)] [overflow-clip-margin:var(--space-3)]',
               // + button: 44px, 20px from the bottom, so 64px; plus the usual 16px.
               fabRoom ? 'pb-20' : 'pb-4',
             )}

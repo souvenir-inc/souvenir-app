@@ -140,7 +140,7 @@ function TeamRow({
           fontSize:       'var(--font-size-body-lg)',
           lineHeight:     'var(--leading-none)',
           color:          'var(--color-text-on-accent)',
-          boxShadow:      'inset 0px 4px 4px color-mix(in srgb, var(--static-black) 25%, transparent), inset 0px -1px 0.4px rgba(18,60,95,0.65)',
+          boxShadow:      'var(--team-switcher-dropdown-shadow)',
         }}
       >
         {team.name.charAt(0).toUpperCase()}

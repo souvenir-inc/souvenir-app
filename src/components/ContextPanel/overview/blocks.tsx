@@ -4,6 +4,7 @@ import React, { useId, useState } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { ArrowDownOneIcon } from '@strange-huge/icons'
 import { CAPTION, EASE, ONE_LINE, ROW_CLASS, TEXT, TWO_LINES } from './styles'
+import { DURATION, LONG } from "@/styles/tokens/motion"
 
 // ── Building blocks ───────────────────────────────────────────────────────────
 
@@ -98,7 +99,7 @@ export function PanelSection({
           aria-hidden
           initial={false}
           animate={{ rotate: open ? 0 : -90 }}
-          transition={reduceMotion ? { duration: 0 } : { duration: 0.24, ease: EASE }}
+          transition={reduceMotion ? { duration: 0 } : { duration: DURATION.moderate, ease: EASE }}
           style={{ position: 'relative', pointerEvents: 'none', display: 'inline-flex', width: 24, height: 24, alignItems: 'center', justifyContent: 'center', color: 'var(--neutral-500)' }}
         >
           <ArrowDownOneIcon size={16} />
@@ -114,7 +115,7 @@ export function PanelSection({
             initial={animateEntry ? { height: 0, opacity: 0 } : false}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={reduceMotion ? { duration: 0 } : { height: { duration: 0.28, ease: EASE }, opacity: { duration: 0.18 } }}
+            transition={reduceMotion ? { duration: 0 } : { height: { duration: DURATION.moderate, ease: EASE }, opacity: { duration: DURATION.base } }}
             style={{ overflow: 'hidden' }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', padding: '0 var(--space-2) var(--space-2-5)' }}>
@@ -212,7 +213,7 @@ export function AnimatedList({ children }: { children: React.ReactNode[] }) {
             initial={firstKeys.has(child.key) ? false : { opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            transition={reduceMotion ? { duration: 0 } : { duration: 0.2, ease: EASE }}
+            transition={reduceMotion ? { duration: 0 } : { duration: DURATION.base, ease: EASE }}
           >
             {child}
           </m.div>
@@ -250,7 +251,7 @@ function LoadingLine() {
       <m.span
         initial={{ x: reduceMotion ? '0%' : '-100%' }}
         animate={reduceMotion ? { x: '0%' } : { x: ['-100%', '334%'] }}
-        transition={reduceMotion ? { duration: 0 } : { duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+        transition={reduceMotion ? { duration: 0 } : { duration: LONG.lg, repeat: Infinity, ease: 'easeInOut' }}
         style={{
           position:        'absolute',
           top:             0,

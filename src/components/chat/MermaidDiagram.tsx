@@ -20,6 +20,7 @@ import { Check, Copy, GitBranch, Maximize2, Minimize2 } from "lucide-react"
 import { ChatChartShell } from "@/components/chat/ChatChartShell"
 import { sanitizeSVG } from "@/lib/security"
 import { CHAT_CHART_PALETTE } from "@/components/chat/chat-chart-theme"
+import { DURATION, SPRING } from "@/styles/tokens/motion"
 
 const THEME = {
   bg:          "var(--neutral-white)",
@@ -173,18 +174,18 @@ export function MermaidDiagram({ code }: { code: string }) {
     <ChatChartShell
       initial={reduceMotion ? false : { opacity: 0, y: 10, scale: 0.99 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: DURATION.slow, ease: [0.16, 1, 0.3, 1] }}
       style={{
         position: expanded ? "fixed" : "relative",
         inset: expanded ? 24 : undefined,
-        zIndex: expanded ? 1100 : undefined,
+        zIndex: expanded ? "var(--z-overlay)" : undefined,
         display: "flex",
         flexDirection: "column",
-        margin: expanded ? 0 : "16px 0",
+        margin: expanded ? 0 : "var(--space-4) 0",
         padding: 0,
         minHeight: expanded ? 0 : 220,
         maxHeight: expanded ? "calc(100vh - 48px)" : undefined,
-        boxShadow: expanded ? "0 28px 80px rgba(18,12,8,0.28)" : undefined,
+        boxShadow: expanded ? "var(--mermaid-diagram-shadow)" : undefined,
         overflow: "hidden",
       }}
     >
@@ -202,7 +203,7 @@ export function MermaidDiagram({ code }: { code: string }) {
           aria-hidden
           initial={reduceMotion ? false : { scale: 0.82, rotate: -8 }}
           animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 340, damping: 24 }}
+          transition={{ type: "spring", ...SPRING.springy }}
           style={{ display: "grid", placeItems: "center", color: CHAT_CHART_PALETTE[0] }}
         >
           <GitBranch size={15} strokeWidth={1.8} />
@@ -246,13 +247,13 @@ export function MermaidDiagram({ code }: { code: string }) {
         className="kaya-scrollbar"
         initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: reduceMotion ? 0 : 0.08, duration: 0.34 }}
+        transition={{ delay: reduceMotion ? 0 : DURATION.instant, duration: DURATION.slow }}
         style={{
           flex: expanded ? "1 1 0" : undefined,
           minHeight: 0,
           display: "grid",
           placeItems: "center",
-          padding: expanded ? 24 : 18,
+          padding: expanded ? "var(--space-6)" : "var(--space-4-5)",
           overflow: "auto",
           backgroundColor: "var(--neutral-white)",
           backgroundImage: "radial-gradient(circle at 1px 1px, var(--neutral-800-05) 1px, transparent 0)",

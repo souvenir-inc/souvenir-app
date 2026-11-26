@@ -46,7 +46,7 @@ export default function TextViewer({ pages, citePage, passage }: TextViewerProps
             style={{
               padding: 'var(--space-5) var(--space-6)', borderRadius: 'var(--radius-xl)', background: 'var(--card-bg)', boxShadow: 'var(--shadow-card-default)',
               // No passage to mark: the cited page itself is outlined.
-              outline: index === citedIndex && !split ? '3px solid var(--color-tag-Yellow-text)' : 'none', outlineOffset: 2,
+              outline: index === citedIndex && !split ? 'var(--text-viewer-outline-width) solid var(--color-tag-Yellow-text)' : 'none', outlineOffset: 'var(--focus-ring-offset)',
             }}
           >
             <h3 style={{ margin: '0 0 var(--space-2)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-wider)' }}>{page.label}</h3>

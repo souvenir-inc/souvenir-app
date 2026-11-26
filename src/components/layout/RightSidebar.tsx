@@ -19,6 +19,7 @@ import { InputField } from "@/components/InputField"
 import { ConfirmModal } from "@/components/ConfirmModal"
 import { toast } from "sonner"
 import type { BadgeColor } from "@/components/Badge"
+import { DURATION, SPRING } from "@/styles/tokens/motion"
 
 // ── Category → badge color ────────────────────────────────────────────────────
 
@@ -461,7 +462,7 @@ function RightSidebarImpl() {
     <m.div
       animate={isOpen ? { width: 332, opacity: 1 } : { width: 0, opacity: 0 }}
       initial={{ width: 0, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 260, damping: 32, mass: 0.9 }}
+      transition={{ type: "spring", ...SPRING.glide }}
       style={{
         height:        "100%",
         flexShrink:    0,
@@ -517,7 +518,7 @@ function RightSidebarImpl() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: DURATION.quick }}
             onClick={() => { setShowDeleteConfirmModal(false); setDeleteFolderTarget(null) }}
             style={{
               position:        "fixed",
@@ -527,7 +528,7 @@ function RightSidebarImpl() {
               alignItems:      "center",
               justifyContent:  "center",
               backgroundColor: "color-mix(in srgb, var(--yellow-950) 40%, transparent)",
-              backdropFilter:  "blur(2px)",
+              backdropFilter:  "blur(var(--blur-2xs))",
             }}
           >
             <m.div
@@ -535,7 +536,7 @@ function RightSidebarImpl() {
               initial={{ opacity: 0, scale: 0.96, y: 8 }}
               animate={{ opacity: 1, scale: 1,    y: 0 }}
               exit={{    opacity: 0, scale: 0.96, y: 8 }}
-              transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.8 }}
+              transition={{ type: "spring", ...SPRING.settle }}
               onClick={(e) => e.stopPropagation()}
               style={{
                 background:    "var(--neutral-white)",
@@ -591,7 +592,7 @@ function RightSidebarImpl() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: DURATION.quick }}
             onClick={() => { setShowRenameModal(false); setRenameFolderTarget(null); setRenameModalName("") }}
             style={{
               position:        "fixed",
@@ -601,7 +602,7 @@ function RightSidebarImpl() {
               alignItems:      "center",
               justifyContent:  "center",
               backgroundColor: "color-mix(in srgb, var(--yellow-950) 40%, transparent)",
-              backdropFilter:  "blur(2px)",
+              backdropFilter:  "blur(var(--blur-2xs))",
             }}
           >
             <m.div
@@ -609,7 +610,7 @@ function RightSidebarImpl() {
               initial={{ opacity: 0, scale: 0.96, y: 8 }}
               animate={{ opacity: 1, scale: 1,    y: 0 }}
               exit={{    opacity: 0, scale: 0.96, y: 8 }}
-              transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.8 }}
+              transition={{ type: "spring", ...SPRING.settle }}
               onClick={(e) => e.stopPropagation()}
               style={{
                 background:    "var(--neutral-white)",
@@ -674,7 +675,7 @@ function RightSidebarImpl() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: DURATION.quick }}
             onClick={() => { setShowFolderModal(false); setFolderModalName("") }}
             style={{
               position:        "fixed",
@@ -684,7 +685,7 @@ function RightSidebarImpl() {
               alignItems:      "center",
               justifyContent:  "center",
               backgroundColor: "color-mix(in srgb, var(--yellow-950) 40%, transparent)",
-              backdropFilter:  "blur(2px)",
+              backdropFilter:  "blur(var(--blur-2xs))",
             }}
           >
             <m.div
@@ -692,7 +693,7 @@ function RightSidebarImpl() {
               initial={{ opacity: 0, scale: 0.96, y: 8 }}
               animate={{ opacity: 1, scale: 1,    y: 0 }}
               exit={{    opacity: 0, scale: 0.96, y: 8 }}
-              transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.8 }}
+              transition={{ type: "spring", ...SPRING.settle }}
               onClick={(e) => e.stopPropagation()}
               style={{
                 background:    "var(--neutral-white)",

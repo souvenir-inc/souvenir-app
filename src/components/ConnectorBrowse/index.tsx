@@ -121,18 +121,18 @@ export function Pagination({
   const btn = (disabled: boolean): React.CSSProperties => ({
     display: 'inline-flex',
     alignItems: 'center',
-    gap: 4,
+    gap: 'var(--space-1)',
     height: 32,
-    padding: '0 10px',
-    borderRadius: 8,
+    padding: '0 var(--space-2-5)',
+    borderRadius: 'var(--radius-md)',
     border: 'none',
     cursor: disabled ? 'not-allowed' : 'pointer',
     opacity: disabled ? 0.5 : 1,
     backgroundColor: 'var(--neutral-white)',
     boxShadow: '0px 0px 0px 1px var(--neutral-200)',
     fontFamily: 'var(--font-body)',
-    fontWeight: 500,
-    fontSize: 13,
+    fontWeight: 'var(--font-weight-medium)',
+    fontSize: 'var(--font-size-body-sm)',
     color: 'var(--neutral-700)',
   })
   return (

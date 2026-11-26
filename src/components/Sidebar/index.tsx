@@ -39,6 +39,7 @@ import { RoleBadge } from '@/components/RoleBadge'
 import type { WorkspaceRole, RoleBadgeMode } from '@/components/RoleBadge'
 import { Tooltip } from '@/components/Tooltip'
 import type { ChipColor } from '@/components/Chip'
+import { BLUR, SPRING } from "@/styles/tokens/motion"
 
 // ── Slack icon (Hugeicons "slack", stroke-rounded) ────────────────────────────
 // Brand glyphs aren't in @strange-huge/icons, so the stroke-rounded paths are
@@ -402,7 +403,7 @@ function AdminGroup({ group, isFirst, selectedItem, onItemClick, expandedItems, 
   const [overflow, setOverflow] = useState<'visible' | 'hidden'>('visible')
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', paddingTop: isFirst ? 0 : '8px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', paddingTop: isFirst ? 0 : 'var(--space-2)' }}>
       <SidebarMenuItem
         fluid
         variant="header"
@@ -777,7 +778,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
           overflowX:       'hidden',
           flexShrink:      0,
           isolation:       'isolate',
-          transition:      'width var(--duration-slow) cubic-bezier(0.16, 1, 0.3, 1)',
+          transition:      'width var(--duration-slow) var(--ease-out-expo)',
         }}
         {...props}
       >
@@ -801,7 +802,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
             justifyContent: isCollapsed ? 'center' : 'space-between',
             paddingTop:     'var(--sidebar-header-top)', // matches the footer: 12px footer padding + 5px account-row padding
             paddingBottom:  'var(--space-2)',
-            paddingLeft:    isCollapsed ? '8px' : '20px',
+            paddingLeft:    isCollapsed ? 'var(--space-2)' : 'var(--space-5)',
             paddingRight:   'var(--space-2)',
           }}>
             {/* Wordmark + org badge — only in expanded. flex:1 + minWidth:0 +
@@ -879,7 +880,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
                   padding:         'var(--space-1)',
                   borderRadius:    'var(--radius-xl)',
                   backgroundColor: 'var(--neutral-50-50)',
-                  boxShadow:       'inset 0px -1px 0px 0px color-mix(in srgb, var(--static-white) 90%, transparent), inset 0px 1px 0px 0px var(--neutral-100), inset 0px 0px 4px 0px rgba(229, 229, 229,0.5)',
+                  boxShadow:       'var(--sidebar-shadow)',
                 } : {}),
               }}>
                 <Tabs
@@ -915,7 +916,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
               padding:         'var(--space-1)',
               borderRadius:    'var(--radius-lg)',
               backgroundColor: 'var(--neutral-50-50)',
-              boxShadow:       'inset 0px -1px 0px 0px color-mix(in srgb, var(--static-white) 90%, transparent), inset 0px 1px 0px 0px var(--neutral-100), inset 0px 0px 4px 0px rgba(229, 229, 229,0.5)',
+              boxShadow:       'var(--sidebar-shadow)',
               display:         'flex',
               flexDirection:   'column',
               alignItems:      'center',
@@ -1055,9 +1056,9 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
           {/* Projects/Agents + Recents — always mounted so shown/scroll state survives collapse/expand.
               motion.div animates opacity+blur in/out on collapse/expand; pointerEvents:none when invisible. */}
           <motion.div
-            animate={{ opacity: isCollapsed ? 0 : 1, filter: isCollapsed ? 'blur(4px)' : 'blur(0px)', transitionEnd: isCollapsed ? {} : { filter: 'none' } }}
+            animate={{ opacity: isCollapsed ? 0 : 1, filter: isCollapsed ? `blur(${BLUR.xs}px)` : 'blur(0px)', transitionEnd: isCollapsed ? {} : { filter: 'none' } }}
             initial={false}
-            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+            transition={{ type: 'spring', ...SPRING.snappy }}
             style={{ display: 'flex', flexDirection: 'column', pointerEvents: isCollapsed ? 'none' : 'auto' }}
           >
             {/* Projects (chats) / Agents — mutually exclusive */}
@@ -1268,8 +1269,8 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
           width:           isCollapsed ? '52px' : undefined,
           zIndex:          'var(--z-raised)',
           backgroundColor: 'var(--neutral-50)',
-          paddingLeft:     isCollapsed ? '4px' : '10px',
-          paddingRight:    isCollapsed ? '4px' : '10px',
+          paddingLeft:     isCollapsed ? 'var(--space-1)' : 'var(--space-2-5)',
+          paddingRight:    isCollapsed ? 'var(--space-1)' : 'var(--space-2-5)',
           paddingTop:      'var(--space-3)',
           paddingBottom:   'var(--space-3)',
           overflow:        'hidden',

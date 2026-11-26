@@ -111,7 +111,7 @@ function ChartTooltip({ active, payload, label, series, mode }: TooltipContentPr
         fontFamily:    'var(--font-body)',
         fontSize:      'var(--font-size-caption)',
         lineHeight:    'var(--line-height-small)',
-        boxShadow:     '0px 1px 4px rgba(59,54,50,0.5), 0px 0px 0px 0.5px var(--neutral-black)',
+        boxShadow:     'var(--usage-bar-chart-shadow)',
       }}
     >
       <span style={{ fontWeight: 'var(--font-weight-medium)', opacity: 0.7 }}>{label}</span>

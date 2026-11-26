@@ -239,7 +239,7 @@ export const FlatSidebarProjectGroup = React.forwardRef<HTMLDivElement, FlatSide
             >
               <m.div
                 variants={staggerVariants}
-                style={{ paddingLeft: icon === null ? 6 : 28, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}
+                style={{ paddingLeft: icon === null ? 'var(--space-1-5)' : 'var(--space-6-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}
               >
                 {React.Children.map(children, (child, i) => (
                   <m.div key={i} variants={itemVariants}>{child}</m.div>

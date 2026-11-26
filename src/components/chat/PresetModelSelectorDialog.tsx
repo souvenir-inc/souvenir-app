@@ -19,6 +19,7 @@ import { ModelIcon } from "@/components/ModelIcon";
 import { trackFeature } from "@/lib/analytics/events";
 import { Badge, type BadgeColor } from "@/components/Badge";
 import { sortModels } from "@/lib/ai-models";
+import { SPRING } from "@/styles/tokens/motion"
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -381,7 +382,7 @@ export function PresetModelSelectorDialog() {
           initial={{ opacity: 0, scale: 0.97, y: -4 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.97, y: -4 }}
-          transition={{ type: "spring", stiffness: 400, damping: 30 }}
+          transition={{ type: "spring", ...SPRING.brisk }}
           style={{
             position: "fixed",
             zIndex: 'var(--z-popover)',

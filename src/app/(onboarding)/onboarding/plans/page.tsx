@@ -13,6 +13,7 @@ import { ContactSalesModal } from '@/components/ContactSalesModal'
 import { Button } from '@/components/ui/button'
 import { InformationCircleIcon } from '@strange-huge/icons'
 import { ONBOARDING_TONE_ROUTE, ONBOARDING_ACCOUNT_TYPE_ROUTE, ONBOARDING_PLANS_ROUTE } from '@/lib/routes'
+import { DURATION, SPRING } from "@/styles/tokens/motion"
 
 const CANVAS_GRADIENT =
   'linear-gradient(180deg, var(--neutral-50) 3.76%, var(--neutral-100) 75%, var(--neutral-200) 116.79%)'
@@ -66,7 +67,7 @@ function GreenDot() {
       backgroundColor: 'var(--green-300)',
       flexShrink: 0,
       marginTop: 'var(--space-1-5)',
-      boxShadow: '0px 1px 1.5px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4), inset 0px 1px 0px color-mix(in srgb, var(--static-white) 61%, transparent), inset 0px -1px 0px rgba(106,98,93,0.05)',
+      boxShadow: 'var(--plans-shadow)',
     }} />
   )
 }
@@ -91,10 +92,10 @@ function BeigeDot() {
         borderRadius: '50%',
         backgroundColor: 'var(--neutral-100)',
         boxShadow: [
-          '0px 1px 1.5px rgba(82,75,71,0.12)',
-          '0px 0px 0px 1px rgba(212, 212, 212,0.4)',
+          'var(--plans-box-shadow)',
+          'var(--plans-box-shadow-2)',
           'inset 0px 1px 0px color-mix(in srgb, var(--static-white) 61%, transparent)',
-          'inset 0px -1px 0px rgba(106,98,93,0.05)',
+          'var(--plans-box-shadow-3)',
         ].join(', '),
       }} />
     </div>
@@ -145,10 +146,10 @@ function BillingToggle({ billing, onChange }: { billing: Billing; onChange: (b: 
     color: 'var(--neutral-50)',
     boxShadow: [
       '0px 0px 0px 1px black',
-      '0px 1.091px 1.091px rgba(59,54,50,0.1)',
-      '0px 1.455px 3.127px rgba(59,54,50,0.4)',
+      'var(--plans-box-shadow-4)',
+      'var(--plans-box-shadow-5)',
       'inset 0px 1px 0.364px var(--neutral-50-30)',
-      'inset 0px -2.182px 0.364px #120c08',
+      'var(--plans-box-shadow-6)',
       'inset 0px -2.545px 4px -2.182px var(--neutral-50-50)',
     ].join(', '),
   }
@@ -158,7 +159,7 @@ function BillingToggle({ billing, onChange }: { billing: Billing; onChange: (b: 
     <div style={{
       display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', padding: 'var(--space-0-5)', borderRadius: 'var(--radius-lg)',
       backgroundColor: 'var(--neutral-50-50)',
-      boxShadow: 'inset 0px -1px 0px color-mix(in srgb, var(--static-white) 90%, transparent), inset 0px 1px 0px var(--neutral-100), inset 0px 0px 4px rgba(229, 229, 229,0.5)',
+      boxShadow: 'var(--plans-shadow-2)',
     }}>
       <button type="button" onClick={() => onChange('monthly')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-1-5) var(--space-2-5) var(--space-2)', borderRadius: 'var(--radius-lg)', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', transition: 'background var(--duration-fast), box-shadow var(--duration-fast)', ...(billing === 'monthly' ? activeStyle : inactiveStyle) }}>Monthly</button>
       <button type="button" onClick={() => onChange('annual')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-1-5) var(--space-2)', borderRadius: 'var(--radius-lg)', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', transition: 'background var(--duration-fast), box-shadow var(--duration-fast)', ...(billing === 'annual' ? activeStyle : inactiveStyle) }}>Yearly</button>
@@ -232,7 +233,7 @@ function IndSlider({ value, onChange }: { value: number; onChange: (i: number) =
   const [trackW, setTrackW] = useState(0)
   const THUMB = 10
   const count = INDIVIDUAL_TIERS.length
-  const spring = { type: 'spring' as const, stiffness: 400, damping: 35 }
+  const spring = { type: 'spring' as const, ...SPRING.settle }
 
   useEffect(() => {
     const el = trackRef.current
@@ -262,7 +263,7 @@ function IndSlider({ value, onChange }: { value: number; onChange: (i: number) =
       <motion.div
         animate={{ x: trackW > 0 ? thumbX : 0 }}
         transition={spring}
-        style={{ position: 'absolute', top: 0, left: 0, width: THUMB, height: THUMB, borderRadius: '50%', backgroundColor: 'var(--neutral-white)', boxShadow: '0 1px 4px color-mix(in srgb, var(--static-black) 22%, transparent), 0 0 0 1px rgba(59,54,50,0.2)' }}
+        style={{ position: 'absolute', top: 0, left: 0, width: THUMB, height: THUMB, borderRadius: '50%', backgroundColor: 'var(--neutral-white)', boxShadow: 'var(--plans-shadow-3)' }}
       />
       {/* Invisible native range — handles drag */}
       <input
@@ -354,10 +355,10 @@ function OnboardingPlansContent() {
 
   const ctaShadow = [
     '0px 0px 0px 1px black',
-    '0px 1.091px 1.091px rgba(59,54,50,0.1)',
-    '0px 1.455px 3.127px rgba(59,54,50,0.4)',
+    'var(--plans-box-shadow-4)',
+    'var(--plans-box-shadow-5)',
     'inset 0px 1px 0.364px var(--neutral-50-30)',
-    'inset 0px -2.182px 0.364px #120c08',
+    'var(--plans-box-shadow-6)',
     'inset 0px -2.545px 4px -2.182px var(--neutral-50-50)',
   ].join(', ')
 
@@ -385,7 +386,7 @@ function OnboardingPlansContent() {
       <style>{`
         .sv-team-slider {
           -webkit-appearance: none; appearance: none;
-          height: 4px; border-radius: 2px; outline: none; cursor: pointer;
+          height: 4px; border-radius: var(--radius-2xs); outline: none; cursor: pointer;
         }
         .sv-team-slider::-webkit-slider-thumb {
           -webkit-appearance: none; appearance: none;
@@ -400,13 +401,13 @@ function OnboardingPlansContent() {
         }
         .sv-ind-slider {
           -webkit-appearance: none; appearance: none;
-          height: 4px; border-radius: 2px; outline: none; cursor: pointer;
+          height: 4px; border-radius: var(--radius-2xs); outline: none; cursor: pointer;
         }
         .sv-ind-slider::-webkit-slider-thumb {
           -webkit-appearance: none; appearance: none;
           width: 10px; height: 10px; border-radius: 50%;
           background: var(--static-white); border: none; cursor: pointer;
-          box-shadow: 0 1px 4px color-mix(in srgb, var(--static-black) 22%, transparent), 0 0 0 1px rgba(59,54,50,0.2);
+          box-shadow: var(--plans-shadow-3);
         }
         .sv-ind-slider::-moz-range-thumb {
           width: 10px; height: 10px; border-radius: 50%;
@@ -454,7 +455,7 @@ function OnboardingPlansContent() {
               </div>
 
               {/* Slack highlight */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-3) var(--space-4) var(--space-3) var(--space-3)', borderRadius: 'var(--radius-xl)', backgroundColor: 'var(--neutral-100)', boxShadow: '0px 1.091px 1.091px rgba(59,54,50,0.05), 0px 1.455px 3.127px rgba(38,33,30,0.15), inset 0px -2.182px 0.364px var(--neutral-100)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-3) var(--space-4) var(--space-3) var(--space-3)', borderRadius: 'var(--radius-xl)', backgroundColor: 'var(--neutral-100)', boxShadow: 'var(--plans-shadow-4)' }}>
                 <SlackLogo />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                   <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-600)' }}>Team-exclusive</span>
@@ -476,7 +477,7 @@ function OnboardingPlansContent() {
                         initial={{ opacity: 0, y: teamSlideDir * 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: teamSlideDir * -12 }}
-                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                        transition={{ duration: DURATION.base, ease: 'easeOut' }}
                         style={{ margin: 0, lineHeight: 0 }}
                       >
                         <span style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-display)', lineHeight: 'var(--line-height-display)', color: 'var(--static-white)' }}>{teamPrice}</span>
@@ -484,14 +485,14 @@ function OnboardingPlansContent() {
                       </motion.p>
                     </AnimatePresence>
                   </div>
-                  <div style={{ position: 'relative', backgroundColor: 'var(--neutral-100)', borderRadius: 'var(--radius-xl)', padding: 'var(--space-3)', width: '100%', boxSizing: 'border-box', boxShadow: '0px 1.091px 1.091px rgba(59,54,50,0.05), 0px 1.455px 3.127px rgba(38,33,30,0.15), inset 0px -2.182px 0.364px var(--neutral-100)', overflow: 'hidden' }}>
+                  <div style={{ position: 'relative', backgroundColor: 'var(--neutral-100)', borderRadius: 'var(--radius-xl)', padding: 'var(--space-3)', width: '100%', boxSizing: 'border-box', boxShadow: 'var(--plans-shadow-4)', overflow: 'hidden' }}>
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={`team-credits-${teamTierIndex}`}
                         initial={{ opacity: 0, y: teamSlideDir * 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: teamSlideDir * -12 }}
-                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                        transition={{ duration: DURATION.base, ease: 'easeOut' }}
                         style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-1)' }}
                       >
                         <span style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--static-black)' }}>{new TeamsTier(teamTier.planId, billing).credits.toLocaleString()}</span>
@@ -503,7 +504,7 @@ function OnboardingPlansContent() {
                     <input type="range" min={0} max={TEAM_TIERS.length - 1} step={1} value={teamTierIndex} onChange={(e) => setTeamTier(Number(e.target.value))} className="sv-team-slider" style={{ display: 'block', width: '100%', padding: 0, background: teamSliderBg }} />
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       {TEAM_TIERS.map((t, i) => (
-                        <button key={t.sliderLabel} type="button" style={{ background: 'none', border: 'none', padding: 0, fontFamily: 'var(--font-body)', fontWeight: i === teamTierIndex ? 600 : 400, fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: i === teamTierIndex ? 'var(--neutral-50)' : 'color-mix(in srgb, var(--static-white) 38%, transparent)', cursor: 'pointer' }} onClick={() => setTeamTier(i)}>
+                        <button key={t.sliderLabel} type="button" style={{ background: 'none', border: 'none', padding: 0, fontFamily: 'var(--font-body)', fontWeight: i === teamTierIndex ? 'var(--font-weight-semibold)' : 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: i === teamTierIndex ? 'var(--neutral-50)' : 'color-mix(in srgb, var(--static-white) 38%, transparent)', cursor: 'pointer' }} onClick={() => setTeamTier(i)}>
                           {t.sliderLabel}
                         </button>
                       ))}
@@ -592,7 +593,7 @@ function OnboardingPlansContent() {
                   </div>
                 </div>
               </div>
-              <button type="button" onClick={() => setContactSalesOpen(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-1-5)', width: '100%', padding: 'var(--space-1-5) var(--space-5) var(--space-2)', borderRadius: 'var(--radius-lg)', border: 'none', backgroundColor: 'var(--neutral-white)', color: 'var(--neutral-700)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', cursor: 'pointer', boxSizing: 'border-box', boxShadow: '0px 1.091px 1.091px rgba(59,54,50,0.05), 0px 1.455px 3.127px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100), inset 0px -2.182px 0.364px var(--neutral-100)' }}>
+              <button type="button" onClick={() => setContactSalesOpen(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-1-5)', width: '100%', padding: 'var(--space-1-5) var(--space-5) var(--space-2)', borderRadius: 'var(--radius-lg)', border: 'none', backgroundColor: 'var(--neutral-white)', color: 'var(--neutral-700)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', cursor: 'pointer', boxSizing: 'border-box', boxShadow: 'var(--plans-shadow-5)' }}>
                 Contact Sales
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden><path d="M2.5 8h11M9.5 4l4 4-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
               </button>
@@ -646,7 +647,7 @@ function OnboardingPlansContent() {
                       </div>
                     </div>
                   </div>
-                  <div style={{ position: 'absolute', inset: 0, borderRadius: 'var(--radius-xl)', pointerEvents: 'none', boxShadow: 'inset 0px -2.182px 0.364px 0px var(--neutral-100)' }} />
+                  <div style={{ position: 'absolute', inset: 0, borderRadius: 'var(--radius-xl)', pointerEvents: 'none', boxShadow: 'var(--shadow-model-featured-default-inner)' }} />
                 </div>
 
                 {/* Volume pricing panel — flex: 1 fills remaining height */}
@@ -662,14 +663,14 @@ function OnboardingPlansContent() {
                   </p>
 
                   {/* Credits display — directional slide animation */}
-                  <div style={{ backgroundColor: 'var(--neutral-100)', borderRadius: 'var(--radius-xl)', padding: 'var(--space-2-5) var(--space-3)', boxSizing: 'border-box', boxShadow: '0px 1.091px 1.091px rgba(59,54,50,0.05), 0px 1.455px 3.127px rgba(38,33,30,0.15), inset 0px -2.182px 0.364px var(--neutral-100)', overflow: 'hidden' }}>
+                  <div style={{ backgroundColor: 'var(--neutral-100)', borderRadius: 'var(--radius-xl)', padding: 'var(--space-2-5) var(--space-3)', boxSizing: 'border-box', boxShadow: 'var(--plans-shadow-4)', overflow: 'hidden' }}>
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={indTierIndex}
                         initial={{ opacity: 0, y: indSlideDir * 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: indSlideDir * -12 }}
-                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                        transition={{ duration: DURATION.base, ease: 'easeOut' }}
                         style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-1)' }}
                       >
                         <span style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--static-black)' }}>{indTier.creditsLabel}</span>
@@ -699,7 +700,7 @@ function OnboardingPlansContent() {
                                 initial={{ opacity: 0, y: 5 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -5 }}
-                                transition={{ duration: 0.14, ease: 'easeOut' }}
+                                transition={{ duration: DURATION.quick, ease: 'easeOut' }}
                                 style={isAnnual && !isActive ? { color: 'var(--yellow-700)' } : undefined}
                               >
                                 {label}

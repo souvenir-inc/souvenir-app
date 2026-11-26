@@ -3,6 +3,7 @@
 import React from 'react'
 import { ArrowRightOneIcon, CancelOneIcon, AlertTwoIcon, AlertCircleIcon } from '@strange-huge/icons'
 import { motion } from 'framer-motion'
+import { DURATION } from "@/styles/tokens/motion"
 
 export type CreditNoticeStatus = 'warning_95' | 'paused'
 
@@ -28,7 +29,7 @@ const LEVEL_TOKENS: Record<Level, { bg: string; text: string; border: string; Ic
 // plus a hairline ring in the level's own border color, instead of a flat
 // CSS border.
 const elevation = (border: string) =>
-  `0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 6px 16px -4px var(--neutral-900-10), 0px 0px 0px 1px ${border}`
+  `var(--shadow-drop-xs), 0px 6px 16px -4px var(--neutral-900-10), 0px 0px 0px 1px ${border}`
 
 interface NoticeConfig {
   level:     Level
@@ -66,8 +67,8 @@ export function InlineCreditNotice({
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] } }}
-      exit={{ opacity: 0, y: 4, transition: { duration: 0.12 } }}
+      animate={{ opacity: 1, y: 0, transition: { duration: DURATION.base, ease: [0.16, 1, 0.3, 1] } }}
+      exit={{ opacity: 0, y: 4, transition: { duration: DURATION.fast } }}
       style={{
         display:         'flex',
         alignItems:      'center',

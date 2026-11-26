@@ -17,6 +17,7 @@ import { ChipInput } from '@/components/ChipInput'
 import { PROJECT_VISIBILITY_OPTIONS, type ProjectVisibility } from '@/lib/api/projects'
 import { Skeleton } from '@/components/Skeleton'
 import { PROJECT_ROUTE, PROJECTS_ROUTE } from '@/lib/routes'
+import { DURATION } from "@/styles/tokens/motion"
 
 const MAX_TAGS = 5
 
@@ -148,8 +149,8 @@ function NewProjectPageInner() {
               scoring as this page's CLS. */}
           {!orgReady ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
-              <Skeleton width={110} height={24} radius={4} />
-              <Skeleton height={44} radius={10} />
+              <Skeleton width={110} height={24} radius={'var(--radius-xs)'} />
+              <Skeleton height={44} radius={'var(--radius-lg)'} />
             </div>
           ) : visibilityOptions.length > 1 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
@@ -241,7 +242,7 @@ function NewProjectPageInner() {
               }}
               onFocus={(e) => {
                 Object.assign(e.currentTarget.style, {
-                  boxShadow:   '0px 0px 0px 3px rgba(74,131,191,0.25), 0px 1px 1.5px 0px rgba(82,75,71,0.12)',
+                  boxShadow:   'var(--new-shadow-2)',
                   borderColor: 'var(--blue-400)',
                 })
               }}
@@ -281,7 +282,7 @@ function NewProjectPageInner() {
                     initial={{ opacity: 0, scale: 0.85 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.85 }}
-                    transition={{ duration: 0.12 }}
+                    transition={{ duration: DURATION.fast }}
                     style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-0-5)' }}
                   >
                     <Badge label={tag.label} color={tag.color} />

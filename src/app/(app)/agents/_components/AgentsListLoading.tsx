@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/Skeleton'
 import { PersonaCardSkeleton } from '@/components/PersonaCard/PersonaCardSkeleton'
 import { PERSONA_CARD_WIDTH } from '@/components/PersonaCard'
 
-const GRID_GAP = 16
+const GRID_GAP = 'var(--space-4)'
 
 /**
  * Route-transition placeholder for /agents (the My Agents list). Mirrors page.tsx: the rounded
@@ -31,22 +31,22 @@ export function AgentsListLoading() {
         <div style={{ width: '100%', maxWidth: 991, padding: '0 var(--space-3)', boxSizing: 'border-box', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--agents-page-gap)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             {/* Tabs: the My Agents / Super Links segmented control */}
-            <Skeleton width={217} height={46} radius={14} />
+            <Skeleton width={217} height={46} radius={'var(--radius-card)'} />
 
             {/* Title row: "Agents" (24/32) + New agent button */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ height: 32, display: 'flex', alignItems: 'center' }}>
-                <Skeleton width={77} height={24} radius={6} />
+                <Skeleton width={77} height={24} radius={'var(--radius-sm)'} />
               </div>
-              <Skeleton width={115} height={36} radius={10} />
+              <Skeleton width={115} height={36} radius={'var(--radius-lg)'} />
             </div>
 
             {/* Toolbar: 450px search on the left, sort + filter on the right */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Skeleton width={450} height={36} radius={10} style={{ maxWidth: '100%' }} />
+              <Skeleton width={450} height={36} radius={'var(--radius-lg)'} style={{ maxWidth: '100%' }} />
               <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                <Skeleton width={132} height={36} radius={10} />
-                <Skeleton width={76} height={36} radius={10} />
+                <Skeleton width={132} height={36} radius={'var(--radius-lg)'} />
+                <Skeleton width={76} height={36} radius={'var(--radius-lg)'} />
               </div>
             </div>
           </div>

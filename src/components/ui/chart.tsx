@@ -76,7 +76,7 @@ export function ChartTooltipContent({ active, payload, label, valueFormatter, hi
           const value = typeof item.value === 'number' ? item.value : Number(item.value)
           return (
             <div key={key} className="flex items-center gap-2">
-              <span aria-hidden className="size-2 shrink-0 rounded-[2px]" style={{ background: entry?.color ?? item.color }} />
+              <span aria-hidden className="size-2 shrink-0 rounded-2xs" style={{ background: entry?.color ?? item.color }} />
               <span className="flex-1 text-[var(--neutral-500)]">{entry?.label ?? item.name}</span>
               <span className="font-medium tabular-nums text-[var(--neutral-900)]">
                 {valueFormatter ? valueFormatter(value) : value}

@@ -4,6 +4,7 @@ import React from "react";
 import { AnimatePresence, m } from "framer-motion";
 import { ModelLogo, AnimatedLogo } from "../ReasoningBlock";
 import type { UIMessage } from "@/types/chat";
+import { BLUR, SPRING } from "@/styles/tokens/motion"
 
 // ── Model attribution: the header row, and the shimmer label shown before ─────
 // ── the model is known ────────────────────────────────────────────────────────
@@ -63,9 +64,9 @@ export function AssistantModelHeader({
       {(message.modelName || !message.isLoading) && (
         <m.div
           key="model-header"
-          initial={{ opacity: 0, y: -4, filter: "blur(4px)" }}
+          initial={{ opacity: 0, y: -4, filter: `blur(${BLUR.xs}px)` }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
-          transition={{ type: "spring", stiffness: 420, damping: 30 }}
+          transition={{ type: "spring", ...SPRING.brisk }}
           draggable={false}
           style={headerStyle}
         >
@@ -86,9 +87,9 @@ export function AssistantModelHeader({
               return (
                 <m.span
                   key={label}
-                  initial={{ opacity: 0, filter: "blur(4px)" }}
+                  initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                   animate={{ opacity: 1, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
-                  transition={{ type: "spring", stiffness: 520, damping: 32 }}
+                  transition={{ type: "spring", ...SPRING.snappy }}
                   style={headerLabelStyle}
                 >
                   {label}

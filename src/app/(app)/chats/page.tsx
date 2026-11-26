@@ -31,6 +31,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { deleteFilesWithChat, takeTrashedWithChat } from '@/lib/api/chat'
 import { libraryKeys } from '@/lib/library/keys'
 import { useLibraryViewer } from '@/lib/library/viewer'
+import { BLUR, DURATION, SPRING } from "@/styles/tokens/motion"
 
 type ChatsTab = 'all' | 'shared' | 'archived'
 
@@ -74,10 +75,10 @@ function LibraryTabDropdown<T extends string>({
           <AnimatePresence mode="popLayout" initial={false}>
             <m.span
               key={value}
-              initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+              initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
               animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-              exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+              transition={{ type: 'spring', ...SPRING.snappy }}
               style={{ display: 'block', transformOrigin: 'left center' }}
             >
               {labels[value]}
@@ -379,7 +380,7 @@ function ChatsPageInner() {
                 initial={{ opacity: 0, x: 8 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 8 }}
-                transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: DURATION.quick, ease: [0.16, 1, 0.3, 1] }}
               >
                 <ChatSelectionBar
                   selectedCount={selectedIds.size}
@@ -396,7 +397,7 @@ function ChatsPageInner() {
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -8 }}
-                transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: DURATION.quick, ease: [0.16, 1, 0.3, 1] }}
                 style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
               >
                 {chatsTab === 'all' && (
@@ -464,9 +465,9 @@ function ChatsPageInner() {
                       <m.span
                         key="search-btn"
                         layout
-                        initial={{ opacity: 0, y: 4, filter: 'blur(4px)' }}
-                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { type: 'spring', duration: 0.3, bounce: 0 } }}
-                        exit={{ opacity: 0, scale: 0.25, filter: 'blur(4px)', transition: { type: 'spring', duration: 0.2, bounce: 0 } }}
+                        initial={{ opacity: 0, y: 4, filter: `blur(${BLUR.xs}px)` }}
+                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { type: 'spring', duration: DURATION.slow, bounce: 0 } }}
+                        exit={{ opacity: 0, scale: 0.25, filter: `blur(${BLUR.xs}px)`, transition: { type: 'spring', duration: DURATION.base, bounce: 0 } }}
                         style={{ display: 'inline-flex', flexShrink: 0 }}
                       >
                         <IconButton
@@ -480,9 +481,9 @@ function ChatsPageInner() {
                     ) : (
                       <m.div
                         key="search-input"
-                        initial={{ opacity: 0, scale: 0.95, filter: 'blur(4px)' }}
-                        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)', transition: { type: 'spring', duration: 0.3, bounce: 0 } }}
-                        exit={{ opacity: 0, scale: 0.95, filter: 'blur(4px)', transition: { duration: 0.15, ease: 'easeIn' } }}
+                        initial={{ opacity: 0, scale: 0.95, filter: `blur(${BLUR.xs}px)` }}
+                        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)', transition: { type: 'spring', duration: DURATION.slow, bounce: 0 } }}
+                        exit={{ opacity: 0, scale: 0.95, filter: `blur(${BLUR.xs}px)`, transition: { duration: DURATION.quick, ease: 'easeIn' } }}
                         style={{ flex: '1 0 0', minWidth: 0 }}
                       >
                         <InputField
@@ -525,7 +526,7 @@ function ChatsPageInner() {
             {sharedLoading && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
                 {[...Array(4)].map((_, i) => (
-                  <Skeleton key={i} height={68} radius={12} style={{ opacity: 1 - i * 0.15 }} />
+                  <Skeleton key={i} height={68} radius={'var(--radius-xl)'} style={{ opacity: 1 - i * 0.15 }} />
                 ))}
               </div>
             )}
@@ -545,7 +546,7 @@ function ChatsPageInner() {
                   padding:         'var(--space-3) var(--space-4)',
                   borderRadius:    'var(--radius-xl)',
                   backgroundColor: 'var(--neutral-white)',
-                  boxShadow:       '0px 1px 2px rgba(18,12,8,0.08), 0px 0px 0px 1px var(--neutral-100)',
+                  boxShadow:       'var(--chats-shadow)',
                 }}
               >
                 <div style={{ flex: '1 0 0', minWidth: 0 }}>
@@ -578,7 +579,7 @@ function ChatsPageInner() {
             {isLoading && chats.length === 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
                 {[...Array(3)].map((_, i) => (
-                  <Skeleton key={i} height={68} radius={12} style={{ opacity: 1 - i * 0.15 }} />
+                  <Skeleton key={i} height={68} radius={'var(--radius-xl)'} style={{ opacity: 1 - i * 0.15 }} />
                 ))}
               </div>
             )}
@@ -613,7 +614,7 @@ function ChatsPageInner() {
         {isLoading && chats.length === 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
             {[...Array(7)].map((_, i) => (
-              <Skeleton key={i} height={68} radius={12} style={{ opacity: 1 - i * 0.15 }} />
+              <Skeleton key={i} height={68} radius={'var(--radius-xl)'} style={{ opacity: 1 - i * 0.15 }} />
             ))}
           </div>
         )}

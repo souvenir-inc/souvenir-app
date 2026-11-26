@@ -1147,5 +1147,341 @@
   --settings-preview-radius-sm: 3px;
   /* Question card */
   --question-card-meta-line-height: 11px;
+
+  /* Tailwind arbitrary values (mapped 2026-11-26): exact values from className strings */
+  --button-lg-padding-x: 22px;
+  --switch-thumb-radius: 9.5px;
+  --toggle-transition-duration: var(--duration-quick); /* Checkbox and Switch fill */
+  --schedule-instructions-padding-y: 9px;
+  --connector-modal-icon-radius: 11px;
+  --connector-modal-title-size: 22px;
+  --connector-modal-title-line-height: 1.2;
+  --checkout-title-line-height: 34px;
+  --template-title-line-height: 26px;
+  --citation-popover-z: 9999;
+  --instructions-field-shadow: 0px 1px 1.5px 0px rgba(82, 75, 71, 0.08);
+  --instructions-field-focus-shadow: 0px 0px 0px 3px rgba(74, 131, 191, 0.25), 0px 1px 1.5px 0px rgba(82, 75, 71, 0.12);
+  /* Dashboard (Figma values, from className strings) */
+  --dashboard-page-top: 15px;
+  --dashboard-download-note-indent: 21px;
+  --dashboard-tab-lifted-padding-x: 13px;
+  --dashboard-empty-bar-gap: 8%;
+  --dashboard-empty-bar-inset: 4%;
+  --dashboard-sync-icon-radius: 3px;
+  --dashboard-toggle-radius: 7px;
+  --dashboard-line-height-sm: 17px;
+  --dashboard-tag-line-height: 14px;
+  --dashboard-micro-size: 10px;
+  --dashboard-avatar-xs-size: 8px;
+  --dashboard-metric-value-size: 44px;
+  --dashboard-metric-value-line-height: 52px;
+  --dashboard-metric-value-tracking: -0.88px;
+  --dashboard-card-value-tracking: -0.56px;
+  --dashboard-tab-tracking: -0.07px;
+  --dashboard-section-tracking: 0.6px;
 }
 /* ── end component values ── */
+
+/* ── Component values (mapped 2026-11-26) ── */
+/* Exact values from style constants, ternaries, template strings, CSSProperties objects and props that
+   ds-scan did not read. One component each, named for it; grouped by file. */
+:root {
+  /* app/(app)/agents/_components/AgentPageShell.tsx */
+  --agent-page-shell-blur: 10px;
+  --agent-page-shell-padding-right: min(340px, 45%);
+  /* app/(app)/agents/_components/SuperLinkParts.tsx */
+  --super-link-parts-radius: 5px;
+  /* app/(app)/agents/_components/SuperLinksTab.tsx */
+  --super-links-tab-radius: 5px;
+  /* app/(app)/agents/new/page.tsx */
+  --new-shadow: 0px 1px 2px 0px rgba(82,75,71,0.16), 0px 0px 0px 1px var(--neutral-300);
+  /* app/(app)/agents/published/page.tsx */
+  --published-blur: 108px;
+  --published-shadow: 0px 1.091px 1.09px 0px rgba(59,54,50,0.05), 0px 1.455px 1px 0px rgba(38,33,30,0.15), 0px 0px 0px 5px var(--neutral-100);
+  /* app/(app)/chats/page.tsx */
+  --chats-shadow: 0px 1px 2px rgba(18,12,8,0.08), 0px 0px 0px 1px var(--neutral-100);
+  /* app/(app)/projects/new/page.tsx */
+  --new-shadow-2: 0px 0px 0px 3px rgba(74,131,191,0.25), 0px 1px 1.5px 0px rgba(82,75,71,0.12);
+  /* app/(app)/schedules/ScheduleSkeletons.tsx */
+  --schedule-skeletons-card-shadow: 0px 1px 3px 0px rgba(82,75,71,0.08), 0px 0px 0px 1px var(--border-default);
+  /* app/(app)/settings/(shell)/(org)/analytics/_components/AnalyticsParts.tsx */
+  --analytics-parts-radius: 11px;
+  /* app/(app)/settings/(shell)/(org)/general/_components/GeneralSkeleton.tsx */
+  --general-skeleton-radius: 5px;
+  /* app/(app)/settings/(shell)/plans-and-billing/_components/billing-primitives.tsx */
+  --billing-primitives-shadow-color: rgba(2,15,24,0.2);
+  /* app/(app)/settings/(shell)/plans-and-billing/_components/billing-widgets.tsx */
+  --billing-widgets-shadow: 0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--blue-700-70);
+  --billing-widgets-shadow-2: 0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--blue-700-40), inset 0px -1px 0px 0px var(--blue-800-15);
+  --billing-widgets-shadow-3: 0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4), inset 0px -1px 0px 0px rgba(106,98,93,0.05);
+  /* app/(app)/settings/(shell)/preferences/page.tsx */
+  --preferences-hairline: #F5F2EF;
+  --preferences-ink: #26211E;
+  --preferences-mid: #827A74;
+  --preferences-dark-bar: #3B3632;
+  /* app/(app)/settings/(shell)/security/page.tsx */
+  --security-shadow: 0px 0px 0px 1px black, 0px 1.091px 1.091px 0px rgba(59,54,50,0.1), 0px 1.455px 3.127px 0px rgba(59,54,50,0.4), inset 0px 1px 0.364px 0px color-mix(in srgb, var(--static-white) 30%, transparent), inset 0px -2.182px 0.364px 0px #120c08, inset 0px -2.545px 4px -2.182px color-mix(in srgb, var(--static-white) 50%, transparent);
+  --security-shadow-2: 0px 1.091px 1.091px 0px rgba(24,2,2,0.05), 0px 1.455px 3.127px 0px rgba(24,2,2,0.15), 0px 0px 0px 1px var(--red-100), inset 0px -2.182px 0.364px 0px var(--red-100);
+  /* app/(app)/slack/link/page.tsx */
+  --link-padding: 40px 44px;
+  --link-shadow: 0px 12px 16px -4px rgba(130,122,116,0.12), 0px 0px 0px 1px var(--neutral-100);
+  /* app/(onboarding)/onboarding/account-type/page.tsx */
+  --account-type-shadow: 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 2px var(--neutral-900);
+  /* app/(onboarding)/onboarding/import/page.tsx */
+  --import-shadow: 0px 1px 1.5px 0px rgba(2,15,24,0.2), inset 0px 1px 0px 0px var(--blue-50-70), inset 0px -1px 0px 0px var(--blue-600-10);
+  /* app/(onboarding)/onboarding/invite/page.tsx */
+  --invite-shadow: 0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--red-500);
+  --invite-shadow-2: 0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--yellow-500);
+  /* app/(onboarding)/onboarding/plans/page.tsx */
+  --plans-shadow: 0px 1px 1.5px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4), inset 0px 1px 0px color-mix(in srgb, var(--static-white) 61%, transparent), inset 0px -1px 0px rgba(106,98,93,0.05);
+  --plans-shadow-2: inset 0px -1px 0px color-mix(in srgb, var(--static-white) 90%, transparent), inset 0px 1px 0px var(--neutral-100), inset 0px 0px 4px rgba(229, 229, 229,0.5);
+  --plans-shadow-3: 0 1px 4px color-mix(in srgb, var(--static-black) 22%, transparent), 0 0 0 1px rgba(59,54,50,0.2);
+  --plans-shadow-4: 0px 1.091px 1.091px rgba(59,54,50,0.05), 0px 1.455px 3.127px rgba(38,33,30,0.15), inset 0px -2.182px 0.364px var(--neutral-100);
+  --plans-shadow-5: 0px 1.091px 1.091px rgba(59,54,50,0.05), 0px 1.455px 3.127px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100), inset 0px -2.182px 0.364px var(--neutral-100);
+  --plans-box-shadow: 0px 1px 1.5px rgba(82,75,71,0.12);
+  --plans-box-shadow-2: 0px 0px 0px 1px rgba(212, 212, 212,0.4);
+  --plans-box-shadow-3: inset 0px -1px 0px rgba(106,98,93,0.05);
+  --plans-box-shadow-4: 0px 1.091px 1.091px rgba(59,54,50,0.1);
+  --plans-box-shadow-5: 0px 1.455px 3.127px rgba(59,54,50,0.4);
+  --plans-box-shadow-6: inset 0px -2.182px 0.364px #120c08;
+  /* app/(onboarding)/onboarding/setup/page.tsx */
+  --setup-shadow: 0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px var(--blue-600-50), inset 0px 1px 0px 0px var(--blue-50-70), inset 0px -1px 0px 0px var(--blue-600-10);
+  /* app/(onboarding)/onboarding/tone/page.tsx */
+  --tone-shadow: 0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 2px var(--neutral-900);
+  --tone-shadow-2: 0px 1.091px 1.09px 0px rgba(59,54,50,0.05), 0px 1.455px 1px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100);
+  /* app/(onboarding)/onboarding/workspace/page.tsx */
+  --workspace-shadow: 0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1.5px var(--neutral-900);
+  /* app/(standalone)/org/change-plan/page.tsx */
+  --change-plan-shadow: 0px 1px 1.5px 0px rgba(20,16,5,0.2), 0px 0px 0px 1px color-mix(in srgb, var(--yellow-600) 50%, transparent);
+  --change-plan-shadow-2: inset 0px 1px 0px 0px rgba(250,241,235,0.7), inset 0px -1px 0px 0px rgba(126,84,53,0.1);
+  --change-plan-shadow-3: inset 0px 1px 0px 0px rgba(250,246,235,0.7), inset 0px -1px 0px 0px rgba(143,116,39,0.1);
+  --change-plan-shadow-4: 0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px var(--blue-600-50), inset 0px 1px 0px 0px rgba(231,244,253,0.7), inset 0px -1px 0px 0px rgba(13,110,178,0.1);
+  --change-plan-shadow-5: 0px 0px 0px 1px var(--neutral-black), 0px 1.091px 1.091px 0px rgba(59,54,50,0.1), 0px 1.455px 3.127px 0px rgba(59,54,50,0.4), inset 0px 1px 0.364px 0px var(--neutral-white-30), inset 0px -2.182px 0.364px 0px var(--neutral-950), inset 0px -2.545px 4px -2.182px var(--neutral-white-50);
+  --change-plan-shadow-6: 0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-300), inset 0px -2.182px 0.364px 0px var(--neutral-200);
+  /* app/globals.css */
+  --globals-text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  /* components/AgentEditor/AvatarCarousel.tsx */
+  --avatar-carousel-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--neutral-100);
+  /* components/AiModelsView/parts.tsx */
+  --ai-models-view-shadow: 0px 2px 2.8px 0px rgba(82,75,71,0.06);
+  --ai-models-view-inner-shadow: inset 0px 1px 0px 0px rgba(231,244,253,0.7), inset 0px -1px 0px 0px rgba(13,110,178,0.1);
+  --ai-models-view-inner-shadow-2: inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 70%, transparent), inset 0px -1px 0px 0px rgba(106,98,93,0.1);
+  --ai-models-view-inner-shadow-3: inset 0px 1px 0px 0px rgba(253,231,231,0.7), inset 0px -1px 0px 0px rgba(159,38,35,0.1);
+  --ai-models-view-inner-shadow-4: inset 0px 1px 0px 0px rgba(247,254,230,0.7), inset 0px -1px 0px 0px rgba(128,183,7,0.1);
+  --ai-models-view-inner-shadow-5: inset 0px 1px 0px 0px rgba(250,241,235,0.7), inset 0px -1px 0px 0px rgba(126,84,53,0.1);
+  --ai-models-view-outer-shadow: 0px 1px 1.5px 0px rgba(10,2,24,0.2), 0px 0px 0px 1px rgba(109,40,217,0.5);
+  --ai-models-view-inner-shadow-6: inset 0px 1px 0px 0px rgba(237,233,254,0.7), inset 0px -1px 0px 0px rgba(109,40,217,0.1);
+  /* components/ApprovalCard/index.tsx */
+  --approval-card-shadow: 0px 0px 0px 1px rgba(59,54,50,0.4);
+  --approval-card-shadow-2: 0px 0px 0px 1px rgba(59,54,50,0.2);
+  --approval-card-shadow-card: 0px 4px 8px 0px rgba(82,75,71,0.10), 0px 0px 0px 1px rgba(59,54,50,0.12);
+  --approval-card-shadow-inner: inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 50%, transparent), inset 0px -1px 0px 0px rgba(82,75,71,0.06);
+  /* components/Avatar/index.tsx */
+  --avatar-hairline: inset 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+  /* components/BrowserPanel/BrowserScreen.tsx */
+  --browser-screen-blur: 6px;
+  --browser-screen-shadow: 0px 2px 8px 0px rgba(26,23,20,0.16), 0px 0px 0px 1px var(--neutral-800-10);
+  /* components/ChatInput/index.tsx */
+  --chat-input-radius: 24px;
+  /* components/ChatRow/index.tsx */
+  --chat-row-outline-width: 1.5px;
+  /* components/ChatSelectionBar/index.tsx */
+  --chat-selection-bar-chip-ring: 0px 0px 0px 1px rgba(59,54,50,0.28);
+  /* components/DocumentCard/index.tsx */
+  --document-card-shadow: 0px 4px 4px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100);
+  /* components/DropdownMenuItem/index.tsx */
+  --dropdown-menu-item-size: calc(var(--font-size-body) - 2px);
+  /* components/EditProjectModal/index.tsx */
+  --edit-project-modal-shadow: 0px 0px 0px 3px rgba(74,131,191,0.25), 0px 1px 1.5px 0px rgba(82,75,71,0.12);
+  /* components/EnhancePromptField/index.tsx */
+  --enhance-prompt-field-border-width: 1.5px;
+  --enhance-prompt-field-border-width-2: 1px;
+  /* components/FlatSidebar/index.tsx */
+  --flat-sidebar-shadow: 4px 0 24px rgba(0, 0, 0, 0.16);
+  --flat-sidebar-padding: 19px 8px 8px;
+  --flat-sidebar-padding-2: 19px 8px 8px 16px;
+  /* components/Library/FileMarks.tsx */
+  --file-marks-stop-color: #a6ebcf;
+  --file-marks-stop-color-2: #3fb98a;
+  /* components/Library/FileTable/FileTable.module.css */
+  --file-table-blur: 14px;
+  /* components/Library/PersonAvatar.tsx */
+  --person-avatar-hairline: inset 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+  /* components/Library/viewers/PdfViewer.tsx */
+  --pdf-viewer-outline-width: 3px;
+  /* components/Library/viewers/TextViewer.tsx */
+  --text-viewer-outline-width: 3px;
+  /* components/MessageBubble/index.tsx */
+  --message-bubble-shadow: 0px 1px 2px rgba(59,54,50,0.08), 0px 0px 0px 1px var(--neutral-200);
+  /* components/MoveToProjectModal/index.tsx */
+  --move-to-project-modal-shadow: 0px 0px 0px 1.5px rgba(59,54,50,0.28);
+  --move-to-project-modal-shadow-row-hover: 0px 0px 0px 1px rgba(59,54,50,0.14);
+  /* components/NotificationPanel/index.tsx */
+  --notification-panel-blur: 3px;
+  /* components/OptionRow/index.tsx */
+  --option-row-check-inner-shadow: inset 0px 1px 0px 0px var(--yellow-200), inset 0px -1px 0px 0px rgba(106,98,93,0.05);
+  /* components/PasswordInputField/index.tsx */
+  --password-input-field-tracking: 1px;
+  /* components/PersonaCard/AgentCardButton.tsx */
+  --agent-card-button-secondary-bg-hover: #f1efec;
+  --agent-card-button-secondary-text: #1c1c1c;
+  --agent-card-button-secondary-text-disabled: rgba(28, 28, 28, 0.45);
+  /* components/PersonaCard/HeroScene.tsx */
+  --hero-scene-duration: var(--duration-slow);
+  /* components/Projects/ProjectRouteStates.tsx */
+  --project-route-states-radius: 24px;
+  /* components/QuestionCard/index.tsx */
+  --question-card-shadow: 0px 0px 0px 1px rgba(59,54,50,0.5);
+  --question-card-shadow-2: inset 0px 1px 0.364px 0px color-mix(in srgb, var(--static-white) 30%, transparent), inset 0px -2.182px 0.364px 0px #120c08, inset 0px -2.545px 4px -2.182px color-mix(in srgb, var(--static-white) 50%, transparent);
+  --question-card-shadow-3: 0px 8px 24px rgba(82,75,71,0.18), 0px 0px 0px 1px rgba(212, 212, 212,0.3);
+  --question-card-card-shadow: 0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(59,54,50,0.1);
+  /* components/RoleBadge/index.tsx */
+  --role-badge-shadow: 0px 1px 1.5px 0px rgba(20,16,5,0.2);
+  --role-badge-shadow-2: inset 0px 1px 0px 0px rgba(250,246,235,0.7);
+  --role-badge-shadow-3: inset 0px -1px 0px 0px rgba(143,116,39,0.1);
+  --role-badge-shadow-4: 0px 1px 1.5px 0px rgba(2,15,24,0.2);
+  /* components/Schedules/ScheduleCard.tsx */
+  --schedule-card-box-shadow: 0px 1px 3px 0px rgba(82, 75, 71, 0.08), 0px 0px 0px 2px var(--blue-300);
+  --schedule-card-box-shadow-2: 0px 1px 3px 0px rgba(82, 75, 71, 0.08), 0px 0px 0px 1px var(--border-default);
+  /* components/SelectionPopover/index.tsx */
+  --selection-popover-blur: 7.273px;
+  /* components/ShareModal/index.tsx */
+  --share-modal-btn-shadow: 0px 0px 0px 2px var(--blue-400), 0px 0px 0px 1px rgba(59,54,50,0.3);
+  /* components/Sidebar/index.tsx */
+  --sidebar-shadow: inset 0px -1px 0px 0px color-mix(in srgb, var(--static-white) 90%, transparent), inset 0px 1px 0px 0px var(--neutral-100), inset 0px 0px 4px 0px rgba(229, 229, 229,0.5);
+  /* components/SidebarMenuItem/index.tsx */
+  --sidebar-menu-item-padding-top: 9px;
+  --sidebar-menu-item-padding-bottom: 9px;
+  /* components/SidebarProjectsSection/index.tsx */
+  --sidebar-projects-section-padding-left: 22px;
+  /* components/SlackConnectModal/index.tsx */
+  --slack-connect-modal-shadow-card-border: 0px 1px 1.5px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-200);
+  /* components/TabItem/index.tsx */
+  --tab-item-padding: 7px 9px;
+  --tab-item-size: 10px;
+  /* components/Tabs/index.tsx */
+  --tabs-padding-left: 30px;
+  --tabs-padding-right: 30px;
+  /* components/TeamChip/index.tsx */
+  --team-chip-size: 7px;
+  --team-chip-size-2: 9px;
+  /* components/TeamSwitcher/index.tsx */
+  --team-switcher-shadow: inset 0px 4px 4px 0px color-mix(in srgb, var(--static-black) 25%, transparent), inset 0px -1px 0.4px 0px rgba(18,60,95,0.65);
+  /* components/TeamSwitcherDropdown/index.tsx */
+  --team-switcher-dropdown-shadow: inset 0px 4px 4px color-mix(in srgb, var(--static-black) 25%, transparent), inset 0px -1px 0.4px rgba(18,60,95,0.65);
+  /* components/TeamSwitcherRow/index.tsx */
+  --team-switcher-row-shadow: inset 0px 4px 4px 0px color-mix(in srgb, var(--static-black) 25%, transparent), inset 0px -1px 0.4px 0px rgba(18,60,95,0.65);
+  /* components/ThemeModeSwitcher/index.tsx */
+  --theme-mode-switcher-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25), 0px 0px 0px 1px rgba(0, 0, 0, 0.08);
+  --theme-mode-switcher-color: #1c1c1c;
+  --theme-mode-switcher-duration: var(--duration-base);
+  /* components/UndoToast/index.tsx */
+  --undo-toast-shadow-inner: inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 60%, transparent), inset 0px -1px 0px 0px rgba(82,75,71,0.05);
+  /* components/UsageBarChart/index.tsx */
+  --usage-bar-chart-shadow: 0px 1px 4px rgba(59,54,50,0.5), 0px 0px 0px 0.5px var(--neutral-black);
+  /* components/VersionCard/index.tsx */
+  --version-card-shadow-avatar: 0px 1.091px 1.09px 0px rgba(59,54,50,0.05), 0px 1.455px 1px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100);
+  /* components/VisibilityRow/index.tsx */
+  --visibility-row-shadow-chip-inner: inset 0px 1px 0px 0px rgba(231,244,253,0.7), inset 0px -1px 0px 0px rgba(13,110,178,0.1);
+  /* components/WorkspaceConnectorCard/index.tsx */
+  --workspace-connector-card-shadow: 0px 1px 2px 0px rgba(82,75,71,0.08), 0px 0px 0px 1px var(--neutral-100);
+  /* components/chat/ActivityRow.tsx */
+  --activity-row-duration: var(--duration-moderate);
+  --activity-row-bg: rgba(59,54,50,0.05);
+  /* components/chat/AnimatedCodeBlock.tsx */
+  --animated-code-block-shadow: 0px 0px 0px 1px color-mix(in srgb, var(--static-black) 90%, transparent), 0px 1px 1px rgba(59,54,50,0.12), 0px 2px 4px rgba(59,54,50,0.28);
+  --animated-code-block-box-shadow: 0px 1px 1px rgba(59,54,50,0.10);
+  --animated-code-block-box-shadow-2: 0px 1.5px 3px rgba(59,54,50,0.35);
+  --animated-code-block-box-shadow-3: inset 0px -2px 0.4px #120C08;
+  /* components/chat/AnimatedPieChart.tsx */
+  --animated-pie-chart-duration: var(--duration-long);
+  --animated-pie-chart-size: 22px;
+  --animated-pie-chart-size-2: 10px;
+  /* components/chat/AnimatedTable.tsx */
+  --animated-table-bg: rgba(59,54,50,0.05);
+  --animated-table-padding: 9px 14px;
+  --animated-table-padding-left: 17px;
+  --animated-table-row-border-bottom: rgba(82,75,71,0.12);
+  /* components/chat/AnimatedTags.tsx */
+  --animated-tags-text: #F9F8F5;
+  /* components/chat/AttachmentManager.tsx */
+  --attachment-manager-blur: 1.5px;
+  /* components/chat/ChatHome.module.css */
+  --chat-home-border-top-color: rgba(255, 255, 255, 0.08);
+  /* components/chat/FileDropOverlay.tsx */
+  --file-drop-overlay-blur: 6px;
+  --file-drop-overlay-top-layer: 2147483000;
+  /* components/chat/ImageGenerationPreview.module.css */
+  --image-generation-preview-blur: 30px;
+  --image-generation-preview-blur-2: 20px;
+  --image-generation-preview-blur-3: 7px;
+  /* components/chat/InitialPrompts.tsx */
+  --initial-prompts-size: 34px;
+  /* components/chat/MermaidDiagram.tsx */
+  --mermaid-diagram-shadow: 0 28px 80px rgba(18,12,8,0.28);
+  /* components/chat/ModelMenu.tsx */
+  --model-menu-effort-ramp: #3b82f6;
+  --model-menu-effort-ramp-2: #8b5cf6;
+  --model-menu-effort-ramp-3: #f59e0b;
+  --model-menu-effort-ramp-4: #ef4444;
+  /* components/chat/PinChipStrip.tsx */
+  --pin-chip-strip-duration: 60ms;
+  /* components/chat/WidgetSkeleton.tsx */
+  --widget-skeleton-radius: 99px;
+  /* components/chat/XmlChart.tsx */
+  --xml-chart-duration: var(--duration-long);
+  --xml-chart-size: 10px;
+  --xml-chart-size-2: 9px;
+  /* components/chat/XmlWeather.tsx */
+  --xml-weather-blur: 18px;
+  /* components/chat/composer/ChipsRow.tsx */
+  --chips-row-duration: var(--duration-instant);
+  /* components/chat/message/GeneratedFilesList.tsx */
+  --generated-files-list-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  /* components/chat/message/StandaloneActivitiesBlock.tsx */
+  --standalone-activities-block-duration: var(--duration-moderate);
+  --standalone-activities-block-duration-2: var(--duration-base);
+  /* components/connectors/connections-shared.tsx */
+  --connections-shared-padding: 72px;
+  /* components/layout/AppLayout.tsx */
+  --app-layout-padding: 19px;
+  /* components/layout/SidebarChromeSkeleton.tsx */
+  --sidebar-chrome-skeleton-radius: 3px;
+  /* components/onboarding/WelcomeModal.tsx */
+  --welcome-modal-shadow: 0px 8px 32px 0px rgba(82,75,71,0.18), 0px 0px 0px 1px var(--neutral-100);
+  --welcome-modal-shadow-2: inset 0px 1px 0.4px var(--neutral-50-30), inset 0px -2px 0.4px #120c08, inset 0px -2.5px 4px -2px var(--neutral-50-50);
+  --welcome-modal-shadow-3: 0px 1px 1px rgba(59,54,50,0.05), 0px 1.5px 3px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-200);
+  --welcome-modal-backdrop-z: 9998;
+  --welcome-modal-z: 9999;
+  /* components/ui/sheet.tsx */
+  --sheet-color: rgba(0, 0, 0, 0.32);
+  /* lib/team-gradients.ts */
+  --team-gradients: #4FACDE;
+  --team-gradients-2: #2D8BBF;
+  --team-gradients-3: #9B6FE0;
+  --team-gradients-4: #7B4FC0;
+  --team-gradients-5: #F59542;
+  --team-gradients-6: #D4742A;
+  --team-gradients-7: #4CAF78;
+  --team-gradients-8: #2D8F58;
+  --team-gradients-9: #E06060;
+  --team-gradients-10: #B83C3C;
+  --team-gradients-11: #60A8E0;
+  --team-gradients-12: #3C80C0;
+  /* constants mapped by hand */
+  --agent-created-card-radius: 20px;
+  --agent-hero-radius: 20px;
+  --browser-screen-z-backdrop: 50;
+  --add-cards-dialog-border-width: 1.25px;
+  --button-raised-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  --preferences-mid-40: rgba(130, 122, 116, 0.4);
+  --preferences-mid-30: rgba(130, 122, 116, 0.3);
+  --preferences-mid-20: rgba(130, 122, 116, 0.2);
+  --xml-funnel-glow-blur: 12px;
+  --xml-weather-drop-y: 18px;
+  --xml-weather-drop-blur: 24px;
+  --activity-row-reveal-duration: var(--duration-moderate);
+  --standalone-activities-block-reveal-duration: var(--duration-moderate);
+  --standalone-activities-block-fade-duration: var(--duration-base);
+}
+/* ── end component values (2026-11-26) ── */

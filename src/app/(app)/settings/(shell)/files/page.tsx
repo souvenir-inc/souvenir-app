@@ -45,7 +45,7 @@ function CardSection({
       style={{
         display:      'flex',
         flexDirection:'column',
-        padding:      `${padTop}px 24px ${padBottom}px`,
+        padding:      `${padTop}px var(--space-6) ${padBottom}px`,
         borderBottom: divider ? '1px solid var(--neutral-100)' : undefined,
       }}
     >
@@ -346,7 +346,7 @@ function OutlineButton({ children, onClick }: { children: React.ReactNode; onCli
         border:          'none',
         cursor:          'pointer',
         backgroundColor: 'var(--neutral-white)',
-        boxShadow:       '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)',
+        boxShadow:       'var(--shadow-card-raised)',
         fontFamily:      'var(--font-body)',
         fontWeight:      'var(--font-weight-medium)',
         fontSize:        'var(--font-size-body)',
@@ -360,7 +360,7 @@ function OutlineButton({ children, onClick }: { children: React.ReactNode; onCli
         position:     'absolute',
         inset:        0,
         borderRadius: 'inherit',
-        boxShadow:    'inset 0px -2.182px 0.364px 0px var(--neutral-100)',
+        boxShadow:    'var(--shadow-model-featured-default-inner)',
         pointerEvents:'none',
       }} />
       {children}
@@ -385,7 +385,7 @@ function DangerButton({ children, onClick }: { children: React.ReactNode; onClic
         border:          'none',
         cursor:          'pointer',
         backgroundColor: 'var(--neutral-white)',
-        boxShadow:       '0px 1.091px 1.091px 0px rgba(24,2,2,0.05), 0px 1.455px 3.127px 0px rgba(24,2,2,0.15), 0px 0px 0px 1px var(--red-100)',
+        boxShadow:       'var(--shadow-card-raised-danger)',
         fontFamily:      'var(--font-body)',
         fontWeight:      'var(--font-weight-medium)',
         fontSize:        'var(--font-size-body)',

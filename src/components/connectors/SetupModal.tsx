@@ -34,7 +34,7 @@ import {
 import { useConnectorSetupFlow, type SetupFlowResult } from '@/lib/useConnectorSetupFlow'
 import { isZapierProviderConnector } from '@/lib/connectorProvider'
 
-const heading = 'm-0 font-[family-name:var(--font-title)] text-[22px] font-normal leading-[1.2] text-[var(--neutral-900)]'
+const heading = 'm-0 font-[family-name:var(--font-title)] text-[length:var(--connector-modal-title-size)] font-normal leading-[var(--connector-modal-title-line-height)] text-[var(--neutral-900)]'
 const muted = 'm-0 font-[family-name:var(--font-body)] text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--color-text-muted)]'
 const panel = 'rounded-xl bg-[var(--neutral-white)] shadow-[0_0_0_1px_var(--neutral-100)]'
 

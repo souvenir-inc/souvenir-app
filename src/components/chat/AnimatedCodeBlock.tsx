@@ -6,6 +6,7 @@ import Copy01Icon from "@hugeicons/core-free-icons/Copy01Icon";
 import Checkmark from "@hugeicons/core-free-icons/Tick01Icon";
 import type { CodeData } from "@/types/chat";
 import { HIcon } from "./response-blocks-shared";
+import { DURATION } from "@/styles/tokens/motion"
 
 // �"��"� AnimatedCodeBlock �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 
@@ -81,9 +82,9 @@ export function AnimatedCodeBlock({ data, onComplete, animate = true }: { data: 
   }, []); // eslint-disable-line
 
   return (
-    <m.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}>
+    <m.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: DURATION.moderate, ease: [0.16, 1, 0.3, 1] }}>
       {data.caption && <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-500)", marginBottom: 'var(--space-1-5)' }}>{data.caption}</div>}
-      <div style={{ background: "var(--widget-code-bg)", borderRadius: 'var(--radius-lg)', overflow: "hidden", boxShadow: "0px 0px 0px 1px color-mix(in srgb, var(--static-black) 90%, transparent), 0px 1px 1px rgba(59,54,50,0.12), 0px 2px 4px rgba(59,54,50,0.28)" }}>
+      <div style={{ background: "var(--widget-code-bg)", borderRadius: 'var(--radius-lg)', overflow: "hidden", boxShadow: "var(--animated-code-block-shadow)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-1-5) var(--space-2-5) var(--space-1-5) var(--space-3)", borderBottom: "1px solid color-mix(in srgb, var(--static-white) 5.5%, transparent)", background: "linear-gradient(180deg, color-mix(in srgb, var(--neutral-700) 30%, transparent) 0%, color-mix(in srgb, var(--neutral-900) 30%, transparent) 100%)" }}>
           <span style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-medium)', letterSpacing: "var(--tracking-wider)", color: "color-mix(in srgb, var(--neutral-200) 55%, transparent)", fontFamily: "var(--font-code, monospace)", textTransform: "uppercase" }}>
             {data.language ?? "code"}
@@ -92,23 +93,23 @@ export function AnimatedCodeBlock({ data, onComplete, animate = true }: { data: 
             onMouseEnter={() => setCopyHovered(true)}
             onMouseLeave={() => setCopyHovered(false)}
             whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.1, ease: "easeOut" }}
+            transition={{ duration: DURATION.snap, ease: "easeOut" }}
             style={{
               width: 76, flexShrink: 0,
               display: "flex", alignItems: "center", justifyContent: "center", gap: 'var(--space-1)',
               padding: "var(--space-1) 0 var(--space-1-5)", borderRadius: 'var(--radius-md)', border: "none", cursor: "pointer",
               background: copyHovered ? "linear-gradient(180deg, var(--neutral-600) 0%, var(--neutral-800) 100%)" : "linear-gradient(180deg, var(--neutral-700) 0%, var(--neutral-900) 100%)",
-              boxShadow: ["0px 0px 0px 1px color-mix(in srgb, var(--static-black) 85%, transparent)", "0px 1px 1px rgba(59,54,50,0.10)", "0px 1.5px 3px rgba(59,54,50,0.35)", copyHovered ? "inset 0px 1px 0.4px color-mix(in srgb, var(--static-white) 42%, transparent)" : "inset 0px 1px 0.4px color-mix(in srgb, var(--static-white) 28%, transparent)", "inset 0px -2px 0.4px #120C08"].join(", "),
+              boxShadow: ["0px 0px 0px 1px color-mix(in srgb, var(--static-black) 85%, transparent)", "var(--animated-code-block-box-shadow)", "var(--animated-code-block-box-shadow-2)", copyHovered ? "inset 0px 1px 0.4px color-mix(in srgb, var(--static-white) 42%, transparent)" : "inset 0px 1px 0.4px color-mix(in srgb, var(--static-white) 28%, transparent)", "var(--animated-code-block-box-shadow-3)"].join(", "),
               transition: "background var(--duration-fast) ease, box-shadow var(--duration-fast) ease",
             }}>
             <AnimatePresence mode="popLayout" initial={false}>
               {copied ? (
-                <m.span key="done" initial={{ opacity: 0, y: 6, scale: 0.85 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6, scale: 0.85 }} transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }} style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)' }}>
+                <m.span key="done" initial={{ opacity: 0, y: 6, scale: 0.85 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6, scale: 0.85 }} transition={{ duration: DURATION.base, ease: [0.16, 1, 0.3, 1] }} style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)' }}>
                   <HIcon icon={Checkmark} size={12} color="var(--green-600)" strokeWidth={2.5} />
                   <span style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-medium)', color: "var(--green-600)", fontFamily: "var(--font-body)", whiteSpace: "nowrap" }}>Copied</span>
                 </m.span>
               ) : (
-                <m.span key="copy" initial={{ opacity: 0, y: 6, scale: 0.85 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6, scale: 0.85 }} transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }} style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)' }}>
+                <m.span key="copy" initial={{ opacity: 0, y: 6, scale: 0.85 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6, scale: 0.85 }} transition={{ duration: DURATION.base, ease: [0.16, 1, 0.3, 1] }} style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)' }}>
                   <HIcon icon={Copy01Icon} size={12} color="color-mix(in srgb, var(--neutral-200) 72%, transparent)" strokeWidth={1.5} />
                   <span style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-medium)', color: "color-mix(in srgb, var(--neutral-200) 72%, transparent)", fontFamily: "var(--font-body)", whiteSpace: "nowrap" }}>Copy</span>
                 </m.span>
@@ -119,20 +120,20 @@ export function AnimatedCodeBlock({ data, onComplete, animate = true }: { data: 
         <pre className="kaya-scrollbar" style={{ margin: 0, padding: "var(--space-3) var(--space-4)", fontSize: 'var(--font-size-body-sm)', lineHeight: "var(--line-height-body-sm)", fontFamily: "var(--font-code, monospace)", overflowX: "auto" }}>
           {visibleLines.map((line, i) => (
             // eslint-disable-next-line react/no-array-index-key
-            <m.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.08 }}
+            <m.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: DURATION.instant }}
               style={{ display: "flex", gap: 'var(--space-3)' }}>
               <span style={{ color: "color-mix(in srgb, var(--neutral-800) 55%, transparent)", userSelect: "none", fontSize: 'var(--font-size-small)', minWidth: 18, textAlign: "right", flexShrink: 0, lineHeight: "var(--line-height-body-sm)" }}>{i + 1}</span>
               <span>{highlightCode(line)}</span>
             </m.div>
           ))}
           {!streamDone && (
-            <m.span animate={{ opacity: [0.2, 1, 0.2] }} transition={{ duration: 0.7, repeat: Infinity }}
+            <m.span animate={{ opacity: [0.2, 1, 0.2] }} transition={{ duration: DURATION.longer, repeat: Infinity }}
               style={{ display: "inline-block", width: 7, height: 14, background: "var(--brown-700)", borderRadius: 'var(--radius-hairline)', verticalAlign: "middle", marginLeft: 'var(--space-7)' }} />
           )}
         </pre>
         <AnimatePresence initial={false}>
           {streamDone && isLong && (
-            <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: DURATION.base }}>
               {!expanded ? (
                 <div style={{ position: "relative" }}>
                   <div style={{ position: "absolute", top: -48, left: 0, right: 0, height: 48, background: "linear-gradient(to bottom, transparent, var(--neutral-900))", pointerEvents: "none" }} />

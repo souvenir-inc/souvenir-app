@@ -204,7 +204,7 @@ function Share({ startOn, board, period, compare, cardView, stamp, isDefault = f
 
 function Avatar({ member }: { member: Person | undefined }) {
   return (
-    <span aria-hidden className="flex size-7 shrink-0 items-center justify-center rounded-full text-[10px] font-medium text-[var(--dashboard-figure)]" style={{ background: member?.color }}>
+    <span aria-hidden className="flex size-7 shrink-0 items-center justify-center rounded-full text-[length:var(--dashboard-micro-size)] font-medium text-[var(--dashboard-figure)]" style={{ background: member?.color }}>
       {member?.initials}
     </span>
   )
@@ -385,7 +385,7 @@ function AddPeople({ people, share, onListOpen, onInvite }: { people: People; sh
             const m = people.get(id)
             return (
               <span key={id} data-chip={id} className="flex h-6 items-center gap-1.5 rounded-md bg-[var(--dashboard-chip-bg)] pl-1.5 pr-1 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-figure)]">
-                <span aria-hidden className="flex size-4 items-center justify-center rounded-full text-[8px] font-medium" style={{ background: m?.color }}>{m?.initials}</span>
+                <span aria-hidden className="flex size-4 items-center justify-center rounded-full text-[length:var(--dashboard-avatar-xs-size)] font-medium" style={{ background: m?.color }}>{m?.initials}</span>
                 {m?.name}
                 {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a chip's × (Figma 170:70828) */}
                 <button type="button" aria-label={`Remove ${m?.name}`} onClick={(e) => { e.stopPropagation(); setPicked((p) => p.filter((x) => x !== id)) }} className={cn('flex size-4 cursor-pointer items-center justify-center rounded-sm border-0 bg-transparent p-0 text-[var(--dashboard-label)] hover:text-[var(--dashboard-figure)]', FOCUS)}>

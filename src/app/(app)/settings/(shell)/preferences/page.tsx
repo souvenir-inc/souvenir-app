@@ -14,12 +14,11 @@ type ThemeMode  = 'light' | 'dark' | 'system'
 // the active theme. Keep these as named constants (not inline colours or tokens): tokens flip
 // in dark mode, and inline hex literals get re-tokenised by scripts/migrate-inline-colors.mjs.
 const FIXED = {
-  page:     '#FFFFFF',
-  hairline: '#F5F2EF',
-  ink:      '#26211E',
-  mid:      '#827A74',
-  midRgb:   '130, 122, 116',
-  darkBar:  '#3B3632',
+  page:     'var(--static-white)',
+  hairline: 'var(--preferences-hairline)',
+  ink:      'var(--preferences-ink)',
+  mid:      'var(--preferences-mid)',
+  darkBar:  'var(--preferences-dark-bar)',
 } as const
 
 function ThemePreview({ mode }: { mode: ThemeMode }) {
@@ -41,7 +40,7 @@ function ThemePreview({ mode }: { mode: ThemeMode }) {
       <div style={{ display: 'flex', flex: '1 0 0', minHeight: 0, overflow: 'hidden' }}>
         {/* Sidebar strip */}
         <div style={{
-          backgroundColor: isDark ? FIXED.ink : 'white',
+          backgroundColor: isDark ? FIXED.ink : 'var(--static-white)',
           display:         'flex',
           flexDirection:   'column',
           gap:             'var(--space-1)',
@@ -57,8 +56,8 @@ function ThemePreview({ mode }: { mode: ThemeMode }) {
               width:           24,
               borderRadius:    'var(--settings-preview-radius-sm)',
               backgroundColor: isDark
-                ? isActive ? 'white' : FIXED.mid
-                : isActive ? FIXED.ink : `rgba(${FIXED.midRgb}, 0.4)`,
+                ? isActive ? 'var(--static-white)' : FIXED.mid
+                : isActive ? FIXED.ink : 'var(--preferences-mid-40)',
             }} />
           ))}
         </div>
@@ -76,19 +75,19 @@ function ThemePreview({ mode }: { mode: ThemeMode }) {
             height:          8,
             width:           50,
             borderRadius:    'var(--radius-xs)',
-            backgroundColor: isDark ? FIXED.mid : `rgba(${FIXED.midRgb}, 0.3)`,
+            backgroundColor: isDark ? FIXED.mid : 'var(--preferences-mid-30)',
           }} />
           <div style={{
             height:          8,
             width:           70,
             borderRadius:    'var(--radius-xs)',
-            backgroundColor: isDark ? FIXED.mid : `rgba(${FIXED.midRgb}, 0.2)`,
+            backgroundColor: isDark ? FIXED.mid : 'var(--preferences-mid-20)',
           }} />
           {/* Input bar */}
           <div style={{
             flex:            '1 0 0',
             minHeight:       0,
-            backgroundColor: isDark ? FIXED.darkBar : 'white',
+            backgroundColor: isDark ? FIXED.darkBar : 'var(--static-white)',
             borderRadius:    'var(--radius-sm)',
             display:         'flex',
             alignItems:      'center',
@@ -100,7 +99,7 @@ function ThemePreview({ mode }: { mode: ThemeMode }) {
               fontWeight: 'var(--font-weight-regular)',
               fontSize: 'var(--font-size-small)',
               lineHeight: 'var(--line-height-small)',
-              color:      isDark ? 'white' : FIXED.ink,
+              color:      isDark ? 'var(--static-white)' : FIXED.ink,
               opacity:    0.8,
               flex:       '1 0 0',
               minWidth:   0,
@@ -228,8 +227,8 @@ export default function PreferencesPage() {
                     position:        'relative',
                     backgroundColor: selected ? 'color-mix(in srgb, var(--neutral-100) 60%, transparent)' : 'var(--neutral-white)',
                     boxShadow:       selected
-                      ? '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4), inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 61%, transparent), inset 0px -1px 0px 0px rgba(106,98,93,0.05)'
-                      : '0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
+                      ? 'var(--shadow-chip), var(--shadow-badge-inner)'
+                      : 'var(--shadow-tile)',
                   }}
                 >
                   <ThemePreview mode={opt.value} />
@@ -334,7 +333,7 @@ export default function PreferencesPage() {
                 resize:          'none',
                 backgroundColor: 'var(--field-surface)',
                 borderRadius:    'var(--radius-lg)',
-                boxShadow:       '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
+                boxShadow:       'var(--shadow-control)',
                 border:          'none',
                 padding:         'var(--settings-preview-pill-padding)',
                 fontFamily:      'var(--font-body)',
@@ -438,7 +437,7 @@ export default function PreferencesPage() {
                 border:          'none',
                 cursor:          'pointer',
                 backgroundColor: 'var(--field-surface)',
-                boxShadow:       '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100), inset 0px -2.182px 0.364px 0px var(--neutral-100)',
+                boxShadow:       'var(--shadow-card-raised), var(--shadow-model-featured-default-inner)',
                 fontFamily:      'var(--font-body)',
                 fontWeight:      'var(--font-weight-medium)',
                 fontSize:        'var(--font-size-body)',

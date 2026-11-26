@@ -20,7 +20,7 @@ export function RequireAdmin({ children }: { children: React.ReactNode }) {
       <div role="status" aria-label="Checking access" style={{ width: '100%', maxWidth: 908, margin: '0 auto', padding: 'var(--space-10) var(--space-6)', boxSizing: 'border-box' }}>
         <Skeleton width="30%" height={28} style={{ marginBottom: 'var(--space-4)' }} />
         <Skeleton width="60%" height={14} style={{ marginBottom: 'var(--space-7)' }} />
-        <Skeleton height={160} radius={16} />
+        <Skeleton height={160} radius={'var(--radius-2xl)'} />
       </div>
     )
   }

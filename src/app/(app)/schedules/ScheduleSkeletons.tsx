@@ -20,8 +20,8 @@ function Pill({ w, h = 20, r = 6, fade }: { w: number; h?: number; r?: number; f
   return <div className="kaya-skeleton" style={{ width: w, height: h, borderRadius: r, flexShrink: 0, ...fade }} />
 }
 
-const CARD_SHADOW = '0px 1px 3px 0px rgba(82,75,71,0.08), 0px 0px 0px 1px var(--border-default)'
-const BORDERED = { borderRadius: 12, border: '1px solid var(--border-default)', backgroundColor: 'var(--card-bg)' } as const
+const CARD_SHADOW = 'var(--schedule-skeletons-card-shadow)'
+const BORDERED = { borderRadius: 'var(--radius-xl)', border: '1px solid var(--border-default)', backgroundColor: 'var(--card-bg)' } as const
 
 // ── /schedules ────────────────────────────────────────────────────────────────
 

@@ -8,6 +8,7 @@ import { ThemedLlmIcon } from '@/components/ThemedLlmIcon'
 import { IconButton } from '@/components/ui/button'
 import { Tooltip, type TooltipSide } from '@/components/Tooltip'
 import { cn } from '@/lib/utils'
+import { BLUR, SPRING } from "@/styles/tokens/motion"
 
 // Lets descendants (this component) react to the active category without the
 // consumer having to thread props — used to suppress the per-row bookmark
@@ -284,10 +285,10 @@ export function ModelSelectItem({
                     {isHovered ? (
                       <m.span
                         key="info"
-                        initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                        initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                         animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-                        exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                        transition={{ type: 'spring', ...SPRING.snappy }}
                         style={{
                           display:        'flex',
                           alignItems:     'center',
@@ -301,10 +302,10 @@ export function ModelSelectItem({
                     ) : (
                       <m.span
                         key="image"
-                        initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                        initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                         animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-                        exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                        transition={{ type: 'spring', ...SPRING.snappy }}
                         style={{
                           display:        'flex',
                           alignItems:     'center',
@@ -380,10 +381,10 @@ export function ModelSelectItem({
             {showBookmark && (
               <m.div
                 key="bookmark-button"
-                initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                 animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-                exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                transition={{ type: 'spring', ...SPRING.snappy }}
                 style={{ display: 'flex', alignItems: 'center' }}
               >
             <IconButton
@@ -408,10 +409,10 @@ export function ModelSelectItem({
                     {isBookmarked ? (
                       <m.span
                         key="solid"
-                        initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                        initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                         animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-                        exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                        transition={{ type: 'spring', ...SPRING.snappy }}
                         style={{ display: 'flex', lineHeight: 0 }}
                       >
                         <BookmarkTwoSolidIcon size={18} />
@@ -419,10 +420,10 @@ export function ModelSelectItem({
                     ) : (
                       <m.span
                         key="outline"
-                        initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                        initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                         animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-                        exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                        transition={{ type: 'spring', ...SPRING.snappy }}
                         style={{ display: 'flex', lineHeight: 0 }}
                       >
                         <BookmarkTwoIcon size={18} />

@@ -37,7 +37,7 @@ import styles from './FileScreen.module.css'
 // The preview (and, inside it, pdf.js) is fetched only once a file page is opened.
 const FilePreview = dynamic(() => import('./viewers/FilePreview'), {
   ssr: false,
-  loading: () => <Skeleton height={420} radius={12} style={{ width: '100%', maxWidth: 720 }} />,
+  loading: () => <Skeleton height={420} radius={'var(--radius-xl)'} style={{ width: '100%', maxWidth: 720 }} />,
 })
 
 const FILE_ERROR = "Couldn't load this file."

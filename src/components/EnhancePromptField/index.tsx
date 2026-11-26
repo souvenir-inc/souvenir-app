@@ -11,6 +11,7 @@ import type { EnhanceMode } from '@/enhance'
 import { BlockErrorBoundary } from '@/components/chat/BlockErrorBoundary'
 import { cn } from '@/lib/utils'
 import { useEnhanceFlow } from './use-enhance-flow'
+import { DURATION } from "@/styles/tokens/motion"
 
 // The open-state views (Q&A, diff, markdown preview) load on the first open, not with the editor.
 const EnhancePanel = dynamic(() => import('./EnhancePanel'), { ssr: false, loading: () => <EnhanceScanningState /> })
@@ -94,11 +95,11 @@ export function EnhancePromptField(
     const containerStateStyle: React.CSSProperties = isOpen ? {
       backgroundColor: 'var(--color-enhance-surface-open)',
       borderColor:     'var(--color-enhance-border-open)',
-      borderWidth:     1.5,
+      borderWidth:     'var(--enhance-prompt-field-border-width)',
     } : {
       backgroundColor: 'var(--field-surface)',
       borderColor:     'var(--border-default)',
-      borderWidth:     1,
+      borderWidth:     'var(--enhance-prompt-field-border-width-2)',
     }
 
     // ── Render ─────────────────────────────────────────────────────────────────
@@ -231,7 +232,7 @@ export function EnhancePromptField(
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 4 }}
-              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: DURATION.base, ease: [0.16, 1, 0.3, 1] }}
               style={{
                 position:      'absolute',
                 inset:         0,

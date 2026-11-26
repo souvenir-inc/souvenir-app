@@ -98,7 +98,7 @@ export function SyncButton({ apps: ids, uses, open, onOpenChange }: SyncButtonPr
         <div className="flex flex-col p-1.5">
           <div className="flex items-center gap-1.5 px-2.5 pb-1 pt-2">
             <span className="text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--neutral-700)]">Data sources</span>
-            <span className="flex h-[18px] items-center rounded-full bg-[var(--dashboard-sync-bg)] px-1.5 text-[length:var(--font-size-caption)] font-medium leading-[14px] text-[var(--neutral-700)]">
+            <span className="flex h-[18px] items-center rounded-full bg-[var(--dashboard-sync-bg)] px-1.5 text-[length:var(--font-size-caption)] font-medium leading-[var(--dashboard-tag-line-height)] text-[var(--neutral-700)]">
               {ids.length}
             </span>
           </div>
@@ -203,7 +203,7 @@ function RowStatus({ id, state, now, yours }: { id: AppId; state: AppState; now:
       // Hover says what the provider said; someone else's account is reconnected by its owner (SY-25).
       const tip = [a.error, yours || !a.needsReconnect ? null : 'Only the person who connected it can reconnect it'].filter(Boolean).join(' • ')
       const status = (
-        <span tabIndex={tip ? 0 : undefined} className={cn(text, 'flex items-center gap-[5px] rounded-sm font-medium text-[var(--dashboard-sync-failed)]', tip && FOCUS)}>
+        <span tabIndex={tip ? 0 : undefined} className={cn(text, 'flex items-center gap-[var(--space-1-25)] rounded-sm font-medium text-[var(--dashboard-sync-failed)]', tip && FOCUS)}>
           <TriangleAlert aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />{a.needsReconnect ? 'Reconnect needed' : 'Sync failed'}
         </span>
       )

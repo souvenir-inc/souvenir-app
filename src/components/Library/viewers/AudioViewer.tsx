@@ -85,7 +85,7 @@ export default function AudioViewer({ url, lines, transcriptStatus, citeMs }: Au
                       display: 'flex', alignItems: 'baseline', gap: 'var(--space-3)', width: '100%', padding: 'var(--space-2) var(--space-2-5)', border: 'none', borderRadius: 'var(--radius-lg)', textAlign: 'left', cursor: 'pointer',
                       background: cited ? 'var(--color-tag-Yellow-bg)' : playing ? 'var(--neutral-100)' : 'transparent',
                       boxShadow: cited ? 'inset 0 0 0 1px var(--color-tag-Yellow-text)' : 'none',
-                      fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', fontWeight: playing ? 500 : 400,
+                      fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', fontWeight: playing ? 'var(--font-weight-medium)' : 'var(--font-weight-regular)',
                     }}
                   >
                     <span style={{ flexShrink: 0, minWidth: 40, color: 'var(--neutral-500)', fontVariantNumeric: 'tabular-nums' }}>{formatTimestamp(line.startMs)}</span>

@@ -23,7 +23,7 @@ import styles from './usage.module.css'
 
 const TITLE = 'var(--font-title)'
 const BODY  = 'var(--font-body)'
-const SECTION_SHADOW = '0px 2px 2.8px 0px rgba(82,75,71,0.12)'
+const SECTION_SHADOW = 'var(--shadow-soft)'
 const LOW_BALANCE_SHARE = 0.15
 
 // Chat includes subtask spend (agents a chat turn hands work to). Order is

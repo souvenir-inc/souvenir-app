@@ -63,11 +63,11 @@ function MembersBlock({ project, onManage }: { project: Project; onManage: () =>
       <div style={{ ...BOX_STYLE, display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)', padding: 'var(--space-3)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2-5)', minHeight: 28 }}>
           {membersQ.isPending ? (
-            <Skeleton height={28} width={120} radius={14} />
+            <Skeleton height={28} width={120} radius={'var(--radius-card)'} />
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
               {shown.map((member, i) => (
-                <Avatar key={member.userId} name={member.name || member.email || member.userId} size="sm" title={member.name ?? member.email ?? undefined} style={{ marginLeft: i === 0 ? 0 : -6, boxShadow: '0 0 0 2px var(--field-surface)' }} />
+                <Avatar key={member.userId} name={member.name || member.email || member.userId} size="sm" title={member.name ?? member.email ?? undefined} style={{ marginLeft: i === 0 ? 0 : 'calc(var(--space-1-5) * -1)', boxShadow: '0 0 0 2px var(--field-surface)' }} />
               ))}
               {extra > 0 && <span style={{ ...MUTED, fontSize: 'var(--font-size-body-sm)', marginLeft: 'var(--space-1-5)' }}>+{extra}</span>}
             </div>

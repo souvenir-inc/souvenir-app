@@ -26,11 +26,11 @@ const cardStyle: React.CSSProperties = {
   width:           480,
   maxWidth:        'calc(100vw - 48px)',
   margin:          '0 auto',
-  padding:         '40px 44px',
+  padding:         'var(--link-padding)',
   borderRadius:    'var(--radius-2xl)',
   boxSizing:       'border-box',
   backgroundColor: 'var(--neutral-white)',
-  boxShadow:       '0px 12px 16px -4px rgba(130,122,116,0.12), 0px 0px 0px 1px var(--neutral-100)',
+  boxShadow:       'var(--link-shadow)',
   textAlign:       'center',
 }
 

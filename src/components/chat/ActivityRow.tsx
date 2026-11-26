@@ -18,6 +18,7 @@ import Cancel01Icon from "@hugeicons/core-free-icons/Cancel01Icon";
 import { QuillWriteOneIcon, NeuralNetworkIcon } from "@strange-huge/icons";
 import type { ActivityItem, ActivityType } from "@/types/chat";
 import { ACTIVITY_VERB, activityVerb, transcribingFile } from "@/lib/activity";
+import { DURATION, SPRING, LONG, STAGGER } from "@/styles/tokens/motion"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IconEntry = { icon: any; isHuge: boolean };
@@ -56,7 +57,7 @@ function SpinnerIcon() {
   return (
     <m.span
       animate={{ rotate: [0, 360] }}
-      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+      transition={{ duration: LONG.xs, repeat: Infinity, ease: "linear" }}
       style={{ display: "flex", alignItems: "center", lineHeight: 0, flexShrink: 0 }}
     >
       <HIcon icon={Spinner} size={16} color="var(--neutral-200)" strokeWidth={2} />
@@ -227,7 +228,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
         {isActive && (
           <m.span
             animate={{ opacity: [0.3, 1, 0.3] }}
-            transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: LONG.sm, repeat: Infinity, ease: "easeInOut" }}
             style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-regular)', color: "var(--neutral-300)", flexShrink: 0 }}
           >
             working…
@@ -255,7 +256,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
             <m.svg
               width="14" height="14" viewBox="0 0 14 14" fill="none"
               animate={{ rotate: manualOpen ? 180 : 0 }}
-              transition={{ type: "spring", stiffness: 380, damping: 28 }}
+              transition={{ type: "spring", ...SPRING.brisk }}
               style={{ display: "block", flexShrink: 0 }}
             >
               <path d="M3 5.5 L7 9.5 L11 5.5" stroke="var(--neutral-400)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
@@ -267,7 +268,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
           <m.svg
             width="14" height="14" viewBox="0 0 14 14" fill="none"
             animate={{ rotate: manualOpen ? 180 : 0 }}
-            transition={{ type: "spring", stiffness: 380, damping: 28 }}
+            transition={{ type: "spring", ...SPRING.brisk }}
             style={{ display: "block", flexShrink: 0 }}
           >
             <path d="M3 5.5 L7 9.5 L11 5.5" stroke="var(--neutral-400)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
@@ -283,7 +284,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
             gridTemplateRows: manualOpen ? "1fr" : "0fr",
             opacity: manualOpen ? 1 : 0,
             visibility: manualOpen ? "visible" : "hidden",
-            transition: `grid-template-rows 280ms cubic-bezier(0.16,1,0.3,1), opacity 200ms ease, visibility 0s linear ${manualOpen ? "0s" : "280ms"}`,
+            transition: `grid-template-rows var(--activity-row-reveal-duration) var(--ease-out-expo), opacity var(--duration-base) ease, visibility 0s linear ${manualOpen ? "0s" : "var(--activity-row-duration)"}`,
           }}
         >
           <div style={{ overflow: "hidden", minHeight: 0 }}>
@@ -317,7 +318,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
             gridTemplateRows: resultsVisible ? "1fr" : "0fr",
             opacity: resultsVisible ? 1 : 0,
             visibility: resultsVisible ? "visible" : "hidden",
-            transition: `grid-template-rows 280ms cubic-bezier(0.16,1,0.3,1), opacity 200ms ease, visibility 0s linear ${resultsVisible ? "0s" : "280ms"}`,
+            transition: `grid-template-rows var(--activity-row-reveal-duration) var(--ease-out-expo), opacity var(--duration-base) ease, visibility 0s linear ${resultsVisible ? "0s" : "var(--activity-row-duration)"}`,
           }}
         >
           <div style={{ overflow: "hidden", minHeight: 0 }}>
@@ -331,7 +332,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
                   tabIndex={resultsVisible ? 0 : -1}
                   initial={{ opacity: 0, x: -4 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: ri * 0.05, duration: 0.18 }}
+                  transition={{ delay: ri * STAGGER.sm, duration: DURATION.base }}
                   style={{
                     display: "flex", alignItems: "center", gap: 'var(--space-1-5)',
                     fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-regular)', minHeight: 20,
@@ -342,7 +343,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
                     color: "inherit",
                     transition: "background var(--duration-fast)",
                   }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(59,54,50,0.05)"; }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--activity-row-bg)"; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                 >
                   <FaviconImg domain={r.domain} size={13} />
@@ -421,7 +422,7 @@ export function ActivitiesSection({ activities }: { activities: ActivityItem[] }
           key={activity.id}
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: i * 0.06 }}
+          transition={{ duration: DURATION.base, delay: i * STAGGER.md }}
         >
           <ActivityRow activity={activity} />
         </m.div>

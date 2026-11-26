@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 
 // ── Geometry (Figma 2870:44159 / 2870:44160) ──────────────────────────────────
 const SIZE = 16
-const RADIUS = 4
+const RADIUS = 'var(--radius-xs)'
 
 // Delay (ms) before the tick draws after the box flips checked. The fill
 // cross-fade plays first, then the stroke draws on top - reads as a confident
@@ -54,8 +54,8 @@ function Checkbox(
         lineHeight:    0,
         borderRadius:  RADIUS,
         outlineStyle:  'solid',
-        outlineWidth:  '2px',
-        outlineOffset: '2px',
+        outlineWidth:  'var(--focus-ring-width)',
+        outlineOffset: 'var(--focus-ring-offset)',
         outlineColor:  isFocused ? 'var(--focus-ring)' : 'transparent',
         transform:     isPressed && !disabled ? 'scale(0.9)' : undefined,
         transition:    'outline-color var(--duration-fast), transform var(--duration-instant) ease-out',
@@ -81,7 +81,7 @@ function Checkbox(
       className={cn(
         'kds-checkbox',
         'shrink-0 cursor-pointer select-none',
-        'transition-[background-color] duration-150 ease-out',
+        'transition-[background-color] duration-[var(--toggle-transition-duration)] ease-out',
         'disabled:cursor-not-allowed',
         className,
       )}

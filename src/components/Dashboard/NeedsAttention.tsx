@@ -67,7 +67,7 @@ export function NeedsAttention({ items, onOpenMetric }: { items: AttentionItem[]
         <div className="flex flex-col p-1.5">
           <div className="flex items-center gap-1.5 px-2.5 py-2">
             <span className="text-[length:var(--font-size-body-sm)] font-medium leading-4 text-[var(--neutral-700)]">Needs attention</span>
-            <span className="rounded-md bg-[var(--dashboard-sync-bg)] px-1.5 py-px text-[length:var(--font-size-caption)] font-medium leading-[14px] text-[var(--neutral-700)]">{items.length}</span>
+            <span className="rounded-md bg-[var(--dashboard-sync-bg)] px-1.5 py-px text-[length:var(--font-size-caption)] font-medium leading-[var(--dashboard-tag-line-height)] text-[var(--neutral-700)]">{items.length}</span>
           </div>
           <div className="relative">
             <ul aria-label="Flagged metrics" className={cn('m-0 list-none p-0', items.length > 7 && 'dashboard-thin-scroll max-h-[357px] overflow-y-auto')}>

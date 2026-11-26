@@ -12,10 +12,10 @@ const WHITE_BUTTON: React.CSSProperties = {
   display: 'inline-flex',
   // CSS custom properties are not in React.CSSProperties; they are set for the Button inside only.
   ...({
-    '--button-secondary-bg':            '#ffffff',
-    '--button-secondary-bg-hover':      '#f1efec',
-    '--button-secondary-text':          '#1c1c1c',
-    '--button-secondary-text-disabled': 'rgba(28, 28, 28, 0.45)',
+    '--button-secondary-bg':            'var(--static-white)',
+    '--button-secondary-bg-hover':      'var(--agent-card-button-secondary-bg-hover)',
+    '--button-secondary-text':          'var(--agent-card-button-secondary-text)',
+    '--button-secondary-text-disabled': 'var(--agent-card-button-secondary-text-disabled)',
   } as React.CSSProperties),
 }
 
@@ -30,10 +30,10 @@ export function AgentCardButton(props: Omit<ButtonProps, 'variant'>) {
 const WHITE_ICON_BUTTON: React.CSSProperties = {
   display: 'inline-flex',
   ...({
-    '--icon-button-secondary-bg':            '#ffffff',
-    '--icon-button-secondary-bg-hover':      '#f1efec',
-    '--icon-button-secondary-icon':          '#1c1c1c',
-    '--icon-button-secondary-icon-disabled': 'rgba(28, 28, 28, 0.45)',
+    '--icon-button-secondary-bg':            'var(--static-white)',
+    '--icon-button-secondary-bg-hover':      'var(--agent-card-button-secondary-bg-hover)',
+    '--icon-button-secondary-icon':          'var(--agent-card-button-secondary-text)',
+    '--icon-button-secondary-icon-disabled': 'var(--agent-card-button-secondary-text-disabled)',
   } as React.CSSProperties),
 }
 

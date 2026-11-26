@@ -46,7 +46,7 @@ function AvatarStack({ members, count }: { members: InvitedMember[]; count: numb
             <span
               key={m.userId || m.email || i}
               style={{
-                marginLeft: i === 0 ? 0 : -8,
+                marginLeft: i === 0 ? 0 : "calc(var(--space-2) * -1)",
                 width: 24,
                 height: 24,
                 borderRadius: "50%",

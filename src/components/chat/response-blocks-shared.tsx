@@ -32,7 +32,7 @@ function renderInlineMd(text: string): React.ReactNode[] {
       return <code key={i} style={INLINE_CODE_STYLE}>{part.slice(1, -1)}</code>;
     const lm = part.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/);
     // eslint-disable-next-line react/no-array-index-key
-    if (lm) return <a key={i} href={lm[2]} target="_blank" rel="noopener noreferrer" style={{ color: "var(--brown-600)", textDecoration: "underline", textUnderlineOffset: 2 }}>{lm[1]}</a>;
+    if (lm) return <a key={i} href={lm[2]} target="_blank" rel="noopener noreferrer" style={{ color: "var(--brown-600)", textDecoration: "underline", textUnderlineOffset: "var(--underline-offset)" }}>{lm[1]}</a>;
     // eslint-disable-next-line react/no-array-index-key
     return <span key={i}>{part}</span>;
   });

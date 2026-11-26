@@ -33,13 +33,13 @@ body {
    transparent ring to transition from, and data-search-active then fades it in while it settles from
    6px out to 3px (and the reverse on blur). */
 [data-search-field] {
-  outline: 2px solid transparent;
-  outline-offset: 6px;
+  outline: var(--focus-ring-width) solid transparent;
+  outline-offset: var(--focus-ring-offset-xl);
   transition: outline-color var(--duration-base) ease, outline-offset var(--duration-base) cubic-bezier(0.22, 1, 0.36, 1);
 }
 [data-search-active] {
   outline-color: var(--focus-ring) !important;
-  outline-offset: 3px !important;
+  outline-offset: var(--focus-ring-offset-md) !important;
 }
 
 /* Settings sidebar icons are static SVG images with dark strokes: white in dark mode. */
@@ -288,7 +288,7 @@ body {
 }
 
 .kaya-thinking-trigger:focus-visible {
-  outline: 1px solid var(--focus-ring);
+  outline: var(--focus-ring-width-thin) solid var(--focus-ring);
   outline-offset: 0;
 }
 
@@ -567,8 +567,8 @@ body {
   background: var(--neutral-100);
 }
 [data-sonner-toaster] [data-sonner-toast] [data-close-button].kds-toast__close.kds-toast__close:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
 
 /* Dark mode: white close button with a black X, on every toast type. */
@@ -729,7 +729,7 @@ body {
   mask-image: radial-gradient(circle at 50% 45%, #000 40%, transparent 72%);
 }
 :root[data-theme="dark"] .agent-orb__dots {
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.16) 0.6px, transparent 0.9px);
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--static-white) 16%, transparent) 0.6px, transparent 0.9px);
 }
 .agent-orb__sheen {
   background: radial-gradient(46% 30% at calc(32% + var(--px, 0) * 6%) calc(22% + var(--py, 0) * 5%), rgba(255, 255, 255, 0.26), transparent 70%);
@@ -800,8 +800,8 @@ body {
   border-radius: var(--radius-lg);
   background: var(--agent-card-chip-bg);
   border: var(--agent-card-chip-border);
-  -webkit-backdrop-filter: blur(8px) saturate(140%);
-  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--blur-sm)) saturate(140%);
+  backdrop-filter: blur(var(--blur-sm)) saturate(140%);
   opacity: 0.55;
   transition: opacity var(--duration-base) ease;
 }
@@ -857,7 +857,7 @@ body {
   font-family: var(--font-title);
   font-weight: var(--font-weight-bold);
   color: var(--agent-zzz-color);
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  text-shadow: var(--globals-text-shadow);
 }
 .agent-zzz > span {
   position: absolute;
@@ -892,7 +892,7 @@ body {
 @keyframes agent-cta-sheen { to { background-position: 150% 0; } }
 .agent-card[data-menu-open="true"] { transform: none; }  /* keeps the menu's fixed backdrop viewport-sized */
 /* Keyboard focus only (:focus-visible) — a mouse click on the button shouldn't ring the card. */
-.agent-card:has(:focus-visible) { outline: 2px solid color-mix(in srgb, var(--c0) 70%, white); outline-offset: 3px; }
+.agent-card:has(:focus-visible) { outline: var(--focus-ring-width) solid color-mix(in srgb, var(--c0) 70%, var(--static-white)); outline-offset: var(--focus-ring-offset-md); }
 @media (hover: none) { .agent-card { transform: none; } }
 @media (prefers-reduced-motion: reduce) {
   .agent-card { transform: none; transition: box-shadow var(--duration-slow) ease, opacity var(--duration-fast); }
@@ -911,16 +911,16 @@ body {
    anything inside it has focus. Outlines paint outside layout, so nothing shifts. A
    scroll container that clips it needs ~6px of padding around the field. */
 .kaya-field {
-  outline: 2px solid transparent;
-  outline-offset: 6px;
+  outline: var(--focus-ring-width) solid transparent;
+  outline-offset: var(--focus-ring-offset-xl);
   transition: outline-color var(--duration-base) ease, outline-offset var(--duration-base) cubic-bezier(0.22, 1, 0.36, 1);
 }
-.kaya-field:focus-within { outline-color: var(--focus-ring); outline-offset: 3px; }
+.kaya-field:focus-within { outline-color: var(--focus-ring); outline-offset: var(--focus-ring-offset-md); }
 
 /* Compact agent cards (Agents panel): the focus ring is for keyboard focus only, never after a click. */
-.compact-agent-card { outline: 2px solid transparent; outline-offset: 3px; }
+.compact-agent-card { outline: var(--focus-ring-width) solid transparent; outline-offset: var(--focus-ring-offset-md); }
 .compact-agent-card:focus { outline: none; }
-.compact-agent-card:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; }
+.compact-agent-card:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring); outline-offset: var(--focus-ring-offset-md); }
 
 /* /agents/new purpose box: a placeholder dark enough to read in light and dark mode. */
 .agent-purpose-input::placeholder { color: var(--neutral-500); opacity: 1; }

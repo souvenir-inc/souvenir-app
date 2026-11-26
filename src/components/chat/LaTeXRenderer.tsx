@@ -99,7 +99,7 @@ export const renderLatexInlineContent = (
           key={`${keyPrefix}-latex-${latexCount++}`}
           style={{
             display: isBlock ? "block" : "inline-block",
-            margin: isBlock ? "8px 0" : "0 2px",
+            margin: isBlock ? "var(--space-2) 0" : "0 var(--space-0-5)",
           }}
           // eslint-disable-next-line react/no-danger -- KaTeX output is library-generated and sanitized
           dangerouslySetInnerHTML={{ __html: sanitizeKaTeX(html) }}

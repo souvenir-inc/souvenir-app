@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/compone
 import { toast } from 'sonner'
 
 const SHADOW_MODAL = 'var(--shadow-4)'
-const SHADOW_INPUT = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--text-field-ring)'
+const SHADOW_INPUT = 'var(--shadow-field)'
 
 // Closing the modal (the X, a click on the overlay) previously discarded
 // whatever was typed with no warning. Persisted here instead: survives

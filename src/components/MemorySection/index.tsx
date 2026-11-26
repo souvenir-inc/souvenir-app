@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { MarkdownRenderer } from '@/lib/markdown-utils'
 import { editMemory, fetchMemorySummary, forgetMemoryNote, type MemoryNote, type MemorySummary } from '@/lib/api/memory'
 import styles from './MemorySection.module.css'
+import { DURATION } from "@/styles/tokens/motion"
 
 // One memory store on the settings Memory page: its notes topic by topic, each opening to the note itself, then the written summary and the edit chat.
 
@@ -118,7 +119,7 @@ function NoteRow({ note, open, onToggle, onForget }: {
         >
           <m.span
             animate={{ rotate: open ? 0 : -90 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: DURATION.quick }}
             style={{ display: 'flex', flexShrink: 0, color: 'var(--neutral-400)' }}
           >
             <ArrowDownOneIcon size={14} />
@@ -156,7 +157,7 @@ function NoteRow({ note, open, onToggle, onForget }: {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={{ duration: DURATION.base, ease: 'easeOut' }}
             style={{ overflow: 'hidden' }}
           >
             <div className={styles.note} style={{ padding: 'var(--memory-item-detail-padding)' }}>
@@ -277,7 +278,7 @@ function ManageDialog({ open, onOpenChange, orgId, summary, onSummary, draft, on
             padding:         'var(--space-1-5) var(--space-1-5) var(--space-1-5) var(--space-4)',
             borderRadius:    'var(--radius-full)',
             backgroundColor: 'var(--field-surface)',
-            boxShadow:       '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
+            boxShadow:       'var(--shadow-control)',
           }}>
             <input
               autoFocus

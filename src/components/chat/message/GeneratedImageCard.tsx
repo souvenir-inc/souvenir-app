@@ -7,6 +7,7 @@ import { IconButton } from "@/components/ui/button";
 import { Tooltip } from "@/components/Tooltip";
 import { ImageDownloadTwoIcon, ArrowExpandOneIcon } from "@strange-huge/icons";
 import { ImageLightbox, downloadImage, overlayButtonStyle } from "./ImageLightbox";
+import { BLUR, DURATION, LONG, STAGGER } from "@/styles/tokens/motion"
 
 // ── Generated Image Card with download button ──────────────────────────────────
 // The expanded view it opens is shared with the images a person attaches to
@@ -82,9 +83,9 @@ export function GeneratedImageCard({ img, index }: { img: { url: string; s3Key?:
       key={img.url}
       // Lands blurred and sharpens, picking up where the generation
       // preview's "developing" canvas left off.
-      initial={{ opacity: 0, scale: 0.97, filter: "blur(18px)" }}
+      initial={{ opacity: 0, scale: 0.97, filter: `blur(${BLUR[18]}px)` }}
       animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: index * 0.1 }}
+      transition={{ duration: LONG.xs, ease: [0.22, 1, 0.36, 1], delay: index * STAGGER.xl }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       // Keyboard focus only: a mouse click focuses the thumbnail too, and the buttons should still go on mouse-out.
@@ -117,7 +118,7 @@ export function GeneratedImageCard({ img, index }: { img: { url: string; s3Key?:
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: DURATION.quick }}
             style={hoverOverlayStyle}
           >
             <div style={hoverButtonsStyle}>

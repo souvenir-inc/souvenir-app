@@ -13,6 +13,7 @@ import {
   AbacusIcon,
   ArrowDownOneIcon,
 } from '@strange-huge/icons'
+import { BLUR, DURATION, SPRING, LONG } from "@/styles/tokens/motion"
 
 // ── Shadow tokens ──────────────────────────────────────────────────────────────
 
@@ -307,9 +308,9 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
       borderRadius:    'var(--radius-lg)',
       width:           collapsed ? 'auto' : fluid ? '100%' : '217px',
       paddingLeft:     'var(--space-1-5)',
-      paddingRight:    (!collapsed && isChatItem && isActive) ? '0px' : '6px',
-      paddingTop:      (!collapsed && isChatItem && isActive) ? '0px' : (isAccountItem && collapsed) ? '9px' : isAccountItem ? '6px' : (isChatItem || isEditVariant) ? '3px' : collapsed ? '6px' : '5px',
-      paddingBottom:   (!collapsed && isChatItem && isActive) ? '0px' : (isAccountItem && collapsed) ? '9px' : isAccountItem ? '6px' : (isChatItem || isEditVariant) ? '3px' : collapsed ? '6px' : '5px',
+      paddingRight:    (!collapsed && isChatItem && isActive) ? '0px' : 'var(--space-1-5)',
+      paddingTop:      (!collapsed && isChatItem && isActive) ? '0px' : (isAccountItem && collapsed) ? 'var(--sidebar-menu-item-padding-top)' : isAccountItem ? 'var(--space-1-5)' : (isChatItem || isEditVariant) ? 'var(--space-0-75)' : collapsed ? 'var(--space-1-5)' : 'var(--space-1-25)',
+      paddingBottom:   (!collapsed && isChatItem && isActive) ? '0px' : (isAccountItem && collapsed) ? 'var(--sidebar-menu-item-padding-bottom)' : isAccountItem ? 'var(--space-1-5)' : (isChatItem || isEditVariant) ? 'var(--space-0-75)' : collapsed ? 'var(--space-1-5)' : 'var(--space-1-25)',
       backgroundColor: isEditVariant || (!isHeader && isActive) ? (isDangerRow ? DANGER_HOVER_BG : 'var(--sidebar-menu-item-hover-bg)') : 'transparent',
       boxShadow:       isEditVariant
                          ? '0px 0px 0px 1px var(--focus-ring)'
@@ -371,10 +372,10 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                   <AnimatePresence mode="popLayout" initial={false}>
                     <motion.span
                       key={shown ? 'hide' : 'show'}
-                      initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                      initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                       animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-                      exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                      transition={{ type: 'spring', ...SPRING.snappy }}
                       style={{ display: 'block', transformOrigin: 'left center' }}
                     >
                       {shown ? 'Hide' : 'Show'}
@@ -426,10 +427,10 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                   <motion.p
                     key="label"
                     style={danger ? { ...bodyTextStyle, color: DANGER_COLOR } : bodyTextStyle}
-                    initial={{ opacity: 0, filter: 'blur(4px)' }}
+                    initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                     animate={{ opacity: 1, filter: 'blur(0px)' }}
-                    exit={{ opacity: 0, filter: 'blur(4px)' }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    exit={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                    transition={{ type: 'spring', ...SPRING.snappy }}
                   >
                     {label}
                   </motion.p>
@@ -441,10 +442,10 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
               {!collapsed && shortcut && (
                 <motion.div
                   key="shortcut"
-                  initial={{ opacity: 0, filter: 'blur(4px)' }}
+                  initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                   animate={{ opacity: 1, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, filter: 'blur(4px)' }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  exit={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                  transition={{ type: 'spring', ...SPRING.snappy }}
                   style={{
                     display:         'flex',
                     alignItems:      'center',
@@ -511,10 +512,10 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                 <motion.p
                   key="label"
                   style={bodyTextStyle}
-                  initial={{ opacity: 0, filter: 'blur(4px)' }}
+                  initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                   animate={{ opacity: 1, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, filter: 'blur(4px)' }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  exit={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                  transition={{ type: 'spring', ...SPRING.snappy }}
                 >
                   {label}
                 </motion.p>
@@ -543,7 +544,7 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                 paddingBottom:   'var(--space-0-5)',
                 maskImage:        (isActive && marqueeOffset > 0 && !isMarqueeing && !marqueeDone) ? 'linear-gradient(to right, black calc(100% - 20px), transparent 100%)' : undefined,
                 WebkitMaskImage:  (isActive && marqueeOffset > 0 && !isMarqueeing && !marqueeDone) ? 'linear-gradient(to right, black calc(100% - 20px), transparent 100%)' : undefined,
-                paddingRight:     isMarqueeing ? '48px' : undefined,
+                paddingRight:     isMarqueeing ? 'var(--space-9)' : undefined,
               }}
             >
               <motion.p
@@ -558,8 +559,8 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                   : { x: 0 }
                 }
                 transition={isHovered && marqueeOffset > 0
-                  ? { duration: marqueeOffset / 40, ease: 'linear', delay: 1 }
-                  : { duration: 0.3, ease: 'easeOut' }
+                  ? { duration: marqueeOffset / 40, ease: 'linear', delay: LONG.xs }
+                  : { duration: DURATION.slow, ease: 'easeOut' }
                 }
                 onAnimationComplete={() => { setIsMarqueeing(false); setMarqueeDone(true) }}
               >
@@ -569,7 +570,7 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexShrink: 0 }}>
               {badge && (
-                <motion.div layout transition={{ type: 'spring', stiffness: 400, damping: 28 }} style={{ display: 'flex', alignItems: 'center' }}>
+                <motion.div layout transition={{ type: 'spring', ...SPRING.brisk }} style={{ display: 'flex', alignItems: 'center' }}>
                   {badge}
                 </motion.div>
               )}
@@ -581,7 +582,7 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                     initial={{ opacity: 0, x: 6 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 6 }}
-                    transition={{ duration: 0.14, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: DURATION.quick, ease: [0.16, 1, 0.3, 1] }}
                     onClick={(e) => { e.stopPropagation(); e.preventDefault(); onMoreClick?.(e) }}
                     style={{
                       display:         'flex',
@@ -677,10 +678,10 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                 {!collapsed && (
                   <motion.div
                     key="user-info"
-                    initial={{ opacity: 0, filter: 'blur(4px)' }}
+                    initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                     animate={{ opacity: 1, filter: 'blur(0px)' }}
-                    exit={{ opacity: 0, filter: 'blur(4px)' }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    exit={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                    transition={{ type: 'spring', ...SPRING.snappy }}
                     style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flexShrink: 0 }}
                   >
                     <p style={bodyTextStyle}>{label}</p>
@@ -711,10 +712,10 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                   key="account-actions"
                   type="button"
                   aria-label="Account settings"
-                  initial={{ opacity: 0, filter: 'blur(4px)' }}
+                  initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                   animate={{ opacity: 1, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, filter: 'blur(4px)' }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  exit={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                  transition={{ type: 'spring', ...SPRING.snappy }}
                   onClick={(e) => { e.stopPropagation(); onSettingsClick?.(e) }}
                   style={{
                     display:         'flex',

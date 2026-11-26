@@ -179,7 +179,7 @@ export function FileInfoCard({ file, viewerId, onManageAccess, onRename, onClose
           <span style={label}>{usedSummary}</span>
         </div>
         {usage.isPending ? (
-          <Skeleton height={14} width={160} radius={6} />
+          <Skeleton height={14} width={160} radius={'var(--radius-sm)'} />
         ) : (
           <>
             {shownUses.map((use) =>
@@ -202,7 +202,7 @@ export function FileInfoCard({ file, viewerId, onManageAccess, onRename, onClose
             )}
             {/* The summary above already counts these, so with nothing listed say which they are, not "N more". */}
             {hidden > 0 && (
-              <p style={{ margin: uses.length ? '4px 0 0' : 0, ...label }}>
+              <p style={{ margin: uses.length ? 'var(--space-1) 0 0' : 0, ...label }}>
                 {uses.length ? `and ${hidden} more you cannot see` : `You cannot see ${hidden === 1 ? 'it' : 'them'}`}
               </p>
             )}
@@ -216,7 +216,7 @@ export function FileInfoCard({ file, viewerId, onManageAccess, onRename, onClose
           <span style={label}>You: {file.accessLabel}</span>
         </div>
         {access.isPending ? (
-          <Skeleton height={32} radius={10} />
+          <Skeleton height={32} radius={'var(--radius-lg)'} />
         ) : (
           shownEntries.map((entry) => (
             <div key={entry.grantId} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', minHeight: 44 }}>

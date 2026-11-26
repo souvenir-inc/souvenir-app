@@ -70,7 +70,7 @@ function RecommendedChip() {
         borderRadius: 'var(--radius-sm)',
         backgroundColor: "var(--blue-100)",
         boxShadow:
-          "0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px var(--blue-600-50), inset 0px 1px 0px 0px var(--blue-50-70), inset 0px -1px 0px 0px var(--blue-600-10)",
+          "var(--setup-shadow)",
       }}
     >
       <span
@@ -107,7 +107,7 @@ function OptionCard({
         flexDirection: "column",
         gap: 'var(--space-4)',
         width: "100%",
-        padding: bordered === "blue" ? "24px 16px 16px" : 16,
+        padding: bordered === "blue" ? "var(--space-6) var(--space-4) var(--space-4)" : "var(--space-4)",
         borderRadius: 'var(--radius-lg)',
         backgroundColor: bordered === "blue" ? "var(--color-surface-raised,var(--static-white))" : "var(--color-surface-base,var(--static-white))",
         border: bordered === "blue" ? "1px solid var(--blue-600-50)" : "1px solid var(--color-border-subtle,#D4D4D4)",

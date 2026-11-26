@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { springs } from '@/lib/springs'
 import { TabItem } from '@/components/TabItem'
 import { IconButton } from '@/components/ui/button'
+import { SPRING } from "@/styles/tokens/motion"
 
 // Styled after shadcnspace "Tabs 08 - Animated Dashboard Tabs": a 1px-bordered track with 4px of
 // padding (3px small) around the tabs, and a white pill the size of the active tab (ring + soft drop
@@ -15,8 +16,8 @@ import { IconButton } from '@/components/ui/button'
 // system: the pill uses the button radius (10px / 8px small) and the track is concentric with it
 // (pill radius + padding: 14px / 11px).
 const TRACK_PAD = { medium: 4, small: 3 } as const
-const TRACK_BORDER = 1
-const PILL_SPRING = { type: 'spring', stiffness: 500, damping: 34, mass: 0.9 } as const
+const TRACK_BORDER = 1 // ds-keep: used in the radius maths below
+const PILL_SPRING = { type: 'spring', ...SPRING.settle } as const
 
 // ── Contexts — set by TabsList, consumed by TabsTrigger ───────────────────────
 
@@ -419,8 +420,8 @@ export function TabsList({
               overflowX:           'auto',
               overscrollBehaviorX: 'contain',
               scrollbarWidth:      'none' as const,
-              paddingLeft:         overflowing ? 30 : 1,
-              paddingRight:        overflowing ? 30 : 0,
+              paddingLeft:         overflowing ? 'var(--tabs-padding-left)' : 'var(--space-px)',
+              paddingRight:        overflowing ? 'var(--tabs-padding-right)' : 0,
               cursor:              overflowing ? (dragging ? 'grabbing' : 'grab') : undefined,
               userSelect:          dragging ? 'none' : undefined,
               touchAction:         'pan-x',

@@ -256,7 +256,7 @@ export function DangerZoneCard() {
               cursor:         'not-allowed',
               opacity:        0.45,
               backgroundColor:'var(--field-surface)',
-              boxShadow:      '0px 1.091px 1.091px 0px rgba(24,2,2,0.05), 0px 1.455px 3.127px 0px rgba(24,2,2,0.15), 0px 0px 0px 1px var(--red-100)',
+              boxShadow:      'var(--shadow-card-raised-danger)',
               fontFamily:     'var(--font-body)',
               fontWeight:     'var(--font-weight-medium)',
               fontSize:       'var(--font-size-body)',

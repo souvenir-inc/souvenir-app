@@ -4,6 +4,7 @@ import React from 'react'
 import { m } from 'framer-motion'
 import { ArrowRightOneIcon, FileTwoIcon } from '@strange-huge/icons'
 import { Badge } from '@/components/Badge'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Types ───────────────────────────────────────────────────────────────────────
 
@@ -103,7 +104,7 @@ export function ArtifactCard({ icon, title, meta, onClick, draftVersion, onViewH
                   padding:             0,
                   cursor:              'pointer',
                   textDecoration:      'underline',
-                  textUnderlineOffset: '2px',
+                  textUnderlineOffset: 'var(--underline-offset)',
                 }}
               >
                 See history
@@ -130,7 +131,7 @@ export function ArtifactCard({ icon, title, meta, onClick, draftVersion, onViewH
       className="brain-artifact-card brain-card-action"
       onClick={onClick}
       whileTap={{ scale: 0.98 }}
-      transition={{ duration: 0.1, ease: 'easeOut' }}
+      transition={{ duration: DURATION.snap, ease: 'easeOut' }}
       style={{
         display:      'block',
         width:        '100%',

@@ -12,7 +12,7 @@ const menuItemStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: "var(--space-2)",
-  padding: "7px 10px",
+  padding: "var(--space-1-75) var(--space-2-5)",
   borderRadius: "var(--radius-md)",
   cursor: "pointer",
   fontFamily: "var(--font-body)",

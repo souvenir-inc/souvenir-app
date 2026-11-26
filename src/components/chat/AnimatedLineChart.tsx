@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { AnimatePresence, m } from "framer-motion";
 import type { LineChartData } from "@/types/chat";
+import { DURATION, SPRING, LONG, STAGGER } from "@/styles/tokens/motion"
 
 // �"��"� AnimatedLineChart �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 
@@ -61,7 +62,7 @@ export function AnimatedLineChart({ data, onComplete, animate = true }: { data: 
   const tooltipLeft = Math.min(Math.max(hoverContainerX - tooltipWidth / 2, 4), (containerRef.current?.clientWidth ?? 360) - tooltipWidth - 4);
 
   return (
-    <m.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+    <m.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: DURATION.moderate, ease: [0.16, 1, 0.3, 1] }}
       style={{ background: "var(--neutral-white)", border: "1px solid var(--brown-50)", borderRadius: 'var(--radius-xl)', padding: "var(--space-4) var(--space-4) var(--space-3)" }}>
       {data.title && <div style={{ fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)", marginBottom: 'var(--space-3)' }}>{data.title}</div>}
       <div ref={containerRef} style={{ position: "relative" }}>
@@ -70,11 +71,11 @@ export function AnimatedLineChart({ data, onComplete, animate = true }: { data: 
           onMouseMove={handleMouseMove} onMouseLeave={() => setHoverIdx(null)}>
           {[0, 0.25, 0.5, 0.75, 1].map((pct) => {
             const yv = PAD.top + pct * chartH;
-            return <m.line key={pct} x1={PAD.left} x2={PAD.left + chartW} y1={yv} y2={yv} stroke="color-mix(in srgb, var(--neutral-800) 7%, transparent)" strokeWidth={1} initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: 0.3, delay: 0.1 }} />;
+            return <m.line key={pct} x1={PAD.left} x2={PAD.left + chartW} y1={yv} y2={yv} stroke="color-mix(in srgb, var(--neutral-800) 7%, transparent)" strokeWidth={1} initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: DURATION.slow, delay: DURATION.snap }} />;
           })}
           {[0, 0.5, 1].map((pct) => {
             const val = maxY - pct * range;
-            return <text key={pct} x={PAD.left - 6} y={PAD.top + pct * chartH + 4} textAnchor="end" fill="var(--neutral-300)" fontSize={11} fontFamily="inherit">{Math.round(val)}{data.unit ?? ""}</text>;
+            return <text key={pct} x={PAD.left - 6} y={PAD.top + pct * chartH + 4} textAnchor="end" fill="var(--neutral-300)" fontSize="var(--font-size-caption)" fontFamily="inherit">{Math.round(val)}{data.unit ?? ""}</text>;
           })}
           {data.lines.map((line, li) => {
             const color = line.color ?? LINE_COLORS[li % LINE_COLORS.length];
@@ -82,7 +83,7 @@ export function AnimatedLineChart({ data, onComplete, animate = true }: { data: 
             const areaPts = pts + ` ${PAD.left + chartW},${PAD.top + chartH} ${PAD.left},${PAD.top + chartH}`;
             return (
               <g key={line.label ?? `line-${li}`}>
-                <m.polygon points={areaPts} fill={`${color}10`} stroke="none" initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ delay: 0.35, duration: 0.4 }} />
+                <m.polygon points={areaPts} fill={`${color}10` /* ds-keep: the chart colour with a hex alpha */} stroke="none" initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ delay: DURATION.slow, duration: DURATION.gentle }} />
                 <polyline points={pts} fill="none" stroke={color} strokeWidth={1.5} pathLength={1} strokeDasharray="1"
                   strokeDashoffset={revealed ? 0 : 1} strokeLinecap="round" strokeLinejoin="round"
                   style={{ transition: "stroke-dashoffset 1.1s cubic-bezier(0.16,1,0.3,1)" /* ds-keep: the chart line draws in */ }} />
@@ -91,9 +92,9 @@ export function AnimatedLineChart({ data, onComplete, animate = true }: { data: 
                   const isHovered = hoverIdx === i;
                   return (
                     <m.circle key={String(p.x)} cx={x} cy={y} r={isHovered ? 4 : 2.5}
-                      fill={isHovered ? "white" : color} stroke={isHovered ? color : "none"} strokeWidth={isHovered ? 2 : 0}
+                      fill={isHovered ? "var(--static-white)" : color} stroke={isHovered ? color : "none"} strokeWidth={isHovered ? 2 : 0}
                       initial={{ scale: 0 }} animate={{ scale: revealed ? 1 : 0 }}
-                      transition={{ type: "spring", stiffness: 480, damping: 22, delay: revealed ? 0 : 0.9 + i * 0.025 }}
+                      transition={{ type: "spring", ...SPRING.lively,  delay: revealed ? 0 : LONG.xs + i * STAGGER.xs }}
                       style={{ transformOrigin: `${x}px ${y}px` }} />
                   );
                 })}
@@ -106,17 +107,17 @@ export function AnimatedLineChart({ data, onComplete, animate = true }: { data: 
             const skip = Math.ceil(total / 7);
             if (i % skip !== 0 && i !== total - 1) return null;
             const { x } = toSVG(i, 0);
-            return <text key={String(p.x)} x={x} y={H - 6} textAnchor="middle" fill="var(--neutral-300)" fontSize={11} fontFamily="inherit">{p.x}</text>;
+            return <text key={String(p.x)} x={x} y={H - 6} textAnchor="middle" fill="var(--neutral-300)" fontSize="var(--font-size-caption)" fontFamily="inherit">{p.x}</text>;
           })}
           {hoverIdx !== null && <line x1={crosshairSvgX} x2={crosshairSvgX} y1={PAD.top} y2={PAD.top + chartH} stroke="color-mix(in srgb, var(--neutral-800) 18%, transparent)" strokeWidth={0.8} strokeDasharray="4 3" />}
         </svg>
         <AnimatePresence initial={false}>
           {hoverIdx !== null && tooltipItems.length > 0 && (
-            <m.div key="tooltip" initial={{ opacity: 0, y: 4, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 4, scale: 0.96 }} transition={{ duration: 0.12 }}
+            <m.div key="tooltip" initial={{ opacity: 0, y: 4, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 4, scale: 0.96 }} transition={{ duration: DURATION.fast }}
               style={{ position: "absolute", top: -8, left: tooltipLeft, width: tooltipWidth, background: "var(--chart-tooltip-bg)", borderRadius: 'var(--radius-md)', padding: "var(--space-1-5) var(--space-2-5)", pointerEvents: "none", zIndex: 'var(--z-raised)', boxShadow: "var(--shadow-3)" }}>
               <div style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)', letterSpacing: "var(--tracking-wide)" }}>{data.lines[0]?.points[hoverIdx]?.x}</div>
               {tooltipItems.map((item, ti) => (
-                <div key={item.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 'var(--space-2)', marginTop: ti > 0 ? 3 : 0 }}>
+                <div key={item.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 'var(--space-2)', marginTop: ti > 0 ? "var(--space-0-75)" : 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)' }}>
                     <div style={{ width: 6, height: 6, borderRadius: "50%", background: item.color, flexShrink: 0 }} />
                     {tooltipItems.length > 1 && <span style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", maxWidth: 52, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.label}</span>}

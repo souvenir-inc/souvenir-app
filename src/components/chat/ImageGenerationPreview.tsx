@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { m } from "framer-motion";
 import type { ActivityItem } from "@/types/chat";
 import styles from "./ImageGenerationPreview.module.css";
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 const STAGES = ["Sketching the composition", "Blocking in colors", "Adding detail", "Finishing touches"];
 const STAGE_MS = 5000;
@@ -101,8 +102,8 @@ export function ImageGenerationPreview({ activity, ref }: { activity?: ActivityI
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       // Dissolves outward while the real image sharpens in beneath it.
-      exit={{ opacity: 0, scale: 1.03, filter: "blur(16px)", transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] } }}
-      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1], layout: { duration: 0.4 } }}
+      exit={{ opacity: 0, scale: 1.03, filter: `blur(${BLUR.lg}px)`, transition: { duration: DURATION.longer, ease: [0.4, 0, 0.2, 1] } }}
+      transition={{ duration: DURATION.slow, ease: [0.22, 1, 0.36, 1], layout: { duration: DURATION.gentle } }}
       layout
     >
       {/* Unpainted canvas */}
@@ -126,7 +127,7 @@ export function ImageGenerationPreview({ activity, ref }: { activity?: ActivityI
 
       <div className={styles.footer}>
         <span className={styles.dot} aria-hidden />
-        <m.span key={caption} className={styles.caption} initial={{ opacity: 0, y: 8, filter: "blur(4px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
+        <m.span key={caption} className={styles.caption} initial={{ opacity: 0, y: 8, filter: `blur(${BLUR.xs}px)` }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: DURATION.gentle, ease: [0.22, 1, 0.36, 1] }}>
           {caption}…
         </m.span>
       </div>

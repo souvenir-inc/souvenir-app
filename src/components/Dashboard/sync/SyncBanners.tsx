@@ -51,7 +51,7 @@ function Shell({ kind, children, onClose, ...rest }: { kind: keyof typeof LOOK; 
     <div
       role={kind === 'failed' ? 'alert' : 'status'}
       data-sync-banner={kind}
-      className={cn('flex min-h-11 items-center gap-2.5 rounded-lg border border-solid py-[5px] pl-3.5 pr-2', LOOK[kind])}
+      className={cn('flex min-h-11 items-center gap-2.5 rounded-lg border border-solid py-[var(--space-1-25)] pl-3.5 pr-2', LOOK[kind])}
       {...rest}
     >
       {children}

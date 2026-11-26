@@ -260,8 +260,8 @@ export function LoopHistoryCard({
                   style={{
                     marginBottom:      'var(--space-1)',
                     overflowWrap:      'anywhere',
-                    '--prose-size-body': '12px',
-                    '--prose-line-body': '18px',
+                    '--prose-size-body': 'var(--font-size-small)',
+                    '--prose-line-body': 'var(--line-height-compact)',
                     '--prose-text':      status === 'failed' ? 'var(--neutral-700)' : 'var(--neutral-500)',
                     '--prose-measure':   'none',
                   } as React.CSSProperties}

@@ -43,7 +43,7 @@ export function fetchBrowsePage(q: string, category: string, cursor: string | un
 }
 
 // The page shell's top padding; the sticky toolbar pins above it.
-const SHELL_PAD_TOP = 'clamp(28px, 5vw, 48px)'
+const SHELL_PAD_TOP = 'clamp(var(--space-6-5), 5vw, var(--space-9))'
 
 export const SPACE = { xs: 4, sm: 6, md: 8, lg: 12, xl: 16, xxl: 24, section: 32 } as const
 
@@ -70,7 +70,7 @@ export function ConnectorsShell({ children, maxWidth = 1040 }: { children: React
         overflowX: 'hidden',
         overscrollBehaviorY: 'contain',
         boxSizing: 'border-box',
-        padding: `${SHELL_PAD_TOP} clamp(20px, 4vw, 40px) 72px`,
+        padding: `${SHELL_PAD_TOP} clamp(var(--space-5), 4vw, var(--space-8)) var(--connections-shared-padding)`,
         background: 'var(--neutral-50)',
         fontFamily: 'var(--font-body)',
       }}
@@ -194,7 +194,7 @@ export function CatalogToolbar({
   return (
     // Stays at the top while the catalogue scrolls, on the page's own background: pinned flush to the
     // scroll box's edge (above the shell's top padding), a little wider than the grid so card shadows hide under it.
-    <div style={{ position: 'sticky', top: `calc(-1 * ${SHELL_PAD_TOP})`, zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.lg, flexWrap: 'wrap', margin: `0 -8px ${SPACE.xxl}px`, padding: `${SPACE.lg}px 8px`, background: 'var(--neutral-50)', borderBottom: '1px solid var(--neutral-100)' }}>
+    <div style={{ position: 'sticky', top: `calc(-1 * ${SHELL_PAD_TOP})`, zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.lg, flexWrap: 'wrap', margin: `0 calc(var(--space-2) * -1) ${SPACE.xxl}px`, padding: `${SPACE.lg}px var(--space-2)`, background: 'var(--neutral-50)', borderBottom: '1px solid var(--neutral-100)' }}>
       <TabsRoot value={view} onValueChange={value => changeView(value as CatalogView)}>
         <TabsList size="small" aria-label="Connector views">
           {VIEW_LABELS.map(([id, label]) => <TabsTrigger key={id} value={id}>{label}</TabsTrigger>)}

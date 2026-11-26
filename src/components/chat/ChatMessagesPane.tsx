@@ -62,8 +62,8 @@ export function ChatMessagesPane({
   }, [scrollerRef]);
   // Two layers, unioned: the fade over the messages, and a solid strip that keeps
   // the scrollbar's column at full opacity.
-  const fade = "linear-gradient(to bottom, #000 calc(100% - 40px), transparent)";
-  const maskLayers = `${fade}, linear-gradient(#000, #000)`;
+  const fade = "linear-gradient(to bottom, var(--static-black) calc(100% - 40px), transparent)";
+  const maskLayers = `${fade}, linear-gradient(var(--static-black), var(--static-black))`;
   const maskSizes = `calc(100% - ${gutter}px) 100%, ${gutter}px 100%`;
 
   return (

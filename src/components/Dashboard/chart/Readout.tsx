@@ -70,7 +70,7 @@ export function Readout({ content, x, y, width, height }: ReadoutProps) {
       ref={ref}
       role="status"
       data-readout
-      className="pointer-events-none absolute z-10 flex min-w-[180px] flex-col gap-[3px] whitespace-nowrap rounded-lg bg-[var(--dashboard-card-bg)] px-2.5 py-2 text-[length:var(--font-size-small)] leading-4 shadow-[var(--dashboard-readout-shadow)]"
+      className="pointer-events-none absolute z-10 flex min-w-[180px] flex-col gap-[var(--space-0-75)] whitespace-nowrap rounded-lg bg-[var(--dashboard-card-bg)] px-2.5 py-2 text-[length:var(--font-size-small)] leading-4 shadow-[var(--dashboard-readout-shadow)]"
       style={{ left, top }}
     >
       <p className="m-0 text-[var(--dashboard-label)]">{content.title}</p>
@@ -84,7 +84,7 @@ export function Readout({ content, x, y, width, height }: ReadoutProps) {
         </div>
       ))}
       {content.footer && (
-        <p className={cn('m-0 border-0 border-t border-solid border-[var(--neutral-200)] pt-[5px] text-right font-medium', TONE[content.footer.tone])}>
+        <p className={cn('m-0 border-0 border-t border-solid border-[var(--neutral-200)] pt-[var(--space-1-25)] text-right font-medium', TONE[content.footer.tone])}>
           {content.footer.text}
         </p>
       )}

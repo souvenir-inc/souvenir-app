@@ -8,6 +8,7 @@ import { computePosition, flip, offset, shift } from '@floating-ui/dom'
 import { CopyOneIcon, TickTwoIcon, RedoIcon, PenOneIcon } from '@strange-huge/icons'
 import { useCorrosion } from '@/lib/useCorrosion'
 import { springs } from '@/lib/springs'
+import { SPRING } from "@/styles/tokens/motion"
 
 // ── Visual constants ───────────────────────────────────────────────────────────
 // Dark warm surface - neutral-800 (#3B3632) gives strong contrast against
@@ -30,7 +31,7 @@ const CARET_W = 6   // half of base width; full base = 12px
 const SWAP_INITIAL = { scale: 0.5, opacity: 0, filter: 'blur(4px)' }
 const SWAP_ANIMATE = { scale: 1,   opacity: 1, filter: 'blur(0px)' }
 const SWAP_EXIT    = { scale: 0.5, opacity: 0, filter: 'blur(4px)' }
-const SWAP_SPRING  = { type: 'spring', stiffness: 500, damping: 30 } as const
+const SWAP_SPRING  = { type: 'spring', ...SPRING.snappy } as const
 
 // Corrosion hover gradient - identical to Button Primary hover
 const HOVER_GLOW_GRADIENT =
@@ -135,7 +136,7 @@ function PopoverAction({
               position:        'absolute',
               inset:           '-0.73px',
               borderRadius:    'var(--selection-popover-radius)',
-              filter:          'blur(7.273px)',
+              filter:          'blur(var(--selection-popover-blur))',
               backgroundImage: HOVER_GLOW_GRADIENT,
             }}
           />
@@ -341,8 +342,8 @@ export function SelectionPopover({
                 left:          caretLeft,
                 width:         0,
                 height:        0,
-                borderLeft:    `${CARET_W}px solid transparent`,
-                borderRight:   `${CARET_W}px solid transparent`,
+                borderLeft:    `${CARET_W}px solid transparent`, // ds-keep: caret maths
+                borderRight:   `${CARET_W}px solid transparent`, // ds-keep: caret maths
                 ...(placement === 'top'
                   ? { borderTop:    `${CARET_H}px solid var(--neutral-800)` }
                   : { borderBottom: `${CARET_H}px solid var(--neutral-800)` }),

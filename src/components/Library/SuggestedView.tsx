@@ -52,7 +52,7 @@ function RecentCard({ file, onAction, first }: { file: LibraryFile; first: boole
             className={styles.cardTitle}
             style={{
               flex: '0 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              fontFamily: 'var(--font-body)', fontWeight: file.unread ? 600 : 500, fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-900)',
+              fontFamily: 'var(--font-body)', fontWeight: file.unread ? 'var(--font-weight-semibold)' : 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-900)',
             }}
           >
             {name}

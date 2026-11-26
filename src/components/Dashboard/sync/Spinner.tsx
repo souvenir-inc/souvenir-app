@@ -7,7 +7,7 @@ export function Spinner({ size = 12, className }: { size?: 12 | 14; className?: 
       aria-hidden
       style={{ width: size, height: size }}
       className={cn(
-        'inline-block shrink-0 animate-spin rounded-full border-[1.5px] border-solid border-[var(--dashboard-spinner-track)] border-t-[var(--dashboard-spinner-ink)] motion-reduce:animate-none',
+        'inline-block shrink-0 animate-spin rounded-full border-[length:var(--border-width-medium)] border-solid border-[var(--dashboard-spinner-track)] border-t-[var(--dashboard-spinner-ink)] motion-reduce:animate-none',
         className,
       )}
     />

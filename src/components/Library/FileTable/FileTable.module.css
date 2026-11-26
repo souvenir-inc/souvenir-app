@@ -46,8 +46,8 @@
 }
 
 .row:has(.rowLink:focus-visible) {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: -2px;
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: calc(var(--focus-ring-offset) * -1);
 }
 
 .rowLink {
@@ -105,8 +105,8 @@
   /* The header stays put while rows scroll under it, so it needs a body: the page colour at 94%,
      blurred, so scrolled rows read as a soft shadow, never as text. */
   background: color-mix(in srgb, var(--neutral-50) 94%, transparent);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--file-table-blur)) saturate(1.2);
+  backdrop-filter: blur(var(--file-table-blur)) saturate(1.2);
   box-sizing: border-box;
 }
 

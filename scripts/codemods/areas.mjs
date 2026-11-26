@@ -51,18 +51,21 @@ function expand(p) {
   return fs.readdirSync(path.join(ROOT, dir)).filter((f) => re.test(f)).map((f) => `${dir}/${f}`);
 }
 
-const args = process.argv.slice(2);
-if (args.includes("--list")) {
-  for (const [name, a] of Object.entries(AREAS)) console.log(`${name.padEnd(12)} screens: ${a.screens.join(",") || "—"}`);
-  process.exit(0);
-}
-const flags = args.filter((a) => a.startsWith("--"));
-const wanted = args.find((a) => !a.startsWith("--"));
-const names = wanted === "all" ? Object.keys(AREAS) : [wanted];
-for (const name of names) {
-  const area = AREAS[name];
-  if (!area) { console.error(`Unknown area: ${name}`); process.exit(1); }
-  const paths = area.paths.flatMap(expand);
-  const out = execFileSync("node", [path.join(import.meta.dirname, "tokens-exact.mjs"), ...paths, ...flags], { cwd: ROOT, encoding: "utf8" });
-  console.log(`${name.padEnd(12)} ${out.trim().split("\n").pop()}`);
+// CLI only when run directly (ds-sweep.mjs imports AREAS).
+if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(import.meta.filename)) {
+  const args = process.argv.slice(2);
+  if (args.includes("--list")) {
+    for (const [name, a] of Object.entries(AREAS)) console.log(`${name.padEnd(12)} screens: ${a.screens.join(",") || "—"}`);
+    process.exit(0);
+  }
+  const flags = args.filter((a) => a.startsWith("--"));
+  const wanted = args.find((a) => !a.startsWith("--"));
+  const names = wanted === "all" ? Object.keys(AREAS) : [wanted];
+  for (const name of names) {
+    const area = AREAS[name];
+    if (!area) { console.error(`Unknown area: ${name}`); process.exit(1); }
+    const paths = area.paths.flatMap(expand);
+    const out = execFileSync("node", [path.join(import.meta.dirname, "tokens-exact.mjs"), ...paths, ...flags], { cwd: ROOT, encoding: "utf8" });
+    console.log(`${name.padEnd(12)} ${out.trim().split("\n").pop()}`);
+  }
 }

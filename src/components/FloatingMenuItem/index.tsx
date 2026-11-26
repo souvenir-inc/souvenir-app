@@ -5,6 +5,7 @@ import { Slot } from '@radix-ui/react-slot'
 import { m, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/Tooltip'
+import { BLUR, DURATION, SPRING } from "@/styles/tokens/motion"
 
 // ── FloatingMenu context ──────────────────────────────────────────────────────
 // Provided by FloatingMenu; FloatingMenuItem reads `opened` from it so
@@ -193,25 +194,25 @@ export function FloatingMenuItem(
           {labelVisible && (
             <m.span
               key="label"
-              initial={{ opacity: 0, filter: 'blur(4px)', maxWidth: 0 }}
+              initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)`, maxWidth: 0 }}
               animate={{
                 opacity:  1,
                 filter:   'blur(0px)',
                 maxWidth: labelWidth,
                 transition: {
-                  opacity:  { delay: 0.07, duration: 0.12, ease: 'easeOut' },
-                  filter:   { delay: 0.07, duration: 0.12, ease: 'easeOut' },
-                  maxWidth: { type: 'spring', stiffness: 700, damping: 40, mass: 0.5 },
+                  opacity:  { delay: DURATION.instant, duration: DURATION.fast, ease: 'easeOut' },
+                  filter:   { delay: DURATION.instant, duration: DURATION.fast, ease: 'easeOut' },
+                  maxWidth: { type: 'spring', ...SPRING.whip },
                 },
               }}
               exit={{
                 opacity:  0,
-                filter:   'blur(4px)',
+                filter:   `blur(${BLUR.xs}px)`,
                 maxWidth: 0,
                 transition: {
-                  opacity:  { duration: 0.15, ease: 'easeIn' },
-                  filter:   { duration: 0.15, ease: 'easeIn' },
-                  maxWidth: { duration: 0.18, ease: [0.895, 0.03, 0.685, 0.22] },
+                  opacity:  { duration: DURATION.quick, ease: 'easeIn' },
+                  filter:   { duration: DURATION.quick, ease: 'easeIn' },
+                  maxWidth: { duration: DURATION.base, ease: [0.895, 0.03, 0.685, 0.22] },
                 },
               }}
               style={{

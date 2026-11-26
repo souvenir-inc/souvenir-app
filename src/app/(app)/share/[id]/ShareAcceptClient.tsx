@@ -109,20 +109,20 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
     return (
       <div style={cardStyle} role="status" aria-busy="true" aria-label="Loading shared agent">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-5)' }}>
-          <Skeleton width={72} height={72} radius={16} />
+          <Skeleton width={72} height={72} radius={'var(--radius-2xl)'} />
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2-5)' }}>
-            <Skeleton width={220} height={28} radius={8} />
-            <Skeleton width={160} height={16} radius={6} />
+            <Skeleton width={220} height={28} radius={'var(--radius-md)'} />
+            <Skeleton width={160} height={16} radius={'var(--radius-sm)'} />
           </div>
-          <Skeleton width="100%" height={72} radius={10} />
+          <Skeleton width="100%" height={72} radius={'var(--radius-lg)'} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', width: '100%' }}>
-            <Skeleton width={200} height={16} radius={6} />
-            <Skeleton width={140} height={16} radius={6} />
+            <Skeleton width={200} height={16} radius={'var(--radius-sm)'} />
+            <Skeleton width={140} height={16} radius={'var(--radius-sm)'} />
           </div>
         </div>
         <div style={footerStyle}>
-          <Skeleton width={100} height={40} radius={10} />
-          <Skeleton width={160} height={40} radius={10} />
+          <Skeleton width={100} height={40} radius={'var(--radius-lg)'} />
+          <Skeleton width={160} height={40} radius={'var(--radius-lg)'} />
         </div>
       </div>
     )

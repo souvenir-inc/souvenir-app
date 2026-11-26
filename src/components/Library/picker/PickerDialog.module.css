@@ -93,8 +93,8 @@
 }
 
 .chip:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .chip[aria-pressed='true'] {
@@ -366,7 +366,7 @@
   color: var(--neutral-900);
   text-decoration: underline;
   text-decoration-color: var(--neutral-300);
-  text-underline-offset: 3px;
+  text-underline-offset: var(--underline-offset-lg);
 }
 
 .clear:hover {
@@ -374,8 +374,8 @@
 }
 
 .clear:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .actions {

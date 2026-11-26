@@ -13,9 +13,9 @@ import type { ModelUnavailableReason } from '@/lib/agent-model-health'
 // one-line description sit beside it, with the white "Use" pill at the right end. Clicking the card
 // opens the agent's details; the pill uses the agent. Hovering plays the avatar and lifts the card a pixel.
 
-const RADIUS = 16
+const RADIUS = 'var(--radius-2xl)'
 const TILE = 52
-const TILE_RADIUS = 12
+const TILE_RADIUS = 'var(--radius-xl)'
 
 export interface CompactAgentCardProps {
   agent:     SelectedPersonaInfo
@@ -81,7 +81,7 @@ export function CompactAgentCard({ agent, superlink, useLabel = 'Use agent', inU
           ? 'var(--shadow-agent-card-hover)'
           : 'var(--shadow-agent-card)',
         transform:       active ? 'translateY(-1px)' : 'none',
-        transition:      'box-shadow var(--duration-base), transform var(--duration-base) cubic-bezier(0.22, 1, 0.36, 1)',
+        transition:      'box-shadow var(--duration-base), transform var(--duration-base) var(--ease-out-quint)',
       }}
       data-surface="raised"
     >

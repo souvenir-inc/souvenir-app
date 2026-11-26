@@ -36,7 +36,7 @@ function Pick({ boards, current, onSave }: Omit<DefaultBoardDialogProps, 'open'>
       style={{ width: 'min(420px, calc(100vw - 32px))', maxWidth: 'none', borderRadius: 'var(--radius-xl)', padding: 'var(--space-5)', background: 'var(--dashboard-card-bg)' }}
     >
       <div className="relative flex flex-col gap-1 pr-8">
-        <DialogTitle className="text-[15px] font-semibold leading-6 text-[var(--dashboard-figure)]">Default board for new members</DialogTitle>
+        <DialogTitle className="text-[length:var(--font-size-body-md)] font-semibold leading-6 text-[var(--dashboard-figure)]">Default board for new members</DialogTitle>
         <p className="m-0 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-label)]">New members start on this board. It never changes anyone’s own tabs.</p>
         <DialogClose asChild>
           <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute -right-1.5 -top-1 size-7 rounded-md" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />

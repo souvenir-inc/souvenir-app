@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, m } from "framer-motion";
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 interface ModelChoosingIndicatorProps {
   modelName?: string | null;
@@ -22,7 +23,7 @@ export function ModelChoosingIndicator({
           initial={{ opacity: 0, scale: 0.9, y: 4 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: -2 }}
-          transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+          transition={{ duration: DURATION.base, ease: [0.4, 0, 0.2, 1] }}
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -61,10 +62,10 @@ export function ModelChoosingIndicator({
             <AnimatePresence mode="popLayout" initial={false}>
               <m.span
                 key={modelName ?? "model"}
-                initial={{ opacity: 0, filter: "blur(3px)" }}
+                initial={{ opacity: 0, filter: `blur(${BLUR[3]}px)` }}
                 animate={{ opacity: 1, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
-                exit={{ opacity: 0, filter: "blur(3px)" }}
-                transition={{ duration: 0.2 }}
+                exit={{ opacity: 0, filter: `blur(${BLUR[3]}px)` }}
+                transition={{ duration: DURATION.base }}
                 style={{ fontWeight: "var(--font-weight-semibold)", color: "var(--neutral-800)" }}
               >
                 {modelName ?? "model"}

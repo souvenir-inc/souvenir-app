@@ -9,7 +9,7 @@ import { PERSONA_CARD_HEIGHT } from './index'
 // with the 93×32 "Use in chat" button — so the real cards replace it without anything moving.
 // Uses the shared .kaya-skeleton pulse utility (globals.css).
 
-const HERO_INSET = 6
+const HERO_INSET = 'var(--space-1-5)'
 const HERO_HEIGHT = 154
 const ACTION_ROW_HEIGHT = 48
 

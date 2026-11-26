@@ -64,7 +64,7 @@ function GhostButton({ children, onClick }: { children: React.ReactNode; onClick
 // Column labels + switch cells share this spacing contract:
 // each cell is 43px wide (centred), gap between cells is 32px.
 const COL_W   = 43
-const COL_GAP = 32
+const COL_GAP = 'var(--space-7)'
 
 function ColHeaders() {
   return (

@@ -118,7 +118,7 @@ export function SettingsTableHeader({
       style={{
         display:              'grid',
         gridTemplateColumns:  columns ?? layout.columns,
-        columnGap:            columnGap ?? layout.columnGap ?? 64,
+        columnGap:            columnGap ?? layout.columnGap ?? 'var(--space-10)',
         alignItems:           'center',
         padding:              'var(--space-3) var(--space-6)',
         borderBottom:         '1px solid var(--neutral-100)',
@@ -175,7 +175,7 @@ export function SettingsTableRow({
       style={{
         display:             'grid',
         gridTemplateColumns: columns ?? layout.columns,
-        columnGap:           columnGap ?? layout.columnGap ?? 64,
+        columnGap:           columnGap ?? layout.columnGap ?? 'var(--space-10)',
         alignItems:          'center',
         minHeight,
         padding:             '0 var(--space-6)',

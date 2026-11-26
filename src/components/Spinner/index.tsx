@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import { m } from 'framer-motion'
+import { DURATION, LONG } from "@/styles/tokens/motion"
 
 export interface SpinnerProps {
   size?: number
@@ -22,7 +23,7 @@ export function Spinner({ size = 20, color = 'currentColor', className, style }:
       style={{ color, flexShrink: 0, ...style }}
       animate={{ rotate: 360 }}
       transition={{
-        duration:   1,
+        duration:   LONG.xs,
         ease:       [0.25, 0.1, 0.25, 1],
         repeat:     Infinity,
         repeatType: 'loop',

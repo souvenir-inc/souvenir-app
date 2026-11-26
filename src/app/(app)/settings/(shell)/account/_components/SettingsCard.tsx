@@ -78,7 +78,7 @@ export function CardSection({
       style={{
         display:         'flex',
         flexDirection:   'column',
-        padding:         `${padTop}px 24px ${padBottom}px`,
+        padding:         `${padTop}px var(--space-6) ${padBottom}px`,
         borderBottom:    divider ? '1px solid var(--neutral-100)' : undefined,
       }}
     >

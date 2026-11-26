@@ -37,17 +37,17 @@ export const ROLE_TOKENS: Record<WorkspaceRole, RoleTokens> = {
     bg:   'var(--yellow-100)',
     text: 'var(--yellow-700)',
     shadow: [
-      '0px 1px 1.5px 0px rgba(20,16,5,0.2)',
+      'var(--role-badge-shadow)',
       '0px 0px 0px 1px color-mix(in srgb, var(--yellow-600) 50%, transparent)',
-      'inset 0px 1px 0px 0px rgba(250,246,235,0.7)',
-      'inset 0px -1px 0px 0px rgba(143,116,39,0.1)',
+      'var(--role-badge-shadow-2)',
+      'var(--role-badge-shadow-3)',
     ].join(', '),
   },
   editor: {
     bg:   'var(--blue-100)',
     text: 'var(--blue-700)',
     shadow: [
-      '0px 1px 1.5px 0px rgba(2,15,24,0.2)',
+      'var(--role-badge-shadow-4)',
       '0px 0px 0px 1px var(--blue-600-50)',
       'inset 0px 1px 0px 0px var(--blue-50-70)',
       'inset 0px -1px 0px 0px var(--blue-600-10)',

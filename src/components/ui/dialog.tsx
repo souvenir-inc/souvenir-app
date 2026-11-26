@@ -125,7 +125,7 @@ export function DialogContent({ size = 'md', hideClose = false, bare = false, ov
           display: 'flex',
           flexDirection: 'column',
           background: 'var(--neutral-white)',
-          borderRadius: 16,
+          borderRadius: 'var(--radius-2xl)',
           boxShadow: SHADOW_MODAL,
           outline: 'none',
           overflow: 'hidden',
@@ -176,7 +176,7 @@ const SR_ONLY: React.CSSProperties = {
 export function DialogTitle({ children, visuallyHidden = false, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title> & { visuallyHidden?: boolean }) {
   return (
     <DialogPrimitive.Title
-      style={visuallyHidden ? SR_ONLY : props.asChild ? undefined : { margin: 0, fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 16, lineHeight: '24px', color: 'var(--neutral-900)' }}
+      style={visuallyHidden ? SR_ONLY : props.asChild ? undefined : { margin: 0, fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-900)' }}
       {...props}
     >
       {children}
@@ -187,7 +187,7 @@ export function DialogTitle({ children, visuallyHidden = false, ...props }: Reac
 export function DialogDescription({ children, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
-      style={props.asChild ? undefined : { margin: 0, fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)' }}
+      style={props.asChild ? undefined : { margin: 0, fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body-lg)', color: 'var(--neutral-500)' }}
       {...props}
     >
       {children}

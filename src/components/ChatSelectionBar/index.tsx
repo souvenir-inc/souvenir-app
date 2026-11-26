@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
 
-const CHIP_RING        = '0px 0px 0px 1px rgba(59,54,50,0.28)'
+const CHIP_RING        = 'var(--chat-selection-bar-chip-ring)'
 const CHIP_RING_DANGER = '0px 0px 0px 1px color-mix(in srgb, var(--red-400) 28%, transparent)'
 
 // ── ChipButton ────────────────────────────────────────────────────────────────

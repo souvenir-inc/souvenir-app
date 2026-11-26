@@ -29,18 +29,18 @@ export function ProjectSkeletonBody() {
   return (
     <>
       <TopBarPortal side="left">
-        <Skeleton width={32} height={32} radius={8} />
+        <Skeleton width={32} height={32} radius={'var(--radius-md)'} />
       </TopBarPortal>
       <div style={{ width: '100%', maxWidth: 679, marginBottom: 'var(--space-6)', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', height: 32 }}>
-          <Skeleton width="45%" height={26} radius={8} />
-          <Skeleton width={72} height={24} radius={6} />
+          <Skeleton width="45%" height={26} radius={'var(--radius-md)'} />
+          <Skeleton width={72} height={24} radius={'var(--radius-sm)'} />
         </div>
         <Skeleton width="60%" height={14} style={{ marginTop: 'var(--space-2)' }} />
       </div>
       {/* The composer card (24px radius, ~130px tall). */}
       <div style={{ width: '100%', maxWidth: 679, flexShrink: 0 }}>
-        <Skeleton height={130} radius={24} />
+        <Skeleton height={130} radius={'var(--project-route-states-radius)'} />
       </div>
       <div style={{ width: '100%', maxWidth: 679, padding: 'var(--space-0-5)', boxSizing: 'border-box' }}>{teamChatsLoadingRows()}</div>
     </>
@@ -63,7 +63,7 @@ export function ProjectsListLoading() {
       <div style={{ width: '100%', maxWidth: 679 }}>
         <Skeleton width="30%" height={28} style={{ marginBottom: 'var(--space-6)' }} />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-6)' }}>
-          {[0, 1, 2, 3].map(i => <Skeleton key={i} height={262} radius={12} style={{ opacity: 1 - i * 0.15 }} />)}
+          {[0, 1, 2, 3].map(i => <Skeleton key={i} height={262} radius={'var(--radius-xl)'} style={{ opacity: 1 - i * 0.15 }} />)}
         </div>
       </div>
     </div>

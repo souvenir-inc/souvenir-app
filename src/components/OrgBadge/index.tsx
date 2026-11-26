@@ -6,6 +6,7 @@ import { m } from 'framer-motion'
 import { LogoIcon } from '@strange-huge/icons'
 import { cn } from '@/lib/utils'
 import type { ChipColor } from '@/components/Chip'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Org identity colour ───────────────────────────────────────────────────────
 // Deterministic assignment from a stable key (org id) into the KDS tag palette —
@@ -177,7 +178,7 @@ export function OrgBadge(
       className={cn('kds-org-badge', className)}
       onClick={onClick}
       whileTap={{ scale: 0.96 }}
-      transition={{ duration: 0.1, ease: 'easeOut' }}
+      transition={{ duration: DURATION.snap, ease: 'easeOut' }}
       style={{ ...baseStyle, cursor: 'pointer' }}
       {...(rest as React.ComponentPropsWithoutRef<typeof m.button>)}
     >

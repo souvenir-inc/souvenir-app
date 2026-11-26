@@ -15,6 +15,7 @@ import { ContactSalesModal } from '@/components/ContactSalesModal'
 import { Spinner } from '@/components/Spinner'
 import { Dropdown } from '@/components/Dropdown'
 import { ORG_PLANS_ROUTE } from '@/lib/routes'
+import { DURATION } from "@/styles/tokens/motion"
 
 const TITLE = 'var(--font-title)'
 const BODY  = 'var(--font-body)'
@@ -57,13 +58,13 @@ function Badge({ label, color }: { label: string; color: 'brown' | 'yellow' }) {
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
       position: 'relative', borderRadius: 'var(--radius-sm)', overflow: 'hidden',
       boxShadow: isBrown
-        ? '0px 1px 1.5px 0px rgba(20,12,5,0.2), 0px 0px 0px 1px rgba(126,84,53,0.5)'
-        : '0px 1px 1.5px 0px rgba(20,16,5,0.2), 0px 0px 0px 1px color-mix(in srgb, var(--yellow-600) 50%, transparent)',
+        ? 'var(--color-tag-Brown-shadow)'
+        : 'var(--change-plan-shadow)',
     }}>
       <div style={{ position: 'absolute', inset: 0, backgroundColor: isBrown ? 'var(--brown-100)' : 'var(--yellow-100)', borderRadius: 'var(--radius-sm)' }} />
       <div style={{ position: 'absolute', inset: 0, borderRadius: 'var(--radius-sm)', pointerEvents: 'none', boxShadow: isBrown
-        ? 'inset 0px 1px 0px 0px rgba(250,241,235,0.7), inset 0px -1px 0px 0px rgba(126,84,53,0.1)'
-        : 'inset 0px 1px 0px 0px rgba(250,246,235,0.7), inset 0px -1px 0px 0px rgba(143,116,39,0.1)' }} />
+        ? 'var(--change-plan-shadow-2)'
+        : 'var(--change-plan-shadow-3)' }} />
       <span style={{ fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)', color: isBrown ? 'var(--brown-700)' : 'var(--yellow-700)', position: 'relative', padding: 'var(--space-0-5) var(--space-1-5)' }}>
         {label}
       </span>
@@ -489,7 +490,7 @@ function OrgChangePlanPageInner() {
                   position: 'absolute', top: 4, bottom: 4, left: 0,
                   borderRadius: 'var(--radius-lg)',
                   background: 'linear-gradient(to bottom, var(--color-interactive-primary-surface-from), var(--color-interactive-primary-surface-to))',
-                  boxShadow: '0px 0px 0px 1px var(--neutral-black), 0px 1.091px 1.091px 0px rgba(59,54,50,0.1), 0px 1.455px 3.127px 0px rgba(59,54,50,0.4)',
+                  boxShadow: 'var(--shadow-pill-active)',
                   pointerEvents: 'none',
                 }}
               />
@@ -578,7 +579,7 @@ function OrgChangePlanPageInner() {
                         position: 'absolute', top: -11, left: 16,
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                         borderRadius: 'var(--radius-sm)', overflow: 'hidden', backgroundColor: 'var(--blue-100)',
-                        boxShadow: '0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px var(--blue-600-50), inset 0px 1px 0px 0px rgba(231,244,253,0.7), inset 0px -1px 0px 0px rgba(13,110,178,0.1)',
+                        boxShadow: 'var(--change-plan-shadow-4)',
                       }}>
                         <span style={{ fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)', color: 'var(--blue-700)', padding: 'var(--space-0-5) var(--space-1-5)' }}>
                           FREE PLAN ACTIVE
@@ -691,7 +692,7 @@ function OrgChangePlanPageInner() {
                     cursor: workspaceButtonDisabled ? 'default' : 'pointer',
                     opacity: workspaceButtonDisabled ? 0.55 : 1,
                     background: 'linear-gradient(to bottom, var(--color-interactive-primary-surface-from), var(--color-interactive-primary-surface-to))',
-                    boxShadow: '0px 0px 0px 1px var(--neutral-black), 0px 1.091px 1.091px 0px rgba(59,54,50,0.1), 0px 1.455px 3.127px 0px rgba(59,54,50,0.4), inset 0px 1px 0.364px 0px var(--neutral-white-30), inset 0px -2.182px 0.364px 0px var(--neutral-950), inset 0px -2.545px 4px -2.182px var(--neutral-white-50)',
+                    boxShadow: 'var(--change-plan-shadow-5)',
                     fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--color-interactive-primary-text)',
                     textShadow: '0px -0.727px 0.364px color-mix(in srgb, var(--static-black) 25%, transparent), 0px 0.364px 0.364px color-mix(in srgb, var(--static-white) 25%, transparent)',
                   }}
@@ -724,12 +725,12 @@ function OrgChangePlanPageInner() {
                   onClick={() => { if (!changingTo && org?.plan !== 'enterprise') { setPlanParam('pro'); setContactSalesOpen(true) } }}
                   disabled={!!changingTo || org?.plan === 'enterprise'}
                   whileTap={(!!changingTo || org?.plan === 'enterprise') ? undefined : { scale: 0.98 }}
-                  transition={{ duration: 0.1, ease: 'easeOut' }}
+                  transition={{ duration: DURATION.snap, ease: 'easeOut' }}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-1)',
                     width: '100%', padding: 'var(--space-1-5) var(--space-0-5) var(--space-2)', borderRadius: 'var(--radius-lg)', border: 'none',
                     backgroundColor: 'var(--neutral-white)', cursor: changingTo ? 'wait' : 'pointer',
-                    boxShadow: '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-300), inset 0px -2.182px 0.364px 0px var(--neutral-200)',
+                    boxShadow: 'var(--change-plan-shadow-6)',
                     fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-700)',
                   }}
                 >

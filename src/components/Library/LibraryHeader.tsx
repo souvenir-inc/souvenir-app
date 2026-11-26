@@ -40,7 +40,7 @@ export function StorageLabel() {
     )
   }
   if (summary.isError) return null
-  return <Skeleton width={84} height={14} radius={6} />
+  return <Skeleton width={84} height={14} radius={'var(--radius-sm)'} />
 }
 
 /**

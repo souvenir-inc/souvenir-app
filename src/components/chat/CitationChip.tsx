@@ -6,6 +6,7 @@ import { SourceCitation, SourceList as SourceListUI } from "@/components/SourceC
 import type { SourceItem } from "@/components/SourceCitation";
 import type { WebCitation } from "@/types/chat";
 import { listedSources } from "@/lib/citations";
+import { DURATION } from "@/styles/tokens/motion"
 
 // -- CitationChip � inline numbered chip backed by SourceCitation hover card ----
 
@@ -57,7 +58,7 @@ export function SourceList({ citations }: { citations: WebCitation[] }) {
     <m.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1], delay: 0.12 }}
+      transition={{ duration: DURATION.moderate, ease: [0.16, 1, 0.3, 1], delay: DURATION.fast }}
     >
       <SourceListUI sources={sources} />
     </m.div>

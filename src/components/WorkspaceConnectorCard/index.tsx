@@ -30,7 +30,7 @@ export function WorkspaceConnectorCard({ connector, isAdmin, onManage, onRevoke 
       padding:         'var(--space-2-5) var(--space-4)',
       backgroundColor: 'var(--neutral-white)',
       borderRadius:    'var(--radius-xl)',
-      boxShadow:       '0px 1px 2px 0px rgba(82,75,71,0.08), 0px 0px 0px 1px var(--neutral-100)',
+      boxShadow:       'var(--workspace-connector-card-shadow)',
     }}>
       {/* Icon */}
       <div style={{

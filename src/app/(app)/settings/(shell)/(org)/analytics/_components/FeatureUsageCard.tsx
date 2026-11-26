@@ -92,7 +92,7 @@ function UsageChart({ series, bucket }: { series: OrgUsageBucket[]; bucket: 'day
         {[0, 1, 2, 3, 4].map(i => (
           <div key={i} aria-hidden style={{ position: 'absolute', left: 0, right: 0, top: `${i * 25}%`, borderTop: `1px ${i === 4 ? 'solid' : 'dashed'} var(--neutral-200)` }} />
         ))}
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', gap: series.length > 40 ? 1 : 3 }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', gap: series.length > 40 ? 'var(--space-px)' : 'var(--space-0-75)' }}>
           {series.map((s, i) => {
             const total = totals[i]
             const label = `${unit ? `${unit} ` : ''}${bucketLabel(s.start)}: ${total.toLocaleString()} credits`
@@ -115,7 +115,7 @@ function UsageChart({ series, bucket }: { series: OrgUsageBucket[]; bucket: 'day
           })}
         </div>
       </div>
-      <div aria-hidden style={{ display: 'flex', gap: series.length > 40 ? 1 : 3, marginTop: 'var(--space-2)' }}>
+      <div aria-hidden style={{ display: 'flex', gap: series.length > 40 ? 'var(--space-px)' : 'var(--space-0-75)', marginTop: 'var(--space-2)' }}>
         {series.map((s, i) => (
           <span key={s.start} style={{ flex: '1 1 0', minWidth: 0, textAlign: 'center', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-400)', whiteSpace: 'nowrap' }}>
             {labelled.has(i) ? bucketLabel(s.start) : ' '}

@@ -47,7 +47,7 @@ export function LibrarySearch({ query, setQuery }: { query: LibraryQuery; setQue
       style={{
         // Up to 240px, and it shrinks (to 160px) before the header's tools wrap, as in the prototype.
         display: 'flex', alignItems: 'center', gap: 'var(--space-0-5)', padding: 'var(--space-1-5) var(--space-2-5)', margin: '0 var(--space-1)', flex: '0 1 240px', minWidth: 160, boxSizing: 'border-box', borderRadius: 'var(--radius-lg)',
-        background: 'var(--text-field-bg)', boxShadow: '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--text-field-ring)',
+        background: 'var(--text-field-bg)', boxShadow: 'var(--shadow-field)',
       }}
     >
       <SearchOneIcon size={16} style={{ color: 'var(--neutral-500)', flexShrink: 0 }} />

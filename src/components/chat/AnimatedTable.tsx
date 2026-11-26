@@ -6,6 +6,7 @@ import Copy01Icon from "@hugeicons/core-free-icons/Copy01Icon";
 import Checkmark from "@hugeicons/core-free-icons/Tick01Icon";
 import type { TableData, TableCellValue } from "@/types/chat";
 import { HIcon } from "./response-blocks-shared";
+import { DURATION, STAGGER } from "@/styles/tokens/motion"
 
 // �"��"� TableCell renderer �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 
@@ -160,19 +161,19 @@ export function AnimatedTable({ data, onComplete, animate = true }: { data: Tabl
 
   const rowBg = (ri: number, isAccentRow: boolean, isTotalsRow: boolean) => {
     if (isAccentRow) return "color-mix(in srgb, var(--brown-700) 4%, transparent)";
-    if (isTotalsRow) return "rgba(59,54,50,0.05)";
+    if (isTotalsRow) return "var(--animated-table-bg)";
     if (isHoverable && hoveredRow === ri) return "color-mix(in srgb, var(--brown-700) 4%, transparent)";
-    if (v === "striped" && ri % 2 === 1) return "rgba(59,54,50,0.05)";
+    if (v === "striped" && ri % 2 === 1) return "var(--animated-table-bg)";
     return "white";
   };
   const cellBorderLeft = (ci: number) => {
     if (isMinimal || isHoverable || isMixed) return "none";
-    return ci > 0 ? "1px solid rgba(59,54,50,0.05)" : "none";
+    return ci > 0 ? "1px solid var(--animated-table-bg)" : "none";
   };
   const rowBorderBottom = (ri: number) => {
     if (ri >= data.rows.length - 1) return "none";
-    if (isMinimal) return "1px solid rgba(59,54,50,0.05)";
-    return "1px solid rgba(82,75,71,0.12)";
+    if (isMinimal) return "1px solid var(--animated-table-bg)";
+    return "1px solid var(--animated-table-row-border-bottom)";
   };
 
   return (
@@ -180,18 +181,18 @@ export function AnimatedTable({ data, onComplete, animate = true }: { data: Tabl
       <div role="table" aria-label={data.caption ? undefined : "Table"} aria-rowcount={data.rows.length + 1} style={{ border: "1px solid var(--brown-50)", borderRadius: 'var(--radius-xl)', overflow: "hidden", fontSize: 'var(--font-size-body)', ...(isMinimal ? { border: "none", borderRadius: 0 } : {}) }}>
         <AnimatePresence>
           {data.caption && isDone && (
-            <m.div key="cap" role="caption" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}
+            <m.div key="cap" role="caption" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: DURATION.slow }}
               style={{ padding: "var(--space-1-5) var(--space-3)", borderBottom: "1px solid var(--brown-50)", fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", fontStyle: "italic" }}>
               {data.caption}
             </m.div>
           )}
         </AnimatePresence>
-        <div role="row" style={{ display: "grid", gridTemplateColumns: gridCols, background: isMinimal ? "transparent" : "rgba(59,54,50,0.05)", borderBottom: "1px solid var(--brown-50)" }}>
+        <div role="row" style={{ display: "grid", gridTemplateColumns: gridCols, background: isMinimal ? "transparent" : "var(--animated-table-bg)", borderBottom: "1px solid var(--brown-50)" }}>
           {data.headers.map((h, ci) => (
             <div key={ci} role="columnheader"
               aria-sort={data.sortable ? (sortCol === ci ? (sortDir === "asc" ? "ascending" : "descending") : "none") : undefined}
               style={{
-                padding: isCompact ? "6px 12px" : "9px 14px",
+                padding: isCompact ? "var(--space-1-5) var(--space-3)" : "var(--animated-table-padding)",
                 fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)", fontSize: 'var(--font-size-body)', letterSpacing: "var(--tracking-normal)",
                 borderLeft: (!isMinimal && !isHoverable) ? (ci > 0 ? "1px solid var(--neutral-800-10)" : "none") : "none",
                 cursor: data.sortable ? "pointer" : "default",
@@ -220,12 +221,12 @@ export function AnimatedTable({ data, onComplete, animate = true }: { data: Tabl
              and causes zero JS-thread work or layout recalculations during streaming. */}
         <AnimatePresence>
           {skeletonVisible && (
-            <m.div key="skeleton" aria-hidden exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            <m.div key="skeleton" aria-hidden exit={{ opacity: 0 }} transition={{ duration: DURATION.base }}>
               {data.rows.map((_, ri) => (
                 <m.div key={ri}
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                  transition={{ delay: ri * 0.045, duration: 0.18 }}
-                  style={{ display: "grid", gridTemplateColumns: gridCols, borderBottom: rowBorderBottom(ri), background: v === "striped" && ri % 2 === 1 ? "rgba(59,54,50,0.05)" : "white" }}>
+                  transition={{ delay: ri * STAGGER.sm, duration: DURATION.base }}
+                  style={{ display: "grid", gridTemplateColumns: gridCols, borderBottom: rowBorderBottom(ri), background: v === "striped" && ri % 2 === 1 ? "var(--animated-table-bg)" : "var(--static-white)" }}>
                   {data.headers.map((_, ci) => (
                     <div key={ci} style={{ padding: cellPad, borderLeft: cellBorderLeft(ci), display: "flex", justifyContent: (isFinancial && ci > 0) ? "flex-end" : (v === "feature-comparison" && ci > 0) ? "center" : "flex-start" }}>
                       {isMixed && ci === 0 ? (
@@ -253,7 +254,7 @@ export function AnimatedTable({ data, onComplete, animate = true }: { data: Tabl
             return (
               <m.div key={`r-${origIdx}`} role="row"
                 initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.18, ease: "easeOut" }}
+                transition={{ duration: DURATION.base, ease: "easeOut" }}
                 onMouseEnter={() => { if (isHoverable) setHoveredRow(ri); }}
                 onMouseLeave={() => { if (isHoverable) setHoveredRow(null); }}
                 style={{ display: "grid", gridTemplateColumns: gridCols, position: "relative", borderBottom: rowBorderBottom(ri), borderTop: isTotalsRow ? "2px solid var(--neutral-800-15)" : "none", background: bg, transition: "background var(--duration-instant)", cursor: isHoverable ? "pointer" : "default" }}>
@@ -265,16 +266,16 @@ export function AnimatedTable({ data, onComplete, animate = true }: { data: Tabl
                   return (
                     <div key={ci} role="cell" style={{
                       padding: cellPad,
-                      paddingLeft: isAccentRow && ci === 0 ? 17 : (isCompact ? 12 : 14),
+                      paddingLeft: isAccentRow && ci === 0 ? "var(--animated-table-padding-left)" : (isCompact ? "var(--space-3)" : "var(--space-3-5)"),
                       color: ci === 0 && !isTotalsRow ? "var(--neutral-900)" : isTotalsRow ? "var(--neutral-900)" : "var(--neutral-700)",
-                      fontWeight: isTotalsRow ? 600 : ci === 0 && !isMixed ? 500 : 400,
+                      fontWeight: isTotalsRow ? "var(--font-weight-semibold)" : ci === 0 && !isMixed ? "var(--font-weight-medium)" : "var(--font-weight-regular)",
                       borderLeft: cellBorderLeft(ci),
-                      fontSize: isCompact ? 12 : isNumericCell ? 13 : 14,
+                      fontSize: isCompact ? "var(--font-size-small)" : isNumericCell ? "var(--font-size-body-sm)" : "var(--font-size-body)",
                       textAlign: rightAlign ? "right" : centerAlign ? "center" : "left",
                       display: centerAlign ? "flex" : "block",
                       alignItems: centerAlign ? "center" : undefined,
                       justifyContent: centerAlign ? "center" : undefined,
-                      lineHeight: isMixed ? "1" : "20px",
+                      lineHeight: isMixed ? "var(--leading-none)" : "var(--line-height-body-sm)",
                     }}>
                       <TableCellContent cell={cell} badgeMap={data.badgeMap} />
                     </div>
@@ -288,7 +289,7 @@ export function AnimatedTable({ data, onComplete, animate = true }: { data: Tabl
 
       <AnimatePresence>
         {isDone && (
-          <m.div key="actions" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}
+          <m.div key="actions" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: DURATION.base }}
             style={{ display: "flex", alignItems: "center", gap: 'var(--space-1-5)', marginTop: 'var(--space-2)', paddingLeft: 'var(--space-0-5)' }}>
             <span style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-300)", flex: 1 }}>
               {data.rows.length} rows · {data.headers.length} col
@@ -299,7 +300,7 @@ export function AnimatedTable({ data, onComplete, animate = true }: { data: Tabl
               background: "transparent", cursor: "pointer", fontSize: 'var(--font-size-small)', color: "var(--neutral-500)",
               fontFamily: "inherit", transition: "all var(--duration-fast)",
             }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(59,54,50,0.05)"; e.currentTarget.style.color = "var(--neutral-700)"; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "var(--animated-table-bg)"; e.currentTarget.style.color = "var(--neutral-700)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--neutral-500)"; }}>
               {mdCopied ? <HIcon icon={Checkmark} size={11} color="var(--green-600)" strokeWidth={2.5} /> : <HIcon icon={Copy01Icon} size={11} color="var(--neutral-500)" strokeWidth={1.5} />}
               {mdCopied ? "Copied!" : "Copy markdown"}

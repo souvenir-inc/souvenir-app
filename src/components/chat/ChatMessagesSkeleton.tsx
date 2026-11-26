@@ -26,7 +26,7 @@ export function ChatMessagesSkeleton() {
             opacity:        1 - i * 0.12,
           }}
         >
-          <Skeleton width={row.width} height={36} radius={14} />
+          <Skeleton width={row.width} height={36} radius={'var(--radius-card)'} />
         </div>
       ))}
     </div>

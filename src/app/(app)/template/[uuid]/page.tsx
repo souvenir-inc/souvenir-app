@@ -44,7 +44,7 @@ export default async function TemplatePage({
   return (
     <div className="flex h-full min-h-0 flex-col">
       <header className="flex shrink-0 flex-wrap items-baseline gap-2.5 border-b border-[var(--neutral-100)] px-5 py-3.5">
-        <h1 className="m-0 font-[family-name:var(--font-title)] text-lg leading-[26px] font-normal text-[var(--neutral-900)]">
+        <h1 className="m-0 font-[family-name:var(--font-title)] text-lg leading-[var(--template-title-line-height)] font-normal text-[var(--neutral-900)]">
           {title}
         </h1>
         <span className="text-[length:var(--font-size-body-sm)] leading-5 text-[var(--neutral-500)]">

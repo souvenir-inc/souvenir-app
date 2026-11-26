@@ -45,7 +45,7 @@ export function deriveInitials(name: string): string {
 // column. The tint is picked from a hash of the seed, so a person keeps their colour everywhere.
 
 const TINTS = ['Blue', 'Green', 'Purple', 'Yellow', 'Brown'] as const
-export const AVATAR_HAIRLINE = 'inset 0 0 0 0.5px rgba(0, 0, 0, 0.08)'
+export const AVATAR_HAIRLINE = 'var(--avatar-hairline)'
 
 export function avatarGradient(colour: string): string {
   return `linear-gradient(135deg, color-mix(in srgb, ${colour} 45%, white), color-mix(in srgb, ${colour} 88%, black))`
@@ -90,7 +90,7 @@ export function Avatar({ ref, name, color, size = 'md', initials, seed, asChild,
           // text flips with it (--neutral-white is a dark surface in dark mode).
           color:           tint ? tint.color : 'var(--color-text-on-accent)',
           fontFamily:      'var(--font-body)',
-          fontWeight:      tint ? 600 : 'var(--font-weight-medium)',
+          fontWeight:      tint ? 'var(--font-weight-semibold)' : 'var(--font-weight-medium)',
           fontSize:        fontSize,
           lineHeight:      'var(--leading-none)',
           userSelect:      'none',

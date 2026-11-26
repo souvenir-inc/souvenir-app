@@ -21,7 +21,7 @@ export function BillingLoadError({ onRetry, retrying }: { onRetry: () => void; r
   )
 }
 
-export function SkeletonBlock({ width = '100%', height, radius = 8 }: { width?: string | number; height: number; radius?: number }) {
+export function SkeletonBlock({ width = '100%', height, radius = 'var(--radius-md)' }: { width?: string | number; height: number; radius?: number | string }) {
   return (
     <div style={{
       width, height, borderRadius: radius,
@@ -38,7 +38,7 @@ export function SkeletonShimmerStyle() {
 }
 
 /** A bone vertically centred in a text line box, so stacked lines keep the real line-heights. */
-export function SkeletonLine({ width, lineHeight, height, radius = 4 }: { width: string | number; lineHeight: number; height: number; radius?: number }) {
+export function SkeletonLine({ width, lineHeight, height, radius = 'var(--radius-xs)' }: { width: string | number; lineHeight: number; height: number; radius?: number | string }) {
   return (
     <div style={{ height: lineHeight, display: 'flex', alignItems: 'center' }}>
       <SkeletonBlock width={width} height={height} radius={radius} />
@@ -50,7 +50,7 @@ export function SkeletonLine({ width, lineHeight, height, radius = 4 }: { width:
 export function SkeletonPageHeader() {
   return (
     <div style={{ paddingLeft: 'var(--space-1)', display: 'flex', flexDirection: 'column' }}>
-      <SkeletonLine width={150} lineHeight={32} height={22} radius={6} />
+      <SkeletonLine width={150} lineHeight={32} height={22} radius={'var(--radius-sm)'} />
       <SkeletonLine width={290} lineHeight={22} height={14} />
     </div>
   )
@@ -83,12 +83,12 @@ export function SkeletonSectionCard({
 }) {
   return (
     <div style={{ border: '1px solid var(--border-default)', borderRadius: 'var(--radius-2xl)', boxShadow: SHADOW_CARD, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-3)', overflow: 'hidden', width: '100%', background }}>
-      <div style={{ borderBottom: headerDivider ? '1px solid var(--neutral-100)' : undefined, padding: headerDivider ? '0 24px 24px' : '0 24px', display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+      <div style={{ borderBottom: headerDivider ? '1px solid var(--neutral-100)' : undefined, padding: headerDivider ? '0 var(--space-6) var(--space-6)' : '0 var(--space-6)', display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
         <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
           <SkeletonLine width={titleWidth} lineHeight={22} height={16} />
           {subtitle && <SkeletonLine width={240} lineHeight={22} height={14} />}
         </div>
-        {action ?? (hasAction && <SkeletonBlock width={120} height={36} radius={10} />)}
+        {action ?? (hasAction && <SkeletonBlock width={120} height={36} radius={'var(--radius-lg)'} />)}
       </div>
       <div style={{ flex: '1 0 0', padding: bodyPadding, display: 'flex', flexDirection: 'column', justifyContent: bodyAlign, gap: bodyGap }}>
         {children}
@@ -101,7 +101,7 @@ export function SkeletonSectionCard({
 function SkeletonStatBlock({ bigWidth, captionWidth }: { bigWidth: number; captionWidth: number }) {
   return (
     <div>
-      <SkeletonLine width={bigWidth} lineHeight={34} height={24} radius={6} />
+      <SkeletonLine width={bigWidth} lineHeight={34} height={24} radius={'var(--radius-sm)'} />
       <div style={{ marginTop: 'var(--space-1-5)' }}><SkeletonLine width={captionWidth} lineHeight={22} height={14} /></div>
     </div>
   )
@@ -126,14 +126,14 @@ export function SkeletonTwoCardRow() {
             headerDivider={false}
             subtitle={false}
             titleWidth={40}
-            action={<SkeletonBlock width={41} height={20} radius={6} />}
+            action={<SkeletonBlock width={41} height={20} radius={'var(--radius-sm)'} />}
             background="linear-gradient(135deg, var(--neutral-white) 0%, var(--neutral-200) 100%)"
             bodyAlign="space-between"
           >
             <SkeletonStatBlock bigWidth={230} captionWidth={195} />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
-              <SkeletonBlock width={110} height={36} radius={10} />
-              <SkeletonBlock width={121} height={36} radius={10} />
+              <SkeletonBlock width={110} height={36} radius={'var(--radius-lg)'} />
+              <SkeletonBlock width={121} height={36} radius={'var(--radius-lg)'} />
             </div>
           </SkeletonSectionCard>
         </div>
@@ -141,19 +141,19 @@ export function SkeletonTwoCardRow() {
           <SkeletonSectionCard headerDivider={false} subtitle={false} titleWidth={130} background="var(--neutral-white)" bodyAlign="space-between" bodyGap={12}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                <SkeletonLine width={72} lineHeight={34} height={24} radius={6} />
-                <SkeletonBlock width={93} height={14} radius={4} />
+                <SkeletonLine width={72} lineHeight={34} height={24} radius={'var(--radius-sm)'} />
+                <SkeletonBlock width={93} height={14} radius={'var(--radius-xs)'} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <SkeletonLine width={197} lineHeight={20} height={13} />
                   <SkeletonLine width={26} lineHeight={20} height={13} />
                 </div>
-                <SkeletonBlock width="100%" height={6} radius={999} />
+                <SkeletonBlock width="100%" height={6} radius={'var(--radius-full)'} />
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <SkeletonBlock width={108} height={36} radius={10} />
+              <SkeletonBlock width={108} height={36} radius={'var(--radius-lg)'} />
             </div>
           </SkeletonSectionCard>
         </div>
@@ -166,12 +166,12 @@ export function SkeletonPaymentCard() {
   return (
     <SkeletonSectionCard titleWidth={65}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-        <SkeletonBlock width={63} height={44} radius={6} />
+        <SkeletonBlock width={63} height={44} radius={'var(--radius-sm)'} />
         <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column' }}>
           <SkeletonLine width={150} lineHeight={22} height={16} />
           <SkeletonLine width={100} lineHeight={22} height={14} />
         </div>
-        <SkeletonBlock width={148} height={36} radius={10} />
+        <SkeletonBlock width={148} height={36} radius={'var(--radius-lg)'} />
       </div>
     </SkeletonSectionCard>
   )
@@ -180,7 +180,7 @@ export function SkeletonPaymentCard() {
 export function SkeletonInvoiceCard({ rows = 1 }: { rows?: number }) {
   const cell: React.CSSProperties = { flex: '1 0 0', minWidth: 0 }
   return (
-    <SkeletonSectionCard titleWidth={110} action={<SkeletonBlock width={94} height={36} radius={10} />} bodyPadding="0 24px 12px">
+    <SkeletonSectionCard titleWidth={110} action={<SkeletonBlock width={94} height={36} radius={'var(--radius-lg)'} />} bodyPadding="0 24px 12px">
       <div style={{ background: 'var(--neutral-white)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', boxShadow: SHADOW_TILE }}>
         <div style={{ display: 'flex', gap: 'var(--space-6)', padding: '0 var(--space-3) var(--space-3)', borderBottom: '1px solid var(--neutral-100)' }}>
           {[32, 55, 45].map(w => <div key={w} style={cell}><SkeletonLine width={w} lineHeight={22} height={13} /></div>)}
@@ -190,7 +190,7 @@ export function SkeletonInvoiceCard({ rows = 1 }: { rows?: number }) {
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-6)', padding: 'var(--space-3)', borderBottom: i < rows - 1 ? '1px solid var(--neutral-100)' : undefined }}>
             <div style={cell}><SkeletonLine width={84} lineHeight={22} height={14} /></div>
             <div style={cell}><SkeletonLine width={56} lineHeight={22} height={14} /></div>
-            <div style={cell}><SkeletonLine width={31} lineHeight={24} height={20} radius={6} /></div>
+            <div style={cell}><SkeletonLine width={31} lineHeight={24} height={20} radius={'var(--radius-sm)'} /></div>
             <div style={{ width: 200, display: 'flex', justifyContent: 'center' }}><SkeletonLine width={32} lineHeight={22} height={14} /></div>
           </div>
         ))}
@@ -214,11 +214,11 @@ export function EnterprisePlansSkeleton({ isAdmin }: { isAdmin: boolean }) {
         {/* Overage spend limit card */}
         <SkeletonSectionCard hasAction>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--space-1-5)' }}>
-            <SkeletonBlock width={80} height={24} radius={6} />
-            <SkeletonBlock width={160} height={14} radius={4} />
+            <SkeletonBlock width={80} height={24} radius={'var(--radius-sm)'} />
+            <SkeletonBlock width={160} height={14} radius={'var(--radius-xs)'} />
           </div>
-          <SkeletonBlock width="100%" height={4} radius={2} />
-          <SkeletonBlock width={220} height={14} radius={4} />
+          <SkeletonBlock width="100%" height={4} radius={'var(--radius-2xs)'} />
+          <SkeletonBlock width={220} height={14} radius={'var(--radius-xs)'} />
         </SkeletonSectionCard>
 
         {isAdmin && <SkeletonPaymentCard />}
@@ -261,10 +261,10 @@ export function PersonalPlansSkeleton() {
           {[0, 1, 2].map(i => (
             <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <SkeletonBlock width={50} height={14} radius={4} />
-                <SkeletonBlock width={90} height={14} radius={4} />
+                <SkeletonBlock width={50} height={14} radius={'var(--radius-xs)'} />
+                <SkeletonBlock width={90} height={14} radius={'var(--radius-xs)'} />
               </div>
-              <SkeletonBlock width="100%" height={4} radius={2} />
+              <SkeletonBlock width="100%" height={4} radius={'var(--radius-2xs)'} />
             </div>
           ))}
         </SkeletonSectionCard>

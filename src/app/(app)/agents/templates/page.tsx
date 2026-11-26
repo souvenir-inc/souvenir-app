@@ -89,7 +89,7 @@ const CARD_HEIGHT = PERSONA_CARD_HEIGHT
 // Three columns of agent cards; the page is as wide as the three plus their gaps.
 const GRID_GAP = 16
 const GRID_WIDTH = CARD_WIDTH * 3 + GRID_GAP * 2
-const GRID_STYLE: React.CSSProperties = { display: 'grid', gridTemplateColumns: `repeat(3, ${CARD_WIDTH}px)`, gap: GRID_GAP }
+const GRID_STYLE: React.CSSProperties = { display: 'grid', gridTemplateColumns: `repeat(3, ${CARD_WIDTH}px)`, gap: GRID_GAP /* ds-keep: also used in layout maths */ }
 
 function TemplateCard({ name, onClick, disabled }: { name: string; onClick: () => void; disabled?: boolean }) {
   return (
@@ -134,7 +134,7 @@ function CustomCard({ onClick, disabled }: { onClick: () => void; disabled?: boo
         width: GRID_WIDTH,
         boxShadow: hovered
           ? '0px 8px 16px 0px color-mix(in srgb, var(--blue-100) 50%, transparent), 0px 0px 0px 1px var(--neutral-100)'
-          : '0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
+          : 'var(--shadow-tile)',
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.6 : 1,
         transform: hovered ? 'translateY(-1px)' : 'none',

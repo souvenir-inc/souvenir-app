@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { StepCanvas, StepHeader, StepFooter, FieldLabel, useLeaveGuard, LeaveGuardModal } from "../_components/step-shell";
 import { ONBOARDING_PROFILE_ROUTE, WELCOME_ROUTE } from "@/lib/routes";
 import { isValidEmail, suggestEmail } from "@/lib/email/check";
+import { DURATION } from "@/styles/tokens/motion"
 
 // What's wrong with what was typed, shown under the box (the text stays in the box to fix):
 // a bad format, an address already added, or a likely domain typo with a suggested fix.
@@ -272,10 +273,10 @@ export default function OnboardingInvitePage() {
             borderRadius: 'var(--radius-lg)',
             backgroundColor: "var(--static-white)",
             boxShadow: problem?.kind === "invalid"
-              ? "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--red-500)"
+              ? "var(--invite-shadow)"
               : problem?.kind === "suggest"
-                ? "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--yellow-500)"
-                : "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)",
+                ? "var(--invite-shadow-2)"
+                : "var(--shadow-control)",
             transition: "box-shadow var(--duration-fast) ease",
             boxSizing: "border-box",
             alignContent: "flex-start",
@@ -289,7 +290,7 @@ export default function OnboardingInvitePage() {
                 initial={{ opacity: 0, scale: 0.85 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.85 }}
-                transition={{ duration: 0.12 }}
+                transition={{ duration: DURATION.fast }}
                 style={{ display: "flex", alignItems: "center", gap: 'var(--space-0-5)' }}
               >
                 <Badge label={email} color={CHIP_COLORS[i % CHIP_COLORS.length]} />

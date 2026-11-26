@@ -174,7 +174,7 @@ export function RtfPreview({ file, serverFailed = false, children }: RtfPreviewP
     if (source.data === undefined || (isRtfDocument(source.data) && !serverFailed)) return null
     return `<style>${RTF_STYLES}</style>${rtfToHtml(source.data)}`
   }, [source.data, serverFailed])
-  if (source.isPending) return <Skeleton height={420} radius={8} style={{ width: '100%' }} />
+  if (source.isPending) return <Skeleton height={420} radius={'var(--radius-md)'} style={{ width: '100%' }} />
   if (html === null) return <>{children}</>
   return <HtmlFrame html={html} title={`Preview of ${file.name}`} />
 }
@@ -201,7 +201,7 @@ export default function SourceViewer({ file, fallback }: SourceViewerProps) {
   const [wrap, setWrap] = useState(true)
   const title = `Preview of ${file.name}`
 
-  if (source.isPending) return <Skeleton height={420} radius={8} style={{ width: '100%' }} />
+  if (source.isPending) return <Skeleton height={420} radius={'var(--radius-md)'} style={{ width: '100%' }} />
   if (source.isError || source.data === undefined) return <>{fallback}</>
 
   const text = source.data

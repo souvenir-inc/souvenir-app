@@ -10,6 +10,7 @@ import { Badge } from '@/components/Badge'
 import { RoleBadge } from '@/components/RoleBadge'
 import { cn } from '@/lib/utils'
 import { getGradient } from '@/lib/team-gradients'
+import { DURATION } from "@/styles/tokens/motion"
 
 // Deterministic gradient palette — src/lib/team-gradients.ts. Each team gets
 // a unique gradient from its name. Stable — same name = same color.
@@ -56,7 +57,7 @@ function TeamAvatar({ teamId, name, size = 20 }: { teamId: string; name: string;
           inset:         0,
           borderRadius:  'var(--radius-xs)',
           pointerEvents: 'none',
-          boxShadow:     'inset 0px 4px 4px 0px color-mix(in srgb, var(--static-black) 25%, transparent), inset 0px -1px 0.4px 0px rgba(18,60,95,0.65)',
+          boxShadow:     'var(--team-switcher-shadow)',
         }}
       />
       <span
@@ -209,8 +210,8 @@ export const TeamSwitcher = React.forwardRef<HTMLDivElement, TeamSwitcherProps>(
             <motion.div
               key="team-switcher-panel"
               initial={{ opacity: 0, scaleX: 0.96, scaleY: 0.75, transformOrigin: 'top center' }}
-              animate={{ opacity: 1, scaleX: 1, scaleY: 1, transition: { duration: 0.18, ease: [0.16, 1, 0.3, 1] } }}
-              exit={{ opacity: 0, scaleY: 0.85, transition: { duration: 0.1, ease: [0.55, 0.085, 0.68, 0.53] } }}
+              animate={{ opacity: 1, scaleX: 1, scaleY: 1, transition: { duration: DURATION.base, ease: [0.16, 1, 0.3, 1] } }}
+              exit={{ opacity: 0, scaleY: 0.85, transition: { duration: DURATION.snap, ease: [0.55, 0.085, 0.68, 0.53] } }}
               style={{
                 position:     'absolute',
                 top:          'calc(100% + 4px)',
@@ -268,7 +269,7 @@ export const TeamSwitcher = React.forwardRef<HTMLDivElement, TeamSwitcherProps>(
                   style={{
                     overflowY: teams.length > 5 ? 'auto' : 'visible',
                     maxHeight: teams.length > 5 ? `${5 * 44}px` : 'none',
-                    padding:   teams.length > 5 ? '3px' : 0,
+                    padding:   teams.length > 5 ? 'var(--space-0-75)' : 0,
                   }}
                 >
                   {teams.map(team => (

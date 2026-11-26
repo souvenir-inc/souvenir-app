@@ -5,6 +5,7 @@ import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { AIModel } from "@/types/ai-model";
 import { ModelIcon } from "@/components/ModelIcon";
+import { SPRING } from "@/styles/tokens/motion"
 
 interface ModelSwitchDialogProps {
   isOpen: boolean;
@@ -44,7 +45,7 @@ export function ModelSwitchDialog({
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            transition={{ type: "spring", ...SPRING.brisk }}
             role="alertdialog"
             aria-labelledby="model-switch-title"
             aria-describedby="model-switch-desc"

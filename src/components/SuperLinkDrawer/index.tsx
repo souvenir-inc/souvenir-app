@@ -17,6 +17,7 @@ import { TokenBudgetBar } from '@/components/TokenBudgetBar'
 import { springs } from '@/lib/springs'
 import { cn } from '@/lib/utils'
 import type { SuperLinkStatus } from '@/components/SuperLinkRow'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -318,7 +319,7 @@ export function SuperLinkDrawer({ ref, link, onClose, onStatusChange, onLimitCha
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{    opacity: 0 }}
-            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: DURATION.base, ease: [0.16, 1, 0.3, 1] }}
             style={{
               position:        'fixed',
               inset:           0,

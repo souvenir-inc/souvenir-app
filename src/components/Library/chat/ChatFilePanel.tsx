@@ -17,7 +17,7 @@ import { FormatGlyph } from '../FormatGlyph'
 import { GoneState, LockedState } from '../FileStates'
 import styles from './LibraryChat.module.css'
 
-const FilePreview = dynamic(() => import('../viewers/FilePreview'), { ssr: false, loading: () => <Skeleton height={240} radius={12} /> })
+const FilePreview = dynamic(() => import('../viewers/FilePreview'), { ssr: false, loading: () => <Skeleton height={240} radius={'var(--radius-xl)'} /> })
 
 export interface ChatFilePanelProps {
   fileId: string
@@ -60,7 +60,7 @@ export function ChatFilePanel({ fileId, cite = null, onClose }: ChatFilePanelPro
       </div>
       <div className={styles.panelBody} style={{ padding: 'var(--space-5)' }}>
         {file.isPending ? (
-          <Skeleton height={240} radius={12} />
+          <Skeleton height={240} radius={'var(--radius-xl)'} />
         ) : locked ? (
           <LockedState fileId={fileId} requested={isAccessRequested(file.error)} />
         ) : gone || !open ? (

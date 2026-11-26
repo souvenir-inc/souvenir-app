@@ -6,6 +6,7 @@ import { CopyOneIcon } from '@strange-huge/icons'
 import { springs } from '@/lib/springs'
 import { StreamingContentRenderer } from './StreamingContentRenderer'
 import { BreathingDot } from '@/components/BreathingDot'
+import { BLUR, DURATION, LONG } from "@/styles/tokens/motion"
 
 // ── Streaming typewriter hook ─────────────────────────────────────────────────
 // RAF ease-out lerp: reveals ~6% of remaining chars per 16ms frame.
@@ -69,7 +70,7 @@ export function StreamCursor() {
         verticalAlign:   'text-bottom',
       }}
       animate={{ opacity: [1, 0, 1] }}
-      transition={{ duration: 0.9, repeat: Infinity, ease: 'easeInOut' }}
+      transition={{ duration: LONG.xs, repeat: Infinity, ease: 'easeInOut' }}
     />
   )
 }
@@ -104,7 +105,7 @@ const renderInline = (text: string, keyPrefix: string): Array<string | JSX.Eleme
           href={match[4]}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: 'var(--brown-500)', textDecoration: 'underline', textUnderlineOffset: '2px' }}
+          style={{ color: 'var(--brown-500)', textDecoration: 'underline', textUnderlineOffset: 'var(--underline-offset)' }}
         >
           {match[3]}
         </a>
@@ -120,7 +121,7 @@ const renderInline = (text: string, keyPrefix: string): Array<string | JSX.Eleme
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: 'var(--brown-500)', textDecoration: 'underline', textUnderlineOffset: '2px' }}
+          style={{ color: 'var(--brown-500)', textDecoration: 'underline', textUnderlineOffset: 'var(--underline-offset)' }}
         >
           {display}
         </a>
@@ -362,7 +363,7 @@ export function StreamingMessageBubble({
 
   return (
     <m.div
-      initial={{ opacity: 0, y: 6, filter: 'blur(4px)' }}
+      initial={{ opacity: 0, y: 6, filter: `blur(${BLUR.xs}px)` }}
       animate={{ opacity: 1, y: 0,  filter: 'blur(0px)', transitionEnd: { filter: 'none' } }}
       transition={springs.moderate}
     >

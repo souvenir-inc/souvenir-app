@@ -3,6 +3,7 @@
 import React, { useCallback, useRef, useState } from 'react'
 import { AnimatePresence, m, useAnimation } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -98,7 +99,7 @@ export function ChipInput(
         if (inputRef.current) inputRef.current.value = value
         shakeControls.start({
           x: [0, -3, 3, -2, 2, -1, 1, 0],
-          transition: { duration: 0.25, ease: 'easeInOut' },
+          transition: { duration: DURATION.moderate, ease: 'easeInOut' },
         })
         return
       }
@@ -139,9 +140,9 @@ export function ChipInput(
             <m.span
               key="placeholder"
               aria-hidden
-              initial={{ opacity: 0, filter: 'blur(2px)' }}
-              animate={{ opacity: 1, filter: 'blur(0px)', transition: { duration: 0.2 } }}
-              exit={{    opacity: 0, filter: 'blur(2px)', transition: { duration: 0.15 } }}
+              initial={{ opacity: 0, filter: `blur(${BLUR['2xs']}px)` }}
+              animate={{ opacity: 1, filter: 'blur(0px)', transition: { duration: DURATION.base } }}
+              exit={{    opacity: 0, filter: `blur(${BLUR['2xs']}px)`, transition: { duration: DURATION.quick } }}
               style={{
                 position:      'absolute',
                 top:           2,

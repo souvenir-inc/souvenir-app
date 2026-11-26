@@ -10,6 +10,7 @@ import {
 import { IconButton } from "@/components/ui/button";
 import { Tooltip } from "@/components/Tooltip";
 import { AudioWaveDisplay } from "@/components/shared/AudioWaveDisplay";
+import { BLUR, DURATION, SPRING } from "@/styles/tokens/motion"
 
 interface SubmitControlsProps {
   value: string;
@@ -100,18 +101,17 @@ export function SubmitControls({
                     initial={
                       isWave
                         ? { scale: 0.5, opacity: 0 }
-                        : { scale: 0.5, opacity: 0, filter: "blur(4px)" }
+                        : { scale: 0.5, opacity: 0, filter: `blur(${BLUR.xs}px)` }
                     }
                     animate={
                       isWave
                         ? { scale: 1, opacity: 1 }
                         : { scale: 1, opacity: 1, filter: "blur(0px)", transitionEnd: { filter: "none" } }
                     }
-                    exit={{ scale: 0.5, opacity: 0, filter: "blur(4px)" }}
+                    exit={{ scale: 0.5, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                     transition={{
                       type: "spring",
-                      stiffness: 500,
-                      damping: 30,
+                      ...SPRING.snappy,
                     }}
                     style={{
                       display: "flex",
@@ -161,14 +161,14 @@ export function SubmitControls({
             key="queue"
             initial={reduceMotion
               ? { opacity: 0 }
-              : { opacity: 0, width: 0, marginLeft: -8, scale: 0.6, overflow: "hidden" }}
+              : { opacity: 0, width: 0, marginLeft: -8 /* ds-keep: animated by framer-motion */, scale: 0.6, overflow: "hidden" }}
             animate={reduceMotion
               ? { opacity: 1 }
               : { opacity: 1, width: 36, marginLeft: 0, scale: 1, transitionEnd: { overflow: "visible" } }}
             exit={reduceMotion
               ? { opacity: 0 }
-              : { opacity: 0, width: 0, marginLeft: -8, scale: 0.6, overflow: "hidden" }}
-            transition={reduceMotion ? { duration: 0.12 } : { type: "spring", stiffness: 500, damping: 36 }}
+              : { opacity: 0, width: 0, marginLeft: -8 /* ds-keep: animated by framer-motion */, scale: 0.6, overflow: "hidden" }}
+            transition={reduceMotion ? { duration: DURATION.fast } : { type: "spring", ...SPRING.settle }}
             onMouseEnter={() => setIsQueueHovered(true)}
             onMouseLeave={() => setIsQueueHovered(false)}
             style={{ display: "inline-flex", flexShrink: 0 }}

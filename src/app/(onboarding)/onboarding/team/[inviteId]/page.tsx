@@ -134,7 +134,7 @@ function WorkspaceJoinCard({
         <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)' }}>
           <div style={{ display: "flex", alignItems: "center" }}>
             {shown.map((member, i) => (
-              <span key={member.userId || member.email || i} style={{ marginLeft: i === 0 ? 0 : -8 }}>
+              <span key={member.userId || member.email || i} style={{ marginLeft: i === 0 ? 0 : "calc(var(--space-2) * -1)" }}>
                 <MemberAvatar member={member} />
               </span>
             ))}

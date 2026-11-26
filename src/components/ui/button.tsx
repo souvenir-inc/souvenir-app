@@ -8,6 +8,7 @@ import { ArrowUpTwoIcon, CancelOneIcon, CheckmarkCircleTwoIcon, PlusSignIcon, Ti
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/Tooltip'
 import { Spinner } from '@/components/Spinner'
+import { DURATION, SPRING } from "@/styles/tokens/motion"
 
 // Every Button / IconButton, styled after the shadcnspace button set:
 //   12 Default ........ black; 09 Outline With Icon / 13–15 sizes share the same base (no hover lift)
@@ -31,7 +32,7 @@ const BASE =
   'border border-transparent [font-family:var(--font-title)] font-[var(--font-weight-medium)] ' +
   'text-[length:var(--font-size-body)] leading-[var(--line-height-body)] ' +
   'transition-[background-color,border-color,box-shadow,filter,translate,scale,opacity] duration-base ' +
-  'cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[var(--focus-ring)] ' +
+  'cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--focus-ring)] ' +
   'active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 ' +
   // Disabled: no hover wash, lift or press (pointer events stay on so the not-allowed cursor shows).
   'disabled:hover:[background-image:none] disabled:data-[active=true]:[background-image:none] disabled:hover:[filter:none] disabled:active:scale-100 disabled:hover:scale-100 ' +
@@ -44,7 +45,7 @@ const HOVER_LAYER =
 
 // Solid colour buttons (danger / save / cancel / reject): white text, a slightly darker fill on hover.
 // Class names are written out in full — Tailwind only generates classes it can read in the source.
-const SOLID = '[box-shadow:0_1px_2px_rgba(0,0,0,0.12)]'
+const SOLID = '[box-shadow:var(--button-raised-shadow)]'
 // The dark default button: a flat fill with the same small shadow as the solid buttons (no 3D bevel,
 // ring or hover lift), so it sits at the same visual weight and size as danger / cancel.
 const PRIMARY_FLAT = cn(
@@ -103,7 +104,7 @@ export const buttonVariants = cva(BASE, {
       md: 'min-h-9 gap-1 rounded-lg px-3.5',
       sm: 'min-h-8 gap-1 rounded-md px-2.5',
       xs: 'min-h-6 gap-0.5 rounded-sm px-1.5 text-xs leading-4',
-      lg: 'min-h-10 gap-1.5 rounded-lg px-[22px]',
+      lg: 'min-h-10 gap-1.5 rounded-lg px-[var(--button-lg-padding-x)]',
     },
   },
   defaultVariants: { variant: 'default', size: 'md' },
@@ -207,7 +208,7 @@ export function Button({
         initial={sendState === 'success' ? { opacity: 0, scale: 0.8 } : { opacity: 0, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={sendState === 'success' ? { opacity: 0, scale: 0.8 } : { opacity: 0, y: -8 }}
-        transition={sendState === 'success' ? { type: 'spring', stiffness: 350, damping: 22 } : { duration: 0.2 }}
+        transition={sendState === 'success' ? { type: 'spring', ...SPRING.springy } : { duration: DURATION.base }}
         className="flex items-center gap-1.5"
       >
         {slot(sendState === 'loading' ? <Spinner size={iconPx} /> : sendState === 'success' ? <TickTwoIcon size={iconPx} /> : (startIcon ?? <ArrowUpTwoIcon size={iconPx} />))}

@@ -23,6 +23,7 @@ import { BellRingIcon } from '@/components/BellRingIcon'
 import { AgentHero } from '@/components/PersonaCard/AgentHero'
 import { formatRelativeTime, parseServerDate } from '@/lib/utils/format-utils'
 import type { AppNotification, NotificationKind } from '@/lib/notifications/types'
+import { DURATION, SPRING, LONG } from "@/styles/tokens/motion"
 
 // ── NotificationPanel ────────────────────────────────────────────────────────
 // The bell's flyout. Presentational only — the sidebar bell feeds it from
@@ -129,7 +130,7 @@ function groupByDay(list: AppNotification[]): Array<{ label: string; items: AppN
 // ── Leading tile ──────────────────────────────────────────────────────────────
 
 const TILE = 32
-const TILE_RADIUS = 8
+const TILE_RADIUS = 'var(--radius-md)'
 
 /**
  * An agent row leads with the agent's own avatar tile — the same AgentHero the
@@ -246,7 +247,7 @@ function NotificationRow({ notification: n, unread, onSelect, onMarkRead, onMark
           aria-hidden
           initial={{ opacity: 1 }}
           animate={{ opacity: 0 }}
-          transition={{ duration: 1.4, delay: 0.35, ease: [0.4, 0, 0.2, 1] }}
+          transition={{ duration: LONG.md, delay: DURATION.slow, ease: [0.4, 0, 0.2, 1] }}
           style={{ position: 'absolute', inset: 0, borderRadius: 'var(--radius-md)', zIndex: -1, pointerEvents: 'none', backgroundColor: 'var(--color-tag-Blue-bg)' }}
         />
       )}
@@ -325,7 +326,7 @@ function NotificationRow({ notification: n, unread, onSelect, onMarkRead, onMark
             aria-label="Notification actions"
             initial={{ opacity: 0, scale: 0.92, x: 6 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.96, x: 4, transition: { duration: 0.12, ease: [0.4, 0, 1, 1] } }}
+            exit={{ opacity: 0, scale: 0.96, x: 4, transition: { duration: DURATION.fast, ease: [0.4, 0, 1, 1] } }}
             transition={PILL_SPRING}
             onClick={e => e.stopPropagation()}
             style={{
@@ -353,8 +354,8 @@ function NotificationRow({ notification: n, unread, onSelect, onMarkRead, onMark
   )
 }
 
-const DOT_SPRING  = { type: 'spring' as const, stiffness: 600, damping: 30 }
-const PILL_SPRING = { type: 'spring' as const, stiffness: 520, damping: 32, mass: 0.7 }
+const DOT_SPRING  = { type: 'spring' as const, ...SPRING.snappy }
+const PILL_SPRING = { type: 'spring' as const, ...SPRING.crisp }
 
 function RowAction({ label, shortcut, icon, onClick }: {
   label:    string
@@ -515,7 +516,7 @@ const EASE_IN  = [0.4, 0, 1, 1] as const
 const TAB_SWAP = {
   enter:  (dir: number) => ({ opacity: 0, x: dir * 18, filter: 'blur(3px)' }),
   center: { opacity: 1, x: 0, filter: 'blur(0px)', transition: { duration: 0.32, ease: EASE_OUT } },
-  exit:   (dir: number) => ({ opacity: 0, x: dir * -18, filter: 'blur(3px)', transition: { duration: 0.16, ease: EASE_IN } }),
+  exit:   (dir: number) => ({ opacity: 0, x: dir * -18, filter: 'blur(var(--notification-panel-blur))', transition: { duration: 0.16, ease: EASE_IN } }),
 }
 
 /** Animates its own height to whatever its content measures, so the panel
@@ -537,7 +538,7 @@ function AutoHeight({ children }: { children: React.ReactNode }) {
     <m.div
       initial={false}
       animate={{ height }}
-      transition={reduceMotion ? { duration: 0 } : { duration: 0.3, ease: EASE_OUT }}
+      transition={reduceMotion ? { duration: 0 } : { duration: DURATION.slow, ease: EASE_OUT }}
       style={{ overflow: 'hidden' }}
     >
       <div ref={innerRef} style={{ position: 'relative' }}>{children}</div>
@@ -597,8 +598,8 @@ export function NotificationPanel({
           key={n.id}
           initial={{ opacity: 0, height: 0, y: -4 }}
           animate={{ opacity: 1, height: 'auto', y: 0 }}
-          exit={{ opacity: 0, height: 0, transition: { height: { duration: 0.22, ease: [0.4, 0, 0.2, 1] }, opacity: { duration: 0.12 } } }}
-          transition={{ height: { duration: 0.24, ease: [0.16, 1, 0.3, 1] }, opacity: { duration: 0.2 }, y: { duration: 0.24, ease: [0.16, 1, 0.3, 1] } }}
+          exit={{ opacity: 0, height: 0, transition: { height: { duration: DURATION.base, ease: [0.4, 0, 0.2, 1] }, opacity: { duration: DURATION.fast } } }}
+          transition={{ height: { duration: DURATION.moderate, ease: [0.16, 1, 0.3, 1] }, opacity: { duration: DURATION.base }, y: { duration: DURATION.moderate, ease: [0.16, 1, 0.3, 1] } }}
         >
           <NotificationRow
             notification={n}

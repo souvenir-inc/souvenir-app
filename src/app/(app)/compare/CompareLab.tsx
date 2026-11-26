@@ -89,7 +89,7 @@ function Scoreboard({ runs, steps }: { runs: Record<Side, Run>; steps: Record<Si
               <span style={{ height: 8, borderRadius: "0 var(--radius-xs) var(--radius-xs) 0", backgroundColor: "var(--neutral-100)", overflow: "hidden" }}>
                 <span style={{ display: "block", height: "100%", width: `${(value / max) * 100}%`, backgroundColor: color, borderRadius: "0 var(--radius-xs) var(--radius-xs) 0" }} />
               </span>
-              <span style={{ textAlign: "right", fontFamily: "var(--font-code)", fontSize: 'var(--font-size-body-sm)', fontWeight: wins ? 600 : 400, color: wins ? "var(--green-700)" : "var(--neutral-900)" }}>{format(value)}</span>
+              <span style={{ textAlign: "right", fontFamily: "var(--font-code)", fontSize: 'var(--font-size-body-sm)', fontWeight: wins ? "var(--font-weight-semibold)" : "var(--font-weight-regular)", color: wins ? "var(--green-700)" : "var(--neutral-900)" }}>{format(value)}</span>
             </div>
           );
         })}

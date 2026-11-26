@@ -19,7 +19,7 @@ export function OfflineBar() {
         <WifiOff aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0" />
         <span className="truncate">You’re offline. Showing data from {clock(s.offlineSince ?? s.now)}.</span>
         <span aria-hidden className="w-2 shrink-0" />
-        <Spinner className="border-white/25 border-t-[var(--dashboard-window-bar-muted)]" />
+        <Spinner className="border-[color-mix(in_oklab,var(--static-white)_25%,transparent)] border-t-[var(--dashboard-window-bar-muted)]" />
         <span className="shrink-0 text-[var(--dashboard-window-bar-muted)]">Reconnecting…</span>
       </div>
     )

@@ -10,6 +10,7 @@ import { Badge, type BadgeColor } from '@/components/Badge'
 import { OptionRow } from '@/components/OptionRow'
 import { springs } from '@/lib/springs'
 import { cn } from '@/lib/utils'
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -85,7 +86,7 @@ const VISUALLY_HIDDEN: React.CSSProperties = {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const CARD_SHADOW = '0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(59,54,50,0.1)'
+const CARD_SHADOW = 'var(--question-card-card-shadow)'
 
 // ── SkipButton ────────────────────────────────────────────────────────────────
 
@@ -105,7 +106,7 @@ function SkipButton({ onClick, disabled }: { onClick?: React.MouseEventHandler<H
         padding:      'var(--space-1-5) var(--space-2-5) var(--space-2)',
         borderRadius: 'var(--radius-lg)',
         border:       'none',
-        boxShadow:    hovered ? '0px 0px 0px 1px rgba(59,54,50,0.5)' : '0px 0px 0px 1px rgba(59,54,50,0.3)',
+        boxShadow:    hovered ? 'var(--question-card-shadow)' : 'var(--shadow-ring-strong)',
         background:   hovered ? 'var(--neutral-50)' : 'transparent',
         cursor:       disabled ? 'not-allowed' : 'pointer',
         opacity:      disabled ? 0.6 : 1,
@@ -150,7 +151,7 @@ function SendButton({ onClick, disabled, pending }: { onClick?: React.MouseEvent
         cursor:         disabled || pending ? 'not-allowed' : 'pointer',
         opacity:        disabled || pending ? 0.6 : 1,
         overflow:       'hidden',
-        boxShadow:      '0px 0px 0px 1px var(--neutral-black, black), 0px 1.091px 1.091px 0px rgba(59,54,50,0.1), 0px 1.455px 3.127px 0px rgba(59,54,50,0.4)',
+        boxShadow:      'var(--shadow-pill-active)',
       }}
     >
       <div
@@ -167,7 +168,7 @@ function SendButton({ onClick, disabled, pending }: { onClick?: React.MouseEvent
         aria-hidden
         style={{
           position:      'absolute', inset: 0, borderRadius: 'inherit',
-          boxShadow:     'inset 0px 1px 0.364px 0px color-mix(in srgb, var(--static-white) 30%, transparent), inset 0px -2.182px 0.364px 0px #120c08, inset 0px -2.545px 4px -2.182px color-mix(in srgb, var(--static-white) 50%, transparent)',
+          boxShadow:     'var(--question-card-shadow-2)',
           pointerEvents: 'none',
         }}
       />
@@ -190,7 +191,7 @@ function RankableRow({ option, index }: { option: QuestionCardOption; index: num
       whileDrag={{
         cursor:    'grabbing',
         zIndex:    'var(--z-raised)',
-        boxShadow: '0px 8px 24px rgba(82,75,71,0.18), 0px 0px 0px 1px rgba(212, 212, 212,0.3)',
+        boxShadow: 'var(--question-card-shadow-3)',
       }}
       style={{
         listStyle:   'none',
@@ -239,8 +240,8 @@ function InfoCardBody({ options, selected, onSelect }: {
         <m.div
           key={opt?.id ?? currentIdx}
           initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0, transition: { duration: 0.15, ease: 'easeOut' } }}
-          exit={{ opacity: 0, y: -4, transition: { duration: 0.1, ease: 'easeIn' } }}
+          animate={{ opacity: 1, y: 0, transition: { duration: DURATION.quick, ease: 'easeOut' } }}
+          exit={{ opacity: 0, y: -4, transition: { duration: DURATION.snap, ease: 'easeIn' } }}
           style={{
             padding:         'var(--space-2-5) var(--space-3)',
             minHeight:       56,
@@ -492,7 +493,7 @@ export function QuestionCard(
         aria-labelledby={questionId}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0, transition: springs.moderate }}
-        exit={{ opacity: 0, y: 12, transition: { duration: 0.1, ease: 'easeIn' } }}
+        exit={{ opacity: 0, y: 12, transition: { duration: DURATION.snap, ease: 'easeIn' } }}
         style={{
           backgroundColor: 'var(--neutral-white, white)',
           borderRadius:    'var(--radius-2xl)',
@@ -550,7 +551,7 @@ export function QuestionCard(
                     }}>
                       <span style={{
                         fontFamily:  'var(--font-body)',
-                        fontWeight:  isCurrent ? 700 : 'var(--font-weight-medium)',
+                        fontWeight:  isCurrent ? 'var(--font-weight-bold)' : 'var(--font-weight-medium)',
                         fontSize:    'var(--font-size-caption)',
                         lineHeight:  'var(--question-card-meta-line-height)',
                         display:     'block',
@@ -668,8 +669,8 @@ export function QuestionCard(
               <m.div
                 key={optionsKey}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 1, transition: { duration: 0.15, ease: 'easeOut' } }}
-                exit={{ opacity: 0, transition: { duration: 0.08, ease: 'easeIn' } }}
+                animate={{ opacity: 1, transition: { duration: DURATION.quick, ease: 'easeOut' } }}
+                exit={{ opacity: 0, transition: { duration: DURATION.instant, ease: 'easeIn' } }}
                 style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}
                 role={type === 'single' ? 'radiogroup' : 'group'}
                 aria-labelledby={questionId}
@@ -708,9 +709,9 @@ export function QuestionCard(
               {showEditBadge && (
                 <m.div
                   key="edit-badge"
-                  initial={{ opacity: 0, scale: 0.5, filter: 'blur(4px)' }}
+                  initial={{ opacity: 0, scale: 0.5, filter: `blur(${BLUR.xs}px)` }}
                   animate={{ opacity: 1, scale: 1, filter: 'blur(0px)', transition: springs.fast }}
-                  exit={{ opacity: 0, scale: 0.5, filter: 'blur(4px)', transition: { duration: 0.08, ease: 'easeIn' as const } }}
+                  exit={{ opacity: 0, scale: 0.5, filter: `blur(${BLUR.xs}px)`, transition: { duration: DURATION.instant, ease: 'easeIn' as const } }}
                   style={{ flexShrink: 0 }}
                 >
                   <OptionBadge variant="edit" />

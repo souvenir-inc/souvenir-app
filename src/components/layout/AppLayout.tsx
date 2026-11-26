@@ -40,6 +40,7 @@ import {
   CHATS_ROUTE,
   TEMPLATE_BASE_ROUTE,
 } from "@/lib/routes";
+import { SPRING } from "@/styles/tokens/motion"
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -245,7 +246,7 @@ export function AppLayout({
             flex:      "1 0 0",
             minHeight: 0,
             display:   "flex",
-            padding:   isSlackPage ? 0 : "10px 10px 10px 0",
+            padding:   isSlackPage ? 0 : "var(--space-2-5) var(--space-2-5) var(--space-2-5) 0",
           }}
         >
         {(isPersonaPage && !isPersonaChatPage) || isSlackPage ? (
@@ -284,7 +285,7 @@ export function AppLayout({
               flexDirection:   "column",
               alignItems:      "flex-start",
               gap:             "var(--space-0-5)",
-              padding:         usesTightCard ? "3px" : "12px",
+              padding:         usesTightCard ? "var(--space-0-75)" : "var(--space-3)",
               borderRadius:    "var(--layout-radius)",
               border:          "1px solid var(--border-default)",
               backgroundColor: "var(--color-surface-container)",
@@ -321,7 +322,7 @@ export function AppLayout({
                 overscrollBehaviorY: (isPersonaChatPage || usesTightCard) ? undefined : "contain",
                 display:             "flex",
                 flexDirection:       "column",
-                paddingRight:        reserveChatToolsGutter ? 40 : undefined,
+                paddingRight:        reserveChatToolsGutter ? "var(--space-8)" : undefined,
                 boxSizing:           "border-box",
               }}
             >
@@ -392,7 +393,7 @@ function ProjectPanelSidebar() {
     <m.div
       animate={isOpen ? { width: 356, opacity: 1 } : { width: 0, opacity: 0 }}
       initial={{ width: 0, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 260, damping: 32, mass: 0.9 }}
+      transition={{ type: "spring", ...SPRING.glide }}
       onAnimationComplete={() => {
         if (isOpen) setSettled(true);
         else setShownPanel(null);
@@ -426,7 +427,7 @@ function ProjectPanelSidebar() {
             // The panel starts at the window's top (the card starts 11px lower), so 19px of padding puts
             // its title and close button on the TopBar's 19–51px band, as the left sidebar's header is.
             minHeight:      51,
-            padding:        `19px 16px 0 ${sidePadding}px`,
+            padding:        `var(--app-layout-padding) var(--space-4) 0 ${sidePadding}px`,
             flexShrink:     0,
           }}
         >
@@ -468,7 +469,7 @@ function ProjectPanelSidebar() {
             scrollbarGutter: "stable both-edges",
           }}
         >
-          <div style={{ padding: `14px ${sidePadding}px ${sidePadding}px`, boxSizing: "border-box", height: "100%" }}>
+          <div style={{ padding: `var(--space-3-5) ${sidePadding}px ${sidePadding}px`, boxSizing: "border-box", height: "100%" }}>
             {(settled || !isOpen) && panel?.content}
           </div>
         </div>

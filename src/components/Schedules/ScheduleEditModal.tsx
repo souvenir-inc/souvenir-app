@@ -154,7 +154,7 @@ export function ScheduleEditModal({ isOpen, schedule, onSave, onClose }: Schedul
               placeholder="Describe what Task should do on each run…"
               rows={3}
               aria-invalid={!!errors.instructions || undefined}
-              className="min-h-20 w-full resize-y rounded-lg border-none bg-[var(--field-surface)] px-3 py-[9px] text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--neutral-800)] shadow-[0px_1px_1.5px_0px_var(--neutral-700-12),0px_0px_0px_1px_var(--neutral-100)] outline-none transition-shadow"
+              className="min-h-20 w-full resize-y rounded-lg border-none bg-[var(--field-surface)] px-3 py-[var(--schedule-instructions-padding-y)] text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--neutral-800)] shadow-[0px_1px_1.5px_0px_var(--neutral-700-12),0px_0px_0px_1px_var(--neutral-100)] outline-none transition-shadow"
             />
             {errors.instructions && <p className={errorText} role="alert">{errors.instructions}</p>}
           </div>

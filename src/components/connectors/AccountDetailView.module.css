@@ -6,7 +6,7 @@
   place-items: center;
   padding: var(--space-4);
   background: var(--overlay-bg);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(var(--blur-xs));
 }
 
 .dialog {

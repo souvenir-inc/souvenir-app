@@ -33,6 +33,7 @@ import { AgentCardMenu } from './AgentCardMenu'
 import { CardActionRow } from './CardActionRow'
 import { ModelUnavailableOverlay } from './ModelUnavailableOverlay'
 import { CARD_HEIGHT, CARD_RADIUS, HERO_HEIGHT, AVATAR_SIZE, HERO_INSET } from './card-metrics'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
 
@@ -59,7 +60,7 @@ function formatCount(n: number): string {
 const RISE = {
   initial:    { y: 8, opacity: 0 },
   animate:    { y: 0, opacity: 1 },
-  transition: { duration: 0.3, ease: 'easeOut' as const },
+  transition: { duration: DURATION.slow, ease: 'easeOut' as const },
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -406,7 +407,7 @@ function PersonaCardInner({
             : undefined,
           cursor:          modelUnavailable ? 'default' : 'pointer',
           boxSizing:       'border-box' as const,
-          zIndex:          menuOpen ? 100 : undefined,
+          zIndex:          menuOpen ? 'var(--z-sticky)' : undefined,
           opacity:         pausePending ? 0.6 : 1,
           pointerEvents:   pausePending ? 'none' : undefined,
           // Lift, tilt and their transitions come from .agent-card (globals.css).
@@ -610,7 +611,7 @@ function PersonaCardInner({
                 fontSize:      'var(--font-size-heading-sm)',
                 lineHeight:    'var(--line-height-heading-sm)',
                 fontWeight:    'var(--font-weight-medium)',
-                letterSpacing: '-0.01em',
+                letterSpacing: 'var(--tracking-tight)',
                 color:         'var(--neutral-950)',
                 overflow:      'hidden',
                 textOverflow:  'ellipsis',

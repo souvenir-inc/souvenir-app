@@ -2,6 +2,7 @@
 
 import React from "react";
 import { AnimatePresence, m } from "framer-motion";
+import { BLUR, DURATION, SPRING } from "@/styles/tokens/motion"
 
 interface ComposerTextareaProps {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
@@ -45,16 +46,16 @@ export function ComposerTextarea({
           <m.div
             key="placeholder"
             aria-hidden
-            initial={{ opacity: 0, filter: "blur(2px)" }}
+            initial={{ opacity: 0, filter: `blur(${BLUR['2xs']}px)` }}
             animate={{
               opacity: 1,
               filter: "blur(0px)", transitionEnd: { filter: "none" },
-              transition: { duration: 0.2 },
+              transition: { duration: DURATION.base },
             }}
             exit={{
               opacity: 0,
-              filter: "blur(2px)",
-              transition: { duration: 0.15 },
+              filter: `blur(${BLUR['2xs']}px)`,
+              transition: { duration: DURATION.quick },
             }}
             style={{
               position: "absolute",
@@ -74,10 +75,10 @@ export function ComposerTextarea({
                 // Keyed by the text so a new placeholder (e.g. "Queue a
                 // follow-up…" while a reply streams) swaps in animated.
                 key={isRecording ? "listening" : `default:${placeholder}`}
-                initial={{ scale: 0.75, opacity: 0, filter: "blur(4px)" }}
+                initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                 animate={{ scale: 1, opacity: 1, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
-                exit={{ scale: 0.75, opacity: 0, filter: "blur(4px)" }}
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                exit={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                transition={{ type: "spring", ...SPRING.snappy }}
                 style={{ display: "block", transformOrigin: "left center" }}
               >
                 {isRecording ? "Listening..." : placeholder}

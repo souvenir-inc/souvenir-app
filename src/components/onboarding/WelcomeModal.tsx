@@ -13,17 +13,18 @@ import { creditsFromUsage } from "@/lib/credits";
 import { formatCredits } from "@/lib/plan-config";
 import { SouvenirLogo } from "@/components/SouvenirLogo";
 import type { UserUsage } from "@/lib/api/user";
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Shared styles ──────────────────────────────────────────────────────────────
 
-const BACKDROP_Z = 9998;
-const MODAL_Z = 9999;
+const BACKDROP_Z = "var(--welcome-modal-backdrop-z)";
+const MODAL_Z = "var(--welcome-modal-z)";
 
 const backdropStyle: React.CSSProperties = {
   position: "fixed",
   inset: 0,
   backgroundColor: "var(--overlay-bg)",
-  backdropFilter: "blur(2px)",
+  backdropFilter: "blur(var(--blur-2xs))",
   zIndex: BACKDROP_Z,
 };
 
@@ -40,7 +41,7 @@ const modalCardStyle: React.CSSProperties = {
   borderRadius: "var(--radius-2xl)",
   padding: "var(--space-7)",
   boxShadow:
-    "0px 8px 32px 0px rgba(82,75,71,0.18), 0px 0px 0px 1px var(--neutral-100)",
+    "var(--welcome-modal-shadow)",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -203,7 +204,7 @@ function TeamsWorkspacePreview() {
                 borderRadius: "inherit",
                 pointerEvents: "none",
                 boxShadow:
-                  "inset 0px 1px 0.4px var(--neutral-50-30), inset 0px -2px 0.4px #120c08, inset 0px -2.5px 4px -2px var(--neutral-50-50)",
+                  "var(--welcome-modal-shadow-2)",
               }}
             />
           </div>
@@ -234,7 +235,7 @@ function TeamsWorkspacePreview() {
             flexDirection: "column",
             gap: "var(--space-1)",
             boxShadow:
-              "0px 1px 1px rgba(59,54,50,0.05), 0px 1.5px 3px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-200)",
+              "var(--welcome-modal-shadow-3)",
           }}
         >
           {/* Pin icon */}
@@ -404,7 +405,7 @@ function WelcomeModalImpl() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: DURATION.base }}
             style={backdropStyle}
           />
 
@@ -417,7 +418,7 @@ function WelcomeModalImpl() {
             initial={{ opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: DURATION.moderate, ease: [0.16, 1, 0.3, 1] }}
             style={modalCardStyle}
           >
             <AnimatePresence mode="wait">
@@ -427,7 +428,7 @@ function WelcomeModalImpl() {
                   initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -12 }}
-                  transition={{ duration: 0.18 }}
+                  transition={{ duration: DURATION.base }}
                   style={{
                     display: "flex",
                     flexDirection: "column",
@@ -484,7 +485,7 @@ function WelcomeModalImpl() {
                   initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -12 }}
-                  transition={{ duration: 0.18 }}
+                  transition={{ duration: DURATION.base }}
                   style={{
                     display: "flex",
                     flexDirection: "column",
@@ -562,7 +563,7 @@ function WelcomeModalImpl() {
                   initial={{ opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.2 }}
+                  transition={{ duration: DURATION.base }}
                   style={{
                     display: "flex",
                     flexDirection: "column",

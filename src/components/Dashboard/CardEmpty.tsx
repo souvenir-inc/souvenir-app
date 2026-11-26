@@ -67,7 +67,7 @@ export function emptyAction(kind: EmptyKind, opts: { canEdit: boolean; onRetry?:
   return null
 }
 
-const LINK = 'cursor-pointer rounded-sm border-0 bg-transparent p-0 text-[length:var(--font-size-body-sm)] font-medium leading-[17px] text-[var(--dashboard-figure)] underline underline-offset-2 outline-none hover:text-[var(--dashboard-label)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]'
+const LINK = 'cursor-pointer rounded-sm border-0 bg-transparent p-0 text-[length:var(--font-size-body-sm)] font-medium leading-[var(--dashboard-line-height-sm)] text-[var(--dashboard-figure)] underline underline-offset-2 outline-none hover:text-[var(--dashboard-label)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]'
 
 /**
  * The empty state itself, placed where the number goes. `compact` (the small 3×1 card) keeps it to
@@ -104,7 +104,7 @@ export function ChartGhost({ bars, caption, note, className }: { bars: boolean; 
     <div data-chart-ghost className={cn('pointer-events-none flex flex-col', className)}>
       <div aria-hidden className="relative min-h-0 flex-1">
         {bars ? (
-          <div className="absolute inset-x-0 bottom-0 top-2 flex items-end justify-around gap-[8%] px-[4%]">
+          <div className="absolute inset-x-0 bottom-0 top-2 flex items-end justify-around gap-[var(--dashboard-empty-bar-gap)] px-[var(--dashboard-empty-bar-inset)]">
             {GHOST_BARS.map((h, i) => (
               <span key={i} className="w-full max-w-11 rounded-t-xs bg-[var(--dashboard-chart-soft)] opacity-35" style={{ height: `${h * 100}%` }} />
             ))}

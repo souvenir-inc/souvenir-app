@@ -58,7 +58,7 @@ export function RenameDialog({ file, onClose }: { file: LibraryFile; onClose: ()
               style={{
                 width: '100%', boxSizing: 'border-box', padding: 'var(--space-2) var(--space-2-5)', borderRadius: 'var(--radius-lg)', border: 'none', outline: 'none',
                 background: 'var(--text-field-bg)', color: 'var(--neutral-900)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)',
-                boxShadow: error ? '0 0 0 1.5px var(--color-tag-Red-text)' : '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--text-field-ring)',
+                boxShadow: error ? '0 0 0 1.5px var(--color-tag-Red-text)' : 'var(--shadow-field)',
               }}
             />
             {error && (

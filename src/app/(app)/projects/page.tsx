@@ -35,6 +35,7 @@ import {
   type SortKey, type ScopeFilter, type ViewMode,
 } from '@/lib/project-filters'
 import { sortProjects, projectMemberCount, formatUpdated } from '@/lib/project-list-utils'
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 // Gradient palette seeded by team name — shared with TeamChip/TeamSwitcherRow/
 // TeamSwitcherDropdown/ProjectCard/etc via src/lib/team-gradients.ts, so a
@@ -318,9 +319,9 @@ function ProjectsPageInner() {
                     <m.span
                       key="search-btn"
                       layout
-                      initial={{ opacity: 0, y: 4, filter: 'blur(4px)' }}
-                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { type: 'spring', duration: 0.3, bounce: 0 } }}
-                      exit={{ opacity: 0, scale: 0.25, filter: 'blur(4px)', transition: { type: 'spring', duration: 0.2, bounce: 0 } }}
+                      initial={{ opacity: 0, y: 4, filter: `blur(${BLUR.xs}px)` }}
+                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { type: 'spring', duration: DURATION.slow, bounce: 0 } }}
+                      exit={{ opacity: 0, scale: 0.25, filter: `blur(${BLUR.xs}px)`, transition: { type: 'spring', duration: DURATION.base, bounce: 0 } }}
                       style={{ display: 'inline-flex', flexShrink: 0 }}
                     >
                       <IconButton
@@ -335,9 +336,9 @@ function ProjectsPageInner() {
                   ) : (
                     <m.div
                       key="search-input"
-                      initial={{ opacity: 0, scale: 0.95, filter: 'blur(4px)' }}
-                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)', transition: { type: 'spring', duration: 0.3, bounce: 0 } }}
-                      exit={{ opacity: 0, scale: 0.95, filter: 'blur(4px)', transition: { duration: 0.15, ease: 'easeIn' } }}
+                      initial={{ opacity: 0, scale: 0.95, filter: `blur(${BLUR.xs}px)` }}
+                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)', transition: { type: 'spring', duration: DURATION.slow, bounce: 0 } }}
+                      exit={{ opacity: 0, scale: 0.95, filter: `blur(${BLUR.xs}px)`, transition: { duration: DURATION.quick, ease: 'easeIn' } }}
                       style={{ flex: '1 0 0', minWidth: 0 }}
                     >
                       <InputField
@@ -419,13 +420,13 @@ function ProjectsPageInner() {
           viewMode === 'list' ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', width: '100%' }}>
               {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} height={64} radius={12} style={{ opacity: 1 - i * 0.15 }} />
+                <Skeleton key={i} height={64} radius={'var(--radius-xl)'} style={{ opacity: 1 - i * 0.15 }} />
               ))}
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-6)', width: '100%' }}>
               {[...Array(4)].map((_, i) => (
-                <Skeleton key={i} height={262} radius={12} style={{ opacity: 1 - i * 0.15 }} />
+                <Skeleton key={i} height={262} radius={'var(--radius-xl)'} style={{ opacity: 1 - i * 0.15 }} />
               ))}
             </div>
           )

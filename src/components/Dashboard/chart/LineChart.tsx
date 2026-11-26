@@ -107,7 +107,7 @@ function Plot({ metric, series, full, target, width, height, hover, onHover }: P
           {full && ticks.map((t) => (
             <g key={t}>
               <line x1={0} x2={plotW} y1={y(t)} y2={y(t)} stroke="var(--dashboard-chart-soft)" strokeDasharray="2 3" />
-              <text x={plotW + 10} y={y(t) + 4} fontSize={12} fill="var(--dashboard-muted)">{formatMetricValue(t, metric.format)}</text>
+              <text x={plotW + 10} y={y(t) + 4} fontSize="var(--font-size-small)" fill="var(--dashboard-muted)">{formatMetricValue(t, metric.format)}</text>
             </g>
           ))}
           {/* The period before: dashed grey on the full chart, a faint line on a sparkline; faint
@@ -120,7 +120,7 @@ function Plot({ metric, series, full, target, width, height, hover, onHover }: P
           {full && target != null && (
             <g data-target-line>
               <line x1={0} x2={plotW} y1={y(target)} y2={y(target)} stroke="var(--dashboard-muted)" strokeDasharray="4 3" />
-              <text x={4} y={y(target) - 5} fontSize={11} fill="var(--dashboard-muted)">Target {formatMetricValue(target, metric.format)}</text>
+              <text x={4} y={y(target) - 5} fontSize="var(--font-size-caption)" fill="var(--dashboard-muted)">Target {formatMetricValue(target, metric.format)}</text>
             </g>
           )}
           {/* A dot per day (up to about 45), green or red against a target; the last one bigger. */}
@@ -135,12 +135,12 @@ function Plot({ metric, series, full, target, width, height, hover, onHover }: P
           })}
           {/* Labels: the latest value, or every value when there are three days or fewer. */}
           {full && cur.map((v, i) => (v != null && (few || i === lastIndex)) && (
-            <text key={`l${i}`} x={x(i) + (i === lastIndex ? 4 : 0)} y={y(v) - 10} fontSize={11} fontWeight={500} textAnchor={i === lastIndex ? 'end' : 'middle'} fill="var(--dashboard-figure)">
+            <text key={`l${i}`} x={x(i) + (i === lastIndex ? 4 : 0)} y={y(v) - 10} fontSize="var(--font-size-caption)" fontWeight="var(--font-weight-medium)" textAnchor={i === lastIndex ? 'end' : 'middle'} fill="var(--dashboard-figure)">
               {formatMetricValue(v, metric.format)}
             </text>
           ))}
           {full && dateIdx.map((i) => (
-            <text key={`d${i}`} x={x(i)} y={plotH + 20} fontSize={12} textAnchor={i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'} fill="var(--dashboard-muted)" dx={i === 0 ? -4 : i === n - 1 ? 4 : 0}>
+            <text key={`d${i}`} x={x(i)} y={plotH + 20} fontSize="var(--font-size-small)" textAnchor={i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'} fill="var(--dashboard-muted)" dx={i === 0 ? -4 : i === n - 1 ? 4 : 0}>
               {dayMonth(series.days[i].date)}
             </text>
           ))}

@@ -5,11 +5,12 @@ import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { LogoIcon } from '@strange-huge/icons'
 import { ThemedLlmIcon } from '@/components/ThemedLlmIcon'
 import { cn } from '@/lib/utils'
+import { DURATION, SPRING as SPRING_TOKENS, LONG } from "@/styles/tokens/motion"
 
 // ── Animation constants ────────────────────────────────────────────────────────
-const SPRING        = { type: 'spring', stiffness: 500, damping: 30 } as const
-const LABEL_SPRING  = { type: 'spring', stiffness: 520, damping: 32 } as const
-const LOGO_SPRING   = { type: 'spring', stiffness: 220, damping: 11, mass: 0.9 } as const
+const SPRING        = { type: 'spring', ...SPRING_TOKENS.snappy } as const
+const LABEL_SPRING  = { type: 'spring', ...SPRING_TOKENS.snappy } as const
+const LOGO_SPRING   = { type: 'spring', ...SPRING_TOKENS.wobbly } as const
 
 const LABEL_ENTER = { opacity: 0, filter: 'blur(5px)', scale: 0.82, y:  5 }
 const LABEL_SHOW  = { opacity: 1, filter: 'blur(0px)', transitionEnd: { filter: 'none' }, scale: 1,    y:  0 }
@@ -209,8 +210,8 @@ export function StreamingIndicator(
         }
         transition={
           isChoosing && !shouldReduceMotion
-            ? { duration: 1.0, repeat: Infinity, ease: 'easeInOut' }
-            : { duration: shouldReduceMotion ? 0 : 0.2 }
+            ? { duration: LONG.xs, repeat: Infinity, ease: 'easeInOut' }
+            : { duration: shouldReduceMotion ? 0 : DURATION.base }
         }
         style={{
           display:    'flex',

@@ -37,7 +37,7 @@ export function SharedByFooter({ board }: { board: Board }) {
     // The owner at the foot (Figma 402:65680): a 16 px avatar, then “Shared by” and the name in Medium.
     <div className="mt-1 flex items-center gap-2.5 border-0 border-t border-solid border-[var(--neutral-100)] px-2 pb-1 pt-2">
       <PersonAvatar initials={board.sharedBy.initials} color={board.sharedBy.color} size={16} />
-      <span className="text-[length:var(--font-size-small)] leading-[17px] text-[var(--dashboard-muted)]">
+      <span className="text-[length:var(--font-size-small)] leading-[var(--dashboard-line-height-sm)] text-[var(--dashboard-muted)]">
         Shared by <span className="font-medium text-[var(--neutral-700)]">{board.sharedBy.name}</span>
       </span>
     </div>
@@ -48,7 +48,7 @@ export function PersonAvatar({ initials, color, size = 24, className }: { initia
   return (
     <span
       aria-hidden
-      className={cn('inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white', className)}
+      className={cn('inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-[var(--static-white)]', className)}
       style={{ width: size, height: size, fontSize: Math.max(7, Math.round(size * 0.44)), background: color ?? 'var(--neutral-700)' }}
     >
       {initials}

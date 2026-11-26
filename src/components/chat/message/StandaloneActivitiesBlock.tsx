@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { m } from "framer-motion";
 import { ActivitiesSection } from "../ActivityRow";
 import type { ActivityItem } from "@/types/chat";
+import { SPRING } from "@/styles/tokens/motion"
 
 // ── Standalone Activities Block (collapsible, used when no reasoning) ─────────
 
@@ -71,7 +72,7 @@ export function StandaloneActivitiesBlock({
             viewBox="0 0 14 14"
             fill="none"
             animate={{ rotate: isOpen ? 180 : 0 }}
-            transition={{ type: "spring", stiffness: 380, damping: 28 }}
+            transition={{ type: "spring", ...SPRING.brisk }}
             style={chevronStyle}
           >
             <path
@@ -95,7 +96,7 @@ export function StandaloneActivitiesBlock({
           gridTemplateRows: isOpen ? "1fr" : "0fr",
           opacity: isOpen ? 1 : 0,
           visibility: isOpen ? "visible" : "hidden",
-          transition: `grid-template-rows 260ms cubic-bezier(0.16,1,0.3,1), opacity 220ms ease, visibility 0s linear ${isOpen ? "0s" : "260ms"}`,
+          transition: `grid-template-rows var(--standalone-activities-block-reveal-duration) var(--ease-out-expo), opacity var(--standalone-activities-block-fade-duration) ease, visibility 0s linear ${isOpen ? "0s" : "var(--standalone-activities-block-duration)"}`,
         }}
       >
         <div style={clipStyle}>

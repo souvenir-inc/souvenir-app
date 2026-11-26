@@ -11,8 +11,8 @@ import { cn } from '@/lib/utils'
 import type { WorkspaceRole } from '@/types/teams'
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
-const SHADOW_MODAL   = '0px 12px 16px -4px rgba(130,122,116,0.12), var(--shadow-soft), 0px 0px 0px 1px var(--neutral-100)'
-const SHADOW_INPUT   = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)'
+const SHADOW_MODAL   = 'var(--shadow-modal-soft)'
+const SHADOW_INPUT   = 'var(--shadow-control)'
 
 const SECTION_LABEL_STYLE: React.CSSProperties = {
   fontFamily: 'var(--font-body)',

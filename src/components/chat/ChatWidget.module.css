@@ -63,7 +63,7 @@
 .date[aria-pressed="true"] { background: var(--widget-accent); color: var(--widget-on-accent); box-shadow: 0 4px 10px -4px color-mix(in srgb, var(--widget-accent) 70%, transparent); }
 .date[aria-pressed="true"] .dot { background: var(--widget-on-accent); }
 .today:not([aria-pressed="true"]) { box-shadow: inset 0 0 0 1.5px var(--widget-accent); font-weight: var(--font-weight-semibold); }
-.date:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: -2px; }
+.date:focus-visible { outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: calc(var(--focus-ring-offset) * -1); }
 .muted { color: var(--neutral-400); }
 .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--widget-accent); }
 .agenda { padding: var(--space-3) var(--space-4) var(--space-1); border-top: 1px solid color-mix(in srgb, var(--neutral-300) 45%, transparent); }

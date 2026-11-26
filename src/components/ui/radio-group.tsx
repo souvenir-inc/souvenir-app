@@ -46,7 +46,7 @@ export function RadioItem({ label, description, className, disabled, ...props }:
       <Radio.Root
         disabled={disabled}
         className={cn(
-          'group relative mt-[3px] inline-flex size-4 shrink-0 items-center justify-center rounded-full border-0 p-0 cursor-pointer',
+          'group relative mt-[var(--space-0-75)] inline-flex size-4 shrink-0 items-center justify-center rounded-full border-0 p-0 cursor-pointer',
           'bg-[var(--checkbox-bg-off)] shadow-[var(--shadow-checkbox-off)]',
           'data-[checked]:bg-[var(--checkbox-bg-on)] data-[checked]:shadow-[var(--shadow-checkbox-on)]',
           'outline-2 outline-solid outline-offset-2 outline-transparent focus-visible:outline-[var(--focus-ring)]',

@@ -29,7 +29,7 @@ const TITLE_STYLE: React.CSSProperties = {
   fontWeight: 'var(--font-weight-medium)',
   fontSize: 'var(--font-size-heading-md)',
   lineHeight: 'var(--line-height-heading-md)',
-  letterSpacing: '-0.01em',
+  letterSpacing: 'var(--tracking-tight)',
   color: 'var(--neutral-900)',
 }
 
@@ -168,7 +168,7 @@ export function PickerDialog({ onClose, onConfirm, excludeIds = [], confirmLabel
         >
           {list.status === 'loading' ? (
             <div aria-busy="true" className={styles.loading}>
-              {Array.from({ length: 5 }).map((_, index) => <Skeleton key={index} height={48} radius={10} />)}
+              {Array.from({ length: 5 }).map((_, index) => <Skeleton key={index} height={48} radius={'var(--radius-lg)'} />)}
             </div>
           ) : list.status === 'error' ? (
             <div role="alert" className={styles.error}>

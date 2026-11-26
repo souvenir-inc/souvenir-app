@@ -25,7 +25,7 @@ export interface SourceFileRowProps {
  */
 export function SourceFileRow({ row, onToggle, onOpen }: SourceFileRowProps) {
   const icon =
-    row.status === 'loading' ? <Skeleton width={20} height={20} radius={6} /> :
+    row.status === 'loading' ? <Skeleton width={20} height={20} radius={'var(--radius-sm)'} /> :
     // The 24px tile, pulled in to the row's 20px icon column so names line up with the web rows.
     row.ref?.state === 'open' ? <span style={{ display: 'inline-flex', margin: 'calc(var(--space-0-5) * -1)' }}><FormatGlyph format={row.ref.format} size="xs" /></span> :
     row.status === 'locked' ? <LockGlyph size={16} /> :

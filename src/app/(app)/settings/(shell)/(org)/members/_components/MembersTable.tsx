@@ -14,6 +14,7 @@ import { SettingsTable, SettingsTableCell, SettingsTableHeader, SettingsTableHea
 import type { OrgMember } from '@/types/teams'
 import { displayRoleFor } from './members-shared'
 import { RemoveButton, RoleDropdown } from './RoleControls'
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 // ── Members table ─────────────────────────────────────────────────────────────
 
@@ -74,9 +75,9 @@ export function MembersTable({
                   <motion.span
                     key="search-btn"
                     layout
-                    initial={{ opacity: 0, y: 4, filter: 'blur(4px)' }}
-                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { type: 'spring', duration: 0.3, bounce: 0 } }}
-                    exit={{ opacity: 0, scale: 0.25, filter: 'blur(4px)', transition: { type: 'spring', duration: 0.2, bounce: 0 } }}
+                    initial={{ opacity: 0, y: 4, filter: `blur(${BLUR.xs}px)` }}
+                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { type: 'spring', duration: DURATION.slow, bounce: 0 } }}
+                    exit={{ opacity: 0, scale: 0.25, filter: `blur(${BLUR.xs}px)`, transition: { type: 'spring', duration: DURATION.base, bounce: 0 } }}
                     style={{ display: 'inline-flex', flexShrink: 0 }}
                   >
                     <IconButton
@@ -90,9 +91,9 @@ export function MembersTable({
                 ) : (
                   <motion.div
                     key="search-input"
-                    initial={{ opacity: 0, scale: 0.95, filter: 'blur(4px)' }}
-                    animate={{ opacity: 1, scale: 1, filter: 'blur(0px)', transition: { type: 'spring', duration: 0.3, bounce: 0 } }}
-                    exit={{ opacity: 0, scale: 0.95, filter: 'blur(4px)', transition: { duration: 0.15, ease: 'easeIn' } }}
+                    initial={{ opacity: 0, scale: 0.95, filter: `blur(${BLUR.xs}px)` }}
+                    animate={{ opacity: 1, scale: 1, filter: 'blur(0px)', transition: { type: 'spring', duration: DURATION.slow, bounce: 0 } }}
+                    exit={{ opacity: 0, scale: 0.95, filter: `blur(${BLUR.xs}px)`, transition: { duration: DURATION.quick, ease: 'easeIn' } }}
                     style={{ flex: '1 0 0', minWidth: 0 }}
                   >
                     <InputField

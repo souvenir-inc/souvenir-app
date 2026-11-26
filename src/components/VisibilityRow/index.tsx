@@ -12,8 +12,8 @@ import { cn } from '@/lib/utils'
 const SHADOW_SELECTED   = 'var(--shadow-soft), 0px 0px 0px 1px var(--neutral-800)'
 const SHADOW_DESELECTED = '0px 0px 0px 1px var(--neutral-white)'
 const SHADOW_LOCKED     = '0px 0px 0px 1px var(--neutral-200)'
-const SHADOW_CHIP_OUTER = '0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px var(--blue-600-50)'
-const SHADOW_CHIP_INNER = 'inset 0px 1px 0px 0px rgba(231,244,253,0.7), inset 0px -1px 0px 0px rgba(13,110,178,0.1)'
+const SHADOW_CHIP_OUTER = 'var(--shadow-chip-selected)'
+const SHADOW_CHIP_INNER = 'var(--visibility-row-shadow-chip-inner)'
 
 // ── Upgrade chip ──────────────────────────────────────────────────────────────
 

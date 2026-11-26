@@ -12,10 +12,11 @@ import { DropdownMenuItem } from '@/components/DropdownMenuItem'
 import { toast } from 'sonner'
 import type { OrgMember } from '@/types/teams'
 import { displayRoleFor } from './members-shared'
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 // ── Remove button (blur-swap animation) ───────────────────────────────────────
 
-const REVEAL = { duration: 0.18, ease: [0.25, 0.46, 0.45, 0.94] as const }
+const REVEAL = { duration: DURATION.base, ease: [0.25, 0.46, 0.45, 0.94] as const }
 
 export function RemoveButton({
   memberName,
@@ -51,9 +52,9 @@ export function RemoveButton({
       {!confirming ? (
         <motion.div
           key="remove"
-          initial={{ opacity: 0, filter: 'blur(4px)' }}
+          initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
           animate={{ opacity: 1, filter: 'blur(0px)', transition: REVEAL }}
-          exit={{    opacity: 0, filter: 'blur(4px)', transition: REVEAL }}
+          exit={{    opacity: 0, filter: `blur(${BLUR.xs}px)`, transition: REVEAL }}
           // The plain danger button (red, white text), like the confirm step.
           style={{ display: 'flex', flexShrink: 0 }}
         >
@@ -74,9 +75,9 @@ export function RemoveButton({
       ) : (
         <motion.div
           key="confirm"
-          initial={{ opacity: 0, filter: 'blur(4px)' }}
+          initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
           animate={{ opacity: 1, filter: 'blur(0px)', transition: REVEAL }}
-          exit={{    opacity: 0, filter: 'blur(4px)', transition: REVEAL }}
+          exit={{    opacity: 0, filter: `blur(${BLUR.xs}px)`, transition: REVEAL }}
           style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', flexShrink: 0 }}
         >
           <Button variant="ghost" size="sm" onClick={() => setConfirming(false)} disabled={busy} style={{ flexShrink: 0 }}>
@@ -133,7 +134,7 @@ function RoleDropdownTrigger({ label, disabled }: { label: string; disabled?: bo
         borderRadius:    'var(--radius-md)',
         border:          'none',
         backgroundColor: 'var(--neutral-white)',
-        boxShadow:       '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)',
+        boxShadow:       'var(--shadow-card-raised)',
         cursor:          disabled ? 'not-allowed' : 'pointer',
         opacity:         disabled ? 0.6 : 1,
         fontFamily:      'var(--font-body)',

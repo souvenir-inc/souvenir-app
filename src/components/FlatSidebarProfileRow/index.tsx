@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { m, useReducedMotion } from 'framer-motion'
 import { SettingsOneIcon } from '@strange-huge/icons'
 import { UserAvatar, userAvatarRadius } from '@/components/Avatar'
+import { SPRING } from "@/styles/tokens/motion"
 
 // ── "Sidebar / Profile Row" (Figma 109:4650) ─────────────────────────────────
 // "50px, avatar centred by counter-axis alignment rather than vertical
@@ -68,7 +69,7 @@ export function FlatSidebarProfileRow({ name, sublabel, avatarSrc, planLabel, on
         // The trailing bell is a 24 px button around a 16 px glyph — 8 px
         // right padding puts its glyph on the same 12 px inset the settings
         // icon sits on without it.
-        padding: trailing ? '0 8px 0 12px' : '0 12px', borderRadius: 'var(--radius-lg)', cursor: 'pointer', boxSizing: 'border-box',
+        padding: trailing ? '0 var(--space-2) 0 var(--space-3)' : '0 var(--space-3)', borderRadius: 'var(--radius-lg)', cursor: 'pointer', boxSizing: 'border-box',
         backgroundColor: isActive ? 'var(--sidebar-menu-item-hover-bg)' : 'transparent',
         boxShadow: isActive ? 'var(--shadow-sidebar-item-hover)' : undefined,
         transition: 'background-color var(--duration-fast), box-shadow var(--duration-fast)',
@@ -100,7 +101,7 @@ export function FlatSidebarProfileRow({ name, sublabel, avatarSrc, planLabel, on
         {planLabel && (
           <span style={{
             display: 'inline-flex', alignItems: 'center', padding: 'var(--space-0-5) var(--space-1-5)', borderRadius: 'var(--radius-sm)',
-            backgroundColor: 'var(--blue-100)', boxShadow: '0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px var(--blue-600-50)',
+            backgroundColor: 'var(--blue-100)', boxShadow: 'var(--shadow-chip-selected)',
             fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)',
             lineHeight: 'var(--line-height-caption)', color: 'var(--blue-700)',
           }}>
@@ -111,7 +112,7 @@ export function FlatSidebarProfileRow({ name, sublabel, avatarSrc, planLabel, on
         <m.span
           aria-hidden
           animate={isActive && !reduceMotion ? { rotate: 90, scale: 1.1 } : { rotate: 0, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 240, damping: 16 }}
+          transition={{ type: 'spring', ...SPRING.bouncy }}
           style={{ display: 'inline-flex', color: 'var(--sidebar-icon, var(--sidebar-menu-item-text))' }}
         >
           <SettingsOneIcon size={16} />

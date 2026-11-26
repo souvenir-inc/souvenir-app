@@ -73,7 +73,7 @@ export function ChipsRow({ chips, scroll }: ChipsRowProps) {
                 backgroundColor: "var(--neutral-800-30)",
                 width: `${thumbWidthPct}%`,
                 left: `${thumbOffsetPct}%`,
-                transition: isThumbDragging ? "none" : "left 60ms",
+                transition: isThumbDragging ? "none" : "left var(--chips-row-duration)",
                 cursor: isThumbDragging ? "grabbing" : "grab",
               }}
               onMouseDown={handleThumbMouseDown}

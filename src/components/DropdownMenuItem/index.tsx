@@ -17,6 +17,7 @@ import { Checkbox } from '@/components/Checkbox'
 import { Spinner } from '@/components/Spinner'
 import { cn } from '@/lib/utils'
 import { useMenuMode, useSlotFocused, DropdownMenuPrimitiveItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Shadow tokens ──────────────────────────────────────────────────────────────
 
@@ -195,7 +196,7 @@ const labelTextStyleStrong: React.CSSProperties = {
 
 /** 12px/16px — a readable step between the 11px caption and the 14px body. */
 const subLabelTextStyleStrong: React.CSSProperties = {
-  fontSize:   'calc(var(--font-size-body) - 2px)',
+  fontSize:   'var(--dropdown-menu-item-size)',
   lineHeight: 'var(--line-height-caption)',
 }
 
@@ -386,8 +387,8 @@ export function DropdownMenuItem(
           // Figma 1056:874 - header pt-4, pb-6
           paddingLeft:     'var(--space-1-5)',
           paddingRight:    'var(--space-1-5)',
-          paddingTop:      isHeader ? '4px' : '5px',
-          paddingBottom:   isHeader ? '6px' : '5px',
+          paddingTop:      isHeader ? 'var(--space-1)' : 'var(--space-1-25)',
+          paddingBottom:   isHeader ? 'var(--space-1-5)' : 'var(--space-1-25)',
           backgroundColor: isActive ? hoverBg : 'transparent',
           boxShadow:       isActive ? hoverShadow : undefined,
           opacity:         disabled ? 0.7 : 1,
@@ -493,7 +494,7 @@ export function DropdownMenuItem(
                   initial={{ scaleY: 0, opacity: 0 }}
                   animate={{ scaleY: 1, opacity: 1 }}
                   exit={{    scaleY: 0, opacity: 0 }}
-                  transition={{ duration: 0.12, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: DURATION.fast, ease: [0.16, 1, 0.3, 1] }}
                   style={{
                     position:        'absolute',
                     left:            0,
@@ -573,7 +574,7 @@ export function DropdownMenuItem(
                     width:        freeAvatarSize,
                     height:       freeAvatarSize,
                     flexShrink:   0,
-                    borderRadius: isTile ? 8 : 6,
+                    borderRadius: isTile ? 'var(--radius-md)' : 'var(--radius-sm)',
                     // The tile reads as a card the logo sits on, so the logo can
                     // stay small without looking lost beside a two-line label.
                     backgroundColor: isTile ? 'var(--neutral-50)' : undefined,

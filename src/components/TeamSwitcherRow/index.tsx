@@ -7,6 +7,7 @@ import { ArrowDownOneIcon } from '@strange-huge/icons'
 import { RoleBadge } from '@/components/RoleBadge'
 import type { WorkspaceRole, RoleBadgeMode } from '@/components/RoleBadge'
 import { getGradient } from '@/lib/team-gradients'
+import { DURATION } from "@/styles/tokens/motion"
 
 // Deterministic gradient palette, seeded by team NAME — src/lib/team-gradients.ts,
 // so a team's row here is always the same colour as its entry in the dropdown
@@ -102,7 +103,7 @@ export const TeamSwitcherRow = React.forwardRef<HTMLDivElement, TeamSwitcherRowP
                 inset:         0,
                 borderRadius:  'var(--radius-xs)',
                 pointerEvents: 'none',
-                boxShadow:     'inset 0px 4px 4px 0px color-mix(in srgb, var(--static-black) 25%, transparent), inset 0px -1px 0.4px 0px rgba(18,60,95,0.65)',
+                boxShadow:     'var(--team-switcher-row-shadow)',
               }}
             />
             <span
@@ -166,7 +167,7 @@ export const TeamSwitcherRow = React.forwardRef<HTMLDivElement, TeamSwitcherRowP
                 initial={{ opacity: 0, y: isOpen ? 6 : -6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.13, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: DURATION.fast, ease: [0.16, 1, 0.3, 1] }}
                 style={{ position: 'absolute', inset: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
               >
                 <span style={{ display: 'inline-flex', transform: isOpen ? 'rotate(180deg)' : 'none' }}>

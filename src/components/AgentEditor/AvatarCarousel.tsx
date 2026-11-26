@@ -145,7 +145,7 @@ export function AvatarCarousel({
                 // The selected tile: a ring in its own colour, offset by a gap of the tray colour.
                 boxShadow: isSelected
                   ? `0 0 0 2px var(--neutral-50), 0 0 0 4px ${choice.colors[1]}`
-                  : '0 1px 2px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--neutral-100)',
+                  : 'var(--avatar-carousel-shadow)',
                 transition: 'box-shadow var(--duration-fast) ease, transform var(--duration-fast) ease',
               }}
             >

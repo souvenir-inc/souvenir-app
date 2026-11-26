@@ -80,8 +80,8 @@ function OptionCard({
         cursor: "pointer",
         outline: "none",
         boxShadow: selected
-          ? "0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 2px var(--neutral-900)"
-          : "0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)",
+          ? "var(--account-type-shadow)"
+          : "var(--shadow-card-raised)",
         transition: "box-shadow var(--duration-fast)",
       }}
     >

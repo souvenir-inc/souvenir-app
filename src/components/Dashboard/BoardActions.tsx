@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 import { NewBoardChooser, type Way } from './NewBoardChooser'
 import { MoreMenuContent, type BoardMenuHandlers } from './tabs/BoardMenus'
 import type { Board } from './tabs/board-state'
+import { DURATION } from "@/styles/tokens/motion"
 
 // The board's actions, bottom right (Figma 6D, rules docs-v2/dashboard/02-board-screen-rules.md):
 //   SpeedDial  the dark + (BS-4). Opens Add cards, New board, Edit board, Share, More above it
@@ -110,13 +111,13 @@ export function SpeedDial({ board, startOpen, onAddCards, onNewBoard, onEditBoar
             aria-label="Board actions"
             className="absolute bottom-[56px] right-1 m-0 flex list-none flex-col items-end gap-2 p-0"
             initial="closed" animate="open" exit="closed"
-            variants={{ open: { transition: { staggerChildren: 0.03, staggerDirection: -1 } }, closed: { transition: { staggerChildren: 0.02 } } }}
+            variants={{ open: { transition: { staggerChildren: DURATION.tick, staggerDirection: -1 } }, closed: { transition: { staggerChildren: DURATION.tick } } }}
           >
             {actions.map((a) => (
               <m.li
                 key={a.key}
                 variants={reduceMotion ? {} : { open: { opacity: 1, y: 0 }, closed: { opacity: 0, y: 8 } }}
-                transition={{ duration: 0.16, ease: [0.2, 0, 0, 1] }}
+                transition={{ duration: DURATION.quick, ease: [0.2, 0, 0, 1] }}
               >
                 {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: one hit area for the label pill and the round button of a speed-dial action (Figma 93:18592 / 93:18596) */}
                 <button
@@ -196,7 +197,7 @@ export function EditBar({ onAddCards, onNewBoard, onDone }: EditBarProps) {
       <button
         type="button"
         onClick={onDone}
-        className={cn('flex h-9 cursor-pointer items-center rounded-full border-0 px-[18px] text-[length:var(--font-size-body-sm)] font-medium leading-5', DIAL, FOCUS)}
+        className={cn('flex h-9 cursor-pointer items-center rounded-full border-0 px-[var(--space-4-5)] text-[length:var(--font-size-body-sm)] font-medium leading-5', DIAL, FOCUS)}
       >
         Done
       </button>

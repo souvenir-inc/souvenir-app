@@ -17,7 +17,7 @@ const bone = (style: React.CSSProperties): React.CSSProperties => ({ flexShrink:
 function TextBar({ width, caption = false }: { width: number | string; caption?: boolean }) {
   return (
     <div style={{ height: caption ? 16 : 22, display: 'flex', alignItems: 'center', minWidth: 0 }}>
-      <div className="kaya-skeleton" style={bone({ width, maxWidth: '100%', height: caption ? 8 : 10, borderRadius: 4 })} />
+      <div className="kaya-skeleton" style={bone({ width, maxWidth: '100%', height: caption ? 8 : 10, borderRadius: 'var(--radius-xs)' })} />
     </div>
   )
 }
@@ -33,8 +33,8 @@ export function SidebarDestinationsSkeleton({ withSlack, collapsed }: { withSlac
   return (
     <>
       {widths.map((w, i) => (
-        <div key={i} aria-hidden style={{ ...ROW, padding: collapsed ? '0 6px' : '0 8px', width: collapsed ? 32 : '100%' }}>
-          <div className="kaya-skeleton" style={bone({ width: 20, height: 20, borderRadius: 6 })} />
+        <div key={i} aria-hidden style={{ ...ROW, padding: collapsed ? '0 var(--space-1-5)' : '0 var(--space-2)', width: collapsed ? 32 : '100%' }}>
+          <div className="kaya-skeleton" style={bone({ width: 20, height: 20, borderRadius: 'var(--radius-sm)' })} />
           {!collapsed && <TextBar width={w} />}
           {!collapsed && withSlack && i === widths.length - 1 && (
             // The "Add" chip at the end of the Slack row.
@@ -51,11 +51,11 @@ function SectionHeader({ labelWidth }: { labelWidth: number }) {
     <div aria-hidden style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 24, padding: 'var(--space-0-5) var(--space-2)', boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
         <TextBar width={labelWidth} />
-        <div className="kaya-skeleton" style={bone({ width: 12, height: 12, borderRadius: 3 })} />
+        <div className="kaya-skeleton" style={bone({ width: 12, height: 12, borderRadius: 'var(--sidebar-chrome-skeleton-radius)' })} />
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
-        <div className="kaya-skeleton" style={bone({ width: 16, height: 16, borderRadius: 4 })} />
-        <div className="kaya-skeleton" style={bone({ width: 16, height: 16, borderRadius: 4 })} />
+        <div className="kaya-skeleton" style={bone({ width: 16, height: 16, borderRadius: 'var(--radius-xs)' })} />
+        <div className="kaya-skeleton" style={bone({ width: 16, height: 16, borderRadius: 'var(--radius-xs)' })} />
       </div>
     </div>
   )
@@ -67,7 +67,7 @@ export function SidebarProjectsSkeleton() {
     <>
       <SectionHeader labelWidth={53} />
       <div aria-hidden style={{ ...ROW, padding: '0 var(--space-2)' }}>
-        <div className="kaya-skeleton" style={bone({ width: 20, height: 20, borderRadius: 6 })} />
+        <div className="kaya-skeleton" style={bone({ width: 20, height: 20, borderRadius: 'var(--radius-sm)' })} />
         <TextBar width={104} />
       </div>
     </>
@@ -105,18 +105,18 @@ export function SidebarProfileSkeleton({ collapsed }: { collapsed: boolean }) {
   if (collapsed) {
     return (
       <div aria-hidden style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-        <div className="kaya-skeleton" style={bone({ width: 32, height: 32, borderRadius: 9999 })} />
+        <div className="kaya-skeleton" style={bone({ width: 32, height: 32, borderRadius: 'var(--radius-full)' })} />
       </div>
     )
   }
   return (
     <div aria-hidden style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', width: '100%', height: 50, padding: '0 var(--space-3)', boxSizing: 'border-box' }}>
-      <div className="kaya-skeleton" style={bone({ width: 32, height: 32, borderRadius: 9999 })} />
+      <div className="kaya-skeleton" style={bone({ width: 32, height: 32, borderRadius: 'var(--radius-full)' })} />
       <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
         <TextBar width={36} />
         <TextBar width={92} caption />
       </div>
-      <div className="kaya-skeleton" style={bone({ width: 16, height: 16, borderRadius: 4 })} />
+      <div className="kaya-skeleton" style={bone({ width: 16, height: 16, borderRadius: 'var(--radius-xs)' })} />
     </div>
   )
 }

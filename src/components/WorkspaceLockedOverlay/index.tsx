@@ -22,8 +22,8 @@ export function WorkspaceLockedOverlay({ isAdmin, onAdminAction }: WorkspaceLock
         alignItems:           'center',
         justifyContent:       'center',
         backgroundColor:      'color-mix(in srgb, var(--neutral-100) 88%, transparent)',
-        backdropFilter:       'blur(4px)',
-        WebkitBackdropFilter: 'blur(4px)',
+        backdropFilter:       'blur(var(--blur-xs))',
+        WebkitBackdropFilter: 'blur(var(--blur-xs))',
         borderRadius:         'inherit',
       }}
     >

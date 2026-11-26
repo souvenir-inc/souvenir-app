@@ -288,7 +288,7 @@ export function ProjectChatRow(
                 padding:         'var(--space-0-5) var(--space-1)',
                 borderRadius:    'var(--radius-sm)',
                 backgroundColor: 'var(--blue-100)',
-                boxShadow:       '0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px var(--blue-600-50)',
+                boxShadow:       'var(--shadow-chip-selected)',
                 fontFamily:      'var(--font-body)',
                 fontWeight:      'var(--font-weight-medium)',
                 fontSize:        'var(--font-size-caption)',
@@ -429,8 +429,8 @@ export function ProjectChatRow(
             width:          !hasPins ? '78px' : undefined,
             overflow:       'hidden',
             boxShadow:      (showPinAction && hasPins)
-              ? '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4)'
-              : '0px 0px 0px 1px rgba(59,54,50,0.3)',
+              ? 'var(--shadow-chip)'
+              : 'var(--shadow-ring-strong)',
             transition:     'box-shadow var(--duration-fast) ease',
           }}
         >
@@ -492,7 +492,7 @@ export function ProjectChatRow(
                 inset:         0,
                 pointerEvents: 'none',
                 borderRadius:  'var(--radius-md)',
-                boxShadow:     'inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 61%, transparent), inset 0px -1px 0px 0px rgba(106,98,93,0.05)',
+                boxShadow:     'var(--shadow-badge-inner)',
               }}
             />
           )}

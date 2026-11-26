@@ -41,7 +41,7 @@ export interface SheetContentProps extends React.ComponentPropsWithoutRef<typeof
 export function SheetContent({
   side = 'left',
   title,
-  overlayColor = 'rgba(0, 0, 0, 0.32)',
+  overlayColor = 'var(--sheet-color)',
   zIndex = 'var(--z-modal)',
   style,
   children,

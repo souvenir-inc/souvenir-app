@@ -79,8 +79,8 @@ export function ScheduleCard({
       : 'var(--card-bg)'
 
   const boxShadow = focused
-    ? '0px 1px 3px 0px rgba(82, 75, 71, 0.08), 0px 0px 0px 2px var(--blue-300)'
-    : '0px 1px 3px 0px rgba(82, 75, 71, 0.08), 0px 0px 0px 1px var(--border-default)'
+    ? 'var(--schedule-card-box-shadow)'
+    : 'var(--schedule-card-box-shadow-2)'
 
   return (
     <button

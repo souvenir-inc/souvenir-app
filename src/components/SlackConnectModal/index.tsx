@@ -9,8 +9,8 @@ import { SouvenirLogo } from '@/components/SouvenirLogo'
 import { getOrgSlackStatus, getSlackInstallUrl, getSlackStatus } from '@/lib/api/slack'
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
-const SHADOW_MODAL = '0px 12px 16px -4px rgba(130,122,116,0.12), var(--shadow-soft), 0px 0px 0px 1px var(--neutral-100)'
-const SHADOW_CARD_BORDER = '0px 1px 1.5px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-200)'
+const SHADOW_MODAL = 'var(--shadow-modal-soft)'
+const SHADOW_CARD_BORDER = 'var(--slack-connect-modal-shadow-card-border)'
 
 // Poll the Slack status after the install tab opens, until the bot reports
 // installed or we give up. 3s cadence keeps it responsive without hammering.

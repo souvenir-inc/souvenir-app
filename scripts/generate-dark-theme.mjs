@@ -251,11 +251,15 @@ const shadowVar = /var\(\s*(--neutral-(?:600|700|800|900|950|black)-\d+)\s*\)/g
 const blackRing = /var\(\s*--neutral-black\s*\)/g
 const shadowOut = []
 const seen = new Set()
+// Tokens added by the 2026-11-26 token pass replaced hard-coded literals, which never changed in dark
+// mode; they keep their written value here (no automatic shadow rewrite).
+const block = (src, start, end) => { const i = src.indexOf(start); if (i < 0) return ''; const j = src.indexOf(end, i); return src.slice(i, j < 0 ? undefined : j) }
+const AS_WRITTEN = new Set([...block(semantic, 'Component values (mapped 2026-11-26)', 'end component values (2026-11-26)').matchAll(/(--[a-zA-Z0-9-]+)s*:/g)].map((m) => m[1]))
 for (const src of [alias, semantic]) {
   let m
   while ((m = tokenRe.exec(src))) {
     const [, name, value] = m
-    if (!/shadow/i.test(name) || seen.has(name)) continue
+    if (!/shadow/i.test(name) || seen.has(name) || AS_WRITTEN.has(name)) continue
     const hasVar = new RegExp(shadowVar.source).test(value)
     const hasRing = new RegExp(blackRing.source).test(value)
     if (!hasVar && !hasRing) continue
@@ -608,7 +612,9 @@ for (const l of lines) {
   const m = l.match(/^\s*(--[a-zA-Z0-9-]+):\s*(.+?);\s*(?:\/\*.*\*\/)?\s*$/)
   if (m) darkEffective[m[1]] = m[2].trim()
 }
-const aliasAndSemantic = { ...decls(noComments(read('aliases.css'))), ...decls(noComments(read('semantic.css'))) }
+// (the 2026-11-26 shared steps in scales.css are restated too, so they resolve like the literals they replaced)
+const scalesAdded = block(read('scales.css'), 'Added 2026-11-26: steps the fix-all pass needed', '/* ── Tailwind mapping')
+const aliasAndSemantic = { ...decls(noComments(read('aliases.css'))), ...decls(noComments(read('semantic.css'))), ...decls(noComments(scalesAdded)) }
 const effective = (n) => darkEffective[n] ?? aliasAndSemantic[n] ?? lightVars[n]
 const dependsMemo = new Map()
 function dependsOnRamp(name, trail = new Set()) {

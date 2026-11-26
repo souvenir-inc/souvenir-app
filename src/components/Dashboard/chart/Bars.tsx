@@ -56,7 +56,7 @@ export function WeeklyBars({ metric, variant, className }: { metric: Metric; var
           {full && (top > 0 ? [0, max / 2, max] : [0]).map((t) => (
             <g key={t}>
               <line x1={0} x2={plotW} y1={y(t)} y2={y(t)} stroke="var(--dashboard-chart-soft)" strokeDasharray={t === 0 ? undefined : '2 3'} />
-              <text x={plotW + 10} y={y(t) + 4} fontSize={12} fill="var(--dashboard-muted)">{formatMetricValue(t, metric.format)}</text>
+              <text x={plotW + 10} y={y(t) + 4} fontSize="var(--font-size-small)" fill="var(--dashboard-muted)">{formatMetricValue(t, metric.format)}</text>
             </g>
           ))}
           {hover != null && (
@@ -73,7 +73,7 @@ export function WeeklyBars({ metric, variant, className }: { metric: Metric; var
             )
           })}
           {full && weeks.map((w, i) => (
-            <text key={`l${w.start.getTime()}`} x={cx(i)} y={plotH + 20} fontSize={12} textAnchor="middle" fill="var(--dashboard-muted)">{dayMonth(w.start)}</text>
+            <text key={`l${w.start.getTime()}`} x={cx(i)} y={plotH + 20} fontSize="var(--font-size-small)" textAnchor="middle" fill="var(--dashboard-muted)">{dayMonth(w.start)}</text>
           ))}
           <rect x={0} y={0} width={plotW} height={plotH} fill="transparent" onPointerMove={onMove} onPointerDown={onMove} style={{ touchAction: 'pan-y' }} />
         </svg>

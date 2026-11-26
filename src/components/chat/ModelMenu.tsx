@@ -116,7 +116,7 @@ function effortLabel(effort: string | null): string {
 
 // Off is neutral; the supported efforts warm from calm blue through violet
 // and amber to a hot red, spread evenly over however many the model has.
-const EFFORT_RAMP = ['#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444']
+const EFFORT_RAMP = ['var(--model-menu-effort-ramp)', 'var(--model-menu-effort-ramp-2)', 'var(--model-menu-effort-ramp-3)', 'var(--model-menu-effort-ramp-4)']
 
 function effortColor(index: number, count: number): string {
   if (index === 0) return 'var(--neutral-500)'
@@ -336,7 +336,7 @@ export function ModelMenu({ onClose }: ModelMenuProps = {}) {
                   marginRight:          'var(--model-menu-scroll-bleed)',
                 }}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: `${MODEL_ROW_GAP}px` }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: `${MODEL_ROW_GAP}px` /* ds-keep: also used in layout maths */ }}>
                   {sortedModels.map(renderModelItem)}
                 </div>
               </div>

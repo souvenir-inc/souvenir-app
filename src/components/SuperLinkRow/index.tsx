@@ -10,6 +10,7 @@ import { Tooltip } from '@/components/Tooltip'
 import { TokenBudgetBar } from '@/components/TokenBudgetBar'
 import { springs } from '@/lib/springs'
 import { cn } from '@/lib/utils'
+import { BLUR } from "@/styles/tokens/motion"
 
 function fmt(n: number): string {
   return n.toLocaleString('en-US')
@@ -211,9 +212,9 @@ export function SuperLinkRow(
                   <AnimatePresence mode="popLayout" initial={false}>
                     <m.span
                       key={copied ? 'check' : 'copy'}
-                      initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                      initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                       animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-                      exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                      exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                       transition={springs.fast}
                       style={{ display: 'inline-flex', transformOrigin: 'center' }}
                     >

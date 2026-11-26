@@ -197,7 +197,7 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
                 <button type="button" onClick={clearSearch} className={cn('h-8 cursor-pointer rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-3 text-[length:var(--font-size-body-sm)] font-medium text-[var(--dashboard-figure)] shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}>Clear search</button>
               </div>
             ) : lines.map((l, i) => {
-              if (l.kind === 'heading') return <p key={`h${i}`} className="m-0 px-2.5 pb-1.5 pt-2.5 text-[length:var(--font-size-caption)] font-semibold leading-4 tracking-[0.6px] text-[var(--dashboard-muted)] first:pt-1">{l.text}</p>
+              if (l.kind === 'heading') return <p key={`h${i}`} className="m-0 px-2.5 pb-1.5 pt-2.5 text-[length:var(--font-size-caption)] font-semibold leading-4 tracking-[var(--dashboard-section-tracking)] text-[var(--dashboard-muted)] first:pt-1">{l.text}</p>
               if (l.kind === 'gap') return <span key={`g${i}`} aria-hidden className="shrink-0" style={{ height: l.size }} />
               if (l.kind === 'callout') return <CallOut key="callout" count={l.count} />
               rowIndex += 1
@@ -227,7 +227,7 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
                   )}
                 >
                   <Checkbox state={!can ? 'none' : picked ? 'on' : 'off'} />
-                  <span className={cn('flex shrink-0 items-center gap-[3px]', !can && 'opacity-45')}>
+                  <span className={cn('flex shrink-0 items-center gap-[var(--space-0-75)]', !can && 'opacity-45')}>
                     {m.custom ? <CustomMark /> : marks.map((app) => <SourceLogo key={app.id} app={app} className="size-4" />)}
                   </span>
                   <span title={m.label} className={cn('min-w-0 flex-1 truncate text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--dashboard-figure)]', picked && 'font-medium', !can && 'opacity-45')}>
@@ -266,7 +266,7 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
 }
 
 function RailHeading({ children, first = false }: { children: React.ReactNode; first?: boolean }) {
-  return <p className={cn('m-0 pl-2.5 text-[length:var(--font-size-caption)] font-semibold leading-4 tracking-[0.6px] text-[var(--dashboard-muted)]', first ? 'py-1.5' : 'pb-1.5 pt-2.5')}>{children}</p>
+  return <p className={cn('m-0 pl-2.5 text-[length:var(--font-size-caption)] font-semibold leading-4 tracking-[var(--dashboard-section-tracking)] text-[var(--dashboard-muted)]', first ? 'py-1.5' : 'pb-1.5 pt-2.5')}>{children}</p>
 }
 
 function RailItem({ icon, label, selected, onClick }: { icon: React.ReactElement<{ size?: number }>; label: string; selected: boolean; onClick: () => void }) {
@@ -292,7 +292,7 @@ function RailItem({ icon, label, selected, onClick }: { icon: React.ReactElement
 function Checkbox({ state }: { state: 'off' | 'on' | 'none' }) {
   if (state === 'none') return <span aria-hidden className="size-4 shrink-0" />
   return (
-    <span aria-hidden className={cn('flex size-4 shrink-0 items-center justify-center rounded', state === 'on' ? 'bg-[var(--dashboard-figure)] text-[var(--dashboard-card-bg)]' : 'border-[1.25px] border-solid border-[var(--dashboard-checkbox-border)] bg-[var(--dashboard-card-bg)]')}>
+    <span aria-hidden className={cn('flex size-4 shrink-0 items-center justify-center rounded', state === 'on' ? 'bg-[var(--dashboard-figure)] text-[var(--dashboard-card-bg)]' : 'border-[length:var(--add-cards-dialog-border-width)] border-solid border-[var(--dashboard-checkbox-border)] bg-[var(--dashboard-card-bg)]')}>
       {state === 'on' && <Check size={12} strokeWidth={2.5} absoluteStrokeWidth />}
     </span>
   )
@@ -324,7 +324,7 @@ function CallOut({ count }: { count: number }) {
       { }
       <a
         href={ORG_CONNECTORS_ROUTE}
-        className={cn('flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1.5 pl-2.5 pr-3 text-[length:var(--font-size-body-sm)] font-medium leading-[18px] text-[var(--dashboard-figure)] no-underline shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}
+        className={cn('flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1.5 pl-2.5 pr-3 text-[length:var(--font-size-body-sm)] font-medium leading-[var(--line-height-compact)] text-[var(--dashboard-figure)] no-underline shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}
       >
         <Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />Connect
       </a>

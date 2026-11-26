@@ -6,6 +6,7 @@ import { PINS_ENABLED } from "@/lib/feature-flags";
 import { IconButton } from "@/components/ui/button";
 import { Tooltip } from "@/components/Tooltip";
 import { PinIcon, CopyOneIcon, RedoIcon, TickTwoIcon } from "@strange-huge/icons";
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Assistant action bar: Pin / Copy / Regenerate ─────────────────────────────
 
@@ -57,7 +58,7 @@ export function MessageActionBar({
   return (
     <m.div
       animate={{ opacity: revealSettled ? 1 : 0 }}
-      transition={{ duration: 0.15 }}
+      transition={{ duration: DURATION.quick }}
       style={{
         display: "flex",
         gap: 'var(--space-0-5)',

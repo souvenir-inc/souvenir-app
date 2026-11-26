@@ -141,12 +141,12 @@ export function SuperLinksTab({
 
             {sharesLoading ? (
               <div style={{ backgroundColor: 'var(--card-bg)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', boxShadow: SHADOW_TILE, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', flex: 1 }}>
-                <Skeleton width={110} height={14} radius={4} />
+                <Skeleton width={110} height={14} radius={'var(--radius-xs)'} />
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', minWidth: 0 }}>
                   <Skeleton width={24} height={24} radius="50%" />
-                  <Skeleton width={100} height={16} radius={4} />
+                  <Skeleton width={100} height={16} radius={'var(--radius-xs)'} />
                 </div>
-                <Skeleton width={160} height={14} radius={4} />
+                <Skeleton width={160} height={14} radius={'var(--radius-xs)'} />
               </div>
             ) : topShare && (
               <div style={{ backgroundColor: 'var(--card-bg)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', boxShadow: SHADOW_TILE, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', flex: 1 }}>
@@ -186,7 +186,7 @@ export function SuperLinksTab({
             }
           >
             {sharesLoading ? (
-              <Skeleton width={80} height={28} radius={5} />
+              <Skeleton width={80} height={28} radius={'var(--super-links-tab-radius)'} />
             ) : (
               <span style={{
                 fontFamily: 'var(--font-title)',
@@ -200,7 +200,7 @@ export function SuperLinksTab({
             )}
 
             {sharesLoading ? (
-              <Skeleton width="100%" height={180} radius={10} />
+              <Skeleton width="100%" height={180} radius={'var(--radius-lg)'} />
             ) : (
               <Sparkline data={sparkData} height={180} />
             )}
@@ -225,7 +225,7 @@ export function SuperLinksTab({
             <SuperLinksEmpty onBrowsePersonas={() => onBrowseAgents()} />
           ) : (
             <SettingsTable columns={MY_LINKS_COLUMNS} columnGap={16} background='var(--card-bg)'>
-              <SettingsTableToolbar title={sharesLoading ? <Skeleton width={130} height={16} radius={4} /> : `My Superlinks · ${totalLinks}`}>
+              <SettingsTableToolbar title={sharesLoading ? <Skeleton width={130} height={16} radius={'var(--radius-xs)'} /> : `My Superlinks · ${totalLinks}`}>
                 <IconButton
                   variant="ghost"
                   size="sm"
@@ -384,7 +384,7 @@ export function SuperLinksTab({
           )
         ) : (
           <SettingsTable columns={SHARED_LINKS_COLUMNS} columnGap={16} background='var(--card-bg)'>
-            <SettingsTableToolbar title={receivedLoading ? <Skeleton width={150} height={16} radius={4} /> : `Shared Superlinks · ${receivedShares.length}`} />
+            <SettingsTableToolbar title={receivedLoading ? <Skeleton width={150} height={16} radius={'var(--radius-xs)'} /> : `Shared Superlinks · ${receivedShares.length}`} />
             <SettingsTableViewport ariaLabel="Shared with me">
               <SettingsTableHeader>
                 <SettingsTableHeaderCell>Agent</SettingsTableHeaderCell>

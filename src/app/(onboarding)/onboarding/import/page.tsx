@@ -205,7 +205,7 @@ export default function OnboardingImportPage() {
                 border: "1px solid var(--blue-600-50)",
                 cursor: "pointer",
                 boxShadow:
-                  "0px 1px 1.5px 0px rgba(2,15,24,0.2), inset 0px 1px 0px 0px var(--blue-50-70), inset 0px -1px 0px 0px var(--blue-600-10)",
+                  "var(--import-shadow)",
               }}
             >
               <span

@@ -57,7 +57,7 @@ export function Alert({ tone = 'info', title, icon, action, onDismiss, urgency =
   return (
     <div ref={ref} role={urgency} data-tone={TOKEN[tone]} className={cn(alertVariants({ tone }), className)} {...props}>
       {icon !== false && (
-        <span aria-hidden className="mt-[3px] inline-flex shrink-0">
+        <span aria-hidden className="mt-[var(--space-0-75)] inline-flex shrink-0">
           {icon ?? <Icon size={16} color="currentColor" />}
         </span>
       )}

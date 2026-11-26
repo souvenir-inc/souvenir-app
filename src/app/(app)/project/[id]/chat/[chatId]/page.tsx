@@ -86,6 +86,7 @@ function LoadingChatSkeleton() {
 // ── Page ──────────────────────────────────────────────────────────────────────
 import { useRecommendationsState } from '@/hooks/use-recommendations'
 import { FileDropOverlay } from '@/components/chat/FileDropOverlay'
+import { DURATION } from "@/styles/tokens/motion"
 
 
 function ProjectChatPageInner() {
@@ -552,7 +553,7 @@ function ProjectChatPageInner() {
         {isNewChatState ? (
           <m.div
             key="new-chat"
-            exit={{ opacity: 0, transition: { duration: 0.28, ease: [0.4, 0, 1, 1] } }}
+            exit={{ opacity: 0, transition: { duration: DURATION.moderate, ease: [0.4, 0, 1, 1] } }}
             className="kaya-scrollbar"
             style={{ position: 'absolute', inset: 0, overflowY: 'auto' }}
           >
@@ -579,13 +580,13 @@ function ProjectChatPageInner() {
                   width:         '100%',
                 }}
               >
-                <m.div exit={{ opacity: 0, y: -28, transition: { duration: 0.22, ease: [0.4, 0, 1, 1] } }}>
+                <m.div exit={{ opacity: 0, y: -28, transition: { duration: DURATION.base, ease: [0.4, 0, 1, 1] } }}>
                   <InitialPrompts />
                 </m.div>
 
                 <m.div
                   style={{ width: '100%', maxWidth: '640px', margin: '0 auto' }}
-                  exit={{ opacity: 0, y: 36, transition: { duration: 0.22, ease: [0.4, 0, 1, 1] } }}
+                  exit={{ opacity: 0, y: 36, transition: { duration: DURATION.base, ease: [0.4, 0, 1, 1] } }}
                 >
                   <AnimatePresence>
                     {creditNoticeStatus && (
@@ -675,7 +676,7 @@ function ProjectChatPageInner() {
           <m.div
             key="active-chat"
             initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0, transition: { duration: 0.35, ease: [0, 0, 0.2, 1] } }}
+            animate={{ opacity: 1, y: 0, transition: { duration: DURATION.slow, ease: [0, 0, 0.2, 1] } }}
             style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}
           >
             <ChatInterface

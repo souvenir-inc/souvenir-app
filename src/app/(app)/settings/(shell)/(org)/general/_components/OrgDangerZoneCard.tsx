@@ -70,7 +70,7 @@ export function OrgDangerZoneCard({ orgId, workspaceName, canDeleteOrg }: { orgI
             flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: 'var(--space-1-5) var(--space-2-5) var(--space-2)', borderRadius: 'var(--radius-lg)', border: 'none', cursor: 'pointer',
             backgroundColor: 'var(--neutral-white)',
-            boxShadow: '0px 1.091px 1.091px 0px rgba(24,2,2,0.05), 0px 1.455px 3.127px 0px rgba(24,2,2,0.15), 0px 0px 0px 1px var(--red-100)',
+            boxShadow: 'var(--shadow-card-raised-danger)',
             fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--red-500)', whiteSpace: 'nowrap',
           }}
         >
@@ -106,7 +106,7 @@ export function OrgDangerZoneCard({ orgId, workspaceName, canDeleteOrg }: { orgI
             padding: 'var(--space-1-5) var(--space-2-5) var(--space-2)', borderRadius: 'var(--radius-lg)', border: 'none', cursor: 'not-allowed',
             opacity: 0.5,
             backgroundColor: 'var(--neutral-white)',
-            boxShadow: '0px 1.091px 1.091px 0px rgba(24,2,2,0.05), 0px 1.455px 3.127px 0px rgba(24,2,2,0.15), 0px 0px 0px 1px var(--red-100)',
+            boxShadow: 'var(--shadow-card-raised-danger)',
             fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--red-500)', whiteSpace: 'nowrap',
           }}
         >
@@ -145,7 +145,7 @@ export function OrgDangerZoneCard({ orgId, workspaceName, canDeleteOrg }: { orgI
             cursor: 'not-allowed',
             opacity: 0.5,
             backgroundColor: 'var(--neutral-white)',
-            boxShadow: '0px 1.091px 1.091px 0px rgba(24,2,2,0.05), 0px 1.455px 3.127px 0px rgba(24,2,2,0.15), 0px 0px 0px 1px var(--red-100)',
+            boxShadow: 'var(--shadow-card-raised-danger)',
             fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--red-500)', whiteSpace: 'nowrap',
           }}
         >

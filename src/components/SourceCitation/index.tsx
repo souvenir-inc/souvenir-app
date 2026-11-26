@@ -323,7 +323,7 @@ export const SourceCitation = React.forwardRef<HTMLButtonElement, SourceCitation
               sideOffset={6}
               align="start"
               forceMount
-              className="z-9999"
+              className="z-[var(--citation-popover-z)]"
               style={{ outline: 'none' }}
             >
               <AnimatePresence>

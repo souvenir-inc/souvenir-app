@@ -16,14 +16,14 @@ const PADDING_Y = 7
 
 const textareaClassName = cn(
   'block w-full min-w-0 resize-none box-border m-0 border-0 outline-none',
-  'px-2.5 py-[7px] rounded-lg', // 7px matches InputField's padding exactly
+  'px-2.5 py-[var(--space-1-75)] rounded-lg', // 7px matches InputField's padding exactly
   'text-body font-normal font-[family-name:var(--font-body)]',
   'bg-[var(--text-field-bg)] text-[var(--text-field-text)] placeholder:text-[var(--text-field-placeholder)]',
   'shadow-[0px_1px_1.5px_0px_var(--neutral-700-12),0px_0px_0px_1px_var(--text-field-ring)]',
   'hover:shadow-[0px_1px_1.5px_0px_var(--neutral-700-12),0px_0px_0px_1px_var(--text-field-ring-hover)]',
   'data-[invalid]:shadow-[0px_1px_1.5px_0px_var(--neutral-700-12),0px_0px_0px_1px_var(--red-500)]',
-  'outline-2 outline-solid outline-offset-[6px] outline-transparent',
-  'focus-visible:outline-[var(--focus-ring)] focus-visible:outline-offset-[3px] data-[invalid]:outline-transparent',
+  'outline-2 outline-solid outline-offset-6 outline-transparent',
+  'focus-visible:outline-[var(--focus-ring)] focus-visible:outline-offset-3 data-[invalid]:outline-transparent',
   'transition-[box-shadow,outline-color,outline-offset] duration-base ease-standard',
   'disabled:cursor-not-allowed disabled:text-[var(--text-field-label-disabled)]',
 )

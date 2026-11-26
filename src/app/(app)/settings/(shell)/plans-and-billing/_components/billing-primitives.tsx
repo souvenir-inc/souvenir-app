@@ -74,7 +74,7 @@ export function fmtNum(n: number | null | undefined): string {
 export const SHADOW_CARD    = 'var(--shadow-soft)'                                   // bordered section card
 export const SHADOW_TILE     = 'var(--shadow-tile)' // white inner tile
 export const SHADOW_MODAL   = 'var(--shadow-4)'
-export const SHADOW_INPUT   = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)'
+export const SHADOW_INPUT   = 'var(--shadow-control)'
 
 // Same "big number" / secondary-text convention as the Monthly Limits /
 // Active members cards on /settings/analytics — applied here to the Plan /
@@ -109,7 +109,7 @@ export function Badge({ label, tone }: { label: string; tone: 'blue' | 'yellow' 
     blue:    { bg: 'var(--blue-100)',    fg: 'var(--blue-700)',    ring: 'var(--blue-600-50)' },
     yellow:  { bg: 'var(--yellow-100)',  fg: 'var(--yellow-700)',  ring: 'color-mix(in srgb, var(--yellow-600) 50%, transparent)' },
     neutral: { bg: 'var(--neutral-100)', fg: 'var(--neutral-700)', ring: 'color-mix(in srgb, var(--neutral-600) 50%, transparent)' },
-    green:   { bg: 'var(--green-50)',    fg: 'var(--green-800)',   ring: 'rgba(128,183,7,0.5)' },
+    green:   { bg: 'var(--green-50)',    fg: 'var(--green-800)',   ring: 'var(--color-tag-Green-ring)' },
     red:     { bg: 'var(--red-100)',     fg: 'var(--red-700)',     ring: 'var(--red-600-51)' },
   }[tone]
   return (
@@ -120,7 +120,7 @@ export function Badge({ label, tone }: { label: string; tone: 'blue' | 'yellow' 
       borderRadius:   'var(--radius-sm)',
       background:     map.bg,
       color:          map.fg,
-      boxShadow:      `0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px ${map.ring}`,
+      boxShadow:      `0px 1px 1.5px 0px var(--billing-primitives-shadow-color), 0px 0px 0px 1px ${map.ring}`,
       fontFamily:     'var(--font-body)',
       fontWeight:     'var(--font-weight-medium)',
       fontSize:       'var(--font-size-caption)',
@@ -187,7 +187,7 @@ export function SectionCard({
     }}>
       <div style={{
         borderBottom: headerDivider ? '1px solid var(--neutral-100)' : undefined,
-        padding:      headerDivider ? '0 24px 24px' : '0 24px',
+        padding:      headerDivider ? '0 var(--space-6) var(--space-6)' : '0 var(--space-6)',
         display:      'flex',
         alignItems:   'center',
         gap:          'var(--space-3)',

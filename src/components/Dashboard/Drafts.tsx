@@ -199,7 +199,7 @@ export function DraftBar({ draft, onStop, onRedraft, onEdit, onDiscard, onKeep }
       <button type="button" className={segment} onClick={onDiscard}>Discard</button>
       {draft.phase === 'ready' && (
         // eslint-disable-next-line no-restricted-syntax -- ds-allow: the dark Keep board segment (Figma 171:89377)
-        <button type="button" onClick={onKeep} className={cn('flex h-9 cursor-pointer items-center whitespace-nowrap rounded-full border-0 px-[18px] text-[length:var(--font-size-body-sm)] font-medium leading-5', DIAL, FOCUS)}>
+        <button type="button" onClick={onKeep} className={cn('flex h-9 cursor-pointer items-center whitespace-nowrap rounded-full border-0 px-[var(--space-4-5)] text-[length:var(--font-size-body-sm)] font-medium leading-5', DIAL, FOCUS)}>
           Keep board
         </button>
       )}

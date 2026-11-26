@@ -47,13 +47,13 @@
 .wash {
   position: absolute;
   inset: -15%;
-  filter: blur(30px);
+  filter: blur(var(--image-generation-preview-blur));
   transform: scale(1.08);
   transition: filter 3s ease, transform 3s ease; /* ds-keep: the preview's slow reveal */
 }
-.card[data-stage="1"] .wash { filter: blur(20px); transform: scale(1.05); }
-.card[data-stage="2"] .wash { filter: blur(12px); transform: scale(1.02); }
-.card[data-stage="3"] .wash { filter: blur(7px); transform: scale(1); }
+.card[data-stage="1"] .wash { filter: blur(var(--image-generation-preview-blur-2)); transform: scale(1.05); }
+.card[data-stage="2"] .wash { filter: blur(var(--blur-md)); transform: scale(1.02); }
+.card[data-stage="3"] .wash { filter: blur(var(--image-generation-preview-blur-3)); transform: scale(1); }
 
 .blob {
   position: absolute;
@@ -107,7 +107,7 @@
     color-mix(in srgb, var(--neutral-white) 65%, transparent),
     transparent
   );
-  filter: blur(8px);
+  filter: blur(var(--blur-sm));
   mix-blend-mode: soft-light;
   animation: igp-front-wave 2.2s ease-in-out infinite alternate;
 }
@@ -123,7 +123,7 @@
   padding: var(--space-1-5) var(--space-3) var(--space-1-5) var(--space-2-5);
   border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--static-black) 45%, transparent);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(var(--blur-sm));
   color: var(--static-white);
   font-size: var(--font-size-label);
   font-weight: var(--font-weight-medium);

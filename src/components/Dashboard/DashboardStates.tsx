@@ -9,7 +9,7 @@ export function Frame({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-[var(--neutral-50)] py-2.5 pr-2.5">
       <section aria-label="Dashboard" className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[var(--layout-radius)] border border-solid border-[var(--border-default)] bg-[var(--dashboard-panel-bg)]">
-        <div className="mx-auto box-border w-full max-w-[1232px] px-4 pt-[15px]">{children}</div>
+        <div className="mx-auto box-border w-full max-w-[1232px] px-4 pt-[var(--dashboard-page-top)]">{children}</div>
       </section>
     </div>
   )
@@ -20,7 +20,7 @@ const QUIET_BUTTON = 'h-8 cursor-pointer rounded-lg border border-solid border-[
 /** Something the warehouse didn't answer, with Try again (CR-21). */
 export function Problem({ text, onRetry }: { text: string; onRetry: () => void }) {
   return (
-    <div data-board-failed className="flex min-h-[240px] flex-col items-center justify-center gap-3 rounded-xl text-[length:var(--font-size-body-sm)] leading-[17px] text-[var(--dashboard-figure)]">
+    <div data-board-failed className="flex min-h-[240px] flex-col items-center justify-center gap-3 rounded-xl text-[length:var(--font-size-body-sm)] leading-[var(--dashboard-line-height-sm)] text-[var(--dashboard-figure)]">
       <p className="m-0">{text}</p>
       {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the white Try again of Figma 170:47131 (1px #D3CEC8, 8px radius, 32px) */}
       <button type="button" onClick={onRetry} className={QUIET_BUTTON}>Try again</button>
@@ -32,7 +32,7 @@ export function Problem({ text, onRetry }: { text: string; onRetry: () => void }
 export function NoStore() {
   return (
     <div data-no-store className="flex min-h-[320px] flex-col items-center justify-center gap-3 text-center text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-figure)]">
-      <p className="m-0 text-[15px] font-medium">Connect your store to see its numbers</p>
+      <p className="m-0 text-[length:var(--font-size-body-md)] font-medium">Connect your store to see its numbers</p>
       <p className="m-0 max-w-[360px] text-[var(--dashboard-label)]">Your dashboard builds itself once Shopify or another store is connected. The first sync takes a few minutes.</p>
       { }
       <a href={ORG_CONNECTORS_ROUTE} className={cn(QUIET_BUTTON, 'flex items-center')}>Connect an app</a>

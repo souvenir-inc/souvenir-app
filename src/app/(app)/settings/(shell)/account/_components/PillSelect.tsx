@@ -89,7 +89,7 @@ export function PillSelect<T extends string>({
           borderRadius:    'var(--radius-md)',
           border:          'none',
           backgroundColor: 'var(--field-surface)',
-          boxShadow:       '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)',
+          boxShadow:       'var(--shadow-card-raised)',
           cursor:          pending ? 'not-allowed' : 'pointer',
           opacity:         pending ? 0.6 : 1,
           fontFamily:      'var(--font-body)',
@@ -144,7 +144,7 @@ export function PillSelect<T extends string>({
               — a single, first-pass-then-stretch computation with no
               percentage-of-indeterminate-ancestor step, so the item's right
               edge lands exactly on the container's own edge. */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: OPTION_ROW_GAP, padding: 'var(--space-2)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: OPTION_ROW_GAP /* ds-keep: also used in layout maths */, padding: 'var(--space-2)' }}>
             {options.map(option => (
               <Dropdown.Item
                 key={option}

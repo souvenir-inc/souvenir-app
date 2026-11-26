@@ -169,7 +169,7 @@ function PersonaPublishedContent() {
                 width: 716,
                 height: 586,
                 borderRadius: 'var(--radius-3xl)',
-                filter: 'blur(108px)',
+                filter: 'blur(var(--published-blur))',
                 mixBlendMode: 'hard-light',
                 background:
                   'radial-gradient(ellipse at 50% 26%, color-mix(in srgb, var(--red-200) 21%, transparent) 14.4%, color-mix(in srgb, var(--brown-400) 45%, transparent) 38%, color-mix(in srgb, var(--neutral-500) 70%, transparent) 61.5%, color-mix(in srgb, var(--neutral-500) 70%, transparent) 100%)',
@@ -201,7 +201,7 @@ function PersonaPublishedContent() {
                   flexShrink: 0,
                   overflow: 'hidden',
                   boxShadow:
-                    '0px 1.091px 1.09px 0px rgba(59,54,50,0.05), 0px 1.455px 1px 0px rgba(38,33,30,0.15), 0px 0px 0px 5px var(--neutral-100)',
+                    'var(--published-shadow)',
                   backgroundColor: 'var(--neutral-100)',
                 }}
               >

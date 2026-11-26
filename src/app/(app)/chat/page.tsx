@@ -75,6 +75,7 @@ import { useRecommendationsState } from "@/hooks/use-recommendations";
 import { PENDING_PERSONA_KEY } from '@/lib/storage-keys'
 import { loadChatSettings, saveChatSettings } from '@/lib/chat/chat-settings-storage'
 import { FileDropOverlay } from "@/components/chat/FileDropOverlay";
+import { DURATION } from "@/styles/tokens/motion"
 
 
 // ── Per-chat settings helpers ─────────────────────────────────────────────────
@@ -900,7 +901,7 @@ function ChatPageInner({ leftChatId }: { leftChatId?: string }) {
         {isNewChat ? (
           <m.div
             key="new-chat"
-            exit={{ opacity: 0, transition: { duration: 0.28, ease: [0.4, 0, 1, 1] } }}
+            exit={{ opacity: 0, transition: { duration: DURATION.moderate, ease: [0.4, 0, 1, 1] } }}
             className="kaya-scrollbar"
             style={{
               position:  "absolute",
@@ -914,7 +915,7 @@ function ChatPageInner({ leftChatId }: { leftChatId?: string }) {
               <div className={homeStyles.content}>
                 {/* Greeting exits upward */}
                 <m.div
-                  exit={{ opacity: 0, y: -28, transition: { duration: 0.22, ease: [0.4, 0, 1, 1] } }}
+                  exit={{ opacity: 0, y: -28, transition: { duration: DURATION.base, ease: [0.4, 0, 1, 1] } }}
                 >
                   <InitialPrompts compact />
                 </m.div>
@@ -922,7 +923,7 @@ function ChatPageInner({ leftChatId }: { leftChatId?: string }) {
                 {/* Input + action buttons + template cards exit downward */}
                 <m.div
                   className={homeStyles.composer}
-                  exit={{ opacity: 0, y: 36, transition: { duration: 0.22, ease: [0.4, 0, 1, 1] } }}
+                  exit={{ opacity: 0, y: 36, transition: { duration: DURATION.base, ease: [0.4, 0, 1, 1] } }}
                 >
                   <AnimatePresence>
                     {creditNoticeStatus && (
@@ -1024,7 +1025,7 @@ function ChatPageInner({ leftChatId }: { leftChatId?: string }) {
           <m.div
             key="active-chat"
             initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0, transition: { duration: 0.35, ease: [0, 0, 0.2, 1] } }}
+            animate={{ opacity: 1, y: 0, transition: { duration: DURATION.slow, ease: [0, 0, 0.2, 1] } }}
             style={{
               position:      "absolute",
               inset:         0,

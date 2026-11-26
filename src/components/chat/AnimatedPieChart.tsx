@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { m } from "framer-motion";
 import type { PieChartData } from "@/types/chat";
+import { DURATION } from "@/styles/tokens/motion"
 
 // �"��"� AnimatedPieChart �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 
@@ -51,20 +52,20 @@ export function AnimatedPieChart({ data, onComplete, animate = true }: { data: P
               strokeDasharray={`${arc.dashLen} ${arc.gapLen}`}
               strokeDashoffset={i < revealedCount ? 0 : arc.dashLen}
               transform={`rotate(${arc.startDeg} ${CX} ${CY})`}
-              style={{ transition: "stroke-dashoffset 0.52s cubic-bezier(0.16,1,0.3,1), stroke-width var(--duration-fast)", strokeLinecap: "butt", cursor: "pointer" }}
+              style={{ transition: "stroke-dashoffset var(--animated-pie-chart-duration) var(--ease-out-expo), stroke-width var(--duration-fast)", strokeLinecap: "butt", cursor: "pointer" }}
               onMouseEnter={() => setHoveredIdx(i)}
               onMouseLeave={() => setHoveredIdx(null)}
             />
           ))}
           {hoveredIdx !== null ? (
             <>
-              <text x={CX} y={CY - 6} textAnchor="middle" fill={arcs[hoveredIdx].color} fontSize={22} fontWeight="700" fontFamily="inherit">{Math.round(arcs[hoveredIdx].pct * 100)}%</text>
-              <text x={CX} y={CY + 16} textAnchor="middle" fill="var(--neutral-600)" fontSize={10} fontFamily="inherit">{data.unit ? `${Math.round(arcs[hoveredIdx].pct * total)}${data.unit}` : arcs[hoveredIdx].label.split(" ").slice(0, 2).join(" ")}</text>
+              <text x={CX} y={CY - 6} textAnchor="middle" fill={arcs[hoveredIdx].color} fontSize="var(--animated-pie-chart-size)" fontWeight="var(--font-weight-bold)" fontFamily="inherit">{Math.round(arcs[hoveredIdx].pct * 100)}%</text>
+              <text x={CX} y={CY + 16} textAnchor="middle" fill="var(--neutral-600)" fontSize="var(--animated-pie-chart-size-2)" fontFamily="inherit">{data.unit ? `${Math.round(arcs[hoveredIdx].pct * total)}${data.unit}` : arcs[hoveredIdx].label.split(" ").slice(0, 2).join(" ")}</text>
             </>
           ) : (
             <>
-              {data.centerLabel && <text x={CX} y={CY - 4} textAnchor="middle" fill="var(--neutral-900)" fontSize={24} fontWeight="700" fontFamily="inherit">{data.centerLabel}</text>}
-              <text x={CX} y={CY + 16} textAnchor="middle" fill="var(--neutral-600)" fontSize={10} fontFamily="inherit">total</text>
+              {data.centerLabel && <text x={CX} y={CY - 4} textAnchor="middle" fill="var(--neutral-900)" fontSize="var(--font-size-heading)" fontWeight="var(--font-weight-bold)" fontFamily="inherit">{data.centerLabel}</text>}
+              <text x={CX} y={CY + 16} textAnchor="middle" fill="var(--neutral-600)" fontSize="var(--animated-pie-chart-size-2)" fontFamily="inherit">total</text>
             </>
           )}
         </svg>
@@ -74,7 +75,7 @@ export function AnimatedPieChart({ data, onComplete, animate = true }: { data: P
           <m.div key={arc.label}
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: i < revealedCount ? 1 : 0, y: i < revealedCount ? 0 : 4 }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
+            transition={{ duration: DURATION.base, ease: "easeOut" }}
             onMouseEnter={() => setHoveredIdx(i)} onMouseLeave={() => setHoveredIdx(null)}
             style={{ display: "flex", alignItems: "center", gap: 'var(--space-2)', cursor: "default", opacity: hoveredIdx !== null && hoveredIdx !== i ? 0.45 : undefined, transition: "opacity var(--duration-fast)" }}>
             <div style={{ width: 10, height: 10, borderRadius: 'var(--radius-xs)', background: arc.color, flexShrink: 0 }} />

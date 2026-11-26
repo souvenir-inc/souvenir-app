@@ -192,7 +192,7 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
         )}
 
         <p className="m-0 pt-2 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-label)]">Chart</p>
-        <div role="radiogroup" aria-label="Chart" data-chart={bars ? 'bars' : 'trend'} className="flex w-fit gap-0.5 rounded-lg bg-[var(--dashboard-hover-band)] p-[3px]">
+        <div role="radiogroup" aria-label="Chart" data-chart={bars ? 'bars' : 'trend'} className="flex w-fit gap-0.5 rounded-lg bg-[var(--dashboard-hover-band)] p-[var(--space-0-75)]">
           {(['trend', 'bars'] as const).map((k) => {
             const on = (k === 'bars') === bars
             return (
@@ -205,7 +205,7 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
                 data-chart-option={k}
                 onClick={() => { if (!on) onChart(k) }}
                 className={cn(
-                  'rounded-[7px] border-0 px-2.5 py-1 text-[length:var(--font-size-body-sm)] leading-5',
+                  'rounded-[var(--dashboard-toggle-radius)] border-0 px-2.5 py-1 text-[length:var(--font-size-body-sm)] leading-5',
                   on ? 'bg-[var(--dashboard-card-bg)] font-medium text-[var(--dashboard-figure)] shadow-[var(--dashboard-control-shadow)]' : 'bg-transparent text-[var(--dashboard-muted)]',
                   'cursor-pointer',
                   FOCUS,

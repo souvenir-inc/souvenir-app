@@ -93,7 +93,7 @@ export function AiModelsView() {
             padding:         'var(--space-1-5) var(--space-2-5)',
             borderRadius:    'var(--radius-lg)',
             backgroundColor: 'var(--text-field-bg)',
-            boxShadow:       '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--text-field-ring)',
+            boxShadow:       'var(--shadow-field)',
           }}>
             <SearchOneIcon size={16} color="var(--neutral-400)" />
             <input

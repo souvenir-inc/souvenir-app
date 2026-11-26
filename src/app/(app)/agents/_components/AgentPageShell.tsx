@@ -75,7 +75,7 @@ export function AgentPageHeader({
             style={{
               pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-1)', borderRadius: 'var(--radius-xl)',
               backgroundColor: 'color-mix(in srgb, var(--neutral-50) 88%, transparent)',
-              backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+              backdropFilter: 'blur(var(--agent-page-shell-blur))', WebkitBackdropFilter: 'blur(var(--agent-page-shell-blur))',
             }}
           >
             {actions}
@@ -87,7 +87,7 @@ export function AgentPageHeader({
           display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', minWidth: 0,
           width: '100%', marginBottom: 'var(--space-6)', flexShrink: 0,
           // Leave the top-right corner free for the sticky buttons.
-          paddingRight: actions ? 'min(340px, 45%)' : 0, boxSizing: 'border-box',
+          paddingRight: actions ? 'var(--agent-page-shell-padding-right)' : 0, boxSizing: 'border-box',
         }}
       >
         <h1

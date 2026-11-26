@@ -14,6 +14,7 @@ import { useDashboardData } from './live/dashboard-data'
 import type { BoardCard, CardSize } from './types'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { CardEmptyState, emptyAction, emptyDetail } from './CardEmpty'
+import { SPRING } from "@/styles/tokens/motion"
 
 // The card grid (Figma "grid", 1200 wide): four 288px columns, 156px rows, 16px gaps. A medium
 // card spans two columns, a large one two columns and two rows. On the 4-column design grid each
@@ -391,7 +392,7 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
               style={{ ['--gc' as string]: `${card.x + 1} / span ${dims(card.size).w}`, ['--gr' as string]: `${card.y + 1} / span ${dims(card.size).h}` }}
               // "position": cards slide to their new places; sizes snap, so nothing stretches.
               layout={reduceMotion ? false : 'position'}
-              transition={{ layout: { type: 'spring', stiffness: 520, damping: 42 } }}
+              transition={{ layout: { type: 'spring', ...SPRING.settle } }}
               onPointerDown={(e) => startMove(e, card)}
               // Edit mode: each card is a keyboard stop. ⌥← / ⌥→ move it; Delete removes it.
               tabIndex={editing ? 0 : undefined}
@@ -423,7 +424,7 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
                 <LandingSlot size={card.size} />
               ) : isSlot ? (
                 // The drop slot: where the card will land (BS-24).
-                <div aria-hidden className="size-full rounded-xl border-2 border-dashed border-[var(--dashboard-drop-line)] bg-[var(--dashboard-drop-slot)]" />
+                <div aria-hidden className="size-full rounded-xl border-[length:var(--border-width-thick)] border-dashed border-[var(--dashboard-drop-line)] bg-[var(--dashboard-drop-slot)]" />
               ) : (
                 // One card that can't render shows its own fallback; the rest of the board stays. Keyed by
                 // what the card shows, so a card whose numbers reload (or come back) gets a fresh try.
@@ -452,7 +453,7 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
                   aria-hidden
                   data-landed={ring.on || undefined}
                   className={cn(
-                    'pointer-events-none absolute inset-0 rounded-xl border-[1.5px] border-solid border-[var(--dashboard-landed-ring)] shadow-[0_0_0_4px_var(--dashboard-landed-halo)]',
+                    'pointer-events-none absolute inset-0 rounded-xl border-[length:var(--border-width-medium)] border-solid border-[var(--dashboard-landed-ring)] shadow-[0_0_0_4px_var(--dashboard-landed-halo)]',
                     'transition-opacity duration-slow motion-reduce:transition-none',
                     ring.on ? 'opacity-100' : 'opacity-0',
                   )}
@@ -474,7 +475,7 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
             className="pointer-events-none fixed z-[var(--z-popover)]"
             style={{
               ...(resizing.settleAt ?? resizing),
-              transition: resizing.settleAt ? `left ${DROP_MS}ms ease-out, top ${DROP_MS}ms ease-out, width ${DROP_MS}ms ease-out, height ${DROP_MS}ms ease-out` : undefined,
+              transition: resizing.settleAt ? `left ${DROP_MS}ms ease-out, top ${DROP_MS}ms ease-out, width ${DROP_MS}ms ease-out, height ${DROP_MS}ms ease-out` /* ds-keep: matches the drop timer */ : undefined,
             }}
           >
             <MetricCard
@@ -503,7 +504,7 @@ export function BoardGrid({ cards, onMoveTo, onSetLayout, onStep, onResize, onRe
               left: drag.settleAt ? drag.settleAt.left : drag.x - drag.offsetX,
               top: drag.settleAt ? drag.settleAt.top : drag.y - drag.offsetY,
               transform: drag.settleAt ? 'scale(1)' : 'scale(1.02)',
-              transition: drag.settleAt ? `left ${DROP_MS}ms ease-out, top ${DROP_MS}ms ease-out, transform ${DROP_MS}ms ease-out` : 'transform 120ms ease-out',
+              transition: drag.settleAt ? `left ${DROP_MS}ms ease-out, top ${DROP_MS}ms ease-out, transform ${DROP_MS}ms ease-out` /* ds-keep: matches the drop timer */ : 'transform var(--duration-fast) ease-out',
             }}
           >
             <MetricCard metric={dragged} size={drag.size} view={cardView?.(drag.id)} dragging />

@@ -96,7 +96,7 @@ function PurposeStep({
           className="kaya-field"
           style={{
             background: 'var(--field-surface)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-3) var(--space-2-5)',
-            boxShadow: '0px 1px 2px 0px rgba(82,75,71,0.16), 0px 0px 0px 1px var(--neutral-300)',
+            boxShadow: 'var(--new-shadow)',
           }}
         >
           <textarea
@@ -140,7 +140,7 @@ function PurposeStep({
                 padding: 'var(--space-1) var(--space-3)', borderRadius: 'var(--radius-full)', border: 'none', cursor: 'pointer',
                 fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)',
                 color: 'var(--neutral-700)', backgroundColor: 'var(--neutral-white)',
-                boxShadow: '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
+                boxShadow: 'var(--shadow-control)',
               }}
             >
               {chip}

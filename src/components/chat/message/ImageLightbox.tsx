@@ -10,7 +10,7 @@ import { ImageDownloadTwoIcon, CancelOneIcon } from "@strange-huge/icons";
 
 export const overlayButtonStyle: React.CSSProperties = {
   background: "color-mix(in srgb, var(--static-black) 55%, transparent)",
-  backdropFilter: "blur(4px)",
+  backdropFilter: "blur(var(--blur-xs))",
   borderRadius: "var(--radius-md)",
   color: "var(--static-white)",
   border: "none",

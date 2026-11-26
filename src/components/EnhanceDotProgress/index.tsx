@@ -3,6 +3,7 @@
 import React from 'react'
 import { m } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -48,7 +49,7 @@ export function EnhanceDotProgress({ ref, total, current, audit = false, classNa
             <m.span key={i}
               aria-hidden
               layout
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              transition={{ duration: DURATION.base, ease: 'easeInOut' }}
               style={{
                 display:         'inline-block',
                 width:           isCurrent ? 18 : 6,

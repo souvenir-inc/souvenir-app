@@ -11,6 +11,7 @@ import { FormatGlyph, formatTintTile } from "@/components/Library/FormatGlyph";
 import { formatLabel } from "@/lib/library/format";
 import type { Format } from "@/lib/library/schemas";
 import type { GeneratedFile } from "@/types/chat";
+import { SPRING, STAGGER } from "@/styles/tokens/motion"
 
 // ── Generated files: the file-type icon (as Library shows it), name, type, View + Download ──
 
@@ -31,7 +32,7 @@ const cardStyle: React.CSSProperties = {
   borderRadius: 'var(--radius-xl)',
   backgroundColor: "var(--card-bg)",
   border: "1px solid var(--neutral-200)",
-  boxShadow: "0 1px 2px rgba(0, 0, 0, 0.04)",
+  boxShadow: "var(--generated-files-list-shadow)",
   boxSizing: "border-box",
 };
 
@@ -45,7 +46,7 @@ function tileStyle(format: Format): React.CSSProperties {
     flexShrink: 0,
     width: 40,
     height: 40,
-    borderRadius: 10,
+    borderRadius: "var(--radius-lg)",
     // The tag tints are badge-strength; mixed halfway into the card they read as a light accent.
     backgroundColor: `color-mix(in srgb, ${tint.background} 50%, var(--card-bg))`,
     boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${tint.ring} 55%, var(--card-bg))`,
@@ -160,7 +161,7 @@ export function GeneratedFilesList({ files }: { files: GeneratedFile[] }) {
             key={file.url}
             initial={{ opacity: 0, y: 8, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ type: "spring", stiffness: 360, damping: 26, delay: i * 0.07 }}
+            transition={{ type: "spring", ...SPRING.brisk,  delay: i * STAGGER.lg }}
             style={cardStyle}
           >
             <span style={tileStyle(format)}>

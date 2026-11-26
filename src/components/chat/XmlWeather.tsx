@@ -22,6 +22,7 @@ import {
   Wind,
 } from "lucide-react"
 import { parseWeatherXml, type ParsedWeather } from "@/components/chat/XmlWeather.parse"
+import { DURATION, LONG, STAGGER } from "@/styles/tokens/motion"
 
 type ConditionFamily = "storm" | "rain" | "snow" | "fog" | "cloud" | "partly" | "wind" | "clear" | "neutral"
 
@@ -180,7 +181,7 @@ function WeatherGlyph({
       aria-label={decorative ? undefined : conditionLabel(condition) || "Weather"}
       role={decorative ? undefined : "img"}
       animate={animate}
-      transition={reduceMotion ? undefined : { duration: family === "clear" ? 5 : 3.2, repeat: Infinity, ease: "easeInOut" }}
+      transition={reduceMotion ? undefined : { duration: family === "clear" ? LONG["2xl"] : LONG.xl, repeat: Infinity, ease: "easeInOut" }}
       style={{ display: "grid", placeItems: "center", flexShrink: 0 }}
     >
       {icon}
@@ -201,7 +202,7 @@ function WeatherMeta({ icon, children }: { icon: React.ReactNode; children: Reac
         color: "var(--neutral-700)",
         background: "rgba(var(--surface-rgb), 0.60)",
         border: "var(--weather-chip-border)",
-        backdropFilter: "blur(8px)",
+        backdropFilter: "blur(var(--blur-sm))",
       }}
     >
       {icon}
@@ -235,7 +236,7 @@ function ForecastTile({
     <m.div
       initial={reduceMotion ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.32, delay: reduceMotion ? 0 : 0.12 + index * 0.055, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: DURATION.slow, delay: reduceMotion ? 0 : DURATION.fast + index * STAGGER.md, ease: [0.16, 1, 0.3, 1] }}
       whileHover={reduceMotion ? undefined : { y: -2 }}
       style={{
         minWidth: 88,
@@ -262,7 +263,7 @@ function ForecastTile({
           <m.div
             initial={reduceMotion ? false : { scaleX: 0 }}
             animate={{ scaleX: 1 }}
-            transition={{ duration: 0.45, delay: reduceMotion ? 0 : 0.18 + index * 0.055, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: DURATION.gentle, delay: reduceMotion ? 0 : DURATION.base + index * STAGGER.md, ease: [0.16, 1, 0.3, 1] }}
             style={{
               position: "absolute",
               left: `${left}%`,
@@ -297,7 +298,7 @@ export function XmlWeather({ xml }: { xml: string }) {
       initial={reduceMotion ? false : { opacity: 0, y: 12, scale: 0.992 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       whileHover={reduceMotion ? undefined : { y: -2 }}
-      transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: DURATION.gentle, ease: [0.16, 1, 0.3, 1] }}
       style={{
         margin: "var(--space-3) 0",
         borderRadius: 'var(--radius-2xl)',
@@ -334,7 +335,7 @@ export function XmlWeather({ xml }: { xml: string }) {
           <m.div
             aria-hidden
             animate={reduceMotion ? undefined : { x: [0, 14, 0], y: [0, -8, 0], scale: [1, 1.08, 1] }}
-            transition={reduceMotion ? undefined : { duration: 10, repeat: Infinity, ease: "easeInOut" }}
+            transition={reduceMotion ? undefined : { duration: LONG["3xl"], repeat: Infinity, ease: "easeInOut" }}
             style={{
               position: "absolute",
               width: 210,
@@ -343,7 +344,7 @@ export function XmlWeather({ xml }: { xml: string }) {
               top: -82,
               borderRadius: "50%",
               background: palette.glow,
-              filter: "blur(18px)",
+              filter: "blur(var(--xml-weather-blur))",
             }}
           />
 
@@ -406,10 +407,10 @@ export function XmlWeather({ xml }: { xml: string }) {
               width: "clamp(88px, 20vw, 148px)",
               display: "grid",
               placeItems: "center",
-              filter: `drop-shadow(0 18px 24px ${palette.accentSoft})`,
+              filter: `drop-shadow(0 var(--xml-weather-drop-y) var(--xml-weather-drop-blur) ${palette.accentSoft})`,
             }}
           >
-            <div style={{ position: "absolute", width: 104, height: 104, borderRadius: "50%", background: palette.accentSoft, filter: "blur(2px)" }} />
+            <div style={{ position: "absolute", width: 104, height: 104, borderRadius: "50%", background: palette.accentSoft, filter: "blur(var(--blur-2xs))" }} />
             <WeatherGlyph condition={weather.current.condition} size={88} reduceMotion={reduceMotion} decorative />
           </div>
         </div>

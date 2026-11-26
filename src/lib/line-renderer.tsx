@@ -41,7 +41,7 @@ function renderKatex(math: string, display: boolean, key: string): React.ReactNo
         data-highlight-atomic="math"
         data-highlight-text={math}
         className={display ? "kaya-scrollbar" : undefined}
-        style={{ display: display ? "block" : "inline-block", margin: display ? "8px 0" : "0 2px", overflowX: display ? "auto" : undefined }}
+        style={{ display: display ? "block" : "inline-block", margin: display ? "var(--space-2) 0" : "0 var(--space-0-5)", overflowX: display ? "auto" : undefined }}
         dangerouslySetInnerHTML={{ __html: html }}
       />
     )
@@ -184,7 +184,7 @@ function renderInlineSegment(text: string, sourceStart: number, prefix: string, 
           style={{
             color: "var(--brown-500)",
             textDecoration: "underline",
-            textUnderlineOffset: "2px",
+            textUnderlineOffset: "var(--underline-offset)",
           }}
         >
           {renderHighlightedText(m[6], sourceStart + m.index + 1, key, ctx)}
@@ -239,7 +239,7 @@ function renderInlineSegment(text: string, sourceStart: number, prefix: string, 
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: "var(--brown-500)", textDecoration: "underline", textUnderlineOffset: "2px" }}
+            style={{ color: "var(--brown-500)", textDecoration: "underline", textUnderlineOffset: "var(--underline-offset)" }}
           >
             {display}
           </a>,
@@ -657,7 +657,7 @@ export function LineRenderer({ content, webCitations, highlights, sourceOffset =
             }}
           >
             {block.items.map((item, ii) => (
-              <li key={ii} style={{ ...textStyle, lineHeight: isReasoning ? "22px" : "24px" }}>
+              <li key={ii} style={{ ...textStyle, lineHeight: isReasoning ? "var(--line-height-body-lg)" : "var(--line-height-heading-sm)" }}>
                 {inline(item, `${k}-li${ii}`)}
               </li>
             ))}
@@ -679,7 +679,7 @@ export function LineRenderer({ content, webCitations, highlights, sourceOffset =
             }}
           >
             {block.items.map((item, ii) => (
-              <li key={ii} style={{ ...textStyle, lineHeight: isReasoning ? "22px" : "24px" }}>
+              <li key={ii} style={{ ...textStyle, lineHeight: isReasoning ? "var(--line-height-body-lg)" : "var(--line-height-heading-sm)" }}>
                 {inline(item, `${k}-li${ii}`)}
               </li>
             ))}
@@ -717,7 +717,7 @@ export function LineRenderer({ content, webCitations, highlights, sourceOffset =
 
       case "paragraph":
         return (
-          <p key={k} style={{ ...textStyle, marginBottom: isReasoning ? 0 : "14px" }}>
+          <p key={k} style={{ ...textStyle, marginBottom: isReasoning ? 0 : "var(--space-3-5)" }}>
             {block.lines.flatMap((line, li) => {
               const nodes = inline(line, `${k}-pl${li}`)
               return li < block.lines.length - 1

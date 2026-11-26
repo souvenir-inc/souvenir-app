@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { m } from 'framer-motion'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── ChipButton ────────────────────────────────────────────────────────────────
 // Atom. The interactive action button used inside Chip (cancel / change / expand).
@@ -58,15 +59,15 @@ export function ChipButton({
       onClick={onClick}
       disabled={disabled}
       whileTap={disabled ? undefined : { scale: 0.9 }}
-      transition={{ duration: 0.1, ease: 'easeOut' }}
+      transition={{ duration: DURATION.snap, ease: 'easeOut' }}
       className="kds-chip-button"
       style={{
         position:       'relative',
         display:        'flex',
         alignItems:     'center',
         justifyContent: 'center',
-        padding:        isSmall ? '1px' : '4px',
-        borderRadius:   isSmall ? '4px' : '8px',
+        padding:        isSmall ? 'var(--space-px)' : 'var(--space-1)',
+        borderRadius:   isSmall ? 'var(--radius-xs)' : 'var(--radius-md)',
         // Small variant has an explicit 16×16 box (Figma 908:454). The 28px
         // variant sizes to its 20×20 icon + 4px padding.
         ...(isSmall && { width: 16, height: 16 }),

@@ -22,9 +22,9 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
 
-const SHADOW_MODAL    = '0px 12px 16px -4px rgba(130,122,116,0.12), var(--shadow-soft), 0px 0px 0px 1px var(--neutral-100)'
+const SHADOW_MODAL    = 'var(--shadow-modal-soft)'
 const SHADOW_AVATAR   = '0px 0px 0px 1px var(--neutral-800-30)'
-const SHADOW_INPUT    = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)'
+const SHADOW_INPUT    = 'var(--shadow-control)'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -145,10 +145,10 @@ function PersonRow({ person, onPermissionChange, onRemove }: PersonRowProps) {
 
   // Ring: rest → subtle, hover → slightly stronger, focus → blue outline
   const btnShadow = focused
-    ? '0px 0px 0px 2px var(--blue-400), 0px 0px 0px 1px rgba(59,54,50,0.3)'
+    ? 'var(--share-modal-btn-shadow)'
     : hovered
       ? '0px 0px 0px 1px var(--neutral-800-50)'
-      : '0px 0px 0px 1px rgba(59,54,50,0.3)'
+      : 'var(--shadow-ring-strong)'
 
   return (
     <li

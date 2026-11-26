@@ -9,6 +9,7 @@ import { IconButton } from '@/components/ui/button'
 import { Tooltip } from '@/components/Tooltip'
 import { cn } from '@/lib/utils'
 import { SouvenirLogo } from '@/components/SouvenirLogo'
+import { BLUR, SPRING } from "@/styles/tokens/motion"
 
 // ── FlatSidebar — Souvenir V1.5 (Figma 136:53072, "Sidebar / Container",
 // layout=projects — the locked v1.5 direction). A single always-visible
@@ -201,18 +202,18 @@ export const FlatSidebar = React.forwardRef<HTMLDivElement, FlatSidebarProps>(
           width: effectiveCollapsed || isNarrow ? '48px' : '294px', height: '100%',
           backgroundColor: 'var(--neutral-50)', overflowX: overlay ? 'visible' : 'hidden', flexShrink: 0, isolation: 'isolate',
           zIndex: overlay ? 'calc(var(--z-overlay) + 1)' : undefined,
-          transition: 'width var(--duration-slow) cubic-bezier(0.16, 1, 0.3, 1)',
+          transition: 'width var(--duration-slow) var(--ease-out-expo)',
         }}
       >
         {/* `inset: 0` exactly reproduces the root's box so every child's
             `position: absolute` offsets (top/bottom/etc., all originally
             written against the root) still land in the same place. */}
         <div onClickCapture={handleDrawerClick} style={overlay
-          ? { position: 'fixed', top: 0, bottom: 0, left: 0, width: '294px', backgroundColor: 'var(--neutral-50)', boxShadow: '4px 0 24px rgba(0, 0, 0, 0.16)' }
+          ? { position: 'fixed', top: 0, bottom: 0, left: 0, width: '294px', backgroundColor: 'var(--neutral-50)', boxShadow: 'var(--flat-sidebar-shadow)' }
           : { position: 'absolute', inset: 0 }}>
         {/* ── Header ── */}
         <div ref={headerRef} style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 'var(--z-raised)', backgroundColor: 'var(--neutral-50)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: effectiveCollapsed ? 'center' : 'space-between', padding: effectiveCollapsed ? '19px 8px 8px' : '19px 8px 8px 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: effectiveCollapsed ? 'center' : 'space-between', padding: effectiveCollapsed ? 'var(--flat-sidebar-padding)' : 'var(--flat-sidebar-padding-2)' }}>
             {!effectiveCollapsed && <SouvenirWordmark />}
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
               {!effectiveCollapsed && (
@@ -254,7 +255,7 @@ export const FlatSidebar = React.forwardRef<HTMLDivElement, FlatSidebarProps>(
 
           {/* ── Destinations — fixed, part of the header, not the scroll area ── */}
           {destinationsItems && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: effectiveCollapsed ? 'center' : 'stretch', gap: 'var(--space-1)', padding: effectiveCollapsed ? '0 6px 8px' : '0 8px 8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: effectiveCollapsed ? 'center' : 'stretch', gap: 'var(--space-1)', padding: effectiveCollapsed ? '0 var(--space-1-5) var(--space-2)' : '0 var(--space-2) var(--space-2)' }}>
               {destinationsItems(effectiveCollapsed)}
             </div>
           )}
@@ -272,9 +273,9 @@ export const FlatSidebar = React.forwardRef<HTMLDivElement, FlatSidebarProps>(
           }}
         >
           <motion.div
-            animate={{ opacity: effectiveCollapsed ? 0 : 1, filter: effectiveCollapsed ? 'blur(4px)' : 'blur(0px)', transitionEnd: effectiveCollapsed ? {} : { filter: 'none' } }}
+            animate={{ opacity: effectiveCollapsed ? 0 : 1, filter: effectiveCollapsed ? `blur(${BLUR.xs}px)` : 'blur(0px)', transitionEnd: effectiveCollapsed ? {} : { filter: 'none' } }}
             initial={false}
-            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+            transition={{ type: 'spring', ...SPRING.snappy }}
             style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', pointerEvents: effectiveCollapsed ? 'none' : 'auto' }}
           >
             {projectItems && <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>{projectItems}</div>}
@@ -296,7 +297,7 @@ export const FlatSidebar = React.forwardRef<HTMLDivElement, FlatSidebarProps>(
         <div style={{
           position: 'absolute', bottom: 0, left: effectiveCollapsed ? '50%' : 0, right: effectiveCollapsed ? 'auto' : 0,
           transform: effectiveCollapsed ? 'translateX(-50%)' : undefined, width: effectiveCollapsed ? '52px' : undefined,
-          zIndex: 'var(--z-raised)', backgroundColor: 'var(--neutral-50)', padding: effectiveCollapsed ? '10px 4px' : '10px', boxSizing: 'border-box',
+          zIndex: 'var(--z-raised)', backgroundColor: 'var(--neutral-50)', padding: effectiveCollapsed ? 'var(--space-2-5) var(--space-1)' : 'var(--space-2-5)', boxSizing: 'border-box',
         }}>
           {accountMenu?.(effectiveCollapsed)}
         </div>

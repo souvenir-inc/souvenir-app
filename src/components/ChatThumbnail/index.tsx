@@ -22,6 +22,7 @@ import { Badge, type BadgeColor } from '@/components/Badge'
 import { springs } from '@/lib/springs'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -197,8 +198,8 @@ function RemoveButton({
         color:           'var(--icon-button-secondary-icon)',
         boxShadow:       'var(--shadow-button-secondary-outer), var(--shadow-button-secondary-inner)',
         outlineStyle:    'solid',
-        outlineWidth:    '2px',
-        outlineOffset:   '2px',
+        outlineWidth:    'var(--focus-ring-width)',
+        outlineOffset:   'var(--focus-ring-offset)',
         outlineColor:    isFocused ? 'var(--focus-ring)' : 'transparent',
         transition:      'outline-color var(--duration-fast)',
         zIndex:          2,
@@ -242,14 +243,14 @@ export function ChatThumbnail({
         // The wrapper's `layout` prop makes sibling thumbnails reflow as
         // one is removed, so the exit animation sits cleanly on top of
         // the row's collapse.
-        initial={{ opacity: 0, scale: 0.7, filter: 'blur(4px)' }}
+        initial={{ opacity: 0, scale: 0.7, filter: `blur(${BLUR.xs}px)` }}
         animate={{
           opacity: 1, scale: 1, filter: 'blur(0px)',
-          transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
+          transition: { duration: DURATION.base, ease: [0.22, 1, 0.36, 1] },
         }}
         exit={{
-          opacity: 0, scale: 0.7, filter: 'blur(4px)',
-          transition: { duration: 0.18, ease: [0.55, 0.085, 0.68, 0.53] },
+          opacity: 0, scale: 0.7, filter: `blur(${BLUR.xs}px)`,
+          transition: { duration: DURATION.base, ease: [0.55, 0.085, 0.68, 0.53] },
         }}
         className={cn(className)}
         onMouseEnter={(e) => { setHovered(true);  onMouseEnter?.(e) }}

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { m } from "framer-motion";
 import type { BarChartData } from "@/types/chat";
+import { DURATION, SPRING, STAGGER } from "@/styles/tokens/motion"
 
 // �"��"� AnimatedBarChart - 6 variants �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 
@@ -61,7 +62,7 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
       <BarChartShell title={data.title} variant={v}>
         <div style={{ position: "relative", height: chartH }}>
           {[0.25, 0.5, 0.75, 1].map((pct) => (
-            <m.div key={pct} initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: 0.4, delay: 0.1 }}
+            <m.div key={pct} initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: DURATION.gentle, delay: DURATION.snap }}
               style={{ position: "absolute", bottom: `${pct * chartH}px`, left: 0, right: 0, height: 1, background: "var(--neutral-800-10)", pointerEvents: "none" }} />
           ))}
           <div style={{ display: "flex", alignItems: "flex-end", gap: 'var(--space-2-5)', height: "100%" }}>
@@ -70,12 +71,12 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
               const color = bar.color ?? BAR_PALETTE[i % BAR_PALETTE.length];
               return (
                 <div key={bar.label} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%", justifyContent: "flex-end" }}>
-                  <m.div initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ delay: i * 0.1 + 0.55, duration: 0.2 }}
+                  <m.div initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ delay: i * STAGGER.xl + DURATION.long, duration: DURATION.base }}
                     style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-700)", marginBottom: 'var(--space-1)', lineHeight: 'var(--leading-none)' }}>
                     {bar.value}{data.unit ?? ""}
                   </m.div>
                   <m.div initial={{ scaleY: 0 }} animate={{ scaleY: revealed ? 1 : 0 }}
-                    transition={{ type: "spring", stiffness: 140, damping: 18, mass: 1, delay: i * 0.1 }}
+                    transition={{ type: "spring", ...SPRING.gentle,   delay: i * STAGGER.xl }}
                     style={{ width: "100%", height: barH, background: color, borderRadius: "var(--radius-xs) var(--radius-xs) 0 0", transformOrigin: "bottom" }} />
                 </div>
               );
@@ -105,10 +106,10 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
                 <div style={{ width: 120, fontSize: 'var(--font-size-small)', color: "var(--neutral-700)", textAlign: "right", flexShrink: 0, lineHeight: "var(--line-height-small)" }}>{bar.label}</div>
                 <div style={{ flex: 1, position: "relative", height: 24, background: "var(--neutral-800-05)", borderRadius: 'var(--radius-xs)', overflow: "hidden" }}>
                   <m.div initial={{ scaleX: 0 }} animate={{ scaleX: revealed ? 1 : 0 }}
-                    transition={{ type: "spring", stiffness: 120, damping: 20, delay: i * 0.08 }}
+                    transition={{ type: "spring", ...SPRING.gentle,  delay: i * STAGGER.lg }}
                     style={{ position: "absolute", inset: 0, width: `${pct * 100}%`, background: color, borderRadius: 'var(--radius-xs)', transformOrigin: "left" }} />
                 </div>
-                <m.div initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ delay: i * 0.08 + 0.5, duration: 0.2 }}
+                <m.div initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ delay: i * STAGGER.lg + DURATION.long, duration: DURATION.base }}
                   style={{ width: 44, fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)', color: "var(--neutral-900)", flexShrink: 0 }}>
                   {bar.value}{data.unit ?? ""}
                 </m.div>
@@ -128,7 +129,7 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
       <BarChartShell title={data.title} variant={v}>
         <div style={{ position: "relative", height: chartH }}>
           {[0.25, 0.5, 0.75, 1].map((pct) => (
-            <m.div key={pct} initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: 0.4, delay: 0.1 }}
+            <m.div key={pct} initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: DURATION.gentle, delay: DURATION.snap }}
               style={{ position: "absolute", bottom: `${pct * chartH}px`, left: 0, right: 0, height: 1, background: "var(--neutral-800-10)", pointerEvents: "none" }} />
           ))}
           <div style={{ display: "flex", alignItems: "flex-end", gap: 'var(--space-4)', height: "100%" }}>
@@ -141,7 +142,7 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
                   const globalIdx = gi * nDatasets + di;
                   return (
                     <m.div key={ds.label} initial={{ scaleY: 0 }} animate={{ scaleY: revealed ? 1 : 0 }}
-                      transition={{ type: "spring", stiffness: 140, damping: 18, mass: 1, delay: globalIdx * 0.06 }}
+                      transition={{ type: "spring", ...SPRING.gentle,   delay: globalIdx * STAGGER.md }}
                       style={{ flex: 1, height: barH, background: color, borderRadius: "var(--radius-xs) var(--radius-xs) 0 0", transformOrigin: "bottom" }} />
                   );
                 })}
@@ -174,7 +175,7 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
       <BarChartShell title={data.title} variant={v}>
         <div style={{ position: "relative", height: chartH }}>
           {[0.25, 0.5, 0.75, 1].map((pct) => (
-            <m.div key={pct} initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: 0.4, delay: 0.1 }}
+            <m.div key={pct} initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: DURATION.gentle, delay: DURATION.snap }}
               style={{ position: "absolute", bottom: `${pct * chartH}px`, left: 0, right: 0, height: 1, background: "var(--neutral-800-10)", pointerEvents: "none" }} />
           ))}
           <div style={{ display: "flex", alignItems: "flex-end", gap: 'var(--space-3)', height: "100%" }}>
@@ -188,7 +189,7 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
                     const color = ds.color ?? BAR_PALETTE[di % BAR_PALETTE.length];
                     return (
                       <m.div key={ds.label} initial={{ scaleY: 0 }} animate={{ scaleY: revealed ? 1 : 0 }}
-                        transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: gi * 0.12 + di * 0.05 }}
+                        transition={{ duration: DURATION.long, ease: [0.16, 1, 0.3, 1], delay: gi * STAGGER.xl + di * STAGGER.sm }}
                         style={{ width: "100%", height: segH, background: color, flexShrink: 0, transformOrigin: "bottom" }} />
                     );
                   })}
@@ -229,7 +230,7 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
                   const color = ds.color ?? BAR_PALETTE[di % BAR_PALETTE.length];
                   return (
                     <m.div key={ds.label} initial={{ flex: 0 }} animate={{ flex: revealed ? pct : 0 }}
-                      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: gi * 0.1 + di * 0.04 }}
+                      transition={{ duration: DURATION.longer, ease: [0.16, 1, 0.3, 1], delay: gi * STAGGER.xl + di * STAGGER.sm }}
                       style={{ background: color, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", minHeight: pct > 8 ? 16 : 0 }}>
                       {pct > 8 && <span style={{ fontSize: 'var(--font-size-small)', color: "color-mix(in srgb, var(--static-white) 85%, transparent)", fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--leading-none)' }}>{Math.round(pct)}%</span>}
                     </m.div>
@@ -265,7 +266,7 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
         <div style={{ position: "relative", height: chartH }}>
           <div style={{ position: "absolute", top: halfH, left: 0, right: 0, height: 1, background: "var(--neutral-800-30)", zIndex: 1 }} />
           {[-1, 1].map((side) => (
-            <m.div key={side} initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: 0.4, delay: 0.1 }}
+            <m.div key={side} initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: DURATION.gentle, delay: DURATION.snap }}
               style={{ position: "absolute", top: halfH - side * halfH * 0.5, left: 0, right: 0, height: 1, background: "var(--neutral-800-05)", pointerEvents: "none" }} />
           ))}
           <div style={{ position: "absolute", inset: 0, display: "flex", gap: 'var(--space-2-5)' }}>
@@ -278,18 +279,18 @@ export function AnimatedBarChart({ data, onComplete, animate = true }: { data: B
                   <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: halfH, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
                     {isPos && (
                       <m.div initial={{ scaleY: 0 }} animate={{ scaleY: revealed ? 1 : 0 }}
-                        transition={{ type: "spring", stiffness: 140, damping: 18, delay: i * 0.1 }}
+                        transition={{ type: "spring", ...SPRING.gentle,  delay: i * STAGGER.xl }}
                         style={{ width: "68%", height: barH, background: color, borderRadius: "var(--radius-xs) var(--radius-xs) 0 0", transformOrigin: "bottom" }} />
                     )}
                   </div>
                   <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: halfH, display: "flex", alignItems: "flex-start", justifyContent: "center" }}>
                     {!isPos && (
                       <m.div initial={{ scaleY: 0 }} animate={{ scaleY: revealed ? 1 : 0 }}
-                        transition={{ type: "spring", stiffness: 140, damping: 18, delay: i * 0.1 }}
+                        transition={{ type: "spring", ...SPRING.gentle,  delay: i * STAGGER.xl }}
                         style={{ width: "68%", height: barH, background: color, borderRadius: "0 0 var(--radius-xs) var(--radius-xs)", transformOrigin: "top" }} />
                     )}
                   </div>
-                  <m.div initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ delay: i * 0.1 + 0.55, duration: 0.2 }}
+                  <m.div initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ delay: i * STAGGER.xl + DURATION.long, duration: DURATION.base }}
                     style={{ position: "absolute", top: halfH - 8, left: "50%", transform: "translateX(-50%)", fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-bold)', color, lineHeight: "var(--line-height-small)", background: "var(--neutral-white)", padding: "0 var(--space-0-5)", borderRadius: 'var(--radius-xs)', zIndex: 2 }}>
                     {bar.value > 0 ? "+" : ""}{bar.value}
                   </m.div>

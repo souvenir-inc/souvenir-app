@@ -4,6 +4,7 @@ import React, { useState, type ReactNode } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
 import { Field } from '@base-ui/react/field'
 import { cn } from '@/lib/utils'
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -149,7 +150,7 @@ export function InputField({
           <Field.Label
             style={
               showLabel
-                ? { ...sharedTextStyle, color: labelColor, display: 'flex', alignItems: 'center', gap: 4 }
+                ? { ...sharedTextStyle, color: labelColor, display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }
                 : {
                     position:   'absolute',
                     width:      1,
@@ -176,18 +177,18 @@ export function InputField({
             alignItems:      'center',
             gap:             'var(--space-0-5)',
             backgroundColor: 'var(--text-field-bg)',
-            padding:         isSmall ? '7px' : '7px 10px',
-            borderRadius:    isSmall ? '8px' : '10px',
+            padding:         isSmall ? 'var(--space-1-75)' : 'var(--space-1-75) var(--space-2-5)',
+            borderRadius:    isSmall ? 'var(--radius-md)' : 'var(--radius-lg)',
             overflow:        'hidden',
             boxShadow:       containerShadow,
             // Focus ring: 2px blue outline offset 3px - radius auto-inherits from
             // border-radius (10px + 3px offset = 13px, matching Figma exactly)
             outlineStyle:    'solid',
-            outlineWidth:    '2px',
+            outlineWidth:    'var(--focus-ring-width)',
             // The ring settles in from 6px out to 3px while it fades up (and back on blur).
-            outlineOffset:   isFocused && !error ? '3px' : '6px',
+            outlineOffset:   isFocused && !error ? 'var(--focus-ring-offset-md)' : 'var(--focus-ring-offset-xl)',
             outlineColor:    isFocused && !error ? 'var(--focus-ring)' : 'transparent',
-            transition:      'box-shadow var(--duration-fast), outline-color var(--duration-base) ease, outline-offset var(--duration-base) cubic-bezier(0.22, 1, 0.36, 1)',
+            transition:      'box-shadow var(--duration-fast), outline-color var(--duration-base) ease, outline-offset var(--duration-base) var(--ease-out-quint)',
             cursor:          disabled ? 'not-allowed' : 'text',
           }}
           onMouseEnter={(e) => {
@@ -221,9 +222,9 @@ export function InputField({
                 <m.span
                   key="placeholder"
                   aria-hidden
-                  initial={{ opacity: 0, filter: 'blur(2px)' }}
-                  animate={{ opacity: 1, filter: 'blur(0px)', transition: { duration: 0.2 } }}
-                  exit={{ opacity: 0, filter: 'blur(2px)', transition: { duration: 0.15 } }}
+                  initial={{ opacity: 0, filter: `blur(${BLUR['2xs']}px)` }}
+                  animate={{ opacity: 1, filter: 'blur(0px)', transition: { duration: DURATION.base } }}
+                  exit={{ opacity: 0, filter: `blur(${BLUR['2xs']}px)`, transition: { duration: DURATION.quick } }}
                   style={{
                     position:      'absolute',
                     inset:         0,

@@ -56,8 +56,8 @@ function CheckoutReturnContent({ backLabel }: { backLabel: string }) {
           <CheckCircleIcon />
         </div>
         <div className="flex flex-col gap-2">
-          <h1 className="m-0 font-[family-name:var(--font-title)] text-[length:var(--font-size-heading-xl)] leading-[34px] font-normal text-[var(--neutral-900)]">{heading}</h1>
-          <p className="m-0 text-[15px] leading-[var(--line-height-body)] text-[var(--neutral-500)]">{description}</p>
+          <h1 className="m-0 font-[family-name:var(--font-title)] text-[length:var(--font-size-heading-xl)] leading-[var(--checkout-title-line-height)] font-normal text-[var(--neutral-900)]">{heading}</h1>
+          <p className="m-0 text-[length:var(--font-size-body-md)] leading-[var(--line-height-body)] text-[var(--neutral-500)]">{description}</p>
         </div>
         <div className="flex w-full max-w-[320px] flex-col gap-3">
           <Button fluid onClick={() => router.push(ORG_PLANS_ROUTE)}>{backLabel}</Button>

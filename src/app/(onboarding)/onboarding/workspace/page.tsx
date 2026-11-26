@@ -59,8 +59,8 @@ function SizePill({
         outline: "none",
         backgroundColor: "var(--static-white)",
         boxShadow: selected
-          ? "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1.5px var(--neutral-900)"
-          : "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)",
+          ? "var(--workspace-shadow)"
+          : "var(--shadow-control)",
         fontFamily: "var(--font-body)",
         fontWeight: 'var(--font-weight-medium)',
         fontSize: 'var(--font-size-body)',
@@ -163,7 +163,7 @@ export default function OnboardingWorkspacePage() {
               borderRadius: 'var(--radius-lg)',
               backgroundColor: "var(--field-surface)",
               boxSizing: "border-box",
-              boxShadow: "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)",
+              boxShadow: "var(--shadow-control)",
             }}
           >
             <input

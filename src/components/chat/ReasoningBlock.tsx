@@ -33,6 +33,7 @@ import {
 } from "@/lib/reasoning";
 import { ModelIcon } from "@/components/ModelIcon";
 import type { ActivityItem, ModelSelectedMeta } from "@/types/chat";
+import { BLUR, DURATION, SPRING, LONG, STAGGER } from "@/styles/tokens/motion"
 
 function isActivityRunning(activity: ActivityItem) {
   return activity.status === "start" || activity.status === "executing" || activity.status === "reading";
@@ -99,18 +100,18 @@ export function AnimatedLogo({
       <AnimatePresence mode="popLayout" initial={false}>
         {!showModel ? (
           <m.div key="souvenir"
-            initial={{ opacity: 0, scale: 0.5, rotate: -8, filter: "blur(6px)" }}
+            initial={{ opacity: 0, scale: 0.5, rotate: -8, filter: `blur(${BLUR[6]}px)` }}
             animate={{ opacity: 1, scale: 1, rotate: 0, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
-            exit={{ opacity: 0, scale: 0.25, rotate: -20, y: -5, filter: "blur(10px)" }}
-            transition={{ type: "spring", stiffness: 420, damping: 26 }}
+            exit={{ opacity: 0, scale: 0.25, rotate: -20, y: -5, filter: `blur(${BLUR[10]}px)` }}
+            transition={{ type: "spring", ...SPRING.springy }}
             style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <SouvenirMark size={16} />
           </m.div>
         ) : (
           <m.div key={`model-${currentModelKey}`}
-            initial={{ opacity: 0, scale: 0.15, rotate: 14, filter: "blur(8px)" }}
+            initial={{ opacity: 0, scale: 0.15, rotate: 14, filter: `blur(${BLUR.sm}px)` }}
             animate={{ opacity: 1, scale: 1, rotate: 0, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
-            transition={{ type: "spring", stiffness: 220, damping: 11, mass: 0.9 }}
+            transition={{ type: "spring", ...SPRING.wobbly }}
             style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <ModelIcon model={modelMeta?.modelName ?? modelName ?? modelMeta?.company} size={16} />
           </m.div>
@@ -121,7 +122,7 @@ export function AnimatedLogo({
         <m.div key={ms}
           initial={{ scale: 0.8, opacity: 0.5 }}
           animate={{ scale: 4.5, opacity: 0 }}
-          transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1], delay: ms / 1000 }}
+          transition={{ duration: DURATION.longer, ease: [0.16, 1, 0.3, 1], delay: ms / 1000 }}
           style={{ position: "absolute", inset: 0, borderRadius: "50%", border: "1.5px solid color-mix(in srgb, var(--brown-700) 35%, transparent)", pointerEvents: "none" }}
         />
       ))}
@@ -182,7 +183,7 @@ function WorkingPulse() {
   return (
     <m.div
       animate={shouldReduceMotion ? undefined : { opacity: [0.3, 0.8, 0.3] }}
-      transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+      transition={{ duration: LONG.sm, repeat: Infinity, ease: "easeInOut" }}
       style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)', fontSize: 'var(--font-size-body)', color: "var(--thinking-text-faint)" }}
     >
       <HugeiconsIcon icon={AiBrain01Icon} size={16} color="var(--thinking-icon-strong)" strokeWidth={1.5} />
@@ -205,9 +206,9 @@ function ResearchTitle({ text }: { text: string }) {
   return (
     <m.span
       key={text}
-      initial={shouldReduceMotion ? false : { opacity: 0, x: 10, filter: "blur(8px)" }}
+      initial={shouldReduceMotion ? false : { opacity: 0, x: 10, filter: `blur(${BLUR.sm}px)` }}
       animate={{ opacity: 1, x: 0, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
-      transition={{ duration: 0.48, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: DURATION.long, ease: [0.16, 1, 0.3, 1] }}
       style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
     >
       ·{" "}
@@ -216,7 +217,7 @@ function ResearchTitle({ text }: { text: string }) {
           key={`${word}-${start}`}
           initial={shouldReduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.01, delay: index * 0.08 }}
+          transition={{ duration: DURATION.tick, delay: index * STAGGER.lg }}
         >
           {index > 0 ? " " : ""}{word}
         </m.span>
@@ -278,7 +279,7 @@ function ThinkingCollapse({ open, id, children }: { open: boolean; id: string; c
       // lingering `bounce: 0` here would be silently ignored — damping: 35
       // against stiffness: 300 is genuinely critically damped (ratio ≈ 1, no
       // overshoot).
-      transition={{ type: "spring", stiffness: springs.moderate.stiffness, damping: 35 }}
+      transition={{ type: "spring", ...SPRING.glide }}
       style={{ overflow: "hidden" }}
     >
       <div style={{ padding: "var(--space-3) 0 var(--space-2-5)", fontFamily: "var(--font-body)", fontSize: 'var(--font-size-body)', color: "var(--neutral-700)" }}>
@@ -348,9 +349,9 @@ function ReasoningStep({
       <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.24, delay: 0.08, ease: "easeOut" }}
+        transition={{ duration: DURATION.moderate, delay: DURATION.instant, ease: "easeOut" }}
       >
-        <div style={{ display: "flex", alignItems: "stretch", paddingBottom: isLast ? 0 : 12 }}>
+        <div style={{ display: "flex", alignItems: "stretch", paddingBottom: isLast ? 0 : "var(--space-3)" }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0, width: 20 }}>
             <span style={{ display: "flex", width: 20, height: 28, alignItems: "center", justifyContent: "center", lineHeight: 0 }}>
               <HugeiconsIcon icon={icon} size={16} color={isActive ? "var(--thinking-icon-active)" : "var(--thinking-text-faint)"} strokeWidth={1.5} />
@@ -359,7 +360,7 @@ function ReasoningStep({
               <m.span
                 initial={shouldReduceMotion ? false : { scaleY: 0, opacity: 0 }}
                 animate={{ scaleY: 1, opacity: 1 }}
-                transition={{ duration: 0.28, ease: "easeOut", delay: 0.1 }}
+                transition={{ duration: DURATION.moderate, ease: "easeOut", delay: DURATION.snap }}
                 style={{
                   flex: 1,
                   width: 1,
@@ -406,7 +407,7 @@ function ReasoningStep({
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: DURATION.base, ease: [0.16, 1, 0.3, 1] }}
                   style={{ overflow: "hidden" }}
                 >
                   <div style={{ margin: "var(--space-2) 0 var(--space-1-5)", paddingLeft: 'var(--space-2-5)', borderLeft: "2px solid var(--thinking-rule)" }}>
@@ -468,7 +469,7 @@ function ActivityGroup({ activities }: { activities: ActivityItem[] }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: DURATION.base, ease: [0.16, 1, 0.3, 1] }}
             style={{ overflow: "hidden" }}
           >
             <div style={{ paddingLeft: 'var(--space-2)' }}>
@@ -497,7 +498,7 @@ function TimelineReasoningStep({ content, active, expandSole }: { content: strin
         <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.24, delay: 0.08, ease: "easeOut" }}
+          transition={{ duration: DURATION.moderate, delay: DURATION.instant, ease: "easeOut" }}
           style={{ display: "flex", gap: 'var(--space-2-5)' }}
         >
           <span style={{ display: "flex", width: 20, height: 22, alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -619,7 +620,7 @@ export function ReasoningContent({
             <Fragment key={group.id}>
               {divider}
               <m.div initial={{ height: 0 }} animate={{ height: "auto" }} transition={springs.slow} style={{ overflow: "hidden" }}>
-                <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.24, delay: 0.08, ease: "easeOut" }}>
+                <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: DURATION.moderate, delay: DURATION.instant, ease: "easeOut" }}>
                   {row}
                 </m.div>
               </m.div>

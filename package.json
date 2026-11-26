@@ -20,6 +20,7 @@
     "lint:types": "eslint --config eslint.config.types.mjs",
     "ds:scan": "node scripts/ds-scan.mjs",
     "ds:check": "node scripts/ds-scan.mjs --check",
+    "ds:sweep": "node scripts/ds-sweep.mjs",
     "lint:css": "stylelint \"src/**/*.css\"",
     "ds:screens": "node scripts/ds-screenshots.mjs"
   },

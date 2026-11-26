@@ -25,6 +25,7 @@ import { useDevNotificationsVersion } from '@/lib/notifications/dev'
 import { useActiveChatAgentId } from '@/lib/active-chat-agent-store'
 import { toastAgentDetailsOpened, toastAgentDetailsClosed } from '@/lib/agent-details-toast'
 import { agentChatBlocked } from '@/lib/agent-chat-gate'
+import { DURATION, SPRING } from "@/styles/tokens/motion"
 
 export const AGENT_SELECT_EVENT = 'agent:select'
 
@@ -39,8 +40,6 @@ export function emitAgentSelect(persona: SelectedPersonaInfo) {
   }
 }
 
-/** Breathing room (px) around the panel's clipped content for button shadows and focus rings. */
-const EDGE = 8
 
 type AgentFilter = 'mine' | 'team' | 'superlink'
 
@@ -213,7 +212,7 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.15 }}
+              transition={{ duration: DURATION.quick }}
               style={{ display: 'inline-flex', flexShrink: 0 }}
             >
               <Dropdown.Float
@@ -258,7 +257,7 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.15 }}
+                transition={{ duration: DURATION.quick }}
                 style={{ display: 'inline-flex', flexShrink: 0 }}
               >
                 <Tooltip content="Search">
@@ -277,7 +276,7 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.15 }}
+                transition={{ duration: DURATION.quick }}
                 style={{ flex: '1 0 0', minWidth: 0 }}
               >
                 <InputField
@@ -396,8 +395,8 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
             left:                 0,
             right:                0,
             height:               40,
-            backdropFilter:       'blur(4px)',
-            WebkitBackdropFilter: 'blur(4px)',
+            backdropFilter:       'blur(var(--blur-xs))',
+            WebkitBackdropFilter: 'blur(var(--blur-xs))',
             maskImage:            'linear-gradient(to bottom, black 0%, transparent 100%)',
             WebkitMaskImage:      'linear-gradient(to bottom, black 0%, transparent 100%)',
             pointerEvents:        'none',
@@ -431,8 +430,8 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
             left:                 0,
             right:                0,
             height:               40,
-            backdropFilter:       'blur(4px)',
-            WebkitBackdropFilter: 'blur(4px)',
+            backdropFilter:       'blur(var(--blur-xs))',
+            WebkitBackdropFilter: 'blur(var(--blur-xs))',
             maskImage:            'linear-gradient(to top, black 0%, transparent 100%)',
             WebkitMaskImage:      'linear-gradient(to top, black 0%, transparent 100%)',
             pointerEvents:        'none',
@@ -489,15 +488,15 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
 
   return (
     // overflow:hidden is needed to clip the sliding layers, but it also clips the buttons' own
-    // shadows / focus rings at the edges. So the clip box is grown by EDGE px on every side
+    // shadows / focus rings at the edges. So the clip box is grown by var(--space-2) on every side
     // (negative margin) and the content gets the same padding back — nothing moves, nothing is cut.
-    <div style={{ position: 'relative', height: `calc(100% + ${EDGE * 2}px)`, margin: -EDGE, overflow: 'hidden' }}>
+    <div style={{ position: 'relative', height: 'calc(100% + var(--space-2) * 2)', margin: 'calc(var(--space-2) * -1)', overflow: 'hidden' }}>
       {/* The list stays mounted underneath (keeps its search / filter / scroll) and drifts
           left while the details slide in from the right. */}
       <m.div
         animate={{ x: detailsId ? -32 : 0, opacity: detailsId ? 0 : 1 }}
-        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-        style={{ height: '100%', boxSizing: 'border-box', padding: EDGE, pointerEvents: detailsId ? 'none' : undefined }}
+        transition={{ duration: DURATION.base, ease: [0.16, 1, 0.3, 1] }}
+        style={{ height: '100%', boxSizing: 'border-box', padding: 'var(--space-2)', pointerEvents: detailsId ? 'none' : undefined }}
         aria-hidden={detailsId ? true : undefined}
       >
         {listView}
@@ -510,8 +509,8 @@ export function AgentsPanelContent({ inProject = false }: { inProject?: boolean 
             initial={{ x: '100%', opacity: 0.4 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: '100%', opacity: 0.4 }}
-            transition={{ type: 'spring', stiffness: 340, damping: 36 }}
-            style={{ position: 'absolute', inset: 0, boxSizing: 'border-box', padding: EDGE, display: 'flex', flexDirection: 'column', backgroundColor: 'var(--neutral-50)' }}
+            transition={{ type: 'spring', ...SPRING.glide }}
+            style={{ position: 'absolute', inset: 0, boxSizing: 'border-box', padding: 'var(--space-2)', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--neutral-50)' }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0, paddingBottom: 'var(--space-3)' }}>
               <Tooltip content="Back to agents">

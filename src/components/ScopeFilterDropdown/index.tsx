@@ -6,6 +6,7 @@ import { ArrowDownOneIcon } from '@strange-huge/icons'
 import { Button } from '@/components/ui/button'
 import { Dropdown } from '@/components/Dropdown'
 import { SCOPE_VALUES, SCOPE_LABEL, SCOPE_DESCRIPTION, type ScopeFilter } from '@/lib/project-filters'
+import { BLUR, SPRING } from "@/styles/tokens/motion"
 
 // ── Scope filter — Personal/Workspace/Shared/Recently Deleted as a Dropdown.Float
 // instead of a Tabs bar, composed the same way AccountMenu wires its own
@@ -27,10 +28,10 @@ export function ScopeFilterDropdown({ value, onChange }: { value: ScopeFilter; o
           <AnimatePresence mode="popLayout" initial={false}>
             <m.span
               key={value}
-              initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+              initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
               animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-              exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+              transition={{ type: 'spring', ...SPRING.snappy }}
               style={{ display: 'block', transformOrigin: 'left center' }}
             >
               {SCOPE_LABEL[value]}

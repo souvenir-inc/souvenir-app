@@ -55,38 +55,38 @@ export const BADGE_STYLES: Record<BadgeColor, {
 }> = {
   blue: {
     bg:          'var(--blue-100)',
-    outerShadow: '0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px rgba(13,110,178,0.5)',
-    innerShadow: 'inset 0px 1px 0px 0px rgba(231,244,253,0.7), inset 0px -1px 0px 0px rgba(13,110,178,0.1)',
+    outerShadow: 'var(--color-tag-Blue-shadow)',
+    innerShadow: 'var(--ai-models-view-inner-shadow)',
     color:       'var(--blue-700)',
   },
   neutral: {
     bg:          'var(--neutral-100)',
-    outerShadow: '0px 1px 1.5px 0px rgba(18,12,8,0.2), 0px 0px 0px 1px rgba(106,98,93,0.5)',
-    innerShadow: 'inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 70%, transparent), inset 0px -1px 0px 0px rgba(106,98,93,0.1)',
+    outerShadow: 'var(--color-tag-Neutral-shadow)',
+    innerShadow: 'var(--ai-models-view-inner-shadow-2)',
     color:       'var(--neutral-700)',
   },
   red: {
     bg:          'var(--red-100)',
-    outerShadow: '0px 1px 1.5px 0px rgba(24,2,2,0.2), 0px 0px 0px 1px rgba(159,38,35,0.5)',
-    innerShadow: 'inset 0px 1px 0px 0px rgba(253,231,231,0.7), inset 0px -1px 0px 0px rgba(159,38,35,0.1)',
+    outerShadow: 'var(--color-tag-Red-shadow)',
+    innerShadow: 'var(--ai-models-view-inner-shadow-3)',
     color:       'var(--red-700)',
   },
   green: {
     bg:          'var(--green-50)',
-    outerShadow: '0px 1px 1.5px 0px rgba(17,25,1,0.2), 0px 0px 0px 1px rgba(128,183,7,0.5)',
-    innerShadow: 'inset 0px 1px 0px 0px rgba(247,254,230,0.7), inset 0px -1px 0px 0px rgba(128,183,7,0.1)',
+    outerShadow: 'var(--color-tag-Green-shadow)',
+    innerShadow: 'var(--ai-models-view-inner-shadow-4)',
     color:       'var(--green-800)',
   },
   brown: {
     bg:          'var(--brown-100)',
-    outerShadow: '0px 1px 1.5px 0px rgba(20,12,5,0.2), 0px 0px 0px 1px rgba(126,84,53,0.5)',
-    innerShadow: 'inset 0px 1px 0px 0px rgba(250,241,235,0.7), inset 0px -1px 0px 0px rgba(126,84,53,0.1)',
+    outerShadow: 'var(--color-tag-Brown-shadow)',
+    innerShadow: 'var(--ai-models-view-inner-shadow-5)',
     color:       'var(--brown-700)',
   },
   purple: {
     bg:          'var(--purple-100)',
-    outerShadow: '0px 1px 1.5px 0px rgba(10,2,24,0.2), 0px 0px 0px 1px rgba(109,40,217,0.5)',
-    innerShadow: 'inset 0px 1px 0px 0px rgba(237,233,254,0.7), inset 0px -1px 0px 0px rgba(109,40,217,0.1)',
+    outerShadow: 'var(--ai-models-view-outer-shadow)',
+    innerShadow: 'var(--ai-models-view-inner-shadow-6)',
     color:       'var(--purple-700)',
   },
 }
@@ -220,8 +220,8 @@ export function ModelCard({ model, toggling, onToggle }: ModelCardProps) {
         border:          '1px solid var(--border-default)',
         backgroundColor: 'var(--neutral-white)',
         boxShadow:       model.blocked
-          ? '0px 2px 2.8px 0px rgba(82,75,71,0.06)'
-          : '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+          ? 'var(--ai-models-view-shadow)'
+          : 'var(--shadow-soft)',
         opacity:         model.blocked ? 0.7 : 1,
         transition:      'opacity var(--duration-base), box-shadow var(--duration-base)',
       }}

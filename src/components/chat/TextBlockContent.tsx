@@ -91,7 +91,7 @@ function renderInlineRich(line: string, citations?: WebCitation[]): React.ReactN
       // [label](url) — always render as a proper link, never as a citation chip
       const lm = match[4].match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/);
       if (lm) {
-        nodes.push(<a key={count++} href={lm[2]} target="_blank" rel="noopener noreferrer" style={{ color: "var(--brown-600)", textDecoration: "underline", textUnderlineOffset: 2 }}>{lm[1]}</a>);
+        nodes.push(<a key={count++} href={lm[2]} target="_blank" rel="noopener noreferrer" style={{ color: "var(--brown-600)", textDecoration: "underline", textUnderlineOffset: "var(--underline-offset)" }}>{lm[1]}</a>);
       }
     } else if (match[5] !== undefined) {
       // bare URL (https?://, www., or domain/path) — auto-link it
@@ -106,7 +106,7 @@ function renderInlineRich(line: string, citations?: WebCitation[]): React.ReactN
       if (cidx !== undefined) {
         nodes.push(<CitationChip key={count++} n={cidx + 1} citation={citations?.[cidx]} />)
       } else {
-        nodes.push(<a key={count++} href={href} target="_blank" rel="noopener noreferrer" style={{ color: "var(--brown-600)", textDecoration: "underline", textUnderlineOffset: 2 }}>{display}</a>)
+        nodes.push(<a key={count++} href={href} target="_blank" rel="noopener noreferrer" style={{ color: "var(--brown-600)", textDecoration: "underline", textUnderlineOffset: "var(--underline-offset)" }}>{display}</a>)
       }
     }
 
@@ -140,17 +140,17 @@ const GAP = "var(--prose-block-gap)";
 const HEADING_STYLE = {
   h1: {
     fontSize: "var(--prose-size-h1)", lineHeight: "var(--prose-line-h1)",
-    fontWeight: 600, color: "var(--prose-heading)", fontFamily: "var(--font-body)",
+    fontWeight: "var(--font-weight-semibold)", color: "var(--prose-heading)", fontFamily: "var(--font-body)",
     marginTop: "var(--prose-h1-space-before)", marginBottom: "var(--prose-h1-space-after)",
   },
   h2: {
     fontSize: "var(--prose-size-h2)", lineHeight: "var(--prose-line-h2)",
-    fontWeight: 600, color: "var(--prose-heading)", fontFamily: "var(--font-body)",
+    fontWeight: "var(--font-weight-semibold)", color: "var(--prose-heading)", fontFamily: "var(--font-body)",
     marginTop: "var(--prose-h2-space-before)", marginBottom: "var(--prose-h2-space-after)",
   },
   h3: {
     fontSize: "var(--prose-size-h3)", lineHeight: "var(--prose-line-h3)",
-    fontWeight: 600, color: "var(--prose-heading)", fontFamily: "var(--font-body)",
+    fontWeight: "var(--font-weight-semibold)", color: "var(--prose-heading)", fontFamily: "var(--font-body)",
     marginTop: "var(--prose-h3-space-before)", marginBottom: "var(--prose-h3-space-after)",
   },
 } as const;

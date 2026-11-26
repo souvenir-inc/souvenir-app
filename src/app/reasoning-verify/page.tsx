@@ -133,7 +133,7 @@ export default function ReasoningVerify() {
               fontSize: 'var(--font-size-small)', fontFamily: 'var(--font-body)',
               background: active === key ? 'color-mix(in srgb, var(--brown-700) 12%, transparent)' : 'var(--neutral-800-05)',
               color: active === key ? 'var(--brown-700)' : 'var(--neutral-700)',
-              fontWeight: active === key ? 600 : 400,
+              fontWeight: active === key ? 'var(--font-weight-semibold)' : 'var(--font-weight-regular)',
             }}
           >
             {STATES[key].label}

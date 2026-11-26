@@ -8,11 +8,11 @@ import { SHOW_DANGER_ZONE } from './GeneralParts'
 function SkeletonBlock({
   width = '100%',
   height,
-  radius = 8,
+  radius = 'var(--radius-md)',
 }: {
   width?: number | string
   height: number
-  radius?: number
+  radius?: number | string
 }) {
   return (
     <div
@@ -57,7 +57,7 @@ function SkeletonRow({ children, border = true }: { children: React.ReactNode; b
 }
 
 /** A bone vertically centred in a text line of the given height, so line boxes match the real text. */
-function Line({ lh, width, height, radius = 4 }: { lh: number; width: number | string; height: number; radius?: number }) {
+function Line({ lh, width, height, radius = 'var(--radius-xs)' }: { lh: number; width: number | string; height: number; radius?: number | string }) {
   return <div style={{ height: lh, display: 'flex', alignItems: 'center' }}><SkeletonBlock width={width} height={height} radius={radius} /></div>
 }
 
@@ -68,28 +68,28 @@ export function GeneralPageSkeleton() {
 
       {/* Page header: h1 (32px line) + subtitle (22px line) */}
       <div style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)', display: 'flex', flexDirection: 'column' }}>
-        <Line lh={32} width={90} height={26} radius={6} />
+        <Line lh={32} width={90} height={26} radius="var(--radius-sm)" />
         <Line lh={22} width={530} height={14} />
       </div>
 
       {/* Workspace: hero (logo, name, link, Edit workspace) + Workspace ID strip */}
       <SkeletonCard>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', padding: 'var(--space-5) var(--space-6)' }}>
-          <SkeletonBlock width={64} height={64} radius={16} />
+          <SkeletonBlock width={64} height={64} radius={'var(--radius-2xl)'} />
           <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-            <Line lh={28} width={164} height={20} radius={6} />
+            <Line lh={28} width={164} height={20} radius="var(--radius-sm)" />
             <div style={{ height: 22, display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)' }}>
-              <SkeletonBlock width={361} height={14} radius={4} />
-              <SkeletonBlock width={16} height={16} radius={4} />
+              <SkeletonBlock width={361} height={14} radius={'var(--radius-xs)'} />
+              <SkeletonBlock width={16} height={16} radius={'var(--radius-xs)'} />
             </div>
           </div>
-          <SkeletonBlock width={125} height={32} radius={8} />
+          <SkeletonBlock width={125} height={32} radius={'var(--radius-md)'} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', padding: 'var(--space-2-5) var(--space-6)', borderTop: '1px solid var(--border-default)', background: 'var(--neutral-50)' }}>
           <Line lh={20} width={82} height={12} />
-          <SkeletonBlock width={143} height={12} radius={4} />
-          <SkeletonBlock width={16} height={16} radius={4} />
-          <SkeletonBlock width={16} height={16} radius={4} />
+          <SkeletonBlock width={143} height={12} radius={'var(--radius-xs)'} />
+          <SkeletonBlock width={16} height={16} radius={'var(--radius-xs)'} />
+          <SkeletonBlock width={16} height={16} radius={'var(--radius-xs)'} />
         </div>
       </SkeletonCard>
 
@@ -100,25 +100,25 @@ export function GeneralPageSkeleton() {
             <Line lh={22} width={108} height={15} />
             <Line lh={20} width={494} height={12} />
           </div>
-          <SkeletonBlock width={73} height={22} radius={999} />
+          <SkeletonBlock width={73} height={22} radius={'var(--radius-full)'} />
         </div>
         <div style={{ padding: 'var(--space-4) var(--space-6) var(--space-5)' }}>
           <div style={{ border: '1px solid var(--border-default)', borderRadius: 'var(--radius-xl)', background: 'var(--field-surface)', overflow: 'hidden' }}>
             <div style={{ height: 140, padding: 'var(--space-4) var(--space-3)', boxSizing: 'border-box' }}>
-              <SkeletonBlock width={630} height={14} radius={4} />
+              <SkeletonBlock width={630} height={14} radius={'var(--radius-xs)'} />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', padding: 'var(--space-2) var(--space-2-5)', borderTop: '1px solid var(--border-default)', background: 'var(--neutral-50)' }}>
               <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                {[140, 206, 168].map(w => <SkeletonBlock key={w} width={w} height={26} radius={999} />)}
+                {[140, 206, 168].map(w => <SkeletonBlock key={w} width={w} height={26} radius={'var(--radius-full)'} />)}
               </div>
-              <SkeletonBlock width={50} height={12} radius={4} />
+              <SkeletonBlock width={50} height={12} radius={'var(--radius-xs)'} />
             </div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-3) var(--space-6)', borderTop: '1px solid var(--border-default)' }}>
-          <div style={{ flex: '1 0 0', minWidth: 0 }}><SkeletonBlock width={235} height={12} radius={4} /></div>
-          <SkeletonBlock width={61} height={32} radius={8} />
-          <SkeletonBlock width={137} height={32} radius={8} />
+          <div style={{ flex: '1 0 0', minWidth: 0 }}><SkeletonBlock width={235} height={12} radius={'var(--radius-xs)'} /></div>
+          <SkeletonBlock width={61} height={32} radius={'var(--radius-md)'} />
+          <SkeletonBlock width={137} height={32} radius={'var(--radius-md)'} />
         </div>
       </SkeletonCard>
 
@@ -126,22 +126,22 @@ export function GeneralPageSkeleton() {
       {SHOW_DANGER_ZONE && (
       <SkeletonCard danger>
         <div style={{ borderBottom: '1px solid var(--neutral-100)', padding: 'var(--space-5) var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
-          <SkeletonBlock width={110} height={16} radius={5} />
-          <SkeletonBlock width={310} height={13} radius={4} />
+          <SkeletonBlock width={110} height={16} radius={'var(--general-skeleton-radius)'} />
+          <SkeletonBlock width={310} height={13} radius={'var(--radius-xs)'} />
         </div>
         <SkeletonRow>
           <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
-            <SkeletonBlock width={150} height={14} radius={5} />
-            <SkeletonBlock width={280} height={13} radius={4} />
+            <SkeletonBlock width={150} height={14} radius={'var(--general-skeleton-radius)'} />
+            <SkeletonBlock width={280} height={13} radius={'var(--radius-xs)'} />
           </div>
-          <SkeletonBlock width={80} height={32} radius={8} />
+          <SkeletonBlock width={80} height={32} radius={'var(--radius-md)'} />
         </SkeletonRow>
         <div style={{ padding: 'var(--space-5) var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', borderBottom: undefined }}>
-          <SkeletonBlock width={160} height={14} radius={5} />
-          <SkeletonBlock width={250} height={13} radius={4} />
+          <SkeletonBlock width={160} height={14} radius={'var(--general-skeleton-radius)'} />
+          <SkeletonBlock width={250} height={13} radius={'var(--radius-xs)'} />
           <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-1)' }}>
-            <SkeletonBlock width={280} height={36} radius={10} />
-            <SkeletonBlock width={150} height={36} radius={8} />
+            <SkeletonBlock width={280} height={36} radius={'var(--radius-lg)'} />
+            <SkeletonBlock width={150} height={36} radius={'var(--radius-md)'} />
           </div>
         </div>
       </SkeletonCard>

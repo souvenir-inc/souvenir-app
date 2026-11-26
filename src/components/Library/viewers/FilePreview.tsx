@@ -23,12 +23,12 @@ import TextViewer from './TextViewer'
 // Rendered text files (HTML, Markdown, email, code) bring Markdown and highlighting; loaded only for them.
 const SourceViewer = dynamic(() => import('./SourceViewer'), {
   ssr: false,
-  loading: () => <Skeleton height={420} radius={12} style={{ width: '100%', maxWidth: 720 }} />,
+  loading: () => <Skeleton height={420} radius={'var(--radius-xl)'} style={{ width: '100%', maxWidth: 720 }} />,
 })
 
 const RtfPreview = dynamic(() => import('./SourceViewer').then((module) => module.RtfPreview), {
   ssr: false,
-  loading: () => <Skeleton height={420} radius={12} style={{ width: '100%', maxWidth: 720 }} />,
+  loading: () => <Skeleton height={420} radius={'var(--radius-xl)'} style={{ width: '100%', maxWidth: 720 }} />,
 })
 
 // While the server is still preparing a preview: try again this often, for at most 5 minutes.
@@ -38,7 +38,7 @@ const PREVIEW_RETRY_LIMIT = 60
 // pdf.js is large; it loads only when a PDF is opened.
 const PdfViewer = dynamic(() => import('./PdfViewer'), {
   ssr: false,
-  loading: () => <Skeleton height={520} radius={12} style={{ width: '100%', maxWidth: 640 }} />,
+  loading: () => <Skeleton height={520} radius={'var(--radius-xl)'} style={{ width: '100%', maxWidth: 640 }} />,
 })
 
 /** Where a sheet preview should start: around the cited row, or the top. */
@@ -91,15 +91,15 @@ export default function FilePreview({ file, cite, onDownload }: FilePreviewProps
     if (file.processingPhase === 'failed') {
       return rtf ? <RtfPreview file={file} serverFailed><NoPreview onDownload={onDownload} /></RtfPreview> : <NoPreview onDownload={onDownload} />
     }
-    return <Skeleton height={420} radius={12} style={{ width: '100%', maxWidth: 720 }} />
+    return <Skeleton height={420} radius={'var(--radius-xl)'} style={{ width: '100%', maxWidth: 720 }} />
   }
   if (file.previewKind === 'none') {
     return <NoPreview onDownload={onDownload} />
   }
-  if (preview.isPending) return <Skeleton height={420} radius={12} style={{ width: '100%', maxWidth: 720 }} />
+  if (preview.isPending) return <Skeleton height={420} radius={'var(--radius-xl)'} style={{ width: '100%', maxWidth: 720 }} />
   if (preview.isError || !preview.data) {
     if (errorCode === 'no_preview' || errorCode === 'preview_failed' || previewGaveUp) return <NoPreview onDownload={onDownload} />
-    if (errorCode === 'preview_processing' && !previewGaveUp) return <Skeleton height={420} radius={12} style={{ width: '100%', maxWidth: 720 }} />
+    if (errorCode === 'preview_processing' && !previewGaveUp) return <Skeleton height={420} radius={'var(--radius-xl)'} style={{ width: '100%', maxWidth: 720 }} />
     return (
       <div role="alert" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2-5)', padding: 'var(--space-9) var(--space-6)', textAlign: 'center' }}>
         <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-500)' }}>Couldn&apos;t load the preview.</p>

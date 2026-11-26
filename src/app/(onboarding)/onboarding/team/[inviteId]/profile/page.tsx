@@ -80,7 +80,7 @@ function RoleSelect({ value, onChange }: { value: OnboardingRole | null; onChang
             borderRadius: 'var(--radius-lg)',
             border: "none",
             backgroundColor: "var(--neutral-white)",
-            boxShadow: "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)",
+            boxShadow: "var(--shadow-control)",
             cursor: "pointer",
             outline: "none",
           }}
@@ -153,7 +153,7 @@ function ToneSelect({ value, onChange }: { value: OnboardingTone; onChange: (v: 
             borderRadius: 'var(--radius-lg)',
             border: "none",
             backgroundColor: "var(--neutral-white)",
-            boxShadow: "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)",
+            boxShadow: "var(--shadow-control)",
             cursor: "pointer",
             outline: "none",
           }}

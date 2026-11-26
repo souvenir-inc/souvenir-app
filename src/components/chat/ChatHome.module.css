@@ -86,8 +86,8 @@
 
 .contextAction:focus-visible,
 .createProject:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .actionLabel {
@@ -152,7 +152,7 @@
 :global(:root[data-theme="dark"]) .contextBar {
   background: var(--chat-home-context-bar-bg-dark);
   border-color: var(--dark-surface-border);
-  border-top-color: rgba(255, 255, 255, 0.08);
+  border-top-color: var(--chat-home-border-top-color);
 }
 
 :global(:root[data-theme="dark"]) .contextBar .contextAction {

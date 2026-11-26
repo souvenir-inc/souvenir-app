@@ -96,7 +96,7 @@ export function AgentsGrid({
           display: 'grid',
           gridTemplateColumns: `repeat(${GRID_COLS}, minmax(0, ${PERSONA_CARD_WIDTH}px))`,
           justifyContent: 'center',
-          gap: GRID_GAP,
+          gap: GRID_GAP, /* ds-keep: also used in layout maths */
         }}>
           {/* Two rows of cards, in as many columns as the real grid has right now. */}
           {Array.from({ length: GRID_COLS * 2 }).map((_, i) => (
@@ -198,7 +198,7 @@ export function AgentsGrid({
                 // row is centred so cards never stretch unevenly.
                 gridTemplateColumns: `repeat(${GRID_COLS}, minmax(0, ${PERSONA_CARD_WIDTH}px))`,
                 justifyContent:      'center',
-                gap:                 GRID_GAP,
+                gap:                 GRID_GAP, /* ds-keep: also used in layout maths */
                 paddingBottom:       'var(--space-4)',
               }}
             >

@@ -100,7 +100,7 @@ export function SystemInstructionsModal({
               System Instructions
             </DialogTitle>
             {projectName && (
-              <p className={`${muted} truncate text-xs leading-[18px] text-[var(--neutral-400)]`}>{projectName}</p>
+              <p className={`${muted} truncate text-xs leading-[var(--line-height-compact)] text-[var(--neutral-400)]`}>{projectName}</p>
             )}
           </div>
 
@@ -131,7 +131,7 @@ export function SystemInstructionsModal({
                 placeholder="e.g. Always respond in British English. Format all code in TypeScript. Be concise and avoid filler phrases..."
                 autoFocus
                 disabled={saving}
-                className={`kaya-scrollbar ${muted.replace('m-0 ', '')} box-border min-h-[220px] w-full flex-[1_1_0] resize-none rounded-xl border border-[var(--border-default)] bg-[var(--field-surface)] px-3.5 py-3 text-sm leading-[var(--line-height-body)] text-[var(--legacy-1a1714)] shadow-[0px_1px_1.5px_0px_rgba(82,75,71,0.08)] outline-none focus:border-[var(--blue-400)] focus:shadow-[0px_0px_0px_3px_rgba(74,131,191,0.25),0px_1px_1.5px_0px_rgba(82,75,71,0.12)]`}
+                className={`kaya-scrollbar ${muted.replace('m-0 ', '')} box-border min-h-[220px] w-full flex-[1_1_0] resize-none rounded-xl border border-[var(--border-default)] bg-[var(--field-surface)] px-3.5 py-3 text-sm leading-[var(--line-height-body)] text-[var(--legacy-1a1714)] shadow-[var(--instructions-field-shadow)] outline-none focus:border-[var(--blue-400)] focus:shadow-[var(--instructions-field-focus-shadow)]`}
               />
               <p className={`${muted} text-right text-xs leading-4 text-[var(--neutral-400)]`}>
                 {draft.length} / {maxLength}

@@ -73,14 +73,14 @@ export function StatTile({
         {label}
       </p>
       {loading ? (
-        <Skeleton width={72} height={24} radius={5} />
+        <Skeleton width={72} height={24} radius={'var(--super-link-parts-radius)'} />
       ) : value !== undefined && (
         <p style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0 }}>
           {value}
         </p>
       )}
       {loading ? (
-        <Skeleton width={96} height={14} radius={4} />
+        <Skeleton width={96} height={14} radius={'var(--radius-xs)'} />
       ) : sub && (
         <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
           {sub}

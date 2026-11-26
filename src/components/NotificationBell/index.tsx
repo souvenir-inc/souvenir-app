@@ -11,6 +11,7 @@ import { useOptionalNotifications } from '@/context/notifications-context'
 import { useGuardedRouter } from '@/context/nav-guard-context'
 import type { AppNotification } from '@/lib/notifications/types'
 import { SETTINGS_PREVIEW_ENABLED } from '@/lib/feature-flags'
+import { DURATION, SPRING } from "@/styles/tokens/motion"
 
 // ── NotificationBell ─────────────────────────────────────────────────────────
 // The bell in the sidebar's profile row (right of the settings icon), or
@@ -33,7 +34,7 @@ import { SETTINGS_PREVIEW_ENABLED } from '@/lib/feature-flags'
 // those on `document`, which a stopped native event would never reach.
 
 const NOTIFICATIONS_SETTINGS_ROUTE = '/settings/notifications'
-const BADGE_SPRING = { type: 'spring' as const, stiffness: 600, damping: 26 }
+const BADGE_SPRING = { type: 'spring' as const, ...SPRING.lively }
 
 export interface NotificationBellProps {
   open:         boolean
@@ -70,7 +71,7 @@ export function NotificationBell({ open, onOpenChange }: NotificationBellProps) 
   const [badgeScope, animateBadge] = useAnimate<HTMLSpanElement>()
   useEffect(() => {
     if (!ringKey || reduceMotion || !badgeScope.current) return
-    void animateBadge(badgeScope.current, { scale: [1, 1.35, 0.92, 1] }, { duration: 0.5, ease: 'easeOut' })
+    void animateBadge(badgeScope.current, { scale: [1, 1.35, 0.92, 1] }, { duration: DURATION.long, ease: 'easeOut' })
   }, [ringKey, reduceMotion, animateBadge, badgeScope])
 
   // Layout effect, not the click handler: the panel can also be opened from
@@ -190,7 +191,7 @@ export function NotificationBell({ open, onOpenChange }: NotificationBellProps) 
             aria-hidden
             initial={{ opacity: 0, scale: 0.4 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.4, transition: { duration: 0.14 } }}
+            exit={{ opacity: 0, scale: 0.4, transition: { duration: DURATION.quick } }}
             transition={BADGE_SPRING}
             style={{ position: 'absolute', top: -3, right: -4, display: 'inline-flex', pointerEvents: 'none' }}
           >

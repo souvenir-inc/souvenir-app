@@ -8,14 +8,15 @@ import { Button } from '@/components/ui/button'
 import { springs } from '@/lib/springs'
 import { cn } from '@/lib/utils'
 import type { BadgeColor } from '@/components/Badge'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
 // Two-layer shadow system: outer elevation + inner depth overlay (KDS standard).
 // Slightly warmer than CARD_SHADOW (QuestionCard) to distinguish this as
 // elevated above the surrounding chat thread.
 
-const SHADOW_CARD  = '0px 4px 8px 0px rgba(82,75,71,0.10), 0px 0px 0px 1px rgba(59,54,50,0.12)'
-const SHADOW_INNER = 'inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 50%, transparent), inset 0px -1px 0px 0px rgba(82,75,71,0.06)'
+const SHADOW_CARD  = 'var(--approval-card-shadow-card)'
+const SHADOW_INNER = 'var(--approval-card-shadow-inner)'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -84,7 +85,7 @@ function DenyReasonChip({ label, onClick }: DenyReasonChipProps) {
       onMouseDown={() => setPressed(true)}
       onMouseUp={() => setPressed(false)}
       whileTap={{ scale: 0.94 }}
-      transition={{ duration: 0.1, ease: 'easeOut' }}
+      transition={{ duration: DURATION.snap, ease: 'easeOut' }}
       style={{
         display:         'inline-flex',
         alignItems:      'center',
@@ -95,8 +96,8 @@ function DenyReasonChip({ label, onClick }: DenyReasonChipProps) {
         cursor:          'pointer',
         backgroundColor: hovered ? 'var(--neutral-100)' : 'var(--neutral-white, white)',
         boxShadow:       hovered
-          ? '0px 0px 0px 1px rgba(59,54,50,0.4)'
-          : '0px 0px 0px 1px rgba(59,54,50,0.2)',
+          ? 'var(--approval-card-shadow)'
+          : 'var(--approval-card-shadow-2)',
         fontFamily:      'var(--font-body)',
         fontWeight:      'var(--font-weight-medium)',
         fontSize:        'var(--font-size-body)',
@@ -343,8 +344,8 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 <motion.div
                   key="ctas"
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: { duration: 0.12, ease: 'easeOut' } }}
-                  exit={{    opacity: 0, transition: { duration: 0.08, ease: 'easeIn'  } }}
+                  animate={{ opacity: 1, transition: { duration: DURATION.fast, ease: 'easeOut' } }}
+                  exit={{    opacity: 0, transition: { duration: DURATION.instant, ease: 'easeIn'  } }}
                   style={{
                     display: 'flex',
                     gap:     'var(--space-2)',
@@ -383,12 +384,12 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   animate={{
                     opacity:    1,
                     height:    'auto',
-                    transition: { ...springs.fast, opacity: { duration: 0.12 } },
+                    transition: { ...springs.fast, opacity: { duration: DURATION.fast } },
                   }}
                   exit={{
                     opacity:    0,
                     height:     0,
-                    transition: { duration: 0.1, ease: 'easeIn' },
+                    transition: { duration: DURATION.snap, ease: 'easeIn' },
                   }}
                   style={{ overflow: 'hidden' }}
                 >
@@ -416,7 +417,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 <motion.div
                   key="accepted"
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: { duration: 0.15, ease: 'easeOut' } }}
+                  animate={{ opacity: 1, transition: { duration: DURATION.quick, ease: 'easeOut' } }}
                   style={{
                     display:    'flex',
                     alignItems: 'center',
@@ -459,7 +460,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 <motion.div
                   key="denied"
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: { duration: 0.15, ease: 'easeOut' } }}
+                  animate={{ opacity: 1, transition: { duration: DURATION.quick, ease: 'easeOut' } }}
                   style={{
                     display:    'flex',
                     alignItems: 'center',

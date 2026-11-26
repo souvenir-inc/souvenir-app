@@ -12,8 +12,8 @@ export interface ChipTooltipProps {
 }
 
 const DIVIDER: React.CSSProperties = { height: 1, background: 'currentColor', opacity: 0.14 }
-const REGULAR = 400
-const STRONG = 700
+const REGULAR = 'var(--font-weight-regular)'
+const STRONG = 'var(--font-weight-bold)'
 
 /**
  * Structured tooltip body for chips, separated into sections by hairline dividers:

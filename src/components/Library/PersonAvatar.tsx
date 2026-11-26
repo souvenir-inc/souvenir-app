@@ -11,7 +11,7 @@ import { Tooltip } from '@/components/Tooltip'
 // Soft diagonal gradient (light top-left to the full tint bottom-right), as in the library prototype.
 const tintGradient = (colour: string) =>
   `linear-gradient(135deg, color-mix(in srgb, ${colour} 45%, white), color-mix(in srgb, ${colour} 88%, black))`
-const HAIRLINE = "inset 0 0 0 0.5px rgba(0, 0, 0, 0.08)"
+const HAIRLINE = 'var(--person-avatar-hairline)'
 
 const TINTS = ['Blue', 'Green', 'Purple', 'Yellow', 'Brown'] as const
 
@@ -77,7 +77,7 @@ export function AccessAvatars({ file, viewerId }: { file: LibraryFile; viewerId:
     <Tooltip content={tip}>
       <span role="img" aria-label={tip} style={{ display: 'inline-flex', alignItems: 'center' }}>
         {shown.map((person, index) => (
-          <span key={person.id} style={{ marginLeft: index === 0 ? 0 : -6, display: 'inline-flex' }}>
+          <span key={person.id} style={{ marginLeft: index === 0 ? 0 : 'calc(var(--space-1-5) * -1)', display: 'inline-flex' }}>
             <PersonAvatar person={person} ring />
           </span>
         ))}

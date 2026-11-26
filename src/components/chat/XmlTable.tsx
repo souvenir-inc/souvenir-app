@@ -15,6 +15,7 @@
 
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, m } from "framer-motion"
+import { DURATION, LONG, STAGGER } from "@/styles/tokens/motion"
 
 interface ParsedTable {
   headers: string[]
@@ -151,15 +152,15 @@ function AnimatedTable({ data, animate = true }: { data: ParsedTable; animate?: 
         )}
         <AnimatePresence>
           {skeletonVisible && (
-            <m.div key="skeleton" exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            <m.div key="skeleton" exit={{ opacity: 0 }} transition={{ duration: DURATION.base }}>
               {rows.map((_, ri) => (
-                <m.div key={ri} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: ri * 0.045, duration: 0.18 }}
+                <m.div key={ri} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: ri * STAGGER.sm, duration: DURATION.base }}
                   style={{ display: "grid", gridTemplateColumns: gridCols, borderBottom: rowBorderBottom(ri), background: "var(--card-bg)" }}>
                   {Array.from({ length: colCount }).map((_, ci) => (
                     <div key={ci} style={{ padding: "var(--space-2-5) var(--space-3)", borderLeft: ci > 0 ? "1px solid var(--neutral-800-05)" : "none" }}>
                       <m.div
                         animate={{ opacity: [0.35, 0.85, 0.35] }}
-                        transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: (ri + ci) * 0.06 }}
+                        transition={{ duration: LONG.md, repeat: Infinity, ease: "easeInOut", delay: (ri + ci) * STAGGER.md }}
                         style={{ height: 12, width: `${skelW(ri, ci)}%`, background: "var(--neutral-800-10)", borderRadius: 'var(--radius-xs)' }}
                       />
                     </div>
@@ -171,10 +172,10 @@ function AnimatedTable({ data, animate = true }: { data: ParsedTable; animate?: 
         </AnimatePresence>
         <AnimatePresence initial={false}>
           {rows.slice(0, revealedRows).map((row, ri) => (
-            <m.div key={ri} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.18, ease: "easeOut" }}
+            <m.div key={ri} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: DURATION.base, ease: "easeOut" }}
               style={{ display: "grid", gridTemplateColumns: gridCols, borderBottom: rowBorderBottom(ri), background: "var(--card-bg)" }}>
               {Array.from({ length: colCount }).map((_, ci) => (
-                <div key={ci} style={{ padding: "var(--space-2-5) var(--space-3)", color: ci === 0 ? "var(--neutral-900)" : "var(--neutral-700)", fontWeight: ci === 0 ? 500 : 400, borderLeft: ci > 0 ? "1px solid var(--neutral-800-05)" : "none", fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-body-sm)", wordBreak: "break-word" }}>
+                <div key={ci} style={{ padding: "var(--space-2-5) var(--space-3)", color: ci === 0 ? "var(--neutral-900)" : "var(--neutral-700)", fontWeight: ci === 0 ? "var(--font-weight-medium)" : "var(--font-weight-regular)", borderLeft: ci > 0 ? "1px solid var(--neutral-800-05)" : "none", fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-body-sm)", wordBreak: "break-word" }}>
                   {row[ci] ?? ""}
                 </div>
               ))}
@@ -184,7 +185,7 @@ function AnimatedTable({ data, animate = true }: { data: ParsedTable; animate?: 
       </div>
       <AnimatePresence>
         {isDone && (
-          <m.div key="actions" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}
+          <m.div key="actions" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: DURATION.base }}
             style={{ display: "flex", alignItems: "center", gap: 'var(--space-1-5)', marginTop: 'var(--space-2)', paddingLeft: 'var(--space-0-5)' }}>
             <span style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-600)", flex: 1 }}>
               {rows.length} {rows.length === 1 ? "row" : "rows"} · {headers.length} col

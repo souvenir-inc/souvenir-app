@@ -9,6 +9,7 @@ import { IconButton } from "@/components/ui/button";
 import { Tooltip } from "@/components/Tooltip";
 import { PINS_ENABLED } from "@/lib/feature-flags";
 import type { QueuedMessage } from "@/lib/message-queue";
+import { BLUR, DURATION, SPRING as SPRING_TOKENS } from "@/styles/tokens/motion"
 
 /** How a row leaves: `sent` lifts off toward the thread, where the real
  *  message lands; `dismissed` (edited, removed, put back) just fades. */
@@ -33,13 +34,13 @@ const ROW_HEIGHT = 36;
 // Rows shown before the list scrolls (a half row peeks to show there's more).
 const VISIBLE_ROWS = 3.5;
 
-const SPRING = { type: "spring", stiffness: 420, damping: 34 } as const;
+const SPRING = { type: "spring", ...SPRING_TOKENS.settle } as const;
 
-const LIFT_OFF = { duration: 0.22, ease: [0.4, 0, 1, 1] } as const;
+const LIFT_OFF = { duration: DURATION.base, ease: [0.4, 0, 1, 1] } as const;
 
 const ROW_VARIANTS = {
   exit: (kind: QueuedRowExit = "dismissed") => kind === "sent"
-    ? { opacity: 0, y: -16, scale: 0.97, filter: "blur(2px)", transition: LIFT_OFF }
+    ? { opacity: 0, y: -16, scale: 0.97, filter: "blur(var(--blur-2xs))", transition: LIFT_OFF }
     : { opacity: 0, scale: 0.97, transition: { duration: 0.15 } },
 };
 
@@ -47,7 +48,7 @@ const ROW_VARIANTS = {
 // send, sliding back under the composer otherwise.
 const TRAY_VARIANTS = {
   exit: (kind: QueuedRowExit = "dismissed") => kind === "sent"
-    ? { opacity: 0, y: -12, filter: "blur(2px)", transition: LIFT_OFF }
+    ? { opacity: 0, y: -12, filter: "blur(var(--blur-2xs))", transition: LIFT_OFF }
     : { opacity: 0, y: TUCK, transition: { duration: 0.18 } },
 };
 
@@ -70,12 +71,12 @@ export function QueuedMessagesTray({ messages, status, waiting, rowExit, onEdit,
           initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: TUCK }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
           exit={reduceMotion ? { opacity: 0 } : "exit"}
-          transition={reduceMotion ? { duration: 0.15 } : SPRING}
+          transition={reduceMotion ? { duration: DURATION.quick } : SPRING}
           style={{
             position:        "relative",
             zIndex:          'var(--z-base)',
-            margin:          `0 12px -${TUCK}px`,
-            padding:         `8px 8px ${TUCK + 6}px`,
+            margin:          `0 var(--space-3) -${TUCK}px`, // ds-keep: TUCK is also framer's y offset
+            padding:         `var(--space-2) var(--space-2) ${TUCK + 6}px`, // ds-keep: TUCK is also framer's y offset
             borderRadius:    "var(--radius-2xl) var(--radius-2xl) 0 0",
             backgroundColor: "var(--neutral-100)",
             boxShadow:       "inset 0 0 0 1px var(--neutral-200)",
@@ -168,10 +169,10 @@ function QueuedRow({ message, position, onEdit, onRemove, reduceMotion, ref }: Q
       ref={ref}
       layout={!reduceMotion}
       variants={ROW_VARIANTS}
-      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 10, filter: "blur(2px)" }}
+      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 10, filter: `blur(${BLUR['2xs']}px)` }}
       animate={{ opacity: 1, y: 0, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
       exit="exit"
-      transition={reduceMotion ? { duration: 0.15 } : SPRING}
+      transition={reduceMotion ? { duration: DURATION.quick } : SPRING}
       aria-label={`Queued message ${position}`}
       style={{
         display:         "flex",

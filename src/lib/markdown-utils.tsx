@@ -170,7 +170,7 @@ function BaseLink({
       style={{
         color: "var(--brown-500)",
         textDecoration: "underline",
-        textUnderlineOffset: "2px",
+        textUnderlineOffset: "var(--underline-offset)",
       }}
     >
       {children}

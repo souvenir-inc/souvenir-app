@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 // ── Shadows ───────────────────────────────────────────────────────────────────
 
 const SHADOW_CARD   = 'var(--shadow-tile)'
-const SHADOW_AVATAR = '0px 1.091px 1.09px 0px rgba(59,54,50,0.05), 0px 1.455px 1px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)'
+const SHADOW_AVATAR = 'var(--version-card-shadow-avatar)'
 
 const EMPTY_VERSION_CHANGES: VersionCardChange[] = []
 

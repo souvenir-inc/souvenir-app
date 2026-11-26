@@ -33,17 +33,17 @@ const BG_NEUTRAL_100 = 'var(--neutral-100)'
 const BORDER_BLUE    = '1px solid var(--focus-ring)'
 
 // Shadow for the numbered badge - shared constant
-const BADGE_OUTER_SHADOW = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4)'
-const BADGE_INNER_SHADOW = 'inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 61%, transparent), inset 0px -1px 0px 0px rgba(106,98,93,0.05)'
+const BADGE_OUTER_SHADOW = 'var(--shadow-chip)'
+const BADGE_INNER_SHADOW = 'var(--shadow-badge-inner)'
 // Shadow for the check/checkbox badge - white with yellow inner glow
-const CHECK_INNER_SHADOW = 'inset 0px 1px 0px 0px var(--yellow-200), inset 0px -1px 0px 0px rgba(106,98,93,0.05)'
+const CHECK_INNER_SHADOW = 'var(--option-row-check-inner-shadow)'
 
 // ── Badge animation variants ───────────────────────────────────────────────────
 
 const badgeEnter = {
   initial:  { scale: 0.5, opacity: 0, filter: 'blur(4px)' },
   animate:  { scale: 1,   opacity: 1, filter: 'blur(0px)', transition: springs.fast },
-  exit:     { scale: 0.5, opacity: 0, filter: 'blur(4px)', transition: { duration: 0.08, ease: 'easeIn' as const } },
+  exit:     { scale: 0.5, opacity: 0, filter: 'blur(var(--blur-xs))', transition: { duration: 0.08, ease: 'easeIn' as const } },
 }
 
 // ── Component ──────────────────────────────────────────────────────────────────
@@ -95,8 +95,8 @@ export function OptionRow({
           borderRadius:    'var(--radius-xl)',
           backgroundColor: bg,
           border:          hasBorder ? BORDER_BLUE : 'none',
-          outline:         focused ? `2px solid var(--focus-ring)` : 'none',
-          outlineOffset:   '-2px',
+          outline:         focused ? `var(--focus-ring-width) solid var(--focus-ring)` : 'none',
+          outlineOffset:   'calc(var(--focus-ring-offset) * -1)',
           position:        'relative',
           userSelect:      'none',
           transition:      'background-color var(--duration-fast) ease',

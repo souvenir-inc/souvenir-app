@@ -88,7 +88,7 @@ function Download({ board, period, compare, onClose, onImage, onNumbers }: Omit<
               )}
             >
               <span className="flex items-center gap-1.5 text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--dashboard-figure)]"><Icon aria-hidden size={15} strokeWidth={1.5} absoluteStrokeWidth />{label}</span>
-              <span className="pl-[21px] text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">{line}</span>
+              <span className="pl-[var(--dashboard-download-note-indent)] text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">{line}</span>
             </button>
           ))}
         </div>

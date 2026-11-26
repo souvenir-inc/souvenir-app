@@ -40,7 +40,7 @@
 .rowLink > span { display: block; font-size: var(--font-size-body); color: var(--neutral-900); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rowLink > small { font-size: var(--font-size-small); color: var(--neutral-600); }
 .rowLink[aria-disabled='true'] { cursor: default; }
-.rowLink:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; border-radius: var(--radius-sm); }
+.rowLink:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring); outline-offset: var(--focus-ring-offset); border-radius: var(--radius-sm); }
 
 .tile {
   display: inline-flex;

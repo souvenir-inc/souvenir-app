@@ -28,6 +28,7 @@ import { GeneratedFilesList } from "./message/GeneratedFilesList";
 import { MessageActionBar } from "./message/MessageActionBar";
 import { useMessageSelection } from "./message/use-message-selection";
 import { useUnmountTimeouts } from "@/hooks/use-unmount-timeouts";
+import { DURATION, SPRING } from "@/styles/tokens/motion"
 
 // The message's parts live in ./message/; this file is the row itself (state,
 // effects, layout) plus the memo comparator. StreamingTextContent is
@@ -86,7 +87,7 @@ function AnswerText({
     <m.div
       initial={isNewMessage ? { opacity: 0, y: 5 } : false}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: DURATION.moderate, ease: [0.16, 1, 0.3, 1] }}
     >
       <LibraryCitationsProvider citations={libraryCitations}>
         <StreamingTextContent
@@ -341,8 +342,8 @@ export function ChatMessage({
         : false}
       animate={isUser ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: 0, scale: 1 }}
       transition={isUser
-        ? { type: "spring", stiffness: 380, damping: 28 }
-        : { duration: 0.4, ease: [0.2, 0, 0, 1] }
+        ? { type: "spring", ...SPRING.brisk }
+        : { duration: DURATION.gentle, ease: [0.2, 0, 0, 1] }
       }
       style={{
         display: "flex",

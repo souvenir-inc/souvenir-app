@@ -13,6 +13,7 @@ import { PROJECT_VISIBILITY_OPTIONS, type ProjectVisibility } from '@/lib/api/pr
 import { MAX_PROJECT_TAGS as MAX_TAGS, addTag, projectFormSchema, type ProjectFormValues } from '@/lib/projects/project-form'
 import { useZodForm } from '@/hooks/use-zod-form'
 import { toast } from 'sonner'
+import { DURATION } from "@/styles/tokens/motion"
 
 const EMPTY_PROJECT_TAGS: ProjectTag[] = []
 
@@ -27,7 +28,7 @@ const INPUT_BASE: React.CSSProperties = {
   background:   'var(--field-surface)',
   border:       '1px solid var(--border-default)',
   borderRadius: 'var(--radius-lg)',
-  boxShadow:    '0px 1px 1.5px 0px rgba(82,75,71,0.12)',
+  boxShadow:    'var(--shadow-drop-xs)',
   outline:      'none',
   width:        '100%',
   padding:      'var(--space-2) var(--space-3)',
@@ -145,13 +146,13 @@ export function EditProjectModal({
 
   function focusInput(e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) {
     Object.assign(e.currentTarget.style, {
-      boxShadow:   '0px 0px 0px 3px rgba(74,131,191,0.25), 0px 1px 1.5px 0px rgba(82,75,71,0.12)',
+      boxShadow:   'var(--edit-project-modal-shadow)',
       borderColor: 'var(--blue-400)',
     })
   }
   function blurInput(e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) {
     Object.assign(e.currentTarget.style, {
-      boxShadow:   '0px 1px 1.5px 0px rgba(82,75,71,0.12)',
+      boxShadow:   'var(--shadow-drop-xs)',
       borderColor: 'var(--border-default)',
     })
   }
@@ -323,7 +324,7 @@ export function EditProjectModal({
                     initial={{ opacity: 0, scale: 0.85 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.85 }}
-                    transition={{ duration: 0.12 }}
+                    transition={{ duration: DURATION.fast }}
                     style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-0-5)' }}
                   >
                     <Badge label={tag.label} color={tag.color} />

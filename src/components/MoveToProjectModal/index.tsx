@@ -10,7 +10,7 @@ import { Button, IconButton } from '@/components/ui/button'
 
 const SHADOW_MODAL        = 'var(--shadow-4)'
 const SHADOW_ROW_SELECTED = '0px 0px 0px 1.5px var(--blue-400)'
-const SHADOW_ROW_HOVER    = '0px 0px 0px 1px rgba(59,54,50,0.14)'
+const SHADOW_ROW_HOVER    = 'var(--move-to-project-modal-shadow-row-hover)'
 
 const EMPTY_PROJECTS: Project[] = []
 
@@ -139,7 +139,7 @@ function ProjectRow({ project, selected, onSelect }: ProjectRowProps) {
         width:           18,
         height:          18,
         borderRadius:    '50%',
-        boxShadow:       selected ? 'none' : '0px 0px 0px 1.5px rgba(59,54,50,0.28)',
+        boxShadow:       selected ? 'none' : 'var(--move-to-project-modal-shadow)',
         backgroundColor: selected ? 'var(--blue-400)' : 'transparent',
         flexShrink:      0,
         display:         'flex',

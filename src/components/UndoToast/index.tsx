@@ -5,13 +5,14 @@ import { Slot } from '@radix-ui/react-slot'
 import { AnimatePresence, motion } from 'framer-motion'
 import { springs } from '@/lib/springs'
 import { cn } from '@/lib/utils'
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
 // Sits inline in a chat thread — slightly elevated above the thread surface.
 // Two-layer: outer lift + inner depth.
 
 const SHADOW_OUTER = 'var(--shadow-undo-toast)'
-const SHADOW_INNER = 'inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 60%, transparent), inset 0px -1px 0px 0px rgba(82,75,71,0.05)'
+const SHADOW_INNER = 'var(--undo-toast-shadow-inner)'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -113,7 +114,7 @@ export const UndoToast = React.forwardRef<HTMLDivElement, UndoToastProps>(
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0, transition: springs.fast }}
-        exit={{    opacity: 0, y: 4, transition: { duration: 0.15, ease: 'easeIn' } }}
+        exit={{    opacity: 0, y: 4, transition: { duration: DURATION.quick, ease: 'easeIn' } }}
       >
         <Comp
           ref={ref}
@@ -174,9 +175,9 @@ export const UndoToast = React.forwardRef<HTMLDivElement, UndoToastProps>(
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.span
               key={status}
-              initial={{ opacity: 0, scale: 0.92, filter: 'blur(2px)' }}
+              initial={{ opacity: 0, scale: 0.92, filter: `blur(${BLUR['2xs']}px)` }}
               animate={{ opacity: 1, scale: 1,    filter: 'blur(0px)', transition: springs.fast }}
-              exit={{    opacity: 0, scale: 0.92, filter: 'blur(2px)', transition: { duration: 0.1, ease: 'easeIn' } }}
+              exit={{    opacity: 0, scale: 0.92, filter: `blur(${BLUR['2xs']}px)`, transition: { duration: DURATION.snap, ease: 'easeIn' } }}
               style={{
                 flex:         '1 0 0',
                 minWidth:     1,
@@ -203,10 +204,10 @@ export const UndoToast = React.forwardRef<HTMLDivElement, UndoToastProps>(
                 type="button"
                 onClick={handleUndo}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 1, transition: { duration: 0.12 } }}
-                exit={{    opacity: 0, transition: { duration: 0.08 } }}
+                animate={{ opacity: 1, transition: { duration: DURATION.fast } }}
+                exit={{    opacity: 0, transition: { duration: DURATION.instant } }}
                 whileTap={{ scale: 0.94 }}
-                transition={{ duration: 0.1, ease: 'easeOut' }}
+                transition={{ duration: DURATION.snap, ease: 'easeOut' }}
                 style={{
                   position:       'relative',
                   zIndex:         'var(--z-base)',

@@ -13,6 +13,7 @@ import { useDashboardData } from './live/dashboard-data'
 import { compareName } from './period'
 import type { App, CardSize, Metric } from './types'
 import { CardEmptyState, ChartGhost, emptyAction, emptyDetail, type EmptyKind } from './CardEmpty'
+import { DURATION } from "@/styles/tokens/motion"
 
 // One metric card (Figma 17:889, 05-cards-reading-rules.md). What it shows follows its size (CR-1):
 //   sm       3×1  288×156  the number and its change
@@ -216,7 +217,7 @@ function Body({ metric, bars, size, view, body, tall, wide, index, appNames, onR
     <m.div
       initial={reduceMotion ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.25, delay: Math.min(index, 12) * 0.04 }}
+      transition={{ duration: DURATION.moderate, delay: Math.min(index, 12) * 0.04 }}
     >
       <Figure metric={metric} syncing={!!view?.syncing} className={figureAt} inlinePill={tall && size !== 'sm-tall' ? view?.health : undefined} />
       {view?.health && (!tall || size === 'sm-tall') && (
@@ -282,7 +283,7 @@ function SyncDot({ tone, tip }: { tone: 'failed' | 'behind'; tip: string }) {
   )
 }
 
-const LEGEND_DOT = { ink: 'bg-[var(--dashboard-chart-ink)] h-0.5 w-2.5 rounded-[1px]', previous: 'bg-[var(--dashboard-chart-previous)] h-0.5 w-2.5 rounded-[1px]', soft: 'bg-[var(--dashboard-chart-soft)] size-2 rounded-[2px]' }
+const LEGEND_DOT = { ink: 'bg-[var(--dashboard-chart-ink)] h-0.5 w-2.5 rounded-hairline', previous: 'bg-[var(--dashboard-chart-previous)] h-0.5 w-2.5 rounded-hairline', soft: 'bg-[var(--dashboard-chart-soft)] size-2 rounded-2xs' }
 
 function Legend({ items }: { items: [keyof typeof LEGEND_DOT, string][] }) {
   return (
@@ -323,7 +324,7 @@ function Figure({ metric, syncing, inlinePill, className }: { metric: Metric; sy
   const Arrow = change?.direction === 'up' ? ArrowUp : ArrowDown
   return (
     <div className={cn('absolute left-4 flex items-baseline gap-2', inlinePill && 'right-4 min-w-0', className)}>
-      <p data-syncing={syncing || undefined} className={cn('m-0 whitespace-nowrap text-[length:var(--font-size-heading-xl)] font-medium leading-8 tracking-[-0.56px] text-[var(--dashboard-figure)]', syncing && 'dashboard-shimmer-text')}>
+      <p data-syncing={syncing || undefined} className={cn('m-0 whitespace-nowrap text-[length:var(--font-size-heading-xl)] font-medium leading-8 tracking-[var(--dashboard-card-value-tracking)] text-[var(--dashboard-figure)]', syncing && 'dashboard-shimmer-text')}>
         {metric.value}
       </p>
       {change ? (

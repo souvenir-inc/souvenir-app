@@ -8,6 +8,7 @@ import { AttachmentManager, type PendingAttachment } from "./AttachmentManager";
 import { PinChipStrip } from "./PinChipStrip";
 import { MentionChip } from "@/components/chat/MentionChip";
 import { UploadNotices } from "@/components/Library/upload/UploadNotices";
+import { SPRING } from "@/styles/tokens/motion"
 
 // Presentational pieces of ChatInterface's layout.
 
@@ -88,7 +89,7 @@ export function ScrollToBottomButton({ visible, onClick }: { visible: boolean; o
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 8 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+          transition={{ type: 'spring', ...SPRING.brisk }}
           style={{
             position: 'absolute',
             bottom: 16,

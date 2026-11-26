@@ -12,13 +12,14 @@ import { IconButton } from '@/components/ui/button'
 import { Dropdown } from '@/components/Dropdown'
 import { Divider } from '@/components/Divider'
 import { cn } from '@/lib/utils'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Shadows (Figma exact) ─────────────────────────────────────────────────────
 
 // Chip: rest = ghost ring, elevated (row hovered/focused) = filled with inner highlight
 const SHADOW_CHIP_REST     = '0px 0px 0px 1px var(--neutral-800-30)'
-const SHADOW_CHIP_ELEVATED = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4)'
-const SHADOW_CHIP_INNER    = 'inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 61%, transparent), inset 0px -1px 0px 0px rgba(106,98,93,0.05)'
+const SHADOW_CHIP_ELEVATED = 'var(--shadow-chip)'
+const SHADOW_CHIP_INNER    = 'var(--shadow-badge-inner)'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -109,7 +110,7 @@ function PinCountChip({ pinCount, pinBoardOpen, rowElevated, title, onClick }: P
         position:        'relative',
         display:         'inline-flex',
         alignItems:      'center',
-        gap:             hasPins ? 4 : 0,
+        gap:             hasPins ? 'var(--space-1)' : 0,
         padding:         'var(--space-1) var(--space-2)',
         borderRadius:    'var(--radius-md)',
         border:          'none',
@@ -123,8 +124,8 @@ function PinCountChip({ pinCount, pinBoardOpen, rowElevated, title, onClick }: P
         boxShadow:       elevated ? SHADOW_CHIP_ELEVATED : SHADOW_CHIP_REST,
         flexShrink:      0,
         whiteSpace:      'nowrap',
-        outline:         focused ? '2px solid var(--blue-400)' : 'none',
-        outlineOffset:   2,
+        outline:         focused ? 'var(--focus-ring-width) solid var(--blue-400)' : 'none',
+        outlineOffset:   'var(--focus-ring-offset)',
         opacity:         pinBoardOpen && !hasPins ? 0.7 : 1,
         transition:      'background-color var(--duration-fast), box-shadow var(--duration-fast), opacity var(--duration-fast)',
       }}
@@ -341,7 +342,7 @@ function ChatRowInner(
         style={{
           display:         'flex',
           alignItems:      'center',
-          padding:         selectionMode ? '0 16px 0 6px' : '12px 16px',
+          padding:         selectionMode ? '0 var(--space-4) 0 var(--space-1-5)' : 'var(--space-3) var(--space-4)',
           height:          selectionMode ? 62 : undefined,
           borderRadius:    'var(--radius-xl)',
           boxSizing:       'border-box',
@@ -349,11 +350,11 @@ function ChatRowInner(
           backgroundColor: bg,
           boxShadow:       rowShadow,
           outline:         isFocused
-            ? '1px solid var(--blue-400)'
+            ? 'var(--focus-ring-width-thin) solid var(--blue-400)'
             : isEmpty
-              ? '1.5px dashed var(--blue-400)'
+              ? 'var(--chat-row-outline-width) dashed var(--blue-400)'
               : 'none',
-          outlineOffset:   -1,
+          outlineOffset:   'calc(var(--focus-ring-offset-sm) * -1)',
           opacity:         disabled || isArchiving ? 0.5 : 1,
           pointerEvents:   disabled || isArchiving ? 'none' : undefined,
           cursor:          isEmpty ? 'default' : isRenaming ? 'text' : 'pointer',
@@ -372,7 +373,7 @@ function ChatRowInner(
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -8 }}
-              transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: DURATION.quick, ease: [0.16, 1, 0.3, 1] }}
               style={{ flexShrink: 0, marginRight: 'var(--space-2)' }}
               onClick={(e) => e.stopPropagation()}
             >

@@ -40,8 +40,8 @@ function ToneCard({
         borderRadius: "var(--radius-2xl)",
         backgroundColor: "var(--neutral-white)",
         boxShadow: selected
-          ? "0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 2px var(--neutral-900)"
-          : "0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)",
+          ? "var(--tone-shadow)"
+          : "var(--shadow-tile)",
         cursor: "pointer",
         border: "none",
         textAlign: "left",
@@ -63,7 +63,7 @@ function ToneCard({
           alignItems: "center",
           justifyContent: "center",
           boxShadow:
-            "0px 1.091px 1.09px 0px rgba(59,54,50,0.05), 0px 1.455px 1px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)",
+            "var(--tone-shadow-2)",
         }}
       >
         <span

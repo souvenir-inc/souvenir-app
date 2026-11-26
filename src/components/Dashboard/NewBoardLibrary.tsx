@@ -128,7 +128,7 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
           <div ref={listRef} role="listbox" aria-label="Start from" className="kaya-scrollbar flex w-[248px] shrink-0 flex-col gap-4 overflow-y-auto bg-[var(--dashboard-hover-band)] px-3 py-4">
             {groups.filter((g) => g.rows.length).map((g) => (
               <div key={g.heading} role="group" aria-label={g.heading} className="flex flex-col gap-0.5">
-                <p className="m-0 px-2 pb-1 text-[length:var(--font-size-caption)] font-medium uppercase leading-4 tracking-[0.04em] text-[var(--dashboard-faint)]">{g.heading}</p>
+                <p className="m-0 px-2 pb-1 text-[length:var(--font-size-caption)] font-medium uppercase leading-4 tracking-wider text-[var(--dashboard-faint)]">{g.heading}</p>
                 {g.rows.map((r) => {
                   const on = r.key === picked
                   return (
@@ -177,7 +177,7 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
                     {leftOut.length === 1 ? '1 card is left out' : `${leftOut.length} cards are left out`}: this store doesn’t measure {leftOut.length === 1 ? 'it' : 'them'} yet
                   </p>
                   { }
-                  <a href={connectHref} data-connect-app={connectApp} className={cn('flex shrink-0 items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1 pl-2.5 pr-3 text-[length:var(--font-size-body-sm)] font-medium leading-[18px] text-[var(--dashboard-figure)] no-underline shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}>
+                  <a href={connectHref} data-connect-app={connectApp} className={cn('flex shrink-0 items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1 pl-2.5 pr-3 text-[length:var(--font-size-body-sm)] font-medium leading-[var(--line-height-compact)] text-[var(--dashboard-figure)] no-underline shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}>
                     <Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />Connect
                   </a>
                 </div>

@@ -157,7 +157,7 @@ function ColumnsShape({ cards }: { cards: number }) {
         <div key={col} className={styles.card} style={{ padding: 'var(--space-3)', display: "flex", flexDirection: "column", gap: 'var(--space-2)' }}>
           <Skeleton width="50%" height={12} style={{ marginBottom: 'var(--space-1)' }} />
           {Array.from({ length: cards - (col % 2) }, (_, i) => (
-            <Skeleton key={i} height={52} radius={8} />
+            <Skeleton key={i} height={52} radius={"var(--radius-md)"} />
           ))}
         </div>
       ))}
@@ -172,7 +172,7 @@ function FunnelShape() {
       {["100%", "78%", "52%", "30%"].map((width, i) => (
         <div key={i} style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1-5)' }}>
           <Skeleton width="28%" height={10} />
-          <Skeleton width={width} height={9} radius={999} />
+          <Skeleton width={width} height={9} radius={"var(--radius-full)"} />
         </div>
       ))}
     </div>
@@ -194,7 +194,7 @@ function TagsShape() {
       <Skeleton width={120} height={10} style={{ marginBottom: 'var(--space-2)' }} />
       <div style={{ display: "flex", flexWrap: "wrap", gap: 'var(--space-1-5)' }}>
         {[92, 124, 80, 106].map((width) => (
-          <Skeleton key={width} width={width} height={27} radius={99} />
+          <Skeleton key={width} width={width} height={27} radius={"var(--widget-skeleton-radius)"} />
         ))}
       </div>
     </div>

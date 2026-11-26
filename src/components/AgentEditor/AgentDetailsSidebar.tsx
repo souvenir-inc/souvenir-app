@@ -32,6 +32,7 @@ import { AgentAvatar } from './AgentAvatar'
 import { ModelField } from './ModelField'
 import { SyncNotice } from './SyncNotice'
 import { BOX_STYLE, HINT_STYLE, INPUT_STYLE, LABEL_STYLE } from './styles'
+import { SPRING } from "@/styles/tokens/motion"
 
 
 const PROBLEM_MESSAGE = {
@@ -74,7 +75,7 @@ export function SaveChanges({ count, onClick, loading }: { count: number; onClic
           initial={{ opacity: 0, scale: 0.9, height: 0 }}
           animate={{ opacity: 1, scale: 1, height: 'auto' }}
           exit={{ opacity: 0, scale: 0.9, height: 0 }}
-          transition={{ type: 'spring', stiffness: 520, damping: 34 }}
+          transition={{ type: 'spring', ...SPRING.snappy }}
           style={{ display: 'flex', justifyContent: 'flex-end', overflow: 'visible' }}
         >
           <Button variant="save" size="sm" loading={loading} onClick={onClick}>

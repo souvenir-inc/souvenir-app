@@ -20,7 +20,7 @@ export function InitialPrompts({ compact = false }: { compact?: boolean }) {
         flexDirection: "column",
         // Centred in both layouts (new chat landing and project/compare chats).
         alignItems:    "center",
-        padding:       compact ? "0" : "0 24px",
+        padding:       compact ? "0" : "0 var(--space-6)",
         textAlign:     "center",
         maxWidth:      "860px",
         margin:        "0 auto",
@@ -64,7 +64,7 @@ export function GreetingHeading({ greeting, compact, animateLogo = false }: {
     <h1
       style={{
         fontFamily: "var(--font-title)", // Google Sans
-        fontSize:   compact ? "28px" : "34px",
+        fontSize:   compact ? "var(--font-size-heading-xl)" : "var(--initial-prompts-size)",
         fontWeight: 'var(--font-weight-regular)',
         color:      "var(--neutral-800)",
         margin:     0,
@@ -90,7 +90,7 @@ export function GreetingHeading({ greeting, compact, animateLogo = false }: {
                         display:       "inline-block",
                         // Centre the mark on the capitals (Google Sans cap height ≈ 0.72em), not the x-height.
                         verticalAlign: `calc(0.36em - ${logoSize / 2}px)`,
-                        marginRight:   compact ? "10px" : "12px",
+                        marginRight:   compact ? "var(--space-2-5)" : "var(--space-3)",
                       }}
                     />
                   )}

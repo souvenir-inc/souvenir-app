@@ -157,7 +157,7 @@ export function TopUsersTable({ users, shownOf, onViewAll, note }: {
   )
 }
 
-export function SkeletonBlock({ width = '100%', height, radius = 8 }: { width?: string | number; height: number; radius?: number }) {
+export function SkeletonBlock({ width = '100%', height, radius = 'var(--radius-md)' }: { width?: string | number; height: number; radius?: number | string }) {
   return (
     <span style={{
       display: 'block', width, height, borderRadius: radius,
@@ -170,7 +170,7 @@ export function SkeletonBlock({ width = '100%', height, radius = 8 }: { width?: 
 }
 
 /** A bone vertically centred in a text line box, so stacked lines keep the real line-heights. */
-function SkeletonLine({ width, lineHeight, height, radius = 4 }: { width: string | number; lineHeight: number; height: number; radius?: number }) {
+function SkeletonLine({ width, lineHeight, height, radius = 'var(--radius-xs)' }: { width: string | number; lineHeight: number; height: number; radius?: number | string }) {
   return (
     <span style={{ height: lineHeight, display: 'flex', alignItems: 'center' }}>
       <SkeletonBlock width={width} height={height} radius={radius} />
@@ -190,15 +190,15 @@ export function AnalyticsPageSkeleton() {
         {/* Header: title + description, Export CSV at the right end */}
         <div style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
           <div>
-            <SkeletonLine width={90} lineHeight={32} height={22} radius={6} />
+            <SkeletonLine width={90} lineHeight={32} height={22} radius={'var(--radius-sm)'} />
             <SkeletonLine width={250} lineHeight={22} height={14} />
           </div>
-          <SkeletonBlock width={117} height={32} radius={8} />
+          <SkeletonBlock width={117} height={32} radius={'var(--radius-md)'} />
         </div>
 
         {/* Date-range tabs + note */}
         <div style={{ paddingLeft: 'var(--space-1)', display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', flexWrap: 'wrap' }}>
-          <SkeletonBlock width={302} height={38} radius={11} />
+          <SkeletonBlock width={302} height={38} radius={'var(--analytics-parts-radius)'} />
           <SkeletonLine width={265} lineHeight={18} height={12} />
         </div>
 
@@ -208,24 +208,24 @@ export function AnalyticsPageSkeleton() {
             <div style={{ ...SKELETON_TILE, gridColumn: 'span 2' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)' }}>
                 <SkeletonLine width={162} lineHeight={24} height={13} />
-                <SkeletonBlock width={94} height={22} radius={999} />
+                <SkeletonBlock width={94} height={22} radius={'var(--radius-full)'} />
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)' }}>
-                <SkeletonLine width={86} lineHeight={34} height={24} radius={6} />
-                <SkeletonBlock width={126} height={16} radius={4} />
+                <SkeletonLine width={86} lineHeight={34} height={24} radius={'var(--radius-sm)'} />
+                <SkeletonBlock width={126} height={16} radius={'var(--radius-xs)'} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--space-3)' }}>
                   <SkeletonLine width={250} lineHeight={20} height={13} />
                   <SkeletonLine width={26} lineHeight={20} height={13} />
                 </div>
-                <SkeletonBlock width="100%" height={6} radius={999} />
+                <SkeletonBlock width="100%" height={6} radius={'var(--radius-full)'} />
               </div>
             </div>
             {[{ label: 70, hint: 110 }, { label: 96, hint: 100 }].map((t, i) => (
               <div key={i} style={SKELETON_TILE}>
                 <SkeletonLine width={t.label} lineHeight={i === 0 ? 20 : 24} height={13} />
-                <SkeletonLine width={i === 0 ? 72 : 20} lineHeight={34} height={24} radius={6} />
+                <SkeletonLine width={i === 0 ? 72 : 20} lineHeight={34} height={24} radius={'var(--radius-sm)'} />
                 <SkeletonLine width={t.hint} lineHeight={16} height={11} />
               </div>
             ))}
@@ -243,17 +243,17 @@ export function AnalyticsPageSkeleton() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)', padding: 'var(--space-5) var(--space-6)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-              <SkeletonLine width={86} lineHeight={34} height={24} radius={6} />
-              <SkeletonBlock width={122} height={16} radius={4} />
+              <SkeletonLine width={86} lineHeight={34} height={24} radius={'var(--radius-sm)'} />
+              <SkeletonBlock width={122} height={16} radius={'var(--radius-xs)'} />
             </div>
-            <SkeletonBlock width="100%" height={60} radius={10} />
+            <SkeletonBlock width="100%" height={60} radius={'var(--radius-lg)'} />
             <div>
               <div style={{ position: 'relative', height: 200 }}>
                 {[0, 1, 2, 3, 4].map(i => (
                   <div key={i} aria-hidden style={{ position: 'absolute', left: 0, right: 0, top: `${i * 25}%`, borderTop: `1px ${i === 4 ? 'solid' : 'dashed'} var(--neutral-200)` }} />
                 ))}
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <SkeletonBlock width={289} height={36} radius={10} />
+                  <SkeletonBlock width={289} height={36} radius={'var(--radius-lg)'} />
                 </div>
               </div>
               <div aria-hidden style={{ display: 'flex', justifyContent: 'space-around', marginTop: 'var(--space-2)' }}>
@@ -273,7 +273,7 @@ export function AnalyticsPageSkeleton() {
               </span>
             }
           >
-            <SkeletonBlock width={140} height={32} radius={8} />
+            <SkeletonBlock width={140} height={32} radius={'var(--radius-md)'} />
           </SettingsTableToolbar>
           <div>
             <SettingsTableHeader>
@@ -286,27 +286,27 @@ export function AnalyticsPageSkeleton() {
               <SettingsTableRow key={row} minHeight={68}>
                 <SettingsTableCell>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', minWidth: 0 }}>
-                    <SkeletonBlock width={22} height={22} radius={6} />
-                    <SkeletonBlock width={32} height={32} radius={999} />
+                    <SkeletonBlock width={22} height={22} radius={'var(--radius-sm)'} />
+                    <SkeletonBlock width={32} height={32} radius={'var(--radius-full)'} />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)' }}>
                       <SkeletonLine width={row === 0 ? 80 : 74} lineHeight={22} height={14} />
                       <SkeletonLine width={row === 0 ? 93 : 170} lineHeight={16} height={10} />
                     </div>
                   </div>
                 </SettingsTableCell>
-                <SettingsTableCell><SkeletonBlock width={row === 0 ? 41 : 51} height={20} radius={6} /></SettingsTableCell>
+                <SettingsTableCell><SkeletonBlock width={row === 0 ? 41 : 51} height={20} radius={'var(--radius-sm)'} /></SettingsTableCell>
                 <SettingsTableCell align="end"><SkeletonLine width={46} lineHeight={22} height={14} /></SettingsTableCell>
                 <SettingsTableCell align="end">
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', width: 140 }}>
-                    <div style={{ flex: '1 0 0', minWidth: 0 }}><SkeletonBlock width="100%" height={4} radius={999} /></div>
-                    <div style={{ width: 36, flexShrink: 0, display: 'flex', justifyContent: 'flex-end' }}><SkeletonBlock width={28} height={13} radius={4} /></div>
+                    <div style={{ flex: '1 0 0', minWidth: 0 }}><SkeletonBlock width="100%" height={4} radius={'var(--radius-full)'} /></div>
+                    <div style={{ width: 36, flexShrink: 0, display: 'flex', justifyContent: 'flex-end' }}><SkeletonBlock width={28} height={13} radius={'var(--radius-xs)'} /></div>
                   </div>
                 </SettingsTableCell>
               </SettingsTableRow>
             ))}
           </div>
           <div style={{ display: 'flex', gap: 'var(--space-1-5)', margin: '0 var(--space-6)' }}>
-            <div style={{ marginTop: 'var(--space-0-5)' }}><SkeletonBlock width={14} height={14} radius={999} /></div>
+            <div style={{ marginTop: 'var(--space-0-5)' }}><SkeletonBlock width={14} height={14} radius={'var(--radius-full)'} /></div>
             <div style={{ flex: '1 0 0', minWidth: 0 }}>
               <SkeletonLine width="100%" lineHeight={16} height={10} />
               <SkeletonLine width="45%" lineHeight={16} height={10} />

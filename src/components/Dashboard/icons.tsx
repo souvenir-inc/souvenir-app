@@ -27,7 +27,7 @@ function LetterTile({ app, size, className }: { app: App; size: number; classNam
       aria-label={app.name}
       title={app.name}
       style={{ width: size, height: size, fontSize: size * 0.64 }}
-      className={cn('inline-flex shrink-0 items-center justify-center rounded-[3px] bg-[var(--dashboard-sync-bg)] font-medium leading-none text-[var(--dashboard-label)]', className)}
+      className={cn('inline-flex shrink-0 items-center justify-center rounded-[var(--dashboard-sync-icon-radius)] bg-[var(--dashboard-sync-bg)] font-medium leading-none text-[var(--dashboard-label)]', className)}
     >
       {app.name[0]?.toUpperCase()}
     </span>

@@ -162,9 +162,9 @@ function ManageTabsBody({
               }}
               className={cn('flex cursor-pointer flex-col gap-1.5 rounded-sm border-0 bg-transparent p-0', FOCUS)}
             >
-              <span className="flex items-baseline gap-[5px] whitespace-nowrap leading-[18px]">
+              <span className="flex items-baseline gap-[var(--space-1-25)] whitespace-nowrap leading-[var(--line-height-compact)]">
                 {/* The 2 px line is the width of the label, not the count (MT-14). */}
-                <span className={cn("relative text-[length:var(--font-size-body-sm)] font-medium after:absolute after:inset-x-0 after:-bottom-2 after:h-0.5 after:rounded-[1px] after:content-['']", tab === key ? 'text-[var(--dashboard-figure)] after:bg-[var(--dashboard-figure)]' : 'text-[var(--dashboard-muted)] hover:text-[var(--dashboard-figure)]')}>{text}</span>
+                <span className={cn("relative text-[length:var(--font-size-body-sm)] font-medium after:absolute after:inset-x-0 after:-bottom-2 after:h-0.5 after:rounded-hairline after:content-['']", tab === key ? 'text-[var(--dashboard-figure)] after:bg-[var(--dashboard-figure)]' : 'text-[var(--dashboard-muted)] hover:text-[var(--dashboard-figure)]')}>{text}</span>
                 {n > 0 && <span className="text-[length:var(--font-size-small)] text-[var(--dashboard-faint)]">{n}</span>}
               </span>
               <span aria-hidden className="h-0.5" />
@@ -187,7 +187,7 @@ function ManageTabsBody({
                   if (!b) return null
                   return (
                     <div {...rowProps} className={ROW} data-open={menuFor === id || undefined} aria-label={label(id)}>
-                      <span className="flex h-full items-center pl-[3px]">{handle}</span>
+                      <span className="flex h-full items-center pl-[var(--space-0-75)]">{handle}</span>
                       {renaming === id ? (
                         <InlineRename
                           initial={label(id)}
@@ -230,7 +230,7 @@ function ManageTabsBody({
                     const b = state.boards[id]
                     if (!b) return null
                     return (
-                      <div key={id} tabIndex={0} className={cn(ROW, 'pl-2 pr-[3px]')} aria-label={`${label(id)}, hidden`}>
+                      <div key={id} tabIndex={0} className={cn(ROW, 'pl-2 pr-[var(--space-0-75)]')} aria-label={`${label(id)}, hidden`}>
                         <RowName board={b} label={label(id)} muted />
                         <IconButton variant="ghost" size="xs" iconSize={16} className="rounded-md" aria-label={`Show ${label(id)}`} title="Show tab"
                           icon={<EyeOff strokeWidth={1.5} absoluteStrokeWidth />} onClick={() => showRow(id)} />
@@ -258,7 +258,7 @@ function ManageTabsBody({
                           variant="ghost" size="xs"
                           leftIcon={<RotateCcw strokeWidth={1.5} absoluteStrokeWidth />}
                           onClick={() => onRestore(d.id)}
-                          className="h-6 gap-1 rounded-md bg-transparent pl-1.5 pr-[7px] text-[length:var(--font-size-small)] font-medium shadow-none [font-family:var(--font-body)] text-[var(--dashboard-figure)] [&_svg]:size-3"
+                          className="h-6 gap-1 rounded-md bg-transparent pl-1.5 pr-[var(--space-1-75)] text-[length:var(--font-size-small)] font-medium shadow-none [font-family:var(--font-body)] text-[var(--dashboard-figure)] [&_svg]:size-3"
                         >
                           Restore
                         </Button>
@@ -297,7 +297,7 @@ function ManageTabsBody({
 /** An info icon and one line on what the tab holds (Hidden, Recently deleted). */
 function Helper({ children }: { children: React.ReactNode }) {
   return (
-    <p className="m-0 flex items-center gap-1.5 pl-[7px] pr-2 text-[length:var(--font-size-body-sm)] leading-[18px] text-[var(--dashboard-muted)]">
+    <p className="m-0 flex items-center gap-1.5 pl-[var(--space-1-75)] pr-2 text-[length:var(--font-size-body-sm)] leading-[var(--line-height-compact)] text-[var(--dashboard-muted)]">
       <Info aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0" />
       {children}
     </p>
@@ -358,7 +358,7 @@ function InlineRename({ initial, onCommit, onDone }: { initial: string; onCommit
     <span
       data-rename-field
       className={cn(
-        'flex h-[26px] min-w-0 flex-1 items-center gap-0.5 rounded-md border border-solid bg-[var(--dashboard-card-bg)] pl-[7px] pr-2',
+        'flex h-[26px] min-w-0 flex-1 items-center gap-0.5 rounded-md border border-solid bg-[var(--dashboard-card-bg)] pl-[var(--space-1-75)] pr-2',
         error ? 'border-[var(--dashboard-error)]' : 'border-[var(--border-default)]',
       )}
     >
@@ -540,7 +540,7 @@ function RowList({ ids, visibleCount, onMove, labelOf, renderRow }: RowListProps
 /** Where a dragged row will land: a 2 px blue line with a dot, 8 px in from each side (MT-4). */
 function RowDropLine() {
   return (
-    <span aria-hidden className="pointer-events-none absolute -top-px left-2 right-2 z-10 h-0.5 rounded-[1px] bg-[var(--dashboard-drop-line)]">
+    <span aria-hidden className="pointer-events-none absolute -top-px left-2 right-2 z-10 h-0.5 rounded-hairline bg-[var(--dashboard-drop-line)]">
       <span className="absolute -left-1 -top-[3px] size-2 rounded-full bg-[var(--dashboard-drop-line)]" />
     </span>
   )

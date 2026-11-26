@@ -211,7 +211,7 @@ export function ChatShareOverlay({ chatId, canManage, readOnly, onCopied, autoOp
                                 backgroundColor: checked ? 'var(--blue-50)' : 'var(--neutral-white)',
                                 boxShadow: checked
                                   ? '0px 0px 0px 1px var(--blue-300)'
-                                  : '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
+                                  : 'var(--shadow-control)',
                               }}
                             >
                               <Checkbox checked={checked} tabIndex={-1} onClick={(e) => e.stopPropagation()} onCheckedChange={() => toggleSelected(member.id)} />

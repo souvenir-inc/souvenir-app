@@ -98,7 +98,7 @@ const headerActionButtonStyle = (visible: boolean, iconHovered: boolean): React.
   cursor: 'pointer',
   color: iconHovered ? 'var(--neutral-black)' : 'var(--sidebar-icon-muted, var(--sidebar-menu-item-muted))',
   opacity: visible ? 1 : 0,
-  transition: 'opacity 150ms, color 150ms',
+  transition: 'opacity var(--duration-quick), color var(--duration-quick)',
 })
 
 export const FlatSidebarRow = React.forwardRef<HTMLDivElement, FlatSidebarRowProps>(
@@ -201,8 +201,8 @@ export const FlatSidebarRow = React.forwardRef<HTMLDivElement, FlatSidebarRowPro
       borderRadius: 'var(--radius-010, 10px)',
       width: collapsed ? 'auto' : '100%',
       height: isHeader ? 'auto' : '32px',
-      paddingLeft: collapsed ? '6px' : 'var(--space-008, 8px)',
-      paddingRight: collapsed ? '6px' : 'var(--space-008, 8px)',
+      paddingLeft: collapsed ? 'var(--space-1-5)' : 'var(--space-008, 8px)',
+      paddingRight: collapsed ? 'var(--space-1-5)' : 'var(--space-008, 8px)',
       backgroundColor: !isHeader && isActive ? 'var(--sidebar-menu-item-hover-bg)' : 'transparent',
       boxShadow: !isHeader && isActive ? 'var(--shadow-sidebar-item-hover)' : undefined,
       cursor: isHeader ? 'default' : isEditVariant ? 'text' : 'pointer',

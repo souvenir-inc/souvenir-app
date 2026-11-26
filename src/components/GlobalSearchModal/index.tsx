@@ -27,6 +27,7 @@ import {
   CloseModalButton,
   KbdHint,
 } from './ResultParts'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -318,7 +319,7 @@ export function GlobalSearchModal({
           <m.div
             initial={{ opacity: 0, scale: 0.97, y: -6 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: DURATION.base, ease: [0.16, 1, 0.3, 1] }}
           >
 
             {/* ── Search header ──────────────────────────────────────────── */}
@@ -359,7 +360,7 @@ export function GlobalSearchModal({
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: DURATION.base, ease: [0.16, 1, 0.3, 1] }}
                   style={{ overflow: 'hidden' }}
                 >
                   <div

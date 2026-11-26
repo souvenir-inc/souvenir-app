@@ -13,9 +13,10 @@ import Exchange01Icon from '@hugeicons/core-free-icons/Exchange01Icon'
 import { cn } from '@/lib/utils'
 import { useModKeyLabel } from '@/lib/platform'
 import { ContentRenderer } from '@/lib/content-renderer'
+import { SPRING as SPRING_TOKENS } from "@/styles/tokens/motion"
 
 // ── Animation constants (KDS in-place swap pattern) ────────────────────────────
-const SPRING       = { type: 'spring', stiffness: 500, damping: 30 } as const
+const SPRING       = { type: 'spring', ...SPRING_TOKENS.snappy } as const
 const SWAP_INITIAL = { scale: 0.75, opacity: 0, filter: 'blur(4px)' }
 const SWAP_ANIMATE = { scale: 1,    opacity: 1, filter: 'blur(0px)', transitionEnd: { filter: 'none' } }
 const SWAP_EXIT    = { scale: 0.75, opacity: 0, filter: 'blur(4px)' }
@@ -214,7 +215,7 @@ export function MessageBubble({
               padding:         'var(--space-2-5) var(--space-4)',
               borderRadius:    'var(--radius-2xl) var(--radius-2xl) var(--radius-2xl) var(--radius-xs)',
               backgroundColor: 'var(--neutral-100)',
-              boxShadow:       '0px 1px 2px rgba(59,54,50,0.08), 0px 0px 0px 1px var(--neutral-200)',
+              boxShadow:       'var(--message-bubble-shadow)',
             }}
           >
             <ContentRenderer content={content} />
@@ -265,9 +266,9 @@ export function MessageBubble({
             backgroundColor: 'var(--message-bubble-user-bg)',
             width:           bubbleWidth,
             maxWidth:        '100%',
-            transition:      shouldReduceMotion
+            transition:      shouldReduceMotion // ds-keep: WIDTH_MS matches the timer
               ? 'none'
-              : `width ${WIDTH_MS}ms ease-out, box-shadow 0.15s ease-out`,
+              : `width ${WIDTH_MS}ms ease-out, box-shadow var(--duration-quick) ease-out`, // ds-keep: WIDTH_MS matches the timer
           }}
         >
           {/* White bg overlay - per Figma node structure */}

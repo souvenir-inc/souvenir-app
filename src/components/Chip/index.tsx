@@ -366,10 +366,10 @@ export function Chip(
               justifyContent: 'center',
               opacity:         effectiveActive ? 0 : 1,
               transform:       effectiveActive ? 'scale(0.75)' : 'scale(1)',
-              filter:          !reduceMotion && effectiveActive ? 'blur(4px)' : 'none',
+              filter:          !reduceMotion && effectiveActive ? 'blur(var(--blur-xs))' : 'none',
               transition:      reduceMotion
-                ? 'opacity 120ms'
-                : 'opacity 120ms, transform 120ms cubic-bezier(0.16,1,0.3,1), filter 120ms',
+                ? 'opacity var(--duration-fast)'
+                : 'opacity var(--duration-fast), transform var(--duration-fast) var(--ease-out-expo), filter var(--duration-fast)',
               pointerEvents:   effectiveActive ? 'none' : undefined,
             }}
           >
@@ -391,10 +391,10 @@ export function Chip(
               justifyContent: 'center',
               opacity:         effectiveActive ? 1 : 0,
               transform:       effectiveActive ? 'scale(1)' : 'scale(0.75)',
-              filter:          !reduceMotion && !effectiveActive ? 'blur(4px)' : 'none',
+              filter:          !reduceMotion && !effectiveActive ? 'blur(var(--blur-xs))' : 'none',
               transition:      reduceMotion
-                ? 'opacity 120ms'
-                : 'opacity 120ms, transform 120ms cubic-bezier(0.16,1,0.3,1), filter 120ms',
+                ? 'opacity var(--duration-fast)'
+                : 'opacity var(--duration-fast), transform var(--duration-fast) var(--ease-out-expo), filter var(--duration-fast)',
               pointerEvents:   !effectiveActive ? 'none' : undefined,
             }}
           >

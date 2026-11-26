@@ -9,7 +9,7 @@ import { Upload } from "lucide-react";
  * stacking context on the page can sit on top of it. It never takes pointer events, so the drop
  * still lands on the page's own drop handler.
  */
-const TOP_LAYER = 2147483000;
+const TOP_LAYER = "var(--file-drop-overlay-top-layer)";
 
 export function FileDropOverlay({ visible }: { visible: boolean }) {
   if (!visible || typeof document === "undefined") return null;
@@ -26,8 +26,8 @@ export function FileDropOverlay({ visible }: { visible: boolean }) {
         justifyContent: "center",
         padding: 'var(--space-4)',
         backgroundColor: "rgba(var(--surface-rgb), 0.72)",
-        backdropFilter: "blur(6px)",
-        WebkitBackdropFilter: "blur(6px)",
+        backdropFilter: "blur(var(--file-drop-overlay-blur))",
+        WebkitBackdropFilter: "blur(var(--file-drop-overlay-blur))",
       }}
     >
       <div

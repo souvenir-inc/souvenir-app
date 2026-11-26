@@ -22,6 +22,7 @@ import React from "react"
 import { m, useReducedMotion } from "framer-motion"
 import { ArrowDown, Filter, TrendingDown } from "lucide-react"
 import { parseFunnelXml } from "@/components/chat/XmlFunnel.parse"
+import { DURATION, SPRING, STAGGER } from "@/styles/tokens/motion"
 
 function formatNum(n: number): string {
   const abs = Math.abs(n)
@@ -45,7 +46,7 @@ export function XmlFunnel({ xml }: { xml: string }) {
       initial={reduceMotion ? false : { opacity: 0, y: 10, scale: 0.99 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       whileHover={reduceMotion ? undefined : { y: -2 }}
-      transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: DURATION.slow, ease: [0.16, 1, 0.3, 1] }}
       style={{
         margin: "var(--space-3) 0",
         padding: "var(--space-4) var(--space-4) var(--space-4)",
@@ -61,7 +62,7 @@ export function XmlFunnel({ xml }: { xml: string }) {
           aria-hidden
           initial={reduceMotion ? false : { rotate: -10, scale: 0.8 }}
           animate={{ rotate: 0, scale: 1 }}
-          transition={{ type: "spring", stiffness: 330, damping: 23 }}
+          transition={{ type: "spring", ...SPRING.springy }}
           style={{
             width: 36,
             height: 36,
@@ -103,7 +104,7 @@ export function XmlFunnel({ xml }: { xml: string }) {
                 <m.div
                   initial={reduceMotion ? false : { opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: reduceMotion ? 0 : i * 0.08 }}
+                  transition={{ delay: reduceMotion ? 0 : i * STAGGER.lg }}
                   style={{ display: "flex", alignItems: "center", gap: 'var(--space-1-5)', paddingLeft: 'var(--space-2-5)', color: "var(--neutral-600)" }}
                 >
                   <ArrowDown size={12} />
@@ -116,7 +117,7 @@ export function XmlFunnel({ xml }: { xml: string }) {
               <m.div
                 initial={reduceMotion ? false : { opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: reduceMotion ? 0 : i * 0.08, duration: 0.26 }}
+                transition={{ delay: reduceMotion ? 0 : i * STAGGER.lg, duration: DURATION.moderate }}
                 style={{
                   padding: "var(--space-2) var(--space-2-5) var(--space-2-5)",
                   borderRadius: 'var(--radius-xl)',
@@ -139,13 +140,13 @@ export function XmlFunnel({ xml }: { xml: string }) {
                   <m.div
                     initial={reduceMotion ? false : { scaleX: 0 }}
                     animate={{ scaleX: Math.max(pct, 0.015) }}
-                    transition={{ delay: reduceMotion ? 0 : 0.12 + i * 0.08, duration: reduceMotion ? 0 : 0.55, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ delay: reduceMotion ? 0 : DURATION.fast + i * STAGGER.lg, duration: reduceMotion ? 0 : DURATION.long, ease: [0.16, 1, 0.3, 1] }}
                   style={{
                     width: "100%",
                     height: "100%",
                     borderRadius: 'var(--radius-full)',
-                    background: `linear-gradient(90deg, ${color}, ${color}B8)`,
-                    boxShadow: `0 0 12px ${color}24`,
+                    background: `linear-gradient(90deg, ${color}, ${color}B8)`, // ds-keep: the chart colour with a hex alpha
+                    boxShadow: `0 0 var(--xml-funnel-glow-blur) ${color}24`, // ds-keep: the chart colour with a hex alpha
                     transformOrigin: "left",
                   }}
                   />

@@ -10,9 +10,9 @@ import { toast } from 'sonner'
 // ── Style constants (mirrors org/plans page tokens) ──────────────────────────
 
 const SHADOW_MODAL = 'var(--shadow-4)'
-const SHADOW_INPUT = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--text-field-ring)'
-const SHADOW_PILL  = '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)'
-const SHADOW_PILL_ACTIVE = '0px 0px 0px 1px var(--neutral-black), 0px 1.091px 1.091px 0px rgba(59,54,50,0.1), 0px 1.455px 3.127px 0px rgba(59,54,50,0.4)'
+const SHADOW_INPUT = 'var(--shadow-field)'
+const SHADOW_PILL  = 'var(--shadow-card-raised)'
+const SHADOW_PILL_ACTIVE = 'var(--shadow-pill-active)'
 
 type PreferredTime = 'mornings' | 'afternoons' | 'evenings'
 

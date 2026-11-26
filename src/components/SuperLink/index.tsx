@@ -8,6 +8,7 @@ import { Switch } from '@/components/Switch'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/Slider'
 import { cn } from '@/lib/utils'
+import { BLUR, DURATION, SPRING } from "@/styles/tokens/motion"
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -18,7 +19,7 @@ function fmt(n: number): string {
 // ── Animation ─────────────────────────────────────────────────────────────────
 
 const EASE   = [0.25, 0.46, 0.45, 0.94] as const
-const REVEAL = { duration: 0.18, ease: EASE }
+const REVEAL = { duration: DURATION.base, ease: EASE }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -216,9 +217,9 @@ export function SuperLink(
             {enabled && (
               <m.div
                 key="url-row"
-                initial={{ opacity: 0, y: -4, filter: 'blur(4px)' }}
+                initial={{ opacity: 0, y: -4, filter: `blur(${BLUR.xs}px)` }}
                 animate={{ opacity: 1, y: 0,  filter: 'blur(0px)' }}
-                exit={{   opacity: 0, y: -4,  filter: 'blur(4px)' }}
+                exit={{   opacity: 0, y: -4,  filter: `blur(${BLUR.xs}px)` }}
                 transition={REVEAL}
                 style={{
                   display:         'flex',
@@ -270,9 +271,9 @@ export function SuperLink(
                     {!revoking ? (
                       <m.div
                         key="actions"
-                        initial={{ opacity: 0, filter: 'blur(4px)' }}
+                        initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                         animate={{ opacity: 1, filter: 'blur(0px)' }}
-                        exit={{   opacity: 0, filter: 'blur(4px)' }}
+                        exit={{   opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                         transition={REVEAL}
                         style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexShrink: 0 }}
                       >
@@ -294,10 +295,10 @@ export function SuperLink(
                           <AnimatePresence mode="popLayout" initial={false}>
                             <m.span
                               key={copied ? 'copied' : 'copy'}
-                              initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                              initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                               animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-                              exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-                              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                              exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                              transition={{ type: 'spring', ...SPRING.snappy }}
                               style={{ display: 'block', transformOrigin: 'center' }}
                             >
                               {copied ? 'Copied!' : 'Copy'}
@@ -308,9 +309,9 @@ export function SuperLink(
                     ) : (
                       <m.div
                         key="confirm"
-                        initial={{ opacity: 0, filter: 'blur(4px)' }}
+                        initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                         animate={{ opacity: 1, filter: 'blur(0px)' }}
-                        exit={{   opacity: 0, filter: 'blur(4px)' }}
+                        exit={{   opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                         transition={REVEAL}
                         style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', flexShrink: 0 }}
                       >
@@ -344,9 +345,9 @@ export function SuperLink(
           {hasLink && (
             <m.div
               key="token-usage"
-              initial={{ opacity: 0, y: -4, filter: 'blur(4px)' }}
+              initial={{ opacity: 0, y: -4, filter: `blur(${BLUR.xs}px)` }}
               animate={{ opacity: 1, y: 0,  filter: 'blur(0px)' }}
-              exit={{   opacity: 0, y: -4,  filter: 'blur(4px)' }}
+              exit={{   opacity: 0, y: -4,  filter: `blur(${BLUR.xs}px)` }}
               transition={REVEAL}
               style={{
                 display:        'flex',
@@ -401,9 +402,9 @@ export function SuperLink(
           {hasLink && (
             <m.div
               key="slider"
-              initial={{ opacity: 0, y: -4, filter: 'blur(4px)' }}
+              initial={{ opacity: 0, y: -4, filter: `blur(${BLUR.xs}px)` }}
               animate={{ opacity: 1, y: 0,  filter: 'blur(0px)' }}
-              exit={{   opacity: 0, y: -4,  filter: 'blur(4px)' }}
+              exit={{   opacity: 0, y: -4,  filter: `blur(${BLUR.xs}px)` }}
               transition={REVEAL}
             >
               <Slider

@@ -25,7 +25,7 @@ export function TemplateCardSkeleton({ count = 3, layout = 'tile', bare = false 
       style={{
         display:       'flex',
         flexDirection: isRow ? 'column' : 'row',
-        gap:           isRow ? '8px' : '10px',
+        gap:           isRow ? 'var(--space-2)' : 'var(--space-2-5)',
         alignItems:    'stretch',
         width:         '100%',
       }}
@@ -40,11 +40,11 @@ export function TemplateCardSkeleton({ count = 3, layout = 'tile', bare = false 
             background:    bare ? 'transparent' : 'var(--neutral-white)',
             border:        bare ? '1px solid transparent' : '1px solid var(--border-default)',
             borderRadius:  'var(--radius-xl)',
-            padding:       isRow ? '12px' : '14px 12px',
+            padding:       isRow ? 'var(--space-3)' : 'var(--space-3-5) var(--space-3)',
             display:       'flex',
             flexDirection: isRow ? 'row' : 'column',
             alignItems:    isRow ? 'center' : 'flex-start',
-            gap:           isRow ? '12px' : '10px',
+            gap:           isRow ? 'var(--space-3)' : 'var(--space-2-5)',
             boxShadow:     bare ? 'none' : '0 1px 3px color-mix(in srgb, var(--static-black) 4%, transparent)',
           }}
         >

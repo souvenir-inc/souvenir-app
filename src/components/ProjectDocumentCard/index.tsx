@@ -13,6 +13,7 @@ import { FormatGlyph } from '@/components/Library/FormatGlyph'
 import { formatLabel } from '@/lib/library/format'
 import { extensionOf } from '@/lib/library/upload/validate'
 import type { Format } from '@/lib/library/schemas'
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 //
 
@@ -67,14 +68,14 @@ export function ProjectDocumentCard(
     return (
       <m.div
         ref={ref}
-        initial={{ opacity: 0, scale: 0.97, filter: 'blur(2px)' }}
+        initial={{ opacity: 0, scale: 0.97, filter: `blur(${BLUR['2xs']}px)` }}
         animate={{
           opacity: 1, scale: 1, filter: 'blur(0px)',
-          transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
+          transition: { duration: DURATION.base, ease: [0.22, 1, 0.36, 1] },
         }}
         exit={{
-          opacity: 0, scale: 0.97, filter: 'blur(2px)',
-          transition: { duration: 0.18, ease: [0.55, 0.085, 0.68, 0.53] },
+          opacity: 0, scale: 0.97, filter: `blur(${BLUR['2xs']}px)`,
+          transition: { duration: DURATION.base, ease: [0.55, 0.085, 0.68, 0.53] },
         }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
@@ -160,8 +161,8 @@ export function ProjectDocumentCard(
                   cursor:          'pointer',
                   color:           'var(--neutral-400)',
                   outlineStyle:    'solid',
-                  outlineWidth:    '2px',
-                  outlineOffset:   '1px',
+                  outlineWidth:    'var(--focus-ring-width)',
+                  outlineOffset:   'var(--focus-ring-offset-sm)',
                   outlineColor:    removeButtonFocused ? 'var(--focus-ring)' : 'transparent',
                   transition:      'color var(--duration-fast), outline-color var(--duration-fast)',
                 }}

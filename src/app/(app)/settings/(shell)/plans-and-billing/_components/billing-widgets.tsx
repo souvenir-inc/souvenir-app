@@ -42,7 +42,7 @@ export function CancelSubscriptionDialog({
       onClick={() => { if (!isCanceling) onKeep() }}
       style={{
         position: 'fixed', inset: 0, zIndex: 'var(--z-modal)', background: 'var(--overlay-bg)',
-        backdropFilter: 'blur(2px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-4)',
+        backdropFilter: 'blur(var(--blur-2xs))', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-4)',
       }}
     >
       {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- stops the backdrop's dismiss-click from firing when interacting with the card itself */}
@@ -113,8 +113,8 @@ export function PermToggle({ checked, onChange }: { checked: boolean; onChange: 
         flexShrink: 0,
         background: checked ? 'var(--blue-400)' : 'var(--neutral-100)',
         boxShadow:  checked
-          ? '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--blue-700-70)'
-          : '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4)',
+          ? 'var(--billing-widgets-shadow)'
+          : 'var(--shadow-chip)',
         transition: 'background var(--duration-fast) ease, box-shadow var(--duration-fast) ease',
       }}
     >
@@ -127,8 +127,8 @@ export function PermToggle({ checked, onChange }: { checked: boolean; onChange: 
         borderRadius: '50%',
         background:   'var(--neutral-white)',
         boxShadow:    checked
-          ? '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--blue-700-40), inset 0px -1px 0px 0px var(--blue-800-15)'
-          : '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4), inset 0px -1px 0px 0px rgba(106,98,93,0.05)',
+          ? 'var(--billing-widgets-shadow-2)'
+          : 'var(--billing-widgets-shadow-3)',
         transition:   'left var(--duration-fast) ease',
       }} />
     </button>

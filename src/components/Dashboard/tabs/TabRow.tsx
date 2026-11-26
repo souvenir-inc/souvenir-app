@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 import { canRename, layoutRow, MAX_NAME, type Board } from './board-state'
 import { TabMenuContent, type BoardMenuHandlers } from './BoardMenus'
 import type { RenameResult } from './use-dashboard'
+import { DURATION, SPRING } from "@/styles/tokens/motion"
 
 // The board tab row (docs-v2/dashboard/01-tabs-rules.md §2 – §7, §10).
 //   Layout     up to 6 tabs, fewer when there's less room; the rest behind "N more" (TAB-15 – TAB-18)
@@ -16,7 +17,7 @@ import type { RenameResult } from './use-dashboard'
 //   Mouse      click opens on release; double-click the open tab renames; right-click opens its menu
 //   Drag       tabs stay put, the place dims, a copy follows, a blue line marks the drop (TAB-30 – TAB-35)
 
-const SEGMENT = 'relative flex h-8 shrink-0 items-center rounded-full px-3.5 text-[length:var(--font-size-body)] font-medium leading-5 tracking-[-0.07px] whitespace-nowrap'
+const SEGMENT = 'relative flex h-8 shrink-0 items-center rounded-full px-3.5 text-[length:var(--font-size-body)] font-medium leading-5 tracking-[var(--dashboard-tab-tracking)] whitespace-nowrap'
 const FOCUS_RING = 'outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-0 focus-visible:outline-[var(--focus-ring)]'
 const TAB_MAX = 220     // TAB-3
 const DRAG_START = 4    // TAB-35
@@ -238,7 +239,7 @@ export function TabRow(props: TabRowProps) {
             <m.div
               key={id}
               layout={reduceMotion ? false : 'position'}
-              transition={{ layout: { duration: 0.15, ease: [0.2, 0, 0, 1] } }}
+              transition={{ layout: { duration: DURATION.quick, ease: [0.2, 0, 0, 1] } }}
               // Shrinkable, so a tight row cuts names short instead of running wider (TAB-4).
               className="relative min-w-0"
             >
@@ -281,7 +282,7 @@ export function TabRow(props: TabRowProps) {
                       <m.span
                         layoutId={pillId}
                         aria-hidden
-                        transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                        transition={reduceMotion ? { duration: 0 } : { type: 'spring', ...SPRING.settle }}
                         className="absolute inset-0 rounded-full bg-gradient-to-b from-[var(--dashboard-tab-active-from)] to-[var(--dashboard-tab-active-to)]"
                       />
                     )}
@@ -330,7 +331,7 @@ export function TabRow(props: TabRowProps) {
         {drag?.line?.kind === 'row' && (
           <span aria-hidden className="pointer-events-none absolute top-0 z-10" style={{ left: drag.line.x - 1 }}>
             <span className="absolute left-[-3px] top-0.5 size-2 rounded-full bg-[var(--dashboard-drop-line)]" />
-            <span className="absolute left-0 top-1.5 h-[26px] w-0.5 rounded-[1px] bg-[var(--dashboard-drop-line)]" />
+            <span className="absolute left-0 top-1.5 h-[26px] w-0.5 rounded-hairline bg-[var(--dashboard-drop-line)]" />
           </span>
         )}
       </div>
@@ -429,7 +430,7 @@ function MoreCount({ ref, boards, open, onOpenChange, tabIndex, onFocus, onKeyDo
 
 function ListDropLine() {
   return (
-    <span aria-hidden className="pointer-events-none absolute -top-px left-1 right-1 z-10 h-0.5 rounded-[1px] bg-[var(--dashboard-drop-line)]">
+    <span aria-hidden className="pointer-events-none absolute -top-px left-1 right-1 z-10 h-0.5 rounded-hairline bg-[var(--dashboard-drop-line)]">
       <span className="absolute -left-1 -top-[3px] size-2 rounded-full bg-[var(--dashboard-drop-line)]" />
     </span>
   )
@@ -471,7 +472,7 @@ export function RenameField({ initial, onCommit, onDone, onValueChange }: Rename
     <div className="relative">
       <div
         className={cn(
-          SEGMENT, 'inline-grid max-w-full grid-cols-[minmax(0,max-content)] border border-solid bg-[var(--dashboard-tab-lifted)] px-[13px]',
+          SEGMENT, 'inline-grid max-w-full grid-cols-[minmax(0,max-content)] border border-solid bg-[var(--dashboard-tab-lifted)] px-[var(--dashboard-tab-lifted-padding-x)]',
           error ? 'border-[var(--dashboard-error)]' : 'border-[var(--border-default)]',
         )}
       >
@@ -495,7 +496,7 @@ export function RenameField({ initial, onCommit, onDone, onValueChange }: Rename
             else if (e.key === 'Escape') { e.preventDefault(); finish() }
           }}
           onBlur={() => commit(true)}
-          className="col-start-1 row-start-1 w-full min-w-0 border-0 bg-transparent p-0 text-[length:var(--font-size-body)] font-medium leading-5 tracking-[-0.07px] text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
+          className="col-start-1 row-start-1 w-full min-w-0 border-0 bg-transparent p-0 text-[length:var(--font-size-body)] font-medium leading-5 tracking-[var(--dashboard-tab-tracking)] text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
         />
       </div>
       {error && <NameError id="board-name-error" className="absolute left-0 top-[calc(100%+6px)] z-20" />}

@@ -19,7 +19,7 @@ export interface AgentCreatedCardProps {
   onUse?:     (agent: SelectedPersonaInfo) => void
 }
 
-const RADIUS = 20
+const RADIUS = 'var(--agent-created-card-radius)'
 // The grid card's 50 / 35 / 15 split of a 320px card.
 const HERO = 160
 const DETAILS = 112

@@ -8,6 +8,7 @@ import type { ActivityItem, ActivityStatus, PlanItem } from '@/types/chat'
 import { ItemRow } from './blocks'
 import { formatElapsed, isRunning, RUNNING, stepText, type TurnState } from './derive'
 import { CAPTION, EASE } from './styles'
+import { DURATION, SPRING, LONG } from "@/styles/tokens/motion"
 
 // Status marks and the to-do list: the pieces that show how a step or turn is going.
 
@@ -43,7 +44,7 @@ function PopIn({ status, children }: { status: string; children: React.ReactNode
       key={status}
       initial={status === firstStatus || reduceMotion ? false : { scale: 0.4, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+      transition={{ type: 'spring', ...SPRING.lively }}
       style={{ display: 'inline-flex' }}
     >
       {children}
@@ -134,7 +135,7 @@ function Shimmer({ children }: { children: string }) {
     <m.span
       initial={{ backgroundPosition: '100% 0' }}
       animate={{ backgroundPosition: ['100% 0', '0% 0'] }}
-      transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
+      transition={{ duration: LONG.lg, repeat: Infinity, ease: 'linear' }}
       style={{
         backgroundImage:      'linear-gradient(90deg, var(--neutral-900) 0%, var(--neutral-900) 40%, var(--neutral-400) 50%, var(--neutral-900) 60%, var(--neutral-900) 100%)',
         backgroundSize:       '250% 100%',
@@ -160,7 +161,7 @@ export function PlanList({ plan, steps }: { plan: PlanItem[]; steps: ActivityIte
       aria-label="To-dos"
       initial={reduceMotion ? false : { opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.28, ease: EASE }}
+      transition={{ duration: DURATION.moderate, ease: EASE }}
       style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)' }}
     >
       {plan.map(item => {
@@ -171,7 +172,7 @@ export function PlanList({ plan, steps }: { plan: PlanItem[]; steps: ActivityIte
             key={item.id}
             aria-current={current ? 'step' : undefined}
             // Waiting items sit faded and brighten as their turn comes.
-            style={{ opacity: item.status === 'pending' ? 0.45 : 1, transition: reduceMotion ? undefined : 'opacity 320ms ease' }}
+            style={{ opacity: item.status === 'pending' ? 0.45 : 1, transition: reduceMotion ? undefined : 'opacity var(--duration-slow) ease' }}
           >
             <ItemRow
               wrap

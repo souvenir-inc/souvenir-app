@@ -267,7 +267,7 @@ export function ShareDialog({ file, onClose, onLostAccess }: { file: LibraryFile
               >
                 {/* The workspace option needs no search, so it shows while people still load. */}
                 {(people.isPending || stale) && options.length === 0 ? (
-                  <Skeleton height={36} radius={10} />
+                  <Skeleton height={36} radius={'var(--radius-lg)'} />
                 ) : options.length === 0 ? (
                   <p className={cx(styles.quiet, styles.noMatch)}>
                     {needle ? `No one called "${query.trim()}"` : 'Everyone already has access'}
@@ -302,8 +302,8 @@ export function ShareDialog({ file, onClose, onLostAccess }: { file: LibraryFile
             <p className={styles.sectionLabel}>Who has access</p>
             {access.isPending ? (
               <div aria-busy="true" className={styles.loadingList}>
-                <Skeleton height={36} radius={10} />
-                <Skeleton height={36} radius={10} />
+                <Skeleton height={36} radius={'var(--radius-lg)'} />
+                <Skeleton height={36} radius={'var(--radius-lg)'} />
               </div>
             ) : access.isError ? (
               <p role="alert" className={styles.quiet}>

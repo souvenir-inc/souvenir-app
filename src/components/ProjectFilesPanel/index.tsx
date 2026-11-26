@@ -9,6 +9,7 @@ import { ConfirmModal } from '@/components/ConfirmModal'
 import { ProjectDocumentCard } from '@/components/ProjectDocumentCard'
 import { FILE_ACCEPT, FILE_CONSTRAINTS, isAllowedType } from '@/hooks/use-file-upload'
 import type { ProjectFile } from '@/context/projects-context'
+import { SPRING } from "@/styles/tokens/motion"
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -194,7 +195,7 @@ export function ProjectFilesPanel({ files, usedBytes, totalBytes, pendingFiles, 
           >
             <m.div
               animate={{ width: `${usedPct}%` }}
-              transition={{ type: 'spring', stiffness: 200, damping: 28 }}
+              transition={{ type: 'spring', ...SPRING.slow }}
               style={{ height: '100%', background: usedPct > 90 ? 'var(--red-500)' : 'var(--blue-500)', borderRadius: 'inherit' }}
             />
           </div>
