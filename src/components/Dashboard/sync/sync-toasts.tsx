@@ -2,12 +2,15 @@
 
 import { TriangleAlert, X } from 'lucide-react'
 import { toast } from 'sonner'
+import { Button, IconButton } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import { appNames } from './sync-model'
 
 // The sync toasts (Figma 287:60863, 195:61735; SY-29, SY-30). The error toast is white with a
 // fine border, names the app, offers Reconnect (admins), and closes after 8 s, staying while
-// hovered (Sonner pauses on hover), with × or on Reconnect.
+// hovered (Sonner pauses on hover), with × or on Reconnect. Sonner's own polite live region reads it
+// once; the toast doesn't add an alert role of its own (A11Y-AN-03, AN-06): the failure doesn't block
+// anything, and Reconnect is also on the board's banner and in Data sources (AN-04).
 
 const FOCUS = 'outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]'
 const ERROR_MS = 8_000
@@ -17,7 +20,6 @@ export function showSyncErrorToast({ names, rest, onReconnect }: { names: string
   const verb = names.length === 1 ? 'sync failed' : 'failed to sync'
   toast.custom((id) => (
     <div
-      role="alert"
       data-sync-toast="error"
       className="flex w-max max-w-[calc(100vw-32px)] items-center gap-2.5 rounded-lg border border-solid border-[var(--dashboard-toast-border)] bg-[var(--dashboard-card-bg)] py-2 pl-3.5 pr-1.5 shadow-[var(--dashboard-toast-shadow)]"
     >
@@ -27,24 +29,25 @@ export function showSyncErrorToast({ names, rest, onReconnect }: { names: string
         {' '}• {rest}
       </p>
       {onReconnect && (
-        // eslint-disable-next-line no-restricted-syntax -- ds-allow: the toast's dark Reconnect (Figma 287:60866)
-        <button
-          type="button"
+        // The toast's dark Reconnect (Figma 287:60866).
+        <Button
+          size="xs"
           onClick={() => { toast.dismiss(id); onReconnect() }}
-          className={cn('shrink-0 cursor-pointer rounded-md border-0 bg-[var(--dashboard-figure)] px-2.5 py-1 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-card-bg)] transition-opacity duration-fast hover:opacity-90', FOCUS)}
+          className={cn('min-h-7 rounded-md border-0 bg-[var(--dashboard-figure)] px-2.5 py-1 [font-family:inherit] text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-card-bg)] shadow-none hover:opacity-90 active:scale-100', FOCUS)}
         >
           Reconnect
-        </button>
+        </Button>
       )}
-      {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the toast's 28px round × (Figma 287:60868) */}
-      <button
-        type="button"
+      {/* The toast's 28px round × (Figma 287:60868). */}
+      <IconButton
+        variant="ghost"
+        size="xs"
+        iconSize={14}
         aria-label="Close"
         onClick={() => toast.dismiss(id)}
-        className={cn('flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 text-[var(--dashboard-muted)] hover:bg-[var(--dashboard-row-hover)] hover:text-[var(--dashboard-figure)]', FOCUS)}
-      >
-        <X aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />
-      </button>
+        icon={<X aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}
+        className={cn('size-7 rounded-full text-[var(--dashboard-muted)] [--hv:var(--dashboard-row-hover)] hover:text-[var(--dashboard-figure)] active:scale-100', FOCUS)}
+      />
     </div>
   ), { duration: ERROR_MS })
 }

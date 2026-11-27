@@ -6,6 +6,7 @@ import {
   rememberOnboarded,
   type OnboardingStateResult,
 } from "@/lib/onboarding-gate";
+import { inviteRedirect } from "@/lib/onboarding-invite-guard";
 import {
   exemptFromOnboardingRedirect,
   isCrossSiteMutation,
@@ -129,6 +130,9 @@ export default async function proxy(request: NextRequest) {
     if (hasOnboarded && !onboardingOpenWhenOnboarded(pathname)) {
       return Response.redirect(new URL(ROOT_ROUTE, request.url));
     }
+    // An invite waiting: its Join screen first, never a step that creates an org of their own.
+    const toInvite = onboarding ? inviteRedirect(pathname, onboarding.nextPath, hasOnboarded) : null;
+    if (toInvite) return Response.redirect(new URL(toInvite, request.url));
     return await auth0.middleware(request);
   }
 

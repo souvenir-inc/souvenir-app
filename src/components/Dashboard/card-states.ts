@@ -1,6 +1,8 @@
 // What each card shows while reading (05-cards-reading-rules.md CR-18 – CR-30): its body state and
 // its health, as pure functions of what the warehouse reported.
 
+import { STATUS_LABEL, needsAttention, statusReason } from '@/lib/scorecard/status'
+import { formatPercent } from './format'
 import type { Health } from './types'
 
 // ── Body state (CR-18) ─────────────────────────────────────────────────────────
@@ -47,16 +49,29 @@ export interface HealthPill {
   target?: string
 }
 
-/** The pill a card shows against its scorecard target, or none when there's nothing to judge (CR-28, CR-29). */
+/**
+ * The pill a card shows against its scorecard target, or none when there's nothing to judge (CR-28,
+ * CR-29). With the scorecard's judgement (lib/scorecard/status.ts) it says what the metric window
+ * says: On track, At risk or Off track; at risk still counts as on track (good).
+ */
 export function healthPill(health: Health | null, body: CardBody): HealthPill | null {
   if (!health || body !== 'numbers') return null
+  const target = `Target ${health.target}`
+  if (health.judgement) {
+    const status = health.judgement.status
+    return { text: STATUS_LABEL[status], tone: status === 'off_track' ? 'bad' : 'good', target }
+  }
   return health.verdict === 'on'
-    ? { text: 'On track', tone: 'good', target: `Target ${health.target}` }
-    : { text: `Off target ${health.off ?? ''}`.trim(), tone: 'bad', target: `Target ${health.target}` }
+    ? { text: 'On track', tone: 'good', target }
+    : { text: `Off target ${health.off ?? ''}`.trim(), tone: 'bad', target }
 }
 
-/** Off target goes into Needs attention. */
-export const flagged = (health: Health | null): health is Health => health?.verdict === 'off'
+/** Off track goes into Needs attention (needsAttention: at risk doesn't). */
+export const flagged = (health: Health | null): health is Health =>
+  !!health && (health.judgement ? needsAttention(health.judgement) : health.verdict === 'off')
 
-/** "Off target −12%": the reason in a Needs attention row. */
-export const reasonOf = (health: Health) => `Off target ${health.off ?? ''}`.trim()
+/** The reason in a Needs attention row: "12% below the target, past the 5% tolerance"; "Off target −12%" without a judgement. */
+export function reasonOf(health: Health): string {
+  if (health.judgement && health.rule) return statusReason(health.judgement, health.rule, formatPercent)
+  return `Off target ${health.off ?? ''}`.trim()
+}

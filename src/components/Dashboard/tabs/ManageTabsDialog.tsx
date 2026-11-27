@@ -1,16 +1,17 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { Ellipsis, Eye, EyeOff, GripVertical, Info, Plus, RotateCcw, TriangleAlert, Users, X } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { Ellipsis, Eye, EyeOff, Plus, RotateCcw, X } from 'lucide-react'
 import { Dropdown } from '@/components/Dropdown'
-import { Tooltip } from '@/components/Tooltip'
 import { Button, IconButton } from '@/components/ui'
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
-import { canRename, cleanName, daysLeft, MAX_NAME, type Board, type DashboardState } from './board-state'
+import { canRename, cleanName, daysLeft, type DashboardState } from './board-state'
 import { TabMenuContent, type BoardMenuHandlers } from './BoardMenus'
+import { RowList } from './ManageRowList'
+import { FadingScroll, FOCUS, Helper, InlineRename, ROW, RowName } from './manage-tabs-parts'
 
-// Manage tabs (docs-v2/dashboard/03-manage-tabs-rules.md, Figma section 415:64464).
+// Manage tabs (fe-handbook/features/dashboard/source-docs/03-manage-tabs-rules.md, Figma section 415:64464).
 // A draft of your order, hidden boards and names: Save applies it; Cancel, Esc or × drop it
 // (MT-7). Delete, Leave and Restore apply at once with a toast and Undo (MT-8); Duplicate and New
 // board too. The draft follows the live state, so an Undo from a toast shows up here as well.
@@ -34,18 +35,6 @@ interface ManageTabsDialogProps {
   onRequestDelete: (id: string) => void
   onRequestLeave: (id: string) => void
 }
-
-const FOCUS = cn(
-  'outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]',
-  'data-[keyboard=true]:focus:outline-2 data-[keyboard=true]:focus:outline-solid data-[keyboard=true]:focus:outline-[var(--focus-ring)]',
-)
-/** The row tint runs 8 px past both edges (MT-3); the list leaves that room on each side. */
-const ROW = cn(
-  'group/row relative isolate flex h-8 items-center gap-2 rounded-md',
-  'before:absolute before:inset-y-0 before:-inset-x-2 before:-z-10 before:rounded-lg before:content-[""] before:transition-colors before:duration-fast',
-  'hover:before:bg-[var(--dashboard-row-hover)] data-[open=true]:before:bg-[var(--dashboard-row-hover)]',
-  FOCUS,
-)
 
 /** Keeps the draft in step with boards added or removed outside it (Undo, delete, restore). */
 function reconcile(d: Draft, s: DashboardState): Draft {
@@ -143,7 +132,7 @@ function ManageTabsBody({
         {/* Inline, borderless tabs; a 2 px line marks the open one (MT-14). */}
         <div role="tablist" aria-label="Manage tabs" className="flex shrink-0 items-start gap-5 px-2">
           {tabs.map(([key, text, n], i) => (
-            // eslint-disable-next-line no-restricted-syntax -- ds-allow: borderless inline tab (Figma 423:65554); components/Tabs is the pill strip
+            // eslint-disable-next-line no-restricted-syntax -- ds-allow: a role="tab" of the dialog's own tablist (← / →, MT-14, MT-16): a borderless label with a 2 px underline the width of the text, not the count (Figma 423:65554). components/Tabs is the pill strip, and Button wraps its children in one padded span and adds a hover fill
             <button
               key={key}
               ref={(el) => { tabRefs.current[i] = el }}
@@ -292,256 +281,5 @@ function ManageTabsBody({
   )
 }
 
-// ── Pieces ────────────────────────────────────────────────────────────────────
-
-/** An info icon and one line on what the tab holds (Hidden, Recently deleted). */
-function Helper({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="m-0 flex items-center gap-1.5 pl-[var(--space-1-75)] pr-2 text-[length:var(--font-size-body-sm)] leading-[var(--line-height-compact)] text-[var(--dashboard-muted)]">
-      <Info aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0" />
-      {children}
-    </p>
-  )
-}
-
-function RowName({ board, label, muted, onDoubleClick }: { board: Board; label: string; muted?: boolean; onDoubleClick?: () => void }) {
-  return (
-    <span className="flex min-w-0 flex-1 items-center gap-2" onDoubleClick={onDoubleClick}>
-      <span className={cn('min-w-0 truncate text-[length:var(--font-size-body)] font-medium leading-5', muted ? 'text-[var(--dashboard-faint)]' : 'text-[var(--neutral-700)]')}>{label}</span>
-      {board.sharedBy && <SharedTag by={board.sharedBy.name} muted={muted} />}
-    </span>
-  )
-}
-
-/**
- * "Shared" (Tag / Shared, MT-12): 20 px pill, no border, a see-through fill (the text colour at
- * 7 %, 4 % muted) so it stays a step darker than a hovered row; people icon and text 12 px. Hover
- * names the owner. Long names cut off before it, so it always shows.
- */
-export function SharedTag({ by, muted }: { by: string; muted?: boolean }) {
-  return (
-    <Tooltip content={`Shared by ${by}`} side="top">
-      <span
-        tabIndex={0}
-        aria-label={`Shared by ${by}`}
-        className={cn(
-          'inline-flex h-5 shrink-0 items-center gap-1 rounded-full pl-1.5 pr-2 text-[length:var(--font-size-small)] font-medium leading-4',
-          muted ? 'bg-[var(--dashboard-tag-bg-muted)] text-[var(--dashboard-faint)]' : 'bg-[var(--dashboard-tag-bg)] text-[var(--dashboard-label)]',
-          FOCUS,
-        )}
-      >
-        <Users aria-hidden size={12} strokeWidth={1.5} absoluteStrokeWidth />
-        Shared
-      </span>
-    </Tooltip>
-  )
-}
-
-/**
- * Rename in place (MT-6): white field, 1 px border, the name selected. Enter or clicking away keeps
- * it; Esc cancels. Empty: red border and "Add a board name" inside the field, at its right.
- */
-function InlineRename({ initial, onCommit, onDone }: { initial: string; onCommit: (raw: string) => boolean; onDone: () => void }) {
-  const [value, setValue] = useState(initial)
-  const [error, setError] = useState(false)
-  const ref = useRef<HTMLInputElement>(null)
-  const done = useRef(false)
-  useEffect(() => { ref.current?.focus(); ref.current?.select() }, [])
-  const finish = () => { if (!done.current) { done.current = true; onDone() } }
-  const commit = (fromBlur: boolean) => {
-    if (done.current) return
-    if (onCommit(value)) return finish()
-    if (fromBlur) finish() // clicking away with nothing typed puts the old name back
-    else setError(true)
-  }
-  return (
-    <span
-      data-rename-field
-      className={cn(
-        'flex h-[26px] min-w-0 flex-1 items-center gap-0.5 rounded-md border border-solid bg-[var(--dashboard-card-bg)] pl-[var(--space-1-75)] pr-2',
-        error ? 'border-[var(--dashboard-error)]' : 'border-[var(--border-default)]',
-      )}
-    >
-      {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: an in-row rename field (MT-6) with its error inside it */}
-      <input
-        ref={ref}
-        value={value}
-        maxLength={MAX_NAME}
-        placeholder="Board name"
-        aria-label="Board name"
-        aria-invalid={error || undefined}
-        aria-describedby={error ? 'manage-name-error' : undefined}
-        onChange={(e) => { setValue(e.target.value); if (error && e.target.value.trim()) setError(false) }}
-        onKeyDown={(e) => {
-          e.stopPropagation()
-          if (e.key === 'Enter') { e.preventDefault(); commit(false) }
-          else if (e.key === 'Escape') {
-            // Esc cancels the rename only (the dialog stands aside: onEscapeKeyDown above).
-            e.preventDefault()
-            finish()
-          }
-        }}
-        onBlur={() => commit(true)}
-        className="h-full min-w-0 flex-1 border-0 bg-transparent p-0 text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
-      />
-      {error && (
-        <span id="manage-name-error" role="alert" className="flex shrink-0 items-center gap-1 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-error)]">
-          <TriangleAlert aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />
-          Add a board name
-        </span>
-      )}
-    </span>
-  )
-}
-
-/** Scrolls between the pinned header and footer, with fades when there's more (MT-1). */
-function FadingScroll({ children, className }: { children: React.ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [edges, setEdges] = useState({ top: false, bottom: false })
-  const read = () => {
-    const el = ref.current
-    if (!el) return
-    setEdges({ top: el.scrollTop > 0, bottom: el.scrollTop + el.clientHeight < el.scrollHeight - 1 })
-  }
-  useEffect(() => {
-    read()
-    const el = ref.current
-    if (!el) return
-    const ro = new ResizeObserver(read)
-    ro.observe(el)
-    if (el.firstElementChild) ro.observe(el.firstElementChild)
-    return () => ro.disconnect()
-  }, [])
-  return (
-    <div className={cn('relative', className)}>
-      {/* No reserved gutter: it would push ⋯ off the line it shares with × and Save (MT-3). */}
-      <div ref={ref} onScroll={read} className="kaya-scrollbar size-full overflow-y-auto" style={{ scrollbarGutter: 'auto' }}>
-        {children}
-      </div>
-      <div aria-hidden className={cn('pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-[var(--neutral-50)] to-transparent transition-opacity', edges.top ? 'opacity-100' : 'opacity-0')} />
-      <div aria-hidden className={cn('pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-[var(--neutral-50)] to-transparent transition-opacity', edges.bottom ? 'opacity-100' : 'opacity-0')} />
-    </div>
-  )
-}
-
-// ── Your tabs: rows that drag by the handle (MT-4) ───────────────────────────
-
-interface RowProps {
-  tabIndex: number
-  'data-row-focus': boolean
-  onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void
-}
-
-interface RowListProps {
-  ids: string[]
-  visibleCount: number
-  onMove: (id: string, to: number) => void
-  labelOf: (id: string) => string
-  renderRow: (id: string, handle: React.ReactNode, rowProps: RowProps) => React.ReactNode
-}
-
-function RowList({ ids, visibleCount, onMove, labelOf, renderRow }: RowListProps) {
-  const listRef = useRef<HTMLDivElement>(null)
-  const [drag, setDrag] = useState<{ id: string; x: number; y: number; line: number | null } | null>(null)
-
-  const start = (e: React.PointerEvent, id: string) => {
-    if (e.button !== 0) return
-    e.preventDefault()
-    const from = ids.indexOf(id)
-    let to: number | null = null
-    const move = (ev: PointerEvent) => {
-      const rows = [...(listRef.current?.querySelectorAll<HTMLElement>('[data-row]') ?? [])]
-      let g = rows.findIndex((r) => { const b = r.getBoundingClientRect(); return ev.clientY < b.top + b.height / 2 })
-      if (g < 0) g = rows.length
-      const t = g > from ? g - 1 : g
-      to = t === from ? null : t // no line when nothing would change
-      setDrag({ id, x: ev.clientX, y: ev.clientY, line: to == null ? null : g })
-    }
-    const end = (commit: boolean) => {
-      window.removeEventListener('pointermove', move)
-      window.removeEventListener('pointerup', up)
-      window.removeEventListener('pointercancel', cancel)
-      window.removeEventListener('keydown', key, true)
-      if (commit && to != null) onMove(id, to)
-      setDrag(null)
-    }
-    const up = () => end(true)
-    const cancel = () => end(false)
-    const key = (ev: KeyboardEvent) => { if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); end(false) } }
-    window.addEventListener('pointermove', move)
-    window.addEventListener('pointerup', up)
-    window.addEventListener('pointercancel', cancel)
-    window.addEventListener('keydown', key, true)
-  }
-
-  // ⌥↑ / ⌥↓ on a focused row (or its handle) move it one place. Moving a focused element in the
-  // page drops its focus, so it's put back on the same row (or handle) after the move.
-  const keyMove = (e: React.KeyboardEvent, id: string, part: 'row' | 'handle') => {
-    if (!e.altKey || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return
-    const i = ids.indexOf(id)
-    const to = i + (e.key === 'ArrowUp' ? -1 : 1)
-    if (to < 0 || to >= ids.length) return
-    e.preventDefault()
-    const list = (e.currentTarget as HTMLElement).closest<HTMLElement>('[data-row-list]')
-    onMove(id, to)
-    requestAnimationFrame(() => {
-      const row = list?.querySelector<HTMLElement>(`[data-row-id="${CSS.escape(id)}"]`)
-      const target = part === 'handle' ? row?.querySelector<HTMLElement>('[data-handle]') : row?.querySelector<HTMLElement>('[data-row-focus]')
-      if (!target) return
-      // Focus set by script doesn't count as keyboard focus, so mark it to keep the ring (MT-3).
-      target.dataset.keyboard = 'true'
-      target.addEventListener('blur', () => { delete target.dataset.keyboard }, { once: true })
-      target.focus()
-    })
-  }
-
-  return (
-    <div ref={listRef} data-row-list className="relative">
-      {ids.map((id, i) => (
-        <div key={id} data-row data-row-id={id} className={cn('relative', drag?.id === id && 'opacity-40')}>
-          {drag?.line === i && <RowDropLine />}
-          {/* A plain line after the last board that fits in the tab row (MT-3). */}
-          {i === visibleCount && visibleCount < ids.length && (
-            <div aria-hidden className="px-2 py-1"><div className="h-px bg-[var(--neutral-200)]" /></div>
-          )}
-          {renderRow(
-            id,
-            // eslint-disable-next-line no-restricted-syntax -- ds-allow: the 16px drag handle (MT-4); IconButton can't take pointer-drag handlers cleanly
-            <button
-              type="button"
-              aria-label={`Move ${labelOf(id)}. Drag, or Alt + up or down arrow.`}
-              data-handle
-              onPointerDown={(e) => start(e, id)}
-              onKeyDown={(e) => keyMove(e, id, 'handle')}
-              className={cn('flex size-4 shrink-0 cursor-grab items-center justify-center rounded-sm border-0 bg-transparent p-0 text-[var(--neutral-400)] hover:text-[var(--neutral-700)] active:cursor-grabbing', FOCUS)}
-            >
-              <GripVertical aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth />
-            </button>,
-            { tabIndex: 0, 'data-row-focus': true, onKeyDown: (e) => { if (e.target === e.currentTarget) keyMove(e, id, 'row') } },
-          )}
-        </div>
-      ))}
-      {drag?.line === ids.length && <div className="relative"><RowDropLine /></div>}
-      {/* The chip that follows the pointer (MT-4): white, hairline border, soft shadow, handle + name. */}
-      {drag && (
-        <div
-          aria-hidden
-          className="pointer-events-none fixed z-[var(--z-tooltip)] flex h-8 items-center gap-2.5 rounded-md border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] pl-2 pr-3 text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--neutral-700)] shadow-[var(--dashboard-tab-lifted-shadow)]"
-          style={{ left: drag.x - 12, top: drag.y - 16 }}
-        >
-          <GripVertical size={16} strokeWidth={1.5} absoluteStrokeWidth className="text-[var(--neutral-400)]" />
-          {labelOf(drag.id)}
-        </div>
-      )}
-    </div>
-  )
-}
-
-/** Where a dragged row will land: a 2 px blue line with a dot, 8 px in from each side (MT-4). */
-function RowDropLine() {
-  return (
-    <span aria-hidden className="pointer-events-none absolute -top-px left-2 right-2 z-10 h-0.5 rounded-hairline bg-[var(--dashboard-drop-line)]">
-      <span className="absolute -left-1 -top-[3px] size-2 rounded-full bg-[var(--dashboard-drop-line)]" />
-    </span>
-  )
-}
+// Kept reachable from here for anything that imported it with the dialog.
+export { SharedTag } from './manage-tabs-parts'

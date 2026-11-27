@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { formatMetricValue } from '../format'
-import { changeLabel, dayMonth, formatExact, weekdayDayMonth } from '../series'
+import { changeLabel, dayMonth, formatExact, lineSummary, weekdayDayMonth } from '../series'
 import type { Metric, Series } from '../types'
 import { ChartGhost } from '../CardEmpty'
-import { Readout, useSize, type ReadoutContent } from './Readout'
+import { Readout, readoutText, useChartKeys, useSize, type ReadoutContent } from './Readout'
 
 // A card's line (05-cards-reading-rules.md):
 //   full   the full chart (CR-3): round ticks on the right, dashed gridlines, the period before
@@ -27,24 +27,59 @@ export interface LineChartProps {
   variant: 'full' | 'spark'
   /** A target per day, drawn as a dashed line (CR-13). */
   target?: number
+  /**
+   * The day a keyboard is reading, from the card around the chart (its button takes the arrow
+   * keys); the readout shows for it as for a hovered day.
+   */
+  active?: number | null
+  /**
+   * The chart is its own Tab stop and reads its days with the arrow keys (the metric window). On a
+   * card leave it off: the card's button does it.
+   */
+  focusable?: boolean
   className?: string
 }
 
-export function LineChart({ metric, series, variant, target, className }: LineChartProps) {
+export function LineChart({ metric, series, variant, target, active = null, focusable = false, className }: LineChartProps) {
   const [ref, { width, height }] = useSize<HTMLDivElement>()
   const [hover, setHover] = useState<number | null>(null)
+  const hintId = useId()
   const full = variant === 'full'
+  const drawn = series.daysWithData >= 2
+  const keys = useChartKeys(focusable && drawn ? series.days.length : 0)
+  const shown = hover ?? keys.index ?? active
+  // Every chart says what it shows in words (A11Y-KB-01); the drawing itself is hidden.
+  const summary = drawn ? lineSummary(metric, series) : undefined
   return (
-    <div ref={ref} className={cn('relative', className)} data-chart={variant} onPointerLeave={() => setHover(null)}>
-      {series.daysWithData < 2 ? (
+    <div
+      ref={ref}
+      className={cn('relative', focusable && drawn && 'rounded-lg outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]', className)}
+      data-chart={variant}
+      role={drawn ? (focusable ? 'group' : 'img') : undefined}
+      aria-roledescription={drawn && focusable ? 'chart' : undefined}
+      aria-label={summary}
+      aria-describedby={focusable && drawn ? hintId : undefined}
+      tabIndex={focusable && drawn ? 0 : undefined}
+      onKeyDown={focusable ? keys.onKeyDown : undefined}
+      onBlur={focusable ? keys.onBlur : undefined}
+      onPointerLeave={() => setHover(null)}
+    >
+      {!drawn ? (
         // Too little history for a line: a faint stand-in, saying how much there is so far.
         <ChartGhost bars={false} className="h-full" caption={series.daysWithData === 0 ? 'Nothing recorded on these days' : '1 day of data so far'} note={full ? 'The chart fills in as more data syncs.' : undefined} />
       ) : width > 0 ? (
-        <Plot metric={metric} series={series} full={full} target={target} width={width} height={height} hover={hover} onHover={setHover} />
+        <Plot metric={metric} series={series} full={full} target={target} width={width} height={height} hover={shown} onHover={setHover} />
       ) : null}
+      {focusable && drawn && (
+        <>
+          <span id={hintId} className="sr-only">Left and right arrow keys read the chart day by day.</span>
+          <span role="status" className="sr-only">{keys.index === null ? '' : readoutText(readoutFor(metric, series, keys.index, full, target))}</span>
+        </>
+      )}
     </div>
   )
 }
+
 
 interface PlotProps {
   metric: Metric

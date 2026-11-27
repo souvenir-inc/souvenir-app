@@ -8,10 +8,12 @@ vi.mock('./client', async importOriginal => {
 })
 
 import { WAREHOUSE_ENDPOINT } from '@/lib/config'
+import { ResponseShapeError } from '@/lib/query-policy'
 import { Warehouse } from './warehouse'
 
 const ID = '9f1c2b7e-4d3a-4f6b-9a8e-1c2d3e4f5a6b'
 const CONNECTION = '45aaa2ea-0000-4000-8000-000000000000'
+const BOARD = 'b1b1b1b1-2222-4333-8444-555555555555'
 
 const summary = {
   id: ID, name: 'Store', timezone: 'America/New_York', defaultBoard: null,
@@ -40,7 +42,7 @@ describe('Warehouse', () => {
       {
         name: 'revenue', label: 'Revenue', unit: 'money', description: '', category: 'store',
         value: { kind: 'sum', table: 'orders', column: 'total', day: 'created_at', where: null },
-        overridden: false, verified: false, createdBy: null, verified: true,
+        overridden: false, createdBy: null, verified: true,
       },
       {
         name: 'shipping_share', label: 'Shipping share', unit: 'ratio', description: '', category: 'custom',
@@ -72,10 +74,10 @@ describe('Warehouse', () => {
       dot: null, lastSyncedAt: null, syncableAt: null,
       connections: [{
         connectionId: CONNECTION, connectorSlug: 'shopify_app', name: 'Shop', state: 'reconnect',
-        error: 'requires an active refresh_token', lastSyncedAt: null, syncingSince: null, syncableAt: null, yours: true,
+        error: 'requires an active refresh_token', lastSyncedAt: null, syncingSince: null, syncableAt: null, metrics: ['revenue'], yours: true,
       }],
     })
-    const status = await new Warehouse(summary).boardStatus('b1')
+    const status = await new Warehouse(summary).boardStatus(BOARD)
     expect(status.connections[0]).toEqual(expect.objectContaining({ state: 'reconnect', yours: true }))
   })
 
@@ -115,9 +117,9 @@ describe('Warehouse', () => {
   it('posts a board picture to a Slack channel as a form', async () => {
     apiFetchJson.mockResolvedValue({ connected: true, channels: [{ id: 'C1', name: 'growth' }] })
     expect((await Warehouse.slackChannels()).channels).toEqual([{ id: 'C1', name: 'growth' }])
-    await new Warehouse(summary).postToSlack('b1', new Blob(['png']), 'store-overview.png', 'C1', 'A member shared Store overview')
+    await new Warehouse(summary).postToSlack(BOARD, new Blob(['png']), 'store-overview.png', 'C1', 'A member shared Store overview')
     const [url, init] = apiFetchVoid.mock.calls[0]
-    expect(url).toBe(`${WAREHOUSE_ENDPOINT}/${ID}/boards/b1/slack`)
+    expect(url).toBe(`${WAREHOUSE_ENDPOINT}/${ID}/boards/${BOARD}/slack`)
     expect(init.method).toBe('POST')
     expect([...(init.body as FormData).keys()]).toEqual(['image', 'channelId', 'text'])
     expect((init.body as FormData).get('channelId')).toBe('C1')
@@ -143,5 +145,69 @@ describe('Warehouse', () => {
     delete bare.defaultBoard
     apiFetchJson.mockResolvedValue(bare)
     expect((await Warehouse.get(ID)).defaultBoard).toBeNull()
+  })
+
+  it('reads how each connection is syncing (GET /{id}/connections), with a signal', async () => {
+    const signal = new AbortController().signal
+    apiFetchJson.mockResolvedValue([{
+      connectionId: CONNECTION, connectorSlug: 'shopify_app', name: 'Shop', state: 'behind',
+      error: null, lastSyncedAt: '2026-11-21T19:48:51Z', syncingSince: null, syncableAt: null, metrics: [], yours: false,
+    }])
+    const states = await new Warehouse(summary).connectionStates(signal)
+    expect(apiFetchJson).toHaveBeenCalledWith(`${WAREHOUSE_ENDPOINT}/${ID}/connections`, { signal })
+    expect(states[0]).toMatchObject({ state: 'behind', metrics: [], yours: false })
+  })
+
+  it('surfaces a malformed response as a ResponseShapeError, not a ZodError', async () => {
+    apiFetchJson.mockResolvedValue({ dot: 'purple', connections: 'none' })
+    const failure = new Warehouse(summary).boardStatus(BOARD)
+    await expect(failure).rejects.toBeInstanceOf(ResponseShapeError)
+    await expect(failure).rejects.toMatchObject({ what: 'GET /warehouse/{id}/boards/{boardId}/status' })
+    // The message names the endpoint only: nothing from the response reaches it.
+    await expect(failure).rejects.toThrow('Unexpected GET /warehouse/{id}/boards/{boardId}/status response')
+  })
+
+  it('refuses a board, scorecard or connection id that isn’t a UUID before sending anything', async () => {
+    const warehouse = new Warehouse(summary)
+    for (const send of [
+      () => warehouse.boardStatus('../../admin'),
+      () => warehouse.putBoard('b1', { name: 'x', layout: {}, metrics: [], general: 'none', grants: [], deleted: false, version: null }),
+      () => warehouse.deleteBoard('b1?x=1'),
+      () => warehouse.refreshBoard(''),
+      () => warehouse.putScorecard('s 1', { name: 'x', rows: [] }),
+      () => warehouse.deleteScorecard('%2e%2e'),
+      () => warehouse.syncConnection('conn/1'),
+      () => Warehouse.get('not-a-uuid'),
+    ]) {
+      await expect(send()).rejects.toMatchObject({ status: 404, code: 'invalid_id', retryable: false })
+    }
+    expect(apiFetchJson).not.toHaveBeenCalled()
+    expect(apiFetchVoid).not.toHaveBeenCalled()
+  })
+
+  it('encodes free-text segments (metric and table names)', async () => {
+    apiFetchJson.mockResolvedValue({ name: 'a/b', columns: [], rows: [], total: 0 })
+    await new Warehouse(summary).rows('a/b?c', 10, 0)
+    expect(apiFetchJson.mock.calls[0][0]).toBe(`${WAREHOUSE_ENDPOINT}/${ID}/tables/a%2Fb%3Fc?limit=10&offset=0`)
+    await new Warehouse(summary).deleteMetric('x/../y')
+    expect(apiFetchVoid.mock.calls[0][0]).toBe(`${WAREHOUSE_ENDPOINT}/${ID}/metrics/x%2F..%2Fy`)
+  })
+
+  it('sends a valid board id as is', async () => {
+    apiFetchJson.mockResolvedValue({ dot: null, lastSyncedAt: null, syncableAt: null, connections: [] })
+    await new Warehouse(summary).refreshBoard(BOARD.toUpperCase())
+    expect(apiFetchJson.mock.calls[0][0]).toBe(`${WAREHOUSE_ENDPOINT}/${ID}/boards/${BOARD.toUpperCase()}/refresh`)
+  })
+})
+
+describe('metric definition depth', () => {
+  it('refuses a definition nested deeper than the cap without overflowing', async () => {
+    const { definitionSchema, MAX_DEFINITION_DEPTH } = await import('./warehouse-schemas')
+    let value: unknown = 'orders'
+    for (let i = 0; i < 10_000; i++) value = { op: 'add', terms: [value, 1] }
+    expect(definitionSchema.safeParse(value).success).toBe(false)
+    let ok: unknown = 'orders'
+    for (let i = 0; i < MAX_DEFINITION_DEPTH / 3; i++) ok = { op: 'add', terms: [ok, 1] }
+    expect(definitionSchema.safeParse(ok).success).toBe(true)
   })
 })

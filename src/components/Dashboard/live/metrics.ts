@@ -1,10 +1,27 @@
-import type { Definition, Measurement, MetricEntry, Scorecard, Term, Unit } from '@/lib/api/warehouse'
+import type { Definition, Measurement, MetricEntry, Scorecard, Term, Unavailable, UnavailableCode, Unit } from '@/lib/api/warehouse'
+import { formatFigure } from '../format'
 import { addDays, isoDate, rangeDays, type Window } from '../period'
 import type { AppId, Day, Health, Metric, MetricChange, MetricFormat, Series, Week } from '../types'
+import { judge, needsAttention, type ScorecardRow } from '@/lib/scorecard/status'
 import type { Apps } from './apps'
 
 const FORMAT: Record<Unit, MetricFormat> = { money: 'currency', count: 'number', percent: 'percent', ratio: 'ratio' }
 const WEEKS = 5
+
+// Why a metric can't be measured, in the app's words: the warehouse's own `reason` is never shown
+// (API-ER-06). A phrase, not a sentence: cards capitalise it, the metric window reads "This store
+// can't measure it yet: …", the new-board list puts it after the name.
+const UNAVAILABLE_COPY = new Map<string, string>([
+  ['no_connection', 'no connected app records it'],
+  ['first_sync', 'its app is still on its first sync'],
+  ['feed_failed', 'its app’s last sync failed'],
+] satisfies [UnavailableCode, string][])
+const UNAVAILABLE_FALLBACK = 'this store can’t read it right now'
+
+/** App copy for an Unavailable, by its code; a code added later reads the generic line. */
+export function unavailableCopy(unavailable: Pick<Unavailable, 'code'>): string {
+  return UNAVAILABLE_COPY.get(unavailable.code) ?? UNAVAILABLE_FALLBACK
+}
 
 /** What the warehouse measured for the board's dates; anything not yet back is undefined. */
 export interface Readings {
@@ -31,21 +48,9 @@ export function weeksWindow(today: Date): Window {
   return { from: addDays(monday, -7 * (WEEKS - 1)), to: today }
 }
 
-const compact = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 })
-const cents = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-const whole = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
-
-/** The card's figure: "$48.2k", "$86.40", "558", "24.8k", "4.32%", "3.09". */
+/** The card’s figure, rounded (the card re-reads `amount` for the viewer’s number style): one formatter for the app (format.ts). */
 export function figure(amount: number | null, format: MetricFormat): string {
-  if (amount === null) return '—'
-  const big = Math.abs(amount) >= 1000
-  const short = compact.format(amount).replace('K', 'k')
-  switch (format) {
-    case 'currency': { const n = big ? compact.format(Math.abs(amount)).replace('K', 'k') : cents.format(Math.abs(amount)); return amount < 0 ? `−$${n}` : `$${n}` }
-    case 'percent': return `${Math.abs(amount) < 10 ? cents.format(amount) : amount.toFixed(1)}%`
-    case 'ratio': return big ? short : cents.format(amount)
-    default: return big ? short : whole.format(amount)
-  }
+  return formatFigure(amount, format)
 }
 
 // The warehouse returns every day and week of the range, with 0 where there were no rows, so
@@ -68,6 +73,11 @@ export function beforeData(m: Measurement | undefined, start: string): boolean {
   if (!m) return false
   const first = firstRecorded(m)
   return first === null || start < first
+}
+
+/** Why the totals couldn't measure a metric; undefined when they could. Metric names are outside keys (JS-1). */
+function unavailableIn(total: Measurement | undefined, name: string): Unavailable | undefined {
+  return total && Object.hasOwn(total.unavailable, name) ? total.unavailable[name] : undefined
 }
 
 /** Every metric in the catalog as the board's dates read it; `get` takes a card id ("revenue#2"). */
@@ -98,10 +108,12 @@ export class Metrics {
     const value = (m: Measurement | undefined, start: string) => scaled(m?.periods.find((p) => p.start === start)?.values[entry.name])
     // A chart's days and weeks: those before the store recorded anything read as "no data yet".
     const charted = (m: Measurement | undefined, start: string) => (beforeData(m, start) ? null : value(m, start))
-    const amount = scaled(r.total?.periods[0]?.values[entry.name])
+    const rawAmount = r.total?.periods[0]?.values[entry.name] ?? null
+    const amount = scaled(rawAmount)
     const before = scaled(r.totalBefore?.periods[0]?.values[entry.name])
     const row = r.scorecards.flatMap((card) => card.rows).find((x) => x.metric === entry.name)
     const upIsGood = row?.direction !== 'down'
+    const unavailable = unavailableIn(r.total, entry.name)
     const series = this.series(r, (m, day) => charted(m, isoDate(day)))
     return {
       id: entry.name,
@@ -118,9 +130,10 @@ export class Metrics {
       change: changeOf(amount, before, upIsGood, series.comparable),
       series,
       weekly: this.weeks(r, (m, day) => charted(m, isoDate(day))),
-      unmeasured: r.total?.unavailable[entry.name]?.reason ?? null,
-      connectWith: r.total?.unavailable[entry.name]?.connectors ?? [],
-      health: row && amount !== null ? healthOf(amount, row.target * scale, row.direction, row.tolerance, format) : null,
+      unmeasured: unavailable ? unavailableCopy(unavailable) : null,
+      unavailableCode: unavailable?.code ?? null,
+      connectWith: unavailable?.connectors ?? [],
+      health: row && rawAmount !== null ? healthOf(rawAmount, row, scale, format) : null,
     }
   }
 
@@ -192,13 +205,19 @@ function changeOf(amount: number | null, before: number | null, upIsGood: boolea
   return { label: `${Math.abs(p).toFixed(1)}%`, direction: up ? 'up' : 'down', sentiment: up === upIsGood ? 'positive' : 'negative' }
 }
 
-/** On track while within the tolerance short of the target; otherwise off by how much (CR-28). */
-function healthOf(amount: number, target: number, direction: 'up' | 'down', tolerance: number, format: MetricFormat): Health {
-  const on = direction === 'up' ? amount >= target * (1 - tolerance) : amount <= target * (1 + tolerance)
-  const off = target ? ((amount - target) / Math.abs(target)) * 100 : 0
+/**
+ * The card's health against its scorecard row, judged in the warehouse's units (lib/scorecard/status:
+ * the same verdict as the metric window and Needs attention; right for negative targets too). Off only
+ * when off track; at risk still reads as on (the backend counts it on track). `scale` turns the
+ * row's target into the card's units for display (a percent's 0.045 is 4.5).
+ */
+function healthOf(raw: number, row: Pick<ScorecardRow, 'target' | 'direction' | 'tolerance'>, scale: number, format: MetricFormat): Health {
+  // Card copy stays CR-28's ("On track" / "Off target −12%"); the judgement only decides the verdict.
+  const on = !needsAttention(judge(raw, row))
+  const off = row.target ? ((raw - row.target) / Math.abs(row.target)) * 100 : 0
   return {
     verdict: on ? 'on' : 'off',
     off: on ? undefined : `${off >= 0 ? '+' : '−'}${Math.abs(off).toFixed(0)}%`,
-    target: figure(target, format),
+    target: figure(row.target * scale, format),
   }
 }

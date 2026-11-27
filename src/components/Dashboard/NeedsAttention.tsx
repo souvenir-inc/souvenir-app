@@ -4,7 +4,10 @@ import { useState, useSyncExternalStore } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { PopoverContent, PopoverRoot, PopoverTrigger } from '@/components/Popover'
 import { Tooltip } from '@/components/Tooltip'
+import { Button } from '@/components/ui'
 import { cn } from '@/lib/utils'
+import { formatCount, plural } from './format'
+import { PLAIN_BUTTON } from './plain-button'
 
 // Needs attention (05-cards-reading-rules.md CR-31 – CR-34; Figma 173:54812, 173:55163), Option B:
 // one quiet pill in the header before the period, counting the metrics that aren't doing well
@@ -40,20 +43,20 @@ export function NeedsAttention({ items, onOpenMetric }: { items: AttentionItem[]
   const narrow = useNarrow()
   if (!items.length) return null
   const tone = items.some((i) => i.tone === 'red') ? 'red' : 'amber'
-  const words = `${items.length} need attention`
+  const words = `${formatCount(items.length)} ${plural(items.length, { one: 'needs', other: 'need' })} attention`
   const trigger = (
     <PopoverTrigger asChild>
-      {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the quiet header pill of Figma 173:54812 (dot, count, chevron) */}
-      <button
-        type="button"
+      {/* The quiet header pill of Figma 173:54812 (dot, count, chevron). */}
+      <Button
+        variant="link"
         data-needs-attention={tone}
         aria-label={words}
-        className={cn('flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2.5 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)] transition-colors duration-fast hover:bg-[var(--dashboard-tabs-track)]', open && 'bg-[var(--dashboard-tabs-track)]', FOCUS)}
+        className={cn(PLAIN_BUTTON, 'flex h-8 shrink-0 cursor-pointer items-center gap-1.5 !rounded-lg border-0 bg-transparent px-2.5 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)] transition-colors duration-fast hover:bg-[var(--dashboard-tabs-track)]', open && 'bg-[var(--dashboard-tabs-track)]', FOCUS)}
       >
         <span aria-hidden className={cn('size-[7px] rounded-full', DOT[tone])} />
-        {narrow ? items.length : words}
+        {narrow ? formatCount(items.length) : words}
         {!narrow && <ChevronDown aria-hidden size={12} strokeWidth={1.75} absoluteStrokeWidth className="text-[var(--dashboard-muted)]" />}
-      </button>
+      </Button>
     </PopoverTrigger>
   )
   return (
@@ -73,12 +76,12 @@ export function NeedsAttention({ items, onOpenMetric }: { items: AttentionItem[]
             <ul aria-label="Flagged metrics" className={cn('m-0 list-none p-0', items.length > 7 && 'dashboard-thin-scroll max-h-[357px] overflow-y-auto')}>
               {items.map((it) => (
                 <li key={it.metricId}>
-                  {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a list row that opens the metric window (Figma 173:55168) */}
-                  <button
-                    type="button"
+                  {/* A list row that opens the metric window (Figma 173:55168). */}
+                  <Button
+                    variant="link"
                     data-attention-row={it.metricId}
                     onClick={() => { setOpen(false); onOpenMetric(it.metricId) }}
-                    className={cn('flex w-full cursor-pointer items-center gap-2.5 rounded-lg border-0 bg-transparent px-2.5 py-2 text-left hover:bg-[var(--dashboard-hover-band)] focus-visible:bg-[var(--dashboard-hover-band)]', FOCUS)}
+                    className={cn(PLAIN_BUTTON, 'flex w-full cursor-pointer items-center justify-start gap-2.5 whitespace-normal !rounded-lg border-0 bg-transparent px-2.5 py-2 text-left hover:bg-[var(--dashboard-hover-band)] focus-visible:bg-[var(--dashboard-hover-band)]', FOCUS)}
                   >
                     <span aria-hidden className={cn('size-[7px] shrink-0 rounded-full', DOT[it.tone])} />
                     <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -86,7 +89,7 @@ export function NeedsAttention({ items, onOpenMetric }: { items: AttentionItem[]
                       <span className="truncate text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-muted)]">{it.boards} · {it.reason}</span>
                     </span>
                     <span className="shrink-0 text-[length:var(--font-size-body-sm)] leading-4 text-[var(--dashboard-figure)]">{it.value}</span>
-                  </button>
+                  </Button>
                 </li>
               ))}
             </ul>

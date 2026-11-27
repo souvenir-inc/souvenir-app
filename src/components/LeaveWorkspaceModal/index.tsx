@@ -7,7 +7,7 @@ import { Dropdown } from '@/components/Dropdown'
 import { toast } from 'sonner'
 import { useOrg } from '@/context/org-context'
 import { useAuth } from '@/context/auth-context'
-import { leaveOrganization } from '@/lib/api/organization'
+import { blockingProjects, leaveOrganization } from '@/lib/api/organization'
 import { CHAT_ROUTE } from '@/lib/routes'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 
@@ -59,7 +59,10 @@ export function LeaveWorkspaceModal({ onClose }: LeaveWorkspaceModalProps) {
       // the safe way to guarantee nothing stale lingers anywhere in the app.
       window.location.href = CHAT_ROUTE
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to leave workspace')
+      const blocking = blockingProjects(err)
+      toast.error(blocking !== null
+        ? `You own ${blocking === 1 ? 'a workspace or shared project' : `${blocking} workspace or shared projects`}. Hand ${blocking === 1 ? 'it' : 'them'} off or archive ${blocking === 1 ? 'it' : 'them'} in Projects before you leave.`
+        : err instanceof Error ? err.message : 'Failed to leave workspace')
       setSubmitting(false)
     }
   }

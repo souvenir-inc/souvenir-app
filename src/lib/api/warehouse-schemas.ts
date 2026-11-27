@@ -47,6 +47,8 @@ export const connectionStateSchema = z.object({
   lastSyncedAt:  z.string().nullable(),
   syncingSince:  z.string().nullable(),
   syncableAt:    z.string().nullable(),
+  /** The board's metrics it feeds; empty when no board was asked about (GET /{id}/connections, a connection's sync). */
+  metrics:       z.array(z.string()),
   yours:         z.boolean(),
 })
 
@@ -82,7 +84,27 @@ export const expressionSchema: z.ZodType<Expression> = z.lazy(() => z.discrimina
   z.object({ op: z.literal('ratio'), numerator: termSchema, denominator: termSchema }),
 ]))
 
-export const definitionSchema = z.union([aggregateSchema, expressionSchema])
+/** Deeper than any real metric (the formula editor caps nesting at 32); stops a hostile `value` from overflowing the stack in the recursive parse below (JS-8). */
+export const MAX_DEFINITION_DEPTH = 64
+
+/** How deeply objects/arrays nest in a value, worked out without recursion; stops counting once past `limit`. */
+export function nestingDepth(value: unknown, limit = MAX_DEFINITION_DEPTH): number {
+  let deepest = 0
+  const stack: [unknown, number][] = [[value, 0]]
+  while (stack.length > 0) {
+    const [node, depth] = stack.pop()!
+    if (node === null || typeof node !== 'object') continue
+    deepest = Math.max(deepest, depth + 1)
+    if (deepest > limit) return deepest
+    for (const child of Object.values(node)) stack.push([child, depth + 1])
+  }
+  return deepest
+}
+
+export const definitionSchema = z
+  .unknown()
+  .refine(value => nestingDepth(value) <= MAX_DEFINITION_DEPTH, { message: 'Metric definition nests too deeply' })
+  .pipe(z.union([aggregateSchema, expressionSchema]))
 
 export const metricEntrySchema = z.object({
   name:        z.string(),
@@ -122,13 +144,19 @@ export const measureRequestSchema = z.object({
   grain:   grainSchema,
 })
 
+/** The reasons the warehouse gives today (schemas.py Unavailable.code). */
+export const UNAVAILABLE_CODES = ['no_connection', 'feed_failed', 'first_sync'] as const
+export type UnavailableCode = (typeof UNAVAILABLE_CODES)[number]
+
 /** Why a metric can’t be measured yet: connect an app, wait for its first sync, or fix a failing sync. */
 export const unavailableSchema = z.object({
-  // Free text on the wire: a code added later must not fail the whole measurement.
+  // One of UNAVAILABLE_CODES. Kept a string so a code added later degrades to generic copy instead
+  // of failing the whole measurement (API-TV-06).
   code:       z.string(),
+  /** The warehouse's own wording: never shown, the UI maps `code` to app copy (API-ER-06). */
   reason:     z.string(),
   /** Connector slugs that would fill it, pre-built apps first; empty unless code is no_connection. */
-  connectors: z.array(z.string()).default([]),
+  connectors: z.array(z.string()),
 })
 
 export const measurementSchema = z.object({

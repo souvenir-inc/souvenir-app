@@ -1,8 +1,13 @@
-import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
-import { cn } from '@/lib/utils'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/empty-state'
+import { ORG_CONNECTORS_ROUTE, ROOT_ROUTE } from '@/lib/routes'
+import { LOAD_COPY } from './board/copy'
+import type { LoadFailure } from './board/errors'
 
-// The screen's frame and its states (loading, problem, no store, no boards): shared by the screen
-// and the route's loading.tsx and error.tsx, so the first paint and the board line up.
+// The screen's frame and its states (loading, problem, not turned on, no access, no store, no
+// boards): shared by the screen and the route's loading.tsx, so the first paint and the board line
+// up. Copy comes from board/errors.ts.
 
 /** The panel every state of the screen sits in (Figma base 17:889). */
 export function Frame({ children }: { children: React.ReactNode }) {
@@ -15,34 +20,67 @@ export function Frame({ children }: { children: React.ReactNode }) {
   )
 }
 
-const QUIET_BUTTON = 'h-8 cursor-pointer rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-3.5 text-[length:var(--font-size-body-sm)] text-[var(--dashboard-figure)] no-underline outline-none hover:bg-[var(--neutral-100)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]'
-
-/** Something the warehouse didn't answer, with Try again (CR-21). */
-export function Problem({ text, onRetry }: { text: string; onRetry: () => void }) {
+/**
+ * Something the warehouse didn't answer (CR-21). Try again only when trying again can work
+ * (API-EM-06); otherwise a way out, never a dead end (SD-EH-03).
+ */
+export function Problem({ text, onRetry }: { text: string; onRetry?: () => void }) {
   return (
-    <div data-board-failed className="flex min-h-[240px] flex-col items-center justify-center gap-3 rounded-xl text-[length:var(--font-size-body-sm)] leading-[var(--dashboard-line-height-sm)] text-[var(--dashboard-figure)]">
-      <p className="m-0">{text}</p>
-      {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the white Try again of Figma 170:47131 (1px #D3CEC8, 8px radius, 32px) */}
-      <button type="button" onClick={onRetry} className={QUIET_BUTTON}>Try again</button>
-    </div>
+    <EmptyState
+      data-board-failed
+      role="alert"
+      title={text}
+      description={onRetry ? undefined : LOAD_COPY.notRetryable}
+      action={onRetry
+        ? <Button variant="outline" size="sm" onClick={onRetry}>Try again</Button>
+        : <Button variant="outline" size="sm" asChild><Link href={ROOT_ROUTE}>Go home</Link></Button>}
+    />
   )
+}
+
+/** Why the dashboard can't show: the warehouse is off, the viewer was refused, or a load failed. */
+export function LoadProblem({ failure, text, onRetry }: { failure: LoadFailure; text: string; onRetry: () => void }) {
+  if (failure.kind === 'not-enabled') return <NotEnabled />
+  if (failure.kind === 'no-access') return <NoDashboardAccess />
+  return <Problem text={text} onRetry={failure.retryable ? onRetry : undefined} />
+}
+
+/** The organization's warehouse isn't turned on: the dashboard isn't available (warehouseEnabled false). */
+export function NotEnabled() {
+  return <EmptyState data-not-enabled role="status" title={LOAD_COPY.notEnabled.title} description={LOAD_COPY.notEnabled.description} action={<HomeLink />} />
+}
+
+/** The warehouse refused the viewer (API-ER-14). */
+export function NoDashboardAccess() {
+  return <EmptyState data-no-access role="status" title={LOAD_COPY.noAccess.title} description={LOAD_COPY.noAccess.description} action={<HomeLink />} />
+}
+
+function HomeLink() {
+  return <Button variant="outline" size="sm" asChild><Link href={ROOT_ROUTE}>Go home</Link></Button>
 }
 
 /** No warehouse yet: one is made when the organization connects its store. */
 export function NoStore() {
   return (
-    <div data-no-store className="flex min-h-[320px] flex-col items-center justify-center gap-3 text-center text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-figure)]">
-      <p className="m-0 text-[length:var(--font-size-body-md)] font-medium">Connect your store to see its numbers</p>
-      <p className="m-0 max-w-[360px] text-[var(--dashboard-label)]">Your dashboard builds itself once Shopify or another store is connected. The first sync takes a few minutes.</p>
-      { }
-      <a href={ORG_CONNECTORS_ROUTE} className={cn(QUIET_BUTTON, 'flex items-center')}>Connect an app</a>
-    </div>
+    <EmptyState
+      data-no-store
+      title="Connect your store to see its numbers"
+      description="Your dashboard builds itself once Shopify or another store is connected. The first sync takes a few minutes."
+      action={<Button variant="outline" size="sm" asChild><Link href={ORG_CONNECTORS_ROUTE}>Connect an app</Link></Button>}
+    />
   )
 }
 
-/** Every board was deleted or left. */
-export function EmptyBoardList() {
-  return <div className="flex min-h-[240px] items-center justify-center text-[length:var(--font-size-body-sm)] text-[var(--dashboard-label)]">No boards yet.</div>
+/** Every board was deleted or left: start a new one (SD-EH-07). */
+export function EmptyBoardList({ onNewBoard }: { onNewBoard: () => void }) {
+  return (
+    <EmptyState
+      data-no-boards
+      title={LOAD_COPY.noBoards.title}
+      description={LOAD_COPY.noBoards.description}
+      action={<Button variant="outline" size="sm" onClick={onNewBoard}>New board</Button>}
+    />
+  )
 }
 
 /** Plain card skeletons, no names or numbers (08 NB-21, NB-31). */

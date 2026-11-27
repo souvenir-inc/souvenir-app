@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import type { Board as SavedBoard, BoardRequest, Warehouse } from '@/lib/api/warehouse'
+import { logger } from '@/lib/logger'
 import type { Board, DashboardState, Person } from '../tabs/board-state'
+import { draftCarry, rebase, serverView, type BoardsSnapshot, type PendingBoards } from '../tabs/board-layer'
 import { Metrics } from './metrics'
 import { validCompare } from '../period'
 
@@ -33,6 +35,14 @@ export class BoardsGoneError extends Error {
   }
 }
 
+/** A save of pending changes that failed; `upTo` is the last change it carried, `cause` why it failed. */
+export class CommitError extends Error {
+  constructor(readonly upTo: number, readonly cause: unknown) {
+    super('Saving the boards failed')
+    this.name = 'CommitError'
+  }
+}
+
 /**
  * The boards of one warehouse, as the viewer sees them. Loads them into the dashboard's state and
  * writes back what changed: the viewer's own boards, the cards and dates of boards they can edit,
@@ -51,20 +61,83 @@ export class BoardStore {
   private left: string[] = []
   /** The arrangement last written (or read). */
   private arranged = ''
-  private queue: Promise<void> = Promise.resolve()
+  private queue: Promise<unknown> = Promise.resolve()
+  /** The boards as the server has them, the last pending change they include, and the drafts to put back. */
+  private base: DashboardState | null = null
+  private seq = 0
+  private carry: BoardsSnapshot['carry'] = []
 
   constructor(private readonly warehouse: Warehouse, private readonly viewer: string) {}
 
+  /**
+   * The boards as the server has them now, for the boards query. Reads wait for writes in flight
+   * (one queue), so a read never lands between a write and the version it returns.
+   */
+  read(people: Map<string, Person>, signal?: AbortSignal): Promise<BoardsSnapshot> {
+    return this.enqueue(async () => {
+      await this.fetchState(people, signal)
+      return this.snapshot()
+    })
+  }
+
   /** The viewer's boards and the boards shared with them; an empty state when there are none yet. */
-  async load(people: Map<string, Person>, signal?: AbortSignal): Promise<DashboardState> {
+  load(people: Map<string, Person>, signal?: AbortSignal): Promise<DashboardState> {
+    return this.enqueue(() => this.fetchState(people, signal))
+  }
+
+  /** The last boards read or written, with the pending changes they include. */
+  snapshot(): BoardsSnapshot {
+    if (!this.base) throw new Error('BoardStore: no boards read yet')
+    return { state: this.base, seq: this.seq, carry: this.carry }
+  }
+
+  /**
+   * Saves every pending change made before this save starts, replayed on the latest boards read.
+   * Resolves with the new snapshot; rejects with a `CommitError` naming the last change it carried.
+   */
+  commit(pending: PendingBoards, openId: string, measurable: Set<string>): Promise<BoardsSnapshot> {
+    return this.enqueue(async () => {
+      const entries = pending.after(this.seq)
+      const upTo = entries.at(-1)?.seq ?? this.seq
+      pending.markAttempted(upTo)
+      const state = rebase(this.snapshot(), entries, openId)
+      const written = (gone: string[] = []) => {
+        const kept = serverView(state)
+        this.base = gone.length ? dropBoards(kept, gone) : kept
+        this.seq = upTo
+        this.carry = draftCarry(state)
+      }
+      try {
+        await this.write(state, measurable)
+        written()
+        return this.snapshot()
+      } catch (error) {
+        // Everything but the gone boards was written: the snapshot moves on without them.
+        if (error instanceof BoardsGoneError) written(error.ids)
+        throw new CommitError(upTo, error)
+      }
+    })
+  }
+
+  private enqueue<T>(job: () => Promise<T>): Promise<T> {
+    const run = this.queue.then(job, job)
+    this.queue = run.catch(() => undefined)
+    return run
+  }
+
+  private async fetchState(people: Map<string, Person>, signal?: AbortSignal): Promise<DashboardState> {
     const saved = await this.warehouse.boards(signal)
     // A board whose layout doesn't parse is left out (and left alone), not a reason to fail every board.
     const read = saved.flatMap((wire) => {
       const layout = layoutSchema.safeParse(wire.layout)
       if (layout.success) return [{ wire, layout: layout.data }]
-      console.warn('[dashboard] skipped a board with an unreadable layout', wire.id)
+      logger.warn('[dashboard] skipped a board with an unreadable layout', wire.id)
       return []
     })
+    // What the server has now is what the next save is measured against.
+    this.written.clear()
+    this.versions.clear()
+    this.others.clear()
     for (const { wire, layout } of read) {
       this.versions.set(wire.id, wire.updatedAt)
       if (wire.role !== 'view') this.written.set(wire.id, canonical(contentOf(wire, layout)))
@@ -91,17 +164,22 @@ export class BoardStore {
     const tabs = [...first, ...inTabs, ...mine, ...named.filter((id) => !first.includes(id))]
     const hidden = [...placed('hidden'), ...workspace.filter((id) => !first.includes(id))]
     this.arranged = JSON.stringify({ tabs, hidden, left: this.left })
-    return {
+    this.base = {
       boards: Object.fromEntries(read.filter((b) => !this.left.includes(b.wire.id)).map(({ wire, layout }) => [wire.id, this.boardOf(wire, layout, people)])),
       tabs,
       hidden,
       deleted: read.filter((b) => b.wire.deletedAt !== null).map((b) => ({ id: b.wire.id, deletedAt: Date.parse(b.wire.deletedAt!) })),
       openId: tabs[0] ?? '',
     }
+    return this.base
   }
 
   /** Writes the boards the viewer may change that did change, deletes their own that went, then their arrangement; one write at a time. */
   save(state: DashboardState, measurable: Set<string>): Promise<void> {
+    return this.enqueue(() => this.write(state, measurable))
+  }
+
+  private write(state: DashboardState, measurable: Set<string>): Promise<void> {
     const next = new Map<string, Content>()
     const deleted = new Set(state.deleted.map((d) => d.id))
     const listed = new Set([...state.tabs, ...state.hidden, ...deleted])
@@ -176,8 +254,7 @@ export class BoardStore {
       if (failed.length) throw failed[0]
       if (gone.length) throw new BoardsGoneError(gone)
     }
-    this.queue = this.queue.then(job, job)
-    return this.queue
+    return job()
   }
 
   private boardOf(wire: SavedBoard, layout: Layout, people: Map<string, Person>): Board {
@@ -194,6 +271,17 @@ export class BoardStore {
       general: wire.general,
       grants: wire.grants,
     }
+  }
+}
+
+/** A state without the given boards (deleted or unshared by their owner). */
+function dropBoards(state: DashboardState, ids: string[]): DashboardState {
+  const gone = new Set(ids)
+  return {
+    ...state,
+    boards: Object.fromEntries(Object.entries(state.boards).filter(([id]) => !gone.has(id))),
+    tabs: state.tabs.filter((id) => !gone.has(id)),
+    hidden: state.hidden.filter((id) => !gone.has(id)),
   }
 }
 

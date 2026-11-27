@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { formatMetricValue, niceMax } from '../format'
-import { changeLabel, dayMonth, formatExact, weekInfo } from '../series'
-import type { Metric } from '../types'
+import { barsSummary, changeLabel, dayMonth, formatExact, weekInfo } from '../series'
+import type { Metric, Week } from '../types'
 import { ChartGhost } from '../CardEmpty'
-import { Readout, useSize, type ReadoutContent } from './Readout'
+import { Readout, readoutText, useChartKeys, useSize, type ReadoutContent } from './Readout'
 
 // Weekly bars for a sum or count (05-cards-reading-rules.md CR-2, CR-11):
 //   full     ticks on the right (0, half, max), a solid baseline, dashed gridlines, the week labels
@@ -18,23 +18,43 @@ import { Readout, useSize, type ReadoutContent } from './Readout'
 const TICKS_W = 36
 const LABELS_H = 24
 
-export function WeeklyBars({ metric, variant, className }: { metric: Metric; variant: 'full' | 'compact'; className?: string }) {
+/**
+ * The weeks the bars draw: weeks before the first one with data aren't drawn, so a store connected
+ * two weeks ago shows two bars, not three empty slots and two bars.
+ */
+export function drawnWeeks(metric: Metric): Week[] {
+  return metric.weekly.slice(Math.max(0, metric.weekly.findIndex((w) => w.value != null)))
+}
+
+interface WeeklyBarsProps {
+  metric: Metric
+  variant: 'full' | 'compact'
+  /** The week a keyboard is reading, from the card around the chart (its button takes the arrow keys). */
+  active?: number | null
+  /** The chart is its own Tab stop and reads its weeks with the arrow keys (the metric window). */
+  focusable?: boolean
+  className?: string
+}
+
+export function WeeklyBars({ metric, variant, active = null, focusable = false, className }: WeeklyBarsProps) {
   const [ref, { width, height }] = useSize<HTMLDivElement>()
   const [hover, setHover] = useState<number | null>(null)
+  const hintId = useId()
   const full = variant === 'full'
-  // Weeks before the first one with data aren't drawn: a store connected two weeks ago shows two
-  // bars, not three empty slots and two bars. Under two weeks with data, there's no chart to draw yet.
+  // Under two weeks with data, there's no chart to draw yet.
   const withData = metric.weekly.filter((w) => w.value != null).length
-  const offset = Math.max(0, metric.weekly.findIndex((w) => w.value != null))
-  const weeks = metric.weekly.slice(offset)
+  const weeks = drawnWeeks(metric)
+  const offset = metric.weekly.length - weeks.length
   const n = weeks.length
+  const sparse = withData < 2
+  const keys = useChartKeys(focusable && !sparse ? n : 0)
+  const shown = hover ?? keys.index ?? (active === null ? null : Math.min(active, n - 1))
   const plotW = full ? width - TICKS_W : width
   const plotH = Math.max(0, full ? height - LABELS_H : height)
   // A week below 0 draws as an empty week; the scale is the weeks above it.
   const values = weeks.map((w) => Math.max(0, w.value ?? 0))
   const top = Math.max(...values, 0)
   const max = full ? (top > 0 ? niceMax(top) : 1) : top * 1.13 || 1
-  const sparse = withData < 2
   const band = plotW / n
   const barW = full ? 44 : 36
   const cx = (i: number) => (full ? band * i + band / 2 : n === 1 ? plotW / 2 : barW / 2 + (i * (plotW - barW)) / (n - 1))
@@ -47,7 +67,26 @@ export function WeeklyBars({ metric, variant, className }: { metric: Metric; var
     setHover(best)
   }
   return (
-    <div ref={ref} className={cn('relative', className)} data-chart={`bars-${variant}`} onPointerLeave={() => setHover(null)}>
+    <div
+      ref={ref}
+      className={cn('relative', focusable && !sparse && 'rounded-lg outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]', className)}
+      data-chart={`bars-${variant}`}
+      // Every chart says what it shows in words (A11Y-KB-01); the drawing itself is hidden.
+      role={sparse ? undefined : focusable ? 'group' : 'img'}
+      aria-roledescription={!sparse && focusable ? 'chart' : undefined}
+      aria-label={sparse ? undefined : barsSummary(metric, weeks)}
+      aria-describedby={focusable && !sparse ? hintId : undefined}
+      tabIndex={focusable && !sparse ? 0 : undefined}
+      onKeyDown={focusable ? keys.onKeyDown : undefined}
+      onBlur={focusable ? keys.onBlur : undefined}
+      onPointerLeave={() => setHover(null)}
+    >
+      {focusable && !sparse && (
+        <>
+          <span id={hintId} className="sr-only">Left and right arrow keys read the chart week by week.</span>
+          <span role="status" className="sr-only">{keys.index === null ? '' : readoutText(weekReadout(metric, keys.index + offset))}</span>
+        </>
+      )}
       {sparse && (
         <ChartGhost bars className="h-full" caption={withData === 0 ? 'No weeks with data yet' : '1 week of data so far'} note="The chart fills in as more data syncs." />
       )}
@@ -59,8 +98,8 @@ export function WeeklyBars({ metric, variant, className }: { metric: Metric; var
               <text x={plotW + 10} y={y(t) + 4} fontSize="var(--font-size-small)" fill="var(--dashboard-muted)">{formatMetricValue(t, metric.format)}</text>
             </g>
           ))}
-          {hover != null && (
-            <rect data-hover-week={hover} x={cx(hover) - (full ? 32 : 24)} y={0} width={full ? 64 : 48} height={plotH} rx={4} fill="var(--dashboard-hover-band)" />
+          {shown != null && (
+            <rect data-hover-week={shown} x={cx(shown) - (full ? 32 : 24)} y={0} width={full ? 64 : 48} height={plotH} rx={4} fill="var(--dashboard-hover-band)" />
           )}
           {weeks.map((w, i) => {
             const h = plotH - y(Math.max(0, w.value ?? 0))
@@ -78,8 +117,8 @@ export function WeeklyBars({ metric, variant, className }: { metric: Metric; var
           <rect x={0} y={0} width={plotW} height={plotH} fill="transparent" onPointerMove={onMove} onPointerDown={onMove} style={{ touchAction: 'pan-y' }} />
         </svg>
       )}
-      {hover != null && (
-        <Readout content={weekReadout(metric, hover + offset)} x={cx(hover) + (cx(hover) > width / 2 ? -barW / 2 : barW / 2)} y={y(Math.max(0, weeks[hover].value ?? 0))} width={width} height={height} />
+      {shown != null && !sparse && (
+        <Readout content={weekReadout(metric, shown + offset)} x={cx(shown) + (cx(shown) > width / 2 ? -barW / 2 : barW / 2)} y={y(Math.max(0, weeks[shown].value ?? 0))} width={width} height={height} />
       )}
     </div>
   )

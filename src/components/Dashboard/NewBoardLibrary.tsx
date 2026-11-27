@@ -5,9 +5,13 @@ import { Calendar, LayoutDashboard, LayoutTemplate, Plug, X } from 'lucide-react
 import { Tooltip } from '@/components/Tooltip'
 import { Button, IconButton } from '@/components/ui'
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { useAuth } from '@/context/auth-context'
 import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
 import { cn } from '@/lib/utils'
+import { roleFor } from './catalog'
+import { countOf, plural } from './format'
 import { SourceLogo } from './icons'
+import { PLAIN_BUTTON } from './plain-button'
 import { useDashboardData } from './live/dashboard-data'
 import { COMPARISONS, periodName } from './period'
 import type { Board } from './tabs/board-state'
@@ -21,7 +25,6 @@ import { dims } from './grid-layout'
 // measure are left out, and a call-out names them with why (NB-9, NB-10).
 
 const FOCUS = 'outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]'
-const YOUR_ROLE_TEMPLATE = 'founder'
 
 /** "template:founder" or "board:<id>". */
 export type LibraryPick = string
@@ -48,14 +51,23 @@ interface Row { key: LibraryPick; label: string; kind: 'template' | 'board' }
 
 function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBoardLibraryProps, 'openOn'> & { initial: LibraryPick }) {
   const { metrics, apps } = useDashboardData()
+  const { user } = useAuth()
   const [picked, setPicked] = useState(initial)
   const listRef = useRef<HTMLDivElement>(null)
 
+  // Your role's template first, when your profile says which it is (catalog.ts roleFor); else one
+  // Templates group, none of them called yours (NB-7).
+  const yourRole = roleFor(user?.onboardingRole)?.id ?? null
+  const templateRow = (t: (typeof TEMPLATES)[number]): Row => ({ key: `template:${t.id}`, label: t.role, kind: 'template' })
   const own = boards.filter((b) => !b.sharedBy && !b.draft)
   const shared = boards.filter((b) => !!b.sharedBy)
   const groups: { heading: string; rows: Row[] }[] = [
-    { heading: 'Your role', rows: TEMPLATES.filter((t) => t.id === YOUR_ROLE_TEMPLATE).map((t) => ({ key: `template:${t.id}`, label: t.role, kind: 'template' })) },
-    { heading: 'Other roles', rows: TEMPLATES.filter((t) => t.id !== YOUR_ROLE_TEMPLATE).map((t) => ({ key: `template:${t.id}`, label: t.role, kind: 'template' })) },
+    ...(yourRole
+      ? [
+          { heading: 'Your role', rows: TEMPLATES.filter((t) => t.id === yourRole).map(templateRow) },
+          { heading: 'Other roles', rows: TEMPLATES.filter((t) => t.id !== yourRole).map(templateRow) },
+        ]
+      : [{ heading: 'Templates', rows: TEMPLATES.map(templateRow) }]),
     { heading: 'Your boards', rows: own.map((b) => ({ key: `board:${b.id}`, label: b.label, kind: 'board' })) },
     { heading: 'Shared with you', rows: shared.map((b) => ({ key: `board:${b.id}`, label: b.label, kind: 'board' })) },
   ]
@@ -132,10 +144,10 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
                 {g.rows.map((r) => {
                   const on = r.key === picked
                   return (
-                    // eslint-disable-next-line no-restricted-syntax -- ds-allow: a library row (Figma 170:41851)
-                    <button
+                    // A library row (Figma 170:41851).
+                    <Button
                       key={r.key}
-                      type="button"
+                      variant="link"
                       role="option"
                       aria-selected={on}
                       data-row={r.key}
@@ -143,7 +155,8 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
                       onClick={() => setPicked(r.key)}
                       onDoubleClick={go}
                       className={cn(
-                        'flex h-8 w-full cursor-pointer items-center gap-2 rounded-lg border border-solid px-2 text-left text-[length:var(--font-size-body-sm)] leading-5',
+                        PLAIN_BUTTON,
+                        'flex h-8 w-full cursor-pointer items-center justify-start gap-2 !rounded-lg border border-solid px-2 text-left text-[length:var(--font-size-body-sm)] leading-5',
                         on ? 'border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] font-medium text-[var(--dashboard-figure)]' : 'border-transparent bg-transparent text-[var(--neutral-700)] hover:bg-[var(--dashboard-card-bg)]',
                         FOCUS,
                       )}
@@ -152,7 +165,7 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
                         ? <LayoutTemplate aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0 text-[var(--dashboard-label)]" />
                         : <LayoutDashboard aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0 text-[var(--dashboard-label)]" />}
                       <span className="min-w-0 truncate">{r.label}</span>
-                    </button>
+                    </Button>
                   )
                 })}
               </div>
@@ -174,7 +187,7 @@ function Library({ initial, boards, onClose, onUseTemplate, onCopy }: Omit<NewBo
               <div data-library-callout className="flex flex-col gap-2 rounded-xl border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-panel-bg)] p-3">
                 <div className="flex items-center gap-2.5">
                   <p className="m-0 min-w-0 flex-1 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)]">
-                    {leftOut.length === 1 ? '1 card is left out' : `${leftOut.length} cards are left out`}: this store doesn’t measure {leftOut.length === 1 ? 'it' : 'them'} yet
+                    {countOf(leftOut.length, { one: 'card is', other: 'cards are' })} left out: this store doesn’t measure {plural(leftOut.length, { one: 'it', other: 'them' })} yet
                   </p>
                   { }
                   <a href={connectHref} data-connect-app={connectApp} className={cn('flex shrink-0 items-center gap-1.5 rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] py-1 pl-2.5 pr-3 text-[length:var(--font-size-body-sm)] font-medium leading-[var(--line-height-compact)] text-[var(--dashboard-figure)] no-underline shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}>

@@ -127,5 +127,11 @@ export const queryKeys = {
     boards: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "boards"] as const,
     status: (org: string, id: string, board: string) => [...queryKeys.warehouse.one(org, id), "status", board] as const,
     measure: (org: string, id: string, request: object) => [...queryKeys.warehouse.one(org, id), "measure", request] as const,
+    /** Every measurement of one warehouse: what a metric definition change makes stale. */
+    measures: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "measure"] as const,
+    /** GET /warehouse/{id}/connections: each connection's sync state, outside any board. */
+    connections: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "connections"] as const,
+    /** GET /warehouse/slack/channels: where the org can post a board (not per warehouse). */
+    slackChannels: (org: string) => [...queryKeys.warehouse.all(org), "slack-channels"] as const,
   },
 } as const;

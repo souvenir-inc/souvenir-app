@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { DAILY_BEFORE, META, SHOP, TODAY, metrics } from '../__fixtures__/live'
 import type { Measurement } from '@/lib/api/warehouse'
-import { Metrics, beforeData, figure, firstRecorded, weeksWindow } from './metrics'
+import { Metrics, beforeData, figure, firstRecorded, unavailableCopy, weeksWindow } from './metrics'
 
 describe('Metrics from the warehouse', () => {
   const m = metrics()
@@ -37,9 +37,40 @@ describe('Metrics from the warehouse', () => {
     expect(m.get('shipping_cost')?.apps).toEqual([])
   })
 
-  it('says why the store can’t measure a metric', () => {
-    expect(m.get('shipping_cost')?.unmeasured).toMatch(/no connection in this store fills/)
+  it('says why the store can’t measure a metric in the app’s words, never the warehouse’s reason', () => {
+    expect(m.get('shipping_cost')?.unmeasured).toBe('no connected app records it')
+    expect(m.get('shipping_cost')?.unmeasured).not.toMatch(/shipments|fills/)
+    expect(m.get('shipping_cost')?.connectWith).toEqual(['shiphero'])
     expect(m.get('shipping_cost')?.value).toBe('—')
+  })
+
+  it('judges health with the scorecard rules, right for a negative target too', () => {
+    const card = (target: number, direction: 'up' | 'down', tolerance: number) => metrics({
+      scorecards: [{ id: 's', name: 'Targets', createdBy: 'u', updatedAt: '', rows: [{ metric: 'net_after_ads', target, direction, tolerance, owner: null, note: '' }] }],
+    }).get('net_after_ads')?.health
+    // 32,600 against an up target of 35,000 with 10% tolerance: at risk, which still reads on.
+    expect(card(35_000, 'up', 0.1)?.verdict).toBe('on')
+    expect(card(40_000, 'up', 0.1)?.verdict).toBe('off')
+    // Negative target, higher is better: 32,600 is far above −1,000, on track (the old band maths
+    // multiplied −1,000 by 0.9 and got it backwards for values in between).
+    expect(card(-1_000, 'up', 0.1)?.verdict).toBe('on')
+    const losing = metrics({
+      total: { grain: 'total', start: '2025-11-08', end: '2025-11-14', timezone: 'UTC', periods: [{ start: '2025-11-08', values: { net_after_ads: -950 } }], unavailable: {} },
+      scorecards: [{ id: 's', name: 'Targets', createdBy: 'u', updatedAt: '', rows: [{ metric: 'net_after_ads', target: -1_000, direction: 'up', tolerance: 0.1, owner: null, note: '' }] }],
+    }).get('net_after_ads')?.health
+    // −950 beats a −1,000 target; the old band (≥ −900) called it off.
+    expect(losing).toEqual({ verdict: 'on', off: undefined, target: '−$1k' })
+    // A down target of 30,000 with 10% tolerance allows up to 33,000.
+    expect(card(30_000, 'down', 0.1)?.verdict).toBe('on')
+    expect(card(30_000, 'down', 0)?.verdict).toBe('off')
+  })
+
+  it('maps each unavailable code to its own copy, and an unknown one to a generic line', () => {
+    const base = { reason: 'internal: feed orders errored with KeyError', connectors: [] }
+    expect(unavailableCopy({ ...base, code: 'first_sync' })).toBe('its app is still on its first sync')
+    expect(unavailableCopy({ ...base, code: 'feed_failed' })).toBe('its app’s last sync failed')
+    expect(unavailableCopy({ ...base, code: 'something_new' })).toBe('this store can’t read it right now')
+    expect(unavailableCopy({ ...base, code: '__proto__' })).toBe('this store can’t read it right now')
   })
 
   it('a sum adds up over days; a ratio does not', () => {

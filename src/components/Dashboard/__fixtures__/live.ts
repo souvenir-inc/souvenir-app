@@ -96,6 +96,6 @@ export const metrics = (over: Partial<Readings> = {}) => new Metrics(readings(ov
 export function connectionState(over: Partial<ConnectionState> = {}): ConnectionState {
   return {
     connectionId: SHOP, connectorSlug: 'shopify_app', name: 'Shopify', state: 'up_to_date', error: null,
-    lastSyncedAt: synced, syncingSince: null, syncableAt: null, yours: true, ...over,
+    lastSyncedAt: synced, syncingSince: null, syncableAt: null, metrics: [], yours: true, ...over,
   }
 }

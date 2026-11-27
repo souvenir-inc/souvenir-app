@@ -1,7 +1,8 @@
-// Sharing (docs-v2/dashboard/09-share-export-rules.md): the workspace's members, who can do what
+// Sharing (fe-handbook/features/dashboard/source-docs/09-share-export-rules.md): the workspace's members, who can do what
 // with a board, matches as you type, and what a board's link opens on. Pure, so the rules are testable.
 
 import type { General, Grant, Role } from '@/lib/api/warehouse'
+import { DASHBOARD_ROUTE } from '@/lib/routes'
 import { COMPARISONS, periodName } from '../period'
 
 export type { General, Grant, Role }
@@ -75,10 +76,15 @@ export function roleFor(share: Share, personId: string): Role | 'owner' | null {
 
 // ── The link (SH-20 – SH-23) ───────────────────────────────────────────────────────
 
-export function boardLink(origin: string, boardId: string, period: string, compare: string): string {
-  const q = new URLSearchParams({ board: boardId, period })
-  if (compare !== 'previous') q.set('compare', compare)
-  return `${origin}/dashboard?${q.toString()}`
+/**
+ * The one link to a board (copy link, Slack posts, the board's own menu): it opens on the given dates
+ * (SH-21); without them it opens on the board's own. `compare` is left out when it's the default.
+ */
+export function boardLink(origin: string, boardId: string, period?: string, compare?: string): string {
+  const q = new URLSearchParams({ board: boardId })
+  if (period) q.set('period', period)
+  if (compare && compare !== 'previous') q.set('compare', compare)
+  return `${origin}${DASHBOARD_ROUTE}?${q.toString()}`
 }
 
 export const periodLabel = periodName

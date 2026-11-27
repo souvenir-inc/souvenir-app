@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { metrics, TODAY } from '../__fixtures__/live'
 import { fileBase, numbersCsv, stamp } from './export'
+import { accessChangePrompt } from './access-change'
 import { People, boardLink, datesLabel, linkCaption, roleFor, type Share } from './share-model'
 
 // 09-share-export-rules.md, with a five-person workspace.
@@ -126,5 +127,43 @@ describe('downloads (SH-33 – SH-37)', () => {
     const none = metrics({ totalBefore: undefined, dailyBefore: undefined, chartBefore: null, compare: 'none' })
     const csv = numbersCsv({ title: 'Store overview', metrics: [none.get('orders')!, none.get('refund_rate')!], period: '7d', compare: 'none', by: 'A member', on: TODAY })
     expect(csv.slice(1).split('\r\n')[3]).toBe('Date,Orders,Refund rate (%)')
+  })
+})
+
+describe('the link without dates, and its route', () => {
+  it('opens the board on its own dates when none are given', () => {
+    expect(boardLink('https://x', 'b-1', undefined, undefined)).toBe('https://x/dashboard?board=b-1')
+    expect(boardLink('https://x', 'a&b', '7d', 'none')).toBe('https://x/dashboard?board=a%26b&period=7d&compare=none')
+  })
+})
+
+describe('downloads neutralise formulas in every form (VS-13)', () => {
+  it('quotes out a full-width or tab-led formula in the title and the exporter', () => {
+    const m = metrics()
+    const csv = numbersCsv({ title: '＝HYPERLINK("x")', metrics: [m.get('revenue')!], period: '7d', compare: 'none', by: '\t=cmd', on: TODAY })
+    const lines = csv.slice(1).split('\r\n')
+    expect(lines[0].replace(/^"/, '')).toMatch(/^'＝HYPERLINK/)
+    expect(lines[1]).toMatch(/^Exported by/)
+  })
+})
+
+describe('confirming access changes (AU-12)', () => {
+  const ctx = { board: 'Store overview', people, lose: 3 }
+  it('names the person and what they lose when removed', () => {
+    expect(accessChangePrompt({ kind: 'remove', userId: 'u-sam' }, ctx)).toEqual({
+      title: 'Remove Sam Lee’s access?',
+      description: 'Sam Lee will no longer be able to open “Store overview”, unless everyone at Example Co can.',
+      confirm: 'Remove access',
+      danger: true,
+    })
+  })
+  it('names the person and the new role on a role change', () => {
+    const edit = accessChangePrompt({ kind: 'role', userId: 'u-gr1', role: 'edit' }, ctx)
+    expect(edit).toMatchObject({ title: 'Let Grace Kim edit “Store overview”?', confirm: 'Change role', danger: false })
+    expect(accessChangePrompt({ kind: 'role', userId: 'u-gr1', role: 'view' }, ctx)).toMatchObject({ title: 'Make Grace Kim a viewer of “Store overview”?', danger: true })
+  })
+  it('counts who loses access when the board goes private, and names the workspace on its role', () => {
+    expect(accessChangePrompt({ kind: 'general', from: 'view', general: 'none' }, ctx)).toMatchObject({ title: 'Make “Store overview” private?', description: expect.stringMatching(/^3 people lose access/), danger: true })
+    expect(accessChangePrompt({ kind: 'general', from: 'view', general: 'edit' }, ctx).title).toBe('Let everyone at Example Co edit “Store overview”?')
   })
 })

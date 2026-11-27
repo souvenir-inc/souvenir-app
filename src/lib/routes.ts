@@ -15,6 +15,10 @@ export const AGENTS_BASICS_NAME_ROUTE = "/agents/basics/name";
 export const AGENTS_BASICS_PURPOSE_ROUTE = "/agents/basics/purpose";
 export const AGENTS_BASICS_TONE_ROUTE = "/agents/basics/tone";
 export const DASHBOARD_ROUTE = "/dashboard";
+/** One metric's page: its number, how it's calculated and what moved it. Names are catalog keys (^[a-z][a-z0-9_]*$). */
+export const DASHBOARD_METRIC_ROUTE = (name: string) => `/dashboard/metrics/${encodeURIComponent(name)}`;
+/** Settings → Metrics: every metric's definition, for every workspace member. */
+export const SETTINGS_METRICS_ROUTE = "/settings/metrics";
 export const SCHEDULES_ROUTE = "/schedules";
 export const LIBRARY_ROUTE = "/library";
 export const LIBRARY_TRASH_ROUTE = "/library/trash";
@@ -67,6 +71,8 @@ export const SETTINGS_BILLING_ROUTE = "/settings/billing";
 // combined "Usage & Billing" page. This page is personal credit-consumption only.
 export const SETTINGS_USAGE_ROUTE = "/settings/usage";
 export const SETTINGS_MEMORY_ROUTE = "/settings/memory";
+// PERSONAL > Data preferences: how numbers show on cards, and the period a new board starts on.
+export const SETTINGS_DATA_PREFERENCES_ROUTE = "/settings/data-preferences";
 export const SETTINGS_BILLING_CHANGE_PLAN_ROUTE = "/settings/billing/change-plan";
 export const SETTINGS_BILLING_CONFIRMATION_ROUTE = "/settings/billing/confirmation";
 export const TEAM_INVITE_BASE_ROUTE = "/team-invite";
@@ -97,7 +103,7 @@ export const ONBOARDING_BASE_ROUTE = "/onboarding";
 export const ONBOARDING_TEAM_BASE_ROUTE = "/onboarding/team";
 export const ONBOARDING_TONE_ROUTE = "/onboarding/tone";
 
-// ── v1.5 workspace-onboarding flow (docs-v1.5/onboarding-v1.5-flow.md) ───────
+// ── v1.5 workspace-onboarding flow (fe-handbook/_archive/2026-08-v1.5-plans/onboarding-v1.5-flow.md) ───────
 // ONBOARDING_WORKSPACE_ROUTE above is reused for this flow's step 2 (same URL,
 // new content) — only these two are new routes.
 export const ONBOARDING_SETUP_ROUTE = "/onboarding/setup";

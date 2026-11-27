@@ -1,4 +1,4 @@
-// The Add cards picker's catalog (docs-v2/dashboard/06-add-cards-rules.md): roles, short forms, and
+// The Add cards picker's catalog (fe-handbook/features/dashboard/source-docs/06-add-cards-rules.md): roles, short forms, and
 // how metrics group by app. The metrics are the warehouse's library (live/metrics.ts).
 
 import type { Apps } from './live/apps'
@@ -6,14 +6,26 @@ import type { CardSize, Metric } from './types'
 
 export interface Role { id: string; label: string }
 
-export const YOUR_ROLE: Role = { id: 'founder', label: 'Founder or CEO' }
-export const OTHER_ROLES: Role[] = [
+/** The roles the picker and the template library group by, in rail order. */
+export const ROLES: Role[] = [
+  { id: 'founder', label: 'Founder or CEO' },
   { id: 'ecommerce', label: 'Head of e-commerce' },
   { id: 'growth', label: 'Growth or ads lead' },
   { id: 'ops', label: 'Ops lead' },
   { id: 'finance', label: 'Finance or fractional CFO' },
   { id: 'agency', label: 'Agency' },
 ]
+
+// The role people gave at onboarding (the profile's `onboardingRole`, backend enum) → the dashboard
+// role that means the same job. Only clear matches: the other onboarding roles (designer, engineer,
+// operator, student, other) have no dashboard role, and nobody is told a role they didn't give.
+const FROM_PROFILE: Record<string, string> = { founder: 'founder', marketing_sales: 'growth' }
+
+/** Your dashboard role from your profile, or null when it isn't known or has no match (no pretend default). */
+export function roleFor(onboardingRole: string | null | undefined): Role | null {
+  const id = onboardingRole && Object.hasOwn(FROM_PROFILE, onboardingRole) ? FROM_PROFILE[onboardingRole] : null
+  return ROLES.find((r) => r.id === id) ?? null
+}
 
 /** Metrics by role, in the order the rail lists them. A metric can sit under several roles. */
 export const ROLE_METRICS: Record<string, string[]> = {
@@ -63,8 +75,3 @@ export function matchOf(m: Metric, query: string, apps: Apps): { at: number; len
   return false
 }
 
-/** "Revenue", "Revenue and Orders", "Revenue, Orders and AOV": names in a sentence (AC-11). */
-export function nameList(names: string[]): string {
-  if (names.length <= 1) return names[0] ?? ''
-  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
-}

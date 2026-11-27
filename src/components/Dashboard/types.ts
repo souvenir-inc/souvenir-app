@@ -1,6 +1,8 @@
 // Dashboard data model. A Metric is what the warehouse measured for one period (live/metrics.ts);
 // the board layout (BoardCard) is kept apart, so a metric can be shown at any size.
 
+import type { Judgement, ScorecardRow } from '@/lib/scorecard/status'
+
 /** A connection feeding the warehouse, by its connection id. */
 export type AppId = string
 
@@ -53,6 +55,9 @@ export interface Week {
 /** How a metric is doing against its scorecard target (CR-28). */
 export interface Health {
   verdict: 'on' | 'off'
+  /** The scorecard verdict from lib/scorecard/status.ts judge(), with the row it was judged by; when set, card-states words the pill and the reason from it, so cards and the metric window agree. */
+  judgement?: Judgement
+  rule?: Pick<ScorecardRow, 'direction' | 'tolerance'>
   /** How far off, e.g. "−12%". */
   off?: string
   /** As wider cards show it, e.g. "$55k". */
@@ -86,6 +91,8 @@ export interface Metric {
   weekly: Week[]
   /** Why this store can't measure it, when it can't (CR-22). */
   unmeasured: string | null
+  /** The warehouse's code for why (`no_connection`, `feed_failed`, `first_sync`, or one added later): the UI words it from this, never from the free text above. */
+  unavailableCode?: string | null
   /** Connector slugs that would let this store measure it, pre-built apps first; empty when connecting isn't the fix. */
   connectWith?: string[]
   health: Health | null

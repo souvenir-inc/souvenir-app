@@ -1,35 +1,24 @@
 // The words charts and readouts use for days, weeks and values (05-cards-reading-rules.md CR-10,
-// CR-11). The numbers themselves are measured by the warehouse (live/metrics.ts).
+// CR-11), and the written summary every chart carries for screen readers. The numbers themselves
+// are measured by the warehouse (live/metrics.ts); formatting is format.ts.
 
-import type { MetricFormat, Week } from './types'
+import { formatChangePercent, formatDayMonth, formatExact, formatWeekday, listNames, plural } from './format'
+import type { Metric, Series, Week } from './types'
+
+export { formatExact } from './format'
 
 const DAY = 86_400_000
-const WEEKDAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short' })
 
 /** "13 Nov". */
-export const dayMonth = (d: Date) => `${d.getDate()} ${d.toLocaleString('en-GB', { month: 'short' })}`
+export const dayMonth = (d: Date) => formatDayMonth(d)
 
 /** "Thu 13 Nov". */
-export const weekdayDayMonth = (d: Date) => `${WEEKDAY.format(d)} ${dayMonth(d)}`
-
-const whole = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
-const cents = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-
-/** A day's exact value for the readout: "52", "$6,812", "$154.50", "1.42%" (CR-10). */
-export function formatExact(value: number, format: MetricFormat): string {
-  switch (format) {
-    case 'currency': { const a = Math.abs(value); const n = a >= 1000 ? whole.format(a) : cents.format(a); return value < 0 ? `−$${n}` : `$${n}` }
-    case 'percent': return `${cents.format(value)}%`
-    case 'ratio': return cents.format(value)
-    default: return whole.format(value)
-  }
-}
+export const weekdayDayMonth = (d: Date) => `${formatWeekday(d)} ${formatDayMonth(d)}`
 
 /** "+15.6%" / "−3.2%" between two values. */
 export function changeLabel(now: number, before: number): string {
   if (!before) return '—'
-  const p = ((now - before) / Math.abs(before)) * 100
-  return `${p >= 0 ? '+' : '−'}${Math.abs(p).toFixed(1)}%`
+  return formatChangePercent(((now - before) / Math.abs(before)) * 100)
 }
 
 export interface WeekInfo {
@@ -41,9 +30,41 @@ export interface WeekInfo {
 
 /** Words for one of the weekly bars; the week in progress runs to today. */
 export function weekInfo(week: Week): WeekInfo {
-  const range = `${WEEKDAY.format(week.start)} ${week.start.getDate()} – ${weekdayDayMonth(week.end)}`
+  const range = `${formatWeekday(week.start)} ${week.start.getDate()} – ${weekdayDayMonth(week.end)}`
   return { title: `Week of ${dayMonth(week.start)}${week.inProgress ? ' (so far)' : ''}`, range }
 }
 
 /** Whole days from one date to another. */
 export const daysBetween = (a: Date, b: Date) => Math.round((b.getTime() - a.getTime()) / DAY)
+
+// ── Chart summaries (A11Y-KB-01: what a chart shows, without a pointer) ─────────
+
+/**
+ * A line chart in a sentence: "Revenue by day, 8 Nov to 14 Nov: lowest $5,850 on 9 Nov, highest
+ * $7,500 on 13 Nov, latest $7,000 on 14 Nov."; days without data are counted at the end.
+ */
+export function lineSummary(metric: Metric, series: Series): string {
+  const days = series.days
+  if (!days.length) return `${metric.label}: no days to show.`
+  const span = `${metric.label} by day, ${dayMonth(days[0].date)} to ${dayMonth(days[days.length - 1].date)}`
+  const known = days.filter((d): d is { date: Date; value: number } => d.value != null)
+  if (known.length === 0) return `${span}: nothing recorded.`
+  const exact = (v: number) => formatExact(v, metric.format)
+  const low = known.reduce((a, d) => (d.value < a.value ? d : a))
+  const high = known.reduce((a, d) => (d.value > a.value ? d : a))
+  const last = known[known.length - 1]
+  const parts = known.length === 1
+    ? [`${exact(last.value)} on ${dayMonth(last.date)}`]
+    : [`lowest ${exact(low.value)} on ${dayMonth(low.date)}`, `highest ${exact(high.value)} on ${dayMonth(high.date)}`, `latest ${exact(last.value)} on ${dayMonth(last.date)}`]
+  const missing = days.length - known.length
+  const gaps = missing > 0 ? ` ${missing} ${plural(missing, { one: 'day has', other: 'days have' })} no data.` : ''
+  return `${span}: ${parts.join(', ')}.${gaps}`
+}
+
+/** Weekly bars in a sentence: "Orders by week, from the week of 13 Oct: 412, 390, 455, 470 and 210 so far this week." */
+export function barsSummary(metric: Metric, weeks: Week[]): string {
+  if (!weeks.length) return `${metric.label}: no weeks to show.`
+  const values = weeks.map((w) => `${w.value == null ? 'no data' : formatExact(w.value, metric.format)}${w.inProgress ? ' so far this week' : ''}`)
+  const head = `${metric.label} by week, from the week of ${dayMonth(weeks[0].start)}`
+  return `${head}: ${listNames(values)}.`
+}

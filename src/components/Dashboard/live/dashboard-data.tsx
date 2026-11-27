@@ -3,16 +3,15 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useOrgIdentity } from '@/context/org-context'
-import { Warehouse, type MeasureRequest, type Measurement } from '@/lib/api/warehouse'
+import type { MeasureRequest, Warehouse } from '@/lib/api/warehouse'
 import { onAnyLinkResult } from '@/lib/connectorProvider'
 import { orgScope, queryKeys } from '@/lib/query-keys'
+import { scorecardQueries } from '@/lib/scorecard/scorecard-queries'
 import { chartWindow, comparedWindow, isoDate, periodWindow, wallClock, type Window } from '../period'
-import { bindSync, setStatus, useSyncState } from '../sync/sync-store'
+import { bindSync, useSyncState } from '../sync/sync-store'
 import { Apps } from './apps'
 import { Metrics, weeksWindow } from './metrics'
-
-const MINUTE = 60_000
-const SYNCING_POLL_MS = 5_000
+import { warehouseQueries } from './warehouse-queries'
 
 /** The open warehouse, its apps and its metrics as the open board's dates read them. */
 export class DashboardData {
@@ -39,22 +38,13 @@ export function useDashboardData(): DashboardData {
 /** The organization's warehouses; the dashboard shows the first. */
 export function useWarehouses() {
   const { orgId, orgIdReady } = useOrgIdentity()
-  return useQuery({
-    queryKey: queryKeys.warehouse.list(orgScope(orgId)),
-    queryFn: ({ signal }) => Warehouse.list(signal),
-    enabled: orgIdReady,
-    staleTime: MINUTE,
-  })
+  return useQuery({ ...warehouseQueries.list(orgScope(orgId)), enabled: orgIdReady })
 }
 
 /** The warehouse's metric catalog; the one query both the screen and the open board read. */
 export function useCatalog(warehouse: Warehouse) {
   const { orgId } = useOrgIdentity()
-  return useQuery({
-    queryKey: queryKeys.warehouse.catalog(orgScope(orgId), warehouse.id),
-    queryFn: ({ signal }) => warehouse.metrics(signal),
-    staleTime: 5 * MINUTE,
-  })
+  return useQuery(warehouseQueries.catalog(orgScope(orgId), warehouse))
 }
 
 /** Today on the store's clock, moved on at the store's midnight so a board left open overnight reads the new day. */
@@ -90,32 +80,17 @@ export function useLiveDashboard(warehouse: Warehouse, open: OpenBoard) {
   const org = orgScope(orgId)
   const today = useToday(warehouse.timezone)
   const catalog = useCatalog(warehouse)
-  const scorecards = useQuery({
-    queryKey: queryKeys.warehouse.scorecards(org, warehouse.id),
-    queryFn: ({ signal }) => warehouse.scorecards(signal),
-    staleTime: 5 * MINUTE,
-  })
+  const scorecards = useQuery(scorecardQueries.list(org, warehouse))
   const names = new Set(catalog.data?.map((e) => e.name) ?? [])
   const onBoard = [...new Set(open.metricIds.map(Metrics.base))].filter((id) => names.has(id)).sort()
   const period = periodWindow(open.period, today)
   const chart = chartWindow(open.period, today)
   const before = comparedWindow(period, open.compare)
   const chartBefore = comparedWindow(chart, open.compare)
-  // A request that isn't made (no comparison) still gets its own key, named after its slot.
   // The totals ask for every metric (metrics: []), so they start with the catalog, not after it;
   // the board's own series need the catalog to know which of its metrics exist.
-  // Same dates, different cards (a card added or removed): the series already in hand stay drawn while
-  // the new request runs, so the other cards don't blink. New dates: no stand-in, the cards shimmer.
-  const measure = (slot: string, body: MeasureRequest | null, enabled = true) => ({
-    queryKey: queryKeys.warehouse.measure(org, warehouse.id, body ?? { off: slot }),
-    queryFn: ({ signal }: { signal: AbortSignal }) => warehouse.measure(body!, signal),
-    enabled: enabled && body !== null && (body.metrics.length === 0 || catalog.isSuccess),
-    staleTime: MINUTE,
-    placeholderData: (previous: Measurement | undefined, query: { queryKey: readonly unknown[] } | undefined) => {
-      const was = query?.queryKey.at(-1) as Partial<MeasureRequest> | undefined
-      return previous && body && was && was.start === body.start && was.end === body.end && was.grain === body.grain ? previous : undefined
-    },
-  })
+  const measure = (slot: string, body: MeasureRequest | null, enabled = true) =>
+    warehouseQueries.measure(org, warehouse, slot, body, enabled && (body?.metrics.length === 0 || catalog.isSuccess))
   const total = useQuery(measure('total', request([], period, 'total')))
   const totalBefore = useQuery(measure('totalBefore', before && request([], before, 'total')))
   const daily = useQuery(measure('daily', request(onBoard, chart, 'day'), onBoard.length > 0))
@@ -190,19 +165,17 @@ function useRefreshOnNewData(warehouse: Warehouse) {
   }, [queryClient, org, warehouse.id])
 }
 
-/** The open board's sync status, polled into the sync store: often while anything syncs, else each minute. */
+/**
+ * The open board's sync status, polled (often while anything syncs, else each minute). The sync store
+ * is pointed at this query and reads the status from the cache; nothing is copied out of it (SD-ST-02).
+ */
 export function useBoardStatus(warehouse: Warehouse, boardId: string, saved: boolean) {
+  const queryClient = useQueryClient()
   const { orgId } = useOrgIdentity()
+  const org = orgScope(orgId)
+  const options = warehouseQueries.status(org, warehouse, boardId)
   useEffect(() => {
-    bindSync(saved ? { warehouse, boardId } : null)
-  }, [warehouse, boardId, saved])
-  const status = useQuery({
-    queryKey: queryKeys.warehouse.status(orgScope(orgId), warehouse.id, boardId),
-    queryFn: ({ signal }) => warehouse.boardStatus(boardId, signal),
-    enabled: saved,
-    refetchInterval: (query) => (query.state.data?.connections.some((c) => c.state === 'syncing' || c.state === 'slow' || c.state === 'first_sync') ? SYNCING_POLL_MS : MINUTE),
-  })
-  useEffect(() => {
-    if (status.data) setStatus(boardId, status.data)
-  }, [boardId, status.data])
+    bindSync(saved ? { client: queryClient, key: queryKeys.warehouse.status(org, warehouse.id, boardId), warehouse, boardId } : null)
+  }, [queryClient, org, warehouse, boardId, saved])
+  useQuery({ ...options, enabled: saved })
 }

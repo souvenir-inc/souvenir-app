@@ -1,6 +1,8 @@
-// Downloads (docs-v2/dashboard/09-share-export-rules.md SH-31 – SH-37): the spreadsheet, the file names,
+// Downloads (fe-handbook/features/dashboard/source-docs/09-share-export-rules.md SH-31 – SH-37): the spreadsheet, the file names,
 // the stamp, and saving a file. The CSV and the names are pure, so they're testable.
 
+import { toCsv, type CsvValue } from '@/lib/csv'
+import { formatDayMonth, formatFullDate } from '../format'
 import { addDays, comparedWindow, isoDate as iso, periodWindow, rangeDays } from '../period'
 import type { Metric } from '../types'
 import { datesLabel, periodLabel } from './share-model'
@@ -16,7 +18,7 @@ export function fileBase(name: string, period: string, today: Date = new Date())
 
 /** "Store overview · Last 7 days • Previous period · <name> · 14 Nov 2025" (SH-34). */
 export function stamp(board: string, period: string, compare: string, by: string, on: Date = new Date()): string {
-  const day = on.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+  const day = formatDayMonth(on, true)
   return `${board} · ${datesLabel(period, compare)} · ${by} · ${day}`
 }
 
@@ -28,15 +30,8 @@ function compareName(days: number, compare: string): string {
 
 /** A header for a card's column: rates say "(%)", multiples "(x)" (SH-37). */
 const header = (m: Metric) => (m.format === 'percent' ? `${m.label} (%)` : m.format === 'ratio' ? `${m.label} (x)` : m.label)
-/** Exact, never "k": two decimals at most, no trailing zeros (6812.4, 5850). */
-const exact = (v: number | null) => (v == null ? '' : String(Math.round(v * 100) / 100))
-
-// A leading = + - @ (or tab/CR) runs as a formula in Excel or Sheets; names are user text, so quote it out.
-const defuse = (s: string) => (/^[=+\-@\t\r]/.test(s) ? `'${s}` : s)
-const cell = (raw: string) => {
-  const s = defuse(raw)
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
-}
+/** Exact, never "k": two decimals at most, no trailing zeros (6812.4, 5850). A number, so a negative stays one. */
+const exact = (v: number | null) => (v == null ? null : Math.round(v * 100) / 100)
 
 /**
  * One sheet: a title row, who exported it and when, a blank row, then Date, each card, the comparison's
@@ -58,9 +53,10 @@ export function numbersCsv(opts: { title: string; metrics: Metric[]; period: str
     const k = iso(date)
     return (s.days.find((d) => iso(d.date) === k) ?? s.previous.find((d) => d && iso(d.date) === k))?.value ?? null
   }
-  const rows: string[][] = [
+  // Board and card names are user text: lib/csv neutralises anything a spreadsheet would run (VS-13).
+  const rows: CsvValue[][] = [
     [`${opts.title} · ${periodLabel(period)}${withCompare ? ` · ${vs}` : ''}`],
-    [`Exported by ${by} on ${on.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`],
+    [`Exported by ${by} on ${formatFullDate(on)}`],
     [],
     ['Date', ...metrics.map(header), ...(withCompare ? [`${cmp} date`, ...metrics.map((m) => `${header(m)}, ${cmp.toLowerCase()}`)] : [])],
   ]
@@ -73,7 +69,7 @@ export function numbersCsv(opts: { title: string; metrics: Metric[]; period: str
       ...(prev ? [iso(prev), ...series.map((s) => exact(valueOn(s, prev)))] : []),
     ])
   }
-  return '﻿' + rows.map((r) => r.map(cell).join(',')).join('\r\n') + '\r\n'
+  return '﻿' + toCsv(rows)
 }
 
 /** Hands a file to the browser to save. */

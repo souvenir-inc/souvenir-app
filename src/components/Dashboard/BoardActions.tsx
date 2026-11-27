@@ -2,22 +2,24 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
-import { Ellipsis, LayoutGrid, Pencil, Plus, Share } from 'lucide-react'
+import { Ellipsis, LayoutGrid, Pencil, Plus, Redo2, Share, Undo2 } from 'lucide-react'
 import { Dropdown } from '@/components/Dropdown'
-import { IconButton } from '@/components/ui'
+import { Button, IconButton } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import { NewBoardChooser, type Way } from './NewBoardChooser'
 import { MoreMenuContent, type BoardMenuHandlers } from './tabs/BoardMenus'
 import type { Board } from './tabs/board-state'
 import { DURATION } from "@/styles/tokens/motion"
 
-// The board's actions, bottom right (Figma 6D, rules docs-v2/dashboard/02-board-screen-rules.md):
+// The board's actions, bottom right (Figma 6D, rules fe-handbook/features/dashboard/source-docs/02-board-screen-rules.md):
 //   SpeedDial  the dark + (BS-4). Opens Add cards, New board, Edit board, Share, More above it
 //              (BS-6 – BS-8); More opens the board's menu above the × (BS-9, BS-10).
-//   EditBar    in edit mode the dial becomes a bar in the same corner: Add cards, New board,
-//              Done (BS-17, BS-20, BS-21).
+//   EditBar    in edit mode the dial becomes a bar in the same corner: Undo, Redo, Add cards,
+//              New board, Done (BS-17, BS-20, BS-21, TAB-14).
 
 const FOCUS = 'outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]'
+/** Button with this corner's own look: body font, no raised shadow, no press scale, no hover layer, no label padding. */
+const PLAIN = 'shadow-none [font-family:inherit] [--hv:transparent] active:scale-100 hover:border-transparent [&>span]:px-0'
 const DIAL = 'bg-gradient-to-b from-[var(--dashboard-tab-active-from)] to-[var(--dashboard-tab-active-to)] text-[var(--dashboard-tab-active-text)]'
 
 // 'new': the New board chooser above the ×, the dial's items folded away (08 NB-1).
@@ -39,7 +41,6 @@ interface SpeedDialProps extends BoardMenuHandlers {
   onOpen: (id: string) => void
   onShow: (id: string) => void
   onStartOver: (id: string) => void
-  onNotReady: (what: string) => void
   /** More → Download… (09 SH-31). */
   onDownload: () => void
   /** Admins: More → Default board for new members… (11 DT-8). */
@@ -119,11 +120,11 @@ export function SpeedDial({ board, startOpen, onAddCards, onNewBoard, onEditBoar
                 variants={reduceMotion ? {} : { open: { opacity: 1, y: 0 }, closed: { opacity: 0, y: 8 } }}
                 transition={{ duration: DURATION.quick, ease: [0.2, 0, 0, 1] }}
               >
-                {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: one hit area for the label pill and the round button of a speed-dial action (Figma 93:18592 / 93:18596) */}
-                <button
-                  type="button"
+                {/* One hit area for the label pill and the round button (Figma 93:18592 / 93:18596). */}
+                <Button
+                  variant="ghost"
                   onClick={() => { if (a.key !== 'more' && a.key !== 'new') setMode('closed'); a.run() }}
-                  className={cn('group/dial flex cursor-pointer items-center gap-2 rounded-full border-0 bg-transparent p-0', FOCUS)}
+                  className={cn(PLAIN, 'group/dial min-h-0 gap-2 rounded-full border-0 bg-transparent p-0 [&>span]:flex [&>span]:items-center [&>span]:gap-2', FOCUS)}
                 >
                   <span className="flex h-7 items-center whitespace-nowrap rounded-lg bg-[var(--dashboard-card-bg)] px-2.5 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)] shadow-[var(--dashboard-raised-shadow)] transition-colors duration-fast group-hover/dial:bg-[var(--neutral-100)]">
                     {a.label}
@@ -131,7 +132,7 @@ export function SpeedDial({ board, startOpen, onAddCards, onNewBoard, onEditBoar
                   <span className="flex size-9 items-center justify-center rounded-full bg-[var(--dashboard-card-bg)] text-[var(--neutral-700)] shadow-[var(--dashboard-raised-shadow)] transition-colors duration-fast group-hover/dial:bg-[var(--neutral-100)]">
                     <a.icon aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth />
                   </span>
-                </button>
+                </Button>
               </m.li>
             ))}
           </m.ul>
@@ -163,11 +164,21 @@ interface EditBarProps {
   onAddCards: () => void
   onNewBoard: (way: Way) => void
   onDone: () => void
+  /** The last change, as ⌘Z (TAB-14). */
+  onUndo: () => void
+  /** The change undone last, as ⌘⇧Z / Ctrl+Y. */
+  onRedo: () => void
+  canUndo: boolean
+  canRedo: boolean
 }
 
-export function EditBar({ onAddCards, onNewBoard, onDone }: EditBarProps) {
+const isMac = () => typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
+
+export function EditBar({ onAddCards, onNewBoard, onDone, onUndo, onRedo, canUndo, canRedo }: EditBarProps) {
   const [choosing, setChoosing] = useState(false)
-  const segment = cn('flex h-9 cursor-pointer items-center gap-1.5 rounded-full border-0 bg-transparent pl-3 pr-3.5 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)] transition-colors duration-fast hover:bg-[var(--neutral-100)]', FOCUS)
+  const segment = cn(PLAIN, 'h-9 min-h-9 gap-1.5 rounded-full border-0 bg-transparent pl-3 pr-3.5 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)] transition-colors duration-fast hover:bg-[var(--neutral-100)]', FOCUS)
+  const round = cn('size-9 rounded-full border-0 bg-transparent text-[var(--neutral-700)] shadow-none hover:bg-[var(--neutral-100)] disabled:text-[var(--neutral-300)]', FOCUS)
+  const mac = isMac()
   return (
     <div
       data-dashboard-fab
@@ -176,10 +187,32 @@ export function EditBar({ onAddCards, onNewBoard, onDone }: EditBarProps) {
       aria-label="Editing the board"
       className="absolute bottom-5 right-5 z-30 flex items-center gap-0.5 rounded-full bg-[var(--dashboard-card-bg)] p-1 shadow-[var(--dashboard-popover-shadow)]"
     >
-      {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a segment of the floating edit bar (Figma 75:21287) */}
-      <button type="button" className={segment} onClick={onAddCards}>
-        <Plus aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth />Add cards
-      </button>
+      <IconButton
+        variant="ghost-2"
+        aria-label="Undo"
+        title={mac ? 'Undo (⌘Z)' : 'Undo (Ctrl+Z)'}
+        aria-keyshortcuts={mac ? 'Meta+Z' : 'Control+Z'}
+        disabled={!canUndo}
+        onClick={onUndo}
+        iconSize={16}
+        icon={<Undo2 aria-hidden strokeWidth={1.5} absoluteStrokeWidth />}
+        className={round}
+      />
+      <IconButton
+        variant="ghost-2"
+        aria-label="Redo"
+        title={mac ? 'Redo (⇧⌘Z)' : 'Redo (Ctrl+Y)'}
+        aria-keyshortcuts={mac ? 'Meta+Shift+Z' : 'Control+Y'}
+        disabled={!canRedo}
+        onClick={onRedo}
+        iconSize={16}
+        icon={<Redo2 aria-hidden strokeWidth={1.5} absoluteStrokeWidth />}
+        className={round}
+      />
+      <span aria-hidden className="mx-0.5 h-4 w-px bg-[var(--neutral-200)]" />
+      <Button variant="ghost" className={segment} onClick={onAddCards} leftIcon={<Plus aria-hidden strokeWidth={1.5} absoluteStrokeWidth />} iconSize={16}>
+        Add cards
+      </Button>
       {choosing && (
         <NewBoardChooser
           className="absolute bottom-[calc(100%+8px)] right-0"
@@ -188,19 +221,27 @@ export function EditBar({ onAddCards, onNewBoard, onDone }: EditBarProps) {
           onPick={(way) => { setChoosing(false); onNewBoard(way) }}
         />
       )}
-      {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a segment of the floating edit bar (Figma 75:21287) */}
-      <button type="button" data-editbar-new aria-pressed={choosing} aria-haspopup="dialog" className={cn(segment, choosing && 'bg-[var(--neutral-100)]')} onClick={() => setChoosing((c) => !c)}>
-        <Plus aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth />New board
-      </button>
+      <Button
+        variant="ghost"
+        data-editbar-new
+        aria-pressed={choosing}
+        aria-haspopup="dialog"
+        className={cn(segment, choosing && 'bg-[var(--neutral-100)]')}
+        onClick={() => setChoosing((c) => !c)}
+        leftIcon={<Plus aria-hidden strokeWidth={1.5} absoluteStrokeWidth />}
+        iconSize={16}
+      >
+        New board
+      </Button>
       <span aria-hidden className="mx-0.5 h-4 w-px bg-[var(--neutral-200)]" />
-      {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the dark Done segment of the floating edit bar (Figma 75:21299) */}
-      <button
-        type="button"
+      {/* The dark Done segment (Figma 75:21299). */}
+      <Button
+        variant="ghost"
         onClick={onDone}
-        className={cn('flex h-9 cursor-pointer items-center rounded-full border-0 px-[var(--space-4-5)] text-[length:var(--font-size-body-sm)] font-medium leading-5', DIAL, FOCUS)}
+        className={cn(PLAIN, 'h-9 min-h-9 rounded-full border-0 px-[var(--space-4-5)] text-[length:var(--font-size-body-sm)] font-medium leading-5', DIAL, FOCUS)}
       >
         Done
-      </button>
+      </Button>
     </div>
   )
 }

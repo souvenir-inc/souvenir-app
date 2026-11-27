@@ -8,7 +8,7 @@ import type { InviteResult } from '@/components/InviteModal'
 import { toast } from 'sonner'
 import { useOrg } from '@/context/org-context'
 import { useAuth } from '@/context/auth-context'
-import { setMemberRole, removeMember, revokeInvite, getOrgSettings } from '@/lib/api/organization'
+import { setMemberRole, removeMember, revokeInvite, getOrgSettings, blockingProjects } from '@/lib/api/organization'
 import { inviteMembers } from '@/lib/api/teams'
 import { updateUser } from '@/lib/api/user'
 import type { OrgMember, WorkspaceRole } from '@/types/teams'
@@ -181,7 +181,13 @@ export default function OrgMembersPage() {
       toast.success(`Removed ${memberLabel}`, { id: toastId })
     } catch (err) {
       restoreRow(prev, id)
-      toast.error(err instanceof Error ? err.message : 'Failed to remove member', { id: toastId })
+      // The backend won't remove someone who still owns workspace or shared projects (souvenir-server#640).
+      const blocking = blockingProjects(err)
+      const them = blocking === 1 ? 'it' : 'them'
+      const message = blocking !== null
+        ? `${memberLabel} owns ${blocking === 1 ? 'a workspace or shared project' : `${blocking} workspace or shared projects`}. They need to hand ${them} off or archive ${them} before they can be removed.`
+        : err instanceof Error ? err.message : 'Failed to remove member'
+      toast.error(message, { id: toastId })
     }
   }
 

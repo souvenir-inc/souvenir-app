@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { ROLE_METRICS, catalogOf, groupOf, landingSize, matchOf, nameList } from './catalog'
+import { ROLE_METRICS, catalogOf, groupOf, landingSize, matchOf, roleFor } from './catalog'
+import { listNames } from './format'
 import { fitAtEnd, toItems } from './grid-layout'
 import { apps, metrics } from './__fixtures__/live'
 import { Metrics } from './live/metrics'
@@ -41,9 +42,9 @@ describe('search (AC-13, AC-14)', () => {
     expect(ROLE_METRICS.founder.slice(0, 4)).toEqual(['revenue', 'net_sales', 'orders', 'aov'])
   })
   it('names in a sentence', () => {
-    expect(nameList(['Revenue'])).toBe('Revenue')
-    expect(nameList(['Revenue', 'Orders'])).toBe('Revenue and Orders')
-    expect(nameList(['Revenue', 'Orders', 'MER'])).toBe('Revenue, Orders and MER')
+    expect(listNames(['Revenue'])).toBe('Revenue')
+    expect(listNames(['Revenue', 'Orders'])).toBe('Revenue and Orders')
+    expect(listNames(['Revenue', 'Orders', 'MER'])).toBe('Revenue, Orders and MER')
   })
 })
 
@@ -65,5 +66,17 @@ describe('landing at the end (AC-16, AC-6)', () => {
     expect(cardIdsFor(['revenue', 'orders'], ['revenue', 'mer', 'revenue'])).toEqual(['revenue#2', 'mer', 'revenue#3'])
     expect(Metrics.base('revenue#2')).toBe('revenue')
     expect(metrics().get('revenue#2')?.label).toBe('Revenue')
+  })
+})
+
+describe('your role (AC-4): from your profile, never a pretend default', () => {
+  it('maps the onboarding roles that mean a dashboard role', () => {
+    expect(roleFor('founder')?.id).toBe('founder')
+    expect(roleFor('marketing_sales')?.id).toBe('growth')
+  })
+  it('names no role when the profile has none, or one with no match', () => {
+    expect(roleFor(null)).toBeNull()
+    expect(roleFor('engineer')).toBeNull()
+    expect(roleFor('__proto__')).toBeNull()
   })
 })

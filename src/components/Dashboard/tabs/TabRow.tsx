@@ -2,30 +2,27 @@
 
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { m, useReducedMotion } from 'framer-motion'
-import { ChevronDown, SlidersHorizontal, Sparkles, TriangleAlert } from 'lucide-react'
+import { ChevronDown, Sparkles } from 'lucide-react'
 import { Dropdown } from '@/components/Dropdown'
 import { Tooltip } from '@/components/Tooltip'
 import { cn } from '@/lib/utils'
-import { canRename, layoutRow, MAX_NAME, type Board } from './board-state'
+import { canRename, layoutRow, type Board } from './board-state'
 import { TabMenuContent, type BoardMenuHandlers } from './BoardMenus'
+import { MoreCount } from './MoreCount'
+import { RenameField } from './RenameField'
+import { FOCUS_RING, SEGMENT } from './tab-styles'
+import { useTabDrag } from './use-tab-drag'
 import type { RenameResult } from './use-dashboard'
 import { DURATION, SPRING } from "@/styles/tokens/motion"
 
-// The board tab row (docs-v2/dashboard/01-tabs-rules.md §2 – §7, §10).
+// The board tab row (fe-handbook/features/dashboard/source-docs/01-tabs-rules.md §2 – §7, §10).
 //   Layout     up to 6 tabs, fewer when there's less room; the rest behind "N more" (TAB-15 – TAB-18)
 //   Keyboard   one tab stop, ← → move, Enter/Space open, ⌥← ⌥→ reorder (TAB-10 – TAB-13)
 //   Mouse      click opens on release; double-click the open tab renames; right-click opens its menu
 //   Drag       tabs stay put, the place dims, a copy follows, a blue line marks the drop (TAB-30 – TAB-35)
 
-const SEGMENT = 'relative flex h-8 shrink-0 items-center rounded-full px-3.5 text-[length:var(--font-size-body)] font-medium leading-5 tracking-[var(--dashboard-tab-tracking)] whitespace-nowrap'
-const FOCUS_RING = 'outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-0 focus-visible:outline-[var(--focus-ring)]'
 const TAB_MAX = 220     // TAB-3
-const DRAG_START = 4    // TAB-35
-const LIST_DELAY = 500  // TAB-33
 const PAD = 2           // capsule padding
-
-type DropLine = { kind: 'row'; x: number } | { kind: 'list'; index: number }
-interface DragView { id: string; label: string; x: number; y: number; to: number | null; line: DropLine | null }
 
 interface TabRowProps extends BoardMenuHandlers {
   boards: Board[]
@@ -127,84 +124,10 @@ export function TabRow(props: TabRowProps) {
   const [moreOpen, setMoreOpen] = useState(false)
 
   // ── Drag (TAB-30 – TAB-35) ────────────────────────────────────────────────
-  const capsuleRef = useRef<HTMLDivElement>(null)
-  const dragListRef = useRef<HTMLDivElement>(null)
-  const [drag, setDrag] = useState<DragView | null>(null)
-  const [dragListOpen, setDragListOpen] = useState(false)
-  const suppressClick = useRef(false)
   const wasOpenAtPress = useRef(false)
-
-  const dropTarget = (from: number, x: number, y: number, listOpen: boolean): Pick<DragView, 'to' | 'line'> => {
-    const inside = (r: DOMRect) => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom
-    let target: number
-    let line: DropLine
-    const list = dragListRef.current
-    if (listOpen && list && inside(list.getBoundingClientRect()) && overflow.length) {
-      const rows = [...list.querySelectorAll<HTMLElement>('[data-more-row]')]
-      let r = rows.findIndex((row) => { const b = row.getBoundingClientRect(); return y < b.top + b.height / 2 })
-      if (r < 0) r = rows.length
-      target = r < overflow.length ? order.indexOf(overflow[r]) : order.indexOf(overflow[overflow.length - 1]) + 1
-      line = { kind: 'list', index: r }
-    } else {
-      const cap = capsuleRef.current?.getBoundingClientRect()
-      const rects = visible.map((id) => tabRefs.current.get(id)?.getBoundingClientRect())
-      let g = rects.findIndex((b) => b && x < b.left + b.width / 2)
-      if (g < 0) g = visible.length
-      target = g < visible.length ? order.indexOf(visible[g]) : order.indexOf(visible[visible.length - 1]) + 1
-      const edge = g < visible.length ? rects[g]!.left : rects[visible.length - 1]!.right
-      line = { kind: 'row', x: edge - (cap?.left ?? 0) }
-    }
-    const to = target > from ? target - 1 : target
-    return to === from ? { to: null, line: null } : { to, line } // no line when nothing would change (TAB-31)
-  }
-
-  const onTabPointerDown = (e: React.PointerEvent, id: string) => {
-    if (e.button !== 0 || renamingId) return
-    const start = { x: e.clientX, y: e.clientY }
-    const from = order.indexOf(id)
-    const label = byId[id]?.label ?? ''
-    let active = false
-    let listOpen = false
-    let timer: number | undefined
-    let latest: Pick<DragView, 'to' | 'line'> = { to: null, line: null }
-
-    const move = (ev: PointerEvent) => {
-      if (!active) {
-        if (Math.hypot(ev.clientX - start.x, ev.clientY - start.y) < DRAG_START) return
-        active = true
-        suppressClick.current = true
-      }
-      // Holding over "N more" for half a second opens the list (TAB-33).
-      const count = countRef.current?.getBoundingClientRect()
-      const overCount = !!count && ev.clientX >= count.left && ev.clientX <= count.right && ev.clientY >= count.top && ev.clientY <= count.bottom
-      if (overCount && !listOpen && timer == null) {
-        timer = window.setTimeout(() => { listOpen = true; timer = undefined; setDragListOpen(true) }, LIST_DELAY)
-      } else if (!overCount && timer != null) {
-        window.clearTimeout(timer); timer = undefined
-      }
-      latest = dropTarget(from, ev.clientX, ev.clientY, listOpen)
-      setDrag({ id, label, x: ev.clientX, y: ev.clientY, ...latest })
-    }
-    const finish = (commit: boolean) => {
-      window.removeEventListener('pointermove', move)
-      window.removeEventListener('pointerup', up)
-      window.removeEventListener('pointercancel', cancel)
-      window.removeEventListener('keydown', key, true)
-      if (timer != null) window.clearTimeout(timer)
-      if (active && commit && latest.to != null) onMoveTo(id, latest.to)
-      setDrag(null)
-      setDragListOpen(false)
-      // The click that follows a drag must not open the tab.
-      window.setTimeout(() => { suppressClick.current = false }, 0)
-    }
-    const up = () => finish(true)
-    const cancel = () => finish(false)
-    const key = (ev: KeyboardEvent) => { if (ev.key === 'Escape' && active) { ev.preventDefault(); ev.stopPropagation(); finish(false) } }
-    window.addEventListener('pointermove', move)
-    window.addEventListener('pointerup', up)
-    window.addEventListener('pointercancel', cancel)
-    window.addEventListener('keydown', key, true)
-  }
+  const { drag, dragListOpen, capsuleRef, dragListRef, suppressClick, onTabPointerDown } = useTabDrag({
+    order, visible, overflow, labelOf: (id) => byId[id]?.label ?? '', renaming: !!renamingId, onMoveTo, tabRefs, countRef,
+  })
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -252,7 +175,7 @@ export function TabRow(props: TabRowProps) {
                 />
               ) : (
                 <Tooltip content={b.label} side="bottom" disabled={!truncated(id) || !!drag}>
-                  {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a tab segment (role=tab) in the dark-pill capsule; Button has no tab role or segment look */}
+                  {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a role="tab" segment of the custom tablist (manual activation, roving tabIndex, drag, double-click rename, TAB-10 – TAB-13); Button wraps its label in a padded span and adds a raised shadow and press scale, which break the shared sliding pill and the truncating name */}
                   <button
                     ref={(el) => { if (el) tabRefs.current.set(id, el); else tabRefs.current.delete(id) }}
                     type="button"
@@ -353,171 +276,5 @@ export function TabRow(props: TabRowProps) {
   )
 }
 
-// ── "N more" (TAB-18, TAB-33) ─────────────────────────────────────────────────
-
-interface MoreCountProps {
-  ref: React.Ref<HTMLButtonElement>
-  boards: Board[]
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  tabIndex: number
-  onFocus: () => void
-  onKeyDown: (e: React.KeyboardEvent) => void
-  onPick: (id: string) => void
-  onManage: () => void
-  /** While a tab is dragged over the count: a plain list with a drop line between rows. */
-  dragList: { line: number | null } | null
-  dragListRef: React.Ref<HTMLDivElement>
-}
-
-function MoreCount({ ref, boards, open, onOpenChange, tabIndex, onFocus, onKeyDown, onPick, onManage, dragList, dragListRef }: MoreCountProps) {
-  const lifted = open || !!dragList
-  const trigger = (
-    // eslint-disable-next-line no-restricted-syntax -- ds-allow: the count is a segment of the tab capsule
-    <button
-      ref={ref}
-      type="button"
-      tabIndex={tabIndex}
-      onFocus={onFocus}
-      onKeyDown={onKeyDown}
-      aria-label={`${boards.length} more boards`}
-      className={cn(
-        SEGMENT, FOCUS_RING, 'cursor-pointer gap-1 border border-solid pl-3.5 pr-3 transition-colors duration-fast',
-        lifted
-          ? 'border-[var(--border-default)] bg-[var(--dashboard-tab-lifted)] text-[var(--dashboard-figure)]'
-          : 'border-transparent bg-transparent text-[var(--dashboard-label)] hover:bg-[var(--dashboard-tab-hover)] hover:text-[var(--dashboard-figure)]',
-      )}
-    >
-      {boards.length} more
-      <ChevronDown aria-hidden size={12} strokeWidth={1.75} absoluteStrokeWidth />
-    </button>
-  )
-
-  if (dragList) {
-    return (
-      <div className="relative shrink-0">
-        {trigger}
-        <div ref={dragListRef} className="absolute left-0 top-[calc(100%+8px)] z-[var(--z-popover)]">
-          <Dropdown size="md" maxHeight={false}>
-            <Dropdown.Section fluid>
-              {boards.map((b, i) => (
-                <div key={b.id} data-more-row className="relative">
-                  {dragList.line === i && <ListDropLine />}
-                  <Dropdown.Item label={b.label} fluid />
-                </div>
-              ))}
-              {dragList.line === boards.length && <div className="relative h-0"><ListDropLine /></div>}
-            </Dropdown.Section>
-          </Dropdown>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <Dropdown.Float autoFlipVertical open={open} onOpenChange={onOpenChange} placement="bottom-start" trigger={trigger}>
-      <Dropdown size="md">
-        <Dropdown.Section fluid>
-          {boards.map((b) => <Dropdown.Item key={b.id} label={b.label} onClick={() => onPick(b.id)} fluid />)}
-        </Dropdown.Section>
-        <Dropdown.Section divider fluid>
-          <Dropdown.Item icon={<SlidersHorizontal />} label="Manage tabs" onClick={onManage} fluid />
-        </Dropdown.Section>
-      </Dropdown>
-    </Dropdown.Float>
-  )
-}
-
-function ListDropLine() {
-  return (
-    <span aria-hidden className="pointer-events-none absolute -top-px left-1 right-1 z-10 h-0.5 rounded-hairline bg-[var(--dashboard-drop-line)]">
-      <span className="absolute -left-1 -top-[3px] size-2 rounded-full bg-[var(--dashboard-drop-line)]" />
-    </span>
-  )
-}
-
-// ── Rename field (TAB-20 – TAB-24) ────────────────────────────────────────────
-
-interface RenameFieldProps {
-  initial: string
-  onCommit: (raw: string) => RenameResult
-  onDone: () => void
-  /** Each keystroke, so the row can make room for the whole name (TAB-22). */
-  onValueChange?: (text: string) => void
-}
-
-export function RenameField({ initial, onCommit, onDone, onValueChange }: RenameFieldProps) {
-  const [value, setValue] = useState(initial)
-  const [error, setError] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const done = useRef(false)
-
-  useEffect(() => {
-    const el = inputRef.current
-    el?.focus()
-    el?.select() // the whole name selected, so typing replaces it (TAB-20)
-  }, [])
-
-  const finish = () => { if (!done.current) { done.current = true; onDone() } }
-  const commit = (fromBlur: boolean) => {
-    if (done.current) return
-    const res = onCommit(value)
-    if (res.ok) return finish()
-    // Empty: Enter keeps the field open with the error; clicking away puts the old name back (TAB-24).
-    if (fromBlur) finish()
-    else setError(true)
-  }
-
-  return (
-    <div className="relative">
-      <div
-        className={cn(
-          SEGMENT, 'inline-grid max-w-full grid-cols-[minmax(0,max-content)] border border-solid bg-[var(--dashboard-tab-lifted)] px-[var(--dashboard-tab-lifted-padding-x)]',
-          error ? 'border-[var(--dashboard-error)]' : 'border-[var(--border-default)]',
-        )}
-      >
-        {/* The invisible copy sizes the field to the whole name (TAB-22). */}
-        <span aria-hidden className="invisible col-start-1 row-start-1 whitespace-pre pr-0.5">{value || 'Board name'}</span>
-        {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the field is the tab segment itself and sizes to the name (TAB-22); Input has its own box */}
-        <input
-          ref={inputRef}
-          value={value}
-          // size=1 drops the input's default ~20-character width, so the copy above sizes the field.
-          size={1}
-          maxLength={MAX_NAME}
-          placeholder="Board name"
-          aria-label="Board name"
-          aria-invalid={error || undefined}
-          aria-describedby={error ? 'board-name-error' : undefined}
-          onChange={(e) => { setValue(e.target.value); onValueChange?.(e.target.value); if (error && e.target.value.trim()) setError(false) }}
-          onKeyDown={(e) => {
-            e.stopPropagation()
-            if (e.key === 'Enter') { e.preventDefault(); commit(false) }
-            else if (e.key === 'Escape') { e.preventDefault(); finish() }
-          }}
-          onBlur={() => commit(true)}
-          className="col-start-1 row-start-1 w-full min-w-0 border-0 bg-transparent p-0 text-[length:var(--font-size-body)] font-medium leading-5 tracking-[var(--dashboard-tab-tracking)] text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
-        />
-      </div>
-      {error && <NameError id="board-name-error" className="absolute left-0 top-[calc(100%+6px)] z-20" />}
-    </div>
-  )
-}
-
-/** "Add a board name" (TAB-24, MT-6). */
-export function NameError({ id, className }: { id?: string; className?: string }) {
-  return (
-    <p
-      id={id}
-      role="alert"
-      className={cn(
-        'm-0 flex items-center gap-1.5 whitespace-nowrap rounded-md border border-solid border-[var(--dashboard-error-border)] bg-[var(--dashboard-error-bg)] py-1 pl-2 pr-2.5',
-        'text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-error)] shadow-[var(--shadow-soft)]',
-        className,
-      )}
-    >
-      <TriangleAlert aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />
-      Add a board name
-    </p>
-  )
-}
+// Kept reachable from here for anything that imported them with the row.
+export { NameError, RenameField } from './RenameField'

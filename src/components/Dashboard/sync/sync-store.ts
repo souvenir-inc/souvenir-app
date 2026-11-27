@@ -1,15 +1,20 @@
 'use client'
 
-// The open board's sync: a small external store, so a sync carries on when you change boards (SY-30)
-// and the offline bar above the app can read it (SY-33). The warehouse's board status feeds it
-// (live/use-live-dashboard.ts); Refresh and Sync go to the warehouse. Components read it through
-// useSyncSnapshot (useSyncExternalStore), never directly (React Compiler).
+// The open board's sync, as the parts of the screen read it. A small external store of UI state only
+// (which syncs this viewer started, recent ends, dismissed banners, online/offline), so a sync carries
+// on when you change boards (SY-30) and the offline bar above the app can read it (SY-33). The apps'
+// states are not kept here: they are read from the board status query (warehouseQueries.status) at
+// snapshot time (SD-ST-02); a new status settles the syncs this viewer started. Components read it
+// through useSyncSnapshot / useSyncState (useSyncExternalStore), never directly (React Compiler).
+// Refresh and Sync are mutations: sync/use-sync-actions.ts.
 
 import { useEffect, useState, useSyncExternalStore } from 'react'
-import type { BoardStatus, ConnectionState, Warehouse } from '@/lib/api/warehouse'
-import { ApiError } from '@/lib/api/client'
-import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
+import { hashKey, type QueryClient, type QueryKey } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import type { BoardStatus, Warehouse } from '@/lib/api/warehouse'
+import { ApiError } from '@/lib/api/client'
+import { logger } from '@/lib/logger'
+import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
 import type { AppId } from '../types'
 import { AppSync, type SyncKind } from './sync-model'
 
@@ -27,11 +32,10 @@ export interface SyncEnd {
   failed: AppId[]
 }
 
-export interface SyncSnapshot {
+/** What this store keeps: UI state, nothing the server sent. */
+interface UiState {
   /** When the snapshot was taken; the store ticks every 10 s while anyone listens. */
   now: number
-  /** The open board's apps, as its last status said. */
-  apps: Record<AppId, AppSync>
   online: boolean
   offlineSince: number | null
   /** Set for 3 s after the connection comes back (SY-34). */
@@ -43,26 +47,83 @@ export interface SyncSnapshot {
   dismissed: string[]
 }
 
-const SERVER: SyncSnapshot = { now: 0, apps: {}, online: true, offlineSince: null, backOnlineAt: null, started: {}, recent: [], dismissed: [] }
-let snap: SyncSnapshot = SERVER
-/** The snapshot as of the last real change: the clock tick doesn't replace it (see useSyncState). */
-let base: SyncSnapshot = SERVER
-let target: { warehouse: Warehouse; boardId: string } | null = null
+export interface SyncSnapshot extends UiState {
+  /** The open board's apps, as its status query last said (read from the query cache, not copied). */
+  apps: Record<AppId, AppSync>
+}
+
+/** The board this store reads the status of, and where that status lives in the query cache. */
+export interface SyncTarget {
+  client: QueryClient
+  key: QueryKey
+  warehouse: Warehouse
+  boardId: string
+}
+
+const NO_APPS: Record<AppId, AppSync> = {}
+const SERVER_UI: UiState = { now: 0, online: true, offlineSince: null, backOnlineAt: null, started: {}, recent: [], dismissed: [] }
+const SERVER: SyncSnapshot = { ...SERVER_UI, apps: NO_APPS }
+
+let ui: UiState = SERVER_UI
+/** The UI state as of the last real change: the clock tick doesn't replace it (see useSyncState). */
+let uiBase: UiState = SERVER_UI
+let target: SyncTarget | null = null
+let stopWatching: (() => void) | null = null
 const listeners = new Set<() => void>()
 const endListeners = new Set<(e: SyncEnd) => void>()
 let recentId = 0
 
-function set(next: Partial<SyncSnapshot>) {
-  snap = { ...snap, ...next, now: Date.now() }
-  base = snap
-  listeners.forEach((l) => l())
+// ── Apps, from the status query ──────────────────────────────────────────────────
+
+const appsByStatus = new WeakMap<BoardStatus, Record<AppId, AppSync>>()
+
+function appsOf(status: BoardStatus | undefined): Record<AppId, AppSync> {
+  if (!status) return NO_APPS
+  let apps = appsByStatus.get(status)
+  if (!apps) {
+    apps = Object.fromEntries(status.connections.map((c) => [c.connectionId, new AppSync(c)]))
+    appsByStatus.set(status, apps)
+  }
+  return apps
+}
+
+const currentStatus = () => (target ? target.client.getQueryData<BoardStatus>(target.key) : undefined)
+
+/** A snapshot that keeps its identity until the UI state or the status changes (useSyncExternalStore needs that). */
+function composer() {
+  let lastUi: UiState | null = null
+  let lastApps: Record<AppId, AppSync> | null = null
+  let out: SyncSnapshot = SERVER
+  return (state: UiState): SyncSnapshot => {
+    const apps = appsOf(currentStatus())
+    if (state !== lastUi || apps !== lastApps) {
+      lastUi = state
+      lastApps = apps
+      out = { ...state, apps }
+    }
+    return out
+  }
+}
+const withApps = composer()
+const withAppsBase = composer()
+const snapshot = () => withApps(ui)
+const baseSnapshot = () => withAppsBase(uiBase)
+
+// ── Changes ───────────────────────────────────────────────────────────────────────
+
+const emit = () => listeners.forEach((l) => l())
+
+function set(next: Partial<UiState>) {
+  ui = { ...ui, ...next, now: Date.now() }
+  uiBase = ui
+  emit()
 }
 
 // The clock only moves "now" (relative times, cooldowns); it skips hidden tabs and catches up on return.
 function tick() {
   if (document.hidden) return
-  snap = { ...snap, now: Date.now() }
-  listeners.forEach((l) => l())
+  ui = { ...ui, now: Date.now() }
+  emit()
 }
 
 let ticker: number | undefined
@@ -97,7 +158,7 @@ export function useCoarseNow(everyMs = 5 * 60_000): number {
 
 /** Every change, and the 10 s clock: for the small parts that show relative times. */
 export function useSyncSnapshot(): SyncSnapshot {
-  return useSyncExternalStore(subscribe, () => snap, () => SERVER)
+  return useSyncExternalStore(subscribe, snapshot, () => SERVER)
 }
 
 /**
@@ -105,12 +166,17 @@ export function useSyncSnapshot(): SyncSnapshot {
  * Its `now` is when the state last changed; pair it with a coarse clock for day or hour maths.
  */
 export function useSyncState(): SyncSnapshot {
-  return useSyncExternalStore(subscribe, () => base, () => SERVER)
+  return useSyncExternalStore(subscribe, baseSnapshot, () => SERVER)
 }
 
 /** The current state, for event handlers (render reads go through useSyncSnapshot). */
 export function getSyncSnapshot(): SyncSnapshot {
-  return snap
+  return snapshot()
+}
+
+/** The board the store reads, for the sync actions; null while a draft or nothing is open. */
+export function getSyncTarget(): SyncTarget | null {
+  return target
 }
 
 /** Hear how each sync you started ends (toasts, SY-29 / SY-30). */
@@ -119,24 +185,47 @@ export function onSyncEnd(l: (e: SyncEnd) => void): () => void {
   return () => endListeners.delete(l)
 }
 
-/** The board whose status this store shows, and the warehouse its syncs go to. */
-export function bindSync(next: { warehouse: Warehouse; boardId: string } | null) {
-  if (target?.boardId === next?.boardId && target?.warehouse.id === next?.warehouse.id) return
+/**
+ * The board whose status this store shows. It watches that status in the query cache: each new
+ * status settles the syncs this viewer started; the apps themselves are read from the cache.
+ */
+export function bindSync(next: SyncTarget | null) {
+  const same = target && next
+    ? target.client === next.client && hashKey(target.key) === hashKey(next.key) && target.warehouse.id === next.warehouse.id
+    : target === next
+  if (same) return
+  stopWatching?.()
+  stopWatching = null
   target = next
-  set({ apps: {} })
+  if (next) {
+    const hash = hashKey(next.key)
+    let seen = currentStatus()
+    stopWatching = next.client.getQueryCache().subscribe((event) => {
+      if (event.query.queryHash !== hash) return
+      const status = event.query.state.data as BoardStatus | undefined
+      if (status === seen) return
+      seen = status
+      if (status) settle(status)
+      else emit()
+    })
+    if (seen) {
+      settle(seen)
+      return
+    }
+  }
+  emit()
 }
 
 /** Leaving the dashboard: what this visit started, finished or dismissed doesn't carry into the next (another warehouse, say). */
 export function resetSyncStore() {
-  target = null
-  set({ apps: {}, started: {}, recent: [], dismissed: [] })
+  bindSync(null)
+  set({ started: {}, recent: [], dismissed: [] })
 }
 
-/** A board status from the warehouse: the apps' states, and the end of any sync this viewer started. */
-export function setStatus(boardId: string, status: BoardStatus) {
-  if (target?.boardId !== boardId) return
-  const apps = Object.fromEntries(status.connections.map((c) => [c.connectionId, new AppSync(c)]))
-  const started = { ...snap.started }
+/** A new board status: the end of any sync this viewer started. */
+function settle(status: BoardStatus) {
+  const apps = appsOf(status)
+  const started = { ...ui.started }
   const ended: Record<SyncKind, SyncEnd> = { refresh: { kind: 'refresh', ok: [], failed: [] }, sync: { kind: 'sync', ok: [], failed: [] } }
   for (const [id, kind] of Object.entries(started) as [AppId, SyncKind][]) {
     const app = apps[id]
@@ -146,10 +235,20 @@ export function setStatus(boardId: string, status: BoardStatus) {
   }
   const now = Date.now()
   const recent = ended.sync.ok.length
-    ? [...snap.recent.filter((r) => now - r.at < RECENT_MS), { id: ++recentId, apps: ended.sync.ok, at: now }]
-    : snap.recent
-  set({ apps, started, recent })
+    ? [...ui.recent.filter((r) => now - r.at < RECENT_MS), { id: ++recentId, apps: ended.sync.ok, at: now }]
+    : ui.recent
+  set({ started, recent })
   for (const end of Object.values(ended)) if (end.ok.length || end.failed.length) endListeners.forEach((l) => l(end))
+}
+
+/** Syncs this viewer just started: their spinners turn until a status says they ended. */
+export function markStarted(ids: AppId[], kind: SyncKind) {
+  if (ids.length) set({ started: { ...ui.started, ...Object.fromEntries(ids.map((id) => [id, kind])) } })
+}
+
+/** Syncs the server refused: they mustn't leave a spinner turning. */
+export function unmarkStarted(ids: AppId[]) {
+  set({ started: Object.fromEntries(Object.entries(ui.started).filter(([id]) => !ids.includes(id as AppId))) })
 }
 
 // ── Online / offline (SY-33, SY-34) ────────────────────────────────────────────
@@ -160,11 +259,11 @@ function ensureOnlineListener() {
   onlineListening = true
   const update = () => {
     const online = navigator.onLine
-    if (online === snap.online) return
+    if (online === ui.online) return
     if (online) {
       const at = Date.now()
       set({ online: true, offlineSince: null, backOnlineAt: at })
-      window.setTimeout(() => { if (snap.backOnlineAt === at) set({ backOnlineAt: null }) }, BACK_ONLINE_MS)
+      window.setTimeout(() => { if (ui.backOnlineAt === at) set({ backOnlineAt: null }) }, BACK_ONLINE_MS)
     } else {
       set({ online: false, offlineSince: Date.now(), backOnlineAt: null })
     }
@@ -192,52 +291,16 @@ export function blockedReason(s: SyncSnapshot, now: number): 'offline' | 'busy' 
   return null
 }
 
+/** Behind, or a sync that failed for a reason other than the sign-in: syncing again may fix it (SY-16). */
+export function syncable(s: SyncSnapshot, ids: AppId[]): AppId[] {
+  return ids.filter((id) => s.apps[id]?.state === 'behind' || (s.apps[id]?.state === 'failed' && !s.apps[id]?.needsReconnect))
+}
+
 /** A Sync or Refresh the server didn't start: said in a toast, never an unhandled rejection. */
-function syncRefused(error: unknown) {
-  console.error('[dashboard] sync refused', error)
+export function syncRefused(error: unknown) {
   const status = error instanceof ApiError ? error.status : 0
+  logger.event('dashboard.sync_refused', { status })
   toast.error(status === 403 ? 'You don’t have access to sync this.' : 'Couldn’t start the sync. Try again in a moment.', { id: 'dashboard-sync' })
-}
-
-function marked(ids: AppId[], kind: SyncKind): Partial<Record<AppId, SyncKind>> {
-  return { ...snap.started, ...Object.fromEntries(ids.map((id) => [id, kind])) }
-}
-
-/** Refresh: every app on the board, skipping apps to reconnect and first syncs (SY-9, SY-32). */
-export async function refreshAll(): Promise<void> {
-  if (!target || blockedReason(snap, Date.now())) return
-  const { warehouse, boardId } = target
-  let status: BoardStatus
-  try {
-    status = await warehouse.refreshBoard(boardId)
-  } catch (error) {
-    syncRefused(error)
-    return
-  }
-  const syncing = status.connections.filter((c) => c.state === 'syncing' || c.state === 'slow').map((c) => c.connectionId)
-  set({ started: marked(syncing, 'refresh') })
-  setStatus(boardId, status)
-}
-
-/** Sync on a banner or a row: only the given apps that are behind (SY-16). */
-export async function syncApps(ids: AppId[]): Promise<void> {
-  if (!target || blockedReason(snap, Date.now())) return
-  const { warehouse, boardId } = target
-  // Behind, or a sync that failed for a reason other than the sign-in: syncing again may fix it.
-  const behind = ids.filter((id) => snap.apps[id]?.state === 'behind' || (snap.apps[id]?.state === 'failed' && !snap.apps[id]?.needsReconnect))
-  if (!behind.length) return
-  set({ started: marked(behind, 'sync') })
-  let states: ConnectionState[]
-  try {
-    states = await Promise.all(behind.map((id) => warehouse.syncConnection(id)))
-  } catch (error) {
-    // A refused sync mustn't leave its spinner turning, and says why.
-    set({ started: Object.fromEntries(Object.entries(snap.started).filter(([id]) => !behind.includes(id as AppId))) })
-    syncRefused(error)
-    return
-  }
-  const apps = { ...snap.apps, ...Object.fromEntries(states.map((c) => [c.connectionId, new AppSync(c)])) }
-  if (target?.boardId === boardId) set({ apps })
 }
 
 /**
@@ -246,7 +309,7 @@ export async function syncApps(ids: AppId[]): Promise<void> {
  * own that needs signing in again.
  */
 export function reconnectHref(id: AppId, from?: string): string {
-  const a = snap.apps[id]
+  const a = snapshot().apps[id]
   if (!a) return ORG_CONNECTORS_ROUTE
   // `return`: the page to come back to once the sign-in ends (the board the person was on).
   const back = from ? `&return=${encodeURIComponent(from)}` : ''
@@ -254,15 +317,16 @@ export function reconnectHref(id: AppId, from?: string): string {
 }
 
 export function reconnect(ids: AppId[]) {
-  const id = ids.find((i) => snap.apps[i]?.needsReconnect && snap.apps[i]?.yours) ?? ids.find((i) => snap.apps[i]?.yours)
+  const apps = snapshot().apps
+  const id = ids.find((i) => apps[i]?.needsReconnect && apps[i]?.yours) ?? ids.find((i) => apps[i]?.yours)
   window.location.assign(id ? reconnectHref(id, `${window.location.pathname}${window.location.search}`) : ORG_CONNECTORS_ROUTE)
 }
 
 /** × on a banner: hidden on this board until its key changes (SY-20). */
 export function dismissBanner(boardId: string, key: string) {
-  set({ dismissed: [...snap.dismissed, `${boardId}|${key}`] })
+  set({ dismissed: [...ui.dismissed, `${boardId}|${key}`] })
 }
 
 export function dismissRecent(id: number) {
-  set({ recent: snap.recent.filter((r) => r.id !== id) })
+  set({ recent: ui.recent.filter((r) => r.id !== id) })
 }

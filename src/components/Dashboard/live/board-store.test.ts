@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Board as SavedBoard, Warehouse } from '@/lib/api/warehouse'
-import { BoardStore, type Layout } from './board-store'
+import { PendingBoards } from '../tabs/board-layer'
+import { BoardStore, CommitError, type Layout } from './board-store'
 
 const VIEWER = 'auth0|viewer'
 const OTHER = 'auth0|other'
@@ -228,5 +229,45 @@ describe('BoardStore', () => {
     api.boards.mockResolvedValueOnce([saved('x', 'Broken', VIEWER, null, { layout: { cards: 'nope' } }), saved('y', 'Fine', VIEWER, null)])
     const state = await store.load(new Map())
     expect(Object.keys(state.boards)).toEqual(['y'])
+  })
+})
+
+describe('BoardStore read and commit (the boards query and the save mutation)', () => {
+  it('saves the pending changes on the boards last read and returns the snapshot that holds them', async () => {
+    const api = warehouseWith([saved('a', 'First', VIEWER, at('tabs', 0))])
+    const store = new BoardStore(api as unknown as Warehouse, VIEWER)
+    await store.read(new Map())
+    const pending = new PendingBoards()
+    pending.push({ type: 'rename', id: 'a', label: 'Renamed' })
+    const snapshot = await store.commit(pending, 'a', new Set(['revenue']))
+    expect(snapshot.seq).toBe(pending.latest)
+    expect(snapshot.state.boards.a.label).toBe('Renamed')
+    expect(api.putBoard).toHaveBeenCalledWith('a', expect.objectContaining({ name: 'Renamed', version: '2025-11-14T09:00:00Z' }))
+  })
+
+  it('a read waits for a write in flight, so it never lands between the write and its version', async () => {
+    const api = warehouseWith([saved('a', 'First', VIEWER, at('tabs', 0))])
+    const store = new BoardStore(api as unknown as Warehouse, VIEWER)
+    await store.read(new Map())
+    const order: string[] = []
+    api.putBoard.mockImplementationOnce(async (id: string) => { order.push('put'); return { ...saved(id, 'Renamed', VIEWER, at('tabs', 0)), updatedAt: '2025-11-15T09:00:00Z' } })
+    api.boards.mockImplementation(async () => { order.push('read'); return [] })
+    const pending = new PendingBoards()
+    pending.push({ type: 'rename', id: 'a', label: 'Renamed' })
+    await Promise.all([store.commit(pending, 'a', new Set(['revenue'])), store.read(new Map())])
+    expect(order).toEqual(['put', 'read'])
+  })
+
+  it('a refused save names the last change it carried', async () => {
+    const api = warehouseWith([saved('a', 'First', VIEWER, at('tabs', 0))])
+    api.putBoard.mockRejectedValueOnce(new Error('refused'))
+    const store = new BoardStore(api as unknown as Warehouse, VIEWER)
+    await store.read(new Map())
+    const pending = new PendingBoards()
+    pending.push({ type: 'rename', id: 'a', label: 'Renamed' })
+    const error = await store.commit(pending, 'a', new Set(['revenue'])).catch((e: unknown) => e)
+    expect(error).toBeInstanceOf(CommitError)
+    expect(error).toMatchObject({ upTo: pending.latest })
+    expect(store.snapshot().seq).toBe(0)
   })
 })

@@ -1,7 +1,8 @@
-// Sync rules as pure functions (docs-v2/dashboard/04-sync-rules.md). The warehouse decides each
+// Sync rules as pure functions (fe-handbook/features/dashboard/source-docs/04-sync-rules.md). The warehouse decides each
 // app's state (behind, failed, waiting on a reconnect…); these read it for the button, list, banners.
 
 import type { ConnectionState } from '@/lib/api/warehouse'
+import { formatClock } from '../format'
 import type { AppId } from '../types'
 
 const MIN = 60_000
@@ -86,7 +87,7 @@ export function buttonState(ids: AppId[], apps: Apps, online: boolean): ButtonSt
 
 /** "9:42 am" in the viewer's time zone. */
 export function clock(at: number): string {
-  return new Date(at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).replace(/\s+/g, ' ').toLowerCase()
+  return formatClock(new Date(at))
 }
 
 /** "Just now", "3 min ago", "3 h ago". */

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { CONNECTIONS, TOTAL, metrics } from './__fixtures__/live'
 import { Apps } from './live/apps'
 import { boardReducer, type Board } from './tabs/board-state'
-import { TEMPLATES, measurable, starterState, templateFor, toBoardCards } from './templates'
+import { TEMPLATES, measurable, starterState, templateFor, templatesFor, toBoardCards } from './templates'
 
 // 08-new-board-rules.md, with the fixture store: Shopify and Meta Ads, no shipping app.
 const tpl = (id: string) => TEMPLATES.find((t) => t.id === id)!
@@ -78,5 +78,19 @@ describe('first visit (NB-31 – NB-33)', () => {
     const st = starterState(shopifyOnly(), ids(), 'auth0|viewer')
     expect(st.tabs).toHaveLength(1)
     expect(st.boards[st.tabs[0]].cards.map((c) => c.metricId)).not.toContain('ad_spend')
+  })
+})
+
+describe('the empty board’s three templates (NB-17) and the default period', () => {
+  it('your role’s first, then the two nearest; with no role, the first three', () => {
+    expect(templatesFor('growth')).toEqual(['growth', 'agency', 'ecommerce'])
+    expect(templatesFor(null)).toEqual(['founder', 'ecommerce', 'growth'])
+    expect(templatesFor('unknown')).toEqual(['founder', 'ecommerce', 'growth'])
+  })
+  it('starter boards start on the viewer’s default period when one is given, else their own', () => {
+    const own = starterState(metrics(), ids(), 'auth0|viewer')
+    expect(own.tabs.map((id) => own.boards[id].period)).toContain('7d')
+    const chosen = starterState(metrics(), ids(), 'auth0|viewer', '90d')
+    expect(new Set(chosen.tabs.map((id) => chosen.boards[id].period))).toEqual(new Set(['90d']))
   })
 })

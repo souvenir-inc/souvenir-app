@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { ArrowLeftOneIcon, BrainTwoIcon, SidebarLeftIcon } from '@strange-huge/icons'
 import { useMobile } from '@/hooks/use-mobile'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { Sigma } from 'lucide-react'
 import Logout01Icon from '@hugeicons/core-free-icons/Logout01Icon'
 import { SidebarMenuItem } from '@/components/SidebarMenuItem'
 import { SidebarMenuSkeleton } from '@/components/SidebarMenuSkeleton'
@@ -22,7 +23,8 @@ import { useOrg } from '@/context/org-context'
 import type { CreditsDisplay } from '@/lib/api/plan'
 import { formatCredits } from '@/lib/format-credits'
 import { useGuardedRouter, useNavGuard } from '@/context/nav-guard-context'
-import { AUTH_LOGIN_ROUTE, SETTINGS_ACCOUNT_ROUTE, SETTINGS_USAGE_ROUTE, SETTINGS_MEMORY_ROUTE, SETTINGS_HELP_ROUTE, SETTINGS_REPORT_BUG_ROUTE, SETTINGS_FEATURE_REQUEST_ROUTE, CHAT_ROUTE, ORG_GENERAL_ROUTE, ORG_MEMBERS_ROUTE, ORG_PLANS_ROUTE, ORG_ANALYTICS_ROUTE, SETTINGS_LIBRARY_ROUTE, ORG_LIBRARY_ROUTE } from '@/lib/routes'
+import { SlidersHorizontal } from 'lucide-react'
+import { AUTH_LOGIN_ROUTE, SETTINGS_ACCOUNT_ROUTE, SETTINGS_USAGE_ROUTE, SETTINGS_MEMORY_ROUTE, SETTINGS_DATA_PREFERENCES_ROUTE,SETTINGS_HELP_ROUTE, SETTINGS_REPORT_BUG_ROUTE, SETTINGS_FEATURE_REQUEST_ROUTE, CHAT_ROUTE, ORG_GENERAL_ROUTE, ORG_MEMBERS_ROUTE, ORG_PLANS_ROUTE, ORG_ANALYTICS_ROUTE, SETTINGS_LIBRARY_ROUTE, ORG_LIBRARY_ROUTE, SETTINGS_METRICS_ROUTE } from '@/lib/routes'
 import { LIBRARY_SETTINGS_ENABLED } from '@/lib/feature-flags'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 
@@ -106,6 +108,8 @@ const PERSONAL_ITEMS = [
   // Same glyph as WORKSPACE's Usage item below — one "Usage" icon, not two.
   { id: 'usage',   label: 'Usage',   href: SETTINGS_USAGE_ROUTE,   icon: <SidebarAssetIcon src="/icons/settings-sidebar/usage-workspace.svg" /> },
   { id: 'memory',  label: 'Memory',  href: SETTINGS_MEMORY_ROUTE,  icon: <BrainTwoIcon size={20} /> },
+  // How numbers show on dashboard cards and the period a new board starts on (this browser only).
+  { id: 'data-preferences', label: 'Data preferences', href: SETTINGS_DATA_PREFERENCES_ROUTE, icon: <SlidersHorizontal aria-hidden size={20} strokeWidth={1.5} /> },
   // Library: auto-save, AI use of files, storage. Off until NEXT_PUBLIC_ENABLE_LIBRARY_SETTINGS=true.
   ...(LIBRARY_SETTINGS_ENABLED ? [{ id: 'library', label: 'Library', href: SETTINGS_LIBRARY_ROUTE, icon: <SidebarAssetIcon src="/icons/settings-sidebar/library.svg" /> }] : []),
 ]
@@ -131,6 +135,13 @@ const WORKSPACE_ITEMS = [
 const HELP_ITEMS = [
   { id: 'help', label: 'Help & Legal', href: SETTINGS_HELP_ROUTE, icon: <SidebarAssetIcon src="/icons/settings-sidebar/help-legal.svg" /> },
 ]
+
+// Metrics: every metric's definition, for every member of a workspace (the warehouse is per organization), so it
+// shows with PERSONAL rather than the admin-only WORKSPACE group. `triggered` is accepted-and-ignored, as above.
+function MetricsIcon({ triggered: _triggered }: { triggered?: boolean }) {
+  return <Sigma size={20} strokeWidth={1.5} aria-hidden style={{ display: 'block' }} />
+}
+const METRICS_ITEM = { id: 'metrics', label: 'Metrics', href: SETTINGS_METRICS_ROUTE, icon: <MetricsIcon /> }
 
 
 // Narrow screens: the settings nav opens as a left-side Sheet (Radix Dialog) with a scrim —
@@ -381,6 +392,18 @@ export function SettingsSidebar() {
                 />
               </m.div>
             ))}
+            {orgId && (
+              <m.div key={METRICS_ITEM.id} variants={sectionItemVariants}>
+                <SidebarMenuItem
+                  fluid
+                  variant="default"
+                  icon={METRICS_ITEM.icon}
+                  label={METRICS_ITEM.label}
+                  selected={pathname === METRICS_ITEM.href}
+                  onClick={() => safeNavigate(METRICS_ITEM.href)}
+                />
+              </m.div>
+            )}
           </m.div>
         </div>
 

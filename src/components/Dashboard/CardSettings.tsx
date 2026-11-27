@@ -1,15 +1,16 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Check, Copy, FileSpreadsheet, Image as ImageIcon, Search, Trash2, TriangleAlert, X } from 'lucide-react'
-import { Button, IconButton } from '@/components/ui'
+import { Button, IconButton, Input, SegmentedControl } from '@/components/ui'
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { userFullName, useAuth } from '@/context/auth-context'
 import { cn } from '@/lib/utils'
 import { catalogOf, groupOf } from './catalog'
 import { dims } from './grid-layout'
-import { barsBySize, type CardView } from './MetricCard'
+import { StillCards, barsBySize, type CardView } from './MetricCard'
+import { PLAIN_BUTTON } from './plain-button'
 import { useDashboardData } from './live/dashboard-data'
 import { Metrics } from './live/metrics'
 import { BoardSnapshot } from './share/BoardSnapshot'
@@ -53,10 +54,9 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
   const [changing, setChanging] = useState(false)
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
-  const [busy, setBusy] = useState<'numbers' | 'image' | null>(null)
   const [failed, setFailed] = useState<'numbers' | 'image' | null>(null)
+  // The image is being made: the card is drawn off screen until it's a PNG.
   const [shooting, setShooting] = useState(false)
-  const shotRef = useRef<HTMLDivElement>(null)
   if (!metric) return null
   const bars = card.chart ? card.chart === 'bars' : barsBySize(card.size)
   const current = Metrics.base(card.metricId)
@@ -89,28 +89,25 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
   }
 
   const file = fileBase(metric.label, period, today)
+  // The numbers are already here: the file is made and saved at once, no waiting.
   const downloadNumbers = () => {
-    setBusy('numbers')
     setFailed(null)
-    window.setTimeout(() => {
-      setBusy(null)
+    try {
       const csv = numbersCsv({ title: metric.label, metrics: [metric], period, compare, by: userFullName(user), on: today })
       saveFile(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `${file}.csv`)
-    }, 900)
+    } catch {
+      setFailed('numbers')
+    }
   }
+  // The card is drawn off screen (CardShot), then into a PNG (S-9b).
   const downloadImage = () => {
-    setBusy('image')
     setFailed(null)
     setShooting(true)
-    // The card drawn off screen once its numbers have faded in, then into a PNG (S-9b).
-    window.setTimeout(() => {
-      const node = shotRef.current
-      const job = node ? nodeToPng(node) : Promise.reject(new Error('no image'))
-      job.then(
-        (blob) => { saveFile(blob, `${file}.png`); setBusy(null); setShooting(false) },
-        () => { setBusy(null); setShooting(false); setFailed('image') },
-      )
-    }, 900)
+  }
+  const shot = (blob: Blob | null) => {
+    setShooting(false)
+    if (blob) saveFile(blob, `${file}.png`)
+    else setFailed('image')
   }
 
   const action = cn('gap-1.5')
@@ -134,30 +131,29 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
         <div className="flex items-center justify-between">
           <p className="m-0 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-label)]">Metric</p>
           {changing && (
-            // eslint-disable-next-line no-restricted-syntax -- ds-allow: Keep this metric, a text link (Figma 19:7214)
-            <button type="button" onClick={() => { setChanging(false); setQuery('') }} className={cn('cursor-pointer rounded-sm border-0 bg-transparent p-0 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-figure)] underline underline-offset-2', FOCUS)}>
+            // Keep this metric, a text link (Figma 19:7214).
+            <Button variant="link" onClick={() => { setChanging(false); setQuery('') }} className={cn(PLAIN_BUTTON, 'cursor-pointer !rounded-sm border-0 bg-transparent p-0 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-figure)] underline underline-offset-2 hover:underline', FOCUS)}>
               Keep this metric
-            </button>
+            </Button>
           )}
         </div>
         {changing ? (
           <div data-metric-search className="flex flex-col gap-1">
-            <div className="flex h-10 items-center gap-2 rounded-lg border border-solid border-[var(--dashboard-way-border)] bg-[var(--dashboard-card-bg)] px-3">
-              <Search aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0 text-[var(--dashboard-label)]" />
-              {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the catalog search in card settings (Figma 19:7214) */}
-              <input
-                autoFocus
-                role="combobox"
-                aria-expanded
-                aria-controls="card-metrics"
-                aria-label="Search metrics"
-                placeholder="Search metrics"
-                value={query}
-                onChange={(e) => { setQuery(e.target.value); setActive(0) }}
-                onKeyDown={onKey}
-                className="h-full min-w-0 flex-1 border-0 bg-transparent text-[length:var(--font-size-body)] text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
-              />
-            </div>
+            {/* The catalog search (Figma 19:7214), on the Input primitive. */}
+            <Input
+              fluid
+              autoFocus
+              role="combobox"
+              aria-expanded
+              aria-controls="card-metrics"
+              aria-activedescendant={choosable[active] ? `card-metric-${choosable[active].id}` : undefined}
+              aria-label="Search metrics"
+              placeholder="Search metrics"
+              leftIcon={<Search size={14} strokeWidth={1.5} absoluteStrokeWidth />}
+              value={query}
+              onChange={(value) => { setQuery(value); setActive(0) }}
+              onKeyDown={onKey}
+            />
             <ul id="card-metrics" role="listbox" aria-label="Metrics" className="kaya-scrollbar m-0 max-h-[240px] list-none overflow-y-auto p-0">
               {list.length === 0 && <li className="px-2 py-2 text-[length:var(--font-size-body-sm)] text-[var(--dashboard-label)]">No metrics match “{query.trim()}”.</li>}
               {list.map((m) => {
@@ -166,6 +162,7 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
                 return (
                   <li
                     key={m.id}
+                    id={`card-metric-${m.id}`}
                     role="option"
                     aria-selected={m.id === current}
                     aria-disabled={!can}
@@ -192,38 +189,27 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
         )}
 
         <p className="m-0 pt-2 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--dashboard-label)]">Chart</p>
-        <div role="radiogroup" aria-label="Chart" data-chart={bars ? 'bars' : 'trend'} className="flex w-fit gap-0.5 rounded-lg bg-[var(--dashboard-hover-band)] p-[var(--space-0-75)]">
-          {(['trend', 'bars'] as const).map((k) => {
-            const on = (k === 'bars') === bars
-            return (
-              // eslint-disable-next-line no-restricted-syntax -- ds-allow: the Trend | Weekly bars switch (Figma 19:6761, S-8)
-              <button
-                key={k}
-                type="button"
-                role="radio"
-                aria-checked={on}
-                data-chart-option={k}
-                onClick={() => { if (!on) onChart(k) }}
-                className={cn(
-                  'rounded-[var(--dashboard-toggle-radius)] border-0 px-2.5 py-1 text-[length:var(--font-size-body-sm)] leading-5',
-                  on ? 'bg-[var(--dashboard-card-bg)] font-medium text-[var(--dashboard-figure)] shadow-[var(--dashboard-control-shadow)]' : 'bg-transparent text-[var(--dashboard-muted)]',
-                  'cursor-pointer',
-                  FOCUS,
-                )}
-              >
-                {k === 'trend' ? 'Trend' : 'Weekly bars'}
-              </button>
-            )
-          })}
+        {/* The Trend | Weekly bars switch (Figma 19:6761, S-8). */}
+        <div data-chart={bars ? 'bars' : 'trend'} className="w-fit">
+          <SegmentedControl<'trend' | 'bars'>
+            aria-label="Chart"
+            size="md"
+            value={bars ? 'bars' : 'trend'}
+            onValueChange={(k) => { if ((k === 'bars') !== bars) onChart(k) }}
+            options={[
+              { value: 'trend', label: <span data-chart-option="trend">Trend</span> },
+              { value: 'bars', label: <span data-chart-option="bars">Weekly bars</span> },
+            ]}
+          />
         </div>
 
         <div className="flex flex-wrap gap-2 pt-3 max-[760px]:flex-col max-[760px]:items-stretch">
           <Button variant="outline" size="sm" data-card-action="duplicate" className={action} leftIcon={<Copy aria-hidden strokeWidth={1.5} absoluteStrokeWidth />} onClick={onDuplicate}>Duplicate</Button>
-          <Button variant="outline" size="sm" data-card-action="numbers" loading={busy === 'numbers'} disabled={busy === 'image'} leftIcon={<FileSpreadsheet aria-hidden strokeWidth={1.5} absoluteStrokeWidth />} onClick={downloadNumbers}>
-            {busy === 'numbers' ? 'Preparing…' : 'Download numbers'}
+          <Button variant="outline" size="sm" data-card-action="numbers" disabled={shooting} leftIcon={<FileSpreadsheet aria-hidden strokeWidth={1.5} absoluteStrokeWidth />} onClick={downloadNumbers}>
+            Download numbers
           </Button>
-          <Button variant="outline" size="sm" data-card-action="image" loading={busy === 'image'} disabled={busy === 'numbers'} leftIcon={<ImageIcon aria-hidden strokeWidth={1.5} absoluteStrokeWidth />} onClick={downloadImage}>
-            {busy === 'image' ? 'Preparing…' : 'Download image'}
+          <Button variant="outline" size="sm" data-card-action="image" loading={shooting} leftIcon={<ImageIcon aria-hidden strokeWidth={1.5} absoluteStrokeWidth />} onClick={downloadImage}>
+            {shooting ? 'Preparing…' : 'Download image'}
           </Button>
           <Button variant="outline" size="sm" data-card-action="remove" leftIcon={<Trash2 aria-hidden strokeWidth={1.5} absoluteStrokeWidth />} onClick={onRemove}>Remove</Button>
         </div>
@@ -236,12 +222,43 @@ function Settings({ card, period, compare, cardView, stamp, pickable, onSwap, on
       </div>
 
       {/* The card drawn off screen for its image, with the stamp (S-9b). */}
-      {shooting && createPortal(
-        <div aria-hidden style={{ position: 'fixed', left: 0, top: 0, transform: 'translateX(-200vw)', pointerEvents: 'none' }}>
-          <BoardSnapshot ref={shotRef} cards={[{ ...card, x: 0, y: 0 }]} cardView={cardView} stamp={stamp} columns={w} />
-        </div>,
-        document.body,
-      )}
+      {shooting && <CardShot card={card} cardView={cardView} stamp={stamp} columns={w} onDone={shot} />}
     </DialogContent>
+  )
+}
+
+interface CardShotProps {
+  card: BoardCard
+  cardView: (cardId: string) => CardView | undefined
+  stamp: string
+  columns: number
+  /** The PNG, or null when it couldn't be made. */
+  onDone: (blob: Blob | null) => void
+}
+
+/**
+ * The card drawn off screen for its image, with the stamp (S-9b). Its numbers are drawn still
+ * (StillCards: no fade-in to wait for), so it's turned into a PNG on the frame after it lays out.
+ * Unmounting (the dialog closing) cancels the frame and drops a late result.
+ */
+function CardShot({ card, cardView, stamp, columns, onDone }: CardShotProps) {
+  const ref = useRef<HTMLDivElement>(null)
+  const done = useEffectEvent(onDone)
+  useEffect(() => {
+    let live = true
+    const frame = requestAnimationFrame(() => {
+      const node = ref.current
+      const job = node ? nodeToPng(node) : Promise.reject(new Error('no image'))
+      job.then((blob) => { if (live) done(blob) }, () => { if (live) done(null) })
+    })
+    return () => { live = false; cancelAnimationFrame(frame) }
+  }, [])
+  return createPortal(
+    <div aria-hidden style={{ position: 'fixed', left: 0, top: 0, transform: 'translateX(-200vw)', pointerEvents: 'none' }}>
+      <StillCards value>
+        <BoardSnapshot ref={ref} cards={[{ ...card, x: 0, y: 0 }]} cardView={cardView} stamp={stamp} columns={columns} />
+      </StillCards>
+    </div>,
+    document.body,
   )
 }

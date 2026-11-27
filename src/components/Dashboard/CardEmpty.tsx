@@ -2,7 +2,10 @@
 
 import { CalendarX2, CircleSlash, Hourglass, Plug, TriangleAlert, Archive, type LucideIcon } from 'lucide-react'
 import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
+import { Button } from '@/components/ui'
 import { cn } from '@/lib/utils'
+import { listNames, plural } from './format'
+import { unavailableCopy } from './live/metrics'
 
 // What a card shows when it has no number to show: one design for every reason (no data yet, needs an
 // app, couldn't load, nothing in these dates, removed). An icon, a headline, why, and the one thing
@@ -35,19 +38,26 @@ export interface EmptyAction {
   href?: string
 }
 
-/** "Shopify", "Shopify and Meta Ads", "Shopify, Meta Ads and Klaviyo". */
-export const listNames = (names: string[]) =>
-  names.length <= 1 ? (names[0] ?? '') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
+/**
+ * Why the warehouse can't measure a metric, as a sentence: the app's own phrase for its code
+ * (live/metrics.ts unavailableCopy, the one source of that wording; API-ER-06: never the
+ * warehouse's free text). With no code, the general sentence.
+ */
+export function unavailableSentence(code: string | null | undefined): string {
+  if (!code) return 'This store has nothing for this metric yet.'
+  const phrase = unavailableCopy({ code })
+  return `${phrase.charAt(0).toUpperCase()}${phrase.slice(1)}.`
+}
 
-/** Why, in a sentence, for each kind; `apps` are the names of the apps the metric reads. */
-export function emptyDetail(kind: EmptyKind, opts: { apps: string[]; reason?: string | null }): string {
+/** Why, in a sentence, for each kind; `apps` are the names of the apps the metric reads, `code` the warehouse's reason code. */
+export function emptyDetail(kind: EmptyKind, opts: { apps: string[]; code?: string | null }): string {
   switch (kind) {
     case 'first-sync':
-      return opts.apps.length ? `${listNames(opts.apps)} ${opts.apps.length === 1 ? 'is' : 'are'} doing a first sync. This fills in when it’s done.` : 'The first sync is still running. This fills in when it’s done.'
+      return opts.apps.length ? `${listNames(opts.apps)} ${plural(opts.apps.length, { one: 'is', other: 'are' })} doing a first sync. This fills in when it’s done.` : 'The first sync is still running. This fills in when it’s done.'
     case 'needs-app':
       return 'No connected app tracks this yet.'
     case 'no-data':
-      return opts.reason ? capitalise(opts.reason) : 'This store has nothing for this metric.'
+      return unavailableSentence(opts.code)
     case 'couldnt-load':
       return 'Something went wrong reading this number.'
     case 'no-dates':
@@ -57,8 +67,6 @@ export function emptyDetail(kind: EmptyKind, opts: { apps: string[]; reason?: st
   }
 }
 
-const capitalise = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).replace(/\.?$/, '.')
-
 /** The empty card's own action: Connect for a missing app, Try again for a failed read, else Remove for editors. */
 export function emptyAction(kind: EmptyKind, opts: { canEdit: boolean; onRetry?: () => void; onRemove?: () => void }): EmptyAction | null {
   if (kind === 'needs-app') return { label: 'Connect an app', href: ORG_CONNECTORS_ROUTE }
@@ -67,6 +75,8 @@ export function emptyAction(kind: EmptyKind, opts: { canEdit: boolean; onRetry?:
   return null
 }
 
+// The Button primitive's link look brought back to the card's: no height, padding or title font.
+const LINK_BUTTON = 'min-h-0 px-0 [font-family:inherit] hover:underline !rounded-sm [&>span]:px-0'
 const LINK = 'cursor-pointer rounded-sm border-0 bg-transparent p-0 text-[length:var(--font-size-body-sm)] font-medium leading-[var(--dashboard-line-height-sm)] text-[var(--dashboard-figure)] underline underline-offset-2 outline-none hover:text-[var(--dashboard-label)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]'
 
 /**
@@ -88,8 +98,8 @@ export function CardEmptyState({ kind, detail, action, compact, className }: { k
       {compact && <span className="sr-only">{detail}</span>}
       {action && (action.href
         ? <a href={action.href} data-no-drag onClick={(e) => e.stopPropagation()} className={cn(LINK, 'mt-0.5')}>{action.label}</a>
-        // eslint-disable-next-line no-restricted-syntax -- ds-allow: the card's underlined text action (Figma 170:89079)
-        : <button type="button" data-no-drag onClick={(e) => { e.stopPropagation(); action.run?.() }} className={cn(LINK, 'mt-0.5')}>{action.label}</button>)}
+        // The card's underlined text action (Figma 170:89079), on the link button.
+        : <Button variant="link" size="xs" data-no-drag onClick={(e) => { e.stopPropagation(); action.run?.() }} className={cn(LINK, LINK_BUTTON, 'mt-0.5')}>{action.label}</Button>)}
     </div>
   )
 }

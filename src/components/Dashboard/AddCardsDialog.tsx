@@ -1,19 +1,22 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Check, LayoutGrid, Plug, Search, Sigma, User, X, XCircle } from 'lucide-react'
-import { Button, IconButton } from '@/components/ui'
+import { Button, IconButton, Input } from '@/components/ui'
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { useAuth } from '@/context/auth-context'
 import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
 import { cn } from '@/lib/utils'
-import { OTHER_ROLES, ROLE_METRICS, YOUR_ROLE, catalogOf, groupOf, groupRank, matchOf, nameList } from './catalog'
+import { ROLES, ROLE_METRICS, catalogOf, groupOf, groupRank, matchOf, roleFor } from './catalog'
+import { countOf, formatCount, listNames, plural } from './format'
+import { PLAIN_BUTTON } from './plain-button'
 import { SourceLogo } from './icons'
 import { useDashboardData } from './live/dashboard-data'
 import { Metrics } from './live/metrics'
 import { measurable } from './templates'
 import type { App, Metric } from './types'
 
-// The Add cards picker (Figma 170:45414, docs-v2/dashboard/06-add-cards-rules.md AC-3 – AC-15),
+// The Add cards picker (Figma 170:45414, fe-handbook/features/dashboard/source-docs/06-add-cards-rules.md AC-3 – AC-15),
 // Option A: grouped by role. Search across every metric; tick as many as you like; Add puts them at
 // the end of the board in the order picked.
 
@@ -46,20 +49,22 @@ type Line =
 
 function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) {
   const { metrics, apps } = useDashboardData()
+  const { user } = useAuth()
+  // Your role from your profile; unknown, the picker opens on All metrics and names no role yours (AC-4).
+  const yourRole = roleFor(user?.onboardingRole)
+  const otherRoles = ROLES.filter((r) => r.id !== yourRole?.id)
   const catalog = catalogOf(metrics.all)
-  const [view, setView] = useState<View>('founder')
+  const [view, setView] = useState<View>(() => yourRole?.id ?? 'all')
   const [query, setQuery] = useState('')
   const [picks, setPicks] = useState<string[]>([])
   const [focus, setFocus] = useState(0)
   const searchRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
-  // Keyed by the ids, so the list below is worked out again only when the cards change.
-  const boardKey = [...new Set(onBoard.map(Metrics.base))].sort().join(',')
-  const boardIds = useMemo(() => new Set(boardKey ? boardKey.split(',') : []), [boardKey])
+  const boardIds = new Set(onBoard.map(Metrics.base))
   const pickable = measurable
 
   // ── What the list shows ─────────────────────────────────────────────────────
-  const lines = useMemo<Line[]>(() => {
+  const lines = ((): Line[] => {
     const searching = query.trim().length > 0
     const source: { metric: Metric; match?: { at: number; length: number } | null }[] = searching
       ? catalog.flatMap((metric) => { const match = matchOf(metric, query, apps); return match === false ? [] : [{ metric, match }] })
@@ -101,7 +106,7 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
       for (const x of waiting) out.push({ kind: 'row', metric: x.metric, match: x.match })
     }
     return out
-  }, [query, view, catalog, metrics, apps, pickable, boardIds])
+  })()
 
   const rows = lines.filter((l): l is Extract<Line, { kind: 'row' }> => l.kind === 'row')
   const focusIndex = Math.min(focus, Math.max(0, rows.length - 1))
@@ -153,33 +158,35 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
         </div>
 
         {/* The search field, with the cursor in it (AC-3, AC-13). */}
-        <div className="mx-6 flex h-10 shrink-0 items-center gap-2 rounded-lg border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] pl-3 pr-2.5 shadow-[var(--dashboard-field-shadow)] focus-within:border-[var(--dashboard-list-border)]">
-          <Search aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0 text-[var(--dashboard-muted)]" />
-          {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the borderless text field inside the drawn search box (Figma 170:45419) */}
-          <input
+        {/* On the Input primitive (Figma 170:45419); the clear sits over its right end. */}
+        <div className="relative mx-6 shrink-0">
+          <Input
             ref={searchRef}
+            fluid
+            leftIcon={<Search size={16} strokeWidth={1.5} absoluteStrokeWidth />}
             value={query}
-            onChange={(e) => { setQuery(e.target.value); setFocus(0) }}
+            onChange={(value) => { setQuery(value); setFocus(0) }}
             placeholder="Search metrics"
             aria-label="Search metrics"
-            className="h-full min-w-0 flex-1 border-0 bg-transparent p-0 text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-muted)]"
+            className="[&_input]:pr-7"
           />
           {query && (
-            // eslint-disable-next-line no-restricted-syntax -- ds-allow: the search field's clear (Figma "clear search", 16px x-circle)
-            <button type="button" aria-label="Clear search" onClick={clearSearch} className={cn('flex size-5 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 text-[var(--dashboard-faint)] hover:text-[var(--dashboard-figure)]', FOCUS)}>
-              <XCircle aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth />
-            </button>
+            <IconButton variant="ghost" size="xs" aria-label="Clear search" onClick={clearSearch} className="absolute right-2 top-1/2 size-6 -translate-y-1/2 rounded-full" icon={<XCircle strokeWidth={1.5} absoluteStrokeWidth />} />
           )}
         </div>
 
         <div className="flex min-h-0 flex-1 gap-4 px-4 pb-4 pt-4">
           {/* The rail: your role, other roles, browse (AC-4). It loses its highlight while searching. */}
           <nav aria-label="Browse metrics" className="flex w-[232px] shrink-0 flex-col gap-0.5 overflow-y-auto rounded-xl bg-[var(--dashboard-tabs-track)] p-2 max-[1099px]:w-[184px]">
-            <RailHeading first>YOUR ROLE</RailHeading>
-            <RailItem icon={<User />} label={YOUR_ROLE.label} selected={!searching && view === YOUR_ROLE.id} onClick={() => { setView(YOUR_ROLE.id); setQuery('') }} />
-            <span aria-hidden className="h-px shrink-0 bg-[var(--dashboard-rail-rule)]" />
-            <RailHeading>OTHER ROLES</RailHeading>
-            {OTHER_ROLES.map((r) => (
+            {yourRole && (
+              <>
+                <RailHeading first>YOUR ROLE</RailHeading>
+                <RailItem icon={<User />} label={yourRole.label} selected={!searching && view === yourRole.id} onClick={() => { setView(yourRole.id); setQuery('') }} />
+                <span aria-hidden className="h-px shrink-0 bg-[var(--dashboard-rail-rule)]" />
+              </>
+            )}
+            <RailHeading first={!yourRole}>{yourRole ? 'OTHER ROLES' : 'ROLES'}</RailHeading>
+            {otherRoles.map((r) => (
               <RailItem key={r.id} icon={<User />} label={r.label} selected={!searching && view === r.id} onClick={() => { setView(r.id); setQuery('') }} />
             ))}
             <span aria-hidden className="h-px shrink-0 bg-[var(--dashboard-rail-rule)]" />
@@ -193,8 +200,8 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
               // No match (AC-15).
               <div className="flex flex-col items-center gap-3 pt-16 text-[length:var(--font-size-body)] leading-5 text-[var(--dashboard-label)]">
                 <p className="m-0">No metrics match “{query.trim()}”.</p>
-                {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the outlined Clear search of Figma 170:55881 */}
-                <button type="button" onClick={clearSearch} className={cn('h-8 cursor-pointer rounded-lg border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] px-3 text-[length:var(--font-size-body-sm)] font-medium text-[var(--dashboard-figure)] shadow-[var(--dashboard-button-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}>Clear search</button>
+                {/* The outlined Clear search of Figma 170:55881. */}
+                <Button variant="outline" size="sm" onClick={clearSearch}>Clear search</Button>
               </div>
             ) : lines.map((l, i) => {
               if (l.kind === 'heading') return <p key={`h${i}`} className="m-0 px-2.5 pb-1.5 pt-2.5 text-[length:var(--font-size-caption)] font-semibold leading-4 tracking-[var(--dashboard-section-tracking)] text-[var(--dashboard-muted)] first:pt-1">{l.text}</p>
@@ -244,20 +251,20 @@ function Picker({ onBoard, onClose, onAdd }: Omit<AddCardsDialogProps, 'open'>) 
         <div className="flex h-16 shrink-0 items-center gap-3 border-0 border-t border-solid border-[var(--neutral-200)] px-6">
           {picks.length > 0 && (
             <p data-picked className="m-0 flex shrink-0 items-center gap-2 text-[length:var(--font-size-body)] leading-[var(--line-height-body)]">
-              <span className="font-medium text-[var(--dashboard-figure)]">{picks.length} picked</span>
-              {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the footer's quiet text link (Figma 170:64075) */}
-              <button type="button" onClick={() => setPicks([])} className={cn('cursor-pointer rounded-sm border-0 bg-transparent p-0 text-[length:var(--font-size-body)] text-[var(--dashboard-label)] hover:text-[var(--dashboard-figure)]', FOCUS)}>Clear</button>
+              <span className="font-medium text-[var(--dashboard-figure)]">{formatCount(picks.length)} picked</span>
+              {/* The footer's quiet text link (Figma 170:64075). */}
+              <Button variant="link" onClick={() => setPicks([])} className={cn(PLAIN_BUTTON, 'cursor-pointer !rounded-sm border-0 bg-transparent p-0 text-[length:var(--font-size-body)] text-[var(--dashboard-label)] hover:text-[var(--dashboard-figure)]', FOCUS)}>Clear</Button>
             </p>
           )}
           {already.length > 0 && <span aria-hidden className="h-4 w-px shrink-0 bg-[var(--neutral-200)]" />}
           {already.length > 0 && (
             <p data-already className="m-0 min-w-0 truncate text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-label)]">
-              {nameList(already)} {already.length === 1 ? 'is' : 'are'} already on this board
+              {listNames(already)} {plural(already.length, { one: 'is', other: 'are' })} already on this board
             </p>
           )}
           <div className="ml-auto flex shrink-0 gap-2">
             <Button variant="outline" onClick={onClose}>Cancel</Button>
-            <Button onClick={add} disabled={!picks.length}>{picks.length <= 1 ? (picks.length ? 'Add card' : 'Add cards') : `Add ${picks.length} cards`}</Button>
+            <Button onClick={add} disabled={!picks.length}>{picks.length === 0 ? 'Add cards' : picks.length === 1 ? 'Add card' : `Add ${countOf(picks.length, { one: 'card', other: 'cards' })}`}</Button>
           </div>
         </div>
       </div>
@@ -271,21 +278,22 @@ function RailHeading({ children, first = false }: { children: React.ReactNode; f
 
 function RailItem({ icon, label, selected, onClick }: { icon: React.ReactElement<{ size?: number }>; label: string; selected: boolean; onClick: () => void }) {
   return (
-    // eslint-disable-next-line no-restricted-syntax -- ds-allow: the picker's rail item (Figma 170:38065)
-    <button
-      type="button"
+    // The picker's rail item (Figma 170:38065).
+    <Button
+      variant="link"
       aria-current={selected ? 'true' : undefined}
       onClick={onClick}
       title={label}
       className={cn(
-        'flex h-9 w-full shrink-0 cursor-pointer items-center gap-2 rounded-lg border border-solid px-2.5 text-left text-[length:var(--font-size-body)] leading-[var(--line-height-body)]',
+        PLAIN_BUTTON,
+        'flex h-9 w-full shrink-0 cursor-pointer items-center justify-start gap-2 !rounded-lg border border-solid px-2.5 text-left text-[length:var(--font-size-body)] leading-[var(--line-height-body)]',
         selected ? 'border-[var(--neutral-200)] bg-[var(--dashboard-card-bg)] font-medium text-[var(--dashboard-figure)] shadow-[var(--dashboard-lift-shadow)]' : 'border-transparent bg-transparent text-[var(--neutral-700)] hover:bg-[var(--dashboard-hover-band)]',
         FOCUS,
       )}
     >
       <span aria-hidden className="flex shrink-0 [&_svg]:size-4 [&_svg]:stroke-[1.5]">{icon}</span>
       <span className="min-w-0 flex-1 truncate">{label}</span>
-    </button>
+    </Button>
   )
 }
 
@@ -319,7 +327,7 @@ function CallOut({ count }: { count: number }) {
       </span>
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="truncate text-[length:var(--font-size-body)] font-medium leading-5 text-[var(--dashboard-figure)]">Not measured here yet</span>
-        <span className="truncate text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">{count} metric{count === 1 ? '' : 's'} need an app this store hasn’t connected</span>
+        <span className="truncate text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-label)]">{countOf(count, { one: 'metric needs', other: 'metrics need' })} an app this store hasn’t connected</span>
       </span>
       { }
       <a

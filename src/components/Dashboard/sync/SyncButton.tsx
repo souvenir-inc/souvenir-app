@@ -3,12 +3,14 @@
 import { Plug, TriangleAlert } from 'lucide-react'
 import { PopoverContent, PopoverRoot, PopoverTrigger } from '@/components/Popover'
 import { Tooltip } from '@/components/Tooltip'
+import { Button, IconButton } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import { RotateCwClockIcon, SourceLogo } from '../icons'
 import { useDashboardData } from '../live/dashboard-data'
 import type { AppId } from '../types'
 import { ago, buttonState, footerText, hoverText, sortApps, type AppState, type ButtonState } from './sync-model'
-import { blockedReason, reconnect, refreshAll, refreshRunning, syncApps, useSyncSnapshot } from './sync-store'
+import { blockedReason, reconnect, refreshRunning, useSyncSnapshot } from './sync-store'
+import { useRefreshAll, useSyncApps, useSyncPending } from './use-sync-actions'
 import { Spinner } from './Spinner'
 
 // The sync button and Data sources (Figma 95:18703; 04-sync-rules.md SY-1 – SY-12, SY-25).
@@ -35,9 +37,10 @@ const TONE = {
   failed: 'font-medium text-[var(--dashboard-sync-failed)]',
 }
 
+// The 24px round row action on the soft fill (Figma 123:20927, 123:20845).
 const ROW_ACTION = cn(
-  'flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-[var(--dashboard-sync-bg)] p-0 text-[var(--dashboard-sync-icon)]',
-  'transition-colors duration-fast hover:bg-[var(--dashboard-tabs-track)] disabled:cursor-default disabled:opacity-50',
+  'size-6 rounded-full border-0 bg-[var(--dashboard-sync-bg)] text-[var(--dashboard-sync-icon)] [--hv:var(--dashboard-tabs-track)]',
+  'active:scale-100 disabled:cursor-default disabled:opacity-50',
   FOCUS,
 )
 
@@ -52,6 +55,8 @@ interface SyncButtonProps {
 export function SyncButton({ apps: ids, uses, open, onOpenChange }: SyncButtonProps) {
   const s = useSyncSnapshot()
   const { apps } = useDashboardData()
+  const refreshAll = useRefreshAll()
+  const pending = useSyncPending()
   const now = s.now
   const state = buttonState(ids, s.apps, s.online)
   const hover = hoverText(ids, s.apps, now, s.online, s.offlineSince)
@@ -67,27 +72,30 @@ export function SyncButton({ apps: ids, uses, open, onOpenChange }: SyncButtonPr
     <PopoverRoot open={open} onOpenChange={onOpenChange}>
       <Tooltip content={hover} side="bottom" disabled={open}>
         <PopoverTrigger asChild>
-          {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a 32px status button with a dot on its edge and an open (white + border) state IconButton doesn't have */}
-          <button
-            type="button"
+          {/* A 32px round status button with a dot on its edge, white with a border while open. */}
+          <IconButton
+            variant="secondary"
+            size="sm"
+            iconSize={state === 'syncing' ? 14 : 16}
             data-sync-state={state}
             aria-label={`Data sources: ${STATE_WORDS[state]}`}
             className={cn(
-              'relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-solid transition-colors duration-fast',
+              'rounded-full border border-solid active:scale-100',
               open
                 ? 'border-[var(--border-default)] bg-[var(--dashboard-card-bg)] text-[var(--dashboard-figure)] shadow-[var(--dashboard-control-shadow)]'
-                : 'border-transparent bg-[var(--dashboard-sync-bg)] text-[var(--dashboard-sync-icon)] hover:bg-[var(--dashboard-tabs-track)]',
+                : 'border-transparent bg-[var(--dashboard-sync-bg)] text-[var(--dashboard-sync-icon)] [--hv:var(--dashboard-tabs-track)]',
               FOCUS,
             )}
-          >
-            {/* Syncing: a spinner takes the icon's place and the dot goes (SY-2). */}
-            {state === 'syncing'
-              ? <Spinner size={14} />
-              : <RotateCwClockIcon aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth />}
-            {DOT[state] && (
-              <span aria-hidden data-sync-dot className={cn('pointer-events-none absolute -right-px -top-px size-2.5 rounded-full shadow-[0_0_0_2px_var(--dashboard-panel-bg)]', DOT[state])} />
-            )}
-          </button>
+            icon={<>
+              {/* Syncing: a spinner takes the icon's place and the dot goes (SY-2). */}
+              {state === 'syncing'
+                ? <Spinner size={14} />
+                : <RotateCwClockIcon aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth />}
+              {DOT[state] && (
+                <span aria-hidden data-sync-dot className={cn('pointer-events-none absolute -right-px -top-px size-2.5 rounded-full shadow-[0_0_0_2px_var(--dashboard-panel-bg)]', DOT[state])} />
+              )}
+            </>}
+          />
         </PopoverTrigger>
       </Tooltip>
       <PopoverContent
@@ -112,21 +120,23 @@ export function SyncButton({ apps: ids, uses, open, onOpenChange }: SyncButtonPr
             <Tooltip content={refreshTip} disabled={!refreshTip} side="bottom" align="start">
               {/* The tooltip needs a hoverable box: a disabled button gets no pointer events. */}
               <span className="inline-flex rounded-full" tabIndex={blocked ? 0 : -1}>
-                {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the outlined Refresh pill of Figma 123:20854 (white, hairline ring, 13px Geist) */}
-                <button
-                  type="button"
-                  onClick={() => { void refreshAll() }}
-                  disabled={blocked !== null}
+                {/* The outlined Refresh pill of Figma 123:20854 (white, hairline ring, 13px). */}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={refreshAll}
+                  disabled={blocked !== null || pending}
+                  iconSize={14}
+                  leftIcon={<RotateCwClockIcon aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}
                   className={cn(
-                    'flex h-8 cursor-pointer items-center gap-1.5 rounded-full border-0 bg-[var(--dashboard-card-bg)] pl-2.5 pr-3.5 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)]',
-                    'shadow-[var(--dashboard-control-shadow)] transition-[background-color,opacity] duration-fast hover:bg-[var(--neutral-100)]',
+                    'h-8 min-h-8 gap-1 rounded-full border-0 bg-[var(--dashboard-card-bg)] pl-2.5 pr-3.5 [font-family:inherit] text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)]',
+                    'shadow-[var(--dashboard-control-shadow)] [--hv:var(--neutral-100)] active:scale-100',
                     'disabled:pointer-events-none disabled:opacity-50',
                     FOCUS,
                   )}
                 >
-                  <RotateCwClockIcon aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />
                   Refresh
-                </button>
+                </Button>
               </span>
             </Tooltip>
             <span aria-live="polite" data-sync-footer className={cn('truncate text-[length:var(--font-size-small)] leading-4', TONE[footer.tone])}>{footer.text}</span>
@@ -155,6 +165,8 @@ function AppList({ ids, blocked }: { ids: AppId[]; blocked: ReturnType<typeof bl
 
 function AppRow({ id, blocked }: { id: AppId; blocked: ReturnType<typeof blockedReason> }) {
   const s = useSyncSnapshot()
+  const syncApps = useSyncApps()
+  const pending = useSyncPending()
   const now = s.now
   const a = s.apps[id]
   const state = a.state
@@ -166,20 +178,22 @@ function AppRow({ id, blocked }: { id: AppId; blocked: ReturnType<typeof blocked
       {(state === 'behind' || (state === 'failed' && !a.needsReconnect)) && (
         <Tooltip content={blocked === 'cooldown' ? 'Synced just now • Sync again in a minute' : `Sync ${name} now`} side="top">
           <span className="inline-flex rounded-full">
-            {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: 24px round row action on the soft fill (Figma 123:20927) */}
-            <button type="button" aria-label={`Sync ${name} now`} disabled={blocked !== null} onClick={() => { void syncApps([id]) }} className={ROW_ACTION}>
-              <RotateCwClockIcon aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />
-            </button>
+            <IconButton
+              variant="secondary" size="xs" iconSize={14} aria-label={`Sync ${name} now`} disabled={blocked !== null || pending}
+              onClick={() => syncApps([id])} className={ROW_ACTION}
+              icon={<RotateCwClockIcon aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}
+            />
           </span>
         </Tooltip>
       )}
       {state === 'failed' && a.needsReconnect && a.yours && (
         <Tooltip content={`Reconnect ${name}`} side="top">
           <span className="inline-flex rounded-full">
-            {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: 24px round row action on the soft fill (Figma 123:20845) */}
-            <button type="button" aria-label={`Reconnect ${name}`} disabled={blocked === 'offline' || blocked === 'busy'} onClick={() => reconnect([id])} className={ROW_ACTION}>
-              <Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />
-            </button>
+            <IconButton
+              variant="secondary" size="xs" iconSize={14} aria-label={`Reconnect ${name}`} disabled={blocked === 'offline' || blocked === 'busy'}
+              onClick={() => reconnect([id])} className={ROW_ACTION}
+              icon={<Plug aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}
+            />
           </span>
         </Tooltip>
       )}

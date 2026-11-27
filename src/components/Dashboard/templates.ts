@@ -1,4 +1,4 @@
-// New board (docs-v2/dashboard/08-new-board-rules.md): the templates, what a template leaves out in
+// New board (fe-handbook/features/dashboard/source-docs/08-new-board-rules.md): the templates, what a template leaves out in
 // this store, and the first visit's starter boards. Pure: the screen passes in the warehouse's
 // metrics. Ask the AI drafts on the server (Warehouse.draftBoard).
 
@@ -45,8 +45,26 @@ export const TEMPLATES: Template[] = [
   ] },
 ]
 
-/** The templates shown on an empty board: your role first, then the two nearest (NB-17). */
-export const FOR_YOUR_ROLE = ['founder', 'ecommerce', 'growth']
+/** Each role's template, then the two nearest to it (NB-17). */
+const NEAREST: Record<string, [string, string, string]> = {
+  founder: ['founder', 'ecommerce', 'growth'],
+  ecommerce: ['ecommerce', 'founder', 'ops'],
+  growth: ['growth', 'agency', 'ecommerce'],
+  ops: ['ops', 'ecommerce', 'finance'],
+  finance: ['finance', 'founder', 'ops'],
+  agency: ['agency', 'growth', 'founder'],
+}
+
+/**
+ * The three templates shown on an empty board: your role's first, then the two nearest (NB-17).
+ * With no known role (catalog.ts roleFor), the library's first three, none of them called yours.
+ */
+export function templatesFor(roleId: string | null): string[] {
+  return roleId && Object.hasOwn(NEAREST, roleId) ? NEAREST[roleId] : TEMPLATES.slice(0, 3).map((t) => t.id)
+}
+
+/** @deprecated The role isn't always known: use templatesFor(roleFor(user.onboardingRole)?.id ?? null). Kept until EmptyBoard moves. */
+export const FOR_YOUR_ROLE = templatesFor(null)
 
 /** A connection feeds it, or it is the workspace's own: it can go on a board (NB-9). */
 export const measurable = (m: Metric | undefined): m is Metric => !!m && !m.unmeasured && (m.custom || m.apps.length > 0)
@@ -96,8 +114,10 @@ const FALLBACKS = ['gross_sales', 'cancellation_rate', 'refunds', 'discounts', '
 /**
  * The starter boards for a warehouse with none (NB-32, NB-33): Store overview always, and each other
  * board whose lead metric this store can measure. A card it can't measure gives way to a store one.
+ * `period`, when given (the viewer's default period, default-period.ts), is what every starter board
+ * starts on; without it each keeps its own.
  */
-export function starterState(metrics: Metrics, newId: () => string, owner: string): DashboardState {
+export function starterState(metrics: Metrics, newId: () => string, owner: string, period?: string): DashboardState {
   const boards: Record<string, Board> = {}
   const tabs: string[] = []
   for (const [i, starter] of STARTERS.entries()) {
@@ -109,7 +129,7 @@ export function starterState(metrics: Metrics, newId: () => string, owner: strin
       .filter((c): c is TemplateCard => c.metricId !== undefined)
     const laid = flowCards(cards)
     const id = newId()
-    boards[id] = { id, label: starter.label, cards: laid, initialCards: laid, period: starter.period, compare: 'previous', access: 'owner', ownerId: owner, general: 'none', grants: [] }
+    boards[id] = { id, label: starter.label, cards: laid, initialCards: laid, period: period ?? starter.period, compare: 'previous', access: 'owner', ownerId: owner, general: 'none', grants: [] }
     tabs.push(id)
   }
   return { boards, tabs, hidden: [], deleted: [], openId: tabs[0] }

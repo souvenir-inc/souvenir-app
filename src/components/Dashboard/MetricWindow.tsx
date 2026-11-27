@@ -3,11 +3,19 @@
 import { useState } from 'react'
 import { ArrowDown, ArrowUp, LayoutGrid, Plus, X } from 'lucide-react'
 import { PopoverContent, PopoverRoot, PopoverTrigger } from '@/components/Popover'
-import { IconButton } from '@/components/ui'
+import { TargetEditor, type TargetMetric } from '@/components/Scorecard/TargetEditor'
+import { TargetSection } from '@/components/Scorecard/TargetSection'
+import { useTarget } from '@/components/Scorecard/use-scorecard'
+import { Button, IconButton } from '@/components/ui/button'
+import { TextLink } from '@/components/ui/link'
+import { DASHBOARD_METRIC_ROUTE } from '@/lib/routes'
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { SegmentedControl } from '@/components/ui/segmented-control'
+import type { Unit } from '@/lib/api/warehouse'
+import { inputScale } from '@/lib/scorecard/target-form'
 import { cn } from '@/lib/utils'
 import { LineChart } from './chart/LineChart'
-import { HealthPillView, type CardView } from './MetricCard'
+import type { CardView } from './MetricCard'
 import { formatMetricValue } from './format'
 import { SourceLogo } from './icons'
 import { useDashboardData } from './live/dashboard-data'
@@ -16,27 +24,37 @@ import { chartWindow, compareName, periodName, rangeDays } from './period'
 import { changeLabel, dayMonth, formatExact, weekdayDayMonth } from './series'
 import { ago } from './sync/sync-model'
 import { useSyncSnapshot } from './sync/sync-store'
-import type { App, AppId, Metric } from './types'
+import type { App, AppId, Metric, MetricFormat } from './types'
 import type { Board } from './tabs/board-state'
 
 // The metric window (Figma 170:75690, 05-cards-reading-rules.md CR-15 – CR-17), drawn as it is today
 // in Scorecards: the name, the header's period, the number and its change, then Trend, Target,
 // Definition, Sources and Other related. Trend opens first, with the same days as the board. Esc,
 // × or a click outside closes it, and focus goes back to the card (the dialog returns it).
+// Set a target / Edit target open the target editor; the Target tab shows the target, its status in
+// words with the reason, the owner and the note (CR-28: health from scorecard targets only).
 
 const FOCUS = 'outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]'
 const TABS = ['Trend', 'Target', 'Definition', 'Sources', 'Other related'] as const
 type Tab = (typeof TABS)[number]
 
+/** The warehouse unit behind a card's format: targets are typed and stored in it. */
+const UNIT: Record<MetricFormat, Unit> = { currency: 'money', number: 'count', percent: 'percent', ratio: 'ratio' }
+
+// The text inside a ghost row button spreads out: name on the left, figure or tag on the right.
+const ROW_BUTTON = 'h-auto min-h-9 w-full justify-start rounded-lg bg-transparent px-2.5 text-left font-normal [&>span:last-child]:flex [&>span:last-child]:min-w-0 [&>span:last-child]:flex-1 [&>span:last-child]:items-center [&>span:last-child]:justify-between [&>span:last-child]:gap-2.5'
+
 interface MetricWindowProps {
   metric: Metric | null
+  /** No longer read: the Target tab works out health from the scorecards itself. */
   view?: CardView
   periodId: string
   /** The open board's other cards, for Other related. */
   related: Metric[]
   onClose: () => void
   onOpenMetric: (metricId: string) => void
-  onNotReady: (what: string) => void
+  /** No longer called: every action in the window works now (CORE-B-13). */
+  onNotReady?: (what: string) => void
   /** Boards you can edit, in tab order (06 AC-22). */
   boards: Board[]
   onAddToBoard: (boardId: string) => void
@@ -50,10 +68,13 @@ export function MetricWindow({ metric, ...rest }: MetricWindowProps) {
   )
 }
 
-function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boards, onAddToBoard }: Omit<MetricWindowProps, 'metric' | 'onClose'> & { metric: Metric }) {
+function Window({ metric, periodId, related, onOpenMetric, boards, onAddToBoard }: Omit<MetricWindowProps, 'metric' | 'onClose'> & { metric: Metric }) {
   const [tab, setTab] = useState<Tab>('Trend')
   const [table, setTable] = useState(false)
-  const { today } = useDashboardData()
+  const [editing, setEditing] = useState(false)
+  const { today, warehouse } = useDashboardData()
+  const target: TargetMetric = { id: metric.id, label: metric.label, unit: UNIT[metric.format], upIsGood: metric.upIsGood }
+  const { found } = useTarget(warehouse, metric.id)
   const chart = chartWindow(periodId, today)
   const n = rangeDays(chart.from, chart.to)
   const periodLabel = periodName(periodId)
@@ -88,6 +109,7 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
             </p>
           </div>
           <div className="absolute right-5 top-[18px] flex items-center gap-2">
+            <TextLink href={DASHBOARD_METRIC_ROUTE(metric.id)} variant="subtle" className="text-[length:var(--font-size-body-sm)]">Open metric page</TextLink>
             <AddToBoard metric={metric} boards={boards} onPick={onAddToBoard} />
             <DialogClose asChild>
               <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="size-7 rounded-md" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
@@ -127,29 +149,23 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
                 <p className="m-0 text-[length:var(--font-size-body-md)] leading-5 text-[var(--dashboard-figure)]">
                   {change ? `${change.direction === 'up' ? 'Up' : 'Down'} ${change.label} on ${lastYear ? 'the same days last year' : `the previous ${n} days`}` : 'Nothing to compare with yet'}
                 </p>
-                <div role="radiogroup" aria-label="Show as" className="flex shrink-0 gap-0.5 rounded-lg bg-[var(--dashboard-hover-band)] p-[var(--space-0-75)]">
-                  {(['Chart', 'Table'] as const).map((k) => (
-                    // eslint-disable-next-line no-restricted-syntax -- ds-allow: the Chart | Table switch (Figma 170:75722)
-                    <button
-                      key={k}
-                      type="button"
-                      role="radio"
-                      aria-checked={(k === 'Table') === table}
-                      onClick={() => setTable(k === 'Table')}
-                      className={cn('cursor-pointer rounded-[var(--dashboard-toggle-radius)] border-0 px-2.5 py-1 text-[length:var(--font-size-small)] leading-4', (k === 'Table') === table ? 'bg-[var(--dashboard-card-bg)] font-medium text-[var(--dashboard-figure)] shadow-[var(--dashboard-control-shadow)]' : 'bg-transparent text-[var(--dashboard-muted)]', FOCUS)}
-                    >
-                      {k}
-                    </button>
-                  ))}
-                </div>
+                <SegmentedControl
+                  aria-label="Show as"
+                  className="shrink-0"
+                  value={table ? 'table' : 'chart'}
+                  onValueChange={(v) => setTable(v === 'table')}
+                  options={[{ value: 'chart', label: 'Chart' }, { value: 'table', label: 'Table' }]}
+                />
               </div>
-              <div className="mt-[var(--space-4-5)] flex items-center gap-5 text-[length:var(--font-size-small)] leading-4">
+              <div className="mt-[var(--space-4-5)] flex flex-wrap items-center gap-x-5 gap-y-2 text-[length:var(--font-size-small)] leading-4">
                 <span className="flex items-center gap-1.5 text-[var(--dashboard-label)]"><span aria-hidden className="h-0.5 w-2.5 rounded-hairline bg-[var(--dashboard-chart-ink)]" />{periodLabel}<strong className="font-medium text-[var(--dashboard-figure)]">{metric.value}</strong></span>
                 {comparable && metric.previous !== null && <span className="flex items-center gap-1.5 text-[var(--dashboard-label)]"><span aria-hidden className="h-0.5 w-2.5 rounded-hairline bg-[var(--dashboard-chart-previous)]" />Previous {n} days<strong className="font-medium text-[var(--dashboard-figure)]">{formatMetricValue(metric.previous, metric.format)}</strong></span>}
-                {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the legend's underlined text link (Figma 170:75736) */}
-                <button type="button" onClick={() => onNotReady('Targets')} className={cn('cursor-pointer border-0 bg-transparent p-0 text-[length:var(--font-size-small)] text-[var(--dashboard-figure)] underline underline-offset-2', FOCUS)}>Set a target</button>
+                {found && <span className="text-[var(--dashboard-label)]">Target <strong className="font-medium text-[var(--dashboard-figure)]">{formatMetricValue(found.row.target * inputScale(target.unit), metric.format)}</strong></span>}
+                <Button variant="link" size="xs" className="min-h-0 px-0 text-[length:var(--font-size-small)] font-normal text-[var(--dashboard-figure)] underline underline-offset-2" onClick={() => setEditing(true)}>
+                  {found ? 'Edit target' : 'Set a target'}
+                </Button>
               </div>
-              {!table && <LineChart metric={metric} series={series} variant="full" className="mt-6 h-[264px]" />}
+              {!table && <LineChart metric={metric} series={series} variant="full" focusable className="mt-6 h-[264px]" />}
               {table && (
                 <table className="mt-5 w-full border-collapse text-[length:var(--font-size-body-sm)] leading-5">
                   <thead>
@@ -162,7 +178,7 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
                       const p = series.comparable ? series.previous[i] : undefined
                       const rising = d.value != null && p?.value != null && d.value >= p.value
                       return (
-                        <tr key={i} className="border-0 border-t border-solid border-[var(--neutral-200)]">
+                        <tr key={d.date.getTime()} className="border-0 border-t border-solid border-[var(--neutral-200)]">
                           <td className="py-2 text-[var(--dashboard-label)]">{weekdayDayMonth(d.date)}</td>
                           <td className="py-2 text-right text-[var(--dashboard-figure)]">{d.value != null ? formatExact(d.value, metric.format) : 'No data'}</td>
                           <td className="py-2 text-right text-[var(--dashboard-muted)]">{p?.value != null ? `${formatExact(p.value, metric.format)} · ${dayMonth(p.date)}` : '—'}</td>
@@ -178,9 +194,12 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
             </>
           )}
           {tab === 'Target' && (
-            view?.health
-              ? <div className="flex items-center gap-2"><HealthPillView pill={view.health} withTarget /></div>
-              : <EmptyTab text="This metric has no target yet." action={['Set a target', () => onNotReady('Targets')]} />
+            <TargetSection
+              warehouse={warehouse}
+              metric={{ ...target, amount: metric.amount }}
+              formatValue={(value) => formatExact(value, metric.format)}
+              onEdit={() => setEditing(true)}
+            />
           )}
           {tab === 'Definition' && <p className="m-0 max-w-[560px] text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--dashboard-figure)]">{metric.definition || 'No definition for this metric yet.'}</p>}
           {tab === 'Sources' && <Sources apps={metric.apps} unmeasured={metric.unmeasured} />}
@@ -189,11 +208,10 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
               <ul className="m-0 flex list-none flex-col gap-1 p-0">
                 {related.map((r) => (
                   <li key={r.id}>
-                    {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a full-width row that opens another metric in this window */}
-                    <button type="button" onClick={() => onOpenMetric(r.id)} className={cn('flex w-full cursor-pointer items-center justify-between rounded-lg border-0 bg-transparent px-2.5 py-2 text-left text-[length:var(--font-size-body-sm)] leading-5 hover:bg-[var(--dashboard-hover-band)]', FOCUS)}>
+                    <Button variant="ghost" size="sm" className={cn(ROW_BUTTON, 'py-2 text-[length:var(--font-size-body-sm)] leading-5')} onClick={() => onOpenMetric(r.id)}>
                       <span className="text-[var(--dashboard-figure)]">{r.label}</span>
                       <span className="text-[var(--dashboard-muted)]">{r.value}</span>
-                    </button>
+                    </Button>
                   </li>
                 ))}
               </ul>
@@ -201,20 +219,13 @@ function Window({ metric, view, periodId, related, onOpenMetric, onNotReady, boa
           )}
         </div>
       </div>
+      <TargetEditor open={editing} onClose={() => setEditing(false)} warehouse={warehouse} metric={target} row={found?.row ?? null} />
     </DialogContent>
   )
 }
 
-function EmptyTab({ text, action }: { text: string; action?: [string, () => void] }) {
-  return (
-    <div className="flex flex-col items-start gap-2 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-muted)]">
-      <p className="m-0">{text}</p>
-      {action && (
-        // eslint-disable-next-line no-restricted-syntax -- ds-allow: underlined text action
-        <button type="button" onClick={action[1]} className={cn('cursor-pointer border-0 bg-transparent p-0 text-[length:var(--font-size-body-sm)] text-[var(--dashboard-figure)] underline underline-offset-2', FOCUS)}>{action[0]}</button>
-      )}
-    </div>
-  )
+function EmptyTab({ text }: { text: string }) {
+  return <p className="m-0 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-muted)]">{text}</p>
 }
 
 function Sources({ apps: ids, unmeasured }: { apps: AppId[]; unmeasured: string | null }) {
@@ -251,14 +262,14 @@ function AddToBoard({ metric, boards, onPick }: { metric: Metric; boards: Board[
   return (
     <PopoverRoot open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the window's white Add to board (Figma 170:81298) */}
-        <button
-          type="button"
+        <Button
+          variant="secondary"
           data-add-to-board
-          className={cn('flex h-9 cursor-pointer items-center gap-1 rounded-lg border border-solid border-[var(--dashboard-hover-band)] bg-[var(--dashboard-card-bg)] pl-2.5 pr-3 text-[length:var(--font-size-body)] font-medium leading-[var(--line-height-body)] text-[var(--dashboard-figure)] shadow-[var(--dashboard-control-shadow)] hover:bg-[var(--neutral-100)]', FOCUS)}
+          className="pl-2.5 pr-3 text-[var(--dashboard-figure)] shadow-[var(--dashboard-control-shadow)]"
+          leftIcon={<Plus aria-hidden strokeWidth={1.5} absoluteStrokeWidth />}
         >
-          <Plus aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth />Add to board
-        </button>
+          Add to board
+        </Button>
       </PopoverTrigger>
       <PopoverContent
         side="bottom" align="end" sideOffset={6} collisionPadding={8} variant="dropdown" maxHeight={false}
@@ -270,21 +281,22 @@ function AddToBoard({ metric, boards, onPick }: { metric: Metric; boards: Board[
         <div role="menu" aria-label="Your boards" className="flex flex-col p-1.5">
           <p className="m-0 py-1.5 pl-2.5 text-[length:var(--font-size-small)] font-medium leading-4 text-[var(--neutral-700)]">Your boards</p>
           {boards.map((b) => (
-            // eslint-disable-next-line no-restricted-syntax -- ds-allow: a board row of the Add to board menu (Figma 170:81328)
-            <button
+            <Button
               key={b.id}
-              type="button"
+              variant="ghost"
+              size="sm"
               role="menuitem"
               data-board-option={b.id}
               onClick={() => { setOpen(false); onPick(b.id) }}
-              className={cn('flex h-9 w-full cursor-pointer items-center gap-2.5 rounded-lg border-0 bg-transparent px-2.5 text-left text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-figure)] hover:bg-[var(--dashboard-sync-bg)] focus-visible:bg-[var(--dashboard-sync-bg)]', FOCUS)}
+              leftIcon={<LayoutGrid aria-hidden strokeWidth={1.5} absoluteStrokeWidth className="text-[var(--dashboard-label)]" />}
+              iconSize={16}
+              className={cn(ROW_BUTTON, 'gap-2.5 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-figure)]')}
             >
-              <LayoutGrid aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0 text-[var(--dashboard-label)]" />
               <span className="min-w-0 flex-1 truncate">{b.label}</span>
               {b.cards.some((c) => Metrics.base(c.metricId) === metric.id) && (
                 <span className="shrink-0 rounded-full bg-[var(--dashboard-sync-bg)] px-2 py-0.5 text-[length:var(--font-size-caption)] font-medium leading-4 text-[var(--neutral-700)]">Already on it</span>
               )}
-            </button>
+            </Button>
           ))}
         </div>
       </PopoverContent>

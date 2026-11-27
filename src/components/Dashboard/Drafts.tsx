@@ -1,12 +1,13 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import { ArrowUp, Sparkles, X } from 'lucide-react'
-import { Button, IconButton } from '@/components/ui'
+import { Button, IconButton, Input, Textarea } from '@/components/ui'
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import type { DraftMessage } from '@/lib/api/warehouse'
 import { SourceLogo } from './icons'
+import { PLAIN_BUTTON } from './plain-button'
 import { Spinner } from './sync/Spinner'
 import { useDashboardData } from './live/dashboard-data'
 import { AI_EXAMPLES } from './templates'
@@ -56,6 +57,7 @@ function Describe({ initial, onSend }: Omit<AskAIDialogProps, 'open'>) {
   const { apps: connected } = useDashboardData()
   const [text, setText] = useState(initial)
   const boxRef = useRef<HTMLTextAreaElement>(null)
+  const hintId = useId()
   const apps = connected.list
   const send = () => { if (text.trim()) onSend(text.trim()) }
   return (
@@ -71,19 +73,21 @@ function Describe({ initial, onSend }: Omit<AskAIDialogProps, 'open'>) {
         <DialogClose asChild>
           <IconButton variant="ghost" size="sm" iconSize={14} aria-label="Close" className="absolute right-3.5 top-3.5 size-7 rounded-md" icon={<X strokeWidth={1.5} absoluteStrokeWidth />} />
         </DialogClose>
-        {/* The box, with Make a draft inside it (greyed until there's text). */}
-        <div className="relative h-[120px] rounded-xl border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-card-bg)] focus-within:border-[var(--dashboard-way-border)]">
-          {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the describe box with its button inside (Figma 170:73490) */}
-          <textarea
+        {/* The box, with Make a draft inside it (greyed until there's text); the Textarea primitive
+            (Figma 170:73490), with room at the bottom for the button. */}
+        <div className="relative">
+          <Textarea
             ref={boxRef}
             aria-label="Describe the board you want"
+            aria-describedby={hintId}
             placeholder="What should this board show? Say what you want to keep an eye on, and how often."
             value={text}
             onChange={(e) => setText(e.target.value)}
-            // Enter sends, Shift+Enter adds a line (NB-20).
+            // Enter sends, Shift+Enter adds a line (NB-20, A11Y-KB-09).
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send() } }}
-            className="kaya-scrollbar block size-full resize-none rounded-xl border-0 bg-transparent px-3.5 pb-12 pt-3 text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)]"
+            className="kaya-scrollbar h-[120px] rounded-xl px-3.5 pb-12 pt-3"
           />
+          <span id={hintId} className="sr-only">Enter makes a draft; Shift and Enter add a line.</span>
           <Button size="sm" data-make-draft disabled={!text.trim()} onClick={send} className="absolute bottom-2.5 right-2.5" leftIcon={<ArrowUp aria-hidden strokeWidth={1.5} absoluteStrokeWidth />}>
             Make a draft
           </Button>
@@ -91,16 +95,16 @@ function Describe({ initial, onSend }: Omit<AskAIDialogProps, 'open'>) {
         {/* Examples fill the box; they don't send. */}
         <div className="flex flex-wrap gap-2">
           {AI_EXAMPLES.map((ex) => (
-            // eslint-disable-next-line no-restricted-syntax -- ds-allow: an example chip (Figma 170:73497)
-            <button
+            // An example chip (Figma 170:73497).
+            <Button
               key={ex}
-              type="button"
+              variant="link"
               data-example
               onClick={() => { setText(ex); boxRef.current?.focus() }}
-              className={cn('h-7 cursor-pointer rounded-full border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-panel-bg)] px-3 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--neutral-700)] hover:bg-[var(--dashboard-hover-band)]', FOCUS)}
+              className={cn(PLAIN_BUTTON, 'h-7 cursor-pointer !rounded-full border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-panel-bg)] px-3 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--neutral-700)] hover:bg-[var(--dashboard-hover-band)]', FOCUS)}
             >
               {ex}
-            </button>
+            </Button>
           ))}
         </div>
         <span aria-hidden className="h-px bg-[var(--neutral-200)]" />
@@ -165,7 +169,8 @@ interface DraftBarProps {
 
 export function DraftBar({ draft, onStop, onRedraft, onEdit, onDiscard, onKeep }: DraftBarProps) {
   const [change, setChange] = useState('')
-  const segment = cn('flex h-9 cursor-pointer items-center rounded-full border-0 bg-transparent px-3.5 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)] transition-colors duration-fast hover:bg-[var(--neutral-100)]', FOCUS)
+  // A segment of the draft bar (Figma 170:79963), on the Button primitive.
+  const segment = cn(PLAIN_BUTTON, 'flex h-9 cursor-pointer items-center !rounded-full border-0 bg-transparent px-3.5 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-figure)] transition-colors duration-fast hover:bg-[var(--neutral-100)]', FOCUS)
   const bar = 'absolute bottom-5 right-5 z-30 flex max-w-[calc(100%-40px)] items-center gap-0.5 rounded-full bg-[var(--dashboard-card-bg)] p-1 shadow-[var(--dashboard-popover-shadow)]'
 
   if (draft.phase === 'drafting') {
@@ -173,8 +178,7 @@ export function DraftBar({ draft, onStop, onRedraft, onEdit, onDiscard, onKeep }
       <div data-dashboard-fab data-draft-bar="drafting" role="toolbar" aria-label="Draft" className={bar}>
         <span role="status" className="flex h-9 items-center gap-2 pl-3 pr-2 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--dashboard-label)]"><Spinner size={14} />Drafting…</span>
         <span aria-hidden className="mx-0.5 h-4 w-px bg-[var(--neutral-200)]" />
-        {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a segment of the draft bar (Figma 170:79963) */}
-        <button type="button" className={segment} onClick={onStop}>Stop</button>
+        <Button variant="link" className={segment} onClick={onStop}>Stop</Button>
       </div>
     )
   }
@@ -182,26 +186,25 @@ export function DraftBar({ draft, onStop, onRedraft, onEdit, onDiscard, onKeep }
     <div data-dashboard-fab data-draft-bar={draft.phase} role="toolbar" aria-label="Draft" className={bar}>
       {draft.phase === 'ready' && (
         <>
-          {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the draft bar's Change something box (Figma 171:89377) */}
-          <input
+          {/* The draft bar's Change something box (Figma 171:89377), on the Input primitive. */}
+          <Input
+            size="small"
             aria-label="Change something"
             placeholder="Change something…"
             value={change}
-            onChange={(e) => setChange(e.target.value)}
+            onChange={setChange}
             onKeyDown={(e) => { if (e.key === 'Enter' && change.trim()) { e.preventDefault(); onRedraft(change.trim()); setChange('') } }}
-            className="h-9 w-[220px] min-w-0 shrink rounded-full border border-solid border-[var(--neutral-200)] bg-[var(--dashboard-panel-bg)] px-3.5 text-[length:var(--font-size-body-sm)] leading-5 text-[var(--dashboard-figure)] outline-none placeholder:text-[var(--dashboard-faint)] focus:border-[var(--dashboard-way-border)]"
+            className="w-[220px] min-w-0 shrink"
           />
-          {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a segment of the draft bar */}
-          <button type="button" className={segment} onClick={onEdit}>Edit</button>
+          <Button variant="link" className={segment} onClick={onEdit}>Edit</Button>
         </>
       )}
-      {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: a segment of the draft bar */}
-      <button type="button" className={segment} onClick={onDiscard}>Discard</button>
+      <Button variant="link" className={segment} onClick={onDiscard}>Discard</Button>
       {draft.phase === 'ready' && (
-        // eslint-disable-next-line no-restricted-syntax -- ds-allow: the dark Keep board segment (Figma 171:89377)
-        <button type="button" onClick={onKeep} className={cn('flex h-9 cursor-pointer items-center whitespace-nowrap rounded-full border-0 px-[var(--space-4-5)] text-[length:var(--font-size-body-sm)] font-medium leading-5', DIAL, FOCUS)}>
+        // The dark Keep board segment (Figma 171:89377).
+        <Button variant="link" onClick={onKeep} className={cn(PLAIN_BUTTON, 'flex h-9 cursor-pointer items-center whitespace-nowrap !rounded-full border-0 px-[var(--space-4-5)] text-[length:var(--font-size-body-sm)] font-medium leading-5', DIAL, FOCUS)}>
           Keep board
-        </button>
+        </Button>
       )}
     </div>
   )

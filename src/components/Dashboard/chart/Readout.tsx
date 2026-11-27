@@ -23,6 +23,36 @@ export function useSize<T extends HTMLElement>() {
   return [ref, size] as const
 }
 
+/**
+ * Arrow keys through a chart's days or weeks, for a chart that is its own Tab stop (the metric
+ * window's): ← → one at a time, Home / End to the ends, Esc stops; leaving the chart stops too.
+ * `index` is null until a key is pressed; the first ← or → starts on the latest.
+ */
+export function useChartKeys(count: number) {
+  const [index, setIndex] = useState<number | null>(null)
+  const shown = index === null || count === 0 ? null : Math.min(index, count - 1)
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape' && shown !== null) { e.preventDefault(); e.stopPropagation(); setIndex(null); return }
+    if (!count) return
+    const last = count - 1
+    const next = e.key === 'ArrowLeft' ? (shown === null ? last : Math.max(0, shown - 1))
+      : e.key === 'ArrowRight' ? (shown === null ? last : Math.min(last, shown + 1))
+      : e.key === 'Home' ? 0
+      : e.key === 'End' ? last
+      : null
+    if (next === null) return
+    e.preventDefault()
+    setIndex(next)
+  }
+  return { index: shown, onKeyDown, onBlur: () => setIndex(null) }
+}
+
+/** A readout as one line for screen readers: "Thu 13 Nov: 13 Nov $7,500, Previous period · 6 Nov $6,900. +8.7% vs previous period". */
+export function readoutText(content: ReadoutContent): string {
+  const rows = content.rows.map((r) => `${r.label} ${r.value}`).join(', ')
+  return `${content.title}: ${rows}${content.footer ? `. ${content.footer.text}` : ''}`
+}
+
 export interface ReadoutRow {
   /** The dot before the label: this period (ink), the period before (grey), a week in progress (soft). */
   dot?: 'ink' | 'previous' | 'soft' | 'met' | 'missed'
@@ -68,7 +98,9 @@ export function Readout({ content, x, y, width, height }: ReadoutProps) {
   return (
     <div
       ref={ref}
-      role="status"
+      // Seen, not announced: keyboard reading is announced once by its own status region
+      // (readoutText), so one change is one announcement (A11Y-AN-06).
+      aria-hidden
       data-readout
       className="pointer-events-none absolute z-10 flex min-w-[180px] flex-col gap-[var(--space-0-75)] whitespace-nowrap rounded-lg bg-[var(--dashboard-card-bg)] px-2.5 py-2 text-[length:var(--font-size-small)] leading-4 shadow-[var(--dashboard-readout-shadow)]"
       style={{ left, top }}

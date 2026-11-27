@@ -1,5 +1,6 @@
 'use client'
 
+import { IconButton } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { SIZE_LABEL, SIZE_LEVEL, SIZE_NAME, type GripProps } from './MetricCard'
 import type { CardSize } from './types'
@@ -15,24 +16,27 @@ const FOCUS = 'outline-none focus-visible:outline-2 focus-visible:outline-solid 
  */
 export function RemoveBadge({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    // eslint-disable-next-line no-restricted-syntax -- ds-allow: the card's remove badge (Figma 19:5119)
-    <button
-      type="button"
+    // The 22 px round badge: its own fill, ring and shadow; it grows a little on hover.
+    <IconButton
+      variant="outline"
+      size="xs"
+      iconSize={10}
       aria-label={`Remove ${label}`}
       data-no-drag // never starts a card drag
       data-remove-badge
       onClick={onRemove}
+      icon={
+        <svg aria-hidden width="10" height="2" viewBox="0 0 10 2" fill="none">
+          <path d="M0.9 1h8.17" stroke="currentColor" strokeWidth="1.46" strokeLinecap="round" />
+        </svg>
+      }
       className={cn(
-        'absolute -left-[7px] -top-[7px] z-10 flex size-[22px] cursor-pointer items-center justify-center rounded-full p-0',
-        'border border-solid border-[var(--dashboard-list-border)] bg-[var(--dashboard-badge-bg)] text-[var(--dashboard-figure)] shadow-[var(--dashboard-badge-shadow)]',
+        'absolute -left-[7px] -top-[7px] z-10 size-[22px] rounded-full',
+        'border-[var(--dashboard-list-border)] bg-[var(--dashboard-badge-bg)] text-[var(--dashboard-figure)] shadow-[var(--dashboard-badge-shadow)] [--hv:transparent]',
         'transition-transform duration-fast ease-standard hover:scale-110 active:scale-95',
         FOCUS,
       )}
-    >
-      <svg aria-hidden width="10" height="2" viewBox="0 0 10 2" fill="none">
-        <path d="M0.9 1h8.17" stroke="currentColor" strokeWidth="1.46" strokeLinecap="round" />
-      </svg>
-    </button>
+    />
   )
 }
 

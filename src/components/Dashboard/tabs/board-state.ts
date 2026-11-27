@@ -1,5 +1,5 @@
 // Board tabs: the state and every rule that changes it, as pure functions.
-// Rules: docs-v2/dashboard/01-tabs-rules.md (IDs in comments: TAB-…, MT-…).
+// Rules: fe-handbook/features/dashboard/source-docs/01-tabs-rules.md (IDs in comments: TAB-…, MT-…).
 //
 // The state is the contract a backend will need: every board you can see, your tab order, the
 // boards you've hidden, the boards you deleted (kept 30 days) and the open board.
@@ -194,7 +194,7 @@ export type BoardAction =
   | { type: 'remove-card'; id: string; metricId: string }
   | { type: 'add-card'; id: string; metricId: string }
   /** Several cards at the end, in this order, each at its size (06 AC-16). A metric already on the board gets a second card ("revenue#2"). */
-  | { type: 'add-cards'; id: string; cards: { metricId: string; size: CardSize }[] }
+  | { type: 'add-cards'; id: string; cards: NewCard[] }
   | { type: 'set-dates'; id: string; period?: string; compare?: string }
   | { type: 'purge-expired'; now: number }
 
@@ -380,6 +380,9 @@ export function boardReducer(s: DashboardState, a: BoardAction): DashboardState 
   }
 }
 
+/** A card to add: its metric, size and, for a copy, the chart it keeps (CS-7). */
+export interface NewCard { metricId: string; size: CardSize; chart?: BoardCard['chart'] }
+
 /** The card ids `addCardsAtEnd` gives: a metric already there (or twice in the batch) gets "#2", "#3"… */
 export function cardIdsFor(existing: string[], metricIds: string[]): string[] {
   const used = new Set(existing)
@@ -392,12 +395,12 @@ export function cardIdsFor(existing: string[], metricIds: string[]): string[] {
 }
 
 /** Cards added at the end, in order (06 AC-16). */
-export function addCardsAtEnd(cards: BoardCard[], add: { metricId: string; size: CardSize }[]): BoardCard[] {
+export function addCardsAtEnd(cards: BoardCard[], add: NewCard[]): BoardCard[] {
   const ids = cardIdsFor(cards.map((c) => c.metricId), add.map((c) => c.metricId))
   let next = cards
   add.forEach((c, i) => {
     const d = dims(c.size)
-    next = [...next, { metricId: ids[i], size: c.size, ...fitAtEnd(toItems(next), d.w, d.h) }]
+    next = [...next, { metricId: ids[i], size: c.size, ...(c.chart ? { chart: c.chart } : {}), ...fitAtEnd(toItems(next), d.w, d.h) }]
   })
   return withItems(next, toItems(next))
 }

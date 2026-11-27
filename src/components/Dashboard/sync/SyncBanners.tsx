@@ -3,13 +3,15 @@
 import { useEffect, useState } from 'react'
 import { Plug, TriangleAlert, X } from 'lucide-react'
 import { Tooltip } from '@/components/Tooltip'
+import { Button, IconButton } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import { RotateCwClockIcon } from '../icons'
 import type { AppId } from '../types'
 import { appNames, banners, clock, hoursSince, type Banner } from './sync-model'
 import {
-  blockedReason, dismissBanner, dismissRecent, reconnect, syncApps, useSyncSnapshot, type Recent,
+  blockedReason, dismissBanner, dismissRecent, reconnect, useSyncSnapshot, type Recent,
 } from './sync-store'
+import { useSyncApps, useSyncPending } from './use-sync-actions'
 import { Spinner } from './Spinner'
 
 // The board's sync banners (Figma 202:60604, 115:20386, 115:20736; SY-13 – SY-22): failed (red)
@@ -55,15 +57,16 @@ function Shell({ kind, children, onClose, ...rest }: { kind: keyof typeof LOOK; 
       {...rest}
     >
       {children}
-      {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the 28px round × of the sync banners (Figma 202:60612) */}
-      <button
-        type="button"
+      {/* The 28px round × of the sync banners (Figma 202:60612). */}
+      <IconButton
+        variant="ghost"
+        size="xs"
+        iconSize={14}
         aria-label="Hide this banner"
         onClick={onClose}
-        className={cn('flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 text-[var(--dashboard-muted)] transition-colors duration-fast hover:bg-[var(--dashboard-row-hover)] hover:text-[var(--dashboard-figure)]', FOCUS)}
-      >
-        <X aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />
-      </button>
+        icon={<X aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}
+        className={cn('size-7 rounded-full text-[var(--dashboard-muted)] [--hv:var(--dashboard-row-hover)] hover:text-[var(--dashboard-figure)] active:scale-100', FOCUS)}
+      />
     </div>
   )
 }
@@ -87,6 +90,8 @@ const TEXT = 'min-w-0 flex-1 text-[length:var(--font-size-body-sm)] leading-5 te
 
 function ProblemBanner({ banner: b, boardId }: { banner: Banner; boardId: string }) {
   const s = useSyncSnapshot()
+  const syncApps = useSyncApps()
+  const pending = useSyncPending()
   const now = s.now
   const blocked = blockedReason(s, now)
   const one = b.apps.length === 1
@@ -127,7 +132,7 @@ function ProblemBanner({ banner: b, boardId }: { banner: Banner; boardId: string
           </BannerAction>
         )}
         {!signIn && (
-          <BannerAction tone="failed" disabled={blocked !== null} onClick={() => { void syncApps(b.apps) }} icon={<RotateCwClockIcon aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}>
+          <BannerAction tone="failed" disabled={blocked !== null || pending} onClick={() => syncApps(b.apps)} icon={<RotateCwClockIcon aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}>
             Try again
           </BannerAction>
         )}
@@ -145,9 +150,9 @@ function ProblemBanner({ banner: b, boardId }: { banner: Banner; boardId: string
           : <><Names ids={b.apps} /> haven’t synced in over 2 hours. Some data may be out of date.</>}
       </p>
       <BannerAction
-        tone="behind" disabled={blocked !== null}
+        tone="behind" disabled={blocked !== null || pending}
         tooltip={blocked === 'cooldown' ? 'Synced just now • Sync again in a minute' : null}
-        onClick={() => { void syncApps(b.apps) }}
+        onClick={() => syncApps(b.apps)}
         icon={<RotateCwClockIcon aria-hidden size={14} strokeWidth={1.5} absoluteStrokeWidth />}
       >
         Sync
@@ -162,20 +167,23 @@ function BannerAction({ tone, disabled, onClick, icon, tooltip = null, children 
   return (
     <Tooltip content={tooltip} disabled={!tooltip} side="bottom">
       <span className="inline-flex shrink-0 rounded-md">
-        {/* eslint-disable-next-line no-restricted-syntax -- ds-allow: the banner's text action in its own colour (Figma 202:60609) */}
-        <button
-          type="button"
+        {/* The banner's text action in its own colour (Figma 202:60609). */}
+        <Button
+          variant="ghost"
+          size="xs"
           disabled={disabled}
           onClick={onClick}
+          iconSize={14}
+          leftIcon={icon}
           className={cn(
-            'flex h-7 cursor-pointer items-center gap-1 rounded-md border-0 bg-transparent px-1.5 text-[length:var(--font-size-body-sm)] font-medium leading-5 transition-[background-color,opacity] duration-fast',
-            'hover:bg-[var(--dashboard-row-hover)] disabled:pointer-events-none disabled:opacity-50',
+            'h-7 min-h-7 gap-1 rounded-md border-0 bg-transparent px-1.5 [font-family:inherit] text-[length:var(--font-size-body-sm)] font-medium leading-5',
+            '[--hv:var(--dashboard-row-hover)] hover:border-transparent active:scale-100 disabled:pointer-events-none disabled:opacity-50',
             tone === 'failed' ? 'text-[var(--dashboard-sync-failed)]' : 'text-[var(--dashboard-sync-behind)]',
             FOCUS,
           )}
         >
-          {icon}{children}
-        </button>
+          {children}
+        </Button>
       </span>
     </Tooltip>
   )

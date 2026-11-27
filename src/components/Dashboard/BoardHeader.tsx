@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Calendar, CalendarRange, ChevronDown } from 'lucide-react'
 import { Dropdown } from '@/components/Dropdown'
 import { Tooltip } from '@/components/Tooltip'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { CustomRange } from './CustomRange'
 import { COMPARISONS, PERIODS } from './period'
@@ -36,22 +37,24 @@ export function PeriodMenu({ period, compare, onChange }: PeriodMenuProps) {
       onOpenChange={setOpen}
       placement="bottom-end"
       trigger={
-        // eslint-disable-next-line no-restricted-syntax -- ds-allow: two-tone Geist label (period + comparison) that Button's single-label Google Sans style can't express
-        <button
-          type="button"
+        // Borderless and two-tone (the period, then the comparison), in the header's body font.
+        <Button
+          variant="ghost"
+          size="sm"
+          active={open}
           aria-label={`Period: ${periodLabel}, ${compareLabel}`}
+          leftIcon={<Calendar aria-hidden strokeWidth={1.5} absoluteStrokeWidth className="text-[var(--dashboard-label)]" />}
+          iconSize={16}
           className={cn(
-            'flex h-8 cursor-pointer items-center gap-1.5 rounded-full border-0 bg-transparent px-2.5 text-[length:var(--font-size-body-sm)] leading-5',
-            'transition-colors duration-fast hover:bg-[var(--dashboard-tabs-track)]',
-            open && 'bg-[var(--dashboard-tabs-track)]',
+            'h-8 min-h-8 gap-1.5 rounded-full border-0 bg-transparent px-2.5 text-[length:var(--font-size-body-sm)] leading-5 shadow-none [font-family:inherit]',
+            '[--hv:var(--dashboard-tabs-track)] hover:border-transparent active:scale-100 transition-colors duration-fast [&>span]:flex [&>span]:items-center [&>span]:gap-1.5 [&>span]:px-0',
             FOCUS,
           )}
         >
-          <Calendar aria-hidden size={16} strokeWidth={1.5} absoluteStrokeWidth className="shrink-0 text-[var(--dashboard-label)]" />
           <span className="font-medium text-[var(--dashboard-figure)]">{periodLabel}</span>
-          {compare !== 'none' && <span className="text-[var(--dashboard-muted)]">{compareLabel}</span>}
+          {compare !== 'none' && <span className="font-normal text-[var(--dashboard-muted)]">{compareLabel}</span>}
           <ChevronDown aria-hidden size={12} strokeWidth={1.75} absoluteStrokeWidth className="shrink-0 text-[var(--dashboard-muted)]" />
-        </button>
+        </Button>
       }
     >
       <Dropdown size="md" maxHeight={false}>
@@ -91,7 +94,9 @@ export function PeriodMenu({ period, compare, onChange }: PeriodMenuProps) {
 export function SharedByAvatar({ person }: { person: Person }) {
   return (
     <Tooltip content={`Shared by ${person.name}`} side="bottom">
-      <span tabIndex={0} aria-label={`Shared by ${person.name}`} className={cn('mr-1 inline-flex rounded-full', FOCUS)}>
+      {/* A picture with a name, not a control: it isn't a tab stop. Keyboard users find the sharer
+          at the foot of the board's tab menu (SharedByFooter). */}
+      <span role="img" aria-label={`Shared by ${person.name}`} className="mr-1 inline-flex rounded-full">
         <PersonAvatar initials={person.initials} color={person.color} size={24} />
       </span>
     </Tooltip>

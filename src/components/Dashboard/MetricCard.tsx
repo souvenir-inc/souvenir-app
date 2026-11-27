@@ -1,14 +1,19 @@
 'use client'
 
-import { useLayoutEffect, useRef, useState } from 'react'
+import { createContext, use, useId, useLayoutEffect, useRef, useState } from 'react'
 import { m, useReducedMotion } from 'framer-motion'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { Tooltip } from '@/components/Tooltip'
+import { Button } from '@/components/ui'
+import { useNumberStyle } from '@/lib/number-style'
 import { cn } from '@/lib/utils'
 import { opens, type CardBody, type HealthPill } from './card-states'
-import { WeeklyBars } from './chart/Bars'
-import { LineChart } from './chart/LineChart'
+import { WeeklyBars, drawnWeeks, weekReadout } from './chart/Bars'
+import { LineChart, readoutFor } from './chart/LineChart'
+import { readoutText, useChartKeys } from './chart/Readout'
+import { formatFigure } from './format'
 import { SourceMark } from './icons'
+import { PLAIN_BUTTON } from './plain-button'
 import { useDashboardData } from './live/dashboard-data'
 import { compareName } from './period'
 import type { App, CardSize, Metric } from './types'
@@ -22,7 +27,7 @@ import { DURATION } from "@/styles/tokens/motion"
 //   lg       6×2  592×328  the number, the full chart (or weekly bars)
 //   full     12×1          the number, a wide line
 //   full-lg  12×2          the number, the full chart with its legend
-// Reading the board the whole card is a button that opens its metric window (CR-6 – CR-8); empty
+// Reading the board a click anywhere on the card, or its button, opens its metric window (CR-6 – CR-8); empty
 // and locked cards don't open (CR-18). In edit mode it shows a × in place of the logo and a resize
 // arc on the bottom-right corner and a remove badge on the top-left, drawn by BoardGrid (Figma 2.5).
 
@@ -83,11 +88,25 @@ interface MetricCardProps {
   className?: string
 }
 
+/**
+ * Cards drawn for a picture (the card and board image downloads): the numbers show at once instead
+ * of fading in, so the picture can be taken on the next frame without waiting on the animation.
+ */
+export const StillCards = createContext(false)
+
+/** Which chart a card draws, by size and choice; null when it has none (the 3 × 1 card). */
+function chartOf(size: CardSize, bars: boolean): 'bars' | 'line' | null {
+  if (size === 'sm') return null
+  return bars && size !== 'sm-tall' && size !== 'full' ? 'bars' : 'line'
+}
+
 export function MetricCard({ metric, size, view, dragging = false, editing = false, onRemove, onOpen, onRetry, index = 0, className }: MetricCardProps) {
   // The chart follows the size: wide cards draw the line, tall wide cards weekly bars (Figma 2.5).
   // A card's own choice in its settings wins (10 CS-6).
   const bars = view?.bars ?? barsBySize(size)
   const { apps } = useDashboardData()
+  const [numberStyle] = useNumberStyle()
+  const hintId = useId()
   // Up to two marks: the app, or the two it blends (CR-5).
   const marks = metric.apps.slice(0, 2).map((id) => apps.get(id)).filter((a): a is App => !!a)
   const body = view?.body ?? 'numbers'
@@ -96,32 +115,62 @@ export function MetricCard({ metric, size, view, dragging = false, editing = fal
   const drawn = body === 'numbers' && metric.amount !== null && (bars ? metric.weekly.filter((w) => w.value != null).length >= 2 : metric.series.daysWithData >= 2)
   const tall = TALL.includes(size)
   const wide = WIDE.includes(size)
+  // The figure in the viewer's number style (Settings → Data preferences).
+  const value = formatFigure(metric.amount, metric.format, numberStyle)
+
+  // What the arrow keys can read: the chart as drawn, day by day or week by week.
+  const chart = body === 'numbers' && !view?.chartLoading && !view?.chartFailed ? chartOf(size, bars) : null
+  const weeks = chart === 'bars' ? drawnWeeks(metric) : []
+  const steps = chart === 'bars'
+    ? (weeks.filter((w) => w.value != null).length >= 2 ? weeks.length : 0)
+    : chart === 'line' && metric.series.daysWithData >= 2 ? metric.series.days.length : 0
+  // The day (or week) the arrow keys are reading, while the card's button has focus (A11Y-KB-01).
+  const keys = useChartKeys(steps)
+  const shown = keys.index
+  const reading = shown === null ? ''
+    : readoutText(chart === 'bars'
+      ? weekReadout(metric, shown + metric.weekly.length - weeks.length)
+      : readoutFor(metric, metric.series, shown, tall && size !== 'sm-tall'))
+
   const change = metric.change ? `${metric.change.direction === 'up' ? 'up' : 'down'} ${metric.change.label}` : 'no comparison'
   const label = openable
-    ? `${metric.label}, ${body === 'today-empty' ? 'no data yet' : `${metric.value}, ${change}`}${view?.dot ? `, ${view.dot.tip}` : ''}. Open`
+    ? `${metric.label}, ${body === 'today-empty' ? 'no data yet' : `${value}, ${change}`}${view?.dot ? `, ${view.dot.tip}` : ''}. Open`
     : metric.label
   return (
     <article
-      aria-label={label}
+      aria-label={metric.label}
       data-card-body={body}
-      role={openable ? 'button' : undefined}
-      tabIndex={openable ? 0 : undefined}
+      // A click anywhere on the card opens it (CR-6); the keyboard and screen readers use its button.
       onClick={openable ? onOpen : undefined}
-      onKeyDown={openable ? (e) => {
-        if (e.target !== e.currentTarget || (e.key !== 'Enter' && e.key !== ' ')) return
-        e.preventDefault()
-        onOpen?.()
-      } : undefined}
       className={cn(
         'group/card relative size-full overflow-clip rounded-xl bg-[var(--dashboard-card-bg)]',
         'transition-shadow duration-base ease-standard',
         dragging ? 'shadow-[var(--dashboard-raised-shadow)]' : 'shadow-[var(--dashboard-card-shadow)]',
-        // Hover lifts the card a little; the pointer is a hand anywhere on it (CR-6). Focus: a 2 px
-        // ring 4 px outside the card (CR-8).
-        openable && 'cursor-pointer hover:shadow-[var(--dashboard-card-hover-shadow)] outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]',
+        // Hover lifts the card a little; the pointer is a hand anywhere on it (CR-6). Focus on its
+        // button: a 2 px ring 4 px outside the card (CR-8).
+        openable && 'cursor-pointer hover:shadow-[var(--dashboard-card-hover-shadow)] outline-none has-[[data-card-open]:focus-visible]:outline-2 has-[[data-card-open]:focus-visible]:outline-offset-4 has-[[data-card-open]:focus-visible]:outline-solid has-[[data-card-open]:focus-visible]:outline-[var(--focus-ring)]',
         className,
       )}
     >
+      {openable && (
+        // The card's own button (A11Y-AR-04: a real button inside the article, not role="button" on
+        // it), stretched under the content so a click anywhere still lands on the card. Arrow keys
+        // read its chart (A11Y-KB-01).
+        <>
+          <Button
+            variant="link"
+            data-card-open
+            aria-label={label}
+            aria-describedby={steps ? hintId : undefined}
+            onClick={(e) => { e.stopPropagation(); onOpen?.() }}
+            onKeyDown={keys.onKeyDown}
+            onBlur={keys.onBlur}
+            className={cn(PLAIN_BUTTON, 'absolute inset-0 size-full !rounded-xl p-0 focus-visible:outline-transparent')}
+          />
+          {steps > 0 && <span id={hintId} className="sr-only">Left and right arrow keys read the chart.</span>}
+          <span role="status" className="sr-only">{reading}</span>
+        </>
+      )}
       <div className={cn('absolute left-4 top-4 flex h-5 min-w-0 items-center gap-1.5', marks.length > 1 ? 'right-[60px]' : 'right-10', size === 'full-lg' && 'right-[230px]', size === 'lg' && bars && 'right-[150px]')}>
         <Title text={metric.label} />
         {view?.dot && <SyncDot tone={view.dot.tone} tip={view.dot.tip} />}
@@ -142,7 +191,7 @@ export function MetricCard({ metric, size, view, dragging = false, editing = fal
       <Body
         metric={metric} bars={bars} size={size} view={view} body={body} tall={tall} wide={wide} index={index}
         appNames={metric.apps.map((id) => apps.get(id)?.name).filter((n): n is string => !!n)}
-        onRetry={onRetry} onRemove={onRemove}
+        onRetry={onRetry} onRemove={onRemove} value={value} active={shown}
       />
 
     </article>
@@ -162,10 +211,15 @@ interface BodyProps {
   appNames: string[]
   onRetry?: () => void
   onRemove?: () => void
+  /** The figure, formatted in the viewer's number style. */
+  value: string
+  /** The day or week the keyboard is reading on the chart. */
+  active: number | null
 }
 
-function Body({ metric, bars, size, view, body, tall, wide, index, appNames, onRetry, onRemove }: BodyProps) {
+function Body({ metric, bars, size, view, body, tall, wide, index, appNames, onRetry, onRemove, value, active }: BodyProps) {
   const reduceMotion = useReducedMotion()
+  const still = use(StillCards)
   const chartBox = chartBoxFor(size, bars)
   const figureAt = tall ? 'top-11' : view?.health && body === 'numbers' && !tall ? 'bottom-[46px]' : 'bottom-4'
 
@@ -186,7 +240,7 @@ function Body({ metric, bars, size, view, body, tall, wide, index, appNames, onR
       <CardEmptyState
         kind={kind}
         compact={size === 'sm'}
-        detail={emptyDetail(kind, { apps: appNames, reason: metric.unmeasured })}
+        detail={emptyDetail(kind, { apps: appNames, code: metric.unavailableCode })}
         action={emptyAction(kind, { canEdit: !!view?.canEdit, onRetry, onRemove })}
         className={cn('absolute left-4 right-4', tall ? 'top-12' : 'bottom-4')}
       />
@@ -215,11 +269,11 @@ function Body({ metric, bars, size, view, body, tall, wide, index, appNames, onR
   if (metric.amount === null && series.daysWithData === 0 && !view?.chartLoading) return empty('no-dates')
   return (
     <m.div
-      initial={reduceMotion ? false : { opacity: 0 }}
+      initial={reduceMotion || still ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: DURATION.moderate, delay: Math.min(index, 12) * 0.04 }}
     >
-      <Figure metric={metric} syncing={!!view?.syncing} className={figureAt} inlinePill={tall && size !== 'sm-tall' ? view?.health : undefined} />
+      <Figure metric={metric} value={value} syncing={!!view?.syncing} className={figureAt} inlinePill={tall && size !== 'sm-tall' ? view?.health : undefined} />
       {view?.health && (!tall || size === 'sm-tall') && (
         <div className={cn('absolute left-4 flex items-center gap-2', size === 'sm-tall' ? 'top-[84px]' : 'bottom-4')}>
           <HealthPillView pill={view.health} withTarget={wide} />
@@ -233,9 +287,9 @@ function Body({ metric, bars, size, view, body, tall, wide, index, appNames, onR
         <p data-chart-failed className={cn('m-0 flex items-center justify-center text-center text-[length:var(--font-size-small)] leading-4 text-[var(--dashboard-muted)]', chartBox)}>Couldn’t load the chart</p>
       )}
       {chartBox && !view?.chartLoading && !view?.chartFailed && (
-        bars && size !== 'sm-tall' && size !== 'full'
-          ? <WeeklyBars metric={metric} variant={size === 'md' ? 'compact' : 'full'} className={chartBox} />
-          : <LineChart metric={metric} series={series} variant={tall && size !== 'sm-tall' ? 'full' : 'spark'} className={chartBox} />
+        chartOf(size, bars) === 'bars'
+          ? <WeeklyBars metric={metric} variant={size === 'md' ? 'compact' : 'full'} active={active} className={chartBox} />
+          : <LineChart metric={metric} series={series} variant={tall && size !== 'sm-tall' ? 'full' : 'spark'} active={active} className={chartBox} />
       )}
     </m.div>
   )
@@ -319,13 +373,13 @@ export function HealthPillView({ pill, withTarget }: { pill: HealthPill; withTar
   )
 }
 
-function Figure({ metric, syncing, inlinePill, className }: { metric: Metric; syncing: boolean; inlinePill?: HealthPill | null; className?: string }) {
+function Figure({ metric, value, syncing, inlinePill, className }: { metric: Metric; value: string; syncing: boolean; inlinePill?: HealthPill | null; className?: string }) {
   const { change } = metric
   const Arrow = change?.direction === 'up' ? ArrowUp : ArrowDown
   return (
     <div className={cn('absolute left-4 flex items-baseline gap-2', inlinePill && 'right-4 min-w-0', className)}>
       <p data-syncing={syncing || undefined} className={cn('m-0 whitespace-nowrap text-[length:var(--font-size-heading-xl)] font-medium leading-8 tracking-[var(--dashboard-card-value-tracking)] text-[var(--dashboard-figure)]', syncing && 'dashboard-shimmer-text')}>
-        {metric.value}
+        {value}
       </p>
       {change ? (
         <p

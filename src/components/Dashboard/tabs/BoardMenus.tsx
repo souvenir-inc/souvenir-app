@@ -1,7 +1,7 @@
 'use client'
 
 import {
-  ArchiveRestore, ArrowLeft, ArrowRight, ChevronRight, Copy, Download, EyeOff, History, House,
+  ArchiveRestore, ArrowLeft, ArrowRight, ChevronRight, Copy, Download, EyeOff, House,
   LayoutGrid, Link2, LogOut, Pencil, Plus, RotateCcw, SlidersHorizontal, Trash2,
 } from 'lucide-react'
 import { Dropdown } from '@/components/Dropdown'
@@ -9,7 +9,7 @@ import { Tooltip } from '@/components/Tooltip'
 import { cn } from '@/lib/utils'
 import { canDelete, canLeave, canRename, type Board } from './board-state'
 
-// The board menus (docs-v2/dashboard/01-tabs-rules.md §6, §11, MT-5):
+// The board menus (fe-handbook/features/dashboard/source-docs/01-tabs-rules.md §6, §11, MT-5):
 //   TabMenuContent    a tab's right-click menu (TAB-27), and a Manage tabs row's ⋯ (MT-5)
 //   MoreMenuContent   More, behind the + button (TAB-28), with All boards › (TAB-29)
 // Every item does the same thing wherever it appears; the screen passes the handlers.
@@ -109,9 +109,8 @@ interface MoreMenuProps extends BoardMenuHandlers {
   onShow: (id: string) => void
   onNewBoard: () => void
   onStartOver: (id: string) => void
-  onNotReady: (what: string) => void
   /** One Download dialog for everyone (09 SH-31). */
-  onDownload?: () => void
+  onDownload: () => void
   /** Admins only: the workspace's default board for new members (11 DT-8). */
   onDefaultBoard?: () => void
   close: () => void
@@ -138,9 +137,8 @@ export function MoreMenuContent({ board, tabs, hidden, deletedCount, onlyOne, cl
         {owner && <Dropdown.Item icon={<Pencil />} label="Rename" onClick={run(() => h.onRename(board.id))} fluid />}
         <Dropdown.Item icon={<Copy />} label="Duplicate" onClick={run(() => h.onDuplicate(board.id))} fluid />
         <Dropdown.Item icon={<Link2 />} label="Copy link" onClick={run(() => h.onCopyLink(board.id))} fluid />
-        <Dropdown.Item icon={<Download />} label="Download…" onClick={run(() => (h.onDownload ? h.onDownload() : h.onNotReady('Download')))} fluid />
+        <Dropdown.Item icon={<Download />} label="Download…" onClick={run(h.onDownload)} fluid />
         {h.onDefaultBoard && <Dropdown.Item icon={<House />} label="Default board for new members…" onClick={run(() => h.onDefaultBoard?.())} fluid />}
-        {!view && <Dropdown.Item icon={<History />} label="Version history" onClick={run(() => h.onNotReady('Version history'))} fluid />}
       </Dropdown.Section>
       <Dropdown.Section divider fluid>
         <Dropdown.Item icon={<EyeOff />} label="Hide tab" disabled={onlyOne} onClick={run(() => h.onHide(board.id))} fluid />
