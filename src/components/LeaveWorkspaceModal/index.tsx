@@ -7,7 +7,7 @@ import { Dropdown } from '@/components/Dropdown'
 import { toast } from 'sonner'
 import { useOrg } from '@/context/org-context'
 import { useAuth } from '@/context/auth-context'
-import { leaveOrganization } from '@/lib/api/organization'
+import { blockingProjects, leaveOrganization } from '@/lib/api/organization'
 import { CHAT_ROUTE } from '@/lib/routes'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 
@@ -59,7 +59,10 @@ export function LeaveWorkspaceModal({ onClose }: LeaveWorkspaceModalProps) {
       // the safe way to guarantee nothing stale lingers anywhere in the app.
       window.location.href = CHAT_ROUTE
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to leave workspace')
+      const blocking = blockingProjects(err)
+      toast.error(blocking !== null
+        ? `You own ${blocking === 1 ? 'a workspace or shared project' : `${blocking} workspace or shared projects`}. Hand ${blocking === 1 ? 'it' : 'them'} off or archive ${blocking === 1 ? 'it' : 'them'} in Projects before you leave.`
+        : err instanceof Error ? err.message : 'Failed to leave workspace')
       setSubmitting(false)
     }
   }
@@ -74,11 +77,11 @@ export function LeaveWorkspaceModal({ onClose }: LeaveWorkspaceModalProps) {
         aria-busy={submitting}
         onEscapeKeyDown={(e) => { if (submitting || successorMenuOpen) e.preventDefault() }}
         onInteractOutside={(e) => { if (submitting || isInDropdown(e.target)) e.preventDefault() }}
-        style={{ width: 420, padding: 24, gap: 20 }}
+        style={{ width: 420, padding: 'var(--space-6)', gap: 'var(--space-5)' }}
       >
         <div>
           <DialogTitle>Leave workspace?</DialogTitle>
-          <DialogDescription style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: '8px 0 0' }}>
+          <DialogDescription style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 'var(--space-2) 0 0' }}>
             {membersLoading
               ? 'Checking workspace admins…'
               : isLastAdmin
@@ -88,8 +91,8 @@ export function LeaveWorkspaceModal({ onClose }: LeaveWorkspaceModalProps) {
         </div>
 
         {!membersLoading && isLastAdmin && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 13, lineHeight: '18px', color: 'var(--neutral-700)', margin: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-700)', margin: 0 }}>
               New admin
             </p>
             <Dropdown.Float
@@ -100,10 +103,10 @@ export function LeaveWorkspaceModal({ onClose }: LeaveWorkspaceModalProps) {
                 <button
                   type="button"
                   style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
-                    width: '100%', padding: '8px 10px', borderRadius: 10, border: 'none',
-                    backgroundColor: 'var(--neutral-white)', boxShadow: '0px 0px 0px 1px rgba(59,54,50,0.3)',
-                    cursor: 'pointer', fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, color: 'var(--neutral-900)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)',
+                    width: '100%', padding: 'var(--space-2) var(--space-2-5)', borderRadius: 'var(--radius-lg)', border: 'none',
+                    backgroundColor: 'var(--neutral-white)', boxShadow: '0px 0px 0px 1px var(--neutral-800-30)',
+                    cursor: 'pointer', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-900)',
                   }}
                 >
                   {selectedCandidate ? (selectedCandidate.name || selectedCandidate.email) : 'Select a member'}
@@ -133,7 +136,7 @@ export function LeaveWorkspaceModal({ onClose }: LeaveWorkspaceModalProps) {
           </div>
         )}
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
           <Button variant="secondary" disabled={submitting} onClick={onClose}>
             Cancel
           </Button>

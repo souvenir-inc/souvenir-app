@@ -132,10 +132,10 @@ export function ConnectorCatalogCard({
         width: '100%',
         minWidth: 0,
         alignItems: 'center',
-        gap: isCompact ? 8 : 12,
-        padding: isCompact ? '10px 12px' : '12px 14px',
+        gap: isCompact ? 'var(--space-2)' : 'var(--space-3)',
+        padding: isCompact ? 'var(--space-2-5) var(--space-3)' : 'var(--space-3) var(--space-3-5)',
         background: 'var(--card-bg)',
-        borderRadius: isCompact ? 16 : 14,
+        borderRadius: isCompact ? 'var(--radius-2xl)' : 'var(--radius-card)',
         boxShadow: 'var(--shadow-surface-card, 0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-200))',
         color: 'var(--color-text-default)',
         fontFamily: 'var(--font-body)',
@@ -155,7 +155,7 @@ export function ConnectorCatalogCard({
           display: 'grid',
           flex: '0 0 auto',
           placeItems: 'center',
-          borderRadius: isCompact ? 10 : 12,
+          borderRadius: isCompact ? 'var(--radius-lg)' : 'var(--radius-xl)',
           width: logoSize,
           height: logoSize,
         }}
@@ -166,13 +166,13 @@ export function ConnectorCatalogCard({
             display: 'grid',
             overflow: 'hidden',
             placeItems: 'stretch',
-            borderRadius: isCompact ? 10 : 6,
+            borderRadius: isCompact ? 'var(--radius-lg)' : 'var(--radius-sm)',
             width: artworkSize,
             height: artworkSize,
           }}
         >
           {isLoading ? (
-            <span className="kaya-skeleton" style={{ display: 'block', width: '100%', height: '100%', borderRadius: 6, background: SKELETON_BG }} />
+            <span className="kaya-skeleton" style={{ display: 'block', width: '100%', height: '100%', borderRadius: 'var(--radius-sm)', background: SKELETON_BG }} />
           ) : iconUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- provider-hosted logo_url
             <img
@@ -205,7 +205,7 @@ export function ConnectorCatalogCard({
           flexDirection: 'column',
           alignItems: 'flex-start',
           justifyContent: 'center',
-          gap: 4,
+          gap: 'var(--space-1)',
         }}
       >
         {isLoading ? (
@@ -213,15 +213,15 @@ export function ConnectorCatalogCard({
           // description 16), so the loading card is as tall as a loaded one.
           <>
             <span style={{ display: 'flex', alignItems: 'center', height: 'var(--line-height-body)' }}>
-              <span className="kaya-skeleton" style={{ display: 'block', width: 120, height: 14, borderRadius: 4, background: SKELETON_BG }} />
+              <span className="kaya-skeleton" style={{ display: 'block', width: 120, height: 14, borderRadius: 'var(--radius-xs)', background: SKELETON_BG }} />
             </span>
             {!isCompact && (
               <>
                 <span style={{ display: 'flex', alignItems: 'center', height: 'var(--line-height-caption)' }}>
-                  <span className="kaya-skeleton" style={{ display: 'block', width: 80, height: 10, borderRadius: 4, background: SKELETON_BG }} />
+                  <span className="kaya-skeleton" style={{ display: 'block', width: 80, height: 10, borderRadius: 'var(--radius-xs)', background: SKELETON_BG }} />
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', height: 'var(--line-height-caption)' }}>
-                  <span className="kaya-skeleton" style={{ display: 'block', width: 170, height: 10, borderRadius: 4, background: SKELETON_BG }} />
+                  <span className="kaya-skeleton" style={{ display: 'block', width: 170, height: 10, borderRadius: 'var(--radius-xs)', background: SKELETON_BG }} />
                 </span>
               </>
             )}

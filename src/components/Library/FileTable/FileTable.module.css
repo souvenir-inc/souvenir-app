@@ -5,8 +5,8 @@
   position: relative;
   display: grid;
   align-items: center;
-  column-gap: 16px;
-  padding: 0 8px;
+  column-gap: var(--space-4);
+  padding: 0 var(--space-2);
   box-sizing: border-box;
 }
 
@@ -24,13 +24,13 @@
 }
 
 .row {
-  transition: background 120ms ease;
+  transition: background var(--duration-fast) ease;
 }
 
 /* Hover rounds the row and hides its divider, so the highlight reads as one soft pill. */
 .row:hover {
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 12px;
+  background: var(--file-row-hover-bg);
+  border-radius: var(--radius-xl);
 }
 
 .row:hover::after {
@@ -40,20 +40,20 @@
 /* "Deleted by Maya" under a name in Trash. */
 .nameSub {
   font-family: var(--font-body);
-  font-size: 12px;
-  line-height: 16px;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
   color: var(--neutral-500);
 }
 
 .row:has(.rowLink:focus-visible) {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: -2px;
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: calc(var(--focus-ring-offset) * -1);
 }
 
 .rowLink {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-2-5);
   min-width: 0;
   color: inherit;
   text-decoration: none;
@@ -74,7 +74,7 @@
 /* The design system's own ghost icon button draws the hover shape (one layer, one radius); this only fades it. */
 .menu {
   opacity: 0.6;
-  transition: opacity 120ms;
+  transition: opacity var(--duration-fast);
 }
 
 .menu:hover,
@@ -99,14 +99,14 @@
   display: grid;
   align-items: center;
   position: relative;
-  column-gap: 16px;
-  padding: 0 8px;
+  column-gap: var(--space-4);
+  padding: 0 var(--space-2);
   height: 42px;
   /* The header stays put while rows scroll under it, so it needs a body: the page colour at 94%,
      blurred, so scrolled rows read as a soft shadow, never as text. */
   background: color-mix(in srgb, var(--neutral-50) 94%, transparent);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--file-table-blur)) saturate(1.2);
+  backdrop-filter: blur(var(--file-table-blur)) saturate(1.2);
   box-sizing: border-box;
 }
 
@@ -206,7 +206,7 @@
 /* (see .menu) */
 .menuHover {
   opacity: 0;
-  transition: opacity 120ms;
+  transition: opacity var(--duration-fast);
 }
 
 .row:hover .menuHover,
@@ -234,8 +234,8 @@
 
 .text {
   font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 22px;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-700);
 }
 
@@ -247,7 +247,7 @@
 .thumb {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   object-fit: cover;
   flex-shrink: 0;
 }
@@ -261,22 +261,22 @@
 .nameLine {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1-5);
   min-width: 0;
 }
 
 .name {
   color: var(--neutral-900);
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
 }
 
 .name[data-unread='true'] {
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .snippet {
-  font-size: 12px;
-  line-height: 16px;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
   color: var(--neutral-500);
 }
 
@@ -285,15 +285,15 @@
 .sortButton {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
   padding: 0;
   border: none;
   background: transparent;
   cursor: pointer;
   font-family: var(--font-body);
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 22px;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-600);
 }
 
@@ -303,9 +303,9 @@
 
 .headLabel {
   font-family: var(--font-body);
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 22px;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   color: var(--neutral-600);
 }
 
@@ -331,15 +331,15 @@
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  margin: 0 40px 20px;
-  transition: opacity 120ms;
+  margin: 0 var(--space-8) var(--space-5);
+  transition: opacity var(--duration-fast);
 }
 
 /* In a narrow window the list gives back some of its side margin to the columns. */
 @media (max-width: 900px) {
   .scroll {
-    margin-left: 16px;
-    margin-right: 16px;
+    margin-left: var(--space-4);
+    margin-right: var(--space-4);
   }
 }
 
@@ -362,7 +362,7 @@
 
 .loadingMore {
   text-align: center;
-  padding: 12px;
+  padding: var(--space-3);
   margin: 0;
   color: var(--neutral-500);
 }

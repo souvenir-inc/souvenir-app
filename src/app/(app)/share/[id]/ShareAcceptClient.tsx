@@ -108,21 +108,21 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
   if (state === 'loading') {
     return (
       <div style={cardStyle} role="status" aria-busy="true" aria-label="Loading shared agent">
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
-          <Skeleton width={72} height={72} radius={16} />
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-            <Skeleton width={220} height={28} radius={8} />
-            <Skeleton width={160} height={16} radius={6} />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-5)' }}>
+          <Skeleton width={72} height={72} radius={'var(--radius-2xl)'} />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2-5)' }}>
+            <Skeleton width={220} height={28} radius={'var(--radius-md)'} />
+            <Skeleton width={160} height={16} radius={'var(--radius-sm)'} />
           </div>
-          <Skeleton width="100%" height={72} radius={10} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
-            <Skeleton width={200} height={16} radius={6} />
-            <Skeleton width={140} height={16} radius={6} />
+          <Skeleton width="100%" height={72} radius={'var(--radius-lg)'} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', width: '100%' }}>
+            <Skeleton width={200} height={16} radius={'var(--radius-sm)'} />
+            <Skeleton width={140} height={16} radius={'var(--radius-sm)'} />
           </div>
         </div>
         <div style={footerStyle}>
-          <Skeleton width={100} height={40} radius={10} />
-          <Skeleton width={160} height={40} radius={10} />
+          <Skeleton width={100} height={40} radius={'var(--radius-lg)'} />
+          <Skeleton width={160} height={40} radius={'var(--radius-lg)'} />
         </div>
       </div>
     )
@@ -132,22 +132,22 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
   if (state === 'expired' || state === 'not_found') {
     return (
       <div style={cardStyle} role="status">
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '8px 0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-4)', padding: 'var(--space-2) 0' }}>
           <div
             style={{
               width: 56,
               height: 56,
-              borderRadius: 16,
+              borderRadius: 'var(--radius-2xl)',
               backgroundColor: 'var(--neutral-100)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 28,
+              fontSize: 'var(--font-size-heading-xl)',
             }}
           >
             🔗
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-1-5)' }}>
             <p role="heading" aria-level={1} style={headingStyle}>
               {state === 'expired' ? 'This link has expired' : 'Link not found'}
             </p>
@@ -171,7 +171,7 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
   if (state === 'error') {
     return (
       <div style={cardStyle} role="alert">
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-4)' }}>
           <p role="heading" aria-level={1} style={headingStyle}>Something went wrong</p>
           <p style={subtextStyle}>{errorMessage}</p>
         </div>
@@ -188,17 +188,17 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
   if (state === 'accepted') {
     return (
       <div style={cardStyle} role="status">
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '8px 0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-4)', padding: 'var(--space-2) 0' }}>
           <div
             style={{
               width: 56,
               height: 56,
-              borderRadius: 16,
+              borderRadius: 'var(--radius-2xl)',
               backgroundColor: 'var(--neutral-100)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 28,
+              fontSize: 'var(--font-size-heading-xl)',
             }}
           >
             ✓
@@ -219,16 +219,16 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
     <div style={cardStyle}>
 
       {/* Header: avatar + name */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)' }}>
         <div
           style={{
             width: 72,
             height: 72,
-            borderRadius: 18,
+            borderRadius: 'var(--radius-2xl)',
             flexShrink: 0,
             overflow: 'hidden',
             backgroundColor: 'var(--neutral-100)',
-            boxShadow: '0px 0px 0px 1px rgba(59,54,50,0.15)',
+            boxShadow: '0px 0px 0px 1px var(--neutral-800-15)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -245,10 +245,10 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
             <span
               style={{
                 fontFamily: 'var(--font-body)',
-                fontWeight: 600,
-                fontSize: 26,
+                fontWeight: 'var(--font-weight-semibold)',
+                fontSize: 'var(--font-size-heading)',
                 color: 'var(--neutral-500)',
-                lineHeight: 1,
+                lineHeight: 'var(--leading-none)',
               }}
             >
               {(preview.persona_name || '?').trim()[0].toUpperCase()}
@@ -256,13 +256,13 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
           )}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-1)' }}>
           <p
             style={{
               fontFamily: 'var(--font-title)',
-              fontWeight: 400,
-              fontSize: 24,
-              lineHeight: '32px',
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: 'var(--font-size-heading)',
+              lineHeight: 'var(--line-height-heading)',
               color: 'var(--legacy-1a1916)',
               margin: 0,
               textAlign: 'center',
@@ -273,9 +273,9 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
           <p
             style={{
               fontFamily: 'var(--font-body)',
-              fontWeight: 400,
-              fontSize: 13,
-              lineHeight: '18px',
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: 'var(--font-size-body-sm)',
+              lineHeight: 'var(--line-height-body-sm)',
               color: 'var(--neutral-500)',
               margin: 0,
               textAlign: 'center',
@@ -291,17 +291,17 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
         <div
           style={{
             backgroundColor: 'var(--neutral-50)',
-            borderRadius: 10,
-            padding: '12px 14px',
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-3) var(--space-3)',
             boxShadow: '0px 0px 0px 1px var(--neutral-100)',
           }}
         >
           <p
             style={{
               fontFamily: 'var(--font-body)',
-              fontWeight: 400,
-              fontSize: 13,
-              lineHeight: '20px',
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: 'var(--font-size-body-sm)',
+              lineHeight: 'var(--line-height-body-sm)',
               color: 'var(--neutral-700)',
               margin: 0,
               whiteSpace: 'pre-line',
@@ -313,7 +313,7 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
       )}
 
       {/* Meta row: model, temperature, credits, expiry */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         {preview.model_id && (
           <MetaRow label="Model" value={modelName ?? preview.model_id} />
         )}
@@ -337,17 +337,17 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
       <div
         style={{
           backgroundColor: 'color-mix(in srgb, var(--blue-600) 6%, transparent)',
-          borderRadius: 10,
-          padding: '10px 14px',
-          boxShadow: '0px 0px 0px 1px rgba(13,110,178,0.15)',
+          borderRadius: 'var(--radius-lg)',
+          padding: 'var(--space-2-5) var(--space-3)',
+          boxShadow: 'var(--share-accept-note-ring)',
         }}
       >
         <p
           style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 400,
-            fontSize: 12,
-            lineHeight: '18px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: 'var(--font-size-small)',
+            lineHeight: 'var(--line-height-small)',
             color: 'var(--blue-700)',
             margin: 0,
           }}
@@ -381,13 +381,13 @@ function ShareAcceptContent({ initial }: { initial: InitialSharePreview | null }
 
 function MetaRow({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
       <span
         style={{
           fontFamily: 'var(--font-body)',
-          fontWeight: 500,
-          fontSize: 13,
-          lineHeight: '18px',
+          fontWeight: 'var(--font-weight-medium)',
+          fontSize: 'var(--font-size-body-sm)',
+          lineHeight: 'var(--line-height-body-sm)',
           color: 'var(--neutral-500)',
           minWidth: 120,
           flexShrink: 0,
@@ -398,9 +398,9 @@ function MetaRow({ label, value }: { label: string; value: string }) {
       <span
         style={{
           fontFamily: 'var(--font-body)',
-          fontWeight: 400,
-          fontSize: 13,
-          lineHeight: '18px',
+          fontWeight: 'var(--font-weight-regular)',
+          fontSize: 'var(--font-size-body-sm)',
+          lineHeight: 'var(--line-height-body-sm)',
           color: 'var(--neutral-800)',
         }}
       >
@@ -415,28 +415,28 @@ function MetaRow({ label, value }: { label: string; value: string }) {
 const cardStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  gap: 20,
+  gap: 'var(--space-5)',
   backgroundColor: 'var(--neutral-white)',
-  borderRadius: 18,
-  padding: '28px 24px',
+  borderRadius: 'var(--radius-2xl)',
+  padding: 'var(--space-6) var(--space-6)',
   width: '100%',
   maxWidth: 480,
   boxShadow:
-    '0px 12px 16px -4px var(--neutral-500-12), 0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
+    '0px 12px 16px -4px var(--neutral-500-12), var(--shadow-soft), 0px 0px 0px 1px var(--neutral-100)',
 }
 
 const footerStyle: React.CSSProperties = {
   display: 'flex',
-  gap: 10,
+  gap: 'var(--space-2-5)',
   justifyContent: 'flex-end',
-  paddingTop: 4,
+  paddingTop: 'var(--space-1)',
 }
 
 const headingStyle: React.CSSProperties = {
   fontFamily: 'var(--font-title)',
-  fontWeight: 400,
-  fontSize: 20,
-  lineHeight: '28px',
+  fontWeight: 'var(--font-weight-regular)',
+  fontSize: 'var(--font-size-heading-md)',
+  lineHeight: 'var(--line-height-heading-md)',
   color: 'var(--legacy-1a1916)',
   margin: 0,
   textAlign: 'center',
@@ -444,9 +444,9 @@ const headingStyle: React.CSSProperties = {
 
 const subtextStyle: React.CSSProperties = {
   fontFamily: 'var(--font-body)',
-  fontWeight: 400,
-  fontSize: 14,
-  lineHeight: '22px',
+  fontWeight: 'var(--font-weight-regular)',
+  fontSize: 'var(--font-size-body)',
+  lineHeight: 'var(--line-height-body)',
   color: 'var(--neutral-500)',
   margin: 0,
   textAlign: 'center',
@@ -463,7 +463,7 @@ export function ShareAcceptClient({ initial }: { initial: InitialSharePreview | 
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100%',
-        padding: '32px 16px',
+        padding: 'var(--space-7) var(--space-4)',
       }}
     >
       <Suspense>

@@ -26,10 +26,10 @@ type TypeChip = 'all' | FormatGroup | 'runs'
 const TITLE_STYLE: React.CSSProperties = {
   margin: 0,
   fontFamily: 'var(--font-title)',
-  fontWeight: 500,
-  fontSize: 20,
-  lineHeight: '28px',
-  letterSpacing: '-0.01em',
+  fontWeight: 'var(--font-weight-medium)',
+  fontSize: 'var(--font-size-heading-md)',
+  lineHeight: 'var(--line-height-heading-md)',
+  letterSpacing: 'var(--tracking-tight)',
   color: 'var(--neutral-900)',
 }
 
@@ -168,7 +168,7 @@ export function PickerDialog({ onClose, onConfirm, excludeIds = [], confirmLabel
         >
           {list.status === 'loading' ? (
             <div aria-busy="true" className={styles.loading}>
-              {Array.from({ length: 5 }).map((_, index) => <Skeleton key={index} height={48} radius={10} />)}
+              {Array.from({ length: 5 }).map((_, index) => <Skeleton key={index} height={48} radius={'var(--radius-lg)'} />)}
             </div>
           ) : list.status === 'error' ? (
             <div role="alert" className={styles.error}>
@@ -224,7 +224,7 @@ export function PickerDialog({ onClose, onConfirm, excludeIds = [], confirmLabel
           )}
         </div>
 
-        <DialogFooter className={styles.footer} style={{ justifyContent: 'space-between', paddingTop: 12 }}>
+        <DialogFooter className={styles.footer} style={{ justifyContent: 'space-between', paddingTop: 'var(--space-3)' }}>
           <span className={styles.selection}>
             <span aria-live="polite" className={styles.count}>{atLimit && max !== undefined ? `${pluralize(picked.length, 'file')} selected. ${pickerLimitHint(max)}` : picked.length === 0 ? '' : `${pluralize(picked.length, 'file')} selected`}</span>
             {picked.length > 0 && (

@@ -32,6 +32,8 @@ interface OrganizationResponse {
   description: string
   logoUrl: string | null
   archived: boolean
+  /** The dashboard (warehouse) is on for this organization; off, every /warehouse call is refused with 403. */
+  warehouseEnabled: boolean
   // 'owner' is a real value here (the org's creator) — not just 'admin'/'member'
   // as OrgRole claims. There's no separate Owner capability tier anywhere in
   // the UI (admin already has full billing/org authority), so it's folded
@@ -185,7 +187,7 @@ export async function listOrganizations(): Promise<Array<{ id: string; name: str
   }))
 }
 
-export async function getOrg(orgId: string): Promise<{ id: string; name: string; slug: string; description: string; logoUrl: string | null; role: OrgRole | null; planType: 'teams' | 'enterprise' | null }> {
+export async function getOrg(orgId: string): Promise<{ id: string; name: string; slug: string; description: string; logoUrl: string | null; role: OrgRole | null; planType: 'teams' | 'enterprise' | null; warehouseEnabled: boolean }> {
   const data = await apiFetchJson<OrganizationResponse>(ORG_ENDPOINT(orgId))
   return {
     id:          data.id,
@@ -195,6 +197,7 @@ export async function getOrg(orgId: string): Promise<{ id: string; name: string;
     logoUrl:     data.logoUrl,
     role:        foldOwnerRole(data.myRole),
     planType:    data.planType === 'enterprise' ? 'enterprise' : data.planType === 'teams' ? 'teams' : null,
+    warehouseEnabled: data.warehouseEnabled === true,
   }
 }
 
@@ -232,6 +235,44 @@ export async function deleteOrg(orgId: string, confirmName: string): Promise<voi
   trackBrowserEvent('org_deleted')
 }
 
+// ── Leaving or removing a member: errors the screens can act on ──────────────────
+
+/** The backend refuses to offboard someone who still owns workspace or shared projects (409, souvenir-server#640). */
+export const UNRESOLVED_OWNERSHIP = 'unresolved_ownership'
+
+const ownershipDetailSchema = z.object({
+  code: z.literal(UNRESOLVED_OWNERSHIP),
+  projectIds: z.array(z.string()).default([]),
+})
+
+/** How many projects block the offboarding, when the error is that refusal; null otherwise. */
+export function blockingProjects(error: unknown): number | null {
+  if (!(error instanceof ApiError) || error.code !== UNRESOLVED_OWNERSHIP) return null
+  const ids = error.details?.projectIds
+  return Array.isArray(ids) ? ids.length : 0
+}
+
+/**
+ * The error for a failed leave or removal. A string `detail` is mapped as before; the ownership refusal
+ * comes as an object (`{ code, message, projectIds }`), which used to be dropped and read as a generic
+ * "out of date" 409. Its own text is never shown (API-ER-06): screens word it from `blockingProjects`.
+ */
+async function offboardError(res: Response, fallbackCode: string): Promise<ApiError> {
+  let detail = `Request failed with status ${res.status}`
+  let body: unknown = null
+  try { body = await res.json() } catch { /* non-JSON error body */ }
+  const raw = body && typeof body === 'object' ? (body as { detail?: unknown }).detail : undefined
+  if (typeof raw === 'string') detail = raw
+  const ownership = ownershipDetailSchema.safeParse(raw)
+  if (ownership.success) {
+    const n = ownership.data.projectIds.length
+    return new ApiError(res.status, UNRESOLVED_OWNERSHIP,
+      `Still owns ${n === 1 ? 'a workspace or shared project' : `${n} workspace or shared projects`}. They need to be handed off first.`,
+      undefined, { retryable: false, details: { projectIds: ownership.data.projectIds } })
+  }
+  return new ApiError(res.status, fallbackCode, friendlyApiError(detail, res.status), detail)
+}
+
 /**
  * POST /organizations/{id}/leave — 204 No Content on success. `successorAdminUserId`
  * is only read server-side when the caller is the last admin (organization.py);
@@ -247,14 +288,7 @@ export async function leaveOrganization(orgId: string, successorAdminUserId?: st
     method: 'POST',
     body:   JSON.stringify(successorAdminUserId ? { successorAdminUserId } : {}),
   })
-  if (!res.ok) {
-    let detail = `Request failed with status ${res.status}`
-    try {
-      const body = await res.json() as { detail?: string }
-      if (typeof body.detail === 'string') detail = body.detail
-    } catch { /* non-JSON error body */ }
-    throw new ApiError(res.status, 'leave_org_failed', friendlyApiError(detail, res.status), detail)
-  }
+  if (!res.ok) throw await offboardError(res, 'leave_org_failed')
   trackBrowserEvent('org_left', { with_successor: Boolean(successorAdminUserId) })
 }
 
@@ -337,14 +371,7 @@ export async function setMemberRole(orgId: string, memberId: string, role: OrgRo
 
 export async function removeMember(orgId: string, memberId: string): Promise<void> {
   const res = await apiFetch(ORG_MEMBER_ENDPOINT(orgId, memberId), { method: 'DELETE' })
-  if (!res.ok) {
-    let detail = `Request failed with status ${res.status}`
-    try {
-      const body = await res.json() as { detail?: string }
-      if (typeof body.detail === 'string') detail = body.detail
-    } catch { /* non-JSON error body */ }
-    throw new ApiError(res.status, 'remove_member_failed', friendlyApiError(detail, res.status), detail)
-  }
+  if (!res.ok) throw await offboardError(res, 'remove_member_failed')
   trackBrowserEvent('org_member_removed')
 }
 

@@ -5,6 +5,8 @@
 //
 // Keys used in only one file should stay defined locally in that file.
 
+import { resetStoredPreferences } from "@/lib/stored-preference";
+
 // Also the name of the cookie that mirrors it: the (app) layout reads the
 // cookie on the server so the sidebar's first render matches the client's
 // (localStorage isn't readable during SSR). LeftSidebar writes both.
@@ -132,3 +134,21 @@ export const SIDEBAR_SLACK_ROW_HINT_KEY = "souvenir:sidebar:slack-row";
 // ── Library ──────────────────────────────────────────────────────────────────
 // When the person last dismissed the "an Admin changed Library settings" notice (an ISO time).
 export const LIBRARY_SETTINGS_SEEN_KEY = "library:v1:settings-seen";
+
+// ── Data preferences (Settings → Data preferences) ───────────────────────────
+// Scope: the signed-in person, on this device (localStorage), one value each, cleared on sign-out.
+// Read through lib/stored-preference.ts, which checks the value on every read.
+/** "rounded" | "exact": how numbers show on cards (lib/number-style.ts). */
+export const NUMBER_STYLE_KEY = "souvenir:number-style:v1";
+/** A period id ("7d"): the period a new board starts on (components/Dashboard/default-period.ts). */
+export const DASHBOARD_DEFAULT_PERIOD_KEY = "souvenir:dashboard:default-period:v1";
+
+const DATA_PREFERENCE_KEYS = [NUMBER_STYLE_KEY, DASHBOARD_DEFAULT_PERIOD_KEY];
+
+/** Forget the data preferences on sign-out, and tell any open reader, so the next person starts on the defaults. */
+export function clearDataPreferences(): void {
+  try {
+    DATA_PREFERENCE_KEYS.forEach((key) => localStorage.removeItem(key));
+  } catch { /* storage unavailable */ }
+  resetStoredPreferences();
+}

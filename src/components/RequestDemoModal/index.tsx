@@ -9,10 +9,10 @@ import { toast } from 'sonner'
 
 // ── Style constants (mirrors org/plans page tokens) ──────────────────────────
 
-const SHADOW_MODAL = '0px 19px 32px 0px rgba(18,12,8,0.15), 0px 2px 2.8px 0px rgba(130,122,116,0.1)'
-const SHADOW_INPUT = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--text-field-ring)'
-const SHADOW_PILL  = '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)'
-const SHADOW_PILL_ACTIVE = '0px 0px 0px 1px var(--neutral-black), 0px 1.091px 1.091px 0px rgba(59,54,50,0.1), 0px 1.455px 3.127px 0px rgba(59,54,50,0.4)'
+const SHADOW_MODAL = 'var(--shadow-4)'
+const SHADOW_INPUT = 'var(--shadow-field)'
+const SHADOW_PILL  = 'var(--shadow-card-raised)'
+const SHADOW_PILL_ACTIVE = 'var(--shadow-pill-active)'
 
 type PreferredTime = 'mornings' | 'afternoons' | 'evenings'
 
@@ -41,17 +41,17 @@ function InputField({
   type?:        string
 }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
-      <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-700)', margin: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', width: '100%' }}>
+      <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-700)', margin: 0 }}>
         {label}
       </p>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'var(--field-surface)', borderRadius: 10, padding: '7px 10px', boxShadow: SHADOW_INPUT }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-0-5)', background: 'var(--field-surface)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-1-5) var(--space-2-5)', boxShadow: SHADOW_INPUT }}>
         <input
           type={type}
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
-          style={{ flex: '1 0 0', minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)', padding: '0 2px' }}
+          style={{ flex: '1 0 0', minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', padding: '0 var(--space-0-5)' }}
         />
       </div>
     </div>
@@ -78,20 +78,20 @@ function TimePill({
         display:         'flex',
         alignItems:      'center',
         justifyContent:  'center',
-        padding:         '6px 10px 8px',
-        borderRadius:    10,
+        padding:         'var(--space-1-5) var(--space-2-5) var(--space-2)',
+        borderRadius:    'var(--radius-lg)',
         border:          'none',
         cursor:          'pointer',
         fontFamily:      'var(--font-body)',
-        fontWeight:      500,
-        fontSize:        14,
-        lineHeight:      '22px',
+        fontWeight:      'var(--font-weight-medium)',
+        fontSize:        'var(--font-size-body)',
+        lineHeight:      'var(--line-height-body)',
         whiteSpace:      'nowrap',
         position:        'relative',
         background:      'var(--neutral-white)',
         color:           active ? 'var(--neutral-50)' : 'var(--neutral-700)',
         boxShadow:       active ? SHADOW_PILL_ACTIVE : SHADOW_PILL,
-        transition:      'box-shadow 120ms, color 120ms',
+        transition:      'box-shadow var(--duration-fast), color var(--duration-fast)',
       }}
     >
       {active && (
@@ -100,8 +100,8 @@ function TimePill({
           style={{
             position:     'absolute',
             inset:        0,
-            borderRadius: 10,
-            background:   'linear-gradient(180deg, var(--neutral-700, #524b47) 0%, var(--neutral-900, #26211e) 100%)',
+            borderRadius: 'var(--radius-lg)',
+            background:   'linear-gradient(180deg, var(--neutral-700) 0%, var(--neutral-900) 100%)',
             pointerEvents: 'none',
           }}
         />
@@ -160,46 +160,46 @@ export function RequestDemoModal({ onClose, onSubmit }: RequestDemoModalProps) {
           if (submitting || (e.target instanceof Element && e.target.closest('[data-kds-dropdown-panel]'))) e.preventDefault()
         }}
         className="kaya-scrollbar p-2"
-        style={{ width: 738, maxHeight: 'calc(100dvh - 48px)', overflow: 'auto', background: 'var(--neutral-50)', borderRadius: 20, boxShadow: SHADOW_MODAL }}
+        style={{ width: 738, maxHeight: 'calc(100dvh - 48px)', overflow: 'auto', background: 'var(--neutral-50)', borderRadius: 'var(--radius-2xl)', boxShadow: SHADOW_MODAL }}
       >
-        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
 
           {/* Header */}
-          <div style={{ padding: '12px 12px 0', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+          <div style={{ padding: 'var(--space-3) var(--space-3) 0', display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)' }}>
             <DialogTitle style={undefined} className="m-0 flex-[1_0_0] font-[family-name:var(--font-title)] text-2xl font-normal leading-8 text-[var(--neutral-900)]">
               Request a demo
             </DialogTitle>
             <button
               onClick={onClose}
               aria-label="Close"
-              className="flex shrink-0 cursor-pointer rounded-lg border-none bg-transparent p-1.5 text-[var(--neutral-700)]"
+              className="flex shrink-0 cursor-pointer rounded-md border-none bg-transparent p-1.5 text-[var(--neutral-700)]"
             >
               <CancelOneIcon size={20} />
             </button>
           </div>
 
           {/* Subtitle */}
-          <div style={{ padding: '0 12px 24px' }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+          <div style={{ padding: '0 var(--space-3) var(--space-6)' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
               A 30-minute walkthrough of Tasks, agents, and the Slack bot.
             </p>
           </div>
 
           {/* Form container */}
-          <div style={{ border: '1px solid var(--border-default)', borderRadius: 16, padding: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ border: '1px solid var(--border-default)', borderRadius: 'var(--radius-2xl)', padding: 'var(--space-3)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
 
             {/* Row 1: Work email + Full name */}
-            <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
               <InputField label="Work email" value={email} onChange={setEmail} placeholder="you@company.com" type="email" />
               <InputField label="Full name"  value={name}  onChange={setName}  placeholder="Jane Smith" />
             </div>
 
             {/* Preferred time toggles */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-700)', margin: 0 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-700)', margin: 0 }}>
                 Preferred time
               </p>
-              <div style={{ display: 'flex', gap: 10 }}>
+              <div style={{ display: 'flex', gap: 'var(--space-2-5)' }}>
                 <TimePill label="Mornings"   active={preferredTime === 'mornings'}   onClick={() => setPreferredTime('mornings')} />
                 <TimePill label="Afternoons" active={preferredTime === 'afternoons'} onClick={() => setPreferredTime('afternoons')} />
                 <TimePill label="Evenings"   active={preferredTime === 'evenings'}   onClick={() => setPreferredTime('evenings')} />
@@ -207,8 +207,8 @@ export function RequestDemoModal({ onClose, onSubmit }: RequestDemoModalProps) {
             </div>
 
             {/* Textarea */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-700)', margin: 0 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-700)', margin: 0 }}>
                 What do you want to see?
               </p>
               <textarea
@@ -216,17 +216,17 @@ export function RequestDemoModal({ onClose, onSubmit }: RequestDemoModalProps) {
                 onChange={e => setMessage(e.target.value)}
                 placeholder="Tell us about your team and what you're trying to solve — we'll tailor the demo to it…"
                 rows={4}
-                style={{ width: '100%', boxSizing: 'border-box', border: 'none', outline: 'none', background: 'var(--field-surface)', borderRadius: 10, padding: '9px 12px', boxShadow: SHADOW_INPUT, fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)', resize: 'none' }}
+                style={{ width: '100%', boxSizing: 'border-box', border: 'none', outline: 'none', background: 'var(--field-surface)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-2) var(--space-3)', boxShadow: SHADOW_INPUT, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', resize: 'none' }}
               />
             </div>
           </div>
 
           {/* Footer */}
-          <div style={{ padding: '24px 0 12px', display: 'flex', flexDirection: 'column', gap: 9 }}>
+          <div style={{ padding: 'var(--space-6) 0 var(--space-3)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <Button variant="default" fluid onClick={handleSubmit} loading={submitting} disabled={submitting}>
               Book a demo
             </Button>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
               Opens a calendar to pick your slot.
             </p>
           </div>

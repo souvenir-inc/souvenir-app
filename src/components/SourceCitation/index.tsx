@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import * as HoverCardPrimitive from '@radix-ui/react-hover-card'
+import { HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger } from '@/components/ui/hover-card'
 import { motion, AnimatePresence } from 'framer-motion'
 import { springs } from '@/lib/springs'
 
@@ -59,7 +59,7 @@ function ConnectorLogoBox({ connector: _connector, title, url }: { connector?: s
   const boxStyle: React.CSSProperties = {
     width:           24,
     height:          24,
-    borderRadius:    4,
+    borderRadius:    'var(--radius-xs)',
     flexShrink:      0,
     display:         'flex',
     alignItems:      'center',
@@ -88,8 +88,8 @@ function ConnectorLogoBox({ connector: _connector, title, url }: { connector?: s
     <div style={boxStyle}>
       <span style={{
         fontFamily:    'var(--font-body)',
-        fontSize:      '10px',
-        lineHeight:    1,
+        fontSize:      'var(--font-size-caption)',
+        lineHeight:    'var(--leading-none)',
         fontWeight:    'var(--font-weight-medium)' as React.CSSProperties['fontWeight'],
         color:         'var(--neutral-500)',
         textTransform: 'uppercase',
@@ -103,7 +103,7 @@ function ConnectorLogoBox({ connector: _connector, title, url }: { connector?: s
 // ── Divider ────────────────────────────────────────────────────────────────────
 
 function Divider() {
-  return <div style={{ height: 1, backgroundColor: 'var(--neutral-200)', margin: '0 -14px' }} />
+  return <div style={{ height: 1, backgroundColor: 'var(--neutral-200)', margin: 'var(--citation-divider-bleed)' }} />
 }
 
 // ── SourceCardContent ──────────────────────────────────────────────────────────
@@ -125,21 +125,21 @@ function SourceCardContent({ index, source, onOpen }: SourceCardContentProps) {
     <div
       style={{
         width:           '272px',
-        borderRadius:    '12px',
+        borderRadius:    'var(--radius-xl)',
         backgroundColor: 'var(--neutral-50)',
         boxShadow:       'var(--shadow-popover)',
-        padding:         '12px 14px',
+        padding:         'var(--space-3) var(--space-3)',
         display:         'flex',
         flexDirection:   'column',
-        gap:             '10px',
+        gap:             'var(--space-2-5)',
         isolation:       'isolate',
       }}
     >
       {/* ── Header: logo + title + subtitle ── */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2-5)' }}>
         <ConnectorLogoBox connector={connector} title={title} url={url} />
 
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', minWidth: 0 }}>
           <span
             style={{
               fontFamily:   'var(--font-body)',
@@ -180,15 +180,15 @@ function SourceCardContent({ index, source, onOpen }: SourceCardContentProps) {
             justifyContent:  'center',
             width:           '16px',
             height:          '16px',
-            borderRadius:    '999px',
+            borderRadius:    'var(--radius-full)',
             backgroundColor: 'var(--neutral-200)',
             flexShrink:      0,
             fontFamily:      'var(--font-body)',
             fontWeight:      'var(--font-weight-medium)',
-            fontSize:        '10px',
-            lineHeight:      1,
+            fontSize:        'var(--font-size-caption)',
+            lineHeight:      'var(--leading-none)',
             color:           'var(--neutral-500)',
-            marginTop:       '2px',
+            marginTop:       'var(--space-0-5)',
           }}
         >
           {index}
@@ -212,7 +212,7 @@ function SourceCardContent({ index, source, onOpen }: SourceCardContentProps) {
                 WebkitBoxOrient:   'vertical',
                 overflow:          'hidden',
                 fontStyle:         'italic',
-                paddingLeft:       '10px',
+                paddingLeft:       'var(--space-2-5)',
                 borderLeft:        '2px solid var(--border-default)',
               }}
             >
@@ -277,13 +277,13 @@ export const SourceCitation = React.forwardRef<HTMLButtonElement, SourceCitation
     useEffect(() => { if (open) setMounted(true) }, [open])
 
     return (
-      <HoverCardPrimitive.Root
+      <HoverCard
         open={open}
         onOpenChange={setOpen}
         openDelay={250}
         closeDelay={120}
       >
-        <HoverCardPrimitive.Trigger asChild>
+        <HoverCardTrigger asChild>
           <button
             ref={ref}
             className={className}
@@ -295,35 +295,35 @@ export const SourceCitation = React.forwardRef<HTMLButtonElement, SourceCitation
               verticalAlign:   'text-bottom',
               width:           '18px',
               height:          '18px',
-              borderRadius:    '999px',
+              borderRadius:    'var(--radius-full)',
               backgroundColor: 'var(--neutral-200)',
               cursor:          'pointer',
               border:          'none',
-              marginLeft:      '2px',
+              marginLeft:      'var(--space-0-5)',
               fontFamily:      'var(--font-body)',
               fontWeight:      'var(--font-weight-medium)',
-              fontSize:        '10px',
-              lineHeight:      1,
+              fontSize:        'var(--font-size-caption)',
+              lineHeight:      'var(--leading-none)',
               color:           'var(--neutral-600)',
               flexShrink:      0,
               outline:         'none',
-              transition:      'background-color 0.1s ease',
+              transition:      'background-color var(--duration-instant) ease',
             }}
             onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--neutral-300)')}
             onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--neutral-200)')}
           >
             {index}
           </button>
-        </HoverCardPrimitive.Trigger>
+        </HoverCardTrigger>
 
         {mounted && (
-          <HoverCardPrimitive.Portal forceMount>
-            <HoverCardPrimitive.Content
+          <HoverCardPortal forceMount>
+            <HoverCardContent
               side="top"
               sideOffset={6}
               align="start"
               forceMount
-              className="z-9999"
+              className="z-[var(--citation-popover-z)]"
               style={{ outline: 'none' }}
             >
               <AnimatePresence>
@@ -341,10 +341,10 @@ export const SourceCitation = React.forwardRef<HTMLButtonElement, SourceCitation
                   </motion.div>
                 )}
               </AnimatePresence>
-            </HoverCardPrimitive.Content>
-          </HoverCardPrimitive.Portal>
+            </HoverCardContent>
+          </HoverCardPortal>
         )}
-      </HoverCardPrimitive.Root>
+      </HoverCard>
     )
   },
 )
@@ -368,17 +368,17 @@ function SourceCard({ source }: { source: SourceItem; index: number }) {
     display:         'flex',
     flexDirection:   'row',
     alignItems:      'center',
-    gap:             '8px',
-    // secondary Button sm: py-[5px] px-[8px]
-    padding:         '5px 8px',
-    borderRadius:    '8px',
+    gap:             'var(--space-2)',
+    // secondary Button sm: py-[5px] px-[var(--space-2)]
+    padding:         'var(--space-1) var(--space-2)',
+    borderRadius:    'var(--radius-md)',
     backgroundColor: 'var(--button-secondary-bg)',
     boxShadow:       hovered
       ? 'var(--shadow-button-secondary-outer-hover)'
       : 'var(--shadow-button-secondary-outer)',
     width:           '200px',
     flexShrink:      0,
-    transition:      'box-shadow 150ms',
+    transition:      'box-shadow var(--duration-fast)',
     textDecoration:  'none',
     cursor:          source.url ? 'pointer' : 'default',
     position:        'relative',
@@ -393,7 +393,7 @@ function SourceCard({ source }: { source: SourceItem; index: number }) {
         inset:           0,
         borderRadius:    'inherit',
         backgroundColor: hovered ? 'var(--button-secondary-bg-hover)' : 'transparent',
-        transition:      'background-color 200ms',
+        transition:      'background-color var(--duration-base)',
         pointerEvents:   'none',
       }} />
 
@@ -405,7 +405,7 @@ function SourceCard({ source }: { source: SourceItem; index: number }) {
         boxShadow:     hovered
           ? 'var(--shadow-button-secondary-inner-hover)'
           : 'var(--shadow-button-secondary-inner)',
-        transition:    'box-shadow 150ms',
+        transition:    'box-shadow var(--duration-fast)',
         pointerEvents: 'none',
       }} />
 
@@ -413,7 +413,7 @@ function SourceCard({ source }: { source: SourceItem; index: number }) {
       <div style={{
         width:           30,
         height:          30,
-        borderRadius:    6,
+        borderRadius:    'var(--radius-sm)',
         backgroundColor: 'var(--neutral-100)',
         border:          '1px solid var(--border-default)',
         display:         'flex',
@@ -437,8 +437,8 @@ function SourceCard({ source }: { source: SourceItem; index: number }) {
         ) : (
           <span style={{
             fontFamily:    'var(--font-body)',
-            fontSize:      '9px',
-            lineHeight:    1,
+            fontSize:      'var(--font-size-caption)',
+            lineHeight:    'var(--leading-none)',
             color:         'var(--neutral-500)',
             textTransform: 'uppercase',
           }}>
@@ -451,7 +451,7 @@ function SourceCard({ source }: { source: SourceItem; index: number }) {
       <div style={{
         display:       'flex',
         flexDirection: 'column',
-        gap:           '1px',
+        gap:           'var(--space-0-5)',
         minWidth:      0,
         flex:          1,
         position:      'relative',
@@ -527,9 +527,9 @@ export const SourceList = React.forwardRef<HTMLDivElement, SourceListProps>(
         ref={ref}
         className={className}
         style={{
-          paddingTop: '10px',
+          paddingTop: 'var(--space-2-5)',
           borderTop:  '1px solid var(--border-default)',
-          marginTop:  '12px',
+          marginTop:  'var(--space-3)',
         }}
       >
         <div
@@ -539,10 +539,10 @@ export const SourceList = React.forwardRef<HTMLDivElement, SourceListProps>(
           style={{
             display:       'flex',
             flexDirection: 'row',
-            gap:           '8px',
+            gap:           'var(--space-2)',
             overflowX:     'auto',
-            padding:       '3px',
-            paddingBottom: '5px',
+            padding:       'var(--space-0-5)',
+            paddingBottom: 'var(--space-1)',
           }}
         >
           {sources.map((source, i) => (

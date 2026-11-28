@@ -61,10 +61,10 @@ export function DropdownSection(
       >
         {divider && <Divider decorative />}
 
-        <div style={{ display: 'flex', flexDirection: 'column', padding: '8px', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', padding: 'var(--space-2)', width: '100%' }}>
           {label && <DropdownMenuItem variant="header" label={label} emphasis={labelEmphasis} headerBadge={labelBadge} fluid />}
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', width: '100%' }}>
             {children}
           </div>
         </div>

@@ -8,6 +8,7 @@ import { computePosition, flip, offset, shift } from '@floating-ui/dom'
 import { CopyOneIcon, TickTwoIcon, RedoIcon, PenOneIcon } from '@strange-huge/icons'
 import { useCorrosion } from '@/lib/useCorrosion'
 import { springs } from '@/lib/springs'
+import { SPRING } from "@/styles/tokens/motion"
 
 // ── Visual constants ───────────────────────────────────────────────────────────
 // Dark warm surface - neutral-800 (#3B3632) gives strong contrast against
@@ -30,7 +31,7 @@ const CARET_W = 6   // half of base width; full base = 12px
 const SWAP_INITIAL = { scale: 0.5, opacity: 0, filter: 'blur(4px)' }
 const SWAP_ANIMATE = { scale: 1,   opacity: 1, filter: 'blur(0px)' }
 const SWAP_EXIT    = { scale: 0.5, opacity: 0, filter: 'blur(4px)' }
-const SWAP_SPRING  = { type: 'spring', stiffness: 500, damping: 30 } as const
+const SWAP_SPRING  = { type: 'spring', ...SPRING.snappy } as const
 
 // Corrosion hover gradient - identical to Button Primary hover
 const HOVER_GLOW_GRADIENT =
@@ -72,11 +73,11 @@ function PopoverAction({
         position:   'relative',
         display:    'inline-flex',
         alignItems: 'center',
-        gap:        4,
+        gap:        'var(--space-1)',
         // Button ghost sm: 5px top/bottom, 8px left/right
-        padding:    '5px 8px',
+        padding:    'var(--space-1) var(--space-2)',
         border:     'none',
-        borderRadius: 8,
+        borderRadius: 'var(--radius-md)',
         cursor:     'pointer',
         background: 'none',
         overflow:   'hidden',
@@ -89,7 +90,7 @@ function PopoverAction({
         fontSize:   'var(--font-size-body)',
         lineHeight: 'var(--line-height-body)',
         boxShadow:  isHovered ? 'var(--shadow-button-subtle-inner-hover)' : undefined,
-        transition: 'box-shadow 150ms',
+        transition: 'box-shadow var(--duration-fast)',
       }}
     >
       {/* ── SVG defs: turbulence filter + blur filter + mask ── */}
@@ -127,15 +128,15 @@ function PopoverAction({
       {/* ── Corrosion glow - turbulence displacement + circle mask reveal ── */}
       <div
         aria-hidden
-        style={{ position: 'absolute', inset: 0, zIndex: 0, filter: `url(#${filterId})` }}
+        style={{ position: 'absolute', inset: 0, zIndex: 'var(--z-base)', filter: `url(#${filterId})` }}
       >
         <div style={{ position: 'absolute', inset: 0, WebkitMask: `url(#${maskId})`, mask: `url(#${maskId})` }}>
           <div
             style={{
               position:        'absolute',
               inset:           '-0.73px',
-              borderRadius:    '8.73px',
-              filter:          'blur(7.273px)',
+              borderRadius:    'var(--selection-popover-radius)',
+              filter:          'blur(var(--selection-popover-blur))',
               backgroundImage: HOVER_GLOW_GRADIENT,
             }}
           />
@@ -149,7 +150,7 @@ function PopoverAction({
           style={{
             position:      'absolute',
             inset:         0,
-            borderRadius:  8,
+            borderRadius:  'var(--radius-md)',
             boxShadow:     '0 0 0 1px var(--button-subtle-border-hover)',
             pointerEvents: 'none',
             zIndex:        2,
@@ -282,13 +283,13 @@ export function SelectionPopover({
             // though this popover is portaled to document.body. Selecting
             // text near the bottom of the message list, close to the
             // composer, should never let this toolbar float over it.
-            zIndex:          0,
+            zIndex:          'var(--z-base)',
             display:         'flex',
             flexDirection:   'row',
             alignItems:      'center',
-            gap:             2,
-            padding:         '4px',
-            borderRadius:    12,
+            gap:             'var(--space-0-5)',
+            padding:         'var(--space-1)',
+            borderRadius:    'var(--radius-xl)',
             backgroundColor: BG,
             boxShadow:       SHADOW_OUTER,
           }}
@@ -323,7 +324,7 @@ export function SelectionPopover({
             style={{
               position:      'absolute',
               inset:         0,
-              borderRadius:  12,
+              borderRadius:  'var(--radius-xl)',
               boxShadow:     SHADOW_INNER,
               pointerEvents: 'none',
             }}
@@ -341,8 +342,8 @@ export function SelectionPopover({
                 left:          caretLeft,
                 width:         0,
                 height:        0,
-                borderLeft:    `${CARET_W}px solid transparent`,
-                borderRight:   `${CARET_W}px solid transparent`,
+                borderLeft:    `${CARET_W}px solid transparent`, // ds-keep: caret maths
+                borderRight:   `${CARET_W}px solid transparent`, // ds-keep: caret maths
                 ...(placement === 'top'
                   ? { borderTop:    `${CARET_H}px solid var(--neutral-800)` }
                   : { borderBottom: `${CARET_H}px solid var(--neutral-800)` }),

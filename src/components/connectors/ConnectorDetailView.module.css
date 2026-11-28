@@ -1,19 +1,19 @@
 .back {
-  margin: 0 0 24px -8px;
+  margin: 0 0 var(--space-6) calc(var(--space-2) * -1);
 }
 
 .header {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px 24px;
-  margin-bottom: 32px;
+  gap: var(--space-3) var(--space-6);
+  margin-bottom: var(--space-7);
 }
 
 .identity {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
   min-width: 0;
   flex: 1;
 }
@@ -28,7 +28,7 @@
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .description {
@@ -50,8 +50,8 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
 }
 
 .sectionTitle {
@@ -61,8 +61,8 @@
 }
 
 .count {
-  padding: 0 6px;
-  border-radius: 5px;
+  padding: 0 var(--space-1-5);
+  border-radius: var(--radius-sm);
   background: var(--neutral-100);
   color: var(--neutral-600);
   font: 500 12px/20px var(--font-body);
@@ -85,7 +85,7 @@
 .empty {
   overflow: hidden;
   border: 1px solid var(--border-default);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   background: var(--neutral-white);
 }
 
@@ -99,12 +99,12 @@
 }
 
 .empty {
-  padding: 32px 20px;
+  padding: var(--space-7) var(--space-5);
   text-align: center;
 }
 
 .emptyTitle {
-  margin: 0 0 4px;
+  margin: 0 0 var(--space-1);
   color: var(--neutral-900);
   font: 500 14px/22px var(--font-body);
 }

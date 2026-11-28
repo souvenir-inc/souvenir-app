@@ -34,13 +34,13 @@ export function StorageLabel() {
   const storage = summary.data?.storage
   if (storage) {
     return (
-      <span style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 13, lineHeight: '20px', color: 'var(--neutral-500)', whiteSpace: 'nowrap' }}>
+      <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-500)', whiteSpace: 'nowrap' }}>
         {storageLabel(storage.usedBytes, storage.limitBytes)}
       </span>
     )
   }
   if (summary.isError) return null
-  return <Skeleton width={84} height={14} radius={6} />
+  return <Skeleton width={84} height={14} radius={'var(--radius-sm)'} />
 }
 
 /**
@@ -64,15 +64,15 @@ function SettingsChangedNotice() {
     <div
       role="status"
       style={{
-        display: 'flex', alignItems: 'flex-start', gap: 14, margin: '20px 8px 0', padding: '16px 16px 16px 18px', borderRadius: 16,
+        display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', margin: 'var(--space-5) var(--space-2) 0', padding: 'var(--space-4) var(--space-4) var(--space-4) var(--space-4)', borderRadius: 'var(--radius-2xl)',
         border: '1px solid var(--border-default)', background: 'var(--card-bg)',
       }}
     >
-      <ShieldCheck size={20} strokeWidth={1.5} aria-hidden style={{ flexShrink: 0, marginTop: 2, color: 'var(--neutral-600)' }} />
+      <ShieldCheck size={20} strokeWidth={1.5} aria-hidden style={{ flexShrink: 0, marginTop: 'var(--space-0-5)', color: 'var(--neutral-600)' }} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <h3 style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)' }}>{MESSAGES.settingsNoticeTitle}</h3>
+        <h3 style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)' }}>{MESSAGES.settingsNoticeTitle}</h3>
         {lines.length > 0 && (
-          <ul style={{ margin: '6px 0 0', paddingLeft: 18, listStyle: 'disc', fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-600)' }}>
+          <ul style={{ margin: 'var(--space-1-5) 0 0', paddingLeft: 'var(--space-4)', listStyle: 'disc', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-600)' }}>
             {lines.map((line) => <li key={line.key}>{line.text}</li>)}
           </ul>
         )}
@@ -124,18 +124,18 @@ export function LibraryHeader({ query, setQuery }: LibraryHeaderProps) {
   const showListTools = !searching && query.tab !== 'suggested'
   return (
     // Side padding eases off on phones so the tab row (Shared) fits.
-    <header style={{ display: 'flex', flexDirection: 'column', padding: '28px clamp(8px, 4vw, 40px) 13px', flexShrink: 0 }}>
+    <header style={{ display: 'flex', flexDirection: 'column', padding: 'var(--library-header-padding)', flexShrink: 0 }}>
       {/* In a narrow window the tools wrap under the title, right-aligned, instead of pushing the page sideways. */}
-      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 16, rowGap: 8, minHeight: 36, padding: '0 8px' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flex: 'none' }}>
-          <h1 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '36px', color: 'var(--neutral-900)' }}>{searching ? 'Search' : MESSAGES.title}</h1>
+      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-4)', rowGap: 'var(--space-2)', minHeight: 36, padding: '0 var(--space-2)' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-3)', flex: 'none' }}>
+          <h1 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading-xl)', color: 'var(--neutral-900)' }}>{searching ? 'Search' : MESSAGES.title}</h1>
           <StorageLabel />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 8, rowGap: 8, marginLeft: 'auto', minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 'var(--space-2)', rowGap: 'var(--space-2)', marginLeft: 'auto', minWidth: 0 }}>
           {showListTools && <FilterPanel query={query} setQuery={setQuery} />}
           {showListTools && <SortMenu query={query} setQuery={setQuery} tab={listTab} />}
           {/* Search and Trash stay side by side on one line. */}
-          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'nowrap', gap: 8, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'nowrap', gap: 'var(--space-2)', minWidth: 0 }}>
             <LibrarySearch query={query} setQuery={setQuery} />
             <TrashLink />
           </div>
@@ -146,14 +146,14 @@ export function LibraryHeader({ query, setQuery }: LibraryHeaderProps) {
         <ScopeToggle query={query} setQuery={setQuery} />
       ) : (
         // In a narrow window the tab row scrolls sideways instead of cutting off its last tab.
-        <div style={{ marginTop: 24, maxWidth: '100%', overflowX: 'auto', scrollbarWidth: 'none' }}>
+        <div style={{ marginTop: 'var(--space-6)', maxWidth: '100%', overflowX: 'auto', scrollbarWidth: 'none' }}>
           <Tabs value={query.tab} onValueChange={(value) => setQuery((current) => tabPatch(current, value as LibraryTab), 'push')}>
             <Tabs.List>
               <Tabs.Trigger value="suggested">Suggested</Tabs.Trigger>
               <Tabs.Trigger value="all">All files</Tabs.Trigger>
               {showShared && (
                 <Tabs.Trigger value="shared">
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1-5)' }}>
                     Shared
                     {hasUnread && <UnreadDot />}
                   </span>

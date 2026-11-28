@@ -125,7 +125,7 @@ export function DeleteChatWithFilesDialog({ chatId, chatTitle, files, loading = 
         </DialogHeader>
         <DialogBody>
           {loading ? (
-            <div aria-busy="true" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div aria-busy="true" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
               <Skeleton height={20} />
               <Skeleton height={20} />
             </div>

@@ -5,12 +5,12 @@
 // gradient, with no backend field required.
 
 export const TEAM_GRADIENTS = [
-  'linear-gradient(135deg, #4FACDE 0%, #2D8BBF 100%)',  // teal-blue
-  'linear-gradient(135deg, #9B6FE0 0%, #7B4FC0 100%)',  // purple
-  'linear-gradient(135deg, #F59542 0%, #D4742A 100%)',  // orange
-  'linear-gradient(135deg, #4CAF78 0%, #2D8F58 100%)',  // green
-  'linear-gradient(135deg, #E06060 0%, #B83C3C 100%)',  // red-brown
-  'linear-gradient(135deg, #60A8E0 0%, #3C80C0 100%)',  // blue
+  'linear-gradient(135deg, var(--team-gradients) 0%, var(--team-gradients-2) 100%)',  // teal-blue
+  'linear-gradient(135deg, var(--team-gradients-3) 0%, var(--team-gradients-4) 100%)',  // purple
+  'linear-gradient(135deg, var(--team-gradients-5) 0%, var(--team-gradients-6) 100%)',  // orange
+  'linear-gradient(135deg, var(--team-gradients-7) 0%, var(--team-gradients-8) 100%)',  // green
+  'linear-gradient(135deg, var(--team-gradients-9) 0%, var(--team-gradients-10) 100%)',  // red-brown
+  'linear-gradient(135deg, var(--team-gradients-11) 0%, var(--team-gradients-12) 100%)',  // blue
 ]
 
 export function getGradient(seed: string): string {

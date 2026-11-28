@@ -335,20 +335,20 @@ function TopBarImpl({ edgeInset = 0, showCitationsToggle: _showCitationsToggle, 
         display:        visible ? "flex" : "none",
         margin:         `-${edgeInset}px -${edgeInset}px 0`,
         alignItems:     "center",
-        gap:            8,
-        padding:        "0 8px",
+        gap:            'var(--space-2)',
+        padding:        "0 var(--space-2)",
         borderBottom:   hasTitle ? "1px solid var(--border-default)" : "1px solid transparent",
         zIndex:         1,
       }}
     >
       {/* empty:hidden so an empty slot takes no room (or flex gap) and the chat name sits 12px in. */}
-      <div ref={leftSlotRef} className="flex empty:hidden" style={{ alignItems: "center", gap: 4, flexShrink: 0 }} />
+      <div ref={leftSlotRef} className="flex empty:hidden" style={{ alignItems: "center", gap: 'var(--space-1)', flexShrink: 0 }} />
       {isProjectChatPage && projectChatMatch ? (
         <>
           {/* ── Left: project › chat as a pill breadcrumb, with the actions menu
               at the right end of the chat name. The model selector lives in the
               composer itself now (ChatInput's own ModelMenu). ── */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0, flex: "1 1 0" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2-5)", minWidth: 0, flex: "1 1 0" }}>
             <ChatBreadcrumb
               crumbs={[{ label: getProject(projectChatMatch[1])?.name ?? "", href: PROJECT_ROUTE(projectChatMatch[1]) }]}
               current={projectChatName || "New chat"}
@@ -365,7 +365,7 @@ function TopBarImpl({ edgeInset = 0, showCitationsToggle: _showCitationsToggle, 
       ) : isPersonaChatPage ? (
         <>
           {/* ── Persona chat: non-interactive model tag + Edit button ── */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
 
             {/* Model tag — same visual as model selector button, no arrow, not interactive */}
             {(personaModel || persona?.modelId) && (() => {
@@ -376,13 +376,13 @@ function TopBarImpl({ edgeInset = 0, showCitationsToggle: _showCitationsToggle, 
                   size="sm"
                   disabled
                 >
-                  <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
                     {personaModel && (
                       <span
                         style={{
                           width:          "16px",
                           height:         "16px",
-                          borderRadius:   "4px",
+                          borderRadius:   "var(--radius-xs)",
                           overflow:       "hidden",
                           flexShrink:     0,
                           display:        "flex",
@@ -441,7 +441,7 @@ function TopBarImpl({ edgeInset = 0, showCitationsToggle: _showCitationsToggle, 
           {!isProjectDetailPage && !isChatsPage && isArchivedChat && backToArchivedButton}
         </>
       )}
-      <div ref={rightSlotRef} className="flex empty:hidden" style={{ alignItems: "center", gap: 8, flexShrink: 0, marginLeft: "auto" }} />
+      <div ref={rightSlotRef} className="flex empty:hidden" style={{ alignItems: "center", gap: 'var(--space-2)', flexShrink: 0, marginLeft: "auto" }} />
     </div>
 
     {/* "Move to project" from the breadcrumb menu on a plain chat. */}

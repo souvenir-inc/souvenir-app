@@ -1,5 +1,7 @@
 # Internal and API Routes: System Design Audit
 
+> **Note (2026-11-25):** `app/auth/access-token/route.ts` and `/api/persona-chat` no longer exist (the SDK serves the token route; agent chat goes through `/api/chat`). Current status: [re-audit](./reaudit-2026-11-25.md).
+
 Scope: every server route handler and dev route: `app/api/chat` (165), `api/persona-chat` (140), `api/backend/[...path]` (123), `api/template/[uuid]` (72, see Templates audit), `api/download` (77), `api/lab/[...path]` (27), `api/onboarding/logout` (30), `app/dispatch/[...path]` (134, Mixpanel proxy), `app/auth/*` (3 files, see Auth audit), `app/(app)/dev/{notifications,greetings}`, `app/reasoning-verify`, `scripts/*.mjs`. About 1,800 lines. These are the only server-side code besides `proxy.ts`.
 Method: all route handlers read (the large ones in full or near full); dev routes by header comments and guards. Items marked (verify) need a closer look.
 Scoring: 1 = applied, 0.5 = partial, 0 = absent, applicable principles only.

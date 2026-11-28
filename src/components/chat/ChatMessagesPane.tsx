@@ -62,8 +62,8 @@ export function ChatMessagesPane({
   }, [scrollerRef]);
   // Two layers, unioned: the fade over the messages, and a solid strip that keeps
   // the scrollbar's column at full opacity.
-  const fade = "linear-gradient(to bottom, #000 calc(100% - 40px), transparent)";
-  const maskLayers = `${fade}, linear-gradient(#000, #000)`;
+  const fade = "linear-gradient(to bottom, var(--static-black) calc(100% - 40px), transparent)";
+  const maskLayers = `${fade}, linear-gradient(var(--static-black), var(--static-black))`;
   const maskSizes = `calc(100% - ${gutter}px) 100%, ${gutter}px 100%`;
 
   return (
@@ -93,9 +93,9 @@ export function ChatMessagesPane({
         style={{
           flex: 1,
           overflowY: "auto",
-          paddingTop: "24px",
+          paddingTop: "var(--space-6)",
           // Matches the 40px fade, so the last message ends clear of it when scrolled to the bottom.
-          paddingBottom: "40px",
+          paddingBottom: "var(--space-8)",
           // Messages fade out over the last 40px as they near the composer instead of stopping at a
           // hard edge. A mask (not a coloured overlay) reveals whatever is behind, so it matches the
           // translucent card in both themes.
@@ -107,7 +107,7 @@ export function ChatMessagesPane({
           WebkitMaskPosition: "left top, right top",
           maskRepeat: "no-repeat, no-repeat",
           WebkitMaskRepeat: "no-repeat, no-repeat",
-          paddingRight: "2px",
+          paddingRight: "var(--space-0-5)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -120,7 +120,7 @@ export function ChatMessagesPane({
         {/* 2px right padding on the scrolling element above sits the scrollbar
             exactly 2px from the layout's edge. Reading-comfort padding lives on the
             inner wrapper below, not on the scrolling element. */}
-        <div style={{ width: "100%", maxWidth: "720px", padding: "0 16px", boxSizing: "border-box" }}>
+        <div style={{ width: "100%", maxWidth: "720px", padding: "0 var(--space-4)", boxSizing: "border-box" }}>
         {/* Loading skeleton — shown while fetching AND while the virtualizer
             settles its initial measurements so the first visible frame is jitter-free */}
         {(isLoadingMessages || isSettling) && <ChatMessagesSkeleton />}

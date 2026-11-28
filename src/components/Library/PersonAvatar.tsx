@@ -11,7 +11,7 @@ import { Tooltip } from '@/components/Tooltip'
 // Soft diagonal gradient (light top-left to the full tint bottom-right), as in the library prototype.
 const tintGradient = (colour: string) =>
   `linear-gradient(135deg, color-mix(in srgb, ${colour} 45%, white), color-mix(in srgb, ${colour} 88%, black))`
-const HAIRLINE = "inset 0 0 0 0.5px rgba(0, 0, 0, 0.08)"
+const HAIRLINE = 'var(--person-avatar-hairline)'
 
 const TINTS = ['Blue', 'Green', 'Purple', 'Yellow', 'Brown'] as const
 
@@ -36,7 +36,7 @@ export function PersonAvatar({ person, size = 24, ring = false }: { person: Pers
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden',
         width: size, height: size, borderRadius: '50%',
         background: tintGradient(`var(--color-tag-${tint}-bg)`), color: `var(--color-tag-${tint}-text)`,
-        fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: Math.round(size * 0.45), lineHeight: 1,
+        fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: Math.round(size * 0.45), lineHeight: 'var(--leading-none)',
         boxShadow: ring ? `${HAIRLINE}, 0 0 0 2px var(--card-bg)` : HAIRLINE,
       }}
     >
@@ -77,7 +77,7 @@ export function AccessAvatars({ file, viewerId }: { file: LibraryFile; viewerId:
     <Tooltip content={tip}>
       <span role="img" aria-label={tip} style={{ display: 'inline-flex', alignItems: 'center' }}>
         {shown.map((person, index) => (
-          <span key={person.id} style={{ marginLeft: index === 0 ? 0 : -6, display: 'inline-flex' }}>
+          <span key={person.id} style={{ marginLeft: index === 0 ? 0 : 'calc(var(--space-1-5) * -1)', display: 'inline-flex' }}>
             <PersonAvatar person={person} ring />
           </span>
         ))}
@@ -86,9 +86,9 @@ export function AccessAvatars({ file, viewerId }: { file: LibraryFile; viewerId:
           <span
             aria-hidden="true"
             style={{
-              marginLeft: -6, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 24, height: 24, padding: '0 5px',
-              borderRadius: 12, background: tintGradient('var(--neutral-100)'), color: 'var(--neutral-700)', boxShadow: `${HAIRLINE}, 0 0 0 2px var(--card-bg)`,
-              fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 11, boxSizing: 'border-box',
+              marginLeft: 'calc(var(--space-1-5) * -1)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 24, height: 24, padding: '0 var(--space-1)',
+              borderRadius: 'var(--radius-xl)', background: tintGradient('var(--neutral-100)'), color: 'var(--neutral-700)', boxShadow: `${HAIRLINE}, 0 0 0 2px var(--card-bg)`,
+              fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-caption)', boxSizing: 'border-box',
             }}
           >
             +{extra}

@@ -1,4 +1,5 @@
 "use client";
+import { httpsUrl } from "@/lib/https-url";
 
 import {
   STRIPE_BILLING_ENDPOINT,
@@ -323,7 +324,7 @@ export async function setupEnterprisePayment(): Promise<string> {
   const response = await apiFetch(`${STRIPE_BILLING_ENDPOINT.replace(/\/billing$/, "")}/enterprise/setup`, { method: "POST" });
   const body: unknown = await response.json().catch(() => null);
   if (!response.ok) throw new BillingActionError(errorReason(body, "Could not start payment setup."), response.status);
-  const url = (body as { checkout_url?: unknown } | null)?.checkout_url;
-  if (typeof url !== "string" || !url) throw new BillingActionError("Payment setup returned no checkout link.", response.status);
+  const url = httpsUrl((body as { checkout_url?: unknown } | null)?.checkout_url);
+  if (!url) throw new BillingActionError("Payment setup returned no checkout link.", response.status);
   return url;
 }

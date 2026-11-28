@@ -33,6 +33,7 @@ import { AgentCardMenu } from './AgentCardMenu'
 import { CardActionRow } from './CardActionRow'
 import { ModelUnavailableOverlay } from './ModelUnavailableOverlay'
 import { CARD_HEIGHT, CARD_RADIUS, HERO_HEIGHT, AVATAR_SIZE, HERO_INSET } from './card-metrics'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
 
@@ -59,7 +60,7 @@ function formatCount(n: number): string {
 const RISE = {
   initial:    { y: 8, opacity: 0 },
   animate:    { y: 0, opacity: 1 },
-  transition: { duration: 0.3, ease: 'easeOut' as const },
+  transition: { duration: DURATION.slow, ease: 'easeOut' as const },
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -406,7 +407,7 @@ function PersonaCardInner({
             : undefined,
           cursor:          modelUnavailable ? 'default' : 'pointer',
           boxSizing:       'border-box' as const,
-          zIndex:          menuOpen ? 100 : undefined,
+          zIndex:          menuOpen ? 'var(--z-sticky)' : undefined,
           opacity:         pausePending ? 0.6 : 1,
           pointerEvents:   pausePending ? 'none' : undefined,
           // Lift, tilt and their transitions come from .agent-card (globals.css).
@@ -456,7 +457,7 @@ function PersonaCardInner({
             ...agentHeroStyle(avatarColors[0]),
             // A draft is not live yet — mute its banner.
             opacity:      isDraft ? 0.55 : paused ? 0.6 : 1,
-            transition:   'opacity 0.2s ease',
+            transition:   'opacity var(--duration-base) ease',
           }}
         >
           <HeroScene
@@ -510,7 +511,7 @@ function PersonaCardInner({
               top:             10,
               right:           10,
               zIndex:          2,
-              borderRadius:    8,
+              borderRadius:    'var(--radius-md)',
               backgroundColor: 'color-mix(in srgb, var(--neutral-white) 62%, transparent)',
             }}
           >
@@ -532,12 +533,12 @@ function PersonaCardInner({
             flex:          '1 1 0',
             minHeight:     0,
             boxSizing:     'border-box' as const,
-            padding:       '14px 18px 0',
+            padding:       'var(--space-3) var(--space-4) 0',
             // No opacity here when unavailable — the scrim below already dims
             // the content, and `opacity < 1` would create a stacking context
             // that traps the ··· menu underneath it.
             pointerEvents: modelUnavailable ? 'none' : undefined,
-            transition:    'opacity 0.2s ease',
+            transition:    'opacity var(--duration-base) ease',
           }}
         >
 
@@ -552,9 +553,9 @@ function PersonaCardInner({
                 zIndex:     2,
                 display:    'flex',
                 alignItems: 'center',
-                gap:        2,
-                borderRadius:    8,
-                padding:         '0 4px 0 0',
+                gap:        'var(--space-0-5)',
+                borderRadius:    'var(--radius-md)',
+                padding:         '0 var(--space-1) 0 0',
                 backgroundColor: 'color-mix(in srgb, var(--neutral-white) 62%, transparent)',
               }}
             >
@@ -607,16 +608,16 @@ function PersonaCardInner({
               const titleStyle: React.CSSProperties = {
                 width:         '100%',
                 fontFamily:    'var(--font-title)', // Google Sans
-                fontSize:      18,
-                lineHeight:    '24px',
+                fontSize:      'var(--font-size-heading-sm)',
+                lineHeight:    'var(--line-height-heading-sm)',
                 fontWeight:    'var(--font-weight-medium)',
-                letterSpacing: '-0.01em',
+                letterSpacing: 'var(--tracking-tight)',
                 color:         'var(--neutral-950)',
                 overflow:      'hidden',
                 textOverflow:  'ellipsis',
                 whiteSpace:    'nowrap',
                 opacity:       paused ? 0.6 : 1,
-                transition:    'opacity 0.2s ease',
+                transition:    'opacity var(--duration-base) ease',
               }
               // With a Details action, the title is the card's keyboard entry point (Tab → Enter).
               return onMenuDetails ? (
@@ -636,7 +637,7 @@ function PersonaCardInner({
                   maxWidth:     '100%',
                   fontFamily:   'var(--font-body)',
                   fontSize:     'var(--font-size-caption)',
-                  lineHeight:   '18px',
+                  lineHeight:   'var(--line-height-caption)',
                   color:        'var(--neutral-600)',
                   overflow:     'hidden',
                   textOverflow: 'ellipsis',
@@ -652,7 +653,7 @@ function PersonaCardInner({
               <Tooltip content={description} disabled={!description} maxWidth={280}><p
                 className={animateHover ? 'persona-card-desc-reading' : undefined}
                 style={{
-                  margin:           '8px 0 0',
+                  margin:           'var(--space-2) 0 0',
                   // Always two lines tall, so every card's action row lines up whatever the description length.
                   minHeight:        'calc(2 * var(--line-height-caption))',
                   fontFamily:       'var(--font-body)',

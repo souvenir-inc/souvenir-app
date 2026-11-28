@@ -36,13 +36,13 @@ export function ProjectListRow({
       style={{
         display:         'flex',
         alignItems:      'center',
-        gap:             12,
-        padding:         '10px 16px',
-        borderRadius:    12,
+        gap:             'var(--space-3)',
+        padding:         'var(--space-2-5) var(--space-4)',
+        borderRadius:    'var(--radius-xl)',
         // White like the grid view's cards (--card-bg); --neutral-white is the cream page colour.
         backgroundColor: hovered || menuOpen ? 'var(--neutral-50)' : 'var(--card-bg)',
-        boxShadow:       '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
-        transition:      'background-color 120ms ease',
+        boxShadow:       'var(--shadow-control)',
+        transition:      'background-color var(--duration-fast) ease',
         width:           '100%',
         boxSizing:       'border-box',
       }}
@@ -60,7 +60,7 @@ export function ProjectListRow({
           ...RESET_BUTTON_STYLE,
           display:    'flex',
           alignItems: 'center',
-          gap:        12,
+          gap:        'var(--space-3)',
           flex:       '1 1 0',
           minWidth:   0,
           cursor:     'pointer',
@@ -75,13 +75,13 @@ export function ProjectListRow({
         />
 
         {/* Title + meta */}
-        <div style={{ flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div style={{ flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)' }}>
           <span
             style={{
               fontFamily:   'var(--font-body)',
               fontWeight:   'var(--font-weight-medium)',
-              fontSize:     14,
-              lineHeight:   '20px',
+              fontSize:     'var(--font-size-body)',
+              lineHeight:   'var(--line-height-body-sm)',
               color:        'var(--neutral-900)',
               overflow:     'hidden',
               textOverflow: 'ellipsis',
@@ -93,9 +93,9 @@ export function ProjectListRow({
           <span
             style={{
               fontFamily:   'var(--font-body)',
-              fontWeight:   400,
-              fontSize:     11,
-              lineHeight:   '16px',
+              fontWeight:   'var(--font-weight-regular)',
+              fontSize:     'var(--font-size-caption)',
+              lineHeight:   'var(--line-height-small)',
               color:        'var(--neutral-500)',
               overflow:     'hidden',
               textOverflow: 'ellipsis',
@@ -109,14 +109,14 @@ export function ProjectListRow({
         {/* Stats — each count gets a fixed-width slot (not just min-width) so a
             1-, 2-, or 3-digit number never nudges either icon's position;
             tabular-nums keeps the digits themselves a constant width too. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, color: 'var(--neutral-400)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexShrink: 0, color: 'var(--neutral-400)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
             <UserIcon size={18} />
-            <span style={{ width: 22, fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '20px', color: 'var(--neutral-500)', fontVariantNumeric: 'tabular-nums' }}>{memberCount}</span>
+            <span style={{ width: 22, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-500)', fontVariantNumeric: 'tabular-nums' }}>{memberCount}</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
             <BubbleChatAddIcon size={18} />
-            <span style={{ width: 22, fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '20px', color: 'var(--neutral-500)', fontVariantNumeric: 'tabular-nums' }}>{project.chatCount}</span>
+            <span style={{ width: 22, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-500)', fontVariantNumeric: 'tabular-nums' }}>{project.chatCount}</span>
           </div>
         </div>
       </button>
@@ -126,7 +126,7 @@ export function ProjectListRow({
           position on every row, regardless of hasActions. */}
       <div style={{ width: 24, height: 24, flexShrink: 0 }}>
         {hasActions && (
-          <div style={{ opacity: showMenu ? 1 : 0, transition: 'opacity 120ms ease' }}>
+          <div style={{ opacity: showMenu ? 1 : 0, transition: 'opacity var(--duration-fast) ease' }}>
             <Dropdown.Float
               open={menuOpen}
               onOpenChange={setMenuOpen}

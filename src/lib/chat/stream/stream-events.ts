@@ -234,11 +234,13 @@ function handleReasoningToAnswer(ctx: StreamEventContext, turn: StreamTurn, pars
 
 function handleContent(ctx: StreamEventContext, turn: StreamTurn, parsed: Payload) {
   const delta = typeof parsed.content === "string" ? parsed.content : ""
-  const wasEmpty = !turn.assistantContent
+  const wasEmpty = !turn.assistantContent && !turn.priorContent
   turn.assistantContent = mergeStreamingText(turn.assistantContent, delta)
-  // Only a leading <think> block is reasoning; while it is open,
-  // everything after it is reasoning too.
-  const { visibleText, thinkingText, thinkingOpen } = extractThinkingContent(turn.assistantContent)
+  // Only a leading <think> block is reasoning; while it is open, everything after it is
+  // reasoning too. Leading in this stretch: earlier stretches' text is added before it after.
+  const extracted = extractThinkingContent(turn.assistantContent)
+  const { thinkingText, thinkingOpen } = extracted
+  const visibleText = turn.priorContent + extracted.visibleText
   // Text that grew marks where this stretch of the answer starts, after whatever the turn did before it.
   if (visibleText.length > turn.answerLength) turn.reasoning.answer(turn.answerLength)
   turn.answerLength = visibleText.length

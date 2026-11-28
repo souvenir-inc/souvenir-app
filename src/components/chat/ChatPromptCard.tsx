@@ -166,7 +166,7 @@ export function ChatPromptCard({ prompt, onDecided, onAnswered }: ChatPromptCard
         onNext={cursor < furthest ? () => navigate(cursor + 1) : undefined}
       />
       {error && (
-        <p role="alert" style={{ margin: "6px 12px 0", color: "var(--red-700)", fontSize: 12 }}>
+        <p role="alert" style={{ margin: "var(--space-1-5) var(--space-3) 0", color: "var(--red-700)", fontSize: 'var(--font-size-small)' }}>
           {error}
         </p>
       )}

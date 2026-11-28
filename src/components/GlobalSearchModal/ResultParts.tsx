@@ -18,7 +18,7 @@ import type { SearchResultType, SearchResult } from './index'
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
 
-export const SHADOW_MODAL   = '0px 8px 32px 0px rgba(82,75,71,0.18), 0px 0px 0px 1px var(--neutral-100)'
+export const SHADOW_MODAL   = 'var(--shadow-4)'
 export const SHADOW_FOCUSED = '0px 0px 0px 1.5px var(--blue-400)'
 
 // ── Color system — mirrors KDS tag palette (Chip, Badge) ─────────────────────
@@ -70,13 +70,13 @@ export function SectionHeader({ label }: { label: string }) {
   return (
     <p
       style={{
-        margin:        '8px 16px 2px',
+        margin:        'var(--space-2) var(--space-4) var(--space-0-5)',
         fontFamily:    'var(--font-body)',
         fontSize:      'var(--font-size-caption)',
-        fontWeight:    600,
+        fontWeight:    'var(--font-weight-semibold)',
         lineHeight:    'var(--line-height-caption)',
         color:         'var(--neutral-400)',
-        letterSpacing: '0.06em',
+        letterSpacing: 'var(--tracking-caps)',
         textTransform: 'uppercase',
       }}
     >
@@ -118,10 +118,10 @@ export function ResultRow({ result, focused, query, onClick, onHover }: ResultRo
       style={{
         display:         'flex',
         alignItems:      'center',
-        gap:             10,
-        padding:         '8px 8px',
-        margin:          '1px 8px',
-        borderRadius:    10,
+        gap:             'var(--space-2-5)',
+        padding:         'var(--space-2) var(--space-2)',
+        margin:          'var(--space-0-5) var(--space-2)',
+        borderRadius:    'var(--radius-lg)',
         border:          'none',
         width:           'calc(100% - 16px)',
         textAlign:       'left',
@@ -129,7 +129,7 @@ export function ResultRow({ result, focused, query, onClick, onHover }: ResultRo
         boxShadow:       focused ? SHADOW_FOCUSED : 'none',
         cursor:          'pointer',
         outline:         'none',
-        transition:      'background-color 100ms, box-shadow 100ms',
+        transition:      'background-color var(--duration-instant), box-shadow var(--duration-instant)',
         flexShrink:      0,
       }}
     >
@@ -141,7 +141,7 @@ export function ResultRow({ result, focused, query, onClick, onHover }: ResultRo
           justifyContent:  'center',
           width:           28,
           height:          28,
-          borderRadius:    8,
+          borderRadius:    'var(--radius-md)',
           backgroundColor: TYPE_ICON_BG[result.type],
           flexShrink:      0,
         }}
@@ -156,7 +156,7 @@ export function ResultRow({ result, focused, query, onClick, onHover }: ResultRo
             margin:       0,
             fontFamily:   'var(--font-body)',
             fontSize:     'var(--font-size-body)',
-            fontWeight:   500,
+            fontWeight:   'var(--font-weight-medium)',
             lineHeight:   'var(--line-height-body)',
             color:        'var(--neutral-800)',
             overflow:     'hidden',
@@ -169,10 +169,10 @@ export function ResultRow({ result, focused, query, onClick, onHover }: ResultRo
         {result.subtitle && (
           <p
             style={{
-              margin:       '2px 0 0',
+              margin:       'var(--space-0-5) 0 0',
               fontFamily:   'var(--font-body)',
               fontSize:     'var(--font-size-caption)',
-              fontWeight:   400,
+              fontWeight:   'var(--font-weight-regular)',
               lineHeight:   'var(--line-height-caption)',
               color:        'var(--neutral-400)',
               overflow:     'hidden',
@@ -191,7 +191,7 @@ export function ResultRow({ result, focused, query, onClick, onHover }: ResultRo
           style={{
             fontFamily: 'var(--font-body)',
             fontSize:   'var(--font-size-caption)',
-            fontWeight: 400,
+            fontWeight: 'var(--font-weight-regular)',
             lineHeight: 'var(--line-height-caption)',
             color:      'var(--neutral-400)',
             whiteSpace: 'nowrap',
@@ -220,11 +220,11 @@ export function CloseModalButton({ onClick }: { onClick: () => void }) {
         justifyContent:  'center',
         width:           32,
         height:          32,
-        borderRadius:    8,
+        borderRadius:    'var(--radius-md)',
         border:          'none',
         cursor:          'pointer',
         flexShrink:      0,
-        transition:      'background-color 120ms',
+        transition:      'background-color var(--duration-fast)',
       }}
     >
       <CancelOneIcon size={16} color="var(--neutral-500)" />
@@ -240,7 +240,7 @@ export function KbdHint({ keys, label }: { keys: string[]; label: string }) {
       style={{
         display:    'inline-flex',
         alignItems: 'center',
-        gap:        4,
+        gap:        'var(--space-1)',
         fontFamily: 'var(--font-body)',
         fontSize:   'var(--font-size-caption)',
         color:      'var(--neutral-400)',
@@ -254,12 +254,12 @@ export function KbdHint({ keys, label }: { keys: string[]; label: string }) {
             alignItems:      'center',
             justifyContent:  'center',
             minWidth:        20,
-            padding:         '1px 5px',
-            borderRadius:    5,
+            padding:         'var(--space-0-5) var(--space-1)',
+            borderRadius:    'var(--radius-sm)',
             backgroundColor: 'var(--neutral-100)',
             boxShadow:       '0px 0px 0px 1px var(--neutral-200)',
             fontFamily:      'var(--font-code)',
-            fontSize: 12,
+            fontSize: 'var(--font-size-small)',
             color:           'var(--neutral-600)',
           }}
         >

@@ -39,7 +39,7 @@ export const TeamChip = React.forwardRef<HTMLSpanElement, TeamChipProps>(
         style={{
           display:    'inline-flex',
           alignItems: 'center',
-          gap:        isSmall ? 4 : 5,
+          gap:        isSmall ? 'var(--space-1)' : 'var(--space-1-25)',
           flexShrink: 0,
           ...style,
         }}
@@ -54,14 +54,14 @@ export const TeamChip = React.forwardRef<HTMLSpanElement, TeamChipProps>(
             justifyContent: 'center',
             width:        isSmall ? 12 : 16,
             height:       isSmall ? 12 : 16,
-            borderRadius: 3,
+            borderRadius: 'var(--radius-xs)',
             background:   gradient,
             flexShrink:   0,
             fontFamily:   'var(--font-title)',
-            fontWeight:   500,
-            fontSize:     isSmall ? 7 : 9,
+            fontWeight:   'var(--font-weight-medium)',
+            fontSize:     isSmall ? 'var(--team-chip-size)' : 'var(--team-chip-size-2)',
             color:        'var(--color-text-on-accent)',
-            lineHeight:   1,
+            lineHeight:   'var(--leading-none)',
             userSelect:   'none',
           }}
         >
@@ -73,7 +73,7 @@ export const TeamChip = React.forwardRef<HTMLSpanElement, TeamChipProps>(
           <span
             style={{
               fontFamily:  'var(--font-body)',
-              fontWeight:  isSmall ? 400 : 500,
+              fontWeight:  isSmall ? 'var(--font-weight-regular)' : 'var(--font-weight-medium)',
               fontSize:    isSmall ? 'var(--font-size-caption)' : 'var(--font-size-body)',
               lineHeight:  isSmall ? 'var(--line-height-caption)' : 'var(--line-height-body)',
               color:       'var(--neutral-500)',
@@ -86,7 +86,7 @@ export const TeamChip = React.forwardRef<HTMLSpanElement, TeamChipProps>(
             <span
               style={{
                 fontFamily:  'var(--font-body)',
-                fontWeight:  400,
+                fontWeight:  'var(--font-weight-regular)',
                 fontSize:    'var(--font-size-caption)',
                 lineHeight:  'var(--line-height-caption)',
                 color:       'var(--neutral-400)',

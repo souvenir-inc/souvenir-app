@@ -170,7 +170,7 @@ function BaseLink({
       style={{
         color: "var(--brown-500)",
         textDecoration: "underline",
-        textUnderlineOffset: "2px",
+        textUnderlineOffset: "var(--underline-offset)",
       }}
     >
       {children}
@@ -236,14 +236,14 @@ const VISUALLY_HIDDEN: React.CSSProperties = {
   width: 1,
   height: 1,
   padding: 0,
-  margin: -1,
+  margin: 'calc(var(--space-px) * -1)',
   overflow: "hidden",
   clip: "rect(0, 0, 0, 0)",
   whiteSpace: "nowrap",
   border: 0,
 };
 
-const H3_STYLE: React.CSSProperties = { fontSize: "var(--prose-size-h3)", fontWeight: 600, color: "var(--prose-heading)", fontFamily: "var(--font-ai-output)", lineHeight: "var(--prose-line-h3)", margin: "var(--prose-h3-space-before) 0 var(--prose-h3-space-after)" };
+const H3_STYLE: React.CSSProperties = { fontSize: "var(--prose-size-h3)", fontWeight: 'var(--font-weight-semibold)', color: "var(--prose-heading)", fontFamily: "var(--font-ai-output)", lineHeight: "var(--prose-line-h3)", margin: "var(--prose-h3-space-before) 0 var(--prose-h3-space-after)" };
 
 // Every component spreads its props through withoutNode so react-markdown's
 // HAST `node` never reaches the DOM as node="[object Object]".
@@ -258,8 +258,8 @@ const BASE_COMPONENTS: Components = {
           fontSize: "var(--prose-size-code)",
           background: "var(--neutral-800-10)",
           color: "var(--prose-heading)",
-          borderRadius: "4px",
-          padding: "1px 5px",
+          borderRadius: "var(--radius-xs)",
+          padding: "var(--prose-code-padding)",
           border: "1px solid var(--neutral-700-12)",
           whiteSpace: "pre",
         }}
@@ -284,15 +284,15 @@ const BASE_COMPONENTS: Components = {
     return (
       <div
         className="kaya-scrollbar"
-        style={{ overflowX: "auto", margin: "16px 0", borderRadius: "8px", border: "1px solid var(--border-default)" }}
+        style={{ overflowX: "auto", margin: "var(--space-4) 0", borderRadius: "var(--radius-md)", border: "1px solid var(--border-default)" }}
       >
         <table
           style={{
             width: "100%",
             minWidth: "540px",
             borderCollapse: "collapse",
-            fontSize: "14px",
-            lineHeight: "22px",
+            fontSize: "var(--font-size-body)",
+            lineHeight: 'var(--line-height-body)',
             fontFamily: "var(--font-body)",
             tableLayout: "auto",
           }}
@@ -317,10 +317,10 @@ const BASE_COMPONENTS: Components = {
     return (
       <th
         style={{
-          padding: "10px 14px",
+          padding: "var(--prose-table-cell-padding)",
           textAlign: "left",
-          fontWeight: 600,
-          fontSize: "13px",
+          fontWeight: 'var(--font-weight-semibold)',
+          fontSize: "var(--font-size-body-sm)",
           color: "var(--neutral-700)",
           borderBottom: "1px solid var(--border-default)",
           whiteSpace: "nowrap",
@@ -336,7 +336,7 @@ const BASE_COMPONENTS: Components = {
     return (
       <td
         style={{
-          padding: "10px 14px",
+          padding: "var(--prose-table-cell-padding)",
           borderBottom: "1px solid var(--neutral-100)",
           color: "var(--neutral-800)",
           verticalAlign: "top",
@@ -394,14 +394,14 @@ const BASE_COMPONENTS: Components = {
     if (type !== "checkbox") return <input type={type} checked={checked} {...withoutNode(props)} />;
     // Task-list checkbox: read-only, sitting inline before the item text.
     return (
-      <span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 8 }}>
+      <span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 'var(--space-2)' }}>
         <Checkbox checked={Boolean(checked)} disabled aria-label="Task" />
       </span>
     );
   },
   h1({ children, ...props }) {
     return (
-      <h2 style={{ fontSize: "var(--prose-size-h1)", fontWeight: 600, color: "var(--prose-heading)", fontFamily: "var(--font-ai-output)", lineHeight: "var(--prose-line-h1)", margin: "var(--prose-h1-space-before) 0 var(--prose-h1-space-after)" }} {...withoutNode(props)}>
+      <h2 style={{ fontSize: "var(--prose-size-h1)", fontWeight: 'var(--font-weight-semibold)', color: "var(--prose-heading)", fontFamily: "var(--font-ai-output)", lineHeight: "var(--prose-line-h1)", margin: "var(--prose-h1-space-before) 0 var(--prose-h1-space-after)" }} {...withoutNode(props)}>
         {children}
       </h2>
     );
@@ -413,7 +413,7 @@ const BASE_COMPONENTS: Components = {
       return <h2 style={VISUALLY_HIDDEN} {...withoutNode(props)}>{children}</h2>;
     }
     return (
-      <h2 style={{ fontSize: "var(--prose-size-h2)", fontWeight: 600, color: "var(--prose-heading)", fontFamily: "var(--font-ai-output)", lineHeight: "var(--prose-line-h2)", margin: "var(--prose-h2-space-before) 0 var(--prose-h2-space-after)" }} {...withoutNode(props)}>
+      <h2 style={{ fontSize: "var(--prose-size-h2)", fontWeight: 'var(--font-weight-semibold)', color: "var(--prose-heading)", fontFamily: "var(--font-ai-output)", lineHeight: "var(--prose-line-h2)", margin: "var(--prose-h2-space-before) 0 var(--prose-h2-space-after)" }} {...withoutNode(props)}>
         {children}
       </h2>
     );
@@ -449,12 +449,12 @@ const BASE_COMPONENTS: Components = {
   },
   hr() {
     return (
-      <hr style={{ border: "none", borderTop: "1px solid var(--border-default)", margin: "16px 0" }} />
+      <hr style={{ border: "none", borderTop: "1px solid var(--border-default)", margin: "var(--space-4) 0" }} />
     );
   },
   p({ children, ...props }) {
     return (
-      <p style={{ margin: "0", marginBottom: "var(--prose-block-gap)", lineHeight: "var(--prose-line-body)", fontWeight: 400, fontSize: "var(--prose-size-body)", color: "var(--prose-text)" }} {...withoutNode(props)}>
+      <p style={{ margin: "0", marginBottom: "var(--prose-block-gap)", lineHeight: "var(--prose-line-body)", fontWeight: 'var(--font-weight-regular)', fontSize: "var(--prose-size-body)", color: "var(--prose-text)" }} {...withoutNode(props)}>
         {children}
       </p>
     );

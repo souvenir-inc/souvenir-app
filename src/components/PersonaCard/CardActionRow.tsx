@@ -5,6 +5,7 @@ import { m } from 'framer-motion'
 import { ArrowRightTwoIcon } from '@strange-huge/icons'
 import { AgentCardButton } from './AgentCardButton'
 import { ACTION_HEIGHT } from './card-metrics'
+import { DURATION } from "@/styles/tokens/motion"
 
 export interface CardPrimaryAction {
   label: string
@@ -37,7 +38,7 @@ export function CardActionRow({ primary, modelUnavailable, ctaHot, setCtaHot, at
       backgroundSize:     '100% 1px',
       backgroundPosition: 'top',
       backgroundRepeat:   'no-repeat',
-      marginInline:   14,
+      marginInline:   'var(--space-3)',
     }}
   >
     {primary && !modelUnavailable && (
@@ -57,7 +58,7 @@ export function CardActionRow({ primary, modelUnavailable, ctaHot, setCtaHot, at
               aria-hidden
               initial={false}
               animate={{ width: ctaHot ? 20 : 0, opacity: ctaHot ? 1 : 0, x: ctaHot ? 0 : -4 }}
-              transition={{ duration: 0.18, ease: 'easeOut' }}
+              transition={{ duration: DURATION.base, ease: 'easeOut' }}
               style={{ display: 'inline-flex', justifyContent: 'flex-end', overflow: 'hidden' }}
             >
               <ArrowRightTwoIcon size={14} />

@@ -19,7 +19,7 @@ export function AgentChipAvatar({ agentId, name, size = 24 }: { agentId: string;
       colors={avatar.colors}
       hovered={false}
       size={size}
-      radius={6}
+      radius="var(--radius-sm)"
       eyes
     />
   )

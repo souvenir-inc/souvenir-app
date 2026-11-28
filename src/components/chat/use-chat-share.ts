@@ -151,10 +151,10 @@ export function useChatShare({ chatId, canManage, onCopied, autoOpen }: Omit<Cha
   const memberRowStyle: React.CSSProperties = {
     display:      'flex',
     alignItems:   'center',
-    gap:          10,
+    gap:          'var(--space-2-5)',
     width:        '100%',
-    padding:      '8px 10px',
-    borderRadius: 10,
+    padding:      'var(--space-2) var(--space-2-5)',
+    borderRadius: 'var(--radius-lg)',
     boxSizing:    'border-box',
   }
 

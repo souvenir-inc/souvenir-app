@@ -55,18 +55,18 @@ function ConnectorCard({
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-start",
-        padding: "16px",
-        borderRadius: "16px",
+        padding: "var(--space-4)",
+        borderRadius: "var(--radius-2xl)",
         border: "none",
         cursor: "pointer",
         outline: "none",
-        backgroundColor: selected ? "var(--neutral-800, #3b3632)" : "var(--neutral-white)",
+        backgroundColor: selected ? "var(--neutral-800)" : "var(--neutral-white)",
         boxShadow:
-          "0px 2px 2.8px 0px var(--neutral-200, #E5E5E5), 0px 0px 0px 1px var(--neutral-200, #E5E5E5)",
+          "0px 2px 2.8px 0px var(--neutral-200), 0px 0px 0px 1px var(--neutral-200)",
         flex: "1 1 0",
         minWidth: 0,
         textAlign: "left",
-        transition: "background-color 120ms",
+        transition: "background-color var(--duration-fast)",
       }}
     >
       {/* Logo */}
@@ -81,7 +81,7 @@ function ConnectorCard({
         }}
       >
         {logoPending ? (
-          <span className="kaya-skeleton" style={{ display: "block", width: 32, height: 32, borderRadius: 8 }} />
+          <span className="kaya-skeleton" style={{ display: "block", width: 32, height: 32, borderRadius: 'var(--radius-md)' }} />
         ) : (
           <ConnectorGlyph slug={connector.id} name={connector.name} logoUrl={logoUrl} size={32} />
         )}
@@ -91,11 +91,11 @@ function ConnectorCard({
       <p
         style={{
           fontFamily: "var(--font-body)",
-          fontWeight: 500,
-          fontSize: 14,
-          lineHeight: "22px",
-          color: selected ? "var(--neutral-50)" : "var(--neutral-900, #26211e)",
-          margin: "8px 0 0",
+          fontWeight: 'var(--font-weight-medium)',
+          fontSize: 'var(--font-size-body)',
+          lineHeight: "var(--line-height-body)",
+          color: selected ? "var(--neutral-50)" : "var(--neutral-900)",
+          margin: "var(--space-2) 0 0",
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
@@ -109,11 +109,11 @@ function ConnectorCard({
       <p
         style={{
           fontFamily: "var(--font-body)",
-          fontWeight: 500,
-          fontSize: 11,
-          lineHeight: "16px",
-          color: selected ? "var(--neutral-200, #E5E5E5)" : "var(--neutral-500, #827a74)",
-          margin: "2px 0 0",
+          fontWeight: 'var(--font-weight-medium)',
+          fontSize: 'var(--font-size-caption)',
+          lineHeight: "var(--line-height-small)",
+          color: selected ? "var(--neutral-200)" : "var(--neutral-500)",
+          margin: "var(--space-0-5) 0 0",
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
@@ -196,7 +196,7 @@ export default function OnboardingConnectorsPage() {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(4, 1fr)",
-          gap: "12px",
+          gap: "var(--space-3)",
         }}
       >
         {CONNECTORS.map((connector) => (

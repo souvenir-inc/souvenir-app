@@ -19,7 +19,7 @@ const VISUALLY_HIDDEN: React.CSSProperties = {
   width: 1,
   height: 1,
   padding: 0,
-  margin: -1,
+  margin: 'calc(var(--space-px) * -1)',
   overflow: "hidden",
   clip: "rect(0, 0, 0, 0)",
   whiteSpace: "nowrap",
@@ -39,7 +39,7 @@ function Bars({ widths, height = 10 }: { widths: string[]; height?: number }) {
 }
 
 function TableShape() {
-  const grid: React.CSSProperties = { display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr", alignItems: "center", gap: 14, height: 40, padding: "0 14px" }
+  const grid: React.CSSProperties = { display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr", alignItems: "center", gap: 'var(--space-3)', height: 40, padding: "0 var(--space-3)" }
   return (
     <>
       <div className={styles.card}>
@@ -52,7 +52,7 @@ function TableShape() {
           </div>
         ))}
       </div>
-      <div style={{ display: "flex", alignItems: "center", height: 26, marginTop: 8 }}>
+      <div style={{ display: "flex", alignItems: "center", height: 26, marginTop: 'var(--space-2)' }}>
         <Skeleton width={96} height={10} />
       </div>
     </>
@@ -62,16 +62,16 @@ function TableShape() {
 function ChartShape() {
   const heights = ["45%", "70%", "55%", "90%", "35%", "65%"]
   return (
-    <div className={styles.card} style={{ padding: "16px 18px 14px" }}>
-      <Skeleton width="38%" height={12} style={{ marginBottom: 14 }} />
-      <div style={{ display: "flex", alignItems: "flex-end", gap: 10, height: 160, borderBottom: "1px solid var(--border-default)" }}>
+    <div className={styles.card} style={{ padding: "var(--space-4) var(--space-4) var(--space-3)" }}>
+      <Skeleton width="38%" height={12} style={{ marginBottom: 'var(--space-3)' }} />
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 'var(--space-2-5)', height: 160, borderBottom: "1px solid var(--border-default)" }}>
         {heights.map((height, i) => (
           <div key={i} style={{ flex: 1, height: "100%", display: "flex", alignItems: "flex-end" }}>
             <Skeleton height={height} radius="4px 4px 0 0" />
           </div>
         ))}
       </div>
-      <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+      <div style={{ display: "flex", gap: 'var(--space-2-5)', marginTop: 'var(--space-2)' }}>
         {heights.map((_, i) => (
           <div key={i} style={{ flex: 1, display: "flex", justifyContent: "center" }}>
             <Skeleton width="60%" height={8} />
@@ -84,9 +84,9 @@ function ChartShape() {
 
 function MetricsShape() {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(170px, 100%), 1fr))", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(170px, 100%), 1fr))", gap: 'var(--space-3)' }}>
       {[0, 1, 2].map((i) => (
-        <div key={i} className={styles.card} style={{ borderRadius: 16, padding: 16, height: 104, display: "flex", flexDirection: "column", gap: 12 }}>
+        <div key={i} className={styles.card} style={{ borderRadius: 'var(--radius-2xl)', padding: 'var(--space-4)', height: 104, display: "flex", flexDirection: "column", gap: 'var(--space-3)' }}>
           <Skeleton width="50%" height={10} />
           <Skeleton width="62%" height={22} />
           <Skeleton width="30%" height={10} />
@@ -99,12 +99,12 @@ function MetricsShape() {
 function StepsShape() {
   return (
     <div>
-      <Skeleton width="36%" height={12} style={{ marginBottom: 14 }} />
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <Skeleton width="36%" height={12} style={{ marginBottom: 'var(--space-3)' }} />
+      <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-4)' }}>
         {ROW_WIDTHS.slice(0, 3).map((width, i) => (
-          <div key={i} style={{ display: "flex", gap: 12 }}>
+          <div key={i} style={{ display: "flex", gap: 'var(--space-3)' }}>
             <Skeleton width={24} height={24} radius="50%" />
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8, paddingTop: 2 }}>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 'var(--space-2)', paddingTop: 'var(--space-0-5)' }}>
               <Skeleton width="45%" height={12} />
               <Skeleton width={width} height={10} />
             </div>
@@ -117,14 +117,14 @@ function StepsShape() {
 
 function MapShape() {
   return (
-    <div className={styles.card} style={{ borderRadius: 8 }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "14px 16px 13px", borderBottom: "1px solid var(--neutral-100)" }}>
+    <div className={styles.card} style={{ borderRadius: 'var(--radius-md)' }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1-5)', padding: "var(--space-3) var(--space-4) var(--space-3)", borderBottom: "1px solid var(--neutral-100)" }}>
         <Skeleton width="34%" height={14} />
         <Skeleton width="52%" height={10} />
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(140px, 220px)", height: 370 }}>
         <Skeleton height="100%" radius={0} />
-        <div style={{ display: "flex", flexDirection: "column", gap: 14, padding: 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-3)', padding: 'var(--space-4)' }}>
           <Bars widths={["70%", "90%", "75%", "60%", "50%"]} />
         </div>
       </div>
@@ -134,16 +134,16 @@ function MapShape() {
 
 function EmailShape() {
   return (
-    <div className={styles.card} style={{ padding: 16 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+    <div className={styles.card} style={{ padding: 'var(--space-4)' }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-2-5)' }}>
         <Skeleton width={32} height={32} radius="50%" />
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 'var(--space-1-5)' }}>
           <Skeleton width="30%" height={12} />
           <Skeleton width="45%" height={10} />
         </div>
       </div>
-      <Skeleton width="58%" height={14} style={{ margin: "18px 0 12px" }} />
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <Skeleton width="58%" height={14} style={{ margin: "var(--space-4) 0 var(--space-3)" }} />
+      <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-2)' }}>
         <Bars widths={["92%", "85%", "60%"]} />
       </div>
     </div>
@@ -152,12 +152,12 @@ function EmailShape() {
 
 function ColumnsShape({ cards }: { cards: number }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 'var(--space-3)' }}>
       {[0, 1, 2].map((col) => (
-        <div key={col} className={styles.card} style={{ padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
-          <Skeleton width="50%" height={12} style={{ marginBottom: 4 }} />
+        <div key={col} className={styles.card} style={{ padding: 'var(--space-3)', display: "flex", flexDirection: "column", gap: 'var(--space-2)' }}>
+          <Skeleton width="50%" height={12} style={{ marginBottom: 'var(--space-1)' }} />
           {Array.from({ length: cards - (col % 2) }, (_, i) => (
-            <Skeleton key={i} height={52} radius={8} />
+            <Skeleton key={i} height={52} radius={"var(--radius-md)"} />
           ))}
         </div>
       ))}
@@ -167,12 +167,12 @@ function ColumnsShape({ cards }: { cards: number }) {
 
 function FunnelShape() {
   return (
-    <div className={styles.card} style={{ padding: 16, display: "flex", flexDirection: "column", gap: 14 }}>
+    <div className={styles.card} style={{ padding: 'var(--space-4)', display: "flex", flexDirection: "column", gap: 'var(--space-3)' }}>
       <Skeleton width="36%" height={12} />
       {["100%", "78%", "52%", "30%"].map((width, i) => (
-        <div key={i} style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+        <div key={i} style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1-5)' }}>
           <Skeleton width="28%" height={10} />
-          <Skeleton width={width} height={9} radius={999} />
+          <Skeleton width={width} height={9} radius={"var(--radius-full)"} />
         </div>
       ))}
     </div>
@@ -181,7 +181,7 @@ function FunnelShape() {
 
 function CalloutShape() {
   return (
-    <div className={styles.card} style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+    <div className={styles.card} style={{ padding: "var(--space-3) var(--space-4)", display: "flex", flexDirection: "column", gap: 'var(--space-2-5)' }}>
       <Skeleton width="38%" height={12} />
       <Skeleton width="86%" height={10} />
     </div>
@@ -191,10 +191,10 @@ function CalloutShape() {
 function TagsShape() {
   return (
     <div>
-      <Skeleton width={120} height={10} style={{ marginBottom: 9 }} />
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+      <Skeleton width={120} height={10} style={{ marginBottom: 'var(--space-2)' }} />
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 'var(--space-1-5)' }}>
         {[92, 124, 80, 106].map((width) => (
-          <Skeleton key={width} width={width} height={27} radius={99} />
+          <Skeleton key={width} width={width} height={27} radius={"var(--widget-skeleton-radius)"} />
         ))}
       </div>
     </div>
@@ -203,10 +203,10 @@ function TagsShape() {
 
 function WeatherShape() {
   return (
-    <div className={styles.card} style={{ height: 210, padding: 18, display: "flex", flexDirection: "column", gap: 12 }}>
+    <div className={styles.card} style={{ height: 210, padding: 'var(--space-4)', display: "flex", flexDirection: "column", gap: 'var(--space-3)' }}>
       <Skeleton width="32%" height={12} />
       <Skeleton width={110} height={44} />
-      <div style={{ display: "flex", gap: 7, marginTop: "auto" }}>
+      <div style={{ display: "flex", gap: 'var(--space-1-5)', marginTop: "auto" }}>
         <Bars widths={["64px", "72px", "58px"]} height={24} />
       </div>
     </div>

@@ -23,6 +23,7 @@ import { AnimatedCard } from "./AnimatedCard";
 import { AnimatedConnectorError } from "./AnimatedConnectorError";
 import { AnimatedSearchTimeout } from "./AnimatedSearchTimeout";
 import { AnimatedFollowUps } from "./AnimatedFollowUps";
+import { DURATION, LONG } from "@/styles/tokens/motion"
 
 // �"��"� BreathingDot - streaming cursor �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 
@@ -30,8 +31,8 @@ function BreathingDot() {
   return (
     <m.span
       animate={{ opacity: [0.15, 1, 0.15] }}
-      transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-      style={{ display: "inline-block", width: 7, height: 7, borderRadius: "50%", background: "var(--neutral-500)", verticalAlign: "middle", marginLeft: 4 }}
+      transition={{ duration: LONG.lg, repeat: Infinity, ease: "easeInOut" }}
+      style={{ display: "inline-block", width: 7, height: 7, borderRadius: "50%", background: "var(--neutral-500)", verticalAlign: "middle", marginLeft: 'var(--space-1)' }}
     />
   );
 }
@@ -98,7 +99,7 @@ export const BlockSequenceRenderer = React.memo(function BlockSequenceRenderer({
   }, [blocks.length]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-4)' }}>
       {blocks.map((block, i) => {
         if (i > activeIdx && !isStatic) return null;
         const isDone = isStatic || i < activeIdx || allDone;

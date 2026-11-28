@@ -31,11 +31,11 @@ export default function TextViewer({ pages, citePage, passage }: TextViewerProps
   }, [citedIndex, passage])
 
   if (pages.length === 0) {
-    return <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-500)' }}>This file has no readable text.</p>
+    return <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-500)' }}>This file has no readable text.</p>
   }
 
   return (
-    <div ref={rootRef} style={{ display: 'flex', flexDirection: 'column', gap: 16, width: '100%', maxWidth: 720 }}>
+    <div ref={rootRef} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', width: '100%', maxWidth: 720 }}>
       {pages.map((page, index) => {
         const marked = index === citedIndex && split
         return (
@@ -44,17 +44,17 @@ export default function TextViewer({ pages, citePage, passage }: TextViewerProps
             id={`text-page-${index}`}
             aria-label={page.label}
             style={{
-              padding: '20px 24px', borderRadius: 12, background: 'var(--card-bg)', boxShadow: 'var(--shadow-card-default)',
+              padding: 'var(--space-5) var(--space-6)', borderRadius: 'var(--radius-xl)', background: 'var(--card-bg)', boxShadow: 'var(--shadow-card-default)',
               // No passage to mark: the cited page itself is outlined.
-              outline: index === citedIndex && !split ? '3px solid var(--color-tag-Yellow-text)' : 'none', outlineOffset: 2,
+              outline: index === citedIndex && !split ? 'var(--text-viewer-outline-width) solid var(--color-tag-Yellow-text)' : 'none', outlineOffset: 'var(--focus-ring-offset)',
             }}
           >
-            <h3 style={{ margin: '0 0 8px', fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 12, lineHeight: '16px', color: 'var(--neutral-500)', textTransform: 'uppercase', letterSpacing: 0.4 }}>{page.label}</h3>
-            <p style={{ margin: 0, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '24px', color: 'var(--neutral-900)' }}>
+            <h3 style={{ margin: '0 0 var(--space-2)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)', textTransform: 'uppercase', letterSpacing: 'var(--tracking-wider)' }}>{page.label}</h3>
+            <p style={{ margin: 0, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-900)' }}>
               {marked ? (
                 <>
                   {marked.before}
-                  <mark data-cited="true" style={{ ...CITED_MARK, padding: '0 2px' }}>{marked.match}</mark>
+                  <mark data-cited="true" style={{ ...CITED_MARK, padding: '0 var(--space-0-5)' }}>{marked.match}</mark>
                   <CitedLabel>{FILE_MESSAGES.citedPassage}</CitedLabel>
                   {marked.after}
                 </>

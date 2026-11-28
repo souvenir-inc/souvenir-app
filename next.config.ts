@@ -138,6 +138,11 @@ const nextConfig: NextConfig = {
       { source: '/org/plans',     destination: '/settings/plans-and-billing', permanent: true },
       { source: '/org/analytics', destination: '/settings/analytics',         permanent: true },
       { source: '/org/activity',  destination: '/settings/activity',          permanent: true },
+      // Old settings links: redirected on the server, before the admin gate. As client pages under
+      // (org)/ they flashed blank, and a member following one met "only admins can see this page".
+      { source: '/settings/billing',                destination: '/settings/plans-and-billing',              permanent: true },
+      { source: '/settings/plans',                  destination: '/settings/plans-and-billing',              permanent: true },
+      { source: '/settings/plans/confirmation',     destination: '/settings/plans-and-billing/confirmation', permanent: true },
       {
         source: '/settings/connectors',
         destination: '/connectors',

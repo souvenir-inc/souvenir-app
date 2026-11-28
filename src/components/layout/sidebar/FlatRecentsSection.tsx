@@ -58,12 +58,12 @@ export function FlatRecentsSection({ activeChatId, onSelectChat, chatHistory, on
           animate={shown ? "open" : "closed"}
           initial="closed"
           variants={sectionStaggerVariants}
-          style={{ display: "flex", flexDirection: "column", gap: 4 }}
+          style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)' }}
         >
           {loading && chats.length === 0 ? (
             <SidebarChatRowsSkeleton rows={5} />
           ) : recentChats.length === 0 ? (
-            <div style={{ padding: "8px 6px", fontFamily: "var(--font-body)", fontSize: "var(--font-size-caption)", color: "var(--neutral-400)" }}>No chats yet</div>
+            <div style={{ padding: "var(--space-2) var(--space-1-5)", fontFamily: "var(--font-body)", fontSize: "var(--font-size-caption)", color: "var(--neutral-400)" }}>No chats yet</div>
           ) : (
             <>
               {recentChats.map((chat) => (

@@ -15,7 +15,7 @@ if (typeof window !== 'undefined' && !GlobalWorkerOptions.workerSrc) {
   GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
 }
 
-const PAGE_GAP = 16
+const PAGE_GAP = 'var(--space-4)'
 // Pages fit the column. A small page (or a narrow slide) may grow to fill it, but not past this.
 const MAX_SCALE = 2
 // The canvas follows the screen's pixel density, up to 3x, and is never wider than MAX_CANVAS_PX.
@@ -142,7 +142,7 @@ function PdfPage({ doc, pageNumber, fit, density, estimate, highlighted, passage
       style={{
         width: size.width * scale, height: size.height * scale, background: 'var(--card-bg)', boxShadow: 'var(--shadow-card-default)',
         // The page is outlined only when there is no passage to mark on it.
-        outline: highlighted && !found ? '3px solid var(--color-tag-Yellow-text)' : 'none', outlineOffset: 2, flexShrink: 0, position: 'relative',
+        outline: highlighted && !found ? 'var(--pdf-viewer-outline-width) solid var(--color-tag-Yellow-text)' : 'none', outlineOffset: 'var(--focus-ring-offset)', flexShrink: 0, position: 'relative',
       }}
     >
       <canvas ref={canvasRef} role="img" aria-label={`Page ${pageNumber} of ${doc.numPages}`} style={{ width: '100%', height: '100%', display: 'block' }} />
@@ -273,7 +273,7 @@ export default function PdfViewer({ url, highlightPage, passage, fitScreen = fal
   }, [doc, highlightPage])
 
   if (failed || !allowed) throw new Error('pdf-unreadable')
-  if (!doc || !size) return <Skeleton height={520} radius={12} style={{ width: '100%', maxWidth: 640 }} />
+  if (!doc || !size) return <Skeleton height={520} radius={'var(--radius-xl)'} style={{ width: '100%', maxWidth: 640 }} />
 
   return (
     <div ref={columnRef} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: PAGE_GAP, width: '100%' }}>

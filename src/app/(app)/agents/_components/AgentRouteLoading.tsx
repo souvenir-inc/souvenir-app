@@ -8,13 +8,13 @@ export function AgentRouteLoading() {
       role="status"
       aria-busy="true"
       aria-label="Loading"
-      style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 24, padding: 32, minHeight: 0 }}
+      style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', padding: 'var(--space-7)', minHeight: 0 }}
     >
-      <Skeleton width={240} height={28} radius={8} />
+      <Skeleton width={240} height={28} radius={'var(--radius-md)'} />
       {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 8, opacity: 1 - i * 0.15 }}>
+        <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', opacity: 1 - i * 0.15 }}>
           <Skeleton width={120} height={12} />
-          <Skeleton height={40} radius={10} />
+          <Skeleton height={40} radius={'var(--radius-lg)'} />
         </div>
       ))}
     </div>

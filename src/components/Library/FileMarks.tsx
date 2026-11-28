@@ -46,8 +46,8 @@ export function GeneratedMark({ detail, file }: { detail?: string; file?: Pick<L
         <svg width="14" height="14" viewBox="0 0 24 24" fill={paint} stroke={paint} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <defs>
             <linearGradient id={gradientId} gradientUnits="userSpaceOnUse" x1="3" y1="3" x2="21" y2="21">
-              <stop offset="0" stopColor="#a6ebcf" />
-              <stop offset="1" stopColor="#3fb98a" />
+              <stop offset="0" stopColor="var(--file-marks-stop-color)" />
+              <stop offset="1" stopColor="var(--file-marks-stop-color-2)" />
             </linearGradient>
           </defs>
           <path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" />

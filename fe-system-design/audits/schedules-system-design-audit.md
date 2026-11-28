@@ -1,5 +1,7 @@
 # Schedules Feature: System Design Audit
 
+> **Note (2026-11-25):** `src/templates/Schedules/*` moved to `src/components/Schedules/*`. Current status: [re-audit](./reaudit-2026-11-25.md).
+
 > **Status (Oct 14 2026): Phases 1–4 done**, except the link store (backend gap b), run paging (gap c) and the manual screen-reader pass.
 >
 > Done (Phase 1):

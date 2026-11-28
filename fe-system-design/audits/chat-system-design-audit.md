@@ -1,5 +1,7 @@
 # Chat Feature: System Design Audit
 
+> **Note (2026-11-25):** `.github/workflows/ci.yml` is not on `ds-dev` (only on `backup/ds-dev-before-workflow-removal`); restoring CI is an open decision. Current status: [re-audit](./reaudit-2026-11-25.md).
+
 > **Status (Oct 14 2026): Phase 1 done; Phase 2 items 1, 2, 3 and 5 done, 4 open.** Phases 3–4 open.
 >
 > Done (Phase 1):

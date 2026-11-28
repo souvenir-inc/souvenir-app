@@ -1,0 +1,273 @@
+'use client'
+
+import { useId, useState } from 'react'
+import { cn } from '@/lib/utils'
+import { formatMetricValue } from '../format'
+import { changeLabel, dayMonth, formatExact, lineSummary, weekdayDayMonth } from '../series'
+import type { Metric, Series } from '../types'
+import { ChartGhost } from '../CardEmpty'
+import { Readout, readoutText, useChartKeys, useSize, type ReadoutContent } from './Readout'
+
+// A card's line (05-cards-reading-rules.md):
+//   full   the full chart (CR-3): round ticks on the right, dashed gridlines, the period before
+//          dashed and grey, a soft area, a dot per day (up to 45), the latest value labelled,
+//          dates under it; a target as a dashed line with met / missed dots (CR-13).
+//   spark  the line beside or under a number (CR-4): no axes, the period before faint behind it.
+// Both answer hover one day at a time with a readout (CR-10, CR-12). With three days or fewer
+// every value is labelled and the period before is faint dots; under two days, one line of
+// words instead (CR-24).
+
+const TICKS_W = 48
+const DATES_H = 24
+const PAD = 12
+
+export interface LineChartProps {
+  metric: Metric
+  series: Series
+  variant: 'full' | 'spark'
+  /** A target per day, drawn as a dashed line (CR-13). */
+  target?: number
+  /**
+   * The day a keyboard is reading, from the card around the chart (its button takes the arrow
+   * keys); the readout shows for it as for a hovered day.
+   */
+  active?: number | null
+  /**
+   * The chart is its own Tab stop and reads its days with the arrow keys (the metric window). On a
+   * card leave it off: the card's button does it.
+   */
+  focusable?: boolean
+  className?: string
+}
+
+export function LineChart({ metric, series, variant, target, active = null, focusable = false, className }: LineChartProps) {
+  const [ref, { width, height }] = useSize<HTMLDivElement>()
+  const [hover, setHover] = useState<number | null>(null)
+  const hintId = useId()
+  const full = variant === 'full'
+  const drawn = series.daysWithData >= 2
+  const keys = useChartKeys(focusable && drawn ? series.days.length : 0)
+  const shown = hover ?? keys.index ?? active
+  // Every chart says what it shows in words (A11Y-KB-01); the drawing itself is hidden.
+  const summary = drawn ? lineSummary(metric, series) : undefined
+  return (
+    <div
+      ref={ref}
+      className={cn('relative', focusable && drawn && 'rounded-lg outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-[var(--focus-ring)]', className)}
+      data-chart={variant}
+      role={drawn ? (focusable ? 'group' : 'img') : undefined}
+      aria-roledescription={drawn && focusable ? 'chart' : undefined}
+      aria-label={summary}
+      aria-describedby={focusable && drawn ? hintId : undefined}
+      tabIndex={focusable && drawn ? 0 : undefined}
+      onKeyDown={focusable ? keys.onKeyDown : undefined}
+      onBlur={focusable ? keys.onBlur : undefined}
+      onPointerLeave={() => setHover(null)}
+    >
+      {!drawn ? (
+        // Too little history for a line: a faint stand-in, saying how much there is so far.
+        <ChartGhost bars={false} className="h-full" caption={series.daysWithData === 0 ? 'Nothing recorded on these days' : '1 day of data so far'} note={full ? 'The chart fills in as more data syncs.' : undefined} />
+      ) : width > 0 ? (
+        <Plot metric={metric} series={series} full={full} target={target} width={width} height={height} hover={shown} onHover={setHover} />
+      ) : null}
+      {focusable && drawn && (
+        <>
+          <span id={hintId} className="sr-only">Left and right arrow keys read the chart day by day.</span>
+          <span role="status" className="sr-only">{keys.index === null ? '' : readoutText(readoutFor(metric, series, keys.index, full, target))}</span>
+        </>
+      )}
+    </div>
+  )
+}
+
+
+interface PlotProps {
+  metric: Metric
+  series: Series
+  full: boolean
+  target?: number
+  width: number
+  height: number
+  hover: number | null
+  onHover: (i: number | null) => void
+}
+
+function Plot({ metric, series, full, target, width, height, hover, onHover }: PlotProps) {
+  const n = series.days.length
+  const plotW = full ? width - TICKS_W : width
+  const plotH = Math.max(0, full ? height - DATES_H : height)
+  const pad = full ? PAD : 2
+  const top = full ? 0 : 6
+  const cur = series.days.map((d) => d.value)
+  const prev = series.comparable ? series.previous.map((d) => d.value) : series.previous.map(() => null)
+  const values = [...cur, ...prev, target ?? null].filter((v): v is number => v != null)
+  const { min, max, ticks } = scaleFor(values, full)
+  const x = (i: number) => (n === 1 ? plotW / 2 : pad + (i * (plotW - pad * 2)) / (n - 1))
+  const y = (v: number) => top + (plotH - top) * (1 - (v - min) / (max - min))
+  const few = series.daysWithData <= 3
+  const good = metric.upIsGood
+  const met = (v: number) => (target == null ? null : good ? v >= target : v <= target)
+
+  const path = (vals: (number | null)[]) => {
+    let d = ''
+    let open = false
+    vals.forEach((v, i) => {
+      if (v == null) { open = false; return }
+      d += `${open ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`
+      open = true
+    })
+    return d
+  }
+  const area = (vals: (number | null)[]) => {
+    // One closed shape per run of days with data, down to the baseline.
+    const runs: number[][] = []
+    vals.forEach((v, i) => { if (v == null) return; const last = runs[runs.length - 1]; if (last && last[last.length - 1] === i - 1) last.push(i); else runs.push([i]) })
+    // The fill runs to 0 when 0 is on the chart (so a negative day hangs below it), else to the bottom.
+    const base = y(Math.min(Math.max(0, min), max))
+    return runs.map((r) => `M${x(r[0])},${base}` + r.map((i) => `L${x(i).toFixed(1)},${y(vals[i]!).toFixed(1)}`).join('') + `L${x(r[r.length - 1])},${base}Z`).join('')
+  }
+  const lastIndex = cur.reduce<number>((acc, v, i) => (v != null ? i : acc), -1)
+  const dateIdx = pickDates(n, plotW)
+
+  const onMove = (e: React.PointerEvent<SVGRectElement>) => {
+    const r = e.currentTarget.getBoundingClientRect()
+    const i = n === 1 ? 0 : Math.round(((e.clientX - r.left - pad) / (plotW - pad * 2)) * (n - 1))
+    onHover(Math.max(0, Math.min(n - 1, i)))
+  }
+
+  return (
+    <div className="absolute inset-0">
+      {height > 0 && (
+        <svg width={width} height={height} className="block overflow-visible" aria-hidden>
+          {full && ticks.map((t) => (
+            <g key={t}>
+              <line x1={0} x2={plotW} y1={y(t)} y2={y(t)} stroke="var(--dashboard-chart-soft)" strokeDasharray="2 3" />
+              <text x={plotW + 10} y={y(t) + 4} fontSize="var(--font-size-small)" fill="var(--dashboard-muted)">{formatMetricValue(t, metric.format)}</text>
+            </g>
+          ))}
+          {/* The period before: dashed grey on the full chart, a faint line on a sparkline; faint
+              dots when there are only a few days (CR-24). */}
+          {few
+            ? prev.map((v, i) => v != null && <circle key={`p${i}`} cx={x(i)} cy={y(v)} r={2} fill="var(--dashboard-chart-previous)" />)
+            : <path d={path(prev)} fill="none" stroke="var(--dashboard-chart-previous)" strokeWidth={full ? 1.25 : 1} strokeDasharray={full ? '3 3' : undefined} strokeLinecap="round" />}
+          <path d={area(cur)} fill="var(--dashboard-chart-area)" />
+          <path d={path(cur)} fill="none" stroke="var(--dashboard-chart-ink)" strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" />
+          {full && target != null && (
+            <g data-target-line>
+              <line x1={0} x2={plotW} y1={y(target)} y2={y(target)} stroke="var(--dashboard-muted)" strokeDasharray="4 3" />
+              <text x={4} y={y(target) - 5} fontSize="var(--font-size-caption)" fill="var(--dashboard-muted)">Target {formatMetricValue(target, metric.format)}</text>
+            </g>
+          )}
+          {/* A dot per day (up to about 45), green or red against a target; the last one bigger. */}
+          {cur.map((v, i) => {
+            if (v == null) return null
+            const isLast = i === lastIndex
+            if (!full && !isLast) return null
+            if (full && n > 45 && !isLast) return null
+            const m = met(v)
+            const fill = m == null ? 'var(--dashboard-chart-ink)' : m ? 'var(--dashboard-positive)' : 'var(--dashboard-negative)'
+            return <circle key={i} cx={x(i)} cy={y(v)} r={isLast ? 3.5 : 2.25} fill={fill} stroke="var(--dashboard-card-bg)" strokeWidth={1.5} />
+          })}
+          {/* Labels: the latest value, or every value when there are three days or fewer. */}
+          {full && cur.map((v, i) => (v != null && (few || i === lastIndex)) && (
+            <text key={`l${i}`} x={x(i) + (i === lastIndex ? 4 : 0)} y={y(v) - 10} fontSize="var(--font-size-caption)" fontWeight="var(--font-weight-medium)" textAnchor={i === lastIndex ? 'end' : 'middle'} fill="var(--dashboard-figure)">
+              {formatMetricValue(v, metric.format)}
+            </text>
+          ))}
+          {full && dateIdx.map((i) => (
+            <text key={`d${i}`} x={x(i)} y={plotH + 20} fontSize="var(--font-size-small)" textAnchor={i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'} fill="var(--dashboard-muted)" dx={i === 0 ? -4 : i === n - 1 ? 4 : 0}>
+              {dayMonth(series.days[i].date)}
+            </text>
+          ))}
+          {/* Hover: a hairline on the day and a ring on the line (CR-10). */}
+          {hover != null && (
+            <g data-hover-day={hover}>
+              <line x1={x(hover)} x2={x(hover)} y1={top} y2={plotH} stroke="var(--dashboard-hover-line)" />
+              {cur[hover] != null && <circle cx={x(hover)} cy={y(cur[hover]!)} r={4.5} fill="var(--dashboard-card-bg)" stroke="var(--dashboard-chart-ink)" strokeWidth={1.5} />}
+            </g>
+          )}
+          <rect x={0} y={0} width={plotW} height={plotH} fill="transparent" onPointerMove={onMove} onPointerDown={onMove} style={{ touchAction: 'pan-y' }} />
+        </svg>
+      )}
+      {hover != null && (
+        <Readout
+          content={readoutFor(metric, series, hover, full, target)}
+          x={x(hover)} y={cur[hover] != null ? y(cur[hover]!) : plotH / 2}
+          width={width} height={height}
+        />
+      )}
+    </div>
+  )
+}
+
+/** Which days get a date under the full chart: the first, the last, and evenly between. */
+export function pickDates(n: number, plotW: number): number[] {
+  // About 150 px a date: 4 on a 6-wide card (8, 10, 12, 14 Nov), all 7 on a 12-wide one (Figma).
+  const fit = Math.max(2, Math.floor(plotW / 150) + 1)
+  if (n <= fit) return Array.from({ length: n }, (_, i) => i)
+  const step = Math.ceil((n - 1) / (fit - 1))
+  const out: number[] = []
+  for (let i = 0; i < n - 1; i += step) out.push(i)
+  if (n - 1 - out[out.length - 1] < step / 2) out.pop()
+  out.push(n - 1)
+  return out
+}
+
+/** What the readout says for day `i` (CR-10, CR-12, CR-13, CR-14). */
+export function readoutFor(metric: Metric, series: Series, i: number, withChange: boolean, target?: number): ReadoutContent {
+  const d = series.days[i]
+  const p = series.comparable ? series.previous[i] : undefined
+  const exact = (v: number) => formatExact(v, metric.format)
+  const good = metric.upIsGood
+  const met = target == null || d.value == null ? null : good ? d.value >= target : d.value <= target
+  // Days after the last day with data are "No data yet" (the app hasn't synced them); a gap before it is "No data".
+  const lastData = series.days.reduce<number>((acc, x, j) => (x.value != null ? j : acc), -1)
+  const rows: ReadoutContent['rows'] = [{
+    dot: met == null ? 'ink' : met ? 'met' : 'missed',
+    label: dayMonth(d.date),
+    // Never a 0: a day after the app's last sync is "No data yet", a day without data "No data".
+    value: d.value != null ? exact(d.value) : i > lastData ? 'No data yet' : 'No data',
+  }]
+  const lastYear = series.compare === 'last-year'
+  if (p) rows.push({ dot: 'previous', label: lastYear ? `Last year · ${dayMonth(p.date)} ${p.date.getFullYear()}` : `Previous period · ${dayMonth(p.date)}`, value: p.value != null ? exact(p.value) : 'No data', muted: true })
+  if (target != null && met != null) rows.push({ label: `Target ${exact(target)}`, value: met ? 'Met' : 'Missed', muted: true })
+  let footer: ReadoutContent['footer']
+  if (withChange && p?.value != null && d.value != null) {
+    const text = changeLabel(d.value, p.value)
+    const rising = d.value >= p.value
+    footer = { text: `${text} vs ${lastYear ? 'last year' : 'previous period'}`, tone: rising === good ? 'good' : 'bad' }
+  }
+  return { title: weekdayDayMonth(d.date), rows, footer }
+}
+
+/**
+ * The vertical range and ticks. The full chart counts from 0 with round ticks, and reaches below 0
+ * when a day is negative; a sparkline uses its own range so its shape shows, and a flat line sits in
+ * the middle. All zero: one tick at 0 and the line along the bottom.
+ */
+export function scaleFor(values: number[], full: boolean): { min: number; max: number; ticks: number[] } {
+  const hi = values.length ? Math.max(...values) : 0
+  const lo = values.length ? Math.min(...values) : 0
+  if (full) {
+    const top = Math.max(hi, 0)
+    const bottom = Math.min(lo, 0)
+    if (top === bottom) return { min: 0, max: 1, ticks: [0] }
+    const step = roundStep((top - bottom) / 4)
+    const min = Math.floor(bottom / step) * step
+    const max = Math.ceil(top / step) * step
+    const ticks: number[] = []
+    for (let t = min; t <= max + step / 2; t += step) ticks.push(Math.round(t / step) * step)
+    return { min, max, ticks }
+  }
+  if (hi === lo) { const s = Math.abs(hi) || 1; return { min: hi - s, max: hi + s, ticks: [] } }
+  const spread = hi - lo
+  return { min: lo >= 0 ? Math.max(0, lo - spread * 0.6) : lo - spread * 0.08, max: hi + spread * 0.08, ticks: [] }
+}
+
+/** A round tick step at or above v: 1, 1.5, 2, 2.5 or 5 times a power of ten (2.5k gives 0 – 10k; 15 gives 0 – 60). */
+export function roundStep(v: number): number {
+  if (!(v > 0)) return 1
+  const exp = 10 ** Math.floor(Math.log10(v))
+  const f = v / exp
+  return (f <= 1 ? 1 : f <= 1.5 ? 1.5 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * exp
+}

@@ -9,11 +9,11 @@ import { cn } from '@/lib/utils'
 
 // All states use box-shadow rings only (no CSS border) so layout never shifts
 // on selection. The selected ring is included in SHADOW_SELECTED.
-const SHADOW_SELECTED   = '0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-800)'
+const SHADOW_SELECTED   = 'var(--shadow-soft), 0px 0px 0px 1px var(--neutral-800)'
 const SHADOW_DESELECTED = '0px 0px 0px 1px var(--neutral-white)'
 const SHADOW_LOCKED     = '0px 0px 0px 1px var(--neutral-200)'
-const SHADOW_CHIP_OUTER = '0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px rgba(13,110,178,0.5)'
-const SHADOW_CHIP_INNER = 'inset 0px 1px 0px 0px rgba(231,244,253,0.7), inset 0px -1px 0px 0px rgba(13,110,178,0.1)'
+const SHADOW_CHIP_OUTER = 'var(--shadow-chip-selected)'
+const SHADOW_CHIP_INNER = 'var(--visibility-row-shadow-chip-inner)'
 
 // ── Upgrade chip ──────────────────────────────────────────────────────────────
 
@@ -34,8 +34,8 @@ function UpgradeChip({
         display:        'flex',
         alignItems:     'center',
         justifyContent: 'center',
-        padding:        2,
-        borderRadius:   6,
+        padding:        'var(--space-0-5)',
+        borderRadius:   'var(--radius-sm)',
         flexShrink:     0,
         cursor:         onClick ? 'pointer' : 'default',
         boxShadow:      SHADOW_CHIP_OUTER,
@@ -52,7 +52,7 @@ function UpgradeChip({
         style={{
           position:        'absolute',
           inset:           0,
-          borderRadius:    6,
+          borderRadius:    'var(--radius-sm)',
           backgroundColor: 'var(--blue-100)',
           pointerEvents:   'none',
         }}
@@ -64,8 +64,8 @@ function UpgradeChip({
           display:        'flex',
           alignItems:     'center',
           justifyContent: 'center',
-          paddingLeft:    2,
-          paddingRight:   2,
+          paddingLeft:    'var(--space-0-5)',
+          paddingRight:   'var(--space-0-5)',
           position:       'relative',
         }}
       >
@@ -73,7 +73,7 @@ function UpgradeChip({
           style={{
             fontFamily: 'var(--font-body)',
             fontSize:   'var(--font-size-caption)',
-            fontWeight: 500,
+            fontWeight: 'var(--font-weight-medium)',
             lineHeight: 'var(--line-height-caption)',
             color:      'var(--blue-700)',
             whiteSpace: 'nowrap',
@@ -91,8 +91,8 @@ function UpgradeChip({
           alignItems:     'center',
           justifyContent: 'center',
           overflow:       'hidden',
-          padding:        1,
-          borderRadius:   4,
+          padding:        'var(--space-0-5)',
+          borderRadius:   'var(--radius-xs)',
           flexShrink:     0,
           width:          14,
           height:         14,
@@ -201,8 +201,8 @@ export function VisibilityRow(
           alignItems:      'center',
           justifyContent:  'center',
           overflow:        'hidden',
-          padding:         '14px 16px',
-          borderRadius:    12,
+          padding:         'var(--space-3) var(--space-4)',
+          borderRadius:    'var(--radius-xl)',
           width:           '100%',
           boxSizing:       'border-box' as const,
           backgroundColor: selected || locked ? 'var(--neutral-50)' : 'var(--neutral-white)',
@@ -226,14 +226,14 @@ export function VisibilityRow(
             alignItems:     'flex-start',
             justifyContent: 'center',
             minWidth:       0,
-            gap:            2,
+            gap:            'var(--space-0-5)',
           }}
         >
           <span
             style={{
               fontFamily: 'var(--font-body)',
               fontSize:   'var(--font-size-body-lg)',
-              fontWeight: 500,
+              fontWeight: 'var(--font-weight-medium)',
               lineHeight: 'var(--line-height-body-lg)',
               color:      labelColor,
               whiteSpace: 'nowrap',
@@ -246,7 +246,7 @@ export function VisibilityRow(
               style={{
                 fontFamily: 'var(--font-body)',
                 fontSize:   'var(--font-size-caption)',
-                fontWeight: 500,
+                fontWeight: 'var(--font-weight-medium)',
                 lineHeight: 'var(--line-height-caption)',
                 color:      descColor,
               }}

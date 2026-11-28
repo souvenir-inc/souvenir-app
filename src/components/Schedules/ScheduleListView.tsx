@@ -32,15 +32,15 @@ function EmptyState({ onCreateNew }: { onCreateNew?: () => void }) {
       flexDirection:  'column',
       alignItems:     'center',
       justifyContent: 'center',
-      gap:            24,
-      padding:        '48px 24px',
+      gap:            'var(--space-6)',
+      padding:        'var(--space-9) var(--space-6)',
     }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', alignItems: 'center' }}>
         <p style={{
           fontFamily: 'var(--font-title)',
           fontWeight: 'var(--font-weight-regular)',
-          fontSize:   24,
-          lineHeight: '32px',
+          fontSize:   'var(--font-size-heading)',
+          lineHeight: 'var(--line-height-heading)',
           color:      'var(--legacy-1a1916)',
           margin:     0,
           whiteSpace: 'nowrap',
@@ -50,8 +50,8 @@ function EmptyState({ onCreateNew }: { onCreateNew?: () => void }) {
         <p style={{
           fontFamily: 'var(--font-body)',
           fontWeight: 'var(--font-weight-regular)',
-          fontSize:   16,
-          lineHeight: '22px',
+          fontSize:   'var(--font-size-body-lg)',
+          lineHeight: 'var(--line-height-body)',
           color:      'var(--legacy-1a1916)',
           textAlign:  'center',
           maxWidth:   427,
@@ -100,30 +100,30 @@ export function ScheduleListView({
     <div style={{
       display:       'flex',
       flexDirection: 'column',
-      gap:           24,
-      padding:       '32px 0',
+      gap:           'var(--space-6)',
+      padding:       'var(--space-7) 0',
       width:         '100%',
     }}>
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
         <div style={{ flex: '1 1 220px', minWidth: 0 }}>
           <h2 style={{
             margin:     0,
             fontFamily: 'var(--font-title)',
-            fontSize:   24,
+            fontSize:   'var(--font-size-heading)',
             fontWeight: 'var(--font-weight-regular)',
-            lineHeight: '32px',
+            lineHeight: 'var(--line-height-heading)',
             color:      'var(--neutral-900)',
           }}>
             Schedules
           </h2>
           <p style={{
-            margin:     '4px 0 0',
+            margin:     'var(--space-1) 0 0',
             fontFamily: 'var(--font-body)',
             fontWeight: 'var(--font-weight-regular)',
-            fontSize:   14,
-            lineHeight: '22px',
+            fontSize:   'var(--font-size-body)',
+            lineHeight: 'var(--line-height-body)',
             color:      'var(--neutral-500)',
           }}>
             {scope === 'organization'
@@ -132,7 +132,7 @@ export function ScheduleListView({
           </p>
         </div>
         {!isEmpty && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: isMobile ? '1 1 100%' : '0 0 auto', minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flex: isMobile ? '1 1 100%' : '0 0 auto', minWidth: 0 }}>
             {searchOpen && (
               <div style={{ flex: '1 1 160px', minWidth: 0, maxWidth: isMobile ? undefined : 220 }}>
                 <InputField
@@ -184,11 +184,11 @@ export function ScheduleListView({
       ) : noSearchResults ? (
         <p style={{
           margin:     0,
-          padding:    '48px 24px',
+          padding:    'var(--space-9) var(--space-6)',
           textAlign:  'center',
           fontFamily: 'var(--font-body)',
-          fontSize:   14,
-          lineHeight: '22px',
+          fontSize:   'var(--font-size-body)',
+          lineHeight: 'var(--line-height-body)',
           color:      'var(--neutral-500)',
         }}>
           No schedules match &ldquo;{query.trim()}&rdquo;.
@@ -199,7 +199,7 @@ export function ScheduleListView({
           <div style={{
             display:             'grid',
             gridTemplateColumns: isMobile ? 'minmax(0, 1fr)' : 'repeat(2, minmax(0, 1fr))',
-            gap:                 24,
+            gap:                 'var(--space-6)',
           }}>
             {visibleSchedules.map(s => (
               <ScheduleCard

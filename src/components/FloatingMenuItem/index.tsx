@@ -5,6 +5,7 @@ import { Slot } from '@radix-ui/react-slot'
 import { m, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/Tooltip'
+import { BLUR, DURATION, SPRING } from "@/styles/tokens/motion"
 
 // ── FloatingMenu context ──────────────────────────────────────────────────────
 // Provided by FloatingMenu; FloatingMenuItem reads `opened` from it so
@@ -109,7 +110,7 @@ export function FloatingMenuItem(
           position:      'relative',
           display:       'flex',
           alignItems:    'center',
-          borderRadius:  '8px',
+          borderRadius:  'var(--radius-md)',
           overflow:      'hidden',
           paddingTop:    0,
           paddingBottom: 0,
@@ -118,7 +119,7 @@ export function FloatingMenuItem(
           opacity:       disabled ? 0.7 : 1,
           cursor:        disabled ? 'not-allowed' : 'pointer',
           // Outlined like the outline Button beside it (e.g. Share): field fill, 1px border, darker on hover.
-          transition:    'box-shadow 150ms, border-color 150ms',
+          transition:    'box-shadow var(--duration-fast), border-color var(--duration-fast)',
           userSelect:    'none',
           // Transparent: an item takes the menu's own colour; only hover / selected add a fill.
           background:    'transparent',
@@ -182,7 +183,7 @@ export function FloatingMenuItem(
             fontWeight:  'var(--font-weight-medium)',
             fontSize:    'var(--font-size-body)',
             lineHeight:  'var(--line-height-body)',
-            paddingRight: '6px',
+            paddingRight: 'var(--space-1-5)',
           }}
         >
           {label}
@@ -193,25 +194,25 @@ export function FloatingMenuItem(
           {labelVisible && (
             <m.span
               key="label"
-              initial={{ opacity: 0, filter: 'blur(4px)', maxWidth: 0 }}
+              initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)`, maxWidth: 0 }}
               animate={{
                 opacity:  1,
                 filter:   'blur(0px)',
                 maxWidth: labelWidth,
                 transition: {
-                  opacity:  { delay: 0.07, duration: 0.12, ease: 'easeOut' },
-                  filter:   { delay: 0.07, duration: 0.12, ease: 'easeOut' },
-                  maxWidth: { type: 'spring', stiffness: 700, damping: 40, mass: 0.5 },
+                  opacity:  { delay: DURATION.instant, duration: DURATION.fast, ease: 'easeOut' },
+                  filter:   { delay: DURATION.instant, duration: DURATION.fast, ease: 'easeOut' },
+                  maxWidth: { type: 'spring', ...SPRING.whip },
                 },
               }}
               exit={{
                 opacity:  0,
-                filter:   'blur(4px)',
+                filter:   `blur(${BLUR.xs}px)`,
                 maxWidth: 0,
                 transition: {
-                  opacity:  { duration: 0.15, ease: 'easeIn' },
-                  filter:   { duration: 0.15, ease: 'easeIn' },
-                  maxWidth: { duration: 0.18, ease: [0.895, 0.03, 0.685, 0.22] },
+                  opacity:  { duration: DURATION.quick, ease: 'easeIn' },
+                  filter:   { duration: DURATION.quick, ease: 'easeIn' },
+                  maxWidth: { duration: DURATION.base, ease: [0.895, 0.03, 0.685, 0.22] },
                 },
               }}
               style={{
@@ -225,7 +226,7 @@ export function FloatingMenuItem(
                 position:    'relative',
                 overflow:    'hidden',
                 display:     'inline-block',
-                paddingRight: '6px',
+                paddingRight: 'var(--space-1-5)',
                 boxSizing:   'border-box',
               }}
             >

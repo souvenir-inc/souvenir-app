@@ -8,6 +8,7 @@ import { ThemedLlmIcon } from '@/components/ThemedLlmIcon'
 import { IconButton } from '@/components/ui/button'
 import { Tooltip, type TooltipSide } from '@/components/Tooltip'
 import { cn } from '@/lib/utils'
+import { BLUR, SPRING } from "@/styles/tokens/motion"
 
 // Lets descendants (this component) react to the active category without the
 // consumer having to thread props — used to suppress the per-row bookmark
@@ -21,7 +22,7 @@ export const ModelSelectorContext = React.createContext<{ category: string; prov
 // Identical shadow system to DropdownMenuItem - shares the same warm-neutral hover language.
 
 const SHADOW_ACTIVE =
-  '0px 1px 1.5px 0px var(--neutral-700-12), 0px 0px 0px 1px var(--neutral-300-40)'
+  'var(--shadow-surface-card-hover)'
 
 const SHADOW_INNER =
   'inset 0px 1px 0px 0px var(--neutral-50-61), inset 0px -1px 0px 0px var(--neutral-600-05)'
@@ -115,8 +116,8 @@ export interface ModelSelectItemProps extends React.HTMLAttributes<HTMLDivElemen
 const labelStyle: React.CSSProperties = {
   fontFamily:    'var(--font-body)',
   fontWeight:    'var(--font-weight-medium)',
-  fontSize:      '14px',
-  lineHeight:    '22px',
+  fontSize:      'var(--font-size-body)',
+  lineHeight:    'var(--line-height-body)',
   color:         'var(--model-select-item-text)',
   whiteSpace:    'nowrap',
   overflow:      'hidden',
@@ -183,7 +184,7 @@ export function ModelSelectItem({
         style={{
           width:        '18px',
           height:       '18px',
-          borderRadius: '5px',
+          borderRadius: 'var(--radius-sm)',
           overflow:     'hidden',
           flexShrink:   0,
           display:      'flex',
@@ -213,17 +214,17 @@ export function ModelSelectItem({
           display:         'flex',
           alignItems:      'center',
           justifyContent:  'space-between',
-          gap:             '8px',
-          padding:         '6px',
+          gap:             'var(--space-2)',
+          padding:         'var(--space-1-5)',
           minHeight:       '36px',
-          borderRadius:    '10px',
+          borderRadius:    'var(--radius-lg)',
           overflow:        'hidden',
           backgroundColor: isActive ? 'var(--model-select-item-bg-active)' : 'transparent',
           boxShadow:       isActive ? SHADOW_ACTIVE : 'none',
           cursor:          'pointer',
           userSelect:      'none',
           flexShrink:      0,
-          transition:      'background-color 150ms, box-shadow 150ms',
+          transition:      'background-color var(--duration-fast), box-shadow var(--duration-fast)',
           ...style,
         }}
         onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) => {
@@ -241,7 +242,7 @@ export function ModelSelectItem({
              so a short label doesn't stretch into dead space; `justifyContent:
              'space-between'` on the row pushes the trailing group (below) to
              the row's right edge instead. */}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', minWidth: 0 }}>
+        <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center', minWidth: 0 }}>
           {resolvedImage && (
             <div
               aria-hidden
@@ -284,10 +285,10 @@ export function ModelSelectItem({
                     {isHovered ? (
                       <m.span
                         key="info"
-                        initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                        initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                         animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-                        exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                        transition={{ type: 'spring', ...SPRING.snappy }}
                         style={{
                           display:        'flex',
                           alignItems:     'center',
@@ -301,10 +302,10 @@ export function ModelSelectItem({
                     ) : (
                       <m.span
                         key="image"
-                        initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                        initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                         animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-                        exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                        transition={{ type: 'spring', ...SPRING.snappy }}
                         style={{
                           display:        'flex',
                           alignItems:     'center',
@@ -331,7 +332,7 @@ export function ModelSelectItem({
              them apart individually. Renders with zero width when none of
              the three are present — harmless, `space-between` just leaves
              the left section flush-left in that case. ── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0 }}>
         {/* ── Right icons slot ── */}
         {icons && (
           <div
@@ -340,7 +341,7 @@ export function ModelSelectItem({
               display:    'flex',
               alignItems: 'center',
               flexShrink: 0,
-              gap:        '2px',
+              gap:        'var(--space-0-5)',
               lineHeight: 0,
               color:      'var(--model-select-item-icon)',
             }}
@@ -380,10 +381,10 @@ export function ModelSelectItem({
             {showBookmark && (
               <m.div
                 key="bookmark-button"
-                initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                 animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-                exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                transition={{ type: 'spring', ...SPRING.snappy }}
                 style={{ display: 'flex', alignItems: 'center' }}
               >
             <IconButton
@@ -408,10 +409,10 @@ export function ModelSelectItem({
                     {isBookmarked ? (
                       <m.span
                         key="solid"
-                        initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                        initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                         animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-                        exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                        transition={{ type: 'spring', ...SPRING.snappy }}
                         style={{ display: 'flex', lineHeight: 0 }}
                       >
                         <BookmarkTwoSolidIcon size={18} />
@@ -419,10 +420,10 @@ export function ModelSelectItem({
                     ) : (
                       <m.span
                         key="outline"
-                        initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                        initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                         animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-                        exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                        transition={{ type: 'spring', ...SPRING.snappy }}
                         style={{ display: 'flex', lineHeight: 0 }}
                       >
                         <BookmarkTwoIcon size={18} />

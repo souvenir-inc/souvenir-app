@@ -69,13 +69,13 @@ function mulberry32(seed: number) {
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
 
 // Scenery fades out at the side edges (no hard cut-offs) and under the ⋮ menu's corner.
-const EDGE_MASK = 'linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent)'
-const MENU_MASK = 'radial-gradient(circle at calc(100% - 26px) 26px, transparent 20px, #000 46px)'
+const EDGE_MASK = 'linear-gradient(90deg, transparent, var(--static-black) 14px, var(--static-black) calc(100% - 14px), transparent)'
+const MENU_MASK = 'radial-gradient(circle at calc(100% - 26px) 26px, transparent 20px, var(--static-black) 46px)'
 const layerStyle = (z: number, filter?: string, opacity = 1): React.CSSProperties => ({
   position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', borderRadius: 'inherit', zIndex: z,
   maskImage: `${EDGE_MASK}, ${MENU_MASK}`, WebkitMaskImage: `${EDGE_MASK}, ${MENU_MASK}`,
   maskComposite: 'intersect', WebkitMaskComposite: 'source-in',
-  filter, opacity, transition: 'opacity 0.3s ease, filter 0.3s ease',
+  filter, opacity, transition: 'opacity var(--hero-scene-duration) ease, filter var(--hero-scene-duration) ease',
 })
 
 export function HeroScene({
@@ -201,8 +201,8 @@ export function HeroScene({
           <svg width={box.W} height={box.H} viewBox={`0 0 ${box.W} ${box.H}`} style={{ display: 'block' }}>
             <defs>
               <radialGradient id={`cs-${uid}`}>
-                <stop offset="0" stopColor="#000" stopOpacity={0.45} />
-                <stop offset="1" stopColor="#000" stopOpacity={0} />
+                <stop offset="0" stopColor="var(--static-black)" stopOpacity={0.45} />
+                <stop offset="1" stopColor="var(--static-black)" stopOpacity={0} />
               </radialGradient>
               {built.defs}
             </defs>

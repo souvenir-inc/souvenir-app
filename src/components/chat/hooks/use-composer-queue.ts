@@ -9,12 +9,15 @@ import {
   restoreQueuedMessage,
   takeAllQueuedMessages,
   takeNextQueuedMessage,
+  isHandingOver,
+  subscribeQueue,
   takeQueuedMessage,
   type QueuedMessage,
   type QueuedMessagePart,
   type QueuedTurnContext,
 } from "@/lib/message-queue";
 import { PINS_ENABLED } from "@/lib/feature-flags";
+import { isStreamActive } from "@/lib/stream-registry";
 import type { PendingAttachment } from "../AttachmentManager";
 import type { QueuedRowExit } from "../QueuedMessagesTray";
 
@@ -214,26 +217,48 @@ export function useQueuedSend({
   /** Stable; always sends with the composer's latest settings. */
   sendTurn: (turn: QueuedMessagePart & { fromQueue: boolean }) => Promise<unknown>;
 }) {
+  // queueReady as it is now: a retry that fires from the queue (after a hand-over) runs outside
+  // a render, and a reply may have started since the effect that scheduled it.
+  const queueReadyRef = useRef(queueReady);
+  useEffect(() => { queueReadyRef.current = queueReady; }, [queueReady]);
   useEffect(() => {
     if (!queueReady) return;
     let cancelled = false;
+    let stopWaiting: (() => void) | undefined;
     const send = () => {
       // A send that started this very tick has the floor (see isSendingRef).
       if (cancelled || isSendingRef.current || askingSaveRef.current > 0) return;
       setQueuedRowExit("sent");
       const message = takeNextQueuedMessage(queueKey);
-      if (message) void sendTurn({ ...message, fromQueue: true });
+      if (message) { void sendTurn({ ...message, fromQueue: true }); return; }
+      // The front message is being handed back from a background send: nothing comes out
+      // until it is in place. queueReady stays true meanwhile (the queue is not empty), so
+      // nothing would rerun this: it tries again once the hand-over ends.
+      if (isHandingOver(queueKey) && !stopWaiting) {
+        stopWaiting = subscribeQueue(() => {
+          if (isHandingOver(queueKey)) return;
+          stopWaiting?.();
+          stopWaiting = undefined;
+          // Busy again (a reply started meanwhile, which the registry knows before React has
+          // rendered it): the message stays queued, and the next time the queue is ready this
+          // effect runs again and sends it.
+          // Nor while the queue is held (a failure during the hand-over sets that at once; the
+          // readiness above only catches up on the next render).
+          if (queueReadyRef.current && !isStreamActive(queueKey) && !getChatQueue(queueKey)?.heldBy) send();
+        });
+      }
     };
     // Hidden tab: no beat (nobody is watching) and no timer — background
     // tabs throttle timers, up to a minute apart.
     if (pageHidden) {
       queueMicrotask(send);
-      return () => { cancelled = true; };
+      return () => { cancelled = true; stopWaiting?.(); };
     }
     const timer = setTimeout(send, QUEUE_SEND_DELAY_MS);
     return () => {
       cancelled = true;
       clearTimeout(timer);
+      stopWaiting?.();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- the refs, setter and sendTurn are stable
   }, [queueReady, queueKey, pageHidden]);

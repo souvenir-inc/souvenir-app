@@ -116,4 +116,24 @@ export const queryKeys = {
     /** GET /organizations/{id}/slack/installation (the sidebar's Slack row). */
     slackStatus: (org: string) => [...queryKeys.orgs.all(org), "slack-status"] as const,
   },
+
+  /** The org's warehouses (GET /warehouse) and, per warehouse, what the dashboard reads. */
+  warehouse: {
+    all: (org: string) => ["warehouse", org] as const,
+    list: (org: string) => [...queryKeys.warehouse.all(org), "list"] as const,
+    one: (org: string, id: string) => [...queryKeys.warehouse.all(org), id] as const,
+    catalog: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "catalog"] as const,
+    scorecards: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "scorecards"] as const,
+    /** GET /warehouse/{id}/proposals: the metric library's Review list. */
+    proposals: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "proposals"] as const,
+    boards: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "boards"] as const,
+    status: (org: string, id: string, board: string) => [...queryKeys.warehouse.one(org, id), "status", board] as const,
+    measure: (org: string, id: string, request: object) => [...queryKeys.warehouse.one(org, id), "measure", request] as const,
+    /** Every measurement of one warehouse: what a metric definition change makes stale. */
+    measures: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "measure"] as const,
+    /** GET /warehouse/{id}/connections: each connection's sync state, outside any board. */
+    connections: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "connections"] as const,
+    /** GET /warehouse/slack/channels: where the org can post a board (not per warehouse). */
+    slackChannels: (org: string) => [...queryKeys.warehouse.all(org), "slack-channels"] as const,
+  },
 } as const;

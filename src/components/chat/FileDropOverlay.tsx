@@ -9,7 +9,7 @@ import { Upload } from "lucide-react";
  * stacking context on the page can sit on top of it. It never takes pointer events, so the drop
  * still lands on the page's own drop handler.
  */
-const TOP_LAYER = 2147483000;
+const TOP_LAYER = "var(--file-drop-overlay-top-layer)";
 
 export function FileDropOverlay({ visible }: { visible: boolean }) {
   if (!visible || typeof document === "undefined") return null;
@@ -24,17 +24,17 @@ export function FileDropOverlay({ visible }: { visible: boolean }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: 16,
+        padding: 'var(--space-4)',
         backgroundColor: "rgba(var(--surface-rgb), 0.72)",
-        backdropFilter: "blur(6px)",
-        WebkitBackdropFilter: "blur(6px)",
+        backdropFilter: "blur(var(--file-drop-overlay-blur))",
+        WebkitBackdropFilter: "blur(var(--file-drop-overlay-blur))",
       }}
     >
       <div
         style={{
           position: "absolute",
           inset: 12,
-          borderRadius: 20,
+          borderRadius: 'var(--radius-2xl)',
           border: "2px dashed var(--neutral-300)",
         }}
       />
@@ -44,9 +44,9 @@ export function FileDropOverlay({ visible }: { visible: boolean }) {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: 12,
-          padding: "28px 36px",
-          borderRadius: 20,
+          gap: 'var(--space-3)',
+          padding: "var(--space-6) var(--space-7)",
+          borderRadius: 'var(--radius-2xl)',
           background: "var(--card-bg)",
           boxShadow: "var(--shadow-card-default)",
           textAlign: "center",
@@ -59,17 +59,17 @@ export function FileDropOverlay({ visible }: { visible: boolean }) {
             justifyContent: "center",
             width: 48,
             height: 48,
-            borderRadius: 14,
+            borderRadius: 'var(--radius-xl)',
             background: "var(--neutral-100)",
             color: "var(--neutral-900)",
           }}
         >
           <Upload size={22} />
         </span>
-        <span style={{ fontFamily: "var(--font-body)", fontSize: 16, lineHeight: "22px", fontWeight: 500, color: "var(--neutral-900)" }}>
+        <span style={{ fontFamily: "var(--font-body)", fontSize: 'var(--font-size-body-lg)', lineHeight: "var(--line-height-body)", fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-900)" }}>
           Drop files to attach
         </span>
-        <span style={{ fontFamily: "var(--font-body)", fontSize: 13, lineHeight: "18px", color: "var(--neutral-500)" }}>
+        <span style={{ fontFamily: "var(--font-body)", fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: "var(--neutral-500)" }}>
           They upload to this chat. Up to 10 files per message.
         </span>
       </div>

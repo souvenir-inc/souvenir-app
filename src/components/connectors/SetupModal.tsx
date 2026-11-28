@@ -34,7 +34,7 @@ import {
 import { useConnectorSetupFlow, type SetupFlowResult } from '@/lib/useConnectorSetupFlow'
 import { isZapierProviderConnector } from '@/lib/connectorProvider'
 
-const heading = 'm-0 font-[family-name:var(--font-title)] text-[22px] font-normal leading-[1.2] text-[var(--neutral-900)]'
+const heading = 'm-0 font-[family-name:var(--font-title)] text-[length:var(--connector-modal-title-size)] font-normal leading-[var(--connector-modal-title-line-height)] text-[var(--neutral-900)]'
 const muted = 'm-0 font-[family-name:var(--font-body)] text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--color-text-muted)]'
 const panel = 'rounded-xl bg-[var(--neutral-white)] shadow-[0_0_0_1px_var(--neutral-100)]'
 
@@ -56,7 +56,7 @@ export function Modal({ label, onDismiss, busy = false, dirty = false, children 
         onEscapeKeyDown={event => { if (busy) event.preventDefault() }}
         onInteractOutside={event => { if (busy || dirty) event.preventDefault() }}
         className="p-6"
-        style={{ width: 520, maxHeight: 'min(760px, calc(100vh - 48px))', overflowY: 'auto', boxShadow: '0 24px 72px rgba(30,28,27,.28)', borderRadius: 12 }}
+        style={{ width: 520, maxHeight: 'min(760px, calc(100vh - 48px))', overflowY: 'auto', boxShadow: 'var(--shadow-4)', borderRadius: 'var(--radius-xl)' }}
       >
         <DialogTitle className="sr-only">{label}</DialogTitle>
         {children}
@@ -86,7 +86,7 @@ function setupFormSchema(existingNames: string[], required: string[]) {
 }
 
 export function SetupModal({
-  catalog, orgId, mode, initialAccount, cancel, onConnected,
+  catalog, orgId, mode, initialAccount, cancel, onConnected, returnTo,
 }: {
   catalog: ConnectorCatalog
   /** Null when the viewer is in no workspace — nobody to share with. */
@@ -95,6 +95,8 @@ export function SetupModal({
   initialAccount?: ConnectorConnection
   cancel: () => void
   onConnected: (result: SetupFlowResult) => void
+  /** Where a sign-in that leaves the page comes back to (see useConnectorSetupFlow). */
+  returnTo?: string | null
 }) {
   const reconnecting = mode === 'reconnect'
 
@@ -103,6 +105,7 @@ export function SetupModal({
     connectorName: catalog.name,
     connectorProvider: catalog.provider,
     onConnected,
+    returnTo,
   })
 
   // What this link may name and share is whatever row it produces, and only a
@@ -129,7 +132,11 @@ export function SetupModal({
   const form = useZodForm<SetupFormValues>(schema, {
     name: reconnecting ? (initialAccount?.nickname ?? '') : '',
     visibility: reconnecting ? (initialAccount?.visibility ?? 'private') : 'private',
-    credentials: {},
+    // Reconnecting a store: its shop is the account's own (a Shopify account is named by its
+    // shop domain), so it's filled in rather than asked for again. Secrets never are.
+    credentials: reconnecting && initialAccount?.accountIdentifier && fields.some(f => f.name === 'shop')
+      ? { shop: initialAccount.accountIdentifier }
+      : {},
   })
   const { name, visibility, credentials } = form.values
   const duplicate = Boolean(form.errors.name)
@@ -226,9 +233,9 @@ export function SetupModal({
 
       {flow.state === 'error' && flow.error && (
         <div role="alert" className="mt-2">
-          <p className="m-0 text-[13px] text-[var(--red-600,#DC2626)]">{flow.error.message}</p>
+          <p className="m-0 text-[length:var(--font-size-body-sm)] text-[var(--red-600)]">{flow.error.message}</p>
           {flow.error.recovery === 'ask_admin' && (
-            <p className={`${muted} mt-1 text-[13px]`}>Ask a workspace admin to enable or set up {catalog.name}.</p>
+            <p className={`${muted} mt-1 text-[length:var(--font-size-body-sm)]`}>Ask a workspace admin to enable or set up {catalog.name}.</p>
           )}
         </div>
       )}

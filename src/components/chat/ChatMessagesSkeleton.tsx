@@ -16,7 +16,7 @@ const ROWS: Array<{ align: 'left' | 'right'; width: string }> = [
 
 export function ChatMessagesSkeleton() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '16px 0', width: '100%' }} aria-hidden>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-4) 0', width: '100%' }} aria-hidden>
       {ROWS.map((row, i) => (
         <div
           key={i}
@@ -26,7 +26,7 @@ export function ChatMessagesSkeleton() {
             opacity:        1 - i * 0.12,
           }}
         >
-          <Skeleton width={row.width} height={36} radius={14} />
+          <Skeleton width={row.width} height={36} radius={'var(--radius-card)'} />
         </div>
       ))}
     </div>

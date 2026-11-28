@@ -6,6 +6,7 @@ import { PINS_ENABLED } from "@/lib/feature-flags";
 import { IconButton } from "@/components/ui/button";
 import { Tooltip } from "@/components/Tooltip";
 import { PinIcon, CopyOneIcon, RedoIcon, TickTwoIcon } from "@strange-huge/icons";
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Assistant action bar: Pin / Copy / Regenerate ─────────────────────────────
 
@@ -57,24 +58,24 @@ export function MessageActionBar({
   return (
     <m.div
       animate={{ opacity: revealSettled ? 1 : 0 }}
-      transition={{ duration: 0.15 }}
+      transition={{ duration: DURATION.quick }}
       style={{
         display: "flex",
-        gap: 2,
-        marginTop: 4,
+        gap: 'var(--space-0-5)',
+        marginTop: 'var(--space-1)',
         pointerEvents: revealSettled ? "auto" : "none",
       }}
     >
       {PINS_ENABLED && canUseContentActions && showPin && (
         <ActionIconButton
-          icon={<PinIcon size={18} color={pinned ? "var(--brown-700, #683D1B)" : "var(--neutral-400)"} />}
+          icon={<PinIcon size={18} color={pinned ? "var(--brown-700)" : "var(--neutral-400)"} />}
           label={pinned ? "Unpin" : "Pin"}
           onClick={onPin}
         />
       )}
       {canUseContentActions && (
         <ActionIconButton
-          icon={copied ? <TickTwoIcon size={18} color="var(--success-600, #80B707)" /> : <CopyOneIcon size={18} color="var(--neutral-400)" />}
+          icon={copied ? <TickTwoIcon size={18} color="var(--success-600)" /> : <CopyOneIcon size={18} color="var(--neutral-400)" />}
           label={copied ? "Copied" : "Copy"}
           onClick={onCopy}
         />

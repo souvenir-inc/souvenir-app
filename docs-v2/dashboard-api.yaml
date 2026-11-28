@@ -1,0 +1,798 @@
+openapi: 3.1.0
+info:
+  title: Souvenir Dashboard API
+  version: "1.0"
+  description: |
+    The dashboard's endpoints on souvenir-server (services/warehouse/router.py).
+    Every route proxies to souvenir-warehouse for the signed-in member's organization.
+    Calls from a member with no organization get 404 "Join an organization first";
+    a warehouse of another organization gets 404 "Warehouse not found".
+    Refusals from the warehouse (403, 404, 409, 422) pass through with its `detail`;
+    any other warehouse failure is 502. 503 when the warehouse is not configured.
+servers:
+  - url: "{serverUrl}"
+    variables:
+      serverUrl:
+        default: http://localhost:8080
+        description: The backend origin (NEXT_PUBLIC_SERVER_URL in front-end)
+security:
+  - bearerAuth: []
+tags:
+  - name: warehouses
+  - name: sync
+  - name: metrics
+  - name: scorecards
+  - name: boards
+  - name: tables
+
+paths:
+  /warehouse:
+    get:
+      tags: [warehouses]
+      operationId: warehouses
+      summary: Every warehouse of the organization
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/WarehouseSummary" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /warehouse/connections:
+    get:
+      tags: [warehouses]
+      operationId: connections
+      summary: Every connection of the organization that has a lake, for any warehouse to read
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AttachedConnection" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /warehouse/{warehouseId}:
+    parameters:
+      - $ref: "#/components/parameters/warehouseId"
+    get:
+      tags: [warehouses]
+      operationId: warehouse
+      summary: One warehouse
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WarehouseSummary" }
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      tags: [warehouses]
+      operationId: putWarehouse
+      summary: Create under the id the app chose, or rename and repoint at other connections
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WarehouseRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WarehouseSummary" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      tags: [warehouses]
+      operationId: deleteWarehouse
+      summary: Delete the warehouse
+      responses:
+        "204": { description: Deleted }
+        default: { $ref: "#/components/responses/Error" }
+
+  /warehouse/{warehouseId}/sync:
+    parameters:
+      - $ref: "#/components/parameters/warehouseId"
+    post:
+      tags: [sync]
+      operationId: sync
+      summary: Sync every connection the warehouse reads
+      responses:
+        "202":
+          description: Accepted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WarehouseSummary" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /warehouse/{warehouseId}/connections/{connectionId}/sync:
+    parameters:
+      - $ref: "#/components/parameters/warehouseId"
+      - name: connectionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      tags: [sync]
+      operationId: syncConnection
+      summary: Sync one connection
+      responses:
+        "202":
+          description: Accepted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConnectionState" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /warehouse/{warehouseId}/metrics:
+    parameters:
+      - $ref: "#/components/parameters/warehouseId"
+    get:
+      tags: [metrics]
+      operationId: metrics
+      summary: The metric catalog (library plus this workspace's custom metrics)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MetricEntry" }
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      tags: [metrics]
+      operationId: putMetric
+      summary: Add or redefine a metric; the warehouse checks the value against its tables and library
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomMetricRequest" }
+      responses:
+        "200":
+          description: The whole catalog after the change
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MetricEntry" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      tags: [metrics]
+      operationId: measure
+      summary: Measure metrics over a date range at a grain
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MeasureRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Measurement" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /warehouse/{warehouseId}/metrics/draft:
+    parameters:
+      - $ref: "#/components/parameters/warehouseId"
+    post:
+      tags: [metrics]
+      operationId: draft
+      summary: Metric chat; turns a short conversation into a custom metric (does not save it)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MetricChatRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MetricDraft" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /warehouse/{warehouseId}/metrics/{name}:
+    parameters:
+      - $ref: "#/components/parameters/warehouseId"
+      - name: name
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      tags: [metrics]
+      operationId: deleteMetric
+      summary: Delete a custom metric, or drop this workspace's override of a library one
+      responses:
+        "204": { description: Deleted }
+        default: { $ref: "#/components/responses/Error" }
+
+  /warehouse/{warehouseId}/scorecards:
+    parameters:
+      - $ref: "#/components/parameters/warehouseId"
+    get:
+      tags: [scorecards]
+      operationId: scorecards
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Scorecard" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /warehouse/{warehouseId}/scorecards/{scorecardId}:
+    parameters:
+      - $ref: "#/components/parameters/warehouseId"
+      - name: scorecardId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      tags: [scorecards]
+      operationId: putScorecard
+      summary: Create under the id the app chose, or replace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ScorecardRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Scorecard" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      tags: [scorecards]
+      operationId: deleteScorecard
+      responses:
+        "204": { description: Deleted }
+        default: { $ref: "#/components/responses/Error" }
+
+  /warehouse/{warehouseId}/boards:
+    parameters:
+      - $ref: "#/components/parameters/warehouseId"
+    get:
+      tags: [boards]
+      operationId: boards
+      summary: Shared boards plus the viewer's own
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Board" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /warehouse/{warehouseId}/boards/{boardId}:
+    parameters:
+      - $ref: "#/components/parameters/warehouseId"
+      - $ref: "#/components/parameters/boardId"
+    put:
+      tags: [boards]
+      operationId: putBoard
+      summary: Create under the id the app chose, or replace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BoardRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Board" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      tags: [boards]
+      operationId: deleteBoard
+      responses:
+        "204": { description: Deleted }
+        default: { $ref: "#/components/responses/Error" }
+
+  /warehouse/{warehouseId}/boards/{boardId}/status:
+    parameters:
+      - $ref: "#/components/parameters/warehouseId"
+      - $ref: "#/components/parameters/boardId"
+    get:
+      tags: [boards]
+      operationId: status
+      summary: Sync status of the apps feeding the board's metrics
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BoardStatus" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /warehouse/{warehouseId}/boards/{boardId}/refresh:
+    parameters:
+      - $ref: "#/components/parameters/warehouseId"
+      - $ref: "#/components/parameters/boardId"
+    post:
+      tags: [boards]
+      operationId: refresh
+      summary: Sync the apps feeding the board
+      responses:
+        "202":
+          description: Accepted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BoardStatus" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /warehouse/{warehouseId}/tables:
+    parameters:
+      - $ref: "#/components/parameters/warehouseId"
+    get:
+      tags: [tables]
+      operationId: tables
+      summary: The store tables (category "store")
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TableSummary" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /warehouse/{warehouseId}/tables/{name}:
+    parameters:
+      - $ref: "#/components/parameters/warehouseId"
+      - name: name
+        in: path
+        required: true
+        schema: { type: string }
+      - name: limit
+        in: query
+        schema: { type: integer, minimum: 1, maximum: 500, default: 50 }
+      - name: offset
+        in: query
+        schema: { type: integer, minimum: 0, default: 0 }
+    get:
+      tags: [tables]
+      operationId: rows
+      summary: A page of one table's rows
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TableRows" }
+        default: { $ref: "#/components/responses/Error" }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Auth0 access token of the signed-in member
+
+  parameters:
+    warehouseId:
+      name: warehouseId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    boardId:
+      name: boardId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  responses:
+    Error:
+      description: "403/404/409/422 passed through from the warehouse, 502 warehouse failure, 503 not configured"
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [detail]
+            properties:
+              detail: {}
+
+  schemas:
+    FeedState:
+      type: object
+      required: [category, status, error, lastSyncedAt]
+      properties:
+        category: { type: string }
+        status:
+          type: string
+          description: queued, building, syncing, ready, failed, reconnect or not_applicable
+        error:
+          type: [string, "null"]
+          description: Why the last sync failed, or why the category does not apply
+        lastSyncedAt: { type: [string, "null"], format: date-time }
+
+    AttachedConnection:
+      type: object
+      required: [connectionId, connectorSlug, name, feeds]
+      properties:
+        connectionId: { type: string, format: uuid }
+        connectorSlug: { type: string }
+        name: { type: string }
+        feeds:
+          type: array
+          description: Each category the connection fills, and how its syncs are going
+          items: { $ref: "#/components/schemas/FeedState" }
+
+    WarehouseSummary:
+      type: object
+      required: [id, name, timezone, connections]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        timezone: { type: string }
+        connections:
+          type: array
+          description: The organization's connections this warehouse reads
+          items: { $ref: "#/components/schemas/AttachedConnection" }
+
+    WarehouseRequest:
+      type: object
+      required: [name, timezone, connections]
+      properties:
+        name: { type: string, minLength: 1 }
+        timezone:
+          type: string
+          minLength: 1
+          description: An IANA zone; days and weeks are counted in it
+        connections:
+          type: array
+          items: { type: string, format: uuid }
+      example:
+        name: Main store
+        timezone: America/New_York
+        connections: ["3f1c2a9e-0000-4000-8000-000000000001"]
+
+    ConnectionState:
+      type: object
+      required: [connectionId, connectorSlug, name, state, error, lastSyncedAt, syncingSince, syncableAt, yours]
+      properties:
+        connectionId: { type: string, format: uuid }
+        connectorSlug: { type: string }
+        name: { type: string }
+        state:
+          type: string
+          enum: [syncing, slow, first_sync, reconnect, failed, behind, up_to_date]
+        error:
+          type: [string, "null"]
+          description: What the provider said, when it failed or refused the sign-in
+        lastSyncedAt:
+          type: [string, "null"]
+          format: date-time
+          description: The oldest of its feeds; null until each has synced once
+        syncingSince: { type: [string, "null"], format: date-time }
+        syncableAt:
+          type: [string, "null"]
+          format: date-time
+          description: When Sync does something again, a minute after the last finished
+        yours:
+          type: boolean
+          description: The viewer owns the account, so Reconnect is theirs to press; otherwise its owner reconnects it
+
+    BoardStatus:
+      type: object
+      required: [dot, lastSyncedAt, syncableAt, connections]
+      properties:
+        dot:
+          type: [string, "null"]
+          enum: [syncing, failed, behind, up_to_date, null]
+          description: Null when nothing feeds the board, or every app on it is on its first sync
+        lastSyncedAt:
+          type: [string, "null"]
+          format: date-time
+          description: The oldest app's, so the board never looks fresher than it is
+        syncableAt: { type: [string, "null"], format: date-time }
+        connections:
+          type: array
+          description: Problems first, then by name
+          items: { $ref: "#/components/schemas/ConnectionState" }
+
+    Unit:
+      type: string
+      enum: [money, count, ratio]
+
+    MetricValue:
+      description: An aggregate over one table, or an expression over other metrics
+      oneOf:
+        - $ref: "#/components/schemas/Aggregate"
+        - $ref: "#/components/schemas/Expression"
+
+    Aggregate:
+      type: object
+      required: [kind, table, day]
+      properties:
+        kind: { type: string, enum: [sum, count] }
+        table: { type: string }
+        column:
+          type: [string, "null"]
+          description: The column summed; required for sum, absent for count
+        day:
+          type: string
+          description: The column that places a row on a day; timestamps use the store's timezone
+        where:
+          type: [string, "null"]
+          description: A SQL filter over the table's columns
+      example: { kind: sum, table: orders, column: total_price, day: created_at, where: "cancelled_at IS NULL" }
+
+    Term:
+      description: A metric name, a number, or a nested expression
+      oneOf:
+        - type: string
+        - type: number
+        - $ref: "#/components/schemas/Expression"
+
+    Expression:
+      oneOf:
+        - type: object
+          required: [op, terms]
+          properties:
+            op: { const: add }
+            terms: { type: array, minItems: 2, items: { $ref: "#/components/schemas/Term" } }
+        - type: object
+          required: [op, left, right]
+          properties:
+            op: { const: subtract }
+            left: { $ref: "#/components/schemas/Term" }
+            right: { $ref: "#/components/schemas/Term" }
+        - type: object
+          required: [op, terms]
+          properties:
+            op: { const: multiply }
+            terms: { type: array, minItems: 2, items: { $ref: "#/components/schemas/Term" } }
+        - type: object
+          required: [op, numerator, denominator]
+          properties:
+            op: { const: ratio }
+            numerator: { $ref: "#/components/schemas/Term" }
+            denominator: { $ref: "#/components/schemas/Term" }
+      discriminator:
+        propertyName: op
+      example: { op: ratio, numerator: net_sales, denominator: orders }
+
+    MetricEntry:
+      type: object
+      required: [name, label, unit, description, category, value, overridden, createdBy, verified]
+      properties:
+        name: { type: string }
+        label: { type: string }
+        unit: { $ref: "#/components/schemas/Unit" }
+        description: { type: string }
+        category:
+          type: string
+          description: The library category, or custom for one this workspace added
+        value: { $ref: "#/components/schemas/MetricValue" }
+        overridden:
+          type: boolean
+          description: This workspace's own definition stands in for the library's
+        createdBy:
+          type: [string, "null"]
+          description: The member who added it; null for a library metric
+        verified:
+          type: boolean
+          description: Someone has checked the definition; library metrics always are
+
+    CustomMetricRequest:
+      type: object
+      required: [name, label, unit, description, value]
+      properties:
+        name: { type: string, pattern: "^[a-z][a-z0-9_]*$", maxLength: 64 }
+        label: { type: string, minLength: 1 }
+        unit: { $ref: "#/components/schemas/Unit" }
+        description: { type: string }
+        value: { $ref: "#/components/schemas/MetricValue" }
+        verified:
+          type: boolean
+          default: false
+          description: Someone has checked the definition; saving it again without this clears it
+      example:
+        name: average_order_value
+        label: Average order value
+        unit: money
+        description: Net sales per order
+        value: { op: ratio, numerator: net_sales, denominator: orders }
+        verified: false
+
+    MetricChatMessage:
+      type: object
+      required: [role, content]
+      properties:
+        role: { type: string, enum: [user, assistant] }
+        content: { type: string, minLength: 1 }
+
+    MetricChatRequest:
+      type: object
+      required: [messages]
+      properties:
+        messages:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/MetricChatMessage" }
+      example:
+        messages:
+          - { role: user, content: "Revenue per order, excluding cancelled orders" }
+
+    MetricDraft:
+      type: object
+      required: [reply, metric]
+      properties:
+        reply:
+          type: string
+          description: A question when something is unclear, otherwise what the metric measures
+        metric:
+          description: The metric the conversation has settled on, once it has; null while a question is open
+          oneOf:
+            - $ref: "#/components/schemas/CustomMetricRequest"
+            - type: "null"
+
+    MeasureRequest:
+      type: object
+      required: [start, end]
+      properties:
+        metrics:
+          type: array
+          default: []
+          items: { type: string }
+        start: { type: string, format: date }
+        end: { type: string, format: date }
+        grain:
+          type: string
+          enum: [day, week, month, total]
+          default: total
+      example:
+        metrics: [net_sales, orders, average_order_value]
+        start: "2026-11-01"
+        end: "2026-11-22"
+        grain: week
+
+    Period:
+      type: object
+      required: [start, values]
+      properties:
+        start: { type: string, format: date }
+        values:
+          type: object
+          description: Metric name to value; null when there is no value for the period
+          additionalProperties: { type: [number, "null"] }
+
+    Measurement:
+      type: object
+      required: [grain, start, end, timezone, periods, unavailable]
+      properties:
+        grain: { type: string, enum: [day, week, month, total] }
+        start: { type: string, format: date }
+        end: { type: string, format: date }
+        timezone: { type: string }
+        periods:
+          type: array
+          items: { $ref: "#/components/schemas/Period" }
+        unavailable:
+          type: object
+          description: Metric name to why it could not be measured
+          additionalProperties: { type: string }
+
+    ScorecardRow:
+      type: object
+      required: [metric, target, direction, tolerance]
+      properties:
+        metric: { type: string, minLength: 1 }
+        target: { type: number }
+        direction:
+          type: string
+          enum: [up, down]
+          description: up when higher is better, down when lower is
+        tolerance:
+          type: number
+          minimum: 0
+          description: How far short of the target still counts as on track, as a fraction of the target
+        owner:
+          type: [string, "null"]
+          default: null
+          description: The user id of the member who answers for it
+        note:
+          type: string
+          default: ""
+          description: What the owner has to say about it
+
+    ScorecardRequest:
+      type: object
+      required: [name, rows]
+      properties:
+        name: { type: string, minLength: 1 }
+        rows:
+          type: array
+          items: { $ref: "#/components/schemas/ScorecardRow" }
+      example:
+        name: Weekly growth
+        rows:
+          - { metric: net_sales, target: 50000, direction: up, tolerance: 0.1, owner: null, note: "" }
+
+    Scorecard:
+      allOf:
+        - $ref: "#/components/schemas/ScorecardRequest"
+        - type: object
+          required: [id, createdBy, updatedAt]
+          properties:
+            id: { type: string, format: uuid }
+            createdBy: { type: string }
+            updatedAt: { type: string, format: date-time }
+
+    BoardRequest:
+      type: object
+      required: [name, layout]
+      properties:
+        name: { type: string, minLength: 1 }
+        layout:
+          type: object
+          additionalProperties: true
+          description: Where everything sits, as the app drew it; kept as given
+        metrics:
+          type: array
+          default: []
+          items: { type: string }
+          description: The metrics on the board; its sync status comes from the apps feeding them
+        shared:
+          type: boolean
+          default: false
+          description: Every member sees it; otherwise only the member who made it
+
+    Board:
+      allOf:
+        - $ref: "#/components/schemas/BoardRequest"
+        - type: object
+          required: [id, createdBy, updatedAt]
+          properties:
+            id: { type: string, format: uuid }
+            createdBy: { type: string }
+            updatedAt: { type: string, format: date-time }
+
+    Column:
+      type: object
+      required: [name, type]
+      properties:
+        name: { type: string }
+        type: { type: string }
+
+    TableSummary:
+      type: object
+      required: [name, meaning, columns, rows]
+      properties:
+        name: { type: string }
+        meaning: { type: string }
+        columns:
+          type: array
+          items: { $ref: "#/components/schemas/Column" }
+        rows: { type: integer, description: Row count }
+
+    TableRows:
+      type: object
+      required: [name, columns, rows, total]
+      properties:
+        name: { type: string }
+        columns:
+          type: array
+          items: { $ref: "#/components/schemas/Column" }
+        rows:
+          type: array
+          items: { type: object, additionalProperties: true }
+        total: { type: integer }

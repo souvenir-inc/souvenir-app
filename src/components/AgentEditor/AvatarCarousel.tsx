@@ -74,7 +74,7 @@ export function AvatarCarousel({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)', width: '100%' }}>
       {/* Preview, on a halo that takes the avatar's colour. */}
       <div
         aria-hidden
@@ -82,7 +82,7 @@ export function AvatarCarousel({
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           width: PREVIEW + 24, height: PREVIEW + 24, borderRadius: '50%',
           backgroundColor: `color-mix(in srgb, ${config.colors[0]} 40%, transparent)`,
-          transition: 'background-color 300ms ease',
+          transition: 'background-color var(--duration-slow) ease',
         }}
       >
         <div style={{ width: PREVIEW, height: PREVIEW, borderRadius: '50%', backgroundColor: 'var(--static-white)', overflow: 'hidden' }}>
@@ -101,10 +101,10 @@ export function AvatarCarousel({
 
       {/* Name of what's shown: the selection, or (muted, with a hint) the tile under the pointer. */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: 36 }}>
-        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 14, lineHeight: '20px', color: previewing ? 'var(--neutral-500)' : 'var(--neutral-800)' }}>
+        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body-sm)', color: previewing ? 'var(--neutral-500)' : 'var(--neutral-800)' }}>
           {config.label}
         </span>
-        <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, lineHeight: '16px', color: 'var(--neutral-500)', visibility: previewing ? 'visible' : 'hidden' }}>
+        <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)', visibility: previewing ? 'visible' : 'hidden' }}>
           Click to choose
         </span>
       </div>
@@ -117,8 +117,8 @@ export function AvatarCarousel({
         onKeyDown={onKeyDown}
         onMouseLeave={() => setHovered(null)}
         style={{
-          display: 'grid', gridTemplateColumns: `repeat(${COLS}, ${TILE}px)`, gap: 10, padding: 12,
-          borderRadius: 16, backgroundColor: 'var(--neutral-50)', boxShadow: 'inset 0 0 0 1px var(--neutral-100)',
+          display: 'grid', gridTemplateColumns: `repeat(${COLS}, ${TILE}px)`, gap: 'var(--space-2-5)', padding: 'var(--space-3)',
+          borderRadius: 'var(--radius-2xl)', backgroundColor: 'var(--neutral-50)', boxShadow: 'inset 0 0 0 1px var(--neutral-100)',
         }}
       >
         {CHOICES.map((choice, i) => {
@@ -145,8 +145,8 @@ export function AvatarCarousel({
                 // The selected tile: a ring in its own colour, offset by a gap of the tray colour.
                 boxShadow: isSelected
                   ? `0 0 0 2px var(--neutral-50), 0 0 0 4px ${choice.colors[1]}`
-                  : '0 1px 2px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--neutral-100)',
-                transition: 'box-shadow 150ms ease, transform 150ms ease',
+                  : 'var(--avatar-carousel-shadow)',
+                transition: 'box-shadow var(--duration-fast) ease, transform var(--duration-fast) ease',
               }}
             >
               <span style={{ display: 'block', width: TILE, height: TILE, borderRadius: '50%', overflow: 'hidden', backgroundColor: 'var(--static-white)' }}>
@@ -168,7 +168,7 @@ export function AvatarCarousel({
                   style={{
                     position: 'absolute', right: -5, bottom: -5, width: 16, height: 16, borderRadius: '50%',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    backgroundColor: choice.colors[1], color: '#fff', boxShadow: '0 0 0 2px var(--neutral-50)',
+                    backgroundColor: choice.colors[1], color: 'var(--static-white)', boxShadow: '0 0 0 2px var(--neutral-50)',
                   }}
                 >
                   <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

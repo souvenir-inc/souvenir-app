@@ -57,14 +57,14 @@ export default function HelpPage() {
     <>
       <div
         className="kaya-scrollbar"
-        style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '64px 24px 48px' }}
+        style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: 'var(--space-10) var(--space-6) var(--space-9)' }}
       >
-        <div style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ paddingLeft: 4, marginBottom: 4 }}>
-            <h1 style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: 0 }}>
+        <div style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)' }}>
+            <h1 style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0 }}>
               Help &amp; Legal
             </h1>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-600)', margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-600)', margin: 0 }}>
               Get support, tell us what to build next, and read the documents that govern your use of Souvenir.
             </p>
           </div>
@@ -74,7 +74,7 @@ export default function HelpPage() {
               <h2 id="help-title" className={styles.cardTitle}>Get help</h2>
               <p className={styles.cardHint}>Ask the community, report a problem, or request a feature.</p>
             </div>
-            <div className={styles.tiles} style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', paddingBottom: 12 }}>
+            <div className={styles.tiles} style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', paddingBottom: 'var(--space-3)' }}>
               <Tile
                 icon={<AssetIcon src="/icons/slack.svg" />}
                 title="Community Slack"

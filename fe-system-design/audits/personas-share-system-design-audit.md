@@ -1,5 +1,7 @@
 # Personas and Share: System Design Audit
 
+> **Note (2026-11-25):** `src/app/api/persona-chat/route.ts` was removed; agent chat goes through `/api/chat`, which now enforces the upload limits (`checkUploads`). Current status: [re-audit](./reaudit-2026-11-25.md).
+
 > **Status (Oct 14 2026): Phases 1–2 done (front-end); Phase 3 items 1 and 3 done, 4.4 done; 3.2 (one link model across share kinds), 3.4 paging and 3.5 notifications open (paging/notifications need the backend).**
 >
 > Done (Phase 1):

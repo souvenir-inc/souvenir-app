@@ -53,7 +53,7 @@ export default function AudioViewer({ url, lines, transcriptStatus, citeMs }: Au
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: '100%', maxWidth: 720 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', width: '100%', maxWidth: 720 }}>
       <audio
         ref={audioRef}
         src={src}
@@ -65,13 +65,13 @@ export default function AudioViewer({ url, lines, transcriptStatus, citeMs }: Au
         Your browser cannot play this recording.
       </audio>
       {lines.length === 0 && (transcriptStatus === 'pending' || transcriptStatus === 'failed') && (
-        <p role="status" style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)' }}>
+        <p role="status" style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)' }}>
           {transcriptStatus === 'pending' ? FILE_MESSAGES.transcriptPending : FILE_MESSAGES.transcriptFailed}
         </p>
       )}
       {lines.length > 0 && (
-        <section aria-label={FILE_MESSAGES.transcript} style={{ borderRadius: 12, background: 'var(--card-bg)', boxShadow: 'var(--shadow-card-default)', padding: 8 }}>
-          <ol ref={listRef} style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <section aria-label={FILE_MESSAGES.transcript} style={{ borderRadius: 'var(--radius-xl)', background: 'var(--card-bg)', boxShadow: 'var(--shadow-card-default)', padding: 'var(--space-2)' }}>
+          <ol ref={listRef} style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)' }}>
             {lines.map((line, index) => {
               const cited = index === citedIndex
               const playing = index === activeIndex
@@ -82,10 +82,10 @@ export default function AudioViewer({ url, lines, transcriptStatus, citeMs }: Au
                     onClick={() => seekTo(line.startMs)}
                     aria-current={playing ? 'true' : undefined}
                     style={{
-                      display: 'flex', alignItems: 'baseline', gap: 12, width: '100%', padding: '8px 10px', border: 'none', borderRadius: 10, textAlign: 'left', cursor: 'pointer',
+                      display: 'flex', alignItems: 'baseline', gap: 'var(--space-3)', width: '100%', padding: 'var(--space-2) var(--space-2-5)', border: 'none', borderRadius: 'var(--radius-lg)', textAlign: 'left', cursor: 'pointer',
                       background: cited ? 'var(--color-tag-Yellow-bg)' : playing ? 'var(--neutral-100)' : 'transparent',
                       boxShadow: cited ? 'inset 0 0 0 1px var(--color-tag-Yellow-text)' : 'none',
-                      fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)', fontWeight: playing ? 500 : 400,
+                      fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', fontWeight: playing ? 'var(--font-weight-medium)' : 'var(--font-weight-regular)',
                     }}
                   >
                     <span style={{ flexShrink: 0, minWidth: 40, color: 'var(--neutral-500)', fontVariantNumeric: 'tabular-nums' }}>{formatTimestamp(line.startMs)}</span>

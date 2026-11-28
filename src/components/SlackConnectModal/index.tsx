@@ -1,8 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import * as Dialog from '@radix-ui/react-dialog'
-import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import { LinkSixIcon, MessagePreviewOneIcon, UserIcon } from '@strange-huge/icons'
 import { Button } from '@/components/ui/button'
@@ -10,8 +9,8 @@ import { SouvenirLogo } from '@/components/SouvenirLogo'
 import { getOrgSlackStatus, getSlackInstallUrl, getSlackStatus } from '@/lib/api/slack'
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
-const SHADOW_MODAL = '0px 12px 16px -4px rgba(130,122,116,0.12), 0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)'
-const SHADOW_CARD_BORDER = '0px 1px 1.5px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-200)'
+const SHADOW_MODAL = 'var(--shadow-modal-soft)'
+const SHADOW_CARD_BORDER = 'var(--slack-connect-modal-shadow-card-border)'
 
 // Poll the Slack status after the install tab opens, until the bot reports
 // installed or we give up. 3s cadence keeps it responsive without hammering.
@@ -50,14 +49,14 @@ function LogoBridge() {
   const tileStyle: React.CSSProperties = {
     width: 48,
     height: 48,
-    borderRadius: 12,
+    borderRadius: 'var(--radius-xl)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
   }
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
       <div style={{ ...tileStyle, backgroundColor: 'var(--neutral-white)', boxShadow: SHADOW_CARD_BORDER }}>
         <SouvenirLogo variant="gray" size={28} alt="Souvenir" />
       </div>
@@ -135,96 +134,91 @@ export function SlackConnectModal({ isOpen, onClose, orgId, onConnected }: Slack
   }
 
   return (
-    <Dialog.Root open={isOpen} onOpenChange={open => { if (!open) onClose() }}>
-      <Dialog.Portal>
-        <Dialog.Overlay
-          style={{ position: 'fixed', inset: 0, backgroundColor: 'var(--overlay-bg)', zIndex: 1100 }}
-        />
-        <Dialog.Content
-          aria-label="Connect Souvenir to Slack"
-          style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1101, outline: 'none' }}
+    <Dialog open={isOpen} onOpenChange={open => { if (!open) onClose() }}>
+      {/* The card below draws its own surface, so the dialog shell is bare. */}
+      <DialogContent
+        bare
+        aria-describedby={undefined}
+        style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+      >
+        <DialogTitle visuallyHidden>Connect Souvenir to Slack</DialogTitle>
+
+        <div
+          style={{
+            display:         'flex',
+            flexDirection:   'column',
+            width:           520,
+            maxWidth:        'calc(100vw - 48px)',
+            maxHeight:       'calc(100vh - 48px)',
+            overflowY:       'auto',
+            borderRadius:    'var(--radius-2xl)',
+            boxSizing:       'border-box',
+            backgroundColor: 'var(--modal-bg)',
+            boxShadow:       SHADOW_MODAL,
+          }}
         >
-          <VisuallyHidden.Root asChild>
-            <Dialog.Title>Connect Souvenir to Slack</Dialog.Title>
-          </VisuallyHidden.Root>
-
-          <div
-            style={{
-              display:         'flex',
-              flexDirection:   'column',
-              width:           520,
-              maxWidth:        'calc(100vw - 48px)',
-              maxHeight:       'calc(100vh - 48px)',
-              overflowY:       'auto',
-              borderRadius:    18,
-              boxSizing:       'border-box',
-              backgroundColor: 'var(--modal-bg)',
-              boxShadow:       SHADOW_MODAL,
-            }}
-          >
-            {/* ── Header — title + Souvenir / link / Slack logo bridge ── */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '28px 28px 24px' }}>
-              <h2 style={{
-                fontFamily: 'var(--font-title)',
-                fontWeight: 400,
-                fontSize:   'var(--font-size-heading)',
-                lineHeight: 'var(--line-height-heading)',
-                color:      'var(--neutral-900)',
-                margin:     0,
-                textAlign:  'center',
-              }}>
-                Connect Souvenir to Slack
-              </h2>
-              <LogoBridge />
-            </div>
-
-            <SectionDivider />
-
-            {/* ── Permissions ── */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '24px 28px 20px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 20, borderRadius: 14, backgroundColor: 'var(--neutral-50)' }}>
-                <p style={{
-                  fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 13, lineHeight: '18px',
-                  color: 'var(--neutral-700)', margin: 0,
-                }}>
-                  Souvenir will be able to:
-                </p>
-                {PERMISSIONS.map(p => (
-                  <div key={p.text} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                    <span aria-hidden style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, flexShrink: 0 }}>
-                      {p.icon}
-                    </span>
-                    <p style={{
-                      fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 13, lineHeight: '18px',
-                      color: 'var(--neutral-700)', margin: 0,
-                    }}>
-                      {p.text}
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <p style={{
-                fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 12, lineHeight: '16px',
-                color: 'var(--neutral-500)', margin: 0,
-              }}>
-                Slack will share your name, email, and workspace ID with Souvenir. By connecting, you agree to Souvenir's privacy policy and terms of service.
-              </p>
-            </div>
-
-            <SectionDivider />
-
-            {/* ── Footer ── */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, padding: '16px 28px' }}>
-              <Button variant="cancel" size="sm" onClick={onClose} disabled={connecting}>
-                Cancel
-              </Button>
-              <Button variant="default" size="sm" loading={connecting} onClick={handleConnect}>
-                Accept and Connect
-              </Button>
-            </div>
+          {/* ── Header — title + Souvenir / link / Slack logo bridge ── */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-4)', padding: 'var(--space-6) var(--space-6) var(--space-6)' }}>
+            <h2 style={{
+              fontFamily: 'var(--font-title)',
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize:   'var(--font-size-heading)',
+              lineHeight: 'var(--line-height-heading)',
+              color:      'var(--neutral-900)',
+              margin:     0,
+              textAlign:  'center',
+            }}>
+              Connect Souvenir to Slack
+            </h2>
+            <LogoBridge />
           </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+
+          <SectionDivider />
+
+          {/* ── Permissions ── */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', padding: 'var(--space-6) var(--space-6) var(--space-5)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', padding: 'var(--space-5)', borderRadius: 'var(--radius-xl)', backgroundColor: 'var(--neutral-50)' }}>
+              <p style={{
+                fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)',
+                color: 'var(--neutral-700)', margin: 0,
+              }}>
+                Souvenir will be able to:
+              </p>
+              {PERMISSIONS.map(p => (
+                <div key={p.text} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
+                  <span aria-hidden style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, flexShrink: 0 }}>
+                    {p.icon}
+                  </span>
+                  <p style={{
+                    fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)',
+                    color: 'var(--neutral-700)', margin: 0,
+                  }}>
+                    {p.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <p style={{
+              fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)',
+              color: 'var(--neutral-500)', margin: 0,
+            }}>
+              Slack will share your name, email, and workspace ID with Souvenir. By connecting, you agree to Souvenir's privacy policy and terms of service.
+            </p>
+          </div>
+
+          <SectionDivider />
+
+          {/* ── Footer ── */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)', padding: 'var(--space-4) var(--space-6)' }}>
+            <Button variant="cancel" size="sm" onClick={onClose} disabled={connecting}>
+              Cancel
+            </Button>
+            <Button variant="default" size="sm" loading={connecting} onClick={handleConnect}>
+              Accept and Connect
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

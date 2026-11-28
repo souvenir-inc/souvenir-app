@@ -37,22 +37,22 @@ function TagChip({ label, selected, onToggle }: { label: string; selected: boole
       style={{
         display:         'flex',
         alignItems:      'center',
-        padding:         '6px 14px',
-        borderRadius:    100,
+        padding:         'var(--space-1-5) var(--space-3)',
+        borderRadius:    'var(--radius-full)',
         border:          selected ? '1px solid var(--blue-400)' : '1px solid var(--border-default)',
         backgroundColor: selected
-          ? 'var(--blue-50, #eff6ff)'
+          ? 'var(--blue-50)'
           : hovered
           ? 'var(--neutral-50)'
           : 'transparent',
-        boxShadow:       selected ? '0px 0px 0px 1px var(--blue-200, #bfdbfe)' : 'none',
+        boxShadow:       selected ? '0px 0px 0px 1px var(--blue-200)' : 'none',
         cursor:          'pointer',
         fontFamily:      'var(--font-body)',
-        fontWeight:      500,
-        fontSize:        14,
-        lineHeight:      '22px',
-        color:           selected ? 'var(--blue-700, #1d4ed8)' : 'var(--neutral-600)',
-        transition:      'background-color 100ms, border-color 100ms, box-shadow 100ms, color 100ms',
+        fontWeight:      'var(--font-weight-medium)',
+        fontSize:        'var(--font-size-body)',
+        lineHeight:      'var(--line-height-body)',
+        color:           selected ? 'var(--blue-700)' : 'var(--neutral-600)',
+        transition:      'background-color var(--duration-instant), border-color var(--duration-instant), box-shadow var(--duration-instant), color var(--duration-instant)',
         userSelect:      'none',
       }}
     >
@@ -101,8 +101,8 @@ export function SaveVersionModal({
         style={{
           width:           400,
           background:      'var(--modal-bg)',
-          borderRadius:    18,
-          boxShadow:       '0px 12px 16px -4px var(--neutral-500-12), 0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
+          borderRadius:    'var(--radius-2xl)',
+          boxShadow:       '0px 12px 16px -4px var(--neutral-500-12), var(--shadow-soft), 0px 0px 0px 1px var(--neutral-100)',
         }}
       >
         {/* Header */}
@@ -112,7 +112,7 @@ export function SaveVersionModal({
             <DialogTitle style={undefined} className="m-0 font-[family-name:var(--font-title)] text-xl font-normal leading-7 text-[var(--legacy-1a1916)]">
               What changed?
             </DialogTitle>
-            <DialogDescription style={undefined} className="m-0 font-[family-name:var(--font-body)] text-sm font-normal leading-[22px] text-[var(--neutral-500)]">
+            <DialogDescription style={undefined} className="m-0 font-[family-name:var(--font-body)] text-sm font-normal leading-[var(--line-height-body)] text-[var(--neutral-500)]">
               Tag this version to track what you updated.
             </DialogDescription>
           </div>

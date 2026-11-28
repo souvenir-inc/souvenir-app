@@ -32,6 +32,7 @@ import { AgentAvatar } from './AgentAvatar'
 import { ModelField } from './ModelField'
 import { SyncNotice } from './SyncNotice'
 import { BOX_STYLE, HINT_STYLE, INPUT_STYLE, LABEL_STYLE } from './styles'
+import { SPRING } from "@/styles/tokens/motion"
 
 
 const PROBLEM_MESSAGE = {
@@ -50,9 +51,9 @@ export interface AgentDetailsSidebarProps {
 
 function ReadOnlyRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
       <p style={LABEL_STYLE}>{label}</p>
-      <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-800)', whiteSpace: 'pre-wrap' }}>
+      <div style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-800)', whiteSpace: 'pre-wrap' }}>
         {children}
       </div>
     </div>
@@ -74,7 +75,7 @@ export function SaveChanges({ count, onClick, loading }: { count: number; onClic
           initial={{ opacity: 0, scale: 0.9, height: 0 }}
           animate={{ opacity: 1, scale: 1, height: 'auto' }}
           exit={{ opacity: 0, scale: 0.9, height: 0 }}
-          transition={{ type: 'spring', stiffness: 520, damping: 34 }}
+          transition={{ type: 'spring', ...SPRING.snappy }}
           style={{ display: 'flex', justifyContent: 'flex-end', overflow: 'visible' }}
         >
           <Button variant="save" size="sm" loading={loading} onClick={onClick}>
@@ -177,11 +178,11 @@ export function AgentDetailsBody({ repoId, canEdit, onClose }: { repoId: string;
   return (
     <>
       {/* 6px of padding all round: the blue focus ring extends ~5px and the panel's scroll area clips overflow. The -6px margin hands the space back, so fields line up with the other panels' 8px edge. */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 18, padding: 6, margin: -6 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-1-5)', margin: 'calc(var(--space-1-5) * -1)' }}>
         {isLoading || (repo && record && !draft) ? (
-          <div role="status" aria-live="polite" style={{ display: 'flex', justifyContent: 'center', paddingTop: 40 }}><Spinner size={22} /></div>
+          <div role="status" aria-live="polite" style={{ display: 'flex', justifyContent: 'center', paddingTop: 'var(--space-8)' }}><Spinner size={22} /></div>
         ) : !repo || !record || !draft || !baseline ? (
-          <p style={{ ...HINT_STYLE, fontSize: 14, lineHeight: '22px' }}>
+          <p style={{ ...HINT_STYLE, fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)' }}>
             This agent couldn’t be found. It may have been deleted, or you may not have access to it.
           </p>
         ) : (
@@ -197,9 +198,9 @@ export function AgentDetailsBody({ repoId, canEdit, onClose }: { repoId: string;
                   disabled={saving}
                 />
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
                   <label htmlFor="agent-details-name" style={LABEL_STYLE}>Name</label>
-                  <div className="kaya-field" style={{ ...BOX_STYLE, padding: '8px 10px' }}>
+                  <div className="kaya-field" style={{ ...BOX_STYLE, padding: 'var(--space-2) var(--space-2-5)' }}>
                     <input
                       id="agent-details-name"
                       type="text"
@@ -222,12 +223,12 @@ export function AgentDetailsBody({ repoId, canEdit, onClose }: { repoId: string;
                   disabled={saving}
                 />
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <label htmlFor="agent-details-description" style={LABEL_STYLE}>Description</label>
                     <span style={HINT_STYLE}>{draft.description.length}/{DESCRIPTION_MAX}</span>
                   </div>
-                  <div className="kaya-field" style={{ ...BOX_STYLE, padding: '8px 10px' }}>
+                  <div className="kaya-field" style={{ ...BOX_STYLE, padding: 'var(--space-2) var(--space-2-5)' }}>
                     <textarea
                       id="agent-details-description"
                       value={draft.description}
@@ -246,7 +247,7 @@ export function AgentDetailsBody({ repoId, canEdit, onClose }: { repoId: string;
                 </Button>
                 {/* Save failures stay visible; success is shown by the button and a toast. */}
                 {problem && (
-                  <div aria-live="polite" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                  <div aria-live="polite" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-1-5)' }}>
                     <Badge color="Red" label="Not saved" />
                     <p role="alert" style={{ ...HINT_STYLE, textAlign: 'center', color: 'var(--color-tag-Red-text, var(--red-700))' }}>{problem}</p>
                   </div>
@@ -254,15 +255,15 @@ export function AgentDetailsBody({ repoId, canEdit, onClose }: { repoId: string;
               </>
             ) : (
               <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
                   <AgentAvatar name={draft.name} repoId={record.repoId} size={56} />
                   <div style={{ minWidth: 0 }}>
-                    <p style={{ margin: 0, fontFamily: 'var(--font-title)', fontSize: 20, lineHeight: '28px', color: 'var(--neutral-900)' }}>{draft.name}</p>
+                    <p style={{ margin: 0, fontFamily: 'var(--font-title)', fontSize: 'var(--font-size-heading-md)', lineHeight: 'var(--line-height-heading-md)', color: 'var(--neutral-900)' }}>{draft.name}</p>
                     <p style={HINT_STYLE}>{record.handle}</p>
                   </div>
                 </div>
                 <ReadOnlyRow label="Model">
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                     {selectedModel && <ModelIcon model={modelIconSource(selectedModel)} size={16} />}
                     {modelName ?? 'Unavailable model'}
                   </span>

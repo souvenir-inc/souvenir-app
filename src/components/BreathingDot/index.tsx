@@ -3,6 +3,7 @@
 import React from 'react'
 import { m, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { DURATION, LONG } from "@/styles/tokens/motion"
 
 // ── Size map ──────────────────────────────────────────────────────────────────
 const SIZE_PX = { sm: 5, md: 7 } as const
@@ -37,7 +38,7 @@ export function BreathingDot({ ref, size = 'md', className, style }: BreathingDo
         transition={
           shouldReduceMotion
             ? {}
-            : { duration: 1.6, repeat: Infinity, ease: 'easeInOut' }
+            : { duration: LONG.lg, repeat: Infinity, ease: 'easeInOut' }
         }
         style={{
           display:         'inline-block',

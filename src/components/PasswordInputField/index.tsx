@@ -6,6 +6,7 @@ import { AnimatePresence, animate, m } from 'framer-motion'
 import { ViewIcon } from '@/components/ViewIcon'
 import { IconButton } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -74,7 +75,7 @@ export function PasswordInputField({
       if (el) {
         await animate(el, { opacity: 0, filter: 'blur(4px)' }, { duration: 0.08 })
         setShowPassword(v => !v)
-        animate(el, { opacity: 1, filter: 'blur(0px)' }, { duration: 0.18, ease: 'easeOut' })
+        animate(el, { opacity: 1, filter: 'blur(0px)' }, { duration: DURATION.base, ease: 'easeOut' })
       } else {
         setShowPassword(v => !v)
       }
@@ -118,7 +119,7 @@ export function PasswordInputField({
         style={{
           display:       'flex',
           flexDirection: 'column',
-          gap:           '4px',
+          gap:           'var(--space-1)',
           width:         fluid ? '100%' : '327px',
         }}
       >
@@ -133,7 +134,7 @@ export function PasswordInputField({
                     width:      1,
                     height:     1,
                     padding:    0,
-                    margin:     -1,
+                    margin:     'calc(var(--space-px) * -1)',
                     overflow:   'hidden',
                     clip:       'rect(0,0,0,0)',
                     whiteSpace: 'nowrap',
@@ -151,22 +152,22 @@ export function PasswordInputField({
             position:        'relative',
             display:         'flex',
             alignItems:      'center',
-            gap:             '2px',
+            gap:             'var(--space-0-5)',
             backgroundColor: 'var(--text-field-bg)',
             height:          '36px',
-            paddingTop:      '2px',
-            paddingBottom:   '2px',
-            paddingLeft:     '10px',
-            paddingRight:    '2px',
-            borderRadius:    '10px',
+            paddingTop:      'var(--space-0-5)',
+            paddingBottom:   'var(--space-0-5)',
+            paddingLeft:     'var(--space-2-5)',
+            paddingRight:    'var(--space-0-5)',
+            borderRadius:    'var(--radius-lg)',
             overflow:        'hidden',
             boxShadow:       containerShadow,
             outlineStyle:    'solid',
-            outlineWidth:    '2px',
+            outlineWidth:    'var(--focus-ring-width)',
             // The ring settles in from 6px out to 3px while it fades up (and back on blur).
-            outlineOffset:   isFocused && !error ? '3px' : '6px',
+            outlineOffset:   isFocused && !error ? 'var(--focus-ring-offset-md)' : 'var(--focus-ring-offset-xl)',
             outlineColor:    isFocused && !error ? 'var(--focus-ring)' : 'transparent',
-            transition:      'box-shadow 150ms, outline-color 200ms ease, outline-offset 260ms cubic-bezier(0.22, 1, 0.36, 1)',
+            transition:      'box-shadow var(--duration-fast), outline-color var(--duration-base) ease, outline-offset var(--duration-base) var(--ease-out-quint)',
             cursor:          disabled ? 'not-allowed' : 'text',
           }}
           onMouseEnter={(e) => {
@@ -179,15 +180,15 @@ export function PasswordInputField({
           }}
         >
           {/* Input - ref'd for the toggle animation */}
-          <div ref={contentRef} style={{ position: 'relative', flex: 1, padding: '0 2px', display: 'flex', alignItems: 'center', minWidth: 0 }}>
+          <div ref={contentRef} style={{ position: 'relative', flex: 1, padding: '0 var(--space-0-5)', display: 'flex', alignItems: 'center', minWidth: 0 }}>
             <AnimatePresence initial={false}>
               {!hasValue && !isFocused && (
                 <m.span
                   key="placeholder"
                   aria-hidden
-                  initial={{ opacity: 0, filter: 'blur(2px)' }}
-                  animate={{ opacity: 1, filter: 'blur(0px)', transition: { duration: 0.2 } }}
-                  exit={{ opacity: 0, filter: 'blur(2px)', transition: { duration: 0.15 } }}
+                  initial={{ opacity: 0, filter: `blur(${BLUR['2xs']}px)` }}
+                  animate={{ opacity: 1, filter: 'blur(0px)', transition: { duration: DURATION.base } }}
+                  exit={{ opacity: 0, filter: `blur(${BLUR['2xs']}px)`, transition: { duration: DURATION.quick } }}
                   style={{
                     position:      'absolute',
                     inset:         0,
@@ -232,8 +233,8 @@ export function PasswordInputField({
                     fontWeight:   'var(--font-weight-regular)',
                     // Larger font-size when hiding password so dots are prominent.
                     // Only applies when there is a value - never touches placeholder text.
-                    fontSize:      (!showPassword && hasValue) ? '16px' : 'var(--font-size-body)',
-                    letterSpacing: (!showPassword && hasValue) ? '1px'  : 'normal',
+                    fontSize:      (!showPassword && hasValue) ? 'var(--font-size-body-lg)' : 'var(--font-size-body)',
+                    letterSpacing: (!showPassword && hasValue) ? 'var(--password-input-field-tracking)'  : 'normal',
                     lineHeight:   'var(--line-height-body)',
                     color:        inputColor,
                     width:        '100%',

@@ -4,6 +4,7 @@ import { logger } from "@/lib/logger"
 import { forwardGeoHeaders } from "@/lib/geo-headers"
 import { chatFormSchema, firstIssue, formFields } from "@/lib/server/chat-forms"
 import { CHAT_CREATE_FIELDS, CHAT_STREAM_FIELDS, keepAcceptedFields } from "@/lib/chat-form-fields"
+import { checkUploads } from "@/lib/server/upload-limits"
 
 export const dynamic = "force-dynamic"
 // Allow up to Vercel's Fluid-compute ceiling for Claude extended-thinking +
@@ -60,6 +61,9 @@ export async function POST(request: NextRequest) {
     webSearch, enable_thinking: thinking, effort, personaId, projectId, systemPrompt, temperature, toneId, libraryFileIds, saveToLibrary, librarySourcesOff,
   } = parsed.data
   const clientFiles = formData.getAll("files").filter((f): f is File => f instanceof File)
+  // The composer keeps to these limits; a request made without it doesn't, so they're held here too.
+  const tooLarge = checkUploads(clientFiles)
+  if (tooLarge) return routeError(tooLarge.status, tooLarge.code, tooLarge.message)
 
   if (!input.trim() && !libraryFileIds && clientFiles.length === 0) {
     return routeError(400, "bad_request", "A message or a file is required")
@@ -122,7 +126,8 @@ export async function POST(request: NextRequest) {
 
   if (!backendResponse.ok || !backendResponse.body) {
     const text = await backendResponse.text().catch(() => "")
-    logger.error("[api/chat] Backend error", { request_id: requestId, status: backendResponse.status, body: text.slice(0, 500) })
+    // Not the body itself: a validation error echoes the request back, the person's message included.
+    logger.error("[api/chat] Backend error", { request_id: requestId, status: backendResponse.status, body_length: text.length })
     // The backend's own error body is passed through: the client reads its
     // detail (credit exhaustion, retired model) to pick the message.
     if (text) return new Response(text, { status: backendResponse.status })

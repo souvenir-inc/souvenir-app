@@ -60,11 +60,11 @@ export interface TooltipProps {
    */
   portal?: boolean
   /**
-   * Stacking order for the floating content. Defaults to 9999 (above nearly
+   * Stacking order for the floating content. Defaults to var(--z-tooltip) (above nearly
    * everything) — appropriate when `portal` is true. When `portal` is false,
    * pass a value that makes sense within the local stacking context instead.
    */
-  zIndex?: number
+  zIndex?: number | string
   /** Ref forwarded to the trigger element (lets wrappers like Dropdown clone-inject refs/handlers). */
   ref?: React.Ref<HTMLButtonElement>
 }
@@ -100,7 +100,7 @@ export function Tooltip({
   maxWidth,
   maxHeight,
   portal = true,
-  zIndex = 9999,
+  zIndex = 'var(--z-tooltip)',
   ...triggerProps
 }: TooltipProps & Omit<React.HTMLAttributes<HTMLElement>, "content">) {
   const isControlled = openProp !== undefined
@@ -200,8 +200,8 @@ export function Tooltip({
           justifyContent:  'center',
           flexDirection:   maxWidth ? 'column' : undefined,
           overflow:        'hidden',
-          borderRadius:    '6px',
-          padding:         maxWidth ? '6px 8px' : '4px 6px',
+          borderRadius:    'var(--radius-sm)',
+          padding:         maxWidth ? 'var(--space-1-5) var(--space-2)' : 'var(--space-1) var(--space-1-5)',
           maxWidth:        cssMaxWidth,
           maxHeight:       maxHeight,
           backgroundImage: 'linear-gradient(180deg, var(--tooltip-bg-from) 0%, var(--tooltip-bg-to) 100%)',
@@ -209,7 +209,7 @@ export function Tooltip({
           pointerEvents:   'none',
           opacity:          entered ? 1 : 0,
           transform:        `translate(${translateX}px, ${translateY}px)`,
-          transition:       'opacity 150ms, transform 150ms cubic-bezier(0.16,1,0.3,1)',
+          transition:       'opacity var(--duration-fast), transform var(--duration-fast) var(--ease-out-expo)',
         }}
       >
         <span

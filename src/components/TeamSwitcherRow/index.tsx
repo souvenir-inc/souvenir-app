@@ -7,6 +7,7 @@ import { ArrowDownOneIcon } from '@strange-huge/icons'
 import { RoleBadge } from '@/components/RoleBadge'
 import type { WorkspaceRole, RoleBadgeMode } from '@/components/RoleBadge'
 import { getGradient } from '@/lib/team-gradients'
+import { DURATION } from "@/styles/tokens/motion"
 
 // Deterministic gradient palette, seeded by team NAME — src/lib/team-gradients.ts,
 // so a team's row here is always the same colour as its entry in the dropdown
@@ -67,21 +68,21 @@ export const TeamSwitcherRow = React.forwardRef<HTMLDivElement, TeamSwitcherRowP
           display:         'flex',
           alignItems:      'center',
           justifyContent:  'space-between',
-          paddingLeft:     '6px',
-          paddingRight:    '6px',
-          paddingTop:      '5px',
-          paddingBottom:   '5px',
-          borderRadius:    '10px',
+          paddingLeft:     'var(--space-1-5)',
+          paddingRight:    'var(--space-1-5)',
+          paddingTop:      'var(--space-1)',
+          paddingBottom:   'var(--space-1)',
+          borderRadius:    'var(--radius-lg)',
           cursor:          'pointer',
           backgroundColor: isActive ? 'var(--sidebar-menu-item-hover-bg)' : 'transparent',
           boxShadow:       isActive ? 'var(--shadow-sidebar-item-hover)' : undefined,
-          transition:      'background-color 150ms, box-shadow 150ms',
+          transition:      'background-color var(--duration-fast), box-shadow var(--duration-fast)',
           ...style,
         }}
         {...props}
       >
         {/* Left: gradient team-initial avatar + team name */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', minWidth: 0 }}>
           <span
             aria-hidden
             style={{
@@ -89,7 +90,7 @@ export const TeamSwitcherRow = React.forwardRef<HTMLDivElement, TeamSwitcherRowP
               display:      'inline-flex',
               width:        '20px',
               height:       '20px',
-              borderRadius: 4,
+              borderRadius: 'var(--radius-xs)',
               background:   getTeamGradient(teamName),
               flexShrink:   0,
               overflow:     'hidden',
@@ -100,9 +101,9 @@ export const TeamSwitcherRow = React.forwardRef<HTMLDivElement, TeamSwitcherRowP
               style={{
                 position:      'absolute',
                 inset:         0,
-                borderRadius:  4,
+                borderRadius:  'var(--radius-xs)',
                 pointerEvents: 'none',
-                boxShadow:     'inset 0px 4px 4px 0px color-mix(in srgb, var(--static-black) 25%, transparent), inset 0px -1px 0.4px 0px rgba(18,60,95,0.65)',
+                boxShadow:     'var(--team-switcher-row-shadow)',
               }}
             />
             <span
@@ -113,9 +114,9 @@ export const TeamSwitcherRow = React.forwardRef<HTMLDivElement, TeamSwitcherRowP
                 alignItems:     'center',
                 justifyContent: 'center',
                 fontFamily:     'var(--font-title)',
-                fontWeight:     500,
-                fontSize:       11,
-                lineHeight:     1,
+                fontWeight:     'var(--font-weight-medium)',
+                fontSize:       'var(--font-size-caption)',
+                lineHeight:     'var(--leading-none)',
                 color:          'var(--color-text-on-accent)',
                 userSelect:     'none',
               }}
@@ -141,7 +142,7 @@ export const TeamSwitcherRow = React.forwardRef<HTMLDivElement, TeamSwitcherRowP
         </div>
 
         {/* Right: role badge + expand button — 4px gap */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexShrink: 0 }}>
           <RoleBadge role={currentUserRole} showLabel mode={roleMode} />
 
           <span
@@ -152,9 +153,9 @@ export const TeamSwitcherRow = React.forwardRef<HTMLDivElement, TeamSwitcherRowP
               justifyContent:  'center',
               width:           '20px',
               height:          '20px',
-              borderRadius:    '4px',
+              borderRadius:    'var(--radius-xs)',
               backgroundColor: 'var(--neutral-white)',
-              boxShadow:       '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4)',
+              boxShadow:       'var(--team-switcher-avatar-shadow)',
               flexShrink:      0,
               color:           'var(--neutral-600)',
               overflow:        'hidden',
@@ -166,7 +167,7 @@ export const TeamSwitcherRow = React.forwardRef<HTMLDivElement, TeamSwitcherRowP
                 initial={{ opacity: 0, y: isOpen ? 6 : -6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.13, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: DURATION.fast, ease: [0.16, 1, 0.3, 1] }}
                 style={{ position: 'absolute', inset: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
               >
                 <span style={{ display: 'inline-flex', transform: isOpen ? 'rotate(180deg)' : 'none' }}>

@@ -51,7 +51,7 @@ export function ProjectCardTagRow({ tags }: { tags: Array<{ label: string; color
   if (tags.length === 0) return null
 
   return (
-    <div style={{ position: 'relative', margin: '10px -1px 0', flexShrink: 0 }}>
+    <div style={{ position: 'relative', margin: 'var(--space-2-5) calc(var(--space-px) * -1) 0', flexShrink: 0 }}>
       <div
         ref={rowRef}
         onMouseDown={onMouseDown}
@@ -62,11 +62,11 @@ export function ProjectCardTagRow({ tags }: { tags: Array<{ label: string; color
         style={{
           display:             'flex',
           flexWrap:            'nowrap',
-          gap:                 4,
+          gap:                 'var(--space-1)',
           overflowX:           'auto',
           overscrollBehaviorX: 'contain',
           scrollbarWidth:      'none',
-          padding:             '1px',
+          padding:             'var(--space-0-5)',
           cursor:              'grab',
           userSelect:          'none',
         }}
@@ -88,7 +88,7 @@ export function ProjectCardTagRow({ tags }: { tags: Array<{ label: string; color
           background:    'linear-gradient(to right, var(--neutral-white) 0%, transparent 100%)',
           pointerEvents: 'none',
           opacity:       atStart ? 0 : 1,
-          transition:    'opacity 150ms ease',
+          transition:    'opacity var(--duration-fast) ease',
         }}
       />
       <div
@@ -102,7 +102,7 @@ export function ProjectCardTagRow({ tags }: { tags: Array<{ label: string; color
           background:    'linear-gradient(to left, var(--neutral-white) 0%, transparent 100%)',
           pointerEvents: 'none',
           opacity:       atEnd ? 0 : 1,
-          transition:    'opacity 150ms ease',
+          transition:    'opacity var(--duration-fast) ease',
         }}
       />
     </div>

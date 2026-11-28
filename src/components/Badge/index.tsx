@@ -56,14 +56,14 @@ export function Badge({ ref, label = 'Label', color = 'Blue', icon, size = 'sm',
           display:         'inline-flex',
           alignItems:      'center',
           justifyContent:  'center',
-          gap:             icon ? 3 : 0,
+          gap:             icon ? 'var(--space-0-75)' : 0,
           // Fixed to the text-only badge's natural height (16px line-height +
           // 2px padding top/bottom) so an icon badge sitting next to a
           // plain-label one — e.g. the persona card footer — always lines up
           // instead of the icon's own box nudging it a couple px taller.
           minHeight:       size === 'md' ? 24 : 20,
-          padding:         '2px',
-          borderRadius:    '6px',
+          padding:         'var(--space-0-5)',
+          borderRadius:    'var(--radius-sm)',
           backgroundColor: cfg.bg,
           boxShadow:       cfg.shadow,
           overflow:        'clip',
@@ -82,10 +82,10 @@ export function Badge({ ref, label = 'Label', color = 'Blue', icon, size = 'sm',
               width:          14,
               height:         14,
               flexShrink:     0,
-              marginLeft:     2,
+              marginLeft:     'var(--space-0-5)',
               position:       'relative',
               overflow:       'hidden',
-              borderRadius:   3,
+              borderRadius:   'var(--radius-xs)',
             }}
           >
             {icon}
@@ -95,11 +95,11 @@ export function Badge({ ref, label = 'Label', color = 'Blue', icon, size = 'sm',
         {/* Label */}
         <span
           style={{
-            padding:    '0 2px',
+            padding:    '0 var(--space-0-5)',
             fontFamily: 'var(--font-body)',
             fontWeight: 'var(--font-weight-medium)',
-            fontSize:   size === 'md' ? 13 : 'var(--font-size-caption)',
-            lineHeight: size === 'md' ? '18px' : 'var(--line-height-caption)',
+            fontSize:   size === 'md' ? 'var(--font-size-body-sm)' : 'var(--font-size-caption)',
+            lineHeight: size === 'md' ? 'var(--line-height-compact)' : 'var(--line-height-caption)',
             color:      cfg.text,
             whiteSpace: 'nowrap',
             position:   'relative',

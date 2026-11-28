@@ -20,7 +20,7 @@ is still true. Every file is in exactly one of three states:
 | [`docs/`](.) | Active + Reference | 184 | API contracts, analytics, design tokens, renderer contract, bundle budget — plus `_archive/` |
 | [`docs-v1.5/`](../docs-v1.5) | Reference | 58 | UX research library, and five v1.5 plans still cited from source |
 | [`docs-v2/`](../docs-v2) | **Active** | 83 | The current workstream: tickets, Library, QA, scope |
-| [`fe-system-design/`](../fe-system-design) | Active + Reference | 86 | The 56 front-end principles and the per-feature audits scored against them |
+| [`fe-system-design/`](../fe-system-design) | Active + Reference | 89 | The 56 front-end principles and the per-feature audits scored against them |
 
 ---
 
@@ -32,11 +32,12 @@ is still true. Every file is in exactly one of three states:
 | [`docs-v2/library/`](../docs-v2/library) | 2026-10-16 | Library feature: product rules, build plan, implementation status, test results |
 | [`docs-v2/qa/<YYYY-MM-DD>/`](../docs-v2/qa) | 2026-10-25 | QA checklists per run |
 | [`docs-v2/scope/`](../docs-v2/scope) | 2026-10-04 | V2 scope of record |
-| [`fe-system-design/audits/`](../fe-system-design/audits) | 2026-10-15 | One system-design audit per feature, with phase status. Start at its `README.md`. |
+| [`fe-system-design/audits/`](../fe-system-design/audits) | 2026-11-25 | One system-design audit per feature, with phase status. Start at its `README.md`; latest pass: `reaudit-2026-11-25.md`. |
 | [`docs/analytics/`](analytics) | 2026-10-15 | Mixpanel contract, front-end implementation, data governance |
 | [`docs/ui/`](ui) | 2026-10-03 | Renderer contract — seven chat components link to `frontend-rendering.md` |
 | [`docs/perf/`](perf) | 2026-10-11 | Bundle budget and baseline; the rules here are enforced by ESLint |
 | [`docs/design-tokens-*.md`](.) | 2026-10-03 | Token audit, mapping and primitives used by the redesign |
+| [`docs/design-system-primitives-plan.md`](design-system-primitives-plan.md) | 2026-11-17 | Plan to standardise primitives and tokens on ds-dev (scan results, 8 phases, targets) |
 
 ## Reference — look up, rarely edit
 

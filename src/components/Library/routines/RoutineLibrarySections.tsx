@@ -150,7 +150,7 @@ export function RoutineRunOutputs({ outputs, messageOnly }: RoutineRunOutputsPro
       ))}
       <Link
         href={RUN_OUTPUTS_HREF}
-        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 4, fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 500, color: 'var(--neutral-900)', textDecoration: 'none' }}
+        style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1-5)', marginTop: 'var(--space-1)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-900)', textDecoration: 'none' }}
       >
         {CHAT_MESSAGES.allRunOutputs}
         <ArrowRightOneIcon size={14} />

@@ -12,8 +12,8 @@ export interface ChipTooltipProps {
 }
 
 const DIVIDER: React.CSSProperties = { height: 1, background: 'currentColor', opacity: 0.14 }
-const REGULAR = 400
-const STRONG = 700
+const REGULAR = 'var(--font-weight-regular)'
+const STRONG = 'var(--font-weight-bold)'
 
 /**
  * Structured tooltip body for chips, separated into sections by hairline dividers:
@@ -24,15 +24,15 @@ const STRONG = 700
 export function ChipTooltip({ title, detail, lines = [], hints = [] }: ChipTooltipProps) {
   const hasBody = Boolean(detail) || lines.length > 0
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, textAlign: 'left', minWidth: 176, padding: '4px 4px 2px', fontWeight: REGULAR }}>
-      <div style={{ fontSize: 12, lineHeight: '16px', fontWeight: STRONG, letterSpacing: '0.01em' }}>{title}</div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', textAlign: 'left', minWidth: 176, padding: 'var(--space-1) var(--space-1) var(--space-0-5)', fontWeight: REGULAR }}>
+      <div style={{ fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', fontWeight: STRONG, letterSpacing: 'var(--tracking-normal)' }}>{title}</div>
 
       {hasBody && (
         <>
           <div style={DIVIDER} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
             {detail && (
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
                 <span style={{ opacity: 0.65 }}>{detail.label}</span>
                 <span style={{ fontWeight: STRONG, textAlign: 'right' }}>{detail.value}</span>
               </div>
@@ -45,13 +45,13 @@ export function ChipTooltip({ title, detail, lines = [], hints = [] }: ChipToolt
       {hints.length > 0 && (
         <>
           <div style={DIVIDER} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
             {hints.map(hint => {
               const [key, ...rest] = hint.split(':')
               const raw = rest.join(':').trim()
               const action = raw.charAt(0).toUpperCase() + raw.slice(1)
               return (
-                <div key={hint} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div key={hint} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                   <span
                     style={{
                       display: 'inline-flex',
@@ -59,13 +59,13 @@ export function ChipTooltip({ title, detail, lines = [], hints = [] }: ChipToolt
                       justifyContent: 'center',
                       width: 18,
                       height: 18,
-                      paddingBottom: 1,
+                      paddingBottom: 'var(--space-0-5)',
                       flexShrink: 0,
-                      fontSize: 12,
-                      lineHeight: 1,
-                      borderRadius: 5,
-                      background: 'color-mix(in srgb, currentColor 12%, transparent)',
-                      boxShadow: 'inset 0 -1px 0 color-mix(in srgb, currentColor 22%, transparent)',
+                      fontSize: 'var(--font-size-small)',
+                      lineHeight: 'var(--leading-none)',
+                      borderRadius: 'var(--radius-sm)',
+                      background: 'var(--chip-tooltip-bg)',
+                      boxShadow: 'var(--chip-tooltip-underline)',
                     }}
                   >
                     {key.trim()}

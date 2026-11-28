@@ -17,6 +17,7 @@ import { Checkbox } from '@/components/Checkbox'
 import { Spinner } from '@/components/Spinner'
 import { cn } from '@/lib/utils'
 import { useMenuMode, useSlotFocused, DropdownMenuPrimitiveItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Shadow tokens ──────────────────────────────────────────────────────────────
 
@@ -195,7 +196,7 @@ const labelTextStyleStrong: React.CSSProperties = {
 
 /** 12px/16px — a readable step between the 11px caption and the 14px body. */
 const subLabelTextStyleStrong: React.CSSProperties = {
-  fontSize:   'calc(var(--font-size-body) - 2px)',
+  fontSize:   'var(--dropdown-menu-item-size)',
   lineHeight: 'var(--line-height-caption)',
 }
 
@@ -215,7 +216,7 @@ const subLabelTextStyle: React.CSSProperties = {
 /** `emphasis="strong"` on a header row — 13px/18px, off the 11px caption step. */
 const headerTextStyleStrong: React.CSSProperties = {
   fontSize:   'var(--font-size-code)',
-  lineHeight: '18px',
+  lineHeight: 'var(--line-height-code)',
   color:      'var(--dropdown-menu-item-muted)',
 }
 
@@ -372,7 +373,7 @@ export function DropdownMenuItem(
           overflow:        'hidden',
           // Figma 1056:840 / 1056:874 - radius 6 px (lowered from 10 px in
           // the same revision that introduced the header right-slot).
-          borderRadius:    '6px',
+          borderRadius:    'var(--radius-sm)',
           // Without this, `width: 100%` sets only the CONTENT box and the
           // 12px of horizontal padding below is added on top, rendering the
           // row 12px wider than its container (e.g. wider than the plain
@@ -384,15 +385,15 @@ export function DropdownMenuItem(
           boxSizing:       'border-box',
           width:           fluid ? '100%' : '217px',
           // Figma 1056:874 - header pt-4, pb-6
-          paddingLeft:     '6px',
-          paddingRight:    '6px',
-          paddingTop:      isHeader ? '4px' : '5px',
-          paddingBottom:   isHeader ? '6px' : '5px',
+          paddingLeft:     'var(--space-1-5)',
+          paddingRight:    'var(--space-1-5)',
+          paddingTop:      isHeader ? 'var(--space-1)' : 'var(--space-1-25)',
+          paddingBottom:   isHeader ? 'var(--space-1-5)' : 'var(--space-1-25)',
           backgroundColor: isActive ? hoverBg : 'transparent',
           boxShadow:       isActive ? hoverShadow : undefined,
           opacity:         disabled ? 0.7 : 1,
           cursor:          isHeader ? 'default' : (disabled || loading) ? 'not-allowed' : 'pointer',
-          transition:      'background-color 150ms, box-shadow 150ms, opacity 150ms',
+          transition:      'background-color var(--duration-fast), box-shadow var(--duration-fast), opacity var(--duration-fast)',
           userSelect:      'none',
           ...style,
         }}
@@ -451,7 +452,7 @@ export function DropdownMenuItem(
               style={{
                 display:    'flex',
                 alignItems: 'center',
-                gap:        8,
+                gap:        'var(--space-2)',
                 height:     emphasis === 'strong' ? 20 : 17,
                 flexShrink: 0,
               }}
@@ -493,14 +494,14 @@ export function DropdownMenuItem(
                   initial={{ scaleY: 0, opacity: 0 }}
                   animate={{ scaleY: 1, opacity: 1 }}
                   exit={{    scaleY: 0, opacity: 0 }}
-                  transition={{ duration: 0.12, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: DURATION.fast, ease: [0.16, 1, 0.3, 1] }}
                   style={{
                     position:        'absolute',
                     left:            0,
                     top:             '4px',
                     bottom:          '4px',
                     width:           '2px',
-                    borderRadius:    '2px',
+                    borderRadius:    'var(--radius-xs)',
                     backgroundColor: 'var(--neutral-900)',
                     transformOrigin: 'center',
                     pointerEvents:   'none',
@@ -514,7 +515,7 @@ export function DropdownMenuItem(
               style={{
                 display:    'flex',
                 alignItems: 'center',
-                gap:        '8px',
+                gap:        'var(--space-2)',
                 flex:       '1 0 0',
                 minWidth:   1,
               }}
@@ -525,7 +526,7 @@ export function DropdownMenuItem(
                   the checkbox itself stops propagation so the row's onClick
                   doesn't double-toggle it. Default variant only. */}
               {showCheckbox && !isDanger && (
-                // eslint-disable-next-line no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements
+                // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements
                 <div
                   style={{ flexShrink: 0, display: 'inline-flex', lineHeight: 0 }}
                   onClick={(e) => e.stopPropagation()}
@@ -573,7 +574,7 @@ export function DropdownMenuItem(
                     width:        freeAvatarSize,
                     height:       freeAvatarSize,
                     flexShrink:   0,
-                    borderRadius: isTile ? 8 : 6,
+                    borderRadius: isTile ? 'var(--radius-md)' : 'var(--radius-sm)',
                     // The tile reads as a card the logo sits on, so the logo can
                     // stay small without looking lost beside a two-line label.
                     backgroundColor: isTile ? 'var(--neutral-50)' : undefined,
@@ -603,7 +604,7 @@ export function DropdownMenuItem(
                       width:        avatarSize,
                       height:       avatarSize,
                       flexShrink:   0,
-                      borderRadius: 6,
+                      borderRadius: 'var(--radius-sm)',
                       overflow:     'hidden',
                       lineHeight:   0,
                     }}
@@ -660,7 +661,7 @@ export function DropdownMenuItem(
                 <Spinner size={16} />
               </div>
             ) : !isDanger && showSwitch ? (
-              // eslint-disable-next-line no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements
+              // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements
               <div
                 style={{ flexShrink: 0, display: 'inline-flex', lineHeight: 0 }}
                 // Switch toggle should not also fire the row's onClick.

@@ -13,5 +13,5 @@ interface StreamingCursorProps {
 export function StreamingCursor({ isVisible }: StreamingCursorProps) {
   if (!isVisible) return null;
 
-  return <BreathingDot style={{ marginLeft: 4, backgroundColor: "var(--neutral-500)" }} />;
+  return <BreathingDot style={{ marginLeft: 'var(--space-1)', backgroundColor: "var(--neutral-500)" }} />;
 }

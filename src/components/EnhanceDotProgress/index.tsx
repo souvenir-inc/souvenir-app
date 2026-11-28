@@ -3,6 +3,7 @@
 import React from 'react'
 import { m } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -34,7 +35,7 @@ export function EnhanceDotProgress({ ref, total, current, audit = false, classNa
         style={{
           display:    'inline-flex',
           alignItems: 'center',
-          gap:        6,
+          gap:        'var(--space-1-5)',
           ...style,
         }}
         {...props}
@@ -44,21 +45,21 @@ export function EnhanceDotProgress({ ref, total, current, audit = false, classNa
           const isPast     = i < current
           const isUpcoming = i > current
           return (
-            // eslint-disable-next-line react/no-array-index-as-key -- fixed-count dot indicator; index is stable
+            // eslint-disable-next-line react/no-array-index-key -- fixed-count dot indicator; index is stable
             <m.span key={i}
               aria-hidden
               layout
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              transition={{ duration: DURATION.base, ease: 'easeInOut' }}
               style={{
                 display:         'inline-block',
                 width:           isCurrent ? 18 : 6,
                 height:          6,
-                borderRadius:    3,
+                borderRadius:    3, // ds-keep: framer-motion's layout animation corrects px radii, not var()
                 backgroundColor: isUpcoming
                   ? 'var(--color-enhance-progress-inactive)'
                   : activeColor,
                 opacity:         isPast ? 0.35 : 1,
-                transition:      'background-color 200ms ease, opacity 200ms ease',
+                transition:      'background-color var(--duration-base) ease, opacity var(--duration-base) ease',
               }}
             />
           )

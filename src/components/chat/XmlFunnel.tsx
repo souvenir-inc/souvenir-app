@@ -22,6 +22,7 @@ import React from "react"
 import { m, useReducedMotion } from "framer-motion"
 import { ArrowDown, Filter, TrendingDown } from "lucide-react"
 import { parseFunnelXml } from "@/components/chat/XmlFunnel.parse"
+import { DURATION, SPRING, STAGGER } from "@/styles/tokens/motion"
 
 function formatNum(n: number): string {
   const abs = Math.abs(n)
@@ -45,29 +46,29 @@ export function XmlFunnel({ xml }: { xml: string }) {
       initial={reduceMotion ? false : { opacity: 0, y: 10, scale: 0.99 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       whileHover={reduceMotion ? undefined : { y: -2 }}
-      transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: DURATION.slow, ease: [0.16, 1, 0.3, 1] }}
       style={{
-        margin: "14px 0",
-        padding: "15px 16px 16px",
-        borderRadius: 18,
+        margin: "var(--space-3) 0",
+        padding: "var(--space-4) var(--space-4) var(--space-4)",
+        borderRadius: 'var(--radius-2xl)',
         border: "1px solid color-mix(in srgb, var(--brown-700) 16%, transparent)",
         background: "linear-gradient(135deg, var(--brown-50) 0%, var(--neutral-50) 52%, var(--brown-50) 100%)",
-        boxShadow: "0 10px 28px rgba(82, 75, 71, 0.09), 0 2px 4px rgba(82, 75, 71, 0.07)",
+        boxShadow: "var(--funnel-card-shadow)",
         overflow: "hidden",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 15 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-2-5)', marginBottom: 'var(--space-4)' }}>
         <m.span
           aria-hidden
           initial={reduceMotion ? false : { rotate: -10, scale: 0.8 }}
           animate={{ rotate: 0, scale: 1 }}
-          transition={{ type: "spring", stiffness: 330, damping: 23 }}
+          transition={{ type: "spring", ...SPRING.springy }}
           style={{
             width: 36,
             height: 36,
             display: "grid",
             placeItems: "center",
-            borderRadius: 11,
+            borderRadius: 'var(--radius-xl)',
             color: "var(--brown-700)",
             background: "color-mix(in srgb, var(--yellow-400) 18%, transparent)",
             border: "1px solid color-mix(in srgb, var(--brown-700) 14%, transparent)",
@@ -84,14 +85,14 @@ export function XmlFunnel({ xml }: { xml: string }) {
           </div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div style={{ fontFamily: "var(--font-body)", fontSize: 17, lineHeight: "21px", fontWeight: "var(--font-weight-semibold)", color: "var(--brown-700)", fontVariantNumeric: "tabular-nums" }}>
+          <div style={{ fontFamily: "var(--font-body)", fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-body-lg)', fontWeight: "var(--font-weight-semibold)", color: "var(--brown-700)", fontVariantNumeric: "tabular-nums" }}>
             {Math.round(finalConversion * 100)}%
           </div>
-          <div style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--neutral-600)" }}>final conversion</div>
+          <div style={{ fontFamily: "var(--font-body)", fontSize: 'var(--font-size-caption)', color: "var(--neutral-600)" }}>final conversion</div>
         </div>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)' }}>
         {funnel.stages.map((stage, i) => {
           const pct = Math.max(0, Math.min(1, stage.value / base))
           const previous = i > 0 ? funnel.stages[i - 1]!.value : stage.value
@@ -103,11 +104,11 @@ export function XmlFunnel({ xml }: { xml: string }) {
                 <m.div
                   initial={reduceMotion ? false : { opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: reduceMotion ? 0 : i * 0.08 }}
-                  style={{ display: "flex", alignItems: "center", gap: 6, paddingLeft: 10, color: "var(--neutral-600)" }}
+                  transition={{ delay: reduceMotion ? 0 : i * STAGGER.lg }}
+                  style={{ display: "flex", alignItems: "center", gap: 'var(--space-1-5)', paddingLeft: 'var(--space-2-5)', color: "var(--neutral-600)" }}
                 >
                   <ArrowDown size={12} />
-                  <span style={{ fontFamily: "var(--font-body)", fontSize: 11 }}>
+                  <span style={{ fontFamily: "var(--font-body)", fontSize: 'var(--font-size-caption)' }}>
                     {Math.round(retained * 100)}% continued
                   </span>
                   {retained < 1 && <TrendingDown size={11} color="var(--warning-800)" />}
@@ -116,36 +117,36 @@ export function XmlFunnel({ xml }: { xml: string }) {
               <m.div
                 initial={reduceMotion ? false : { opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: reduceMotion ? 0 : i * 0.08, duration: 0.26 }}
+                transition={{ delay: reduceMotion ? 0 : i * STAGGER.lg, duration: DURATION.moderate }}
                 style={{
-                  padding: "9px 10px 10px",
-                  borderRadius: 12,
+                  padding: "var(--space-2) var(--space-2-5) var(--space-2-5)",
+                  borderRadius: 'var(--radius-xl)',
                   backgroundColor: "rgba(var(--surface-rgb), 0.62)",
                   border: "1px solid color-mix(in srgb, var(--neutral-700) 8%, transparent)",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 7 }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 'var(--space-2)', marginBottom: 'var(--space-1-5)' }}>
                   <Tooltip content={stage.label} maxWidth={280}><span style={{ flex: "1 1 0", minWidth: 0, fontFamily: "var(--font-body)", fontSize: "var(--font-size-caption)", fontWeight: "var(--font-weight-medium)", color: "var(--neutral-800)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {stage.label}
                   </span></Tooltip>
                   <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--font-size-caption)", color: "var(--neutral-700)", fontWeight: "var(--font-weight-medium)", fontVariantNumeric: "tabular-nums" }}>
                     {formatNum(stage.value)}
                   </span>
-                  <span style={{ minWidth: 36, textAlign: "right", fontFamily: "var(--font-body)", fontSize: 11, color: "var(--neutral-600)", fontVariantNumeric: "tabular-nums" }}>
+                  <span style={{ minWidth: 36, textAlign: "right", fontFamily: "var(--font-body)", fontSize: 'var(--font-size-caption)', color: "var(--neutral-600)", fontVariantNumeric: "tabular-nums" }}>
                     {Math.round(pct * 100)}%
                   </span>
                 </div>
-                <div style={{ height: 9, borderRadius: 999, backgroundColor: "color-mix(in srgb, var(--neutral-700) 8%, transparent)", overflow: "hidden" }}>
+                <div style={{ height: 9, borderRadius: 'var(--radius-full)', backgroundColor: "color-mix(in srgb, var(--neutral-700) 8%, transparent)", overflow: "hidden" }}>
                   <m.div
                     initial={reduceMotion ? false : { scaleX: 0 }}
                     animate={{ scaleX: Math.max(pct, 0.015) }}
-                    transition={{ delay: reduceMotion ? 0 : 0.12 + i * 0.08, duration: reduceMotion ? 0 : 0.55, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ delay: reduceMotion ? 0 : DURATION.fast + i * STAGGER.lg, duration: reduceMotion ? 0 : DURATION.long, ease: [0.16, 1, 0.3, 1] }}
                   style={{
                     width: "100%",
                     height: "100%",
-                    borderRadius: 999,
-                    background: `linear-gradient(90deg, ${color}, ${color}B8)`,
-                    boxShadow: `0 0 12px ${color}24`,
+                    borderRadius: 'var(--radius-full)',
+                    background: `linear-gradient(90deg, ${color}, ${color}B8)`, // ds-keep: the chart colour with a hex alpha
+                    boxShadow: `0 0 var(--xml-funnel-glow-blur) ${color}24`, // ds-keep: the chart colour with a hex alpha
                     transformOrigin: "left",
                   }}
                   />

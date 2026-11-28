@@ -9,7 +9,7 @@ import { PERSONA_CARD_HEIGHT } from './index'
 // with the 93×32 "Use in chat" button — so the real cards replace it without anything moving.
 // Uses the shared .kaya-skeleton pulse utility (globals.css).
 
-const HERO_INSET = 6
+const HERO_INSET = 'var(--space-1-5)'
 const HERO_HEIGHT = 154
 const ACTION_ROW_HEIGHT = 48
 
@@ -17,7 +17,7 @@ const ACTION_ROW_HEIGHT = 48
 function Line({ lineHeight, height, width }: { lineHeight: number; height: number; width: number | string }) {
   return (
     <div style={{ height: lineHeight, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="kaya-skeleton" style={{ height, width, borderRadius: 6 }} />
+      <div className="kaya-skeleton" style={{ height, width, borderRadius: 'var(--radius-sm)' }} />
     </div>
   )
 }
@@ -31,7 +31,7 @@ export function PersonaCardSkeleton({ style }: { style?: React.CSSProperties }) 
         width:           '100%',
         height:          PERSONA_CARD_HEIGHT,
         boxSizing:       'border-box',
-        borderRadius:    20,
+        borderRadius:    'var(--radius-2xl)',
         display:         'flex',
         flexDirection:   'column',
         backgroundColor: 'var(--agent-card-bg)',
@@ -42,7 +42,7 @@ export function PersonaCardSkeleton({ style }: { style?: React.CSSProperties }) 
       {/* Hero image with the avatar centred on it and the ⋯ button top-right */}
       <div
         className="kaya-skeleton"
-        style={{ position: 'relative', margin: HERO_INSET, marginBottom: 0, height: HERO_HEIGHT, flexShrink: 0, borderRadius: 14 }}
+        style={{ position: 'relative', margin: HERO_INSET, marginBottom: 0, height: HERO_HEIGHT, flexShrink: 0, borderRadius: 'var(--radius-xl)' }}
       >
         <div
           style={{
@@ -64,7 +64,7 @@ export function PersonaCardSkeleton({ style }: { style?: React.CSSProperties }) 
             right:           6,
             width:           26,
             height:          26,
-            borderRadius:    9,
+            borderRadius:    'var(--radius-lg)',
             backgroundColor: 'var(--agent-card-bg)',
             opacity:         0.6,
           }}
@@ -72,7 +72,7 @@ export function PersonaCardSkeleton({ style }: { style?: React.CSSProperties }) 
       </div>
 
       {/* Name (18/24), "by" line (11/18), 8px gap, two description lines (11/16) */}
-      <div style={{ flex: '1 1 0', minHeight: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '14px 18px 0' }}>
+      <div style={{ flex: '1 1 0', minHeight: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'var(--space-3) var(--space-4) 0' }}>
         <Line lineHeight={24} height={16} width="56%" />
         <Line lineHeight={18} height={10} width={34} />
         <div style={{ height: 8 }} />
@@ -81,8 +81,8 @@ export function PersonaCardSkeleton({ style }: { style?: React.CSSProperties }) 
       </div>
 
       {/* Action row: the "Use in chat" button */}
-      <div style={{ height: ACTION_ROW_HEIGHT, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginInline: 14, borderTop: '1px solid var(--neutral-100)', boxSizing: 'border-box' }}>
-        <div className="kaya-skeleton" style={{ height: 32, width: 93, borderRadius: 8 }} />
+      <div style={{ height: ACTION_ROW_HEIGHT, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginInline: 'var(--space-3)', borderTop: '1px solid var(--neutral-100)', boxSizing: 'border-box' }}>
+        <div className="kaya-skeleton" style={{ height: 32, width: 93, borderRadius: 'var(--radius-md)' }} />
       </div>
     </div>
   )

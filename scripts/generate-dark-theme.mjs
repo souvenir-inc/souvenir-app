@@ -251,11 +251,15 @@ const shadowVar = /var\(\s*(--neutral-(?:600|700|800|900|950|black)-\d+)\s*\)/g
 const blackRing = /var\(\s*--neutral-black\s*\)/g
 const shadowOut = []
 const seen = new Set()
+// Tokens added by the 2026-11-26 token pass replaced hard-coded literals, which never changed in dark
+// mode; they keep their written value here (no automatic shadow rewrite).
+const block = (src, start, end) => { const i = src.indexOf(start); if (i < 0) return ''; const j = src.indexOf(end, i); return src.slice(i, j < 0 ? undefined : j) }
+const AS_WRITTEN = new Set([...block(semantic, 'Component values (mapped 2026-11-26)', 'end component values (2026-11-26)').matchAll(/(--[a-zA-Z0-9-]+)s*:/g)].map((m) => m[1]))
 for (const src of [alias, semantic]) {
   let m
   while ((m = tokenRe.exec(src))) {
     const [, name, value] = m
-    if (!/shadow/i.test(name) || seen.has(name)) continue
+    if (!/shadow/i.test(name) || seen.has(name) || AS_WRITTEN.has(name)) continue
     const hasVar = new RegExp(shadowVar.source).test(value)
     const hasRing = new RegExp(blackRing.source).test(value)
     if (!hasVar && !hasRing) continue
@@ -509,6 +513,9 @@ const PROJECT_OVERRIDES = [
   ['--popover-bg', 'var(--color-surface-default)'],
   ['--modal-bg', 'var(--color-surface-default)'],
   ['--card-bg', 'var(--color-surface-default)'],
+  // Dialogs and sheets (--shadow-4): the light value in scales.css is a fixed literal, so dark
+  // sets its own, built on the dark popover shadow and ring as it was before.
+  ['--shadow-4', 'var(--shadow-popover), 0px 16px 32px -8px rgba(38, 33, 30, 0.18)'],
   // Layout / card hairline border (AppLayout content card, agent cards): the original dark-grey value.
   ['--border-default', 'var(--neutral-200)'],
   ['--toast-bg', DARK_SURFACE_HEX],
@@ -527,6 +534,68 @@ const PROJECT_OVERRIDES = [
   ['--button-danger-bg-hover', 'rgb(220 38 38 / 0.85)'],
   ['--button-danger-text', '#FFFFFF'],
   ['--button-danger-text-disabled', '#FFFFFF'],
+  // Dashboard (docs-v2/dashboard): dark panel, cards, charts, tabs and sync colours. Moved here from
+  // a :root[data-theme="dark"] block in semantic.css, which must stay light-only.
+  ["--dashboard-panel-bg", "#161616"],
+  ["--dashboard-card-shadow", "0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 0px 0px 1px rgba(255, 255, 255, 0.08)"],
+  ["--dashboard-raised-shadow", "0px 16px 32px -8px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px rgba(255, 255, 255, 0.12)"],
+  ["--dashboard-negative", "var(--danger-700)"],
+  ["--dashboard-chart-area", "rgba(255, 255, 255, 0.05)"],
+  ["--dashboard-chart-soft", "#383838"],
+  ["--dashboard-chart-compare", "#555555"],
+  ["--dashboard-tabs-track", "#222222"],
+  ["--dashboard-sync-bg", "#222222"],
+  ["--dashboard-tab-hover", "#2C2C2C"],
+  ["--dashboard-tab-pressed", "#363636"],
+  ["--dashboard-tab-lifted", "#2A2A2A"],
+  ["--dashboard-tab-lifted-shadow", "0px 6px 16px 0px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px rgba(255, 255, 255, 0.1)"],
+  ["--dashboard-faint", "#8A8A8A"],
+  ["--dashboard-error", "var(--danger-700)"],
+  ["--dashboard-error-bg", "rgba(220, 38, 38, 0.12)"],
+  ["--dashboard-error-border", "rgba(220, 38, 38, 0.4)"],
+  ["--dashboard-sync-behind", "#F59E0B"],
+  ["--dashboard-sync-failed", "var(--danger-700)"],
+  ["--dashboard-spinner-track", "#444444"],
+  ["--dashboard-shimmer-light", "#6B6B6B"],
+  ["--dashboard-banner-failed-bg", "rgba(220, 38, 38, 0.12)"],
+  ["--dashboard-banner-failed-border", "rgba(220, 38, 38, 0.35)"],
+  ["--dashboard-banner-behind-bg", "rgba(245, 158, 11, 0.12)"],
+  ["--dashboard-banner-behind-border", "rgba(245, 158, 11, 0.35)"],
+  ["--dashboard-banner-syncing-bg", "#222222"],
+  ["--dashboard-banner-syncing-border", "#383838"],
+  ["--dashboard-banner-synced-bg", "rgba(34, 197, 94, 0.12)"],
+  ["--dashboard-banner-synced-border", "rgba(34, 197, 94, 0.35)"],
+  ["--dashboard-toast-border", "#383838"],
+  ["--dashboard-toast-shadow", "0px 8px 24px 0px rgba(0, 0, 0, 0.5)"],
+  ["--dashboard-window-bar-bg", "#000000"],
+  ["--dashboard-card-hover-shadow", "0px 0px 0px 1px rgba(255, 255, 255, 0.18), 0px 8px 20px -10px rgba(0, 0, 0, 0.6)"],
+  ["--dashboard-chart-previous", "#5A5A5A"],
+  ["--dashboard-hover-line", "#5A5A5A"],
+  ["--dashboard-hover-band", "#262626"],
+  ["--dashboard-readout-shadow", "0px 4px 12px -2px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px #383838"],
+  ["--dashboard-window-shadow", "0px 24px 48px -12px rgba(0, 0, 0, 0.6)"],
+  ["--dashboard-list-shadow", "0px 12px 24px -8px rgba(0, 0, 0, 0.5)"],
+  ["--dashboard-list-border", "#383838"],
+  ["--dashboard-shimmer-from", "#262626"],
+  ["--dashboard-shimmer-via", "#303030"],
+  ["--dashboard-pill-bg", "#1F1F1F"],
+  ["--dashboard-pill-border", "#383838"],
+  ["--dashboard-pill-bad-text", "#FCA5A5"],
+  ["--dashboard-pill-warn-text", "#FCD34D"],
+  ["--dashboard-checkbox-border", "#5A5A5A"],
+  ["--dashboard-landed-ring", "#8A8A8A"],
+  ["--dashboard-landed-halo", "rgba(255, 255, 255, 0.08)"],
+  ["--dashboard-popover-shadow", "0px 12px 28px -6px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px rgba(255, 255, 255, 0.1)"],
+  ["--dashboard-control-shadow", "0px 0px 0px 1px rgba(255, 255, 255, 0.12)"],
+  ["--dashboard-drop-slot", "rgba(13, 110, 178, 0.16)"],
+  ["--dashboard-badge-bg", "#3A3A3A"],
+  ["--dashboard-badge-shadow", "0px 2px 6px -1px rgba(0, 0, 0, 0.5)"],
+  ["--dashboard-slot-line", "#6E6E6E"],
+  ["--dashboard-slot-fill", "rgba(255, 255, 255, 0.04)"],
+  ["--dashboard-resize-shadow", "0px 10px 24px 0px rgba(0, 0, 0, 0.5)"],
+  ["--dashboard-tag-bg", "rgba(255, 255, 255, 0.1)"],
+  ["--dashboard-tag-bg-muted", "rgba(255, 255, 255, 0.05)"],
+  ["--dashboard-row-hover", "rgba(255, 255, 255, 0.05)"],
   ['--shadow-agent-card-hover', '0px 6px 16px -3px rgba(255, 255, 255, 0.2), 0px 1px 3px 0px rgba(255, 255, 255, 0.14), 0px 0px 0px 1px var(--neutral-400)'],
 ]
 for (const [name, value] of PROJECT_OVERRIDES) lines.push(`  ${name}: ${value};`)
@@ -543,7 +612,9 @@ for (const l of lines) {
   const m = l.match(/^\s*(--[a-zA-Z0-9-]+):\s*(.+?);\s*(?:\/\*.*\*\/)?\s*$/)
   if (m) darkEffective[m[1]] = m[2].trim()
 }
-const aliasAndSemantic = { ...decls(noComments(read('aliases.css'))), ...decls(noComments(read('semantic.css'))) }
+// (the 2026-11-26 shared steps in scales.css are restated too, so they resolve like the literals they replaced)
+const scalesAdded = block(read('scales.css'), 'Added 2026-11-26: steps the fix-all pass needed', '/* ── Tailwind mapping')
+const aliasAndSemantic = { ...decls(noComments(read('aliases.css'))), ...decls(noComments(read('semantic.css'))), ...decls(noComments(scalesAdded)) }
 const effective = (n) => darkEffective[n] ?? aliasAndSemantic[n] ?? lightVars[n]
 const dependsMemo = new Map()
 function dependsOnRamp(name, trail = new Set()) {

@@ -75,7 +75,7 @@ export function FormatGlyph({ format, size = 'sm', showLabel = false }: FormatGl
     format === 'audio' ? <AudioWaveOneIcon size={dims.icon} /> :
     <FileTwoIcon size={dims.icon} />
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, minWidth: 0, flexShrink: 0 }}>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minWidth: 0, flexShrink: 0 }}>
       <span
         aria-hidden="true"
         style={{
@@ -87,7 +87,7 @@ export function FormatGlyph({ format, size = 'sm', showLabel = false }: FormatGl
         {icon}
       </span>
       {showLabel && (
-        <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-700)' }}>{formatLabel(format)}</span>
+        <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-700)' }}>{formatLabel(format)}</span>
       )}
     </span>
   )

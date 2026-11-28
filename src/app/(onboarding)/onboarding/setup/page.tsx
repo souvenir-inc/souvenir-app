@@ -66,20 +66,20 @@ function RecommendedChip() {
         left: 16,
         display: "inline-flex",
         alignItems: "center",
-        padding: "2px 6px",
-        borderRadius: 6,
-        backgroundColor: "var(--blue-100,#cadcf1)",
+        padding: "var(--space-0-5) var(--space-1-5)",
+        borderRadius: 'var(--radius-sm)',
+        backgroundColor: "var(--blue-100)",
         boxShadow:
-          "0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px var(--blue-600-50), inset 0px 1px 0px 0px var(--blue-50-70), inset 0px -1px 0px 0px var(--blue-600-10)",
+          "var(--setup-shadow)",
       }}
     >
       <span
         style={{
           fontFamily: "var(--font-body)",
-          fontWeight: 500,
-          fontSize: 11,
-          lineHeight: "16px",
-          color: "var(--blue-700,#135487)",
+          fontWeight: 'var(--font-weight-medium)',
+          fontSize: 'var(--font-size-caption)',
+          lineHeight: "var(--line-height-small)",
+          color: "var(--blue-700)",
           whiteSpace: "nowrap",
         }}
       >
@@ -105,10 +105,10 @@ function OptionCard({
         position: "relative",
         display: "flex",
         flexDirection: "column",
-        gap: 16,
+        gap: 'var(--space-4)',
         width: "100%",
-        padding: bordered === "blue" ? "24px 16px 16px" : 16,
-        borderRadius: 10,
+        padding: bordered === "blue" ? "var(--space-6) var(--space-4) var(--space-4)" : "var(--space-4)",
+        borderRadius: 'var(--radius-lg)',
         backgroundColor: bordered === "blue" ? "var(--color-surface-raised,var(--static-white))" : "var(--color-surface-base,var(--static-white))",
         border: bordered === "blue" ? "1px solid var(--blue-600-50)" : "1px solid var(--color-border-subtle,#D4D4D4)",
         boxSizing: "border-box",
@@ -121,13 +121,13 @@ function OptionCard({
 
 function OptionHeading({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle: string }) {
   return (
-    <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+    <div style={{ display: "flex", gap: 'var(--space-3)', alignItems: "flex-start" }}>
       {icon}
-      <div style={{ display: "flex", flexDirection: "column", gap: 8, width: 312 }}>
-        <p style={{ fontFamily: "var(--font-title)", fontWeight: 500, fontSize: 20, lineHeight: "24px", color: "var(--color-text-primary,#524b47)", margin: 0 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-2)', width: 312 }}>
+        <p style={{ fontFamily: "var(--font-title)", fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-heading-md)', lineHeight: "var(--line-height-heading-sm)", color: "var(--color-text-primary)", margin: 0 }}>
           {title}
         </p>
-        <p style={{ fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 14, lineHeight: "16px", color: "var(--color-text-secondary,#6a625d)", margin: 0 }}>
+        <p style={{ fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-small)", color: "var(--color-text-secondary,#6a625d)", margin: 0 }}>
           {subtitle}
         </p>
       </div>
@@ -162,11 +162,11 @@ export default function OnboardingSetupChoicePage() {
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: "var(--neutral-50)",
-        padding: "40px 16px",
+        padding: "var(--space-8) var(--space-4)",
         boxSizing: "border-box",
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 24, width: "100%", maxWidth: 392 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-6)', width: "100%", maxWidth: 392 }}>
         {/* ── Slack option ── */}
         <OptionCard bordered="blue">
           <RecommendedChip />
@@ -178,17 +178,17 @@ export default function OnboardingSetupChoicePage() {
           <div
             style={{
               display: "flex",
-              gap: 12,
+              gap: 'var(--space-3)',
               alignItems: "flex-start",
-              padding: 8,
-              borderRadius: 10,
+              padding: 'var(--space-2)',
+              borderRadius: 'var(--radius-lg)',
               backgroundColor: "var(--color-surface-base,var(--static-white))",
             }}
           >
-            <div style={{ flexShrink: 0, width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--neutral-700,#524b47)" }}>
+            <div style={{ flexShrink: 0, width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--neutral-700)" }}>
               <HugeiconsIcon icon={AiMagicIcon} size={16} strokeWidth={1.6} />
             </div>
-            <p style={{ flex: 1, fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 14, lineHeight: "16px", color: "var(--color-text-secondary,#6a625d)", margin: 0 }}>
+            <p style={{ flex: 1, fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-small)", color: "var(--color-text-secondary,#6a625d)", margin: 0 }}>
               We&apos;ll also grab your workspace details, so no setup required
             </p>
           </div>

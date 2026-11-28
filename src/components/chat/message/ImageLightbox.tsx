@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { Dialog, useFocusReturn } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { IconButton } from "@/components/ui/button";
 import { ImageDownloadTwoIcon, CancelOneIcon } from "@strange-huge/icons";
 
@@ -11,38 +10,34 @@ import { ImageDownloadTwoIcon, CancelOneIcon } from "@strange-huge/icons";
 
 export const overlayButtonStyle: React.CSSProperties = {
   background: "color-mix(in srgb, var(--static-black) 55%, transparent)",
-  backdropFilter: "blur(4px)",
-  borderRadius: "8px",
+  backdropFilter: "blur(var(--blur-xs))",
+  borderRadius: "var(--radius-md)",
   color: "var(--static-white)",
   border: "none",
-  padding: "6px",
+  padding: "var(--space-1-5)",
   cursor: "pointer",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
 };
 
-export const srOnlyStyle: React.CSSProperties = {
-  position: "absolute", width: 1, height: 1, padding: 0, margin: -1,
-  overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", border: 0,
-};
-
+// No zIndex of its own: DialogContent puts it at --z-modal, above the dialog's (transparent)
+// overlay at --z-overlay. Set lower, the overlay covered the lightbox and took every click.
 const lightboxStyle: React.CSSProperties = {
   position: "fixed",
   inset: 0,
-  zIndex: 1000,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  padding: "32px",
+  padding: "var(--space-7)",
   background: "color-mix(in srgb, var(--static-black) 80%, transparent)",
   cursor: "zoom-out",
   outline: "none",
 };
 
-const lightboxButtonsStyle: React.CSSProperties = { position: "absolute", top: "16px", right: "16px", display: "flex", gap: "8px" };
+const lightboxButtonsStyle: React.CSSProperties = { position: "absolute", top: "16px", right: "16px", display: "flex", gap: "var(--space-2)" };
 
-const lightboxImageStyle: React.CSSProperties = { maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: "8px", cursor: "default" };
+const lightboxImageStyle: React.CSSProperties = { maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: "var(--radius-md)", cursor: "default" };
 
 /**
  * Saves the image instead of opening it. Routes through the /api/download proxy:
@@ -79,31 +74,28 @@ export function ImageLightbox({
   alt: string;
   onDownload: () => void;
 }) {
-  const { capture, handleCloseAutoFocus } = useFocusReturn();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogPrimitive.Portal>
-        <DialogPrimitive.Content
-          aria-describedby={undefined}
-          onClick={() => onOpenChange(false)}
-          onCloseAutoFocus={handleCloseAutoFocus}
-          style={lightboxStyle}
-        >
-          {capture}
-          <DialogPrimitive.Title style={srOnlyStyle}>Expanded image</DialogPrimitive.Title>
-          <div style={lightboxButtonsStyle} onClick={(e) => e.stopPropagation()}>
-            <IconButton onClick={onDownload} aria-label="Download image" icon={<ImageDownloadTwoIcon size={18} />} style={overlayButtonStyle} />
-            <IconButton onClick={() => onOpenChange(false)} aria-label="Close" icon={<CancelOneIcon size={18} />} style={overlayButtonStyle} />
-          </div>
-          {/* eslint-disable-next-line @next/next/no-img-element -- presigned URL, same as the card */}
-          <img
-            src={url}
-            alt={alt}
-            onClick={(e) => e.stopPropagation()}
-            style={lightboxImageStyle}
-          />
-        </DialogPrimitive.Content>
-      </DialogPrimitive.Portal>
+      <DialogContent
+        bare
+        overlay={false}
+        aria-describedby={undefined}
+        onClick={() => onOpenChange(false)}
+        style={lightboxStyle}
+      >
+        <DialogTitle visuallyHidden>Expanded image</DialogTitle>
+        <div style={lightboxButtonsStyle} onClick={(e) => e.stopPropagation()}>
+          <IconButton onClick={onDownload} aria-label="Download image" icon={<ImageDownloadTwoIcon size={18} />} style={overlayButtonStyle} />
+          <IconButton onClick={() => onOpenChange(false)} aria-label="Close" icon={<CancelOneIcon size={18} />} style={overlayButtonStyle} />
+        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element -- presigned URL, same as the card */}
+        <img
+          src={url}
+          alt={alt}
+          onClick={(e) => e.stopPropagation()}
+          style={lightboxImageStyle}
+        />
+      </DialogContent>
     </Dialog>
   );
 }

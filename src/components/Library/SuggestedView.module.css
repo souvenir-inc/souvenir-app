@@ -6,7 +6,7 @@
   box-sizing: border-box;
   background: var(--card-bg);
   box-shadow: var(--shadow-card-default);
-  transition: box-shadow 150ms ease, background 150ms ease, border-color 150ms ease;
+  transition: box-shadow var(--duration-fast) ease, background var(--duration-fast) ease, border-color var(--duration-fast) ease;
 }
 
 .tile {
@@ -20,7 +20,7 @@
   min-width: 0;
   height: 168px;
   border: 1px solid var(--border-default);
-  border-radius: 16px;
+  border-radius: var(--radius-2xl);
 }
 
 .tile {
@@ -28,7 +28,7 @@
   min-width: 0;
   height: 64px;
   border: 1px solid var(--border-default);
-  border-radius: 16px;
+  border-radius: var(--radius-2xl);
   box-shadow: none;
 }
 
@@ -43,8 +43,8 @@
 
 .card:has(.link:focus-visible),
 .tile:has(.link:focus-visible) {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .link {
@@ -60,20 +60,20 @@
 
 .cardLink {
   flex-direction: column;
-  padding: 14px 16px 12px;
+  padding: var(--space-3) var(--space-4) var(--space-3);
 }
 
 .tileLink {
   align-items: center;
-  gap: 12px;
-  padding: 0 14px;
+  gap: var(--space-3);
+  padding: 0 var(--space-3);
 }
 
 .more {
   position: absolute;
   z-index: 1;
   opacity: 0;
-  transition: opacity 120ms ease;
+  transition: opacity var(--duration-fast) ease;
 }
 
 .card .more {
@@ -115,13 +115,13 @@
 .cardGrid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .tileGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 @container (max-width: 760px) {
@@ -147,5 +147,5 @@
   width: 96px;
   height: 64px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
 }

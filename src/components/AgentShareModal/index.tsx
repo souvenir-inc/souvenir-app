@@ -3,8 +3,7 @@
 import React from 'react'
 import { CancelOneIcon } from '@strange-huge/icons'
 import { IconButton } from '@/components/ui/button'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogClose, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { ShareAgentPanel } from '@/components/ShareAgentPanel'
 
 // ── Agent share modal ─────────────────────────────────────────────────────────
@@ -31,18 +30,18 @@ export function AgentShareModal({ open, onClose, repoId, agentName }: AgentShare
           aria-label={`Share ${agentName}`}
           style={{
             width: 680, maxWidth: 'calc(100vw - 48px)', maxHeight: 'calc(100vh - 96px)', minHeight: 380,
-            gap: 24, padding: 32, background: 'var(--modal-bg)',
-            boxShadow: '0px 8px 32px rgba(18,12,8,0.18), 0px 0px 0px 1px var(--neutral-100)',
+            gap: 'var(--space-6)', padding: 'var(--space-7)', background: 'var(--modal-bg)',
+            boxShadow: 'var(--shadow-4)',
           }}
         >
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <DialogPrimitive.Title asChild>
+              <DialogTitle asChild>
                 <p className="m-0 mb-1 font-[family-name:var(--font-title)] text-2xl leading-8 font-normal text-[var(--neutral-900)]">Share agent</p>
-              </DialogPrimitive.Title>
-              <DialogPrimitive.Description asChild>
-                <p className="m-0 truncate text-sm leading-[22px] text-[var(--neutral-500)]">{agentName}</p>
-              </DialogPrimitive.Description>
+              </DialogTitle>
+              <DialogDescription asChild>
+                <p className="m-0 truncate text-sm leading-[var(--line-height-body)] text-[var(--neutral-500)]">{agentName}</p>
+              </DialogDescription>
             </div>
             <DialogClose asChild>
               <IconButton variant="ghost" size="xs" icon={<CancelOneIcon />} aria-label="Close" />

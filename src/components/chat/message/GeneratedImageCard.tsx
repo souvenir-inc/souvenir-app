@@ -7,6 +7,7 @@ import { IconButton } from "@/components/ui/button";
 import { Tooltip } from "@/components/Tooltip";
 import { ImageDownloadTwoIcon, ArrowExpandOneIcon } from "@strange-huge/icons";
 import { ImageLightbox, downloadImage, overlayButtonStyle } from "./ImageLightbox";
+import { BLUR, DURATION, LONG, STAGGER } from "@/styles/tokens/motion"
 
 // ── Generated Image Card with download button ──────────────────────────────────
 // The expanded view it opens is shared with the images a person attaches to
@@ -16,7 +17,7 @@ import { ImageLightbox, downloadImage, overlayButtonStyle } from "./ImageLightbo
 // allocate them again.
 const cardStyle: React.CSSProperties = {
   position: "relative",
-  borderRadius: "10px",
+  borderRadius: "var(--radius-lg)",
   overflow: "hidden",
   border: "1px solid var(--border-default)",
   maxWidth: "320px",
@@ -47,7 +48,7 @@ const hoverOverlayStyle: React.CSSProperties = {
   right: "8px",
 };
 
-const hoverButtonsStyle: React.CSSProperties = { display: "flex", gap: "6px" };
+const hoverButtonsStyle: React.CSSProperties = { display: "flex", gap: "var(--space-1-5)" };
 
 function isFocusVisible(el: Element) {
   try { return el.matches(":focus-visible"); } catch { return true; }
@@ -82,9 +83,9 @@ export function GeneratedImageCard({ img, index }: { img: { url: string; s3Key?:
       key={img.url}
       // Lands blurred and sharpens, picking up where the generation
       // preview's "developing" canvas left off.
-      initial={{ opacity: 0, scale: 0.97, filter: "blur(18px)" }}
+      initial={{ opacity: 0, scale: 0.97, filter: `blur(${BLUR[18]}px)` }}
       animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: index * 0.1 }}
+      transition={{ duration: LONG.xs, ease: [0.22, 1, 0.36, 1], delay: index * STAGGER.xl }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       // Keyboard focus only: a mouse click focuses the thumbnail too, and the buttons should still go on mouse-out.
@@ -117,7 +118,7 @@ export function GeneratedImageCard({ img, index }: { img: { url: string; s3Key?:
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: DURATION.quick }}
             style={hoverOverlayStyle}
           >
             <div style={hoverButtonsStyle}>

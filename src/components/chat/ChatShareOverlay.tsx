@@ -107,8 +107,8 @@ export function ChatShareOverlay({ chatId, canManage, readOnly, onCopied, autoOp
           hideClose
           aria-describedby={undefined}          style={{
             background:    'var(--modal-bg)',
-            borderRadius:  '20px',
-            boxShadow:     '0px 8px 32px 0px rgba(26,23,20,0.24), 0px 0px 0px 1px rgba(59,54,50,0.12)',
+            borderRadius:  'var(--radius-2xl)',
+            boxShadow:     'var(--shadow-4)',
             width:         '560px',
             maxWidth:      'calc(100vw - 32px)',
             height:        MODAL_HEIGHT,
@@ -119,8 +119,8 @@ export function ChatShareOverlay({ chatId, canManage, readOnly, onCopied, autoOp
           }}
         >
               {/* Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 20px 16px', flexShrink: 0 }}>
-                <DialogTitle style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: '24px', lineHeight: '32px', color: 'var(--legacy-1a1714)', margin: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--space-5) var(--space-5) var(--space-4)', flexShrink: 0 }}>
+                <DialogTitle style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--legacy-1a1714)', margin: 0 }}>
                   Share chat
                 </DialogTitle>
                 <IconButton variant="ghost" size="xs" icon={<CancelOneIcon />} aria-label="Close" onClick={() => setChatShareOpen(false)} />
@@ -133,7 +133,7 @@ export function ChatShareOverlay({ chatId, canManage, readOnly, onCopied, autoOp
                 onValueChange={(v: string) => setActiveTab(v as ChatShareTab)}
                 style={{ display: 'flex', flexDirection: 'column', flex: '1 1 0', minHeight: 0 }}
               >
-                <div style={{ padding: '16px 20px 0', flexShrink: 0 }}>
+                <div style={{ padding: 'var(--space-4) var(--space-5) 0', flexShrink: 0 }}>
                   <TabsList size="small">
                     <TabsTrigger value="share">Share</TabsTrigger>
                     <TabsTrigger value="manage" count={existingShares.length > 0 ? existingShares.length : undefined}>Active shares</TabsTrigger>
@@ -144,7 +144,7 @@ export function ChatShareOverlay({ chatId, canManage, readOnly, onCopied, autoOp
                     doesn't already have an active share of this chat ── */}
                 <TabsContent
                   value="share"
-                  style={{ display: 'flex', flexDirection: 'column', flex: '1 1 0', minHeight: 0, paddingTop: '16px' }}
+                  style={{ display: 'flex', flexDirection: 'column', flex: '1 1 0', minHeight: 0, paddingTop: 'var(--space-4)' }}
                 >
                   {/* Person-to-person only — the backend dropped both the
                       project/team target and the editable/read-only mode
@@ -152,42 +152,42 @@ export function ChatShareOverlay({ chatId, canManage, readOnly, onCopied, autoOp
                       read-only-in-place; the recipient can always fork
                       their own copy from there, so there's nothing left
                       to pick beyond who to share with. */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '0 20px', flexShrink: 0 }}>
-                    <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, color: 'var(--neutral-900)', margin: 0 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', padding: '0 var(--space-5)', flexShrink: 0 }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-900)', margin: 0 }}>
                       Share with
                     </p>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, lineHeight: '18px', color: 'var(--neutral-500)', margin: '0 0 8px' }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)', margin: '0 0 var(--space-2)' }}>
                       They can view this chat and make their own copy of it.
                     </p>
                   </div>
 
                   <div
                     className="kaya-scrollbar"
-                    style={{ flex: '1 1 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', padding: '0 20px 20px' }}
+                    style={{ flex: '1 1 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', padding: '0 var(--space-5) var(--space-5)' }}
                   >
                     {/* padding: 3 — same convention as ProjectMembersPanel/
                         ProjectAddMembersList's own scrollable row lists: gives
                         the selected row's box-shadow ring room to breathe so
                         it doesn't get clipped at the scroll container's edges
                         (most visibly the top row, flush against the top). */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', padding: 3 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', padding: 'var(--space-0-5)' }}>
                       {sharesLoading ? (
                         Array.from({ length: 4 }).map((_, i) => (
                           <div key={i} aria-hidden style={memberRowStyle}>
-                            <div className="kaya-skeleton" style={{ width: 16, height: 16, borderRadius: 4, flexShrink: 0 }} />
+                            <div className="kaya-skeleton" style={{ width: 16, height: 16, borderRadius: 'var(--radius-xs)', flexShrink: 0 }} />
                             <div className="kaya-skeleton" style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0 }} />
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
-                              <div className="kaya-skeleton" style={{ height: 13, width: '45%', borderRadius: 6 }} />
-                              <div className="kaya-skeleton" style={{ height: 11, width: '65%', borderRadius: 6 }} />
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', flex: 1 }}>
+                              <div className="kaya-skeleton" style={{ height: 13, width: '45%', borderRadius: 'var(--radius-sm)' }} />
+                              <div className="kaya-skeleton" style={{ height: 11, width: '65%', borderRadius: 'var(--radius-sm)' }} />
                             </div>
                           </div>
                         ))
                       ) : shareableMembers.length === 0 ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', padding: '32px 8px', textAlign: 'center' }}>
-                          <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'var(--neutral-100)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-3)', padding: 'var(--space-7) var(--space-2)', textAlign: 'center' }}>
+                          <div style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-xl)', background: 'var(--neutral-100)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <ShareOneIcon size={20} color="var(--neutral-400)" />
                           </div>
-                          <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '18px', color: 'var(--neutral-600)', margin: 0 }}>
+                          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-600)', margin: 0 }}>
                             Everyone in the workspace already has this chat shared with them.
                           </p>
                         </div>
@@ -208,20 +208,20 @@ export function ChatShareOverlay({ chatId, canManage, readOnly, onCopied, autoOp
                                 ...memberRowStyle,
                                 border: 'none',
                                 cursor: 'pointer',
-                                backgroundColor: checked ? 'var(--blue-50, #eef5fc)' : 'var(--neutral-white)',
+                                backgroundColor: checked ? 'var(--blue-50)' : 'var(--neutral-white)',
                                 boxShadow: checked
-                                  ? '0px 0px 0px 1px var(--blue-300, #a8cdec)'
-                                  : '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
+                                  ? '0px 0px 0px 1px var(--blue-300)'
+                                  : 'var(--shadow-control)',
                               }}
                             >
                               <Checkbox checked={checked} tabIndex={-1} onClick={(e) => e.stopPropagation()} onCheckedChange={() => toggleSelected(member.id)} />
                               <Avatar name={member.name || member.email} size="sm" />
                               <div style={{ minWidth: 0, flex: '1 0 0', textAlign: 'left' }}>
-                                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 13, lineHeight: '18px', color: 'var(--neutral-800)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-800)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                   {member.name || member.email}
                                 </p>
                                 {member.name && member.email && (
-                                  <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', lineHeight: '16px', color: 'var(--neutral-600)', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-600)', margin: 'var(--space-0-5) 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     {member.email}
                                   </p>
                                 )}
@@ -238,37 +238,37 @@ export function ChatShareOverlay({ chatId, canManage, readOnly, onCopied, autoOp
                 <TabsContent
                   value="manage"
                   className="kaya-scrollbar"
-                  style={{ flex: '1 1 0', minHeight: 0, overflowY: 'auto', paddingTop: '16px', paddingBottom: '20px' }}
+                  style={{ flex: '1 1 0', minHeight: 0, overflowY: 'auto', paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-5)' }}
                 >
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '0 20px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', padding: '0 var(--space-5)' }}>
                     {sharesLoading ? (
                       [0, 1].map(i => (
                         <div
                           key={i}
                           style={{
                             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                            padding: '10px 12px', borderRadius: '10px',
+                            padding: 'var(--space-2-5) var(--space-3)', borderRadius: 'var(--radius-lg)',
                             backgroundColor: 'var(--neutral-50)', boxShadow: '0px 0px 0px 1px var(--neutral-100)',
-                            gap: '8px', opacity: 1 - i * 0.25,
+                            gap: 'var(--space-2)', opacity: 1 - i * 0.25,
                           }}
                         >
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                            <div className="kaya-skeleton" style={{ width: 110, height: 13, borderRadius: 4 }} />
-                            <div className="kaya-skeleton" style={{ width: 140, height: 11, borderRadius: 4 }} />
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                            <div className="kaya-skeleton" style={{ width: 110, height: 13, borderRadius: 'var(--radius-xs)' }} />
+                            <div className="kaya-skeleton" style={{ width: 140, height: 11, borderRadius: 'var(--radius-xs)' }} />
                           </div>
-                          <div className="kaya-skeleton" style={{ width: 64, height: 28, borderRadius: 8 }} />
+                          <div className="kaya-skeleton" style={{ width: 64, height: 28, borderRadius: 'var(--radius-md)' }} />
                         </div>
                       ))
                     ) : existingShares.length === 0 ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', padding: '32px 8px', textAlign: 'center' }}>
-                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'var(--neutral-100)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-3)', padding: 'var(--space-7) var(--space-2)', textAlign: 'center' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-xl)', background: 'var(--neutral-100)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <ShareOneIcon size={20} color="var(--neutral-400)" />
                         </div>
                         <div>
-                          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: '13px', lineHeight: '18px', color: 'var(--neutral-700)', margin: 0 }}>
+                          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-700)', margin: 0 }}>
                             No active shares
                           </p>
-                          <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', lineHeight: '18px', color: 'var(--neutral-600)', margin: '4px 0 0' }}>
+                          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-600)', margin: 'var(--space-1) 0 0' }}>
                             Use the Share tab to share this chat with a person or project.
                           </p>
                         </div>
@@ -284,19 +284,19 @@ export function ChatShareOverlay({ chatId, canManage, readOnly, onCopied, autoOp
                               display:         'flex',
                               alignItems:      'center',
                               justifyContent:  'space-between',
-                              padding:         '10px 12px',
-                              borderRadius:    '10px',
+                              padding:         'var(--space-2-5) var(--space-3)',
+                              borderRadius:    'var(--radius-lg)',
                               backgroundColor: 'var(--neutral-50)',
                               boxShadow:       '0px 0px 0px 1px var(--neutral-100)',
-                              gap:             '8px',
+                              gap:             'var(--space-2)',
                             }}
                           >
                             <div style={{ minWidth: 0 }}>
-                              <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: '13px', lineHeight: '18px', color: 'var(--neutral-800)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-800)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {label}
                               </p>
                               {share.targetUserName && share.targetUserEmail && (
-                                <p style={{ fontFamily: 'var(--font-body)', fontSize: '11px', lineHeight: '16px', color: 'var(--neutral-600)', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-600)', margin: 'var(--space-0-5) 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                   {share.targetUserEmail}
                                 </p>
                               )}
@@ -321,7 +321,7 @@ export function ChatShareOverlay({ chatId, canManage, readOnly, onCopied, autoOp
               <div style={{ height: '1px', background: 'var(--neutral-100)', flexShrink: 0 }} />
 
               {/* Footer */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px', padding: '16px 20px', flexShrink: 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-4) var(--space-5)', flexShrink: 0 }}>
                 <Button variant="ghost" onClick={() => setChatShareOpen(false)}>
                   {activeTab === 'share' ? 'Cancel' : 'Close'}
                 </Button>

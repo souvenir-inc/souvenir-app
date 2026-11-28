@@ -129,7 +129,25 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   const [isLoadingMessages, setIsLoadingMessages] = useState(false)
   const [hasMoreMessages, setHasMoreMessages] = useState(false)
   const [historyLoadId, setHistoryLoadId] = useState(0)
-  const [runningMessageId, setRunningMessageId] = useState<string | null>(null)
+  // Kept with the chat it belongs to. A chatId change without a remount leaves this
+  // render holding the previous chat's value — the reset effect cannot alter a render
+  // that has already begun — and a running id handed to the wrong chat makes the
+  // follow attach one chat's stream to another's reply.
+  const [runningOwner, setRunningOwner] = useState<{ chatId: string; id: string } | null>(null)
+  // When a running reply was last cleared by a stop or a finished end, by "chat:reply", as a
+  // step of clearSeq. A
+  // history request that started before that step may still list the reply as running: its
+  // install does not bring it back.
+  const clearSeqRef = useRef(0)
+  // With each clear, the run's segment count as last seen in a history (the backend counts one
+  // segment, plus one per answer the run went on from): a snapshot with more segments is the
+  // run taken back up after that clear, not the run that ended.
+  const clearedAtRef = useRef(new Map<string, { seq: number; segments: number | undefined }>())
+  const seenSegmentsRef = useRef(new Map<string, number>())
+  // The running reply as of the last render, for the stream listener (which outlives renders):
+  // a finished end clears that reply, and is recorded under its id.
+  const runningOwnerRef = useRef(runningOwner)
+  useEffect(() => { runningOwnerRef.current = runningOwner }, [runningOwner])
   // Bumped when a background stream ends, purely to re-run the write-back
   // effect: the stream's final commit can land before completeStream() clears
   // the registry, in which case the effect would skip that commit and the chat
@@ -145,6 +163,17 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   const cursorRef = useRef<string | undefined>(undefined)
   const pagesRef = useRef(1)
   const loadingRef = useRef(false)
+  // Which request holds loadingRef: only that one frees it (and stops the spinner). A later
+  // request (the next chat's load, say) takes it over, and an earlier one settling late leaves
+  // it alone.
+  const loadOwnerRef = useRef<object | null>(null)
+  const takeLoadGuard = () => { const token = {}; loadOwnerRef.current = token; loadingRef.current = true; return token }
+  const freeLoadGuard = (token: object) => {
+    if (loadOwnerRef.current !== token) return false
+    loadOwnerRef.current = null
+    loadingRef.current = false
+    return true
+  }
   // Mirrors `state` for the guards that run outside render (a background
   // refresh deciding whether a turn started while it was in flight). Synced in
   // an effect, not during render: a background fetch resolves whole ticks after
@@ -183,12 +212,23 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   const install = useCallback((
     id: string,
     list: UIMessage[],
-    meta: { hasMore: boolean; cursor: string | undefined; runningId: string | null },
+    meta: { hasMore: boolean; cursor: string | undefined; runningId: string | null; runningSegments?: number; requestedAt?: number },
   ) => {
     cursorRef.current = meta.cursor
     pagesRef.current = 1
-    setState({ chatId: id, list, loaded: true })
-    setRunningMessageId(meta.runningId)
+    const key = `${id}:${meta.runningId}`
+    const clear = clearedAtRef.current.get(key)
+    const resumedSince = clear?.segments !== undefined && meta.runningSegments !== undefined && meta.runningSegments > clear.segments
+    const stale = meta.runningId !== null && meta.requestedAt !== undefined && clear !== undefined && clear.seq > meta.requestedAt && !resumedSince
+    if (meta.runningId !== null && meta.runningSegments !== undefined && !stale) seenSegmentsRef.current.set(key, meta.runningSegments)
+    // A stale "running": that reply was stopped or finished after this request went out. Its row
+    // is not shown as loading either, or it would spin with nothing left to follow.
+    const shown = stale ? list.map((msg) => (msg.id === meta.runningId ? { ...msg, isLoading: false } : msg)) : list
+    setState({ chatId: id, list: shown, loaded: true })
+    const owner = meta.runningId && !stale ? { chatId: id, id: meta.runningId } : null
+    // Kept in step at once (not only after the render): an end handled before then must see it.
+    runningOwnerRef.current = owner
+    setRunningOwner(owner)
     setHasMoreMessages(meta.hasMore)
     setHistoryLoadId((n) => n + 1)
     setMessagesLoadError(null)
@@ -199,10 +239,12 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
   }, [cacheEnabled])
 
   /** Fetches `id`'s first page through whichever loader is configured. */
-  const fetchHistory = useCallback(async (id: string): Promise<{ list: UIMessage[]; hasMore: boolean; cursor: string | undefined; runningId: string | null }> => {
+  const fetchHistory = useCallback(async (id: string): Promise<{ list: UIMessage[]; hasMore: boolean; cursor: string | undefined; runningId: string | null; runningSegments?: number; requestedAt: number }> => {
+    // The clear step this request started at (see clearedAtRef).
+    const requestedAt = clearSeqRef.current
     if (options?.loadMessages) {
       const msgs = await options.loadMessages(id)
-      return { list: msgs, hasMore: false, cursor: undefined, runningId: null }
+      return { list: msgs, hasMore: false, cursor: undefined, runningId: null, requestedAt }
     }
     const res = await getChatMessages(id)
     const list = withRunningTurn(toUIMessages(res.messages))
@@ -211,12 +253,19 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
       hasMore: res.has_more,
       cursor: res.next_cursor ?? undefined,
       runningId: runningReply(list)?.id ?? null,
+      runningSegments: runningReply(list)?.run?.segments,
+      requestedAt,
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- options is stable for each hook consumer
   }, [])
 
+  // Which visit to a chat this is: opening another chat starts a new one, and a refresh that
+  // started in an earlier visit installs nothing (its history is another chat's).
+  const visitRef = useRef(0)
+
   // Load messages whenever chatId changes
   useEffect(() => {
+    visitRef.current += 1
     if (!chatId) {
       if (hasPreviousChatRef.current) setState(EMPTY_HISTORY)
       setHasMoreMessages(false)
@@ -228,7 +277,8 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
 
     hasPreviousChatRef.current = true
     setMessagesLoadError(null)
-    setRunningMessageId(null)
+    runningOwnerRef.current = null
+    setRunningOwner(null)
 
     // If this chatId was just created during an active stream, skip the
     // fetch-and-clear cycle - the stream is still writing messages. Re-tag the
@@ -278,7 +328,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
     let cancelled = false
 
     const load = async () => {
-      loadingRef.current = true
+      const guard = takeLoadGuard()
       if (!background) setIsLoadingMessages(true)
       try {
         if (pendingStream) await waitForChatStreams(chatId, 90_000)
@@ -289,7 +339,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
         // installing the server's copy would delete the message being sent and
         // orphan the stream writing into it.
         if (background && (getStreamCompletion(chatId) || stateRef.current.list.some(isPendingLocal))) return
-        install(chatId, result.list, { hasMore: result.hasMore, cursor: result.cursor, runningId: result.runningId })
+        install(chatId, result.list, { hasMore: result.hasMore, cursor: result.cursor, runningId: result.runningId, runningSegments: result.runningSegments, requestedAt: result.requestedAt })
       } catch (err) {
         logger.error("[useChatState] Failed to load messages", err)
         if (cancelled || background) return
@@ -298,7 +348,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
         setMessagesLoadError(message)
       } finally {
         if (!cancelled && !background) setIsLoadingMessages(false)
-        loadingRef.current = false
+        freeLoadGuard(guard)
       }
     }
 
@@ -336,6 +386,44 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
     })
   }, [state, hasMoreMessages, streamEndTick, cacheEnabled])
 
+  // The history's running reply stops being "running" once a stream for this chat has
+  // ended (the follow that read it, or a send after it): the queue waits on it until then.
+  // Only an end that shows the run finished: not an inconclusive one (a send that failed
+  // before its run, a follow that never reached the stream), nor a failure or stop, after
+  // which the earlier reply may still be running and stays eligible to be followed.
+  // A Stop is one too, when it stopped the stream writing that very reply (a follow of it): the
+  // backend stops the run, and nothing else would clear it (no reload follows a Stop). Another
+  // send stopped before its run took over leaves it, as above.
+  useEffect(() => subscribeStreams((event) => {
+    const noteCleared = (key: string) => { clearSeqRef.current += 1; clearedAtRef.current.set(key, { seq: clearSeqRef.current, segments: seenSegmentsRef.current.get(key) }) }
+    if (event.type === "stopped") {
+      noteCleared(`${event.chatId}:${event.replyId}`)
+      // Stopped with no entry to end (a follow waiting to reconnect): the same rule, by reply id.
+      if (runningOwnerRef.current?.chatId === event.chatId && runningOwnerRef.current.id === event.replyId) runningOwnerRef.current = null
+      setRunningOwner((owner) => (owner && owner.chatId === event.chatId && owner.id === event.replyId ? null : owner))
+      return
+    }
+    if (event.type !== "end") return
+    // A run that ended on its own error is over too (not a dropped reader, which says "error"
+    // without runEnded): the queue must not wait on it.
+    const finished = (event.outcome === "done" && !event.inconclusive) || (event.outcome === "error" && event.runEnded === true)
+    const stoppedThisReply = event.outcome === "aborted" && event.replyId !== undefined
+    if (!finished && !stoppedThisReply) return
+    // A finished end clears the reply that was running then (not any reply of the chat: one that
+    // started after it is still running, and a snapshot naming it is not stale).
+    const owner = runningOwnerRef.current
+    // (Read from the ref, which every write keeps current, and the same reply is the one cleared
+    // below: the recorded clear and the cleared owner never differ.)
+    // With no reply installed yet for the chat (its history still loading), the end's own reply.
+    // An end that names its reply clears that reply only (a later one still running stays); one
+    // that names none clears the reply that was running then.
+    const cleared = event.replyId ?? (finished && owner && owner.chatId === event.chatId ? owner.id : undefined)
+    if (cleared) noteCleared(`${event.chatId}:${cleared}`)
+    if (!cleared) return
+    if (runningOwnerRef.current?.chatId === event.chatId && runningOwnerRef.current.id === cleared) runningOwnerRef.current = null
+    setRunningOwner((current) => (current && current.chatId === event.chatId && current.id === cleared ? null : current))
+  }), [])
+
   // Re-run the write-back once a reply for the shown chat has ended.
   useEffect(() => {
     if (!cacheEnabled) return
@@ -350,7 +438,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
 
   const loadMoreMessages = useCallback(async () => {
     if (!chatId || loadingRef.current || !hasMoreMessages) return
-    loadingRef.current = true
+    const guard = takeLoadGuard()
     try {
       const res = await getChatMessages(chatId, cursorRef.current)
       cursorRef.current = res.next_cursor ?? undefined
@@ -361,7 +449,7 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
       logger.error("[useChatState] Failed to load more messages", err)
       toast.error(err instanceof Error ? err.message : "Failed to load more messages")
     } finally {
-      loadingRef.current = false
+      freeLoadGuard(guard)
     }
   }, [chatId, hasMoreMessages, setMessages])
 
@@ -450,19 +538,24 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
    *  from a dropped background-stream connection). */
   const refreshMessages = useCallback(async () => {
     if (!chatId || loadingRef.current) return
-    loadingRef.current = true
+    const guard = takeLoadGuard()
     setIsLoadingMessages(true)
+    const visit = visitRef.current
     try {
       const result = await fetchHistory(chatId)
-      install(chatId, result.list, { hasMore: result.hasMore, cursor: result.cursor, runningId: result.runningId })
+      if (visitRef.current !== visit) return
+      install(chatId, result.list, { hasMore: result.hasMore, cursor: result.cursor, runningId: result.runningId, runningSegments: result.runningSegments, requestedAt: result.requestedAt })
     } catch (err) {
+      if (visitRef.current !== visit) return
       logger.error("[useChatState] Failed to refresh messages", err)
       const message = err instanceof Error ? err.message : "Failed to refresh messages"
       toast.error(message)
       setMessagesLoadError(message)
     } finally {
-      setIsLoadingMessages(false)
-      loadingRef.current = false
+      // Only while this refresh still holds the guard: a load that took it over (the next chat's)
+      // owns the spinner. If none did (the next chat came from cache), this stops the spinner it
+      // started, in whichever chat is open, so it never stays on.
+      if (freeLoadGuard(guard)) setIsLoadingMessages(false)
     }
   }, [chatId, fetchHistory, install])
 
@@ -480,6 +573,6 @@ export function useChatState(chatId: string | undefined, options?: UseChatStateO
     refreshMessages,
     messagesLoadError,
     historyLoadId,
-    runningMessageId,
+    runningMessageId: runningOwner && runningOwner.chatId === chatId ? runningOwner.id : null,
   }
 }

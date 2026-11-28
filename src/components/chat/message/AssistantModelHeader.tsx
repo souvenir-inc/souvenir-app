@@ -4,6 +4,7 @@ import React from "react";
 import { AnimatePresence, m } from "framer-motion";
 import { ModelLogo, AnimatedLogo } from "../ReasoningBlock";
 import type { UIMessage } from "@/types/chat";
+import { BLUR, SPRING } from "@/styles/tokens/motion"
 
 // ── Model attribution: the header row, and the shimmer label shown before ─────
 // ── the model is known ────────────────────────────────────────────────────────
@@ -11,26 +12,26 @@ import type { UIMessage } from "@/types/chat";
 const headerStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: "6px",
-  marginBottom: "4px",
+  gap: "var(--space-1-5)",
+  marginBottom: "var(--space-1)",
   userSelect: "none",
 };
 
 const headerLabelStyle: React.CSSProperties = {
   fontFamily: "var(--font-body)",
-  fontSize: "14px",
-  fontWeight: 500,
+  fontSize: "var(--font-size-body)",
+  fontWeight: 'var(--font-weight-medium)',
   color: "var(--model-name-text)",
 };
 
-const loadingWrapperStyle: React.CSSProperties = { margin: "4px 0 8px" };
+const loadingWrapperStyle: React.CSSProperties = { margin: "var(--space-1) 0 var(--space-2)" };
 
-const loadingRowStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 7, minHeight: 20, userSelect: "none" };
+const loadingRowStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 'var(--space-1-5)', minHeight: 20, userSelect: "none" };
 
 const loadingLabelStyle: React.CSSProperties = {
-  fontSize: 14,
-  fontWeight: 500,
-  lineHeight: "18px",
+  fontSize: 'var(--font-size-body)',
+  fontWeight: 'var(--font-weight-medium)',
+  lineHeight: 'var(--line-height-body)',
 };
 
 /** Resolve the actual model display name — never expose "souvenir" as a routing label. */
@@ -63,9 +64,9 @@ export function AssistantModelHeader({
       {(message.modelName || !message.isLoading) && (
         <m.div
           key="model-header"
-          initial={{ opacity: 0, y: -4, filter: "blur(4px)" }}
+          initial={{ opacity: 0, y: -4, filter: `blur(${BLUR.xs}px)` }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
-          transition={{ type: "spring", stiffness: 420, damping: 30 }}
+          transition={{ type: "spring", ...SPRING.brisk }}
           draggable={false}
           style={headerStyle}
         >
@@ -86,9 +87,9 @@ export function AssistantModelHeader({
               return (
                 <m.span
                   key={label}
-                  initial={{ opacity: 0, filter: "blur(4px)" }}
+                  initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                   animate={{ opacity: 1, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
-                  transition={{ type: "spring", stiffness: 520, damping: 32 }}
+                  transition={{ type: "spring", ...SPRING.snappy }}
                   style={headerLabelStyle}
                 >
                   {label}

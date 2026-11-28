@@ -102,27 +102,27 @@ function ChartTooltip({ active, payload, label, series, mode }: TooltipContentPr
       style={{
         background:    'linear-gradient(180deg, var(--tooltip-bg-from) 0%, var(--tooltip-bg-to) 100%)',
         color:         'var(--tooltip-text)',
-        borderRadius:  8,
-        padding:       '8px 10px',
+        borderRadius:  'var(--radius-md)',
+        padding:       'var(--space-2) var(--space-2-5)',
         display:       'flex',
         flexDirection: 'column',
-        gap:           4,
+        gap:           'var(--space-1)',
         minWidth:      120,
         fontFamily:    'var(--font-body)',
-        fontSize:      11,
-        lineHeight:    '16px',
-        boxShadow:     '0px 1px 4px rgba(59,54,50,0.5), 0px 0px 0px 0.5px var(--neutral-black)',
+        fontSize:      'var(--font-size-caption)',
+        lineHeight:    'var(--line-height-small)',
+        boxShadow:     'var(--usage-bar-chart-shadow)',
       }}
     >
-      <span style={{ fontWeight: 500, opacity: 0.7 }}>{label}</span>
+      <span style={{ fontWeight: 'var(--font-weight-medium)', opacity: 0.7 }}>{label}</span>
       {rows.map(s => {
         const item = payload.find(p => p.dataKey === s.id)
         if (!item || item.value == null) return null
         return (
-          <span key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: s.color, flexShrink: 0 }} />
+          <span key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)' }}>
+            <span style={{ width: 8, height: 8, borderRadius: 'var(--radius-xs)', backgroundColor: s.color, flexShrink: 0 }} />
             <span style={{ flex: 1 }}>{s.label}</span>
-            <span style={{ fontWeight: 500 }}>{Number(item.value).toLocaleString()}</span>
+            <span style={{ fontWeight: 'var(--font-weight-medium)' }}>{Number(item.value).toLocaleString()}</span>
           </span>
         )
       })}

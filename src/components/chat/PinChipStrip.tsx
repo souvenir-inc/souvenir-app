@@ -103,20 +103,20 @@ export function PinChipStrip({ children }: PinChipStripProps) {
 
   if (!PINS_ENABLED) return null;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-0-5)" }}>
       {/* Single-row scrollable strip */}
       <div
         ref={scrollRef}
         style={{
           display:       "flex",
           flexWrap:      "nowrap",
-          gap:           "4px",
+          gap:           "var(--space-1)",
           overflowX:     "auto",
           scrollbarWidth: "none",
-          paddingTop:    "3px",
-          paddingBottom: "3px",
-          paddingLeft:   "3px",
-          paddingRight:  "3px",
+          paddingTop:    "var(--space-0-5)",
+          paddingBottom: "var(--space-0-5)",
+          paddingLeft:   "var(--space-0-5)",
+          paddingRight:  "var(--space-0-5)",
         }}
       >
         {children}
@@ -126,10 +126,10 @@ export function PinChipStrip({ children }: PinChipStripProps) {
       {isOverflowing && (
         <div
           style={{
-            paddingTop:    "4px",
-            paddingBottom: "4px",
-            marginLeft:    "3px",
-            marginRight:   "3px",
+            paddingTop:    "var(--space-1)",
+            paddingBottom: "var(--space-1)",
+            marginLeft:    "var(--space-0-5)",
+            marginRight:   "var(--space-0-5)",
             userSelect:    "none",
           }}
         >
@@ -137,7 +137,7 @@ export function PinChipStrip({ children }: PinChipStripProps) {
           <div
             style={{
               height:          2,
-              borderRadius:    999,
+              borderRadius:    'var(--radius-full)',
               backgroundColor: "var(--neutral-800-05)",
               position:        "relative",
               cursor:          isDragging ? "grabbing" : "pointer",
@@ -150,11 +150,11 @@ export function PinChipStrip({ children }: PinChipStripProps) {
                 position:        "absolute",
                 top:             0,
                 height:          "100%",
-                borderRadius:    999,
+                borderRadius:    'var(--radius-full)',
                 backgroundColor: "var(--neutral-800-30)",
                 width:           `${thumbWidthPct}%`,
                 left:            `${thumbOffsetPct}%`,
-                transition:      isDragging ? "none" : "left 60ms",
+                transition:      isDragging ? "none" : "left var(--pin-chip-strip-duration)",
                 cursor:          isDragging ? "grabbing" : "grab",
               }}
               onMouseDown={handleThumbMouseDown}

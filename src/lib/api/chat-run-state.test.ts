@@ -1,0 +1,52 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+// getChatRunState answers "running" or "idle" only when the backend actually said so.
+const apiFetch = vi.fn();
+vi.mock("./client", async (orig) => ({
+  ...(await orig<typeof import("./client")>()),
+  apiFetch: (...args: unknown[]) => apiFetch(...args),
+}));
+
+import { getChatRunState } from "./chat";
+
+const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
+
+beforeEach(() => apiFetch.mockReset());
+
+describe("getChatRunState", () => {
+  it("is running when the chat has a stream, idle when it has none", async () => {
+    apiFetch.mockResolvedValueOnce(json({ streamId: "s-1" }));
+    await expect(getChatRunState("c1")).resolves.toBe("running");
+    apiFetch.mockResolvedValueOnce(json({ streamId: null }));
+    await expect(getChatRunState("c1")).resolves.toBe("idle");
+  });
+
+  it("throws, rather than answering idle, when it can't tell", async () => {
+    apiFetch.mockResolvedValueOnce(json({ detail: "unavailable" }, 503));
+    await expect(getChatRunState("c1")).rejects.toThrow(/503/);
+    apiFetch.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    await expect(getChatRunState("c1")).rejects.toThrow("Failed to fetch");
+  });
+
+  it("throws, rather than answering idle, when the body has no usable streamId", async () => {
+    for (const body of [{}, { streamId: 42 }, { streamId: "" }, null]) {
+      apiFetch.mockResolvedValueOnce(json(body));
+      await expect(getChatRunState("c1")).rejects.toThrow(/Malformed/);
+    }
+  });
+
+  it("fails, and aborts the request, when the lookup never settles", async () => {
+    vi.useFakeTimers();
+    try {
+      let signal: AbortSignal | undefined;
+      apiFetch.mockImplementationOnce((_path: string, opts: { signal: AbortSignal }) => { signal = opts.signal; return new Promise(() => {}); });
+      const state = getChatRunState("c1", 5000);
+      const check = expect(state).rejects.toThrow(/Timed out/);
+      await vi.advanceTimersByTimeAsync(5000);
+      await check;
+      expect(signal?.aborted).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});

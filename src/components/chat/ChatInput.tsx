@@ -220,9 +220,9 @@ export function ChatInput(
           borderRadius: szRadius,
           backgroundColor: "var(--chat-input-bg)",
           boxShadow: shadow,
-          outline: isPinDragOver ? "2px dashed var(--focus-ring)" : "none",
-          outlineOffset: 2,
-          transition: "box-shadow 150ms, outline-color 150ms",
+          outline: isPinDragOver ? "var(--focus-ring-width) dashed var(--focus-ring)" : "none",
+          outlineOffset: "var(--focus-ring-offset)",
+          transition: "box-shadow var(--duration-fast), outline-color var(--duration-fast)",
           cursor: disabled ? "not-allowed" : undefined,
           ...callerStyle,
         }}
@@ -243,7 +243,7 @@ export function ChatInput(
             width: 1,
             height: 1,
             padding: 0,
-            margin: -1,
+            margin: 'calc(var(--space-px) * -1)',
             overflow: "hidden",
             clip: "rect(0,0,0,0)",
             whiteSpace: "nowrap",
@@ -287,11 +287,11 @@ export function ChatInput(
         />
 
         {/* ── Footer bar ── */}
-        <div style={{ display: "flex", flexDirection: "column", width: "100%", gap: "6px" }}>
+        <div style={{ display: "flex", flexDirection: "column", width: "100%", gap: "var(--space-1-5)" }}>
 
           {/* Pin items row — @-mention pins and pin-folder chips, separate from feature badges */}
           {PINS_ENABLED && pinChips && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", paddingLeft: "3px", paddingRight: "3px" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-1)", paddingLeft: "var(--space-0-5)", paddingRight: "var(--space-0-5)" }}>
               {pinChips}
             </div>
           )}
@@ -303,11 +303,11 @@ export function ChatInput(
               alignItems: "center",
               justifyContent: "space-between",
               width: "100%",
-              gap: "8px",
+              gap: "var(--space-2)",
             }}
           >
             {/* Left: attach button + chips column */}
-            <div style={{ display: "flex", gap: "8px", alignItems: "center", flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "center", flex: 1, minWidth: 0 }}>
               {!hideAddButton && (
                 <AddMenuButton addMenu={addMenu} onAdd={onAdd} disabled={addDisabled} size={szBtn} />
               )}
@@ -315,7 +315,7 @@ export function ChatInput(
             </div>
 
             {/* Right: model selector + action button — never shrinks */}
-            <div style={{ display: "flex", gap: "8px", alignItems: "center", flexShrink: 0 }}>
+            <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "center", flexShrink: 0 }}>
             {hideModelSelector ? null : (
               <ModelPickerButton
                 modelName={modelName}

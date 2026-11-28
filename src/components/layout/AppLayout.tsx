@@ -6,6 +6,7 @@ import { m } from "framer-motion";
 import { CancelOneIcon } from "@strange-huge/icons";
 import { LeftSidebar } from "./LeftSidebar";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { OfflineBar } from "@/components/Dashboard/sync/OfflineBar";
 import { RightSidebar } from "./RightSidebar";
 import { HighlightSidebar } from "./HighlightSidebar";
 import { TopBar } from "./TopBar";
@@ -32,12 +33,14 @@ import {
   ORG_BASE_ROUTE,
   TEAMS_BASE_ROUTE,
   SCHEDULES_ROUTE,
+  DASHBOARD_ROUTE,
   ORG_CONNECTORS_ROUTE,
   ORG_SOUVENIR_SLACK_ROUTE,
   CHAT_ROUTE,
   CHATS_ROUTE,
   TEMPLATE_BASE_ROUTE,
 } from "@/lib/routes";
+import { SPRING } from "@/styles/tokens/motion"
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -118,6 +121,8 @@ export function AppLayout({
   const isTemplatePage = pathname.startsWith(TEMPLATE_BASE_ROUTE)
   // Schedules builds its own glass card, so it takes the same bare shell.
   const isSchedulesPage = pathname.startsWith(SCHEDULES_ROUTE)
+  // Dashboard builds its own board panel (Figma 17:889): no TopBar or floating chat tools.
+  const isDashboardPage = pathname.startsWith(DASHBOARD_ROUTE)
   // Connectors / Souvenir-in-Slack are settings-style pages too (moved off
   // /org/* to their own top-level routes) — same TopBar/FloatingPanel strip
   // as /org and /teams/[teamId] above.
@@ -169,15 +174,18 @@ export function AppLayout({
 
   // The shared LeftSidebar, then the page itself full-height, with no TopBar
   // or floating chat tools.
-  if (isTemplatePage || isSchedulesPage) {
+  if (isTemplatePage || isSchedulesPage || isDashboardPage) {
     return (
+      // The dashboard's offline bar runs across the top of the window, above the whole app (SY-33).
+      <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100svh', backgroundColor: 'var(--neutral-white)' }}>
+      {isDashboardPage && <OfflineBar />}
       <div
         style={{
           display:         'flex',
           alignItems:      'stretch',
           width:           '100%',
-          height:          '100svh',
-          backgroundColor: 'var(--neutral-white)',
+          flex:            1,
+          minHeight:       0,
         }}
       >
         <ErrorBoundary variant="region" label="Sidebar">
@@ -195,6 +203,7 @@ export function AppLayout({
           <ErrorBoundary>{children}</ErrorBoundary>
         </main>
         <AppDialogs />
+      </div>
       </div>
     )
   }
@@ -237,7 +246,7 @@ export function AppLayout({
             flex:      "1 0 0",
             minHeight: 0,
             display:   "flex",
-            padding:   isSlackPage ? 0 : "10px 10px 10px 0",
+            padding:   isSlackPage ? 0 : "var(--space-2-5) var(--space-2-5) var(--space-2-5) 0",
           }}
         >
         {(isPersonaPage && !isPersonaChatPage) || isSlackPage ? (
@@ -275,8 +284,8 @@ export function AppLayout({
               display:         "flex",
               flexDirection:   "column",
               alignItems:      "flex-start",
-              gap:             "2px",
-              padding:         usesTightCard ? "3px" : "12px",
+              gap:             "var(--space-0-5)",
+              padding:         usesTightCard ? "var(--space-0-75)" : "var(--space-3)",
               borderRadius:    "var(--layout-radius)",
               border:          "1px solid var(--border-default)",
               backgroundColor: "var(--color-surface-container)",
@@ -313,7 +322,7 @@ export function AppLayout({
                 overscrollBehaviorY: (isPersonaChatPage || usesTightCard) ? undefined : "contain",
                 display:             "flex",
                 flexDirection:       "column",
-                paddingRight:        reserveChatToolsGutter ? 40 : undefined,
+                paddingRight:        reserveChatToolsGutter ? "var(--space-8)" : undefined,
                 boxSizing:           "border-box",
               }}
             >
@@ -384,7 +393,7 @@ function ProjectPanelSidebar() {
     <m.div
       animate={isOpen ? { width: 356, opacity: 1 } : { width: 0, opacity: 0 }}
       initial={{ width: 0, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 260, damping: 32, mass: 0.9 }}
+      transition={{ type: "spring", ...SPRING.glide }}
       onAnimationComplete={() => {
         if (isOpen) setSettled(true);
         else setShownPanel(null);
@@ -414,11 +423,11 @@ function ProjectPanelSidebar() {
             display:        "flex",
             alignItems:     "center",
             justifyContent: "space-between",
-            gap:            8,
+            gap:            'var(--space-2)',
             // The panel starts at the window's top (the card starts 11px lower), so 19px of padding puts
             // its title and close button on the TopBar's 19–51px band, as the left sidebar's header is.
             minHeight:      51,
-            padding:        `19px 16px 0 ${sidePadding}px`,
+            padding:        `var(--app-layout-padding) var(--space-4) 0 ${sidePadding}px`,
             flexShrink:     0,
           }}
         >
@@ -460,7 +469,7 @@ function ProjectPanelSidebar() {
             scrollbarGutter: "stable both-edges",
           }}
         >
-          <div style={{ padding: `14px ${sidePadding}px ${sidePadding}px`, boxSizing: "border-box", height: "100%" }}>
+          <div style={{ padding: `var(--space-3-5) ${sidePadding}px ${sidePadding}px`, boxSizing: "border-box", height: "100%" }}>
             {(settled || !isOpen) && panel?.content}
           </div>
         </div>

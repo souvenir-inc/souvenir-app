@@ -37,36 +37,36 @@ const OUTER: React.CSSProperties = {
   display:        'flex',
   alignItems:     'flex-start',
   justifyContent: 'center',
-  paddingTop:     64,
-  paddingBottom:  48,
+  paddingTop:     'var(--space-10)',
+  paddingBottom:  'var(--space-9)',
 }
 
 const INNER: React.CSSProperties = {
   width:         '100%',
   maxWidth:      908,
-  padding:       '0 24px',
+  padding:       '0 var(--space-6)',
   boxSizing:     'border-box',
   display:       'flex',
   flexDirection: 'column',
-  gap:           10,
+  gap:           'var(--space-2-5)',
 }
 
 const CARD: React.CSSProperties = {
   border:        '1px solid var(--border-default)',
-  borderRadius:  16,
-  boxShadow:     '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+  borderRadius:  'var(--radius-2xl)',
+  boxShadow:     'var(--shadow-soft)',
   display:       'flex',
   flexDirection: 'column',
   overflow:      'hidden',
-  paddingTop:    12,
-  paddingBottom: 12,
+  paddingTop:    'var(--space-3)',
+  paddingBottom: 'var(--space-3)',
 }
 
 // ── Shared skeleton shapes ────────────────────────────────────────────────────
 
 function PageHeader() {
   return (
-    <div style={{ paddingLeft: 4, marginBottom: 4, display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
       <Bone w={180} h={28} r={8} />
       <Bone w="60%" h={14} />
     </div>
@@ -90,7 +90,7 @@ function Section({
       borderBottom:  divider ? '1px solid var(--neutral-100)' : undefined,
       display:       'flex',
       flexDirection: 'column',
-      gap:           12,
+      gap:           'var(--space-3)',
     }}>
       {children}
     </div>
@@ -99,9 +99,9 @@ function Section({
 
 function FormRow2Col() {
   return (
-    <div style={{ display: 'flex', gap: 16 }}>
+    <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
       {[0, 1].map(col => (
-        <div key={col} style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div key={col} style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
           <Bone w={80} h={12} />
           <Bone w="100%" h={36} r={8} />
         </div>
@@ -112,12 +112,12 @@ function FormRow2Col() {
 
 function ToggleRow() {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-      <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 5 }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
+      <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
         <Bone w="50%" h={13} />
         <Bone w="35%" h={11} />
       </div>
-      <div style={{ display: 'flex', gap: 32 }}>
+      <div style={{ display: 'flex', gap: 'var(--space-7)' }}>
         <Bone w={36} h={20} r={10} />
         <Bone w={36} h={20} r={10} />
       </div>
@@ -127,7 +127,7 @@ function ToggleRow() {
 
 function CheckboxRow() {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)' }}>
       <Bone w={16} h={16} r={4} style={{ flexShrink: 0 }} />
       <Bone w="45%" h={13} />
     </div>
@@ -142,10 +142,10 @@ function SectionLabel() {
  *  button. */
 function SessionRowSkeleton({ current = false }: { current?: boolean }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
       <Bone w={20} h={20} r={6} style={{ flexShrink: 0 }} />
-      <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 5 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
           <Bone w="40%" h={13} />
           {current && <Bone w={56} h={18} r={6} />}
         </div>
@@ -160,8 +160,8 @@ function SessionRowSkeleton({ current = false }: { current?: boolean }) {
  *  ghost button right. */
 function LinkRowSkeleton() {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-      <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 5 }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
+      <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
         <Bone w="45%" h={13} />
         <Bone w="65%" h={11} />
       </div>
@@ -175,8 +175,8 @@ function LinkRowSkeleton() {
 // Account mirrors the real page: 860px column (padding on the scroller, not
 // inside the column), 12px gaps, and the page's own card/grid classes so the
 // profile header, field grid and choice tiles keep their real sizes.
-const ACCOUNT_OUTER: React.CSSProperties = { ...OUTER, padding: '64px 24px 48px' }
-const ACCOUNT_INNER: React.CSSProperties = { width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 12 }
+const ACCOUNT_OUTER: React.CSSProperties = { ...OUTER, padding: 'var(--space-10) var(--space-6) var(--space-9)' }
+const ACCOUNT_INNER: React.CSSProperties = { width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }
 
 /** A text line: the real line-height box with a glyph-height bar centred in it. */
 function Line({ lh, h, w }: { lh: number; h: number; w: number | string }) {
@@ -190,7 +190,7 @@ function Line({ lh, h, w }: { lh: number; h: number; w: number | string }) {
 /** Label (22) + 36px input (r10) + optional hint (22), as InputField lays them out. */
 function FieldSkeleton({ labelW, hintW }: { labelW: number; hintW?: number }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
       <Line lh={22} h={13} w={labelW} />
       <Bone w="100%" h={36} r={10} />
       {hintW !== undefined && <Line lh={22} h={12} w={hintW} />}
@@ -202,7 +202,7 @@ export function AccountSkeleton() {
   return (
     <div className="kaya-scrollbar" style={ACCOUNT_OUTER} aria-busy="true">
       <div style={ACCOUNT_INNER}>
-        <div style={{ paddingLeft: 4, marginBottom: 4 }}>
+        <div style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)' }}>
           <Line lh={32} h={24} w={110} />
           <Line lh={22} h={14} w={340} />
         </div>
@@ -212,7 +212,7 @@ export function AccountSkeleton() {
           <div className={`${accountStyles.cardHead} ${accountStyles.cardHeadRow}`}>
             <div>
               <Line lh={22} h={16} w={56} />
-              <div style={{ marginTop: 2 }}><Line lh={20} h={12} w={170} /></div>
+              <div style={{ marginTop: 'var(--space-0-5)' }}><Line lh={20} h={12} w={170} /></div>
             </div>
             <div className={accountStyles.actions}><Bone w={96} h={32} r={8} /></div>
           </div>
@@ -267,7 +267,7 @@ function Sect({ h, last, children, gap = 0 }: { h: number; last?: boolean; child
     <div style={{
       height:        h,
       boxSizing:     'border-box',
-      padding:       '0 24px',
+      padding:       '0 var(--space-6)',
       display:       'flex',
       flexDirection: 'column',
       justifyContent: 'center',
@@ -303,7 +303,7 @@ function CardHeader({ titleW, descW }: { titleW: number; descW: number | string 
 function ControlRow({ labelW, hintW, controlW, last, h = 75 }: { labelW: number; hintW: number; controlW: number; last?: boolean; h?: number }) {
   return (
     <Sect h={h} last={last}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <TextLine lh={22} h={14} w={labelW} />
           <TextLine lh={16} h={11} w={hintW} />
@@ -334,13 +334,13 @@ export function FilesSkeleton() {
               <Bone w={100} h={16} />
               <Bone w={90} h={13} />
             </div>
-            <Bone w="100%" h={4} r={2} style={{ margin: '10px 0 12px' }} />
+            <Bone w="100%" h={4} r={2} style={{ margin: 'var(--space-2-5) 0 var(--space-3)' }} />
             <TextLine lh={22} h={12} w="48%" />
           </Sect>
           <div style={{ height: 140, display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
             {[47, 47, 46].map((h, i) => (
               <div key={i} style={{
-                height: h, boxSizing: 'border-box', padding: '0 24px', display: 'flex',
+                height: h, boxSizing: 'border-box', padding: '0 var(--space-6)', display: 'flex',
                 alignItems: 'center', justifyContent: 'space-between',
                 borderBottom: i < 2 ? '1px solid var(--neutral-100)' : undefined,
               }}>
@@ -359,7 +359,7 @@ export function FilesSkeleton() {
           <Sect h={96} last>
             <TextLine lh={22} h={14} w={120} />
             <TextLine lh={16} h={11} w={330} />
-            <div style={{ display: 'flex', gap: 8, height: 20, alignItems: 'center', marginTop: 4 }}>
+            <div style={{ display: 'flex', gap: 'var(--space-2)', height: 20, alignItems: 'center', marginTop: 'var(--space-1)' }}>
               {[0, 1, 2, 3, 4, 5, 6, 7].map(i => <Bone key={i} w={34 + (i % 3) * 6} h={20} r={6} />)}
             </div>
           </Sect>
@@ -368,13 +368,13 @@ export function FilesSkeleton() {
         {/* Limits by plan */}
         <div style={CARD}>
           <CardHeader titleW={120} descW="45%" />
-          <div style={{ height: 213, boxSizing: 'border-box', padding: 12, flexShrink: 0 }}>
+          <div style={{ height: 213, boxSizing: 'border-box', padding: 'var(--space-3)', flexShrink: 0 }}>
             <div style={{
-              height: 201, boxSizing: 'border-box', border: '1px solid var(--neutral-100)', borderRadius: 8,
-              padding: '0 12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-around',
+              height: 201, boxSizing: 'border-box', border: '1px solid var(--neutral-100)', borderRadius: 'var(--radius-md)',
+              padding: '0 var(--space-3)', display: 'flex', flexDirection: 'column', justifyContent: 'space-around',
             }}>
               {[0, 1, 2, 3].map(row => (
-                <div key={row} style={{ display: 'flex', gap: 24 }}>
+                <div key={row} style={{ display: 'flex', gap: 'var(--space-6)' }}>
                   {[80, 100, 110, 90].map((w, col) => <Bone key={col} w={w} h={12} />)}
                 </div>
               ))}
@@ -406,8 +406,8 @@ export function SecuritySkeleton() {
             <Bone w="55%" h={12} />
           </Section>
           <Section>
-            <div style={{ border: '1px solid var(--neutral-100)', borderRadius: 8, padding: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ border: '1px solid var(--neutral-100)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <Bone w={100} h={20} r={6} />
                 <Bone w={160} h={12} />
                 <Bone w={260} h={12} />
@@ -424,8 +424,8 @@ export function SecuritySkeleton() {
             <Bone w="50%" h={12} />
           </Section>
           <Section>
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <Bone w={327} h={36} r={8} />
                 <Bone w={80} h={22} r={6} />
               </div>
@@ -438,7 +438,7 @@ export function SecuritySkeleton() {
         <div style={CARD}>
           <Section divider>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                 <Bone w={130} h={16} />
                 <Bone w={70} h={22} r={6} />
               </div>
@@ -457,9 +457,9 @@ export function SecuritySkeleton() {
             <Bone w="50%" h={12} />
           </Section>
           <Section>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
               <Bone w={20} h={20} r={4} style={{ flexShrink: 0 }} />
-              <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <div style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                 <Bone w={60} h={14} />
                 <Bone w={160} h={12} />
               </div>
@@ -482,12 +482,12 @@ function NotifGroupHeader() {
     <Section divider>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Bone w={160} h={16} />
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
           <Bone w={80} h={28} r={8} />
           <Bone w={80} h={28} r={8} />
         </div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 32 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-7)' }}>
         <Bone w={50} h={12} />
         <Bone w={50} h={12} />
       </div>
@@ -518,7 +518,7 @@ export function NotificationsSkeleton() {
             {[0, 1].map(i => <ToggleRow key={i} />)}
           </Section>
           <Section>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
               <Bone w="50%" h={13} />
               <Bone w="35%" h={11} />
             </div>
@@ -566,11 +566,11 @@ export function PreferencesSkeleton() {
             <Bone w="60%" h={12} />
           </Section>
           <Section>
-            <div style={{ display: 'flex', gap: 24 }}>
+            <div style={{ display: 'flex', gap: 'var(--space-6)' }}>
               {[0, 1, 2].map(i => (
-                <div key={i} style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div key={i} style={{ flex: '1 0 0', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                   <Bone w="100%" h={64} r={8} />
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                     <Bone w={16} h={16} r={4} />
                     <Bone w={70} h={12} />
                   </div>
@@ -603,8 +603,8 @@ export function PreferencesSkeleton() {
         {/* Memory */}
         <div style={CARD}>
           <Section>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <Bone w={170} h={16} />
                 <Bone w={240} h={12} />
                 <Bone w={130} h={22} r={6} />
@@ -625,7 +625,7 @@ export function HelpSkeleton() {
         <PageHeader />
 
         {/* 2-col action cards */}
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 'var(--space-2-5)' }}>
           {[0, 1].map(i => (
             <div key={i} style={{ ...CARD, flex: '1 0 0' }}>
               <Section divider>
@@ -665,7 +665,7 @@ export function HelpSkeleton() {
         </div>
 
         {/* Footer — left-aligned row, not centered */}
-        <div style={{ display: 'flex', alignItems: 'center', paddingTop: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', paddingTop: 'var(--space-2)' }}>
           <Bone w="100%" h={12} />
         </div>
       </div>

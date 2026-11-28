@@ -55,12 +55,12 @@ export function CategorySection({
     .slice(0, DISCOVER_SECTION_SIZE)
   if (shown.length === 0) return null
   return (
-    <div style={{ marginBottom: 40 }}>
+    <div style={{ marginBottom: 'var(--space-8)' }}>
       <CatalogSectionLabel
         label={category}
         action={(
           // A plain text link with an arrow, not a boxed button: it leads on to the whole category.
-          <button type="button" className="group inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-md border-0 bg-transparent px-1 py-0.5 text-[13px] font-medium leading-5 text-[var(--neutral-600)] transition-colors [font-family:var(--font-body)] hover:text-[var(--neutral-900)] focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]" onClick={viewAll} aria-label={`View all ${category} connectors`}>
+          <button type="button" className="group inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-sm border-0 bg-transparent px-1 py-0.5 text-[length:var(--font-size-body-sm)] font-medium leading-5 text-[var(--neutral-600)] transition-colors [font-family:var(--font-body)] hover:text-[var(--neutral-900)] focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]" onClick={viewAll} aria-label={`View all ${category} connectors`}>
             View all <ArrowRightOneIcon size={14} className="transition-transform group-hover:translate-x-0.5" />
           </button>
         )}

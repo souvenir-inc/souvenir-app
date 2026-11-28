@@ -66,7 +66,7 @@ export function PermissionPromptCard({
     >
 
       {/* Actions — rendered from the backend event's options */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 8 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
         {options.map((opt) => {
           const isPrimary = opt.style === 'primary' || opt.value === 'allow' || opt.value === 'allow_once'
           const isDanger  = opt.style === 'danger'

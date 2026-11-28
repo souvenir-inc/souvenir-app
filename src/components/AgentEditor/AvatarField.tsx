@@ -7,6 +7,7 @@ import type { AvatarChoice } from '@/components/PersonaCard/AnimatedPersonaAvata
 import { AgentAvatar } from './AgentAvatar'
 import { AvatarCarousel } from './AvatarCarousel'
 import { HINT_STYLE, LABEL_STYLE } from './styles'
+import { DURATION } from "@/styles/tokens/motion"
 
 export interface AvatarFieldProps {
   name:      string
@@ -28,7 +29,7 @@ export function AvatarField({ name, value, onChange, disabled = false, buttonLab
   const [pending, setPending] = useState<AvatarChoice>(value)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2-5)' }}>
       <p style={LABEL_STYLE}>Avatar</p>
 
       <AnimatePresence initial={false} mode="wait">
@@ -38,11 +39,11 @@ export function AvatarField({ name, value, onChange, disabled = false, buttonLab
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, width: '100%' }}
+            transition={{ duration: DURATION.base, ease: [0.16, 1, 0.3, 1] }}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)', width: '100%' }}
           >
             <AvatarCarousel value={pending} onChange={setPending} disabled={disabled} />
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
               <Button variant="cancel" size="sm" onClick={() => setOpen(false)}>Cancel</Button>
               <Button
                 variant="default"
@@ -60,8 +61,8 @@ export function AvatarField({ name, value, onChange, disabled = false, buttonLab
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}
+            transition={{ duration: DURATION.base, ease: [0.16, 1, 0.3, 1] }}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)' }}
           >
             <AgentAvatar name={name} choice={value} size={88} />
             <Button variant="outline" size="sm" disabled={disabled} onClick={() => { setPending(value); setOpen(true) }}>

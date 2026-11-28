@@ -13,7 +13,7 @@ import { ConnectorGlyph } from '@/components/ConnectorGlyph'
 import { Button } from '@/components/ui/button'
 import { ConnectorCatalog, ConnectorConnection } from '@/lib/api/connectors'
 
-const heading = 'm-0 font-[family-name:var(--font-title)] text-[22px] font-normal leading-[1.2] text-[var(--neutral-900)]'
+const heading = 'm-0 font-[family-name:var(--font-title)] text-[length:var(--connector-modal-title-size)] font-normal leading-[var(--connector-modal-title-line-height)] text-[var(--neutral-900)]'
 const muted = 'm-0 font-[family-name:var(--font-body)] text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--color-text-muted)]'
 const panel = 'rounded-xl bg-[var(--neutral-white)] shadow-[0_0_0_1px_var(--neutral-100)]'
 
@@ -39,9 +39,9 @@ export function RemoveModal({
         onEscapeKeyDown={event => { if (busy) event.preventDefault() }}
         onInteractOutside={event => { if (busy) event.preventDefault() }}
         className="p-6"
-        style={{ width: 480, boxShadow: '0 24px 72px rgba(30,28,27,.28)', borderRadius: 12 }}
+        style={{ width: 480, boxShadow: 'var(--shadow-4)', borderRadius: 'var(--radius-xl)' }}
       >
-        <div className="mb-4 grid size-11 place-items-center rounded-[11px] bg-[var(--neutral-white)] shadow-[0_0_0_1px_var(--neutral-100)]">
+        <div className="mb-4 grid size-11 place-items-center rounded-[var(--connector-modal-icon-radius)] bg-[var(--neutral-white)] shadow-[0_0_0_1px_var(--neutral-100)]">
           <ConnectorGlyph slug={catalog.slug} name={catalog.name} logoUrl={catalog.logoUrl} size={30} />
         </div>
         <DialogTitle className="sr-only">{`Remove ${account.nickname} (${account.email})?`}</DialogTitle>

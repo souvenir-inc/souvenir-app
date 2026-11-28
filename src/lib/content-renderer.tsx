@@ -52,11 +52,11 @@ const XmlWeather = dynamic(() => import("@/components/chat/XmlWeather").then((m)
  */
 function IncompleteBlockNotice({ tag, xml }: { tag: StructuredTag; xml: string }) {
   return (
-    <div style={{ margin: "12px 0", fontFamily: "var(--font-body)", fontSize: 13, lineHeight: "20px", color: "var(--neutral-600)" }}>
+    <div style={{ margin: "var(--space-3) 0", fontFamily: "var(--font-body)", fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: "var(--neutral-600)" }}>
       <p style={{ margin: 0 }}>Couldn&apos;t display this {tag} — the response ended early.</p>
       <details>
-        <summary style={{ width: "fit-content", marginTop: 4, fontSize: 12, cursor: "pointer" }}>Show raw output</summary>
-        <pre className="kaya-scrollbar" style={{ fontSize: 12, color: "var(--neutral-500)", overflowX: "auto", margin: "8px 0 0", padding: "10px 14px", background: "var(--neutral-800-05)", borderRadius: 8, border: "1px solid var(--neutral-100)", whiteSpace: "pre-wrap", wordBreak: "break-all", fontFamily: "var(--font-code)" }}>
+        <summary style={{ width: "fit-content", marginTop: 'var(--space-1)', fontSize: 'var(--font-size-small)', cursor: "pointer" }}>Show raw output</summary>
+        <pre className="kaya-scrollbar" style={{ fontSize: 'var(--font-size-small)', color: "var(--neutral-500)", overflowX: "auto", margin: "var(--space-2) 0 0", padding: "var(--raw-output-padding)", background: "var(--neutral-800-05)", borderRadius: 'var(--radius-md)', border: "1px solid var(--neutral-100)", whiteSpace: "pre-wrap", wordBreak: "break-all", fontFamily: "var(--font-code)" }}>
           {xml}
         </pre>
       </details>

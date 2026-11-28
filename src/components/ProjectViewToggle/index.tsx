@@ -6,6 +6,7 @@ import { ArrowDownOneIcon } from '@strange-huge/icons'
 import { Button } from '@/components/ui/button'
 import { Dropdown } from '@/components/Dropdown'
 import { VIEW_LABELS, VIEW_DESCRIPTION, type ViewMode } from '@/lib/project-filters'
+import { BLUR, SPRING } from "@/styles/tokens/motion"
 
 // ── Grid/List toggle — single secondary button + Dropdown, same "view filter"
 // pattern as Pinboard's own view switcher (in-place label swap included). ──
@@ -47,10 +48,10 @@ export function ProjectViewToggle({ value, onChange }: { value: ViewMode; onChan
           <AnimatePresence mode="popLayout" initial={false}>
             <m.span
               key={value}
-              initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+              initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
               animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-              exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+              transition={{ type: 'spring', ...SPRING.snappy }}
               style={{ display: 'block', transformOrigin: 'left center' }}
             >
               {VIEW_LABELS[value]}

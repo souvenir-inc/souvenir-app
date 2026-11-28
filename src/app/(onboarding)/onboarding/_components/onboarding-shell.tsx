@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 // from screen to screen. Figma 5795:41421 — neutral-50 → neutral-100 → neutral-200.
 
 const CANVAS_GRADIENT =
-  "linear-gradient(180deg, var(--neutral-50) 3.76%, var(--neutral-100,#F5F5F5) 75%, var(--neutral-200,#E5E5E5) 116.79%)";
+  "linear-gradient(180deg, var(--neutral-50) 3.76%, var(--neutral-100) 75%, var(--neutral-200) 116.79%)";
 
 // ── Logo glyph ──────────────────────────────────────────────────────────────────
 
@@ -49,7 +49,7 @@ export function OnboardingScreen({
         alignItems: "center",
         justifyContent: "center",
         background: CANVAS_GRADIENT,
-        padding: "40px 16px",
+        padding: "var(--space-8) var(--space-4)",
         boxSizing: "border-box",
       }}
     >
@@ -57,22 +57,22 @@ export function OnboardingScreen({
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: 32,
+          gap: 'var(--space-7)',
           width: "100%",
           maxWidth: width,
         }}
       >
         {/* Heading block */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-4)' }}>
           <SouvenirGlyph />
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-2)' }}>
             <h1
               style={{
                 fontFamily: "var(--font-title)",
-                fontWeight: 400,
-                fontSize: 24,
-                lineHeight: "32px",
-                color: "var(--neutral-800,#3b3632)",
+                fontWeight: 'var(--font-weight-regular)',
+                fontSize: 'var(--font-size-heading)',
+                lineHeight: "var(--line-height-heading)",
+                color: "var(--neutral-800)",
                 margin: 0,
               }}
             >
@@ -82,10 +82,10 @@ export function OnboardingScreen({
               <p
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontWeight: 400,
-                  fontSize: 16,
-                  lineHeight: "22px",
-                  color: "var(--neutral-800,#3b3632)",
+                  fontWeight: 'var(--font-weight-regular)',
+                  fontSize: 'var(--font-size-body-lg)',
+                  lineHeight: "var(--line-height-body)",
+                  color: "var(--neutral-800)",
                   margin: 0,
                 }}
               >
@@ -99,7 +99,7 @@ export function OnboardingScreen({
         {children}
 
         {/* Footer */}
-        {footer && <div style={{ marginTop: 16 }}>{footer}</div>}
+        {footer && <div style={{ marginTop: 'var(--space-4)' }}>{footer}</div>}
       </div>
     </div>
   );
@@ -146,7 +146,7 @@ export function OnboardingFooter({
         alignItems: "center",
         justifyContent: "space-between",
         width: "100%",
-        gap: 16,
+        gap: 'var(--space-4)',
       }}
     >
       {onBack ? (
@@ -156,7 +156,7 @@ export function OnboardingFooter({
       ) : (
         <span />
       )}
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-3)' }}>
         {leftSlot}
         <Button
           size="sm"

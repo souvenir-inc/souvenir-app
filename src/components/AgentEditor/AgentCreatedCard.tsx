@@ -19,7 +19,7 @@ export interface AgentCreatedCardProps {
   onUse?:     (agent: SelectedPersonaInfo) => void
 }
 
-const RADIUS = 20
+const RADIUS = 'var(--agent-created-card-radius)'
 // The grid card's 50 / 35 / 15 split of a 320px card.
 const HERO = 160
 const DETAILS = 112
@@ -37,9 +37,9 @@ export function AgentCreatedCard({ agent, published, inUse, onUse }: AgentCreate
       role="group"
       aria-label={`Agent created: ${agent.name}`}
       // Rows already sit in the chat's centred column, like any assistant message.
-      style={{ width: '100%', padding: '12px 0', boxSizing: 'border-box' }}
+      style={{ width: '100%', padding: 'var(--space-3) 0', boxSizing: 'border-box' }}
     >
-      <p style={{ ...HINT_STYLE, marginBottom: 8 }}>
+      <p style={{ ...HINT_STYLE, marginBottom: 'var(--space-2)' }}>
         {published ? 'Your agent is ready and saved.' : 'Your agent was created but isn’t live yet.'}
       </p>
       <div
@@ -55,16 +55,16 @@ export function AgentCreatedCard({ agent, published, inUse, onUse }: AgentCreate
       >
         <AgentHero name={agent.name} agentId={agent.id} height={HERO} avatarSize={110} radius={RADIUS} />
 
-        <div style={{ minHeight: DETAILS, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '12px 16px 0', textAlign: 'center' }}>
-          <p style={{ margin: 0, maxWidth: '100%', fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', fontSize: 20, lineHeight: '26px', color: 'var(--neutral-900)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{agent.name}</p>
-          <p style={{ ...HINT_STYLE, fontSize: 13, lineHeight: '20px' }}>{agent.handle}</p>
+        <div style={{ minHeight: DETAILS, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-0-5)', padding: 'var(--space-3) var(--space-4) 0', textAlign: 'center' }}>
+          <p style={{ margin: 0, maxWidth: '100%', fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-heading-md)', lineHeight: 'var(--line-height-heading-md)', color: 'var(--neutral-900)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{agent.name}</p>
+          <p style={{ ...HINT_STYLE, fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)' }}>{agent.handle}</p>
           {agent.description && (
-            <p style={{ ...HINT_STYLE, margin: '6px 0 0', fontSize: 13, lineHeight: '20px', color: 'var(--neutral-600)' }}>{agent.description}</p>
+            <p style={{ ...HINT_STYLE, margin: 'var(--space-1-5) 0 0', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-600)' }}>{agent.description}</p>
           )}
         </div>
 
         {/* Action row */}
-        <div style={{ minHeight: ACTION, flexShrink: 0, boxSizing: 'border-box', marginInline: 16, borderTop: '1px solid var(--neutral-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap', padding: '8px 0' }}>
+        <div style={{ minHeight: ACTION, flexShrink: 0, boxSizing: 'border-box', marginInline: 'var(--space-4)', borderTop: '1px solid var(--neutral-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)', flexWrap: 'wrap', padding: 'var(--space-2) 0' }}>
           <Button variant="outline" size="sm" onClick={() => push(`${AGENTS_ROUTE}?agent=${agent.id}`)}>Open</Button>
           <Button variant="outline" size="sm" onClick={() => push(AGENT_EDIT_ROUTE(agent.id))}>Edit</Button>
           {published && onUse && (

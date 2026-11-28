@@ -13,6 +13,7 @@ import type { SlackStatus } from '@/lib/api/slack'
 import { SlackWorkspaceConfig } from './SlackWorkspaceConfig'
 import { SlackAdminOnly, SlackNotConnected } from './SlackEmptyState'
 import styles from './slack-config.module.css'
+import { slackUrl } from '@/lib/https-url'
 
 export default function SouvenirSlackPage() {
   const { orgId, orgReady, orgRole } = useOrg()
@@ -47,7 +48,9 @@ export default function SouvenirSlackPage() {
     if (!isAdmin || !workspace || updating || removing) return
     setUpdating(true)
     try {
-      const url = await getSlackInstallUrl(workspace.teamId)
+      // Only ever on to Slack's own install screen.
+      const url = slackUrl(await getSlackInstallUrl(workspace.teamId))
+      if (!url) throw new Error('Could not start Slack permission update')
       window.location.assign(url)
     } catch (err) {
       setUpdating(false)
@@ -114,10 +117,10 @@ export default function SouvenirSlackPage() {
       fluid
     >
       {!orgReady || statusLoading ? (
-        <div className="kaya-skeleton" style={{ width: '100%', height: 556, borderRadius: 16 }} />
+        <div className="kaya-skeleton" style={{ width: '100%', height: 556, borderRadius: 'var(--radius-2xl)' }} />
       ) : statusError && isAdmin ? (
-        <div role="alert" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12, padding: 24, borderRadius: 16, background: 'var(--neutral-white)', boxShadow: '0 0 0 1px var(--neutral-100)' }}>
-          <strong style={{ fontWeight: 500 }}>Couldn&apos;t check your Slack connection</strong>
+        <div role="alert" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--space-3)', padding: 'var(--space-6)', borderRadius: 'var(--radius-2xl)', background: 'var(--neutral-white)', boxShadow: '0 0 0 1px var(--neutral-100)' }}>
+          <strong style={{ fontWeight: 'var(--font-weight-medium)' }}>Couldn&apos;t check your Slack connection</strong>
           <span style={{ color: 'var(--color-text-muted)' }}>Slack may still be connected. Try again in a moment.</span>
           <Button variant="secondary" size="sm" onClick={loadStatus}>Retry</Button>
         </div>
@@ -135,8 +138,8 @@ export default function SouvenirSlackPage() {
                 </span>
                 <span style={{ minWidth: 0 }}>
                   <span className={styles.connectionTitle} style={{ display: 'block' }}>{teamName ?? 'Slack workspace'}</span>
-                  <span className={styles.connectionMeta} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <CheckmarkCircleTwoIcon size={12} color="var(--green-600, #16a34a)" />
+                  <span className={styles.connectionMeta} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
+                    <CheckmarkCircleTwoIcon size={12} color="var(--green-600)" />
                     {workspace?.needsReinstall ? 'Connected · Permission update needed' : 'Connected'}
                   </span>
                 </span>

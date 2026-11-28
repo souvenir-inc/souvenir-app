@@ -1,6 +1,7 @@
 "use client";
 
 import { apiFetch, apiFetchJson, ApiError, friendlyApiError } from "./client";
+import { forgetChatSettings } from "@/lib/chat/chat-settings-storage";
 import {
   API_BASE_URL,
   CHATS_ENDPOINT,
@@ -28,7 +29,7 @@ import { parseSteps } from "@/lib/chat/steps";
 import { extractThinkingContent } from "@/lib/parsers/content-parser";
 import { INCOMPLETE_ANSWER_MESSAGE } from "@/lib/turn-outcome";
 import { EMPTY_TURN_MESSAGE } from "@/lib/model-error";
-import { isPromptEvent, parsePrompt } from "@/lib/api/prompts";
+import { isPromptEvent, parsePrompt, type Prompt } from "@/lib/api/prompts";
 import { parseRun } from "@/lib/chat/run";
 import { INTERRUPTED_MESSAGE } from "@/lib/turn-outcome";
 
@@ -191,6 +192,8 @@ export async function deleteChat(chatId: string): Promise<void> {
       "Failed to delete chat",
     );
   }
+  // Nor its settings on this device (the attached agent, web search).
+  forgetChatSettings(chatId);
   // Its history must not outlive it: Undo restores the chat but not this entry,
   // so the restored chat reloads from the server rather than from a stale copy.
   dropChatHistory(chatId);
@@ -306,8 +309,10 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
   const userText = raw.input ?? raw.prompt;
   const aiText = raw.output ?? raw.response;
 
-  // Paired format - has both user input and AI output in one row
-  if (userText || aiText) {
+  // Paired format - has both user input and AI output in one row. Told by the fields being
+  // there, not by their text: a file-only turn saves both as "" and is still a pair (its
+  // upload, and a run or card still going, would otherwise be read as one empty user row).
+  if (userText != null || aiText != null) {
     const messages: Message[] = [];
     const sources = parseSources(raw);
     const allFileAtts = normalizeFileAttachments(raw);
@@ -340,10 +345,7 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
     const imageLinks = Array.isArray(raw.image_links)
       ? (raw.image_links.filter((u): u is string => typeof u === "string" && u.length > 0))
       : undefined;
-    const prompts = (raw.prompts ?? []).flatMap((entry) => {
-      const prompt = isPromptEvent(entry.event) ? parsePrompt(entry.event, entry) : null;
-      return prompt ? [prompt] : [];
-    });
+    const prompts = parsePrompts(raw.prompts);
     const run = parseRun(raw.run);
     const hasAssistantPayload = Boolean(aiText) || assistantAtts.length > 0 || (imageLinks && imageLinks.length > 0);
     if (hasAssistantPayload) {
@@ -354,7 +356,7 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
         // the single ID for the AI response.
         id: baseId,
         role: "assistant",
-        ...splitPersistedAnswer(aiText ?? "", raw.reasoning ?? raw.thinking_content),
+        ...splitPersistedAnswer(aiText ?? "", raw.reasoning ?? raw.thinking_content, run?.status === "stopped"),
         created_at: createdAt,
         chat_id: chatId,
         steps: parseSteps(raw.steps),
@@ -366,7 +368,7 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
         prompts: prompts.length > 0 ? prompts : undefined,
         run,
       });
-    } else if (userText || uploadedAtts.length > 0) {
+    } else if (userText || uploadedAtts.length > 0 || run || prompts.length > 0) {
       // The turn finished with no answer saved (e.g. reasoning or tools only):
       // keep a placeholder so it does not vanish and can still be regenerated.
       messages.push({
@@ -400,11 +402,14 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
     ? (raw.image_links.filter((u): u is string => typeof u === "string" && u.length > 0))
     : undefined;
 
+  const run = role === "assistant" ? parseRun(raw.run) : undefined;
+  // A reply saved on its own row keeps its cards too, as in the paired format.
+  const prompts = role === "assistant" ? parsePrompts(raw.prompts) : [];
   return [{
     id: baseId,
     role,
     ...(role === "assistant"
-      ? splitPersistedAnswer(content, raw.reasoning ?? raw.thinking_content)
+      ? splitPersistedAnswer(content, raw.reasoning ?? raw.thinking_content, run?.status === "stopped")
       : { content, thinking: raw.reasoning ?? raw.thinking_content ?? undefined }),
     created_at: createdAt,
     chat_id: chatId,
@@ -414,7 +419,24 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
     library_citations: raw.libraryCitations ?? raw.library_citations ?? undefined,
     file_attachments: fileAttachments.length > 0 ? fileAttachments : undefined,
     image_links: imageLinks && imageLinks.length > 0 ? imageLinks : undefined,
+    // As in the paired format: a stopped turn's run is what marks it "Generation stopped".
+    ...(role === "assistant" ? { run, ...(prompts.length > 0 ? { prompts } : {}) } : {}),
   }];
+}
+
+/**
+ * The prompt cards saved with a turn. History is boundary data: `prompts` has been seen as a
+ * non-array, and an entry as null. Either would throw and reject the whole page of history,
+ * losing every message on it, so both are checked before the shape is relied on.
+ */
+function parsePrompts(raw: unknown): Prompt[] {
+  return (Array.isArray(raw) ? (raw as unknown[]) : []).flatMap((entry) => {
+    if (typeof entry !== "object" || entry === null) return [];
+    const event: unknown = (entry as { event?: unknown }).event;
+    if (typeof event !== "string" || !isPromptEvent(event)) return [];
+    const prompt = parsePrompt(event, entry);
+    return prompt ? [prompt] : [];
+  });
 }
 
 /**
@@ -425,12 +447,15 @@ function normalizeMessages(raw: BackendMessage, chatId: string): Message[] {
 function splitPersistedAnswer(
   text: string,
   persistedThinking: string | null | undefined,
+  // Stopped by the person: an unfinished answer is what Stop leaves, not a failure, and the
+  // turn already says "Generation stopped".
+  stopped = false,
 ): Pick<Message, "content" | "thinking" | "errorNotice"> {
   const { visibleText, thinkingText, thinkingOpen } = extractThinkingContent(text);
   return {
     content: visibleText,
     thinking: persistedThinking || thinkingText || undefined,
-    errorNotice: thinkingOpen ? INCOMPLETE_ANSWER_MESSAGE : undefined,
+    errorNotice: thinkingOpen && !stopped ? INCOMPLETE_ANSWER_MESSAGE : undefined,
   };
 }
 
@@ -552,9 +577,46 @@ export async function deleteMessage(messageId: string): Promise<void> {
 export async function getChatStreamId(chatId: string): Promise<string | null> {
   const response = await apiFetch(CHAT_ENDPOINT(chatId));
   if (!response.ok) return null;
-  const chat = (await response.json()) as { streamId?: string | null };
+  // GET /chats/{id} always sends streamId, null when idle (checked live 2026-11-20); see getChatRunState.
+  const chat = (await response.json()) as { streamId: string | null };
   return chat.streamId ?? null;
 }
+
+/**
+ * Whether the backend has a run going for the chat. Unlike getChatStreamId, it throws
+ * when it can't tell (a failed request or a non-OK response) rather than answering "no":
+ * for a caller about to send into the chat, "unknown" must not read as "idle".
+ */
+export async function getChatRunState(chatId: string, timeoutMs = RUN_STATE_TIMEOUT_MS): Promise<"running" | "idle"> {
+  // The whole lookup (token refresh, request, body) has a deadline: a request that
+  // never settles fails like any other, so a caller retrying it is never stuck.
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      reject(new Error("Timed out reading the chat's run state"));
+    }, timeoutMs);
+  });
+  const lookup = (async () => {
+    const response = await apiFetch(CHAT_ENDPOINT(chatId), { signal: controller.signal });
+    if (!response.ok) throw new Error(`Couldn't read the chat's run state (${response.status})`);
+    // Contract: GET /chats/{id} always sends streamId, null when idle (checked live
+    // 2026-11-20). Anything else is "can't tell", not "idle".
+    const chat: unknown = await response.json();
+    const streamId = chat && typeof chat === "object" ? (chat as { streamId?: unknown }).streamId : undefined;
+    if (streamId === null) return "idle" as const;
+    if (typeof streamId === "string" && streamId) return "running" as const;
+    throw new Error("Malformed run state from the backend");
+  })();
+  lookup.catch(() => {});
+  return Promise.race([lookup, deadline]).then(
+    (state) => { clearTimeout(timer); return state; },
+    (error: unknown) => { clearTimeout(timer); throw error; },
+  );
+}
+/** How long one run-state lookup may take before it counts as failed. */
+export const RUN_STATE_TIMEOUT_MS = 10_000;
 
 /** POST /chats/{chat_id}/stop — abort an in-flight stream. */
 export async function stopChat(chatId: string): Promise<void> {

@@ -8,17 +8,30 @@ import type { InviteResult } from '@/components/InviteModal'
 import { toast } from 'sonner'
 import { useOrg } from '@/context/org-context'
 import { useAuth } from '@/context/auth-context'
-import { setMemberRole, removeMember, revokeInvite, getOrgSettings } from '@/lib/api/organization'
+import { setMemberRole, removeMember, revokeInvite, getOrgSettings, blockingProjects } from '@/lib/api/organization'
 import { inviteMembers } from '@/lib/api/teams'
 import { updateUser } from '@/lib/api/user'
 import type { OrgMember, WorkspaceRole } from '@/types/teams'
-import { SHADOW_CARD, SHADOW_STAT_CARD, displayRoleFor } from './_components/members-shared'
+import { displayRoleFor } from './_components/members-shared'
 import { MembersTable } from './_components/MembersTable'
 import { MembersPageSkeleton } from './_components/MembersSkeleton'
+import { Card } from '@/components/ui/card'
+import { Inline, Stack } from '@/components/ui/layout'
+import { Heading, Text } from '@/components/ui/text'
 
 // Both dialogs load the first time they open, then stay mounted so their exit animation plays.
 const RolesPermissionsModal = dynamic(() => import('./_components/RoleModals').then(m => m.RolesPermissionsModal), { ssr: false })
 const AppInviteModal = dynamic(() => import('@/components/InviteModal').then(m => m.AppInviteModal), { ssr: false })
+
+function StatTile({ label, value, note }: { label: string; value: number; note: string }) {
+  return (
+    <Card variant="tile" padding="sm" className="flex-[1_0_0] gap-1.5">
+      <Text variant="body-sm" weight="medium" tone="muted">{label}</Text>
+      <Text variant="heading-xl" className="font-[family-name:var(--font-title)]">{value}</Text>
+      <Text variant="small" tone="subtle">{note}</Text>
+    </Card>
+  )
+}
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -168,7 +181,13 @@ export default function OrgMembersPage() {
       toast.success(`Removed ${memberLabel}`, { id: toastId })
     } catch (err) {
       restoreRow(prev, id)
-      toast.error(err instanceof Error ? err.message : 'Failed to remove member', { id: toastId })
+      // The backend won't remove someone who still owns workspace or shared projects (souvenir-server#640).
+      const blocking = blockingProjects(err)
+      const them = blocking === 1 ? 'it' : 'them'
+      const message = blocking !== null
+        ? `${memberLabel} owns ${blocking === 1 ? 'a workspace or shared project' : `${blocking} workspace or shared projects`}. They need to hand ${them} off or archive ${them} before they can be removed.`
+        : err instanceof Error ? err.message : 'Failed to remove member'
+      toast.error(message, { id: toastId })
     }
   }
 
@@ -265,7 +284,7 @@ export default function OrgMembersPage() {
 
   if (membersLoading) {
     return (
-      <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: 64, paddingBottom: 48 }}>
+      <div className="kaya-scrollbar" style={{ flex: '1 0 0', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: 'var(--space-10)', paddingBottom: 'var(--space-9)' }}>
         <MembersPageSkeleton />
       </div>
     )
@@ -282,25 +301,25 @@ export default function OrgMembersPage() {
         display:        'flex',
         alignItems:     'flex-start',
         justifyContent: 'center',
-        paddingTop:     64,
-        paddingBottom:  48,
+        paddingTop:     'var(--space-10)',
+        paddingBottom:  'var(--space-9)',
       }}
     >
       {/* Horizontal padding lives here, not on the scrolling element above —
           keeps the scrollbar flush with the container's edge. */}
-      <div style={{ width: '100%', maxWidth: 908, padding: '0 24px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <Stack gap="3" className="w-full max-w-[908px] px-6 box-border">
 
         {/* Page header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+        <Inline gap="3" align="start" justify="between">
           <div>
             {/* 24/32 matches the header treatment on every other v1.5 settings
                 page (Account, Usage, General) and Figma node 18:24255. */}
-            <h1 style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: 0 }}>
+            <Heading level={1} className="font-[family-name:var(--font-title)]">
               Members
-            </h1>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: '4px 0 0' }}>
+            </Heading>
+            <Text tone="muted" className="mt-1">
               Manage who has access to your workspace and what they can do.
-            </p>
+            </Text>
           </div>
           <Button
             variant="secondary"
@@ -310,33 +329,14 @@ export default function OrgMembersPage() {
           >
             Roles &amp; Permissions
           </Button>
-        </div>
+        </Inline>
 
         {/* Stats row */}
-        <div style={{
-          border:       '1px solid var(--border-default)',
-          borderRadius: 16,
-          boxShadow:    SHADOW_CARD,
-          padding:      12,
-          display:      'flex',
-          gap:          9,
-        }}>
-          <div style={{ flex: '1 0 0', minWidth: 0, backgroundColor: 'var(--neutral-white)', borderRadius: 8, padding: 12, display: 'flex', flexDirection: 'column', gap: 6, boxShadow: SHADOW_STAT_CARD }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 13, lineHeight: '20px', color: 'var(--neutral-500)', margin: 0 }}>Total members</p>
-            <p style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 28, lineHeight: '36px', color: 'var(--neutral-900)', margin: 0 }}>{totalMembers}</p>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 12, lineHeight: '16px', color: 'var(--neutral-400)', margin: 0 }}>unlimited seats</p>
-          </div>
-          <div style={{ flex: '1 0 0', minWidth: 0, backgroundColor: 'var(--neutral-white)', borderRadius: 8, padding: 12, display: 'flex', flexDirection: 'column', gap: 6, boxShadow: SHADOW_STAT_CARD }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 13, lineHeight: '20px', color: 'var(--neutral-500)', margin: 0 }}>Admins</p>
-            <p style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 28, lineHeight: '36px', color: 'var(--neutral-900)', margin: 0 }}>{adminCount}</p>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 12, lineHeight: '16px', color: 'var(--neutral-400)', margin: 0 }}>workspace admins</p>
-          </div>
-          <div style={{ flex: '1 0 0', minWidth: 0, backgroundColor: 'var(--neutral-white)', borderRadius: 8, padding: 12, display: 'flex', flexDirection: 'column', gap: 6, boxShadow: SHADOW_STAT_CARD }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 13, lineHeight: '20px', color: 'var(--neutral-500)', margin: 0 }}>Pending invites</p>
-            <p style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 28, lineHeight: '36px', color: 'var(--neutral-900)', margin: 0 }}>{pendingInvites}</p>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 12, lineHeight: '16px', color: 'var(--neutral-400)', margin: 0 }}>awaiting acceptance</p>
-          </div>
-        </div>
+        <Card variant="panel" padding="sm" className="flex-row gap-2">
+          <StatTile label="Total members" value={totalMembers} note="unlimited seats" />
+          <StatTile label="Admins" value={adminCount} note="workspace admins" />
+          <StatTile label="Pending invites" value={pendingInvites} note="awaiting acceptance" />
+        </Card>
 
         {/* Members table */}
         <MembersTable
@@ -350,7 +350,7 @@ export default function OrgMembersPage() {
           onInviteClick={() => setInviteOpen(true)}
         />
 
-      </div>
+      </Stack>
 
       {/* Roles & Permissions info modal — opened from the info button next to the page title */}
       {rolesSeen && <RolesPermissionsModal open={rolesInfoOpen} onClose={() => setRolesInfoOpen(false)} />}

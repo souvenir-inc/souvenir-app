@@ -18,21 +18,21 @@ export function EmptyState({ icon, title, text, children }: EmptyStateProps) {
       style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 0,
         // More padding below than above: centred under the header, at the optical centre rather than low.
-        padding: '24px 24px 10vh', textAlign: 'center', flex: '1 0 auto',
+        padding: 'var(--library-empty-padding)', textAlign: 'center', flex: '1 0 auto',
       }}
     >
       <span
         aria-hidden="true"
         style={{
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 48, height: 48, borderRadius: 14,
-          background: 'var(--neutral-100)', color: 'var(--neutral-600)', marginBottom: 16,
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 48, height: 48, borderRadius: 'var(--radius-xl)',
+          background: 'var(--neutral-100)', color: 'var(--neutral-600)', marginBottom: 'var(--space-4)',
         }}
       >
         {icon}
       </span>
-      <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 18, lineHeight: '28px', color: 'var(--neutral-900)' }}>{title}</p>
-      {text && <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-600)', maxWidth: 380, marginTop: 4 }}>{text}</p>}
-      {children && <div style={{ marginTop: 20, display: 'flex', gap: 8 }}>{children}</div>}
+      <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-heading-sm)', lineHeight: 'var(--line-height-heading-md)', color: 'var(--neutral-900)' }}>{title}</p>
+      {text && <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-600)', maxWidth: 380, marginTop: 'var(--space-1)' }}>{text}</p>}
+      {children && <div style={{ marginTop: 'var(--space-5)', display: 'flex', gap: 'var(--space-2)' }}>{children}</div>}
     </div>
   )
 }

@@ -29,21 +29,21 @@ export interface OptionRowProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const BG_WHITE       = 'var(--neutral-white, white)'
 const BG_NEUTRAL_50  = 'var(--neutral-50)'
-const BG_NEUTRAL_100 = 'var(--neutral-100, #F5F5F5)'
+const BG_NEUTRAL_100 = 'var(--neutral-100)'
 const BORDER_BLUE    = '1px solid var(--focus-ring)'
 
 // Shadow for the numbered badge - shared constant
-const BADGE_OUTER_SHADOW = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4)'
-const BADGE_INNER_SHADOW = 'inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 61%, transparent), inset 0px -1px 0px 0px rgba(106,98,93,0.05)'
+const BADGE_OUTER_SHADOW = 'var(--shadow-chip)'
+const BADGE_INNER_SHADOW = 'var(--shadow-badge-inner)'
 // Shadow for the check/checkbox badge - white with yellow inner glow
-const CHECK_INNER_SHADOW = 'inset 0px 1px 0px 0px var(--yellow-200, #d8c9a7), inset 0px -1px 0px 0px rgba(106,98,93,0.05)'
+const CHECK_INNER_SHADOW = 'var(--option-row-check-inner-shadow)'
 
 // ── Badge animation variants ───────────────────────────────────────────────────
 
 const badgeEnter = {
   initial:  { scale: 0.5, opacity: 0, filter: 'blur(4px)' },
   animate:  { scale: 1,   opacity: 1, filter: 'blur(0px)', transition: springs.fast },
-  exit:     { scale: 0.5, opacity: 0, filter: 'blur(4px)', transition: { duration: 0.08, ease: 'easeIn' as const } },
+  exit:     { scale: 0.5, opacity: 0, filter: 'blur(var(--blur-xs))', transition: { duration: 0.08, ease: 'easeIn' as const } },
 }
 
 // ── Component ──────────────────────────────────────────────────────────────────
@@ -87,19 +87,19 @@ export function OptionRow({
         style={{
           display:         'flex',
           alignItems:      'center',
-          gap:             10,
+          gap:             'var(--space-2-5)',
           height:          42,
           width:           '100%',
           flexShrink:      0,
-          padding:         '0 10px',
-          borderRadius:    12,
+          padding:         '0 var(--space-2-5)',
+          borderRadius:    'var(--radius-xl)',
           backgroundColor: bg,
           border:          hasBorder ? BORDER_BLUE : 'none',
-          outline:         focused ? `2px solid var(--focus-ring)` : 'none',
-          outlineOffset:   '-2px',
+          outline:         focused ? `var(--focus-ring-width) solid var(--focus-ring)` : 'none',
+          outlineOffset:   'calc(var(--focus-ring-offset) * -1)',
           position:        'relative',
           userSelect:      'none',
-          transition:      'background-color 150ms ease',
+          transition:      'background-color var(--duration-fast) ease',
           ...style,
         }}
         {...props}
@@ -122,7 +122,7 @@ export function OptionRow({
                   style={{
                     width:           28,
                     height:          28,
-                    borderRadius:    8,
+                    borderRadius:    'var(--radius-md)',
                     flexShrink:      0,
                     display:         'flex',
                     alignItems:      'center',
@@ -137,13 +137,13 @@ export function OptionRow({
                     style={{
                       position:        'absolute',
                       inset:           0,
-                      borderRadius:    8,
+                      borderRadius:    'var(--radius-md)',
                       backgroundColor: BG_WHITE,
                       pointerEvents:   'none',
                     }}
                   />
                   <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <TickTwoIcon size={14} color="var(--neutral-700, #524b47)" />
+                    <TickTwoIcon size={14} color="var(--neutral-700)" />
                   </div>
                   <div
                     aria-hidden
@@ -166,7 +166,7 @@ export function OptionRow({
                   style={{
                     width:           28,
                     height:          28,
-                    borderRadius:    8,
+                    borderRadius:    'var(--radius-md)',
                     flexShrink:      0,
                     display:         'flex',
                     alignItems:      'center',
@@ -181,7 +181,7 @@ export function OptionRow({
                     style={{
                       position:        'absolute',
                       inset:           0,
-                      borderRadius:    8,
+                      borderRadius:    'var(--radius-md)',
                       backgroundColor: BG_WHITE,
                       pointerEvents:   'none',
                     }}
@@ -207,7 +207,7 @@ export function OptionRow({
                   style={{
                     width:           28,
                     height:          28,
-                    borderRadius:    8,
+                    borderRadius:    'var(--radius-md)',
                     flexShrink:      0,
                     display:         'flex',
                     alignItems:      'center',
@@ -222,13 +222,13 @@ export function OptionRow({
                     style={{
                       position:        'absolute',
                       inset:           0,
-                      borderRadius:    8,
+                      borderRadius:    'var(--radius-md)',
                       backgroundColor: BG_WHITE,
                       pointerEvents:   'none',
                     }}
                   />
                   <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <TickTwoIcon size={14} color="var(--neutral-700, #524b47)" />
+                    <TickTwoIcon size={14} color="var(--neutral-700)" />
                   </div>
                   <div
                     aria-hidden
@@ -256,7 +256,7 @@ export function OptionRow({
             fontWeight:   'var(--font-weight-medium)',
             fontSize:     'var(--font-size-body-lg, 16px)',
             lineHeight:   'var(--line-height-body-lg, 22px)',
-            color:        'var(--neutral-600, #6a625d)',
+            color:        'var(--neutral-600)',
             margin:       0,
             overflow:     'hidden',
             textOverflow: 'ellipsis',
@@ -277,13 +277,13 @@ export function OptionRow({
               flexShrink:     0,
               width:          24,
               height:         24,
-              borderRadius:   6,
+              borderRadius:   'var(--radius-sm)',
               cursor:         'grab',
               touchAction:    'none',
               ...dragHandleProps?.style,
             }}
           >
-            <DragDropVerticalIcon size={18} color="var(--neutral-500, #8a7f79)" />
+            <DragDropVerticalIcon size={18} color="var(--neutral-500)" />
           </div>
         )}
       </div>

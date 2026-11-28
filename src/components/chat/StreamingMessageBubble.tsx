@@ -6,9 +6,9 @@ import { CopyOneIcon } from '@strange-huge/icons'
 import { springs } from '@/lib/springs'
 import { StreamingContentRenderer } from './StreamingContentRenderer'
 import { BreathingDot } from '@/components/BreathingDot'
+import { BLUR, DURATION, LONG } from "@/styles/tokens/motion"
 
 // ── Streaming typewriter hook ─────────────────────────────────────────────────
-// Ported from front-end/src/components/chat/chat-message.tsx.
 // RAF ease-out lerp: reveals ~6% of remaining chars per 16ms frame.
 // Fast when far behind the latest token; decelerates gracefully as it catches up.
 // Pass enabled=false (or when isComplete=true) to snap to full text immediately.
@@ -65,12 +65,12 @@ export function StreamCursor() {
         width:           2,
         height:          '1em',
         background:      'var(--neutral-400)',
-        borderRadius:    1,
-        marginLeft:      1,
+        borderRadius:    'var(--radius-hairline)',
+        marginLeft:      'var(--space-0-5)',
         verticalAlign:   'text-bottom',
       }}
       animate={{ opacity: [1, 0, 1] }}
-      transition={{ duration: 0.9, repeat: Infinity, ease: 'easeInOut' }}
+      transition={{ duration: LONG.xs, repeat: Infinity, ease: 'easeInOut' }}
     />
   )
 }
@@ -105,7 +105,7 @@ const renderInline = (text: string, keyPrefix: string): Array<string | JSX.Eleme
           href={match[4]}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: 'var(--brown-500)', textDecoration: 'underline', textUnderlineOffset: '2px' }}
+          style={{ color: 'var(--brown-500)', textDecoration: 'underline', textUnderlineOffset: 'var(--underline-offset)' }}
         >
           {match[3]}
         </a>
@@ -121,7 +121,7 @@ const renderInline = (text: string, keyPrefix: string): Array<string | JSX.Eleme
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: 'var(--brown-500)', textDecoration: 'underline', textUnderlineOffset: '2px' }}
+          style={{ color: 'var(--brown-500)', textDecoration: 'underline', textUnderlineOffset: 'var(--underline-offset)' }}
         >
           {display}
         </a>
@@ -140,7 +140,6 @@ function InlineContent({ text, keyPrefix }: { text: string; keyPrefix: string })
 }
 
 // ── Markdown renderer ──────────────────────────────────────────────────────────
-// Adapted from front-end/src/components/chat/chat-message.tsx > renderTextContent.
 // Converted from Tailwind → KDS semantic tokens (var(--token)).
 // Handles: headings (h1–h3), bullet lists, code blocks (with copy), paragraphs, bold.
 
@@ -163,7 +162,7 @@ export function renderStreamingContent(value: string, keyPrefix: string): JSX.El
     if (listBuffer.length === 0) return
     const k = `${keyPrefix}-list-${nodes.length}`
     nodes.push(
-      <ul key={k} style={{ paddingLeft: 20, margin: '4px 0', display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <ul key={k} style={{ paddingLeft: 'var(--space-5)', margin: 'var(--space-1) 0', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
         {listBuffer.map((item, idx) => (
           <li key={`${k}-${idx}`} style={{
             fontFamily:   'var(--font-body)',
@@ -202,7 +201,7 @@ export function renderStreamingContent(value: string, keyPrefix: string): JSX.El
           fontSize:    HEADING_SIZES[level],
           lineHeight:  'var(--line-height-body)',
           color:       'var(--neutral-900)',
-          margin:      '8px 0 2px',
+          margin:      'var(--space-2) 0 var(--space-0-5)',
           wordBreak:   'break-word',
         }}>
           <InlineContent text={headingMatch[2]} keyPrefix={`${keyPrefix}-h-${lineIndex}`} />
@@ -272,18 +271,18 @@ function CodeBlock({ code, lang }: { code: string; lang?: string }) {
   return (
     <div style={{
       position:        'relative',
-      borderRadius:    14,
+      borderRadius:    'var(--radius-xl)',
       border:          '1px solid var(--border-default)',
       backgroundColor: 'var(--neutral-50)',
       overflow:        'hidden',
-      margin:          '4px 0',
+      margin:          'var(--space-1) 0',
     }}>
       {/* Header row */}
       <div style={{
         display:         'flex',
         alignItems:      'center',
         justifyContent:  'space-between',
-        padding:         '6px 12px',
+        padding:         'var(--space-1-5) var(--space-3)',
         borderBottom:    '1px solid var(--neutral-100)',
       }}>
         <span style={{
@@ -300,9 +299,9 @@ function CodeBlock({ code, lang }: { code: string; lang?: string }) {
           style={{
             display:     'inline-flex',
             alignItems:  'center',
-            gap:         4,
-            padding:     '3px 8px',
-            borderRadius: 8,
+            gap:         'var(--space-1)',
+            padding:     'var(--space-0-5) var(--space-2)',
+            borderRadius: 'var(--radius-md)',
             border:      '1px solid var(--border-default)',
             background:  'var(--neutral-white)',
             cursor:      'pointer',
@@ -321,10 +320,10 @@ function CodeBlock({ code, lang }: { code: string; lang?: string }) {
         className="kaya-scrollbar"
         style={{
           margin:               0,
-          padding:              '10px 14px',
+          padding:              'var(--space-2-5) var(--space-3)',
           fontFamily:           'var(--font-mono, monospace)',
-          fontSize:             13,
-          lineHeight:           '20px',
+          fontSize:             'var(--font-size-body-sm)',
+          lineHeight:           'var(--line-height-body-sm)',
           color:                'var(--neutral-700)',
           overflowX:            'auto',
           overscrollBehaviorX:  'contain',
@@ -364,7 +363,7 @@ export function StreamingMessageBubble({
 
   return (
     <m.div
-      initial={{ opacity: 0, y: 6, filter: 'blur(4px)' }}
+      initial={{ opacity: 0, y: 6, filter: `blur(${BLUR.xs}px)` }}
       animate={{ opacity: 1, y: 0,  filter: 'blur(0px)', transitionEnd: { filter: 'none' } }}
       transition={springs.moderate}
     >
@@ -372,7 +371,7 @@ export function StreamingMessageBubble({
       {!isComplete && (
         <BreathingDot
           size="sm"
-          style={{ marginLeft: 3, backgroundColor: 'var(--neutral-500)' }}
+          style={{ marginLeft: 'var(--space-0-5)', backgroundColor: 'var(--neutral-500)' }}
         />
       )}
     </m.div>

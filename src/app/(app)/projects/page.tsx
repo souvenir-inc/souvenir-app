@@ -35,6 +35,7 @@ import {
   type SortKey, type ScopeFilter, type ViewMode,
 } from '@/lib/project-filters'
 import { sortProjects, projectMemberCount, formatUpdated } from '@/lib/project-list-utils'
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 // Gradient palette seeded by team name — shared with TeamChip/TeamSwitcherRow/
 // TeamSwitcherDropdown/ProjectCard/etc via src/lib/team-gradients.ts, so a
@@ -246,45 +247,45 @@ function ProjectsPageInner() {
         height:         '100%',
         overflowY:      'auto',
         overflowX:      'hidden',
-        paddingTop:     35,
-        paddingBottom:  40,
+        paddingTop:     'var(--projects-page-top)',
+        paddingBottom:  'var(--space-8)',
         boxSizing:      'border-box',
       }}
     >
       {/* Horizontal padding lives here, not on the scrolling element above —
           keeps the scrollbar flush with the container's edge. */}
-      <div style={{ width: '100%', maxWidth: '884px', padding: '0 24px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div style={{ width: '100%', maxWidth: '884px', padding: '0 var(--space-6)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
 
         {/* Heading row */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0, flex: '1 1 0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-3)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', minWidth: 0, flex: '1 1 0' }}>
               <h1
                 style={{
                   fontFamily:  'var(--font-title)',
                   fontWeight:  'var(--font-weight-regular)',
-                  fontSize:    '24px',
-                  lineHeight:  '32px',
+                  fontSize:    'var(--font-size-heading)',
+                  lineHeight:  'var(--line-height-heading)',
                   color:       'var(--legacy-1a1916)',
                   margin:      0,
                 }}
               >
                 Projects
               </h1>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', alignSelf: 'flex-start' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', alignSelf: 'flex-start' }}>
                 <Badge label={`${personalCount} Personal`} color="Neutral" />
                 {orgId && (
                   <>
-                    <span style={{ color: 'var(--neutral-300)', fontSize: 12 }}>|</span>
+                    <span style={{ color: 'var(--neutral-300)', fontSize: 'var(--font-size-small)' }}>|</span>
                     <Badge label={`${workspaceCount} Workspace`} color="Neutral" />
-                    <span style={{ color: 'var(--neutral-300)', fontSize: 12 }}>|</span>
+                    <span style={{ color: 'var(--neutral-300)', fontSize: 'var(--font-size-small)' }}>|</span>
                     <Badge label={`${sharedCount} Shared`} color="Neutral" />
                   </>
                 )}
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', flexShrink: 0 }}>
               {/* New Project — hidden on the Recently Deleted tab, which has no create action */}
               {scopeFilter !== 'trash' && (
                 <Button variant="default" leftIcon={<PlusSignIcon animated />} onClick={() => push(newProjectHref)}>
@@ -296,7 +297,7 @@ function ProjectsPageInner() {
         </div>
 
         {/* Search + filter row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', width: '100%' }}>
           {/* Personal / Workspace / Shared / Recently Deleted scope — anchored
               to the left. Workspace and Shared both require an org (matches
               the backend's own visibility rules), so the whole filter stays
@@ -308,7 +309,7 @@ function ProjectsPageInner() {
           {/* Search + view + sort — grouped to the right; none of these apply
               to the Recently Deleted tab (nothing to search/sort/switch grid-list for). */}
           {scopeFilter !== 'trash' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0, marginLeft: 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', flexShrink: 0, marginLeft: 'auto' }}>
             {/* Search — same collapse-to-icon pattern as PinboardHeader's own
                 search: ghost IconButton expands into an InputField in place. */}
             <Tooltip content="Search" disabled={searchOpen}>
@@ -318,9 +319,9 @@ function ProjectsPageInner() {
                     <m.span
                       key="search-btn"
                       layout
-                      initial={{ opacity: 0, y: 4, filter: 'blur(4px)' }}
-                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { type: 'spring', duration: 0.3, bounce: 0 } }}
-                      exit={{ opacity: 0, scale: 0.25, filter: 'blur(4px)', transition: { type: 'spring', duration: 0.2, bounce: 0 } }}
+                      initial={{ opacity: 0, y: 4, filter: `blur(${BLUR.xs}px)` }}
+                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { type: 'spring', duration: DURATION.slow, bounce: 0 } }}
+                      exit={{ opacity: 0, scale: 0.25, filter: `blur(${BLUR.xs}px)`, transition: { type: 'spring', duration: DURATION.base, bounce: 0 } }}
                       style={{ display: 'inline-flex', flexShrink: 0 }}
                     >
                       <IconButton
@@ -335,9 +336,9 @@ function ProjectsPageInner() {
                   ) : (
                     <m.div
                       key="search-input"
-                      initial={{ opacity: 0, scale: 0.95, filter: 'blur(4px)' }}
-                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)', transition: { type: 'spring', duration: 0.3, bounce: 0 } }}
-                      exit={{ opacity: 0, scale: 0.95, filter: 'blur(4px)', transition: { duration: 0.15, ease: 'easeIn' } }}
+                      initial={{ opacity: 0, scale: 0.95, filter: `blur(${BLUR.xs}px)` }}
+                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)', transition: { type: 'spring', duration: DURATION.slow, bounce: 0 } }}
+                      exit={{ opacity: 0, scale: 0.95, filter: `blur(${BLUR.xs}px)`, transition: { duration: DURATION.quick, ease: 'easeIn' } }}
                       style={{ flex: '1 0 0', minWidth: 0 }}
                     >
                       <InputField
@@ -417,15 +418,15 @@ function ProjectsPageInner() {
           // less space than either real layout, causing a real, measured
           // (not dev-mode-artifact) CLS hit.
           viewMode === 'list' ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', width: '100%' }}>
               {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} height={64} radius={12} style={{ opacity: 1 - i * 0.15 }} />
+                <Skeleton key={i} height={64} radius={'var(--radius-xl)'} style={{ opacity: 1 - i * 0.15 }} />
               ))}
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px', width: '100%' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-6)', width: '100%' }}>
               {[...Array(4)].map((_, i) => (
-                <Skeleton key={i} height={262} radius={12} style={{ opacity: 1 - i * 0.15 }} />
+                <Skeleton key={i} height={262} radius={'var(--radius-xl)'} style={{ opacity: 1 - i * 0.15 }} />
               ))}
             </div>
           )
@@ -435,11 +436,11 @@ function ProjectsPageInner() {
               style={{
                 fontFamily: 'var(--font-title)',
                 fontWeight: 'var(--font-weight-regular)',
-                fontSize:   '24px',
-                lineHeight: '32px',
+                fontSize:   'var(--font-size-heading)',
+                lineHeight: 'var(--line-height-heading)',
                 color:      'var(--neutral-500)',
                 textAlign:  'center',
-                margin:     '40px 0',
+                margin:     'var(--space-8) 0',
               }}
             >
               No projects matching &ldquo;{query}&rdquo;
@@ -450,9 +451,9 @@ function ProjectsPageInner() {
                 display:        'flex',
                 flexDirection:  'column',
                 alignItems:     'center',
-                gap:            '16px',
-                padding:        '64px 24px',
-                borderRadius:   '16px',
+                gap:            'var(--space-4)',
+                padding:        'var(--space-10) var(--space-6)',
+                borderRadius:   'var(--radius-2xl)',
                 border:         '1px dashed var(--neutral-300)',
                 background:     'var(--neutral-50)',
               }}
@@ -461,8 +462,8 @@ function ProjectsPageInner() {
                 style={{
                   fontFamily:  'var(--font-title)',
                   fontWeight:  'var(--font-weight-regular)',
-                  fontSize:    '24px',
-                  lineHeight:  '32px',
+                  fontSize:    'var(--font-size-heading)',
+                  lineHeight:  'var(--line-height-heading)',
                   color:       'var(--neutral-500)',
                   textAlign:   'center',
                   margin:      0,
@@ -476,7 +477,7 @@ function ProjectsPageInner() {
             </div>
           )
         ) : viewMode === 'list' ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', width: '100%' }}>
             {filtered.map((project) => (
               <ProjectListRow
                 key={project.id}
@@ -496,7 +497,7 @@ function ProjectsPageInner() {
             style={{
               display:               'grid',
               gridTemplateColumns:   'repeat(2, 1fr)',
-              gap:                   '24px',
+              gap:                   'var(--space-6)',
               width:                 '100%',
             }}
           >

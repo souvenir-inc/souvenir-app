@@ -75,7 +75,7 @@ function CentredMessage({ children }: { children: React.ReactNode }) {
 // wait doesn't flash empty text.
 function LoadingChatSkeleton() {
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', height: '100%', overflow: 'hidden', padding: '32px 16px' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', height: '100%', overflow: 'hidden', padding: 'var(--space-7) var(--space-4)' }}>
       <div style={{ width: '100%', maxWidth: 679 }}>
         <ChatMessagesSkeleton />
       </div>
@@ -86,6 +86,7 @@ function LoadingChatSkeleton() {
 // ── Page ──────────────────────────────────────────────────────────────────────
 import { useRecommendationsState } from '@/hooks/use-recommendations'
 import { FileDropOverlay } from '@/components/chat/FileDropOverlay'
+import { DURATION } from "@/styles/tokens/motion"
 
 
 function ProjectChatPageInner() {
@@ -552,7 +553,7 @@ function ProjectChatPageInner() {
         {isNewChatState ? (
           <m.div
             key="new-chat"
-            exit={{ opacity: 0, transition: { duration: 0.28, ease: [0.4, 0, 1, 1] } }}
+            exit={{ opacity: 0, transition: { duration: DURATION.moderate, ease: [0.4, 0, 1, 1] } }}
             className="kaya-scrollbar"
             style={{ position: 'absolute', inset: 0, overflowY: 'auto' }}
           >
@@ -566,7 +567,7 @@ function ProjectChatPageInner() {
                 flexDirection:  'column',
                 alignItems:     'center',
                 justifyContent: 'center',
-                padding:        '40px 16px 48px',
+                padding:        'var(--space-8) var(--space-4) var(--space-9)',
               }}
             >
               <div
@@ -574,18 +575,18 @@ function ProjectChatPageInner() {
                   display:       'flex',
                   flexDirection: 'column',
                   alignItems:    'center',
-                  gap:           '24px',
+                  gap:           'var(--space-6)',
                   maxWidth:      '768px',
                   width:         '100%',
                 }}
               >
-                <m.div exit={{ opacity: 0, y: -28, transition: { duration: 0.22, ease: [0.4, 0, 1, 1] } }}>
+                <m.div exit={{ opacity: 0, y: -28, transition: { duration: DURATION.base, ease: [0.4, 0, 1, 1] } }}>
                   <InitialPrompts />
                 </m.div>
 
                 <m.div
                   style={{ width: '100%', maxWidth: '640px', margin: '0 auto' }}
-                  exit={{ opacity: 0, y: 36, transition: { duration: 0.22, ease: [0.4, 0, 1, 1] } }}
+                  exit={{ opacity: 0, y: 36, transition: { duration: DURATION.base, ease: [0.4, 0, 1, 1] } }}
                 >
                   <AnimatePresence>
                     {creditNoticeStatus && (
@@ -639,13 +640,13 @@ function ProjectChatPageInner() {
                     style={{
                       display:        'flex',
                       justifyContent: 'center',
-                      gap:            '8px',
-                      marginTop:      '16px',
+                      gap:            'var(--space-2)',
+                      marginTop:      'var(--space-4)',
                       flexWrap:       'wrap',
                     }}
                   >
                     {ACTION_BUTTONS.map(btn => (
-                      <div key={btn.mode} style={{ opacity: (btn.disabled || (selectedMode && selectedMode !== btn.mode)) ? 0.4 : 1, transition: 'opacity 150ms' }}>
+                      <div key={btn.mode} style={{ opacity: (btn.disabled || (selectedMode && selectedMode !== btn.mode)) ? 0.4 : 1, transition: 'opacity var(--duration-fast)' }}>
                         <Button
                           variant="outline"
                           size="sm"
@@ -661,7 +662,7 @@ function ProjectChatPageInner() {
 
                   {/* Starter cards — generated per user by /recommendations. */}
                   {(recommendations || recommendationsLoading) && (
-                    <div style={{ marginTop: '20px', textAlign: 'left' }}>
+                    <div style={{ marginTop: 'var(--space-5)', textAlign: 'left' }}>
                       {recommendations
                         ? <StarterList cards={recommendations.cards} onSelect={(card) => handleSend(card.prompt)} />
                         : <StarterListSkeleton />}
@@ -675,7 +676,7 @@ function ProjectChatPageInner() {
           <m.div
             key="active-chat"
             initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0, transition: { duration: 0.35, ease: [0, 0, 0.2, 1] } }}
+            animate={{ opacity: 1, y: 0, transition: { duration: DURATION.slow, ease: [0, 0, 0.2, 1] } }}
             style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}
           >
             <ChatInterface

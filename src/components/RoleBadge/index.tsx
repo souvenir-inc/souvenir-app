@@ -37,17 +37,17 @@ export const ROLE_TOKENS: Record<WorkspaceRole, RoleTokens> = {
     bg:   'var(--yellow-100)',
     text: 'var(--yellow-700)',
     shadow: [
-      '0px 1px 1.5px 0px rgba(20,16,5,0.2)',
+      'var(--role-badge-shadow)',
       '0px 0px 0px 1px color-mix(in srgb, var(--yellow-600) 50%, transparent)',
-      'inset 0px 1px 0px 0px rgba(250,246,235,0.7)',
-      'inset 0px -1px 0px 0px rgba(143,116,39,0.1)',
+      'var(--role-badge-shadow-2)',
+      'var(--role-badge-shadow-3)',
     ].join(', '),
   },
   editor: {
     bg:   'var(--blue-100)',
     text: 'var(--blue-700)',
     shadow: [
-      '0px 1px 1.5px 0px rgba(2,15,24,0.2)',
+      'var(--role-badge-shadow-4)',
       '0px 0px 0px 1px var(--blue-600-50)',
       'inset 0px 1px 0px 0px var(--blue-50-70)',
       'inset 0px -1px 0px 0px var(--blue-600-10)',
@@ -169,11 +169,11 @@ export const RoleBadge = React.forwardRef<HTMLSpanElement | HTMLButtonElement, R
             justifyContent:  'center',
             width:           showLabel ? 'auto' : '100%',
             height:          '100%',
-            padding:         '2px',
-            borderRadius:    '6px',
+            padding:         'var(--space-0-5)',
+            borderRadius:    'var(--radius-sm)',
             backgroundColor: tokens.bg,
             boxShadow:       tokens.shadow,
-            gap:             '1px',
+            gap:             'var(--space-0-5)',
             color:           tokens.text,
           }}
         >
@@ -186,8 +186,8 @@ export const RoleBadge = React.forwardRef<HTMLSpanElement | HTMLButtonElement, R
               width:          '16px',
               height:         '16px',
               flexShrink:     0,
-              padding:        '1px',
-              borderRadius:   '4px',
+              padding:        'var(--space-0-5)',
+              borderRadius:   'var(--radius-xs)',
               overflow:       'clip',
             }}
           >
@@ -197,11 +197,11 @@ export const RoleBadge = React.forwardRef<HTMLSpanElement | HTMLButtonElement, R
           {showLabel && (
             <span
               style={{
-                padding:    '0 2px',
+                padding:    '0 var(--space-0-5)',
                 fontFamily: 'var(--font-body)',
-                fontWeight: 500,
-                fontSize:   '11px',
-                lineHeight: 1,
+                fontWeight: 'var(--font-weight-medium)',
+                fontSize:   'var(--font-size-caption)',
+                lineHeight: 'var(--leading-none)',
                 color:      tokens.text,
                 whiteSpace: 'nowrap',
                 flexShrink: 0,
@@ -212,7 +212,7 @@ export const RoleBadge = React.forwardRef<HTMLSpanElement | HTMLButtonElement, R
           )}
 
           {isInteractive && (
-            <span style={{ display: 'inline-flex', alignItems: 'center', paddingRight: '2px', color: tokens.text }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', paddingRight: 'var(--space-0-5)', color: tokens.text }}>
               <ChevronGlyph />
             </span>
           )}

@@ -41,16 +41,16 @@ function GhostButton({ children, onClick }: { children: React.ReactNode; onClick
         display:         'inline-flex',
         alignItems:      'center',
         justifyContent:  'center',
-        padding:         '5px 8px',
-        borderRadius:    8,
+        padding:         'var(--settings-preview-chip-padding)',
+        borderRadius:    'var(--radius-md)',
         border:          'none',
         cursor:          'pointer',
         backgroundColor: 'transparent',
-        boxShadow:       '0px 0px 0px 1px rgba(59,54,50,0.3)',
+        boxShadow:       'var(--settings-preview-ring)',
         fontFamily:      'var(--font-body)',
-        fontWeight:      500,
-        fontSize:        14,
-        lineHeight:      '22px',
+        fontWeight:      'var(--font-weight-medium)',
+        fontSize:        'var(--font-size-body)',
+        lineHeight:      'var(--line-height-body)',
         color:           'var(--neutral-700)',
         whiteSpace:      'nowrap',
         flexShrink:      0,
@@ -64,15 +64,15 @@ function GhostButton({ children, onClick }: { children: React.ReactNode; onClick
 // Column labels + switch cells share this spacing contract:
 // each cell is 43px wide (centred), gap between cells is 32px.
 const COL_W   = 43
-const COL_GAP = 32
+const COL_GAP = 'var(--space-7)'
 
 function ColHeaders() {
   return (
     <div style={{
       display:      'flex',
       alignItems:   'center',
-      paddingLeft:  24,
-      paddingRight: 48,
+      paddingLeft:  'var(--space-6)',
+      paddingRight: 'var(--space-9)',
     }}>
       <div style={{ flex: '1 0 0', minWidth: 0 }} />
       <div style={{ display: 'flex', gap: COL_GAP, alignItems: 'center' }}>
@@ -80,9 +80,9 @@ function ColHeaders() {
           <div key={label} style={{ width: COL_W, display: 'flex', justifyContent: 'center' }}>
             <span style={{
               fontFamily: 'var(--font-body)',
-              fontWeight: 500,
-              fontSize:   14,
-              lineHeight: '22px',
+              fontWeight: 'var(--font-weight-medium)',
+              fontSize:   'var(--font-size-body)',
+              lineHeight: 'var(--line-height-body)',
               color:      'var(--neutral-900)',
               whiteSpace: 'nowrap',
             }}>
@@ -99,12 +99,12 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <p style={{
       fontFamily:    'var(--font-body)',
-      fontWeight:    500,
-      fontSize:      14,
-      lineHeight:    '22px',
+      fontWeight:    'var(--font-weight-medium)',
+      fontSize:      'var(--font-size-body)',
+      lineHeight:    'var(--line-height-body)',
       color:         'var(--neutral-900)',
       margin:        0,
-      letterSpacing: '0.03em',
+      letterSpacing: 'var(--tracking-wide)',
       whiteSpace:    'nowrap',
     }}>
       {children}
@@ -135,17 +135,17 @@ function NotifRow({
     <div style={{
       display:      'flex',
       alignItems:   'center',
-      gap:          12,
-      padding:      '6px 0 12px',
+      gap:          'var(--space-3)',
+      padding:      'var(--space-1-5) 0 var(--space-3)',
       borderBottom: divider ? '1px solid var(--neutral-100)' : undefined,
     }}>
       {/* Label + description */}
       <div style={{ flex: '1 0 0', minWidth: 0 }}>
         <p style={{
           fontFamily: 'var(--font-body)',
-          fontWeight: 500,
-          fontSize:   14,
-          lineHeight: '22px',
+          fontWeight: 'var(--font-weight-medium)',
+          fontSize:   'var(--font-size-body)',
+          lineHeight: 'var(--line-height-body)',
           color:      'var(--neutral-900)',
           margin:     0,
         }}>
@@ -153,9 +153,9 @@ function NotifRow({
         </p>
         <p style={{
           fontFamily: 'var(--font-body)',
-          fontWeight: 400,
-          fontSize: 12,
-          lineHeight: '16px',
+          fontWeight: 'var(--font-weight-regular)',
+          fontSize: 'var(--font-size-small)',
+          lineHeight: 'var(--line-height-small)',
           color:      'var(--neutral-500)',
           margin:     0,
         }}>
@@ -189,10 +189,10 @@ function NotifCard({ children }: { children: React.ReactNode }) {
   return (
     <div style={{
       border:        '1px solid var(--border-default)',
-      borderRadius:  16,
-      boxShadow:     '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+      borderRadius:  'var(--radius-2xl)',
+      boxShadow:     'var(--shadow-soft)',
       overflow:      'hidden',
-      paddingTop:    12,
+      paddingTop:    'var(--space-3)',
     }}>
       {children}
     </div>
@@ -212,17 +212,17 @@ function CardHeader({
     <div style={{
       display:      'flex',
       alignItems:   'center',
-      gap:          4,
-      padding:      '12px 24px 24px',
+      gap:          'var(--space-1)',
+      padding:      'var(--space-3) var(--space-6) var(--space-6)',
       borderBottom: '1px solid var(--neutral-100)',
     }}>
       <p style={{
         flex:         '1 0 0',
         minWidth:     0,
         fontFamily:   'var(--font-body)',
-        fontWeight:   500,
-        fontSize:     16,
-        lineHeight:   '22px',
+        fontWeight:   'var(--font-weight-medium)',
+        fontSize:     'var(--font-size-body-lg)',
+        lineHeight:   'var(--line-height-body)',
         color:        'var(--neutral-900)',
         margin:       0,
         overflow:     'hidden',
@@ -231,7 +231,7 @@ function CardHeader({
       }}>
         {title}
       </p>
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
         <GhostButton onClick={onEnableAll}>Enable all</GhostButton>
         <GhostButton onClick={onMuteAll}>Mute all</GhostButton>
       </div>
@@ -289,21 +289,21 @@ export default function NotificationsPage() {
         display:        'flex',
         alignItems:     'flex-start',
         justifyContent: 'center',
-        paddingTop:     64,
-        paddingBottom:  48,
+        paddingTop:     'var(--space-10)',
+        paddingBottom:  'var(--space-9)',
       }}
     >
       {/* Horizontal padding lives here, not on the scrolling element above —
           keeps the scrollbar flush with the container's edge. */}
-      <div style={{ width: '100%', maxWidth: 908, padding: '0 24px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ width: '100%', maxWidth: 908, padding: '0 var(--space-6)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
 
         {/* ── Page header ── */}
-        <div style={{ paddingLeft: 4, marginBottom: 4 }}>
+        <div style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)' }}>
           <h1 style={{
             fontFamily:   'var(--font-title)',
-            fontWeight:   400,
-            fontSize:     24,
-            lineHeight:   '32px',
+            fontWeight:   'var(--font-weight-regular)',
+            fontSize:     'var(--font-size-heading)',
+            lineHeight:   'var(--line-height-heading)',
             color:        'var(--neutral-900)',
             margin:       0,
             overflow:     'hidden',
@@ -314,9 +314,9 @@ export default function NotificationsPage() {
           </h1>
           <p style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 400,
-            fontSize:   14,
-            lineHeight: '22px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize:   'var(--font-size-body)',
+            lineHeight: 'var(--line-height-body)',
             color:      'var(--neutral-500)',
             margin:     0,
           }}>
@@ -335,7 +335,7 @@ export default function NotificationsPage() {
           <ColHeaders />
 
           {/* AUTOMATIONS section */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 24px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', padding: 'var(--space-3) var(--space-6)' }}>
             <SectionLabel>AUTOMATIONS</SectionLabel>
             <NotifRow
               id="automation-complete"
@@ -352,7 +352,7 @@ export default function NotificationsPage() {
           </div>
 
           {/* CONTENT section */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 24px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', padding: 'var(--space-3) var(--space-6)' }}>
             <SectionLabel>CONTENT</SectionLabel>
             {PINS_ENABLED && (
               <NotifRow
@@ -377,7 +377,7 @@ export default function NotificationsPage() {
           </div>
 
           {/* USAGE section */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 24px 12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', padding: 'var(--space-3) var(--space-6) var(--space-3)' }}>
             <SectionLabel>USAGE</SectionLabel>
 
             {/* Budget alert - single switch row */}
@@ -389,12 +389,12 @@ export default function NotificationsPage() {
             />
 
             {/* Budget routing - checkbox group */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '6px 0 12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-1-5) 0 var(--space-3)' }}>
               <p style={{
                 fontFamily: 'var(--font-body)',
-                fontWeight: 500,
-                fontSize:   14,
-                lineHeight: '22px',
+                fontWeight: 'var(--font-weight-medium)',
+                fontSize:   'var(--font-size-body)',
+                lineHeight: 'var(--line-height-body)',
                 color:      'var(--neutral-900)',
                 margin:     0,
               }}>
@@ -410,7 +410,7 @@ export default function NotificationsPage() {
                   style={{
                     display:    'flex',
                     alignItems: 'center',
-                    gap:        10,
+                    gap:        'var(--space-2-5)',
                     cursor:     'pointer',
                     userSelect: 'none',
                   }}
@@ -423,9 +423,9 @@ export default function NotificationsPage() {
                   />
                   <span style={{
                     fontFamily: 'var(--font-body)',
-                    fontWeight: 400,
-                    fontSize:   14,
-                    lineHeight: '22px',
+                    fontWeight: 'var(--font-weight-regular)',
+                    fontSize:   'var(--font-size-body)',
+                    lineHeight: 'var(--line-height-body)',
                     color:      'var(--neutral-900)',
                     flex:       '1 0 0',
                     minWidth:   0,
@@ -448,7 +448,7 @@ export default function NotificationsPage() {
 
           <ColHeaders />
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 24px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', padding: 'var(--space-3) var(--space-6)' }}>
             <NotifRow
               id="team-invite"
               label="Team invite"
@@ -480,7 +480,7 @@ export default function NotificationsPage() {
 
           <ColHeaders />
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 24px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', padding: 'var(--space-3) var(--space-6)' }}>
             <NotifRow
               id="payment-successful"
               label="Payment successful"
@@ -502,20 +502,20 @@ export default function NotificationsPage() {
         <div
           style={{
             border:          '1px solid var(--border-default)',
-            borderRadius:    16,
-            boxShadow:       '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+            borderRadius:    'var(--radius-2xl)',
+            boxShadow:       'var(--shadow-soft)',
             overflow:        'hidden',
-            padding:         '12px 24px',
+            padding:         'var(--space-3) var(--space-6)',
             backgroundColor: 'var(--neutral-50)',
           }}
         >
           <p style={{
             fontFamily:   'var(--font-body)',
-            fontWeight:   500,
-            fontSize:     16,
-            lineHeight:   '22px',
+            fontWeight:   'var(--font-weight-medium)',
+            fontSize:     'var(--font-size-body-lg)',
+            lineHeight:   'var(--line-height-body)',
             color:        'var(--neutral-900)',
-            margin:       '0 0 2px',
+            margin:       '0 0 var(--space-0-5)',
             overflow:     'hidden',
             textOverflow: 'ellipsis',
             whiteSpace:   'nowrap',
@@ -524,9 +524,9 @@ export default function NotificationsPage() {
           </p>
           <p style={{
             fontFamily:   'var(--font-body)',
-            fontWeight:   400,
-            fontSize:     14,
-            lineHeight:   '22px',
+            fontWeight:   'var(--font-weight-regular)',
+            fontSize:     'var(--font-size-body)',
+            lineHeight:   'var(--line-height-body)',
             color:        'var(--neutral-500)',
             margin:       0,
           }}>

@@ -217,6 +217,6 @@ const [index] = useState(() => buildIndex(items)); // runs once
 - Next.js: [Server and Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components).
 
 ### In this codebase
-- `useState` is the dominant pattern: about 290 files under `src/` use it (for example `src/templates/Schedules/ScheduleEditModal.tsx` holds 10 state hooks), so check large components for values that change together and would suit a reducer or a single union.
+- `useState` is the dominant pattern: about 290 files under `src/` use it (for example `src/components/Schedules/ScheduleEditModal.tsx` held 10 state hooks before it moved to `useZodForm`), so check large components for values that change together and would suit a reducer or a single union.
 - `useReducer` is used once, in `src/hooks/use-agent-draft-sync.ts` (`syncReducer`), which is the model to follow for status-style state.
 - Server data is handled by `@tanstack/react-query` (installed); avoid mirroring it into `useState`. `zustand`, `redux`, `mobx` and `react-hook-form` are not installed, so lifting state and context (`src/context/`) are the only sharing tools besides the URL.

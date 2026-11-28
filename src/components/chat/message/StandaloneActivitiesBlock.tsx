@@ -4,15 +4,16 @@ import React, { useState } from "react";
 import { m } from "framer-motion";
 import { ActivitiesSection } from "../ActivityRow";
 import type { ActivityItem } from "@/types/chat";
+import { SPRING } from "@/styles/tokens/motion"
 
 // ── Standalone Activities Block (collapsible, used when no reasoning) ─────────
 
-const wrapperStyle: React.CSSProperties = { margin: "4px 0 8px" };
+const wrapperStyle: React.CSSProperties = { margin: "var(--space-1) 0 var(--space-2)" };
 
-const headerRowStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 7, minHeight: 20, userSelect: "none" };
+const headerRowStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 'var(--space-1-5)', minHeight: 20, userSelect: "none" };
 
 const summaryStyle: React.CSSProperties = {
-  fontSize: 14,
+  fontSize: 'var(--font-size-body)',
   color: "var(--neutral-600)",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -25,10 +26,10 @@ const toggleStyle: React.CSSProperties = {
   background: "transparent",
   border: "none",
   cursor: "pointer",
-  padding: 3,
+  padding: 'var(--space-0-5)',
   display: "flex",
   alignItems: "center",
-  borderRadius: 4,
+  borderRadius: 'var(--radius-xs)',
   flexShrink: 0,
 };
 
@@ -36,7 +37,7 @@ const chevronStyle: React.CSSProperties = { display: "block", flexShrink: 0 };
 
 const clipStyle: React.CSSProperties = { overflow: "hidden", minHeight: 0 };
 
-const panelStyle: React.CSSProperties = { paddingTop: 10 };
+const panelStyle: React.CSSProperties = { paddingTop: 'var(--space-2-5)' };
 
 export function StandaloneActivitiesBlock({
   activities,
@@ -71,7 +72,7 @@ export function StandaloneActivitiesBlock({
             viewBox="0 0 14 14"
             fill="none"
             animate={{ rotate: isOpen ? 180 : 0 }}
-            transition={{ type: "spring", stiffness: 380, damping: 28 }}
+            transition={{ type: "spring", ...SPRING.brisk }}
             style={chevronStyle}
           >
             <path
@@ -95,7 +96,7 @@ export function StandaloneActivitiesBlock({
           gridTemplateRows: isOpen ? "1fr" : "0fr",
           opacity: isOpen ? 1 : 0,
           visibility: isOpen ? "visible" : "hidden",
-          transition: `grid-template-rows 260ms cubic-bezier(0.16,1,0.3,1), opacity 220ms ease, visibility 0s linear ${isOpen ? "0s" : "260ms"}`,
+          transition: `grid-template-rows var(--standalone-activities-block-reveal-duration) var(--ease-out-expo), opacity var(--standalone-activities-block-fade-duration) ease, visibility 0s linear ${isOpen ? "0s" : "var(--standalone-activities-block-duration)"}`,
         }}
       >
         <div style={clipStyle}>

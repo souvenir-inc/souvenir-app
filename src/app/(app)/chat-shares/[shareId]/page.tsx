@@ -32,7 +32,7 @@ function SharedReply({ message }: { message: SharedChatMessage }) {
   const sources = useMemo(() => deriveCitationsFromSources(output), [output])
   const citations = sources.citations.length > 0 ? sources.citations : undefined
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingRight: '10%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', paddingRight: 'var(--chat-share-answer-inset)' }}>
       {message.reasoning && (
         <ReasoningBlock
           thinkingContent={message.reasoning}
@@ -101,8 +101,8 @@ function SharedChatContent() {
     // Mirrors the real shared-chat layout below — header block + message
     // bubbles — instead of flashing plain "Loading…" text.
     return (
-      <div style={{ maxWidth: 760, margin: '0 auto', width: '100%', padding: '24px 24px 64px', display: 'flex', flexDirection: 'column', gap: 24 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ maxWidth: 760, margin: '0 auto', width: '100%', padding: 'var(--space-6) var(--space-6) var(--space-10)', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
           <Skeleton width="45%" height={26} />
           <Skeleton width="25%" height={14} />
         </div>
@@ -126,18 +126,18 @@ function SharedChatContent() {
           flexDirection:  'column',
           alignItems:     'center',
           justifyContent: 'center',
-          gap:            20,
+          gap:            'var(--space-5)',
           height:         '100%',
-          padding:        48,
+          padding:        'var(--space-9)',
           textAlign:      'center',
         }}
       >
         <p
           style={{
             fontFamily: 'var(--font-title)',
-            fontWeight: 400,
-            fontSize:   22,
-            lineHeight: '30px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize:   'var(--font-size-heading-md)',
+            lineHeight: 'var(--line-height-heading-md)',
             color:      'var(--neutral-900)',
             margin:     0,
             maxWidth:   440,
@@ -165,10 +165,10 @@ function SharedChatContent() {
           maxWidth:    760,
           margin:      '0 auto',
           width:       '100%',
-          padding:     '24px 24px 64px',
+          padding:     'var(--space-6) var(--space-6) var(--space-10)',
           display:     'flex',
           flexDirection: 'column',
-          gap:         24,
+          gap:         'var(--space-6)',
         }}
       >
         {/* Back button — isolated above header */}
@@ -184,14 +184,14 @@ function SharedChatContent() {
         </div>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <h1
               style={{
                 fontFamily:     'var(--font-title)',
-                fontWeight:     400,
-                fontSize:       22,
-                lineHeight:     '30px',
+                fontWeight:     'var(--font-weight-regular)',
+                fontSize:       'var(--font-size-heading-md)',
+                lineHeight:     'var(--line-height-heading-md)',
                 color:          'var(--neutral-900)',
                 margin:         0,
                 overflow:       'hidden',
@@ -201,11 +201,11 @@ function SharedChatContent() {
             >
               {view.chatTitle}
             </h1>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--neutral-500)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', marginTop: 'var(--space-1)' }}>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-500)' }}>
                 Shared chat
               </span>
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--neutral-400)' }}>·</span>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-400)' }}>·</span>
               <Badge label="Read only" color="Red" />
             </div>
           </div>
@@ -226,28 +226,28 @@ function SharedChatContent() {
 
         {/* Messages */}
         {view.messages.length === 0 ? (
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-400)', textAlign: 'center', paddingTop: 48, margin: 0 }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-400)', textAlign: 'center', paddingTop: 'var(--space-9)', margin: 0 }}>
             No messages in this chat.
           </p>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             {view.messages.map(msg => (
-              <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
                 {msg.input && (
                   <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <div
                       style={{
                         maxWidth:        '78%',
                         backgroundColor: 'var(--neutral-100)',
-                        borderRadius:    '16px 16px 4px 16px',
-                        padding:         '10px 14px',
+                        borderRadius:    'var(--radius-2xl) var(--radius-2xl) var(--radius-xs) var(--radius-2xl)',
+                        padding:         'var(--space-2-5) var(--space-3)',
                       }}
                     >
                       <p
                         style={{
                           fontFamily: 'var(--font-body)',
-                          fontSize:   14,
-                          lineHeight: '22px',
+                          fontSize:   'var(--font-size-body)',
+                          lineHeight: 'var(--line-height-body)',
                           color:      'var(--neutral-800)',
                           margin:     0,
                           whiteSpace: 'pre-wrap',

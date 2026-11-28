@@ -22,6 +22,7 @@ import { Badge, type BadgeColor } from '@/components/Badge'
 import { springs } from '@/lib/springs'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -121,8 +122,8 @@ function IconBadge({
         display:         'flex',
         alignItems:      'center',
         justifyContent:  'center',
-        padding:         2,
-        borderRadius:    6,
+        padding:         'var(--space-0-5)',
+        borderRadius:    'var(--radius-sm)',
         flexShrink:      0,
         backgroundColor: 'var(--color-tag-Neutral-bg)',
         boxShadow:       'var(--color-tag-Neutral-shadow)',
@@ -189,18 +190,18 @@ function RemoveButton({
         display:         'flex',
         alignItems:      'center',
         justifyContent:  'center',
-        padding:         4,
-        borderRadius:    8,
+        padding:         'var(--space-1)',
+        borderRadius:    'var(--radius-md)',
         border:          'none',
         cursor:          'pointer',
         backgroundColor: 'var(--neutral-white)',
         color:           'var(--icon-button-secondary-icon)',
         boxShadow:       'var(--shadow-button-secondary-outer), var(--shadow-button-secondary-inner)',
         outlineStyle:    'solid',
-        outlineWidth:    '2px',
-        outlineOffset:   '2px',
+        outlineWidth:    'var(--focus-ring-width)',
+        outlineOffset:   'var(--focus-ring-offset)',
         outlineColor:    isFocused ? 'var(--focus-ring)' : 'transparent',
-        transition:      'outline-color 150ms',
+        transition:      'outline-color var(--duration-fast)',
         zIndex:          2,
       }}
     >
@@ -242,14 +243,14 @@ export function ChatThumbnail({
         // The wrapper's `layout` prop makes sibling thumbnails reflow as
         // one is removed, so the exit animation sits cleanly on top of
         // the row's collapse.
-        initial={{ opacity: 0, scale: 0.7, filter: 'blur(4px)' }}
+        initial={{ opacity: 0, scale: 0.7, filter: `blur(${BLUR.xs}px)` }}
         animate={{
           opacity: 1, scale: 1, filter: 'blur(0px)',
-          transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
+          transition: { duration: DURATION.base, ease: [0.22, 1, 0.36, 1] },
         }}
         exit={{
-          opacity: 0, scale: 0.7, filter: 'blur(4px)',
-          transition: { duration: 0.18, ease: [0.55, 0.085, 0.68, 0.53] },
+          opacity: 0, scale: 0.7, filter: `blur(${BLUR.xs}px)`,
+          transition: { duration: DURATION.base, ease: [0.55, 0.085, 0.68, 0.53] },
         }}
         className={cn(className)}
         onMouseEnter={(e) => { setHovered(true);  onMouseEnter?.(e) }}
@@ -266,8 +267,8 @@ export function ChatThumbnail({
               height:          120,
               flexShrink:      0,
               display:         'flex',
-              padding:         12,
-              borderRadius:    16,
+              padding:         'var(--space-3)',
+              borderRadius:    'var(--radius-2xl)',
               overflow:        'hidden',
               backgroundColor: 'var(--neutral-white)',
               boxShadow:       CARD_SHADOW,
@@ -280,7 +281,7 @@ export function ChatThumbnail({
                 flex:          '1 0 0',
                 minWidth:      1,
                 height:        '100%',
-                gap:           10,
+                gap:           'var(--space-2-5)',
                 alignItems:    'flex-start',
               }}
             >
@@ -321,8 +322,8 @@ export function ChatThumbnail({
                 display:         'flex',
                 flexDirection:   'column',
                 justifyContent:  'center',
-                padding:         12,
-                borderRadius:    18,
+                padding:         'var(--space-3)',
+                borderRadius:    'var(--radius-2xl)',
                 overflow:        'hidden',
                 backgroundColor: 'var(--neutral-white)',
                 boxShadow:       CARD_SHADOW,
@@ -332,7 +333,7 @@ export function ChatThumbnail({
                 style={{
                   display:       'flex',
                   flexDirection: 'column',
-                  gap:           8,
+                  gap:           'var(--space-2)',
                   width:         96,
                   flexShrink:    0,
                 }}
@@ -375,8 +376,8 @@ export function ChatThumbnail({
                 display:         'flex',
                 flexDirection:   'column',
                 justifyContent:  'flex-end',
-                padding:         12,
-                borderRadius:    18,
+                padding:         'var(--space-3)',
+                borderRadius:    'var(--radius-2xl)',
                 overflow:        'hidden',
                 backgroundColor: 'var(--neutral-white)',
                 boxShadow:       CARD_SHADOW,

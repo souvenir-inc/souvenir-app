@@ -5,6 +5,7 @@ import { m, AnimatePresence } from 'framer-motion'
 import { MoreVerticalIcon, PenOneIcon, ShareOneIcon, CopyOneIcon, StopCircleIcon, ArrowRightTwoIcon, InformationCircleIcon } from '@strange-huge/icons'
 import { IconButton } from '@/components/ui/button'
 import { Dropdown, DROPDOWN_SCALE_PRESET } from '@/components/Dropdown'
+import { DURATION } from "@/styles/tokens/motion"
 
 export interface AgentCardMenuProps {
   open: boolean
@@ -71,7 +72,7 @@ export function AgentCardMenu({
         aria-label="More options"
         aria-expanded={open}
         icon={
-          <m.span animate={{ rotate: open ? 90 : 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} style={{ display: 'inline-flex' }}>
+          <m.span animate={{ rotate: open ? 90 : 0 }} transition={{ duration: DURATION.base, ease: 'easeOut' }} style={{ display: 'inline-flex' }}>
             <MoreVerticalIcon />
           </m.span>
         }
@@ -87,7 +88,7 @@ export function AgentCardMenu({
               style={{
                 position: 'fixed',
                 inset:    0,
-                zIndex:   10,
+                zIndex:   'var(--z-raised)',
               }}
               onMouseDown={() => onOpenChange(false)}
             />
@@ -99,7 +100,7 @@ export function AgentCardMenu({
                 position: 'absolute',
                 ...(dropUp ? { bottom: 28, top: 'auto' } : { top: 28 }),
                 right:    0,
-                zIndex:   20,
+                zIndex:   'var(--z-dropdown)',
               }}
             >
               <Dropdown size="sm" maxHeight={false}>

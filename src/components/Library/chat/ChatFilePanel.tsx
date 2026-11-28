@@ -17,7 +17,7 @@ import { FormatGlyph } from '../FormatGlyph'
 import { GoneState, LockedState } from '../FileStates'
 import styles from './LibraryChat.module.css'
 
-const FilePreview = dynamic(() => import('../viewers/FilePreview'), { ssr: false, loading: () => <Skeleton height={240} radius={12} /> })
+const FilePreview = dynamic(() => import('../viewers/FilePreview'), { ssr: false, loading: () => <Skeleton height={240} radius={'var(--radius-xl)'} /> })
 
 export interface ChatFilePanelProps {
   fileId: string
@@ -50,7 +50,7 @@ export function ChatFilePanel({ fileId, cite = null, onClose }: ChatFilePanelPro
             <Link
               href={citationHref(open.id, cite)}
               aria-label="Open file page"
-              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, color: 'var(--neutral-600)' }}
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 'var(--radius-md)', color: 'var(--neutral-600)' }}
             >
               <ArrowUpRightOneIcon size={16} />
             </Link>
@@ -58,9 +58,9 @@ export function ChatFilePanel({ fileId, cite = null, onClose }: ChatFilePanelPro
         )}
         <IconButton variant="ghost" size="sm" aria-label="Close file" icon={<CancelOneIcon size={16} />} onClick={onClose} />
       </div>
-      <div className={styles.panelBody} style={{ padding: 20 }}>
+      <div className={styles.panelBody} style={{ padding: 'var(--space-5)' }}>
         {file.isPending ? (
-          <Skeleton height={240} radius={12} />
+          <Skeleton height={240} radius={'var(--radius-xl)'} />
         ) : locked ? (
           <LockedState fileId={fileId} requested={isAccessRequested(file.error)} />
         ) : gone || !open ? (

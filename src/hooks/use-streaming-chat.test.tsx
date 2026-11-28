@@ -175,7 +175,8 @@ describe('useStreamingChat turn result', () => {
       { type: 'RUN_FINISHED', ...RUN },
     ])
     expect(outcome).toBe('done')
-    expect(ended).toEqual([{ type: 'end', chatId: 'chat-1', outcome: 'done' }])
+    // Every end names the reply it was writing.
+    expect(ended).toEqual([{ type: 'end', chatId: 'chat-1', outcome: 'done', replyId: 'loading-1' }])
   })
 
   it('reports a run error as an error, even with text already shown', async () => {
@@ -185,7 +186,8 @@ describe('useStreamingChat turn result', () => {
       { type: 'RUN_ERROR', message: 'stream error' },
     ])
     expect(outcome).toBe('error')
-    expect(ended).toEqual([{ type: 'end', chatId: 'chat-1', outcome: 'error' }])
+    // The run reported its own end (RUN_ERROR): marked so, unlike a reader that dropped.
+    expect(ended).toEqual([{ type: 'end', chatId: 'chat-1', outcome: 'error', runEnded: true, replyId: 'loading-1' }])
   })
 
   it('reports a failed request as an error', async () => {
@@ -204,7 +206,8 @@ describe('useStreamingChat turn result', () => {
     expect(await done).toBe('aborted')
     FakeXHR.last = null
     expect(isStreamActive('chat-1')).toBe(false)
-    expect(ended).toEqual([{ type: 'end', chatId: 'chat-1', outcome: 'aborted' }])
+    // The Stop names the reply it stopped, so a view can tell its own running reply's follow apart.
+    expect(ended).toEqual([{ type: 'end', chatId: 'chat-1', outcome: 'aborted', replyId: 'loading-1' }])
   })
 })
 

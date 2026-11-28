@@ -73,30 +73,18 @@ import { buildAgentCardMessages } from "@/lib/agent-card-messages";
 import { StarterList, StarterListSkeleton } from "@/components/StarterSuggestions";
 import { useRecommendationsState } from "@/hooks/use-recommendations";
 import { PENDING_PERSONA_KEY } from '@/lib/storage-keys'
+import { loadChatSettings, saveChatSettings } from '@/lib/chat/chat-settings-storage'
 import { FileDropOverlay } from "@/components/chat/FileDropOverlay";
+import { DURATION } from "@/styles/tokens/motion"
 
 
 // ── Per-chat settings helpers ─────────────────────────────────────────────────
 // Settings (webSearch, persona) are stored per-chatId so each chat remembers
 // its own state and navigating between chats never bleeds settings across.
 
-interface ChatSettings {
-  webSearch: boolean;
-  persona: SelectedPersonaInfo | null;
-}
-
 const NEVER_RAN = Symbol("chat-url-effect-not-run");
 
-function loadChatSettings(chatId: string): ChatSettings | null {
-  try {
-    const raw = localStorage.getItem(`souvenir_chat_${chatId}`);
-    return raw ? (JSON.parse(raw) as ChatSettings) : null;
-  } catch { return null; }
-}
-
-function saveChatSettings(chatId: string, settings: ChatSettings): void {
-  try { localStorage.setItem(`souvenir_chat_${chatId}`, JSON.stringify(settings)); } catch {}
-}
+// Kept by lib/chat/chat-settings-storage (validated, capped, no agent instructions, cleared on sign-out).
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
@@ -847,7 +835,7 @@ function ChatPageInner({ leftChatId }: { leftChatId?: string }) {
   const handleNewChatSend = (value: string) => {
     if (!value.trim() && newChatAttachments.length === 0) return;
     // Hard-stop backstop: an exhausted credit/topup user cannot send. The input is
-    // already disabled and the CreditStatusBanner explains why, so block silently.
+    // already disabled and the credit banner (ExhaustionBanner) explains why, so block silently.
     if (creditStatus.blocked) return;
     if (selectedProjectId && !getProject(selectedProjectId)?.canEdit) {
       setNewChatInput(value);
@@ -913,7 +901,7 @@ function ChatPageInner({ leftChatId }: { leftChatId?: string }) {
         {isNewChat ? (
           <m.div
             key="new-chat"
-            exit={{ opacity: 0, transition: { duration: 0.28, ease: [0.4, 0, 1, 1] } }}
+            exit={{ opacity: 0, transition: { duration: DURATION.moderate, ease: [0.4, 0, 1, 1] } }}
             className="kaya-scrollbar"
             style={{
               position:  "absolute",
@@ -927,7 +915,7 @@ function ChatPageInner({ leftChatId }: { leftChatId?: string }) {
               <div className={homeStyles.content}>
                 {/* Greeting exits upward */}
                 <m.div
-                  exit={{ opacity: 0, y: -28, transition: { duration: 0.22, ease: [0.4, 0, 1, 1] } }}
+                  exit={{ opacity: 0, y: -28, transition: { duration: DURATION.base, ease: [0.4, 0, 1, 1] } }}
                 >
                   <InitialPrompts compact />
                 </m.div>
@@ -935,7 +923,7 @@ function ChatPageInner({ leftChatId }: { leftChatId?: string }) {
                 {/* Input + action buttons + template cards exit downward */}
                 <m.div
                   className={homeStyles.composer}
-                  exit={{ opacity: 0, y: 36, transition: { duration: 0.22, ease: [0.4, 0, 1, 1] } }}
+                  exit={{ opacity: 0, y: 36, transition: { duration: DURATION.base, ease: [0.4, 0, 1, 1] } }}
                 >
                   <AnimatePresence>
                     {creditNoticeStatus && (
@@ -978,7 +966,7 @@ function ChatPageInner({ leftChatId }: { leftChatId?: string }) {
                       disabled={creditStatus.blocked}
                       attachmentsSlot={
                         PINS_ENABLED && newChatMentionedPins.length > 0 ? (
-                          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
                             <PinChipStrip>
                               {newChatMentionedPins.map((mp) => (
                                 <MentionChip
@@ -1023,7 +1011,7 @@ function ChatPageInner({ leftChatId }: { leftChatId?: string }) {
                   {/* ── Starter cards ───────────────────────────────────────── */}
                   {/* Generated per user by /recommendations; absent until it lands. */}
                   {(recommendations || recommendationsLoading) && (
-                    <div style={{ marginTop: "20px", textAlign: "left" }}>
+                    <div style={{ marginTop: "var(--space-5)", textAlign: "left" }}>
                       {recommendations
                         ? <StarterList cards={recommendations.cards} onSelect={(card) => handleNewChatSend(card.prompt)} />
                         : <StarterListSkeleton />}
@@ -1037,7 +1025,7 @@ function ChatPageInner({ leftChatId }: { leftChatId?: string }) {
           <m.div
             key="active-chat"
             initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0, transition: { duration: 0.35, ease: [0, 0, 0.2, 1] } }}
+            animate={{ opacity: 1, y: 0, transition: { duration: DURATION.slow, ease: [0, 0, 0.2, 1] } }}
             style={{
               position:      "absolute",
               inset:         0,

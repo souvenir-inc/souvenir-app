@@ -27,6 +27,7 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 import { toast } from 'sonner'
 import { trackFeature } from '@/lib/analytics/events'
 import { isImeKey } from '@/lib/ime'
+import { BLUR, DURATION, SPRING } from "@/styles/tokens/motion"
 
 // ── Canonical default menu contents ───────────────────────────────────────────
 // The Add menu (Figma 3219:33599) and Model menu (Figma 3208:32989 + 3142:36710)
@@ -135,7 +136,7 @@ function PersonaSearchInput({
   inputId: string
 }) {
   return (
-    <div style={{ padding: 8 }}>
+    <div style={{ padding: 'var(--space-2)' }}>
       <input
         id={inputId}
         type="text"
@@ -146,13 +147,13 @@ function PersonaSearchInput({
         spellCheck={false}
         style={{
           width:           '100%',
-          padding:         '7px 10px',
-          borderRadius:    10,
+          padding:         'var(--space-1-5) var(--space-2-5)',
+          borderRadius:    'var(--radius-lg)',
           border:          'none',
           outline:         'none',
           background:      'var(--field-surface)',
           boxShadow:
-            '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
+            'var(--shadow-control)',
           fontFamily:      'var(--font-body)',
           fontWeight:      'var(--font-weight-regular)',
           fontSize:        'var(--font-size-body)',
@@ -449,10 +450,10 @@ function DefaultModelMenu() {
                   maxHeight:            DEFAULT_MODEL_LIST_MAX_HEIGHT,
                   overflowY:            'auto',
                   overscrollBehaviorY:  'contain',
-                  padding:              '3px',
+                  padding:              'var(--space-0-5)',
                 }}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                   {sampleModels.map((model) => (
                     // `icon`+ModelIcon (not the `llm` prop) — Souvenir-mark
                     // fallback for unrecognized providers, and a slightly
@@ -648,8 +649,7 @@ export interface ChatInputProps extends Omit<React.HTMLAttributes<HTMLDivElement
   /**
    * Project pin folders - derived from the user's Sidebar projects.
    * Rendered in the Add menu's "Pin folders" submenu under a "Project
-   * folders" section header. See `specs/patterns/project-pinboard-folder-sync.md`
-   * for the canonical mapping. Ignored when `addMenu` is overridden.
+   * folders" section header. Ignored when `addMenu` is overridden.
    */
   projectFolders?: ChatInputFolder[]
   // ── Auto-chip state (uncontrolled / controlled) ─────────────────────────
@@ -1098,14 +1098,14 @@ export function ChatInput({
           display:         'flex',
           flexDirection:   compact ? 'row' : 'column',
           alignItems:      compact ? 'center' : undefined,
-          gap:             compact ? '8px' : '24px',
+          gap:             compact ? 'var(--space-2)' : 'var(--space-6)',
           width:           '100%',
           maxWidth:        '754px',
-          padding:         compact ? (addButton ? '8px' : '8px 8px 8px 20px') : '20px',
-          borderRadius:    compact ? '16px' : '24px',
+          padding:         compact ? (addButton ? 'var(--space-2)' : 'var(--space-2) var(--space-2) var(--space-2) var(--space-5)') : 'var(--space-5)',
+          borderRadius:    compact ? 'var(--radius-2xl)' : 'var(--chat-input-radius)',
           backgroundColor: 'var(--chat-input-bg)',
           boxShadow:       shadow,
-          transition:      'box-shadow 150ms',
+          transition:      'box-shadow var(--duration-fast)',
         }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -1120,7 +1120,7 @@ export function ChatInput({
           style={{
             position: 'absolute',
             width: 1, height: 1,
-            padding: 0, margin: -1,
+            padding: 0, margin: 'calc(var(--space-px) * -1)',
             overflow: 'hidden',
             clip: 'rect(0,0,0,0)',
             whiteSpace: 'nowrap',
@@ -1146,8 +1146,8 @@ export function ChatInput({
             style={{
               display:       'flex',
               flexWrap:      'wrap',
-              gap:           '12px',
-              paddingBottom: '8px',
+              gap:           'var(--space-3)',
+              paddingBottom: 'var(--space-2)',
             }}
           >
             {pinCards}
@@ -1164,9 +1164,9 @@ export function ChatInput({
               <m.div
                 key="placeholder"
                 aria-hidden
-                initial={{ opacity: 0, filter: 'blur(2px)' }}
-                animate={{ opacity: 1, filter: 'blur(0px)', transitionEnd: { filter: 'none' }, transition: { duration: 0.2 } }}
-                exit={{ opacity: 0, filter: 'blur(2px)', transition: { duration: 0.15 } }}
+                initial={{ opacity: 0, filter: `blur(${BLUR['2xs']}px)` }}
+                animate={{ opacity: 1, filter: 'blur(0px)', transitionEnd: { filter: 'none' }, transition: { duration: DURATION.base } }}
+                exit={{ opacity: 0, filter: `blur(${BLUR['2xs']}px)`, transition: { duration: DURATION.quick } }}
                 style={{
                   position:      'absolute',
                   top:           0,
@@ -1183,10 +1183,10 @@ export function ChatInput({
                 <AnimatePresence mode="popLayout" initial={false}>
                   <m.span
                     key={isRecording ? 'listening' : 'default'}
-                    initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                    initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                     animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)', transitionEnd: { filter: 'none' } }}
-                    exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                    transition={{ type: 'spring', ...SPRING.snappy }}
                     style={{ display: 'block', transformOrigin: 'left center' }}
                   >
                     {isRecording ? 'Listening...' : placeholder}
@@ -1248,7 +1248,7 @@ export function ChatInput({
           }}
         >
           {/* Left: attach button + chips slot */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
             {!compact && addButton}
             {(webSearch || activeStyle || activePersona || chips) && (
               <div
@@ -1258,7 +1258,7 @@ export function ChatInput({
                 // to a second line - matches the reference composer's overflow
                 // behaviour). Auto-chips render BEFORE consumer-provided
                 // chips so file-attachment / custom badges appear after.
-                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
               >
                 {autoChips}
                 {chips}
@@ -1267,7 +1267,7 @@ export function ChatInput({
           </div>
 
           {/* Right: model selector + mic/send button */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
             {!hideModelSelector && (disabledModelSelector ? (
               // Agent/persona chip active — that chat always uses the
               // agent's own configured model, so no menu at all. Same
@@ -1350,10 +1350,10 @@ export function ChatInput({
                       return (
                         <m.span
                           key={iconKey}
-                          initial={isWave ? { scale: 0.5, opacity: 0 }               : { scale: 0.5, opacity: 0, filter: 'blur(4px)' }}
+                          initial={isWave ? { scale: 0.5, opacity: 0 }               : { scale: 0.5, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                           animate={isWave ? { scale: 1,   opacity: 1 }               : { scale: 1,   opacity: 1, filter: 'blur(0px)', transitionEnd: { filter: 'none' } }}
-                          exit={isWave    ? { scale: 0.5, opacity: 0 }               : { scale: 0.5, opacity: 0, filter: 'blur(4px)' }}
-                          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                          exit={isWave    ? { scale: 0.5, opacity: 0 }               : { scale: 0.5, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                          transition={{ type: 'spring', ...SPRING.snappy }}
                           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
                           {isRecording

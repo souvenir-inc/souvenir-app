@@ -1,0 +1,96 @@
+import { describe, expect, it } from 'vitest'
+import { CONNECTIONS, TOTAL, metrics } from './__fixtures__/live'
+import { Apps } from './live/apps'
+import { boardReducer, type Board } from './tabs/board-state'
+import { TEMPLATES, measurable, starterState, templateFor, templatesFor, toBoardCards } from './templates'
+
+// 08-new-board-rules.md, with the fixture store: Shopify and Meta Ads, no shipping app.
+const tpl = (id: string) => TEMPLATES.find((t) => t.id === id)!
+const ids = () => { let n = 0; return () => `board-${++n}` }
+/** The same store with Meta Ads disconnected: the warehouse can't measure anything built on ads. */
+const NO_ADS = { code: 'no_connection', reason: 'needs ad_insights, which no connection in this store fills', connectors: ['metaads'] }
+const shopifyOnly = () => metrics({
+  apps: new Apps(CONNECTIONS.slice(0, 1)),
+  total: { ...TOTAL, unavailable: { ...TOTAL.unavailable, ...Object.fromEntries(['ad_spend', 'platform_roas', 'platform_cpa', 'mer', 'net_after_ads'].map((n) => [n, NO_ADS])) } },
+})
+
+describe('templates (NB-7 – NB-13)', () => {
+  it('lists six, your role first', () => {
+    expect(TEMPLATES.map((t) => t.role)).toEqual(['Founder or CEO', 'Head of e-commerce', 'Growth or ads lead', 'Ops lead', 'Finance or fractional CFO', 'Agency'])
+  })
+  it('leaves out what the store can’t measure: not in its library, no app feeding it, or unavailable (NB-9)', () => {
+    const used = templateFor(tpl('ecommerce').cards, metrics())
+    expect(used.cards.map((c) => c.metricId)).toEqual(['revenue', 'orders', 'aov', 'cancellation_rate', 'refund_rate'])
+    expect(used.leftOut).toEqual(['new_customers'])
+    expect(templateFor(tpl('agency').cards, shopifyOnly()).cards).toEqual([])
+  })
+  it('measurable: an app feeds it, or it is the workspace’s own', () => {
+    const m = metrics()
+    expect(measurable(m.get('revenue'))).toBe(true)
+    expect(measurable(m.get('net_after_ads'))).toBe(true)
+    expect(measurable(m.get('shipping_cost'))).toBe(false)
+    expect(measurable(m.get('nope'))).toBe(false)
+  })
+  it('lays the cards out in the template’s order (NB-12)', () => {
+    const cards = toBoardCards(templateFor(tpl('founder').cards, metrics()).cards)
+    expect(cards[0]).toEqual({ metricId: 'revenue', size: 'full', x: 0, y: 0 })
+    expect(cards.slice(1).map((c) => c.metricId)).toEqual(['mer', 'aov'])
+  })
+})
+
+describe('board actions for New board', () => {
+  const s = starterState(metrics(), ids(), 'auth0|viewer')
+  const ads = s.tabs[1]
+  it('update-board patches a board’s own fields', () => {
+    const next = boardReducer(s, { type: 'update-board', id: ads, patch: { label: 'Grow', draft: true } })
+    expect(next.boards[ads].label).toBe('Grow')
+    expect(next.boards[ads].draft).toBe(true)
+    expect(next.boards[ads].cards).toBe(s.boards[ads].cards)
+  })
+  it('replace swaps the whole state (first visit, NB-32)', () => {
+    const start = starterState(metrics(), ids(), 'auth0|viewer')
+    expect(boardReducer(s, { type: 'replace', state: start })).toBe(start)
+  })
+  it('a new board lands as the last tab, open (NB-12, NB-34)', () => {
+    const b: Board = { id: 'x', label: 'Founder', cards: [], initialCards: [], period: '7d', compare: 'previous', access: 'owner', ownerId: 'auth0|viewer', general: 'view', grants: [] }
+    const next = boardReducer(s, { type: 'add-board', board: b, index: s.tabs.length, open: true })
+    expect(next.tabs.at(-1)).toBe('x')
+    expect(next.openId).toBe('x')
+  })
+})
+
+describe('first visit (NB-31 – NB-33)', () => {
+  it('Store overview always, then each board whose lead metric the store measures', () => {
+    const st = starterState(metrics(), ids(), 'auth0|viewer')
+    expect(st.tabs.map((id) => st.boards[id].label)).toEqual(['Store overview', 'Ads'])
+    expect(st.openId).toBe(st.tabs[0])
+    // Theirs, and open for the workspace to view until they say otherwise.
+    expect(Object.values(st.boards).every((b) => b.access === 'owner' && b.ownerId === 'auth0|viewer' && b.general === 'none')).toBe(true)
+  })
+  it('a card the store can’t measure gives way to a store one, never twice on a board', () => {
+    const st = starterState(metrics(), ids(), 'auth0|viewer')
+    const cards = st.boards[st.tabs[0]].cards.map((c) => c.metricId)
+    expect(cards).not.toContain('new_customers')
+    expect(cards).toContain('cancellation_rate')
+    expect(new Set(cards).size).toBe(cards.length)
+  })
+  it('with only Shopify: Store overview alone, from store metrics', () => {
+    const st = starterState(shopifyOnly(), ids(), 'auth0|viewer')
+    expect(st.tabs).toHaveLength(1)
+    expect(st.boards[st.tabs[0]].cards.map((c) => c.metricId)).not.toContain('ad_spend')
+  })
+})
+
+describe('the empty board’s three templates (NB-17) and the default period', () => {
+  it('your role’s first, then the two nearest; with no role, the first three', () => {
+    expect(templatesFor('growth')).toEqual(['growth', 'agency', 'ecommerce'])
+    expect(templatesFor(null)).toEqual(['founder', 'ecommerce', 'growth'])
+    expect(templatesFor('unknown')).toEqual(['founder', 'ecommerce', 'growth'])
+  })
+  it('starter boards start on the viewer’s default period when one is given, else their own', () => {
+    const own = starterState(metrics(), ids(), 'auth0|viewer')
+    expect(own.tabs.map((id) => own.boards[id].period)).toContain('7d')
+    const chosen = starterState(metrics(), ids(), 'auth0|viewer', '90d')
+    expect(new Set(chosen.tabs.map((id) => chosen.boards[id].period))).toEqual(new Set(['90d']))
+  })
+})

@@ -90,11 +90,11 @@ export function ProjectsSection({
           initial="closed"
           variants={sectionStaggerVariants}
           style={{
-            paddingTop:    "4px",
-            paddingLeft:   "6px",
+            paddingTop:    "var(--space-1)",
+            paddingLeft:   "var(--space-1-5)",
             display:       "flex",
             flexDirection: "column",
-            gap:           "4px",
+            gap:           "var(--space-1)",
           }}
         >
           {showNewProject && (
@@ -120,7 +120,7 @@ export function ProjectsSection({
 
           {!projectsLoading && projects.length === 0 && (
             <div style={{
-              padding:    "8px 6px",
+              padding:    "var(--space-2) var(--space-1-5)",
               fontFamily: "var(--font-body)",
               fontSize:   "var(--font-size-caption)",
               color:      "var(--neutral-400)",
@@ -203,7 +203,7 @@ export function ProjectsSection({
 export function TeamsSidebarContent({ role }: TeamsSidebarContentProps) {
   const isAdmin = role !== 'member'
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', paddingTop: 'var(--space-1)' }}>
       <ProjectsSection
         label="Workspace projects"
         showNewProject={isAdmin}

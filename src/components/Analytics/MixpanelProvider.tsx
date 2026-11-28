@@ -45,15 +45,19 @@ export function MixpanelProvider({ children }: { children: ReactNode }) {
   const auth0Id = (user?.auth0Id || decodeJwtSub(jwtToken)) ?? null;
   const planType = user?.planType ?? null;
   const orgId = user?.orgId ?? null;
+  // Dev-only tripwire: authenticated but neither auth0_id nor a token `sub` is
+  // available yet — events stay anonymous ($device:…) until identity resolves.
+  const hasUser = !!user;
   useEffect(() => {
-    if (!auth0Id) {
-      // Dev-only tripwire: authenticated but neither auth0_id nor a token `sub` is
-      // available yet — events stay anonymous ($device:…) until identity resolves.
-      if (isDev && isAuthenticated && user) {
-        console.warn("[analytics] no auth0 id yet (token sub missing) — events anonymous until identity resolves");
-      }
-      return;
+    if (isDev && !auth0Id && isAuthenticated && hasUser) {
+      console.warn("[analytics] no auth0 id yet (token sub missing) — events anonymous until identity resolves");
     }
+  }, [auth0Id, isAuthenticated, hasUser]);
+  // Runs when who the person is (or their plan or org) changes, not each time the profile or the
+  // token is fetched again: those refetch after every chat turn and every token refresh, and each
+  // run here sends an identify and a profile update.
+  useEffect(() => {
+    if (!auth0Id) return;
     if (isDev) console.info("[analytics] identify →", auth0Id);
     // Order matters (per the Mixpanel skill): identify BEFORE people.set / register.
     identifyUser(auth0Id);
@@ -69,7 +73,7 @@ export function MixpanelProvider({ children }: { children: ReactNode }) {
         setPeople({ [STAMP.plan]: planType });
       }
     }
-  }, [auth0Id, planType, orgId, isAuthenticated, user, jwtToken]);
+  }, [auth0Id, planType, orgId]);
 
   // 3) On logout, reset so the next anonymous session isn't merged with this user.
   useEffect(() => {

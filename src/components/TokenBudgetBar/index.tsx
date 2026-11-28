@@ -2,8 +2,8 @@
 
 import React from 'react'
 import { cn } from '@/lib/utils'
-
-// ── Types ─────────────────────────────────────────────────────────────────────
+import { Meter } from '@/components/ui/meter'
+import { meterToneFor } from '@/components/ui/meter-tone'
 
 export type TokenBudgetBarSize = 'sm' | 'lg'
 
@@ -18,77 +18,29 @@ export interface TokenBudgetBarProps extends React.HTMLAttributes<HTMLDivElement
   showLabel?: boolean
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 function fmtK(n: number): string {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M'
   if (n >= 1_000)     return (n / 1_000).toFixed(1).replace(/\.0$/, '') + 'K'
   return String(n)
 }
 
-function colourForPct(pct: number): { fill: string, text: string } {
-  if (pct >= 0.85) return { fill: 'var(--red-400)', text: 'var(--red-500)' }
-  if (pct >= 0.60) return { fill: 'var(--warning-500)', text: 'var(--warning-700)' }
-  return                 { fill: 'var(--success-500)', text: 'var(--success-700)' }
-}
+// The percentage text takes the deeper step of the fill's colour.
+const TEXT = { success: 'text-[var(--success-700)]', warning: 'text-[var(--warning-700)]', danger: 'text-[var(--red-500)]' } as const
 
-// ── Component ─────────────────────────────────────────────────────────────────
-
-export function TokenBudgetBar({ ref, used, limit, size = 'sm', showLabel = false, className, style, ...props }: TokenBudgetBarProps & { ref?: React.Ref<HTMLDivElement> }) {
-    const pct  = limit > 0 ? Math.max(0, Math.min(used / limit, 1)) : 0
-    const col  = colourForPct(pct)
-    const h    = size === 'lg' ? 10 : 6
-
-    return (
-      <div
-        ref={ref}
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={limit}
-        aria-valuenow={used}
-        aria-label={`${Math.round(pct * 100)}% of credit budget used`}
-        className={cn(className)}
-        style={{ display: 'flex', flexDirection: 'column', gap: showLabel ? 4 : 0, width: '100%', ...style }}
-        {...props}
-      >
-        <div
-          style={{
-            height:          h,
-            borderRadius:    999,
-            backgroundColor: 'var(--neutral-100)',
-            overflow:        'hidden',
-          }}
-        >
-          <div
-            style={{
-              width:           `${pct * 100}%`,
-              height:          '100%',
-              backgroundColor: col.fill,
-              borderRadius:    999,
-              transition:      'width 240ms ease, background-color 200ms ease',
-            }}
-          />
+/** A credit budget: the shared Meter with its fill coloured by how much is used (green, amber, red). */
+export function TokenBudgetBar({ ref, used, limit, size = 'sm', showLabel = false, className, ...props }: TokenBudgetBarProps & { ref?: React.Ref<HTMLDivElement> }) {
+  const fraction = limit > 0 ? Math.max(0, Math.min(used / limit, 1)) : 0
+  return (
+    <div ref={ref} className={cn('flex w-full flex-col', showLabel && 'gap-1', className)} {...props}>
+      <Meter label={`${Math.round(fraction * 100)}% of credit budget used`} value={used} max={limit} tone="auto" size={size} />
+      {showLabel && (
+        <div className="flex justify-between text-caption">
+          <span className={cn('font-medium', TEXT[meterToneFor(fraction)])}>{Math.round(fraction * 100)}% used</span>
+          <span className="text-[var(--neutral-500)]">{fmtK(used)} / {fmtK(limit)} credits</span>
         </div>
-        {showLabel && (
-          <div
-            style={{
-              display:        'flex',
-              justifyContent: 'space-between',
-              fontFamily:     'var(--font-body)',
-              fontSize:       'var(--font-size-caption)',
-              lineHeight:     'var(--line-height-caption)',
-            }}
-          >
-            <span style={{ color: col.text, fontWeight: 'var(--font-weight-medium)' }}>
-              {Math.round(pct * 100)}% used
-            </span>
-            <span style={{ color: 'var(--neutral-500)' }}>
-              {fmtK(used)} / {fmtK(limit)} credits
-            </span>
-          </div>
-        )}
-      </div>
-    )
+      )}
+    </div>
+  )
 }
 
 TokenBudgetBar.displayName = 'TokenBudgetBar'

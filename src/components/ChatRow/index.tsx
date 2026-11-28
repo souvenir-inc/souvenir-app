@@ -12,13 +12,14 @@ import { IconButton } from '@/components/ui/button'
 import { Dropdown } from '@/components/Dropdown'
 import { Divider } from '@/components/Divider'
 import { cn } from '@/lib/utils'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Shadows (Figma exact) ─────────────────────────────────────────────────────
 
 // Chip: rest = ghost ring, elevated (row hovered/focused) = filled with inner highlight
-const SHADOW_CHIP_REST     = '0px 0px 0px 1px rgba(59,54,50,0.3)'
-const SHADOW_CHIP_ELEVATED = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4)'
-const SHADOW_CHIP_INNER    = 'inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 61%, transparent), inset 0px -1px 0px 0px rgba(106,98,93,0.05)'
+const SHADOW_CHIP_REST     = '0px 0px 0px 1px var(--neutral-800-30)'
+const SHADOW_CHIP_ELEVATED = 'var(--shadow-chip)'
+const SHADOW_CHIP_INNER    = 'var(--shadow-badge-inner)'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -109,24 +110,24 @@ function PinCountChip({ pinCount, pinBoardOpen, rowElevated, title, onClick }: P
         position:        'relative',
         display:         'inline-flex',
         alignItems:      'center',
-        gap:             hasPins ? 4 : 0,
-        padding:         '5px 8px',
-        borderRadius:    8,
+        gap:             hasPins ? 'var(--space-1)' : 0,
+        padding:         'var(--space-1) var(--space-2)',
+        borderRadius:    'var(--radius-md)',
         border:          'none',
         backgroundColor: elevated ? 'color-mix(in srgb, var(--neutral-100) 60%, transparent)' : 'color-mix(in srgb, var(--static-white) 0%, transparent)',
         cursor:          'pointer',
         fontFamily:      'var(--font-body)',
         fontSize:        'var(--font-size-body)',
-        fontWeight:      500,
+        fontWeight:      'var(--font-weight-medium)',
         lineHeight:      'var(--line-height-body)',
         color:           'var(--neutral-700)',
         boxShadow:       elevated ? SHADOW_CHIP_ELEVATED : SHADOW_CHIP_REST,
         flexShrink:      0,
         whiteSpace:      'nowrap',
-        outline:         focused ? '2px solid var(--blue-400)' : 'none',
-        outlineOffset:   2,
+        outline:         focused ? 'var(--focus-ring-width) solid var(--blue-400)' : 'none',
+        outlineOffset:   'var(--focus-ring-offset)',
         opacity:         pinBoardOpen && !hasPins ? 0.7 : 1,
-        transition:      'background-color 120ms, box-shadow 120ms, opacity 120ms',
+        transition:      'background-color var(--duration-fast), box-shadow var(--duration-fast), opacity var(--duration-fast)',
       }}
     >
       {hasPins && <PinIcon size={16} color="var(--neutral-500)" />}
@@ -138,7 +139,7 @@ function PinCountChip({ pinCount, pinBoardOpen, rowElevated, title, onClick }: P
           style={{
             position:      'absolute',
             inset:         0,
-            borderRadius:  8,
+            borderRadius:  'var(--radius-md)',
             boxShadow:     SHADOW_CHIP_INNER,
             pointerEvents: 'none',
           }}
@@ -164,7 +165,7 @@ function ThreeDotButton({ visible, title, readOnly = false, onClick, ref, ...res
         flexShrink:    0,
         opacity:       visible ? 1 : 0,
         pointerEvents: visible ? 'auto' : 'none',
-        transition:    'opacity 120ms',
+        transition:    'opacity var(--duration-fast)',
       }}
     >
       <IconButton
@@ -341,24 +342,24 @@ function ChatRowInner(
         style={{
           display:         'flex',
           alignItems:      'center',
-          padding:         selectionMode ? '0 16px 0 6px' : '12px 16px',
+          padding:         selectionMode ? '0 var(--space-4) 0 var(--space-1-5)' : 'var(--space-3) var(--space-4)',
           height:          selectionMode ? 62 : undefined,
-          borderRadius:    12,
+          borderRadius:    'var(--radius-xl)',
           boxSizing:       'border-box',
           width:           '100%',
           backgroundColor: bg,
           boxShadow:       rowShadow,
           outline:         isFocused
-            ? '1px solid var(--blue-400)'
+            ? 'var(--focus-ring-width-thin) solid var(--blue-400)'
             : isEmpty
-              ? '1.5px dashed var(--blue-400)'
+              ? 'var(--chat-row-outline-width) dashed var(--blue-400)'
               : 'none',
-          outlineOffset:   -1,
+          outlineOffset:   'calc(var(--focus-ring-offset-sm) * -1)',
           opacity:         disabled || isArchiving ? 0.5 : 1,
           pointerEvents:   disabled || isArchiving ? 'none' : undefined,
           cursor:          isEmpty ? 'default' : isRenaming ? 'text' : 'pointer',
           userSelect:      'none',
-          transition:      'background-color 120ms, box-shadow 150ms',
+          transition:      'background-color var(--duration-fast), box-shadow var(--duration-fast)',
           ...style,
         }}
         {...props}
@@ -372,8 +373,8 @@ function ChatRowInner(
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -8 }}
-              transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              style={{ flexShrink: 0, marginRight: 9 }}
+              transition={{ duration: DURATION.quick, ease: [0.16, 1, 0.3, 1] }}
+              style={{ flexShrink: 0, marginRight: 'var(--space-2)' }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* The row itself is the labelled checkbox (role, aria-checked, Space/Enter); this box is
@@ -395,7 +396,7 @@ function ChatRowInner(
               flex:         '1 1 0',
               fontFamily:   'var(--font-body)',
               fontSize:     'var(--font-size-body)',
-              fontWeight:   400,
+              fontWeight:   'var(--font-weight-regular)',
               lineHeight:   'var(--line-height-body)',
               color:        'var(--neutral-500)',
               margin:       0,
@@ -417,7 +418,7 @@ function ChatRowInner(
                 flex:          '1 1 0',
                 display:       'flex',
                 flexDirection: 'column',
-                gap:           6,
+                gap:           'var(--space-1-5)',
                 minWidth:      0,
               }}
             >
@@ -450,7 +451,7 @@ function ChatRowInner(
                     flex:            '1 1 0',
                     fontFamily:      'var(--font-body)',
                     fontSize:        'var(--font-size-body-lg)',
-                    fontWeight:      400,
+                    fontWeight:      'var(--font-weight-regular)',
                     lineHeight:      'var(--line-height-body-lg)',
                     color:           'var(--legacy-1a1714)',
                     border:          'none',
@@ -467,7 +468,7 @@ function ChatRowInner(
                   style={{
                     fontFamily:   'var(--font-body)',
                     fontSize:     'var(--font-size-body-lg)',
-                    fontWeight:   400,
+                    fontWeight:   'var(--font-weight-regular)',
                     lineHeight:   'var(--line-height-body-lg)',
                     color:        'var(--legacy-1a1714)',
                     overflow:     'hidden',
@@ -485,7 +486,7 @@ function ChatRowInner(
                   style={{
                     fontFamily:   'var(--font-body)',
                     fontSize:     'var(--font-size-caption)',
-                    fontWeight:   400,
+                    fontWeight:   'var(--font-weight-regular)',
                     lineHeight:   'var(--line-height-caption)',
                     color:        'var(--neutral-400)',
                     overflow:     'hidden',
@@ -504,7 +505,7 @@ function ChatRowInner(
               style={{
                 display:    'flex',
                 alignItems: 'center',
-                gap:        6,
+                gap:        'var(--space-1-5)',
                 flexShrink: 0,
               }}
             >

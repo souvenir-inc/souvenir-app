@@ -266,9 +266,11 @@ export function messageParts(timeline: ReasoningTimelineItem[], content: string)
   for (const item of timeline) {
     if (item.kind === 'text') {
       const start = textIndex === 0 ? 0 : item.start
-      const text = content.slice(start, starts[textIndex + 1] ?? content.length).trim()
+      // Trimmed only to tell whether it is empty: leading indentation can be Markdown (a code block).
+      // The line breaks that separate one stretch from the next are not the answer's, though.
+      const text = content.slice(start, starts[textIndex + 1] ?? content.length).replace(/^\n+|\s+$/g, '')
       textIndex += 1
-      if (text) parts.push({ kind: 'text', id: item.id, content: text })
+      if (text.trim()) parts.push({ kind: 'text', id: item.id, content: text })
       continue
     }
     const last = parts[parts.length - 1]
@@ -351,7 +353,12 @@ export function createReasoningAccumulator(seed: ReasoningTimelineItem[] = []): 
     .flatMap((item) => item.kind === 'reasoning' ? [item.content] : [])
     .join('\n\n')
   let text = reasoningText()
-  let sequence = seed.length
+  // Seeded ids keep the numbers they were minted with, which skip where reasoning
+  // events merged into one item; counting from seed.length could mint one again.
+  let sequence = seed.reduce((next, item) => {
+    const n = Number(/-(\d+)$/.exec(item.id)?.[1])
+    return Number.isInteger(n) ? Math.max(next, n + 1) : next
+  }, seed.length)
   const committed: ReasoningSection[] = []
   const previewSteps = new Map<number, ReasoningSection>()
   let heading = ''

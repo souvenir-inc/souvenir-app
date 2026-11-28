@@ -19,6 +19,14 @@ describe("LineRenderer inline math vs. currency prose", () => {
     expect(html).not.toContain("katex")
   })
 
+  it("renders a formula that follows a currency range", () => {
+    const html = renderToStaticMarkup(<LineRenderer content="Budget $50K–$80K; use $x^2$." />)
+
+    expect(html).toContain("$50K–$80K; use")
+    expect(html).toContain("katex")
+    expect(html).not.toContain("$x^2$")
+  })
+
   it("still renders real inline math via KaTeX", () => {
     const html = renderToStaticMarkup(<LineRenderer content="The formula is $E=mc^2$ for energy." />)
 
@@ -30,8 +38,8 @@ describe("LineRenderer inline math vs. currency prose", () => {
       <LineRenderer content={"**Clarifying context**\n\nChecking the source."} variant="reasoning" />,
     )
 
-    expect(html).toContain("font-size:14px")
-    expect(html).toContain("line-height:22px")
+    expect(html).toContain("font-size:var(--font-size-body)")
+    expect(html).toContain("line-height:var(--line-height-body)")
     expect(html).toContain("height:8px")
     // Same colours as before in light (#524B47 body, #26211E heading (--neutral-900 now)) — the body is
     // now the theme token --neutral-700 so it can flip in dark mode.

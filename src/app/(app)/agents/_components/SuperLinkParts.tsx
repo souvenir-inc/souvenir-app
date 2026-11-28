@@ -39,8 +39,8 @@ export function CopyUrlButton({ url }: { url: string }) {
 // same shadow constants, non-uppercase section titles) instead of the
 // generic StatCard/var(--shadow-surface-card) chrome used elsewhere. ────────
 
-export const SHADOW_CARD = '0px 2px 2.8px 0px rgba(82,75,71,0.12)'                                    // bordered section card
-export const SHADOW_TILE = '0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)' // white inner tile
+export const SHADOW_CARD = 'var(--shadow-soft)'                                    // bordered section card
+export const SHADOW_TILE = 'var(--shadow-tile)' // white inner tile
 
 /** White stat tile — label / value / sub. Ditto /org/plans' StatTile. */
 export function StatTile({
@@ -60,29 +60,29 @@ export function StatTile({
   return (
     <div style={{
       background:    'var(--card-bg)',
-      borderRadius:  8,
-      padding:       12,
+      borderRadius:  'var(--radius-md)',
+      padding:       'var(--space-3)',
       boxShadow:     SHADOW_TILE,
       display:       'flex',
       flexDirection: 'column',
-      gap:           6,
+      gap:           'var(--space-1-5)',
       flex:          '1 1 200px',
       minWidth:      160,
     }}>
-      <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)', margin: 0 }}>
+      <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', margin: 0 }}>
         {label}
       </p>
       {loading ? (
-        <Skeleton width={72} height={24} radius={5} />
+        <Skeleton width={72} height={24} radius={'var(--super-link-parts-radius)'} />
       ) : value !== undefined && (
-        <p style={{ fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: 0 }}>
+        <p style={{ fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0 }}>
           {value}
         </p>
       )}
       {loading ? (
-        <Skeleton width={96} height={14} radius={4} />
+        <Skeleton width={96} height={14} radius={'var(--radius-xs)'} />
       ) : sub && (
-        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
           {sub}
         </p>
       )}
@@ -109,14 +109,14 @@ export function SectionCard({
   return (
     <div style={{
       border:        '1px solid var(--border-default)',
-      borderRadius:  16,
+      borderRadius:  'var(--radius-2xl)',
       boxShadow:     SHADOW_CARD,
       backgroundColor: 'var(--card-bg)',
       display:       'flex',
       flexDirection: 'column',
-      gap:           12,
-      paddingTop:    12,
-      paddingBottom: 12,
+      gap:           'var(--space-3)',
+      paddingTop:    'var(--space-3)',
+      paddingBottom: 'var(--space-3)',
       overflow:      'hidden',
       width:         '100%',
     }}>
@@ -128,17 +128,17 @@ export function SectionCard({
           relative to whichever sibling (e.g. the Tabs) happens to be taller. */}
       <div style={{
         borderBottom: '1px solid var(--neutral-100)',
-        padding:      '12px 24px 24px',
+        padding:      'var(--space-3) var(--space-6) var(--space-6)',
         display:      'flex',
         alignItems:   'center',
-        gap:          12,
+        gap:          'var(--space-3)',
       }}>
-        <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 16, lineHeight: '22px', color: 'var(--neutral-900)', margin: 0 }}>
+        <div style={{ flex: '1 0 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
+          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)', margin: 0 }}>
             {title}
           </p>
           {subtitle && (
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
               {subtitle}
             </p>
           )}

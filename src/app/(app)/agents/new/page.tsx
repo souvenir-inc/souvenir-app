@@ -62,7 +62,7 @@ const PROBLEM_MESSAGE = {
 
 function Centered({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 35, alignItems: 'center', width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--agents-new-gap)', alignItems: 'center', width: '100%' }}>
       {children}
     </div>
   )
@@ -70,12 +70,12 @@ function Centered({ children }: { children: React.ReactNode }) {
 
 function Heading({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', textAlign: 'center' }}>
-      <h1 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', alignItems: 'center', textAlign: 'center' }}>
+      <h1 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)' }}>
         {title}
       </h1>
       {subtitle && (
-        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)', maxWidth: 520 }}>
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', maxWidth: 520 }}>
           {subtitle}
         </p>
       )}
@@ -90,13 +90,13 @@ function PurposeStep({
   return (
     <Centered>
       <Heading title="What should this agent do?" subtitle="One sentence is enough — we’ll set up the name, model and instructions for you." />
-      <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 684, gap: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 684, gap: 'var(--space-3)' }}>
         {/* kaya-field: the signature blue focus ring. A stronger edge than the other cards so the box reads in both themes. */}
         <div
           className="kaya-field"
           style={{
-            background: 'var(--field-surface)', borderRadius: 10, padding: '12px 10px',
-            boxShadow: '0px 1px 2px 0px rgba(82,75,71,0.16), 0px 0px 0px 1px var(--neutral-300)',
+            background: 'var(--field-surface)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-3) var(--space-2-5)',
+            boxShadow: 'var(--new-shadow)',
           }}
         >
           <textarea
@@ -112,11 +112,11 @@ function PurposeStep({
             }}
             style={{
               width: '100%', resize: 'none', background: 'transparent', border: 'none', outline: 'none',
-              fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-950)',
+              fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-950)',
             }}
           />
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--space-3)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)' }}>
           <span>Keep it to what the agent should do.</span>
           <span>{purpose.length}/{PURPOSE_MAX}</span>
         </div>
@@ -124,23 +124,23 @@ function PurposeStep({
         <p
           id="agent-purpose-suggestions"
           style={{
-            margin: '8px 0 -4px', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)',
-            fontSize: 12, lineHeight: '16px', color: 'var(--neutral-500)',
+            margin: 'var(--space-2) 0 calc(var(--space-1) * -1)', fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)',
+            fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)',
           }}
         >
           Suggestions
         </p>
-        <div role="group" aria-labelledby="agent-purpose-suggestions" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div role="group" aria-labelledby="agent-purpose-suggestions" style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
           {STARTER_CHIPS.map(chip => (
             <button
               key={chip}
               type="button"
               onClick={() => onChange(chip)}
               style={{
-                padding: '5px 12px', borderRadius: 999, border: 'none', cursor: 'pointer',
-                fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 13, lineHeight: '20px',
+                padding: 'var(--space-1) var(--space-3)', borderRadius: 'var(--radius-full)', border: 'none', cursor: 'pointer',
+                fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)',
                 color: 'var(--neutral-700)', backgroundColor: 'var(--neutral-white)',
-                boxShadow: '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)',
+                boxShadow: 'var(--shadow-control)',
               }}
             >
               {chip}
@@ -149,11 +149,11 @@ function PurposeStep({
         </div>
 
         {/* Wraps on narrow screens so Continue never runs off the right edge. */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, paddingTop: 40 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-2)', paddingTop: 'var(--space-8)' }}>
           <Button variant="outline" size="sm" leftIcon={<ArrowLeftOneIcon size={16} />} onClick={onBack}>
             Agents
           </Button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginLeft: 'auto' }}>
             <Button variant="ghost" size="sm" onClick={() => push(AGENTS_TEMPLATES_ROUTE)}>
               Start from a template
             </Button>
@@ -176,7 +176,7 @@ function PurposeStep({
 function WorkingStep({ title, subtitle }: { title: string; subtitle: string }) {
   return (
     <Centered>
-      <div role="status" aria-live="polite" style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center', paddingTop: 40 }}>
+      <div role="status" aria-live="polite" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', alignItems: 'center', paddingTop: 'var(--space-8)' }}>
         <Spinner size={24} />
         <Heading title={title} subtitle={subtitle} />
       </div>
@@ -193,7 +193,7 @@ function FailedStep({
         title="We couldn’t set up your agent"
         subtitle="Your purpose is saved. Try again, or fill in the details yourself."
       />
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 'var(--space-2)' }}>
         <Button variant="outline" size="sm" leftIcon={<ArrowLeftOneIcon size={16} />} onClick={onEditPurpose}>Edit purpose</Button>
         <Button variant="outline" size="sm" onClick={onManual}>Fill in manually</Button>
         <Button variant="default" size="sm" onClick={onRetry}>Try again</Button>

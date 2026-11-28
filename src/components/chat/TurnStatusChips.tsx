@@ -7,6 +7,7 @@ import AiWebBrowsingIcon from "@hugeicons/core-free-icons/AiWebBrowsingIcon";
 import { useOpenChatPanel } from "@/hooks/use-open-chat-panel";
 import type { ActivityStatus, UIMessage } from "@/types/chat";
 import styles from "./TurnStatusChips.module.css";
+import { DURATION } from "@/styles/tokens/motion"
 
 // Two chips riding just above the composer while a reply is running:
 //   left  — "Using browser", only while the agent is driving the browser;
@@ -82,7 +83,7 @@ export function TurnStatusChips({ messages, active }: { messages: UIMessage[]; a
             initial={{ opacity: 0, y: 6, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.96 }}
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: DURATION.base, ease: [0.22, 1, 0.36, 1] }}
           >
             <span className={styles.browserIcon} aria-hidden>
               <span className={styles.orbit} />
@@ -113,7 +114,7 @@ export function TurnStatusChips({ messages, active }: { messages: UIMessage[]; a
             initial={{ opacity: 0, y: 6, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.96 }}
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: DURATION.base, ease: [0.22, 1, 0.36, 1] }}
           >
             <ProgressRing value={steps ? done / steps : null} />
             {steps > 0 && <span className={styles.detail}>{done}/{steps} steps</span>}
@@ -143,7 +144,7 @@ function ProgressRing({ value }: { value: number | null }) {
         strokeDasharray={c}
         strokeDashoffset={value === null ? c * 0.7 : c * (1 - Math.max(0.06, value))}
         transform="rotate(-90 8 8)"
-        style={{ transition: "stroke-dashoffset 400ms ease" }}
+        style={{ transition: "stroke-dashoffset var(--duration-slow) ease" }}
       />
     </svg>
   );

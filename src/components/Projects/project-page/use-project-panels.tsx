@@ -69,8 +69,8 @@ export function useProjectPanels({ project, canEdit, canManageMembers, onOpenIns
         title: 'Instructions & Files',
         onClose: close,
         content: (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 12, lineHeight: '16px', color: 'var(--neutral-500)', margin: '-12px 0 0' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)', margin: 'calc(var(--space-3) * -1) 0 0' }}>
               Instructions are included as part of the context for every chat in this project.
             </p>
             <BlockErrorBoundary label="instructions">

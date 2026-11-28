@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { SPRING } from "@/styles/tokens/motion"
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -101,9 +102,9 @@ export function TabItem(
           justifyContent: fluid ? 'center' : undefined,
           flex:           fluid ? '1 0 0' : undefined,
           // Tabs 08 spacing: 14px each side on medium (12 + the label's 2), 11 on small.
-          gap:            isSmall ? '4px' : '6px',
-          padding:        isSmall ? '7px 9px' : '7px 12px',
-          borderRadius:   isSmall ? '8px' : '10px',
+          gap:            isSmall ? 'var(--space-1)' : 'var(--space-1-5)',
+          padding:        isSmall ? 'var(--tab-item-padding)' : 'var(--space-1-75) var(--space-3)',
+          borderRadius:   isSmall ? 'var(--radius-md)' : 'var(--radius-lg)',
           // ── Background / shadow - suppressed when parent handles the pill ──
           backgroundColor: !disableSelectedStyle && isSelected ? 'var(--tab-item-bg-selected)' : 'transparent',
           boxShadow:       !disableSelectedStyle && isSelected ? 'var(--shadow-tab-item-selected)' : 'none',
@@ -111,7 +112,7 @@ export function TabItem(
           border:         'none',
           cursor:         isDisabled ? 'not-allowed' : 'pointer',
           position:       'relative',
-          transition:     'background-color 150ms, box-shadow 150ms',
+          transition:     'background-color var(--duration-fast), box-shadow var(--duration-fast)',
         }}
         {...props}
       >
@@ -138,7 +139,7 @@ export function TabItem(
               flexShrink: 0,
               lineHeight: 0,
               color:      textColor,
-              transition: 'color 150ms',
+              transition: 'color var(--duration-fast)',
             }}
           >
             {icon}
@@ -161,7 +162,7 @@ export function TabItem(
                 flexShrink:     0,
                 width:          isSelected ? (reservedLabelWidth ?? 'auto') : 0,
                 opacity:        isSelected ? 1 : 0,
-                transition:     'opacity 200ms ease',
+                transition:     'opacity var(--duration-base) ease',
               }}
             >
               <span
@@ -172,10 +173,10 @@ export function TabItem(
                   lineHeight: isSmall ? 'var(--line-height-caption)' : 'var(--line-height-body)',
                   color:      textColor,
                   whiteSpace: 'nowrap',
-                  padding:    '0 2px',
+                  padding:    '0 var(--space-0-5)',
                   // Slides in with the pill; clipped by the slot when inactive.
                   transform:  isSelected ? 'translateX(0)' : 'translateX(-4px)',
-                  transition: 'color 150ms, transform 200ms ease',
+                  transition: 'color var(--duration-fast), transform var(--duration-base) ease',
                 }}
               >
                 {children}
@@ -192,8 +193,8 @@ export function TabItem(
                 color:      textColor,
                 whiteSpace: 'nowrap',
                 flexShrink: 0,
-                padding:    '0 2px',
-                transition: 'color 150ms',
+                padding:    '0 var(--space-0-5)',
+                transition: 'color var(--duration-fast)',
               }}
             >
               {children}
@@ -226,7 +227,7 @@ function TabCount({ count, active, small }: { count: number | string; active: bo
         initial={{ opacity: 0, scale: 0.5, y: -6 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.5, y: 6 }}
-        transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+        transition={{ type: 'spring', ...SPRING.lively }}
         style={{
           display:            'inline-flex',
           alignItems:         'center',
@@ -234,17 +235,17 @@ function TabCount({ count, active, small }: { count: number | string; active: bo
           flexShrink:         0,
           minWidth:           size,
           height:             size,
-          padding:            small ? '0 4px' : '0 5px',
+          padding:            small ? '0 var(--space-1)' : '0 var(--space-1-25)',
           boxSizing:          'border-box',
-          borderRadius:       999,
+          borderRadius:       'var(--radius-full)',
           fontFamily:         'var(--font-body)',
-          fontSize:           small ? 10 : 12,
-          fontWeight:         small ? 500 : 600,
-          lineHeight:         1,
+          fontSize:           small ? 'var(--tab-item-size)' : 'var(--font-size-small)',
+          fontWeight:         small ? 'var(--font-weight-medium)' : 'var(--font-weight-semibold)',
+          lineHeight:         'var(--leading-none)',
           fontVariantNumeric: 'tabular-nums',
           backgroundColor:    dark ? 'var(--neutral-900)' : 'var(--neutral-200)',
           color:              dark ? 'var(--neutral-50)' : 'var(--neutral-600)',
-          transition:         'background-color 150ms, color 150ms',
+          transition:         'background-color var(--duration-fast), color var(--duration-fast)',
         }}
       >
         {count}

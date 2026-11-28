@@ -25,7 +25,7 @@ const LANGUAGE: Record<string, string> = {
 // The tallest a rendered page or email is shown before it scrolls inside its frame.
 const MAX_FRAME_HEIGHT = 20_000
 
-const muted: React.CSSProperties = { fontFamily: 'var(--font-body)', fontSize: 13, lineHeight: '20px', color: 'var(--neutral-500)' }
+const muted: React.CSSProperties = { fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-500)' }
 
 // ── HTML (web pages and email bodies) ───────────────────────────────────────
 
@@ -59,9 +59,9 @@ function HtmlFrame({ html, title }: { html: string; title: string }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', width: '100%' }}>
       {blocked > 0 && !showImages && (
-        <p style={{ ...muted, margin: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <p style={{ ...muted, margin: 0, display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
           {blocked === 1 ? '1 image from the web is hidden.' : `${blocked} images from the web are hidden.`}
           <button
             type="button"
@@ -79,7 +79,7 @@ function HtmlFrame({ html, title }: { html: string; title: string }) {
         referrerPolicy="no-referrer"
         srcDoc={srcDoc}
         onLoad={measure}
-        style={{ display: 'block', width: '100%', height, border: '1px solid var(--border-default)', borderRadius: 8, background: '#fff' }}
+        style={{ display: 'block', width: '100%', height, border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', background: 'var(--static-white)' }}
       />
     </div>
   )
@@ -94,8 +94,8 @@ function Plain({ text, mono }: { text: string; mono?: boolean }) {
         width: '100%', margin: 0, boxSizing: 'border-box', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', tabSize: 4,
         color: 'var(--neutral-900)',
         ...(mono
-          ? { padding: '16px 20px', borderRadius: 8, background: 'var(--neutral-50)', border: '1px solid var(--border-default)', fontFamily: 'var(--font-mono, ui-monospace, monospace)', fontSize: 13, lineHeight: '20px' }
-          : { fontFamily: 'var(--font-body)', fontSize: 15, lineHeight: '26px' }),
+          ? { padding: 'var(--space-4) var(--space-5)', borderRadius: 'var(--radius-md)', background: 'var(--neutral-50)', border: '1px solid var(--border-default)', fontFamily: 'var(--font-mono, ui-monospace, monospace)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)' }
+          : { fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)' }),
       }}
     >
       {text}
@@ -130,10 +130,10 @@ function Email({ raw, title }: { raw: string; title: string }) {
   const email = useMemo(() => parseEmail(raw), [raw])
   const rows = (['from', 'to', 'cc', 'date'] as const).filter((key) => email.headers[key])
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
-      <header style={{ paddingBottom: 16, borderBottom: '1px solid var(--border-default)', fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-900)' }}>
-        <h2 style={{ margin: '0 0 10px', fontWeight: 600, fontSize: 18, lineHeight: '26px' }}>{email.headers.subject || '(no subject)'}</h2>
-        <dl style={{ display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: '2px 16px', margin: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)', width: '100%' }}>
+      <header style={{ paddingBottom: 'var(--space-4)', borderBottom: '1px solid var(--border-default)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-900)' }}>
+        <h2 style={{ margin: '0 0 var(--space-2-5)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-heading-sm)', lineHeight: 'var(--line-height-heading-sm)' }}>{email.headers.subject || '(no subject)'}</h2>
+        <dl style={{ display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: 'var(--space-0-5) var(--space-4)', margin: 0 }}>
           {rows.map((key) => (
             <React.Fragment key={key}>
               <dt style={{ color: 'var(--neutral-500)', textTransform: 'capitalize' }}>{key}</dt>
@@ -174,7 +174,7 @@ export function RtfPreview({ file, serverFailed = false, children }: RtfPreviewP
     if (source.data === undefined || (isRtfDocument(source.data) && !serverFailed)) return null
     return `<style>${RTF_STYLES}</style>${rtfToHtml(source.data)}`
   }, [source.data, serverFailed])
-  if (source.isPending) return <Skeleton height={420} radius={8} style={{ width: '100%' }} />
+  if (source.isPending) return <Skeleton height={420} radius={'var(--radius-md)'} style={{ width: '100%' }} />
   if (html === null) return <>{children}</>
   return <HtmlFrame html={html} title={`Preview of ${file.name}`} />
 }
@@ -201,11 +201,11 @@ export default function SourceViewer({ file, fallback }: SourceViewerProps) {
   const [wrap, setWrap] = useState(true)
   const title = `Preview of ${file.name}`
 
-  if (source.isPending) return <Skeleton height={420} radius={8} style={{ width: '100%' }} />
+  if (source.isPending) return <Skeleton height={420} radius={'var(--radius-md)'} style={{ width: '100%' }} />
   if (source.isError || source.data === undefined) return <>{fallback}</>
 
   const text = source.data
-  if (!text.trim()) return <p style={{ ...muted, fontSize: 14, margin: 0 }}>This file is empty.</p>
+  if (!text.trim()) return <p style={{ ...muted, fontSize: 'var(--font-size-body)', margin: 0 }}>This file is empty.</p>
 
   const rendered = mode === 'html' || mode === 'markdown' || mode === 'email'
   const showsCode = (rendered && view === 'source') || mode === 'code'
@@ -218,9 +218,9 @@ export default function SourceViewer({ file, fallback }: SourceViewerProps) {
   else body = <Plain text={text} mono={extension === 'log'} />
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 16, width: '100%', minWidth: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 'var(--space-4)', width: '100%', minWidth: 0 }}>
       {(rendered || showsCode) && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, minHeight: 32 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', minHeight: 32 }}>
           {rendered ? (
             <Tabs value={view} onValueChange={(value) => setView(value as 'preview' | 'source')}>
               <Tabs.List size="small" aria-label="View">
@@ -230,7 +230,7 @@ export default function SourceViewer({ file, fallback }: SourceViewerProps) {
             </Tabs>
           ) : <span />}
           {showsCode && (
-            <label style={{ ...muted, display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', userSelect: 'none' }}>
+            <label style={{ ...muted, display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1-5)', cursor: 'pointer', userSelect: 'none' }}>
               <input type="checkbox" checked={wrap} onChange={(event) => setWrap(event.target.checked)} style={{ margin: 0, accentColor: 'var(--neutral-900)' }} />
               Wrap lines
             </label>

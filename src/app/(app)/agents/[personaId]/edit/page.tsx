@@ -49,8 +49,8 @@ function StatusPanel({ title, children }: { title: string; children?: React.Reac
   const { push } = useRouter()
   return (
     <AgentPageShell maxWidth={640}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center', textAlign: 'center', paddingTop: 48 }}>
-        <h1 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', alignItems: 'center', textAlign: 'center', paddingTop: 'var(--space-9)' }}>
+        <h1 style={{ margin: 0, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)' }}>
           {title}
         </h1>
         {children}
@@ -159,17 +159,17 @@ function EditAgentContent() {
   if (repoLoading || !draft || !baseline) {
     if (!repoLoading && !repo) {
       return <StatusPanel title="Agent not found">
-        <p style={{ ...HINT_STYLE, fontSize: 14, lineHeight: '22px' }}>It may have been deleted, or you may not have access to it.</p>
+        <p style={{ ...HINT_STYLE, fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)' }}>It may have been deleted, or you may not have access to it.</p>
       </StatusPanel>
     }
     if (!repoLoading && repo && !record) {
       return <StatusPanel title="Nothing to edit yet">
-        <p style={{ ...HINT_STYLE, fontSize: 14, lineHeight: '22px' }}>This agent has no saved version.</p>
+        <p style={{ ...HINT_STYLE, fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)' }}>This agent has no saved version.</p>
       </StatusPanel>
     }
     return (
       <AgentPageShell>
-        <div role="status" aria-live="polite" style={{ display: 'flex', justifyContent: 'center', paddingTop: 80 }}>
+        <div role="status" aria-live="polite" style={{ display: 'flex', justifyContent: 'center', paddingTop: 'var(--page-top-inset)' }}>
           <Spinner size={24} />
         </div>
       </AgentPageShell>
@@ -179,7 +179,7 @@ function EditAgentContent() {
   if (!isOwner) {
     return (
       <StatusPanel title={isTeamShared ? 'This agent is shared with your workspace' : 'You can’t edit this agent'}>
-        <p style={{ ...HINT_STYLE, fontSize: 14, lineHeight: '22px', maxWidth: 440 }}>
+        <p style={{ ...HINT_STYLE, fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', maxWidth: 440 }}>
           {isTeamShared
             ? 'Only its owner can change it. Make your own copy to edit.'
             : 'Only its owner can change it.'}
@@ -231,7 +231,7 @@ function EditAgentContent() {
       />
 
       {notice && (
-        <div style={{ width: '100%', marginBottom: 20 }}>
+        <div style={{ width: '100%', marginBottom: 'var(--space-5)' }}>
           <SyncNotice notice={notice} onLoadLatest={accept} onDismiss={dismissNotice} />
         </div>
       )}

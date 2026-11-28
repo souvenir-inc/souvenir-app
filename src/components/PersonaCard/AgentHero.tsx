@@ -33,7 +33,7 @@ const NOISE =
 /** The banner's background for an agent's colour: a light glow top-left and a dark pool bottom-right over a deep base, with film grain on top. Spread into a style object. */
 export function agentHeroStyle(color: string): React.CSSProperties {
   return {
-    backgroundColor:     `color-mix(in srgb, ${color} 64%, black)`,
+    backgroundColor:     `color-mix(in srgb, ${color} 64%, var(--static-black))`,
     backgroundImage: [
       NOISE,
       `radial-gradient(120% 150% at 12% 0%, color-mix(in srgb, ${color} 72%, white) 0%, transparent 58%)`,
@@ -53,7 +53,7 @@ export interface AgentHeroProps {
   width?:     number
   avatarSize?: number
   /** Corner radius, to match the card it sits in. Top corners only unless `rounded`. */
-  radius?:    number
+  radius?:    number | string
   /** Round all four corners (a free-standing tile) instead of just the top two. */
   rounded?:   boolean
   /** Shape of the avatar orb: the default circle, or a rounded square. */
@@ -75,7 +75,7 @@ export function AgentHero({
   height = 104,
   width,
   avatarSize = 64,
-  radius = 20,
+  radius = 'var(--agent-hero-radius)',
   rounded = false,
   orbShape = 'circle',
   hovered = false,
@@ -88,7 +88,8 @@ export function AgentHero({
   const avatar = getAvatarChoice(stored ?? defaultAvatarChoice(name, agentId))
   // The same living scene, orb and eyes as the agents grid, in the lite cut for a small hero.
   const [gaze] = useState(() => new GazeChannel())
-  const borderRadius = rounded ? radius : `${radius}px ${radius}px 0 0`
+  const r = typeof radius === 'number' ? `${radius}px` : radius
+  const borderRadius = rounded ? r : `${r} ${r} 0 0`
 
   return (
     <div
@@ -104,7 +105,7 @@ export function AgentHero({
           borderRadius,
           ...agentHeroStyle(avatar.colors[0]),
           opacity,
-          transition:   'opacity 0.2s ease',
+          transition:   'opacity var(--duration-base) ease',
         }}
       />
       <HeroScene

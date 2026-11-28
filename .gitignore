@@ -43,3 +43,6 @@ next-env.d.ts
 # local dev logs / editor extension packages
 tmp-*.log
 *.vsix
+
+# Design-system visual baseline (local only)
+/.ds-screens/

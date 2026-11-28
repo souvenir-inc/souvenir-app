@@ -14,7 +14,8 @@ vi.mock("@/lib/auth0", () => ({
   auth0: auth0Mocks,
 }));
 
-import proxy from "./proxy";
+import proxy, { config } from "./proxy";
+import { unstable_doesMiddlewareMatch } from "next/experimental/testing/server";
 import { determineNextOnboardingPath } from "@/lib/onboarding-gate";
 import { parseUserMeGate } from "@/lib/api/user-me-schema";
 
@@ -148,6 +149,19 @@ describe("proxy onboarding gate", () => {
     );
     expect(real.status).toBe(200);
     expect(real.headers.get("set-cookie")).toContain("souvenir_checkout_complete=;");
+  });
+
+  it.each([
+    "/api/backend/x",
+    "/api/backend/openapi.json",
+    "/api/backend/v1.0/chats",
+    "/api/download",
+  ])("runs on every route handler, dotted paths too: %s", (path) => {
+    expect(unstable_doesMiddlewareMatch({ config, url: `https://app.getsouvenir.com${path}` })).toBe(true);
+  });
+
+  it.each(["/icons/logo.svg", "/_next/static/chunk.js", "/dispatch/evt"])("still lets files and analytics through: %s", (path) => {
+    expect(unstable_doesMiddlewareMatch({ config, url: `https://app.getsouvenir.com${path}` })).toBe(false);
   });
 
   it("returns a JSON 401 for /api routes without a session", async () => {

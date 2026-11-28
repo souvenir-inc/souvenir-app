@@ -37,10 +37,10 @@ export class PreviewBoundary extends React.Component<Props, State> {
   render() {
     if (!this.state.failed) return this.props.children
     return (
-      <div role="alert" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '48px 24px', textAlign: 'center' }}>
-        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 16, lineHeight: '24px', color: 'var(--neutral-900)' }}>This preview isn&apos;t available</p>
-        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-500)' }}>You can still download the file.</p>
-        <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
+      <div role="alert" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2-5)', padding: 'var(--space-9) var(--space-6)', textAlign: 'center' }}>
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-900)' }}>This preview isn&apos;t available</p>
+        <p style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)' }}>You can still download the file.</p>
+        <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-1-5)' }}>
           <Button variant="secondary" onClick={() => this.setState({ failed: false })}>Try again</Button>
           {this.props.onDownload && <Button onClick={this.props.onDownload}>Download</Button>}
         </div>

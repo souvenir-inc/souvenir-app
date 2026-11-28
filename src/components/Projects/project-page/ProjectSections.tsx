@@ -14,7 +14,7 @@ import type { ProjectPanels } from './use-project-panels'
 
 const screenStyle: React.CSSProperties = { position: 'relative', display: 'flex', width: '100%', flex: '1 1 auto', minHeight: 0, overflow: 'hidden' }
 const columnStyle: React.CSSProperties = { flex: '1 0 0', minWidth: 0, height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }
-const innerStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 16px 8px', boxSizing: 'border-box', gap: '12px', height: '100%' }
+const innerStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'var(--space-4) var(--space-4) var(--space-2)', boxSizing: 'border-box', gap: 'var(--space-3)', height: '100%' }
 
 /** The page frame: the outer row and the centred left column. Shared by the page and its skeleton. */
 export function ProjectFrame({ children, overlay }: { children: React.ReactNode; overlay?: React.ReactNode }) {
@@ -47,7 +47,7 @@ const toolStyle: React.CSSProperties = { border: '1px solid transparent', boxSha
  */
 export function ProjectToolsMenu({ panels }: { panels: ProjectPanels }) {
   return (
-    <div style={{ position: 'absolute', top: '50%', right: 16, transform: 'translateY(-50%)', zIndex: 20 }}>
+    <div style={{ position: 'absolute', top: '50%', right: 16, transform: 'translateY(-50%)', zIndex: 'var(--z-sticky)' }}>
       <FloatingMenu aria-label="Project tools">
         <FloatingMenuItem style={toolStyle} icon={<SettingsOneIcon size={20} animated />} label="Project settings" active={panels.open === 'settings'} onClick={() => panels.toggle('settings')} />
         <FloatingMenuItem style={toolStyle} icon={<FolderLibraryIcon size={20} />} label="Instructions & Files" active={panels.open === 'files'} onClick={() => panels.toggle('files')} />

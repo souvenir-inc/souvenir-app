@@ -28,30 +28,30 @@ export function CreativityField({ value, onChange, disabled = false }: Creativit
   const [active, setActive] = useState(false)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
       <p style={LABEL_STYLE}>Creativity</p>
       <div
         style={{
-          display: 'flex', flexDirection: 'column', gap: 8,
-          padding: '12px 16px 12px',
+          display: 'flex', flexDirection: 'column', gap: 'var(--space-2)',
+          padding: 'var(--space-3) var(--space-4) var(--space-3)',
           // Same surface and ring as every other field (white in light, a lifted grey in dark), so the card
           // reads against the page in both themes.
-          borderRadius: 18, backgroundColor: 'var(--field-surface)',
-          boxShadow: '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--text-field-ring)',
+          borderRadius: 'var(--radius-2xl)', backgroundColor: 'var(--field-surface)',
+          boxShadow: 'var(--shadow-field)',
         }}
       >
         {/* Top padding makes room for the floating value. */}
-        <div style={{ position: 'relative', paddingTop: 30 }}>
+        <div style={{ position: 'relative', paddingTop: 'var(--space-7)' }}>
           <span
             aria-hidden
             style={{
               position: 'absolute', top: 0, left: thumbLeft(current),
               transform: `translateX(-50%) scale(${active ? 1.1 : 1})`,
-              transition: 'transform 150ms ease',
+              transition: 'transform var(--duration-fast) ease',
               pointerEvents: 'none', whiteSpace: 'nowrap',
-              padding: '2px 6px', borderRadius: 6,
+              padding: 'var(--space-0-5) var(--space-1-5)', borderRadius: 'var(--radius-sm)',
               backgroundColor: 'var(--neutral-900)', color: 'var(--neutral-white)',
-              fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 12, lineHeight: '16px',
+              fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-small)', lineHeight: 'var(--line-height-small)',
               fontVariantNumeric: 'tabular-nums',
             }}
           >
@@ -72,7 +72,7 @@ export function CreativityField({ value, onChange, disabled = false }: Creativit
             onPointerLeave={() => setActive(false)}
           />
         </div>
-        <div aria-hidden style={{ display: 'flex', justifyContent: 'space-between', gap: 12, fontVariantNumeric: 'tabular-nums' }}>
+        <div aria-hidden style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--space-3)', fontVariantNumeric: 'tabular-nums' }}>
           <span style={HINT_STYLE}>{MIN.toFixed(1)} · Precise</span>
           <span style={HINT_STYLE}>Creative · {MAX.toFixed(1)}</span>
         </div>

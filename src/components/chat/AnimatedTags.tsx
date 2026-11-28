@@ -5,6 +5,7 @@ import { m } from "framer-motion";
 import type { TagsData } from "@/types/chat";
 import { useTheme } from "@/context/theme-context";
 import { blendOver, ensureContrast } from "./AnimatedTags.contrast";
+import { DURATION, SPRING } from "@/styles/tokens/motion"
 
 // �"��"� AnimatedTags �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 
@@ -24,7 +25,7 @@ const TAG_PALETTES = [
 function tagPalette(color: string | undefined, i: number, isLight: boolean) {
   const pal = TAG_PALETTES[i % TAG_PALETTES.length];
   if (!color || !/^#[0-9a-fA-F]{6}$/.test(color)) return pal;
-  const text = isLight ? ensureContrast(color, blendOver(color, 0x15 / 255, "#F9F8F5")) : color;
+  const text = isLight ? ensureContrast(color, blendOver(color, 0x15 / 255, "var(--animated-tags-text)")) : color;
   return { bg: `${color}15`, text, border: `${color}28` };
 }
 
@@ -47,15 +48,15 @@ export function AnimatedTags({ data, onComplete, animate = true }: { data: TagsD
   }, []); // eslint-disable-line
 
   return (
-    <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18 }} style={{ fontFamily: "var(--font-body)" }}>
-      {data.title && <div style={{ fontSize: 12, fontWeight: 500, color: "var(--neutral-600)", marginBottom: 9, textTransform: "uppercase", letterSpacing: "0.5px" }}>{data.title}</div>}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+    <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: DURATION.base }} style={{ fontFamily: "var(--font-body)" }}>
+      {data.title && <div style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-600)", marginBottom: 'var(--space-2)', textTransform: "uppercase", letterSpacing: "var(--tracking-wider)" }}>{data.title}</div>}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 'var(--space-1-5)' }}>
         {data.tags.slice(0, revealedTags).map((tag, i) => {
           const pal = tagPalette(tag.color, i, isLight);
           return (
             <m.span key={tag.label} initial={{ scale: 0.55, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 420, damping: 22 }}>
-              <span style={{ display: "inline-flex", alignItems: "center", background: pal.bg, border: `1px solid ${pal.border}`, color: pal.text, borderRadius: 99, padding: "3px 11px", fontSize: 13, fontWeight: 500, lineHeight: "19px" }}>
+              transition={{ type: "spring", ...SPRING.lively }}>
+              <span style={{ display: "inline-flex", alignItems: "center", background: pal.bg, border: `1px solid ${pal.border}`, color: pal.text, borderRadius: 'var(--radius-full)', padding: "var(--space-0-5) var(--space-2-5)", fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-body-sm)' }}>
                 {tag.label}
               </span>
             </m.span>

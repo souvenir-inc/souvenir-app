@@ -85,14 +85,14 @@ function PickerColumn<T extends string | number>({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: '1 1 0', minWidth: 0 }}>
-      <div style={{ padding: '8px 8px 0' }}>
+      <div style={{ padding: 'var(--space-2) var(--space-2) 0' }}>
         <Dropdown.Item variant="header" label={title} fluid />
       </div>
       <div
         role="listbox"
         aria-label={title}
         className="kaya-scrollbar-sm kaya-no-gutter"
-        style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 220, overflowY: 'auto', padding: '4px 8px 8px' }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', maxHeight: 220, overflowY: 'auto', padding: 'var(--space-1) var(--space-2) var(--space-2)' }}
       >
         {options.map(opt => (
           <div key={opt.value} ref={selected === opt.value ? selectedRef : undefined}>
@@ -172,7 +172,7 @@ export function TimeField({
   const isSmall = size === 'small'
 
   return (
-    <div className={cn(className)} style={{ display: 'flex', flexDirection: 'column', gap: 6, width: fluid ? '100%' : '140px', ...style }}>
+    <div className={cn(className)} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)', width: fluid ? '100%' : '140px', ...style }}>
       {label && (
         <label
           htmlFor={id}
@@ -191,7 +191,7 @@ export function TimeField({
                   width:      1,
                   height:     1,
                   padding:    0,
-                  margin:     -1,
+                  margin:     'calc(var(--space-px) * -1)',
                   overflow:   'hidden',
                   clip:       'rect(0,0,0,0)',
                   whiteSpace: 'nowrap',
@@ -245,7 +245,7 @@ export function TimeField({
             />
           </div>
           <div style={{ height: 1, backgroundColor: 'var(--neutral-100)', flexShrink: 0 }} />
-          <div style={{ display: 'flex', justifyContent: 'flex-end', padding: 8 }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', padding: 'var(--space-2)' }}>
             <Button variant="default" size="sm" onClick={confirm}>
               Confirm time
             </Button>

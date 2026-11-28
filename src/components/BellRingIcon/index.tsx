@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react'
 import { m, useAnimate, useReducedMotion } from 'framer-motion'
+import { DURATION, LONG } from "@/styles/tokens/motion"
 
 // ── BellRingIcon ─────────────────────────────────────────────────────────────
 // Hugeicons "bell-ring", stroke-rounded (MIT). Paths copied verbatim from
@@ -30,14 +31,14 @@ export interface BellRingIconProps extends Omit<React.SVGProps<SVGSVGElement>, '
 
 // A real bell peal: big first strike, decaying swings, settles at rest.
 const PEAL_ROTATE = [0, -22, 18, -14, 10, -6, 3, 0]
-const PEAL_OPTIONS = { duration: 1.1, ease: 'easeOut' as const }
+const PEAL_OPTIONS = { duration: LONG.sm, ease: 'easeOut' as const }
 // Plain-<g> pivots for the imperative peal (fill-box so % is the group's own box).
 const PEAL_PIVOT_BODY: React.CSSProperties  = { transformBox: 'fill-box', transformOrigin: '50% 8%' }
 const PEAL_PIVOT_WAVES: React.CSSProperties = { transformBox: 'fill-box', transformOrigin: '50% 50%' }
 
 const SWING = {
   rest:  { rotate: 0 },
-  swing: { rotate: [0, 14, -12, 8, -5, 2, 0], transition: { duration: 0.7, ease: 'easeInOut' as const } },
+  swing: { rotate: [0, 14, -12, 8, -5, 2, 0], transition: { duration: DURATION.longer, ease: 'easeInOut' as const } },
 }
 
 const WAVES = {

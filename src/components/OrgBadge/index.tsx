@@ -6,6 +6,7 @@ import { m } from 'framer-motion'
 import { LogoIcon } from '@strange-huge/icons'
 import { cn } from '@/lib/utils'
 import type { ChipColor } from '@/components/Chip'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Org identity colour ───────────────────────────────────────────────────────
 // Deterministic assignment from a stable key (org id) into the KDS tag palette —
@@ -88,20 +89,20 @@ export function OrgBadge(
     <img
       src={orgLogoSrc}
       alt=""
-      style={{ width: 16, height: 16, borderRadius: 4, objectFit: 'cover', display: 'block', flexShrink: 0 }}
+      style={{ width: 16, height: 16, borderRadius: 'var(--radius-xs)', objectFit: 'cover', display: 'block', flexShrink: 0 }}
     />
   ) : (
     <span
       aria-hidden
       style={{
-        width: 16, height: 16, borderRadius: 4, flexShrink: 0,
+        width: 16, height: 16, borderRadius: 'var(--radius-xs)', flexShrink: 0,
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         // Square uses the colour's dark text tone; white letter — the tag pair is
         // designed as text-on-bg so contrast holds across all colours.
         backgroundColor: textToken,
         color: 'var(--neutral-white)',
         fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)',
-        fontSize: '9px', lineHeight: 1,
+        fontSize: 'var(--font-size-caption)', lineHeight: 'var(--leading-none)',
       }}
     >
       {monogram || <LogoIcon size={12} color="var(--neutral-white)" />}
@@ -114,7 +115,7 @@ export function OrgBadge(
       {/* Org name — truncates; full name in title tooltip */}
       <Tooltip content={fullName ?? orgName} maxWidth={280}><span
         style={{
-          padding:      '0 2px',
+          padding:      '0 var(--space-0-5)',
           fontFamily:   'var(--font-body)',
           fontWeight:   'var(--font-weight-medium)',
           fontSize:     'var(--font-size-caption)',
@@ -146,9 +147,9 @@ export function OrgBadge(
     // unconstrained context it stays content-width.
     flexShrink:      1,
     minWidth:        0,
-    padding:         '2px',
+    padding:         'var(--space-0-5)',
     border:          'none',
-    borderRadius:    '6px',
+    borderRadius:    'var(--radius-sm)',
     backgroundColor: bgToken,
     boxShadow:       shadowTok,
   }
@@ -177,7 +178,7 @@ export function OrgBadge(
       className={cn('kds-org-badge', className)}
       onClick={onClick}
       whileTap={{ scale: 0.96 }}
-      transition={{ duration: 0.1, ease: 'easeOut' }}
+      transition={{ duration: DURATION.snap, ease: 'easeOut' }}
       style={{ ...baseStyle, cursor: 'pointer' }}
       {...(rest as React.ComponentPropsWithoutRef<typeof m.button>)}
     >

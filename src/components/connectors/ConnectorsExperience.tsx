@@ -10,6 +10,7 @@ import { useDeleteCustomApi, useUnlinkAccount } from '@/lib/connectors/connector
 import { connectorDetailQuery, linkedConnectorsQuery, mergeCatalog } from '@/lib/connectors/connector-queries'
 import { queryKeys } from '@/lib/query-keys'
 import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
+import { forgetReturn, safeReturnPath } from '@/lib/connector-return'
 import type { ConnectorPick } from '@/lib/api/recommendations'
 import type { SetupFlowResult } from '@/lib/useConnectorSetupFlow'
 import { ConnectionsView } from './ConnectionsView'
@@ -186,6 +187,16 @@ export function ConnectorsExperience({ initialSearch = '' }: { initialSearch?: s
     setSetupOpen(true)
   }, [])
 
+  // `?open=<slug>&account=<id>&reconnect=1`: the dashboard's Reconnect lands here and starts the
+  // reconnect for that account at once, instead of leaving the viewer to find the button. Once per link.
+  const reconnectParam = searchParams.get('reconnect') === '1'
+  const autoReconnected = React.useRef<string | null>(null)
+  useEffect(() => {
+    if (!reconnectParam || !activeAccount || autoReconnected.current === activeAccount.id) return
+    autoReconnected.current = activeAccount.id
+    reconnectAccount(activeAccount)
+  }, [reconnectParam, activeAccount, reconnectAccount])
+
   const backToConnections = useCallback(() => {
     showView(null)
   }, [showView])
@@ -213,10 +224,22 @@ export function ConnectorsExperience({ initialSearch = '' }: { initialSearch?: s
   const urlNeedsReset = !loading && !!openParam && !invalidView && view === 'connections'
   useEffect(() => { if (urlNeedsReset) router.replace(ORG_CONNECTORS_ROUTE, { scroll: false }) }, [urlNeedsReset, router])
 
+  // `?return=<path>`: where the person came from (the dashboard's Reconnect). Kept for the visit, as
+  // the view's own URL changes drop it. A sign-in that leaves the page (Shopify, MCP apps) remembers
+  // it just before it goes (the setup flow does that, not this page: a popup copies the page's
+  // session storage when it opens, and would follow it itself); one in a popup goes back from here
+  // when it succeeds.
+  const [returnTo, setReturnTo] = useState(() => safeReturnPath(searchParams.get('return')))
+
   const handleSetupConnected = useCallback((_result: SetupFlowResult) => {
     setSetupOpen(false)
     void fetchAll()
-  }, [fetchAll])
+    if (setupMode === 'reconnect' && returnTo) {
+      setReturnTo(null)
+      forgetReturn()
+      router.push(returnTo)
+    }
+  }, [fetchAll, setupMode, router, returnTo])
 
   // Throws on failure so ConfirmModal stays open and toasts the error.
   const confirmDeleteApi = useCallback(async () => {
@@ -310,6 +333,7 @@ export function ConnectorsExperience({ initialSearch = '' }: { initialSearch?: s
           initialAccount={setupAccount}
           cancel={() => setSetupOpen(false)}
           onConnected={handleSetupConnected}
+          returnTo={setupMode === 'reconnect' ? returnTo : null}
         />
       )}
 

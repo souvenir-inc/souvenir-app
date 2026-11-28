@@ -13,6 +13,7 @@ import { FormatGlyph } from '@/components/Library/FormatGlyph'
 import { formatLabel } from '@/lib/library/format'
 import { extensionOf } from '@/lib/library/upload/validate'
 import type { Format } from '@/lib/library/schemas'
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 //
 
@@ -34,7 +35,7 @@ function fileFormat(name: string, fileType?: string): { format: Format; ext: str
   return { format: FORMAT_BY_EXT[ext] ?? 'text', ext }
 }
 
-const NAME_STYLE: React.CSSProperties = { display: 'block', fontSize: 14, color: 'var(--neutral-900)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
+const NAME_STYLE: React.CSSProperties = { display: 'block', fontSize: 'var(--font-size-body)', color: 'var(--neutral-900)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
 
 //
 
@@ -67,14 +68,14 @@ export function ProjectDocumentCard(
     return (
       <m.div
         ref={ref}
-        initial={{ opacity: 0, scale: 0.97, filter: 'blur(2px)' }}
+        initial={{ opacity: 0, scale: 0.97, filter: `blur(${BLUR['2xs']}px)` }}
         animate={{
           opacity: 1, scale: 1, filter: 'blur(0px)',
-          transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
+          transition: { duration: DURATION.base, ease: [0.22, 1, 0.36, 1] },
         }}
         exit={{
-          opacity: 0, scale: 0.97, filter: 'blur(2px)',
-          transition: { duration: 0.18, ease: [0.55, 0.085, 0.68, 0.53] },
+          opacity: 0, scale: 0.97, filter: `blur(${BLUR['2xs']}px)`,
+          transition: { duration: DURATION.base, ease: [0.55, 0.085, 0.68, 0.53] },
         }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
@@ -87,19 +88,19 @@ export function ProjectDocumentCard(
           style={{
             display:      'flex',
             alignItems:   'center',
-            gap:          12,
-            padding:      '10px 8px 10px 12px',
+            gap:          'var(--space-3)',
+            padding:      'var(--space-2-5) var(--space-2) var(--space-2-5) var(--space-3)',
             border:       '1px solid var(--border-default)',
-            borderRadius: 14,
+            borderRadius: 'var(--radius-xl)',
             background:   uploading ? 'var(--neutral-100)' : 'var(--field-surface)',
             fontFamily:   'var(--font-body)',
             boxSizing:    'border-box',
             width:        '100%',
-            transition:   'background 200ms',
+            transition:   'background var(--duration-base)',
           }}
         >
           <FormatGlyph format={format} size="md" />
-          <span style={{ flex: 1, minWidth: 0, lineHeight: 1.3 }}>
+          <span style={{ flex: 1, minWidth: 0, lineHeight: 'var(--leading-tight)' }}>
             {url ? (
               <Tooltip content={`Open ${name}`} maxWidth={280}>
                 <a href={url} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ ...NAME_STYLE, textDecoration: 'none' }}>
@@ -109,7 +110,7 @@ export function ProjectDocumentCard(
             ) : (
               <span style={{ ...NAME_STYLE, color: uploading ? 'var(--neutral-600)' : NAME_STYLE.color }}>{name}</span>
             )}
-            <small style={{ fontSize: 12, color: 'var(--neutral-600)' }}>
+            <small style={{ fontSize: 'var(--font-size-small)', color: 'var(--neutral-600)' }}>
               {[formatLabel(format), ext ? `.${ext}` : null, sizeLabel].filter(Boolean).join(' · ')}
             </small>
           </span>
@@ -153,17 +154,17 @@ export function ProjectDocumentCard(
                   width:           22,
                   height:          22,
                   flexShrink:      0,
-                  padding:         3,
+                  padding:         'var(--space-0-5)',
                   border:          'none',
-                  borderRadius:    6,
+                  borderRadius:    'var(--radius-sm)',
                   background:      'none',
                   cursor:          'pointer',
                   color:           'var(--neutral-400)',
                   outlineStyle:    'solid',
-                  outlineWidth:    '2px',
-                  outlineOffset:   '1px',
+                  outlineWidth:    'var(--focus-ring-width)',
+                  outlineOffset:   'var(--focus-ring-offset-sm)',
                   outlineColor:    removeButtonFocused ? 'var(--focus-ring)' : 'transparent',
-                  transition:      'color 150ms, outline-color 150ms',
+                  transition:      'color var(--duration-fast), outline-color var(--duration-fast)',
                 }}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--neutral-700)' }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--neutral-400)' }}

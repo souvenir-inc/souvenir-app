@@ -18,6 +18,7 @@ import Cancel01Icon from "@hugeicons/core-free-icons/Cancel01Icon";
 import { QuillWriteOneIcon, NeuralNetworkIcon } from "@strange-huge/icons";
 import type { ActivityItem, ActivityType } from "@/types/chat";
 import { ACTIVITY_VERB, activityVerb, transcribingFile } from "@/lib/activity";
+import { DURATION, SPRING, LONG, STAGGER } from "@/styles/tokens/motion"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IconEntry = { icon: any; isHuge: boolean };
@@ -56,7 +57,7 @@ function SpinnerIcon() {
   return (
     <m.span
       animate={{ rotate: [0, 360] }}
-      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+      transition={{ duration: LONG.xs, repeat: Infinity, ease: "linear" }}
       style={{ display: "flex", alignItems: "center", lineHeight: 0, flexShrink: 0 }}
     >
       <HIcon icon={Spinner} size={16} color="var(--neutral-200)" strokeWidth={2} />
@@ -102,7 +103,7 @@ function FaviconImg({ domain, size = 14 }: { domain?: string; size?: number }) {
       width={size}
       height={size}
       alt=""
-      style={{ borderRadius: 3, flexShrink: 0, display: "block" }}
+      style={{ borderRadius: 'var(--radius-xs)', flexShrink: 0, display: "block" }}
       onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
     />
   );
@@ -157,7 +158,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 8,
+          gap: 'var(--space-2)',
           background: "transparent",
           border: "none",
           cursor: expandable ? "pointer" : "default",
@@ -180,7 +181,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
         </span>
 
         {/* Verb */}
-        <span style={{ fontSize: 14, fontWeight: 500, color: "var(--neutral-700)", flexShrink: 0 }}>
+        <span style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-700)", flexShrink: 0 }}>
           {verb}
         </span>
 
@@ -188,8 +189,8 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
         {detailText && (
           <span
             style={{
-              fontSize: 14,
-              fontWeight: 400,
+              fontSize: 'var(--font-size-body)',
+              fontWeight: 'var(--font-weight-regular)',
               color: "var(--neutral-600)",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -204,21 +205,21 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
 
         {/* Result count */}
         {isDone && hasResults && (
-          <span style={{ fontSize: 14, fontWeight: 400, color: "var(--neutral-200)", flexShrink: 0 }}>
+          <span style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-regular)', color: "var(--neutral-200)", flexShrink: 0 }}>
             {activity.results!.length} {activity.type === "web-search" ? "result" : "file"}{activity.results!.length === 1 ? "" : "s"}
           </span>
         )}
 
         {/* Duration */}
         {isDone && activity.durationS !== undefined && (
-          <span style={{ fontSize: 12, fontWeight: 400, color: "var(--neutral-200)", flexShrink: 0 }}>
+          <span style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-regular)', color: "var(--neutral-200)", flexShrink: 0 }}>
             {activity.durationS < 1 ? `${Math.round(activity.durationS * 1000)}ms` : `${activity.durationS.toFixed(1)}s`}
           </span>
         )}
 
         {/* Percentage — only while running; a finished row shows its duration */}
         {isActive && activity.percent !== undefined && (
-          <span style={{ fontSize: 12, fontWeight: 400, color: "var(--neutral-200)", flexShrink: 0 }}>
+          <span style={{ fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-regular)', color: "var(--neutral-200)", flexShrink: 0 }}>
             {Math.round(activity.percent)}%
           </span>
         )}
@@ -227,8 +228,8 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
         {isActive && (
           <m.span
             animate={{ opacity: [0.3, 1, 0.3] }}
-            transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
-            style={{ fontSize: 14, fontWeight: 400, color: "var(--neutral-300)", flexShrink: 0 }}
+            transition={{ duration: LONG.sm, repeat: Infinity, ease: "easeInOut" }}
+            style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-regular)', color: "var(--neutral-300)", flexShrink: 0 }}
           >
             working…
           </m.span>
@@ -239,13 +240,13 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
           <>
             <span
               style={{
-                fontSize: 12,
-                fontWeight: 600,
-                color: "var(--neutral-600, #6A625D)",
-                letterSpacing: "0.4px",
+                fontSize: 'var(--font-size-small)',
+                fontWeight: 'var(--font-weight-semibold)',
+                color: "var(--neutral-600)",
+                letterSpacing: "var(--tracking-wider)",
                 background: "color-mix(in srgb, var(--neutral-800) 8%, transparent)",
-                borderRadius: 4,
-                padding: "1px 5px",
+                borderRadius: 'var(--radius-xs)',
+                padding: "var(--space-0-5) var(--space-1)",
                 flexShrink: 0,
                 textTransform: "uppercase",
               }}
@@ -255,10 +256,10 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
             <m.svg
               width="14" height="14" viewBox="0 0 14 14" fill="none"
               animate={{ rotate: manualOpen ? 180 : 0 }}
-              transition={{ type: "spring", stiffness: 380, damping: 28 }}
+              transition={{ type: "spring", ...SPRING.brisk }}
               style={{ display: "block", flexShrink: 0 }}
             >
-              <path d="M3 5.5 L7 9.5 L11 5.5" stroke="var(--neutral-400, #9C938B)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M3 5.5 L7 9.5 L11 5.5" stroke="var(--neutral-400)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
             </m.svg>
           </>
         )}
@@ -267,10 +268,10 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
           <m.svg
             width="14" height="14" viewBox="0 0 14 14" fill="none"
             animate={{ rotate: manualOpen ? 180 : 0 }}
-            transition={{ type: "spring", stiffness: 380, damping: 28 }}
+            transition={{ type: "spring", ...SPRING.brisk }}
             style={{ display: "block", flexShrink: 0 }}
           >
-            <path d="M3 5.5 L7 9.5 L11 5.5" stroke="var(--neutral-400, #9C938B)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M3 5.5 L7 9.5 L11 5.5" stroke="var(--neutral-400)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
           </m.svg>
         )}
       </button>
@@ -283,18 +284,18 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
             gridTemplateRows: manualOpen ? "1fr" : "0fr",
             opacity: manualOpen ? 1 : 0,
             visibility: manualOpen ? "visible" : "hidden",
-            transition: `grid-template-rows 280ms cubic-bezier(0.16,1,0.3,1), opacity 200ms ease, visibility 0s linear ${manualOpen ? "0s" : "280ms"}`,
+            transition: `grid-template-rows var(--activity-row-reveal-duration) var(--ease-out-expo), opacity var(--duration-base) ease, visibility 0s linear ${manualOpen ? "0s" : "var(--activity-row-duration)"}`,
           }}
         >
           <div style={{ overflow: "hidden", minHeight: 0 }}>
             <div
               className="kaya-scrollbar"
               style={{
-                marginLeft: 48, marginTop: 4, padding: "8px 10px",
+                marginLeft: 'var(--space-9)', marginTop: 'var(--space-1)', padding: "var(--space-2) var(--space-2-5)",
                 maxHeight: 240, overflowY: "auto",
-                fontSize: 13, lineHeight: 1.5, color: "var(--neutral-600)",
+                fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--leading-normal)', color: "var(--neutral-600)",
                 whiteSpace: "pre-wrap", wordBreak: "break-word",
-                background: "rgba(59,54,50,0.04)", borderRadius: 8,
+                background: "color-mix(in srgb, var(--neutral-800) 4%, transparent)", borderRadius: 'var(--radius-md)',
               }}
             >
               {activity.output}
@@ -317,11 +318,11 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
             gridTemplateRows: resultsVisible ? "1fr" : "0fr",
             opacity: resultsVisible ? 1 : 0,
             visibility: resultsVisible ? "visible" : "hidden",
-            transition: `grid-template-rows 280ms cubic-bezier(0.16,1,0.3,1), opacity 200ms ease, visibility 0s linear ${resultsVisible ? "0s" : "280ms"}`,
+            transition: `grid-template-rows var(--activity-row-reveal-duration) var(--ease-out-expo), opacity var(--duration-base) ease, visibility 0s linear ${resultsVisible ? "0s" : "var(--activity-row-duration)"}`,
           }}
         >
           <div style={{ overflow: "hidden", minHeight: 0 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 5, paddingLeft: 48, paddingTop: 4, paddingBottom: 4 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)', paddingLeft: 'var(--space-9)', paddingTop: 'var(--space-1)', paddingBottom: 'var(--space-1)' }}>
               {activity.results!.map((r, ri) => (
                 <m.a
                   key={ri}
@@ -331,18 +332,18 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
                   tabIndex={resultsVisible ? 0 : -1}
                   initial={{ opacity: 0, x: -4 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: ri * 0.05, duration: 0.18 }}
+                  transition={{ delay: ri * STAGGER.sm, duration: DURATION.base }}
                   style={{
-                    display: "flex", alignItems: "center", gap: 6,
-                    fontSize: 13, fontWeight: 400, minHeight: 20,
+                    display: "flex", alignItems: "center", gap: 'var(--space-1-5)',
+                    fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-regular)', minHeight: 20,
                     textDecoration: "none",
-                    borderRadius: 6,
-                    padding: "2px 4px",
-                    margin: "0 -4px",
+                    borderRadius: 'var(--radius-sm)',
+                    padding: "var(--space-0-5) var(--space-1)",
+                    margin: "0 calc(var(--space-1) * -1)",
                     color: "inherit",
-                    transition: "background 120ms",
+                    transition: "background var(--duration-fast)",
                   }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(59,54,50,0.05)"; }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--activity-row-bg)"; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                 >
                   <FaviconImg domain={r.domain} size={13} />
@@ -351,10 +352,10 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
                     {r.title}
                   </span>
                   {r.domain && r.domain !== "pin" && (
-                    <span style={{ color: "var(--neutral-300)", flexShrink: 0, fontSize: 12 }}>{r.domain}</span>
+                    <span style={{ color: "var(--neutral-300)", flexShrink: 0, fontSize: 'var(--font-size-small)' }}>{r.domain}</span>
                   )}
                   {r.domain === "pin" && (
-                    <span style={{ color: "var(--neutral-300)", flexShrink: 0, fontStyle: "italic", fontSize: 12 }}>pin</span>
+                    <span style={{ color: "var(--neutral-300)", flexShrink: 0, fontStyle: "italic", fontSize: 'var(--font-size-small)' }}>pin</span>
                   )}
                 </m.a>
               ))}
@@ -365,7 +366,7 @@ export function ActivityRow({ activity }: { activity: ActivityItem }) {
 
       {/* Progress message (for tool_progress / docx_progress) */}
       {isActive && activity.progressMessage && (
-        <div style={{ paddingLeft: 44, fontSize: 13, color: "var(--neutral-300)", fontStyle: "italic", paddingTop: 4 }}>
+        <div style={{ paddingLeft: 'var(--activity-row-detail-indent)', fontSize: 'var(--font-size-body-sm)', color: "var(--neutral-300)", fontStyle: "italic", paddingTop: 'var(--space-1)' }}>
           {activity.progressMessage}
         </div>
       )}
@@ -389,19 +390,19 @@ const PROMPT_MARKER_TEXT: Record<PromptMarkerState, string> = {
 export function PromptMarkerRow({ title, state }: { title: string; state: PromptMarkerState }) {
   const detail = title.trim();
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, minHeight: 22, fontFamily: "var(--font-body)" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-2)', minHeight: 22, fontFamily: "var(--font-body)" }}>
       {state === "answered" && <CheckmarkIcon />}
       <span style={{ display: "flex", alignItems: "center", lineHeight: 0, flexShrink: 0 }}>
         <HIcon icon={MessageQuestionIcon} size={16} color={state === "answered" ? "var(--green-600)" : "var(--neutral-500)"} />
       </span>
       <span
         className={state === "waiting" ? "kaya-thinking-step-shimmer" : undefined}
-        style={{ fontSize: 14, fontWeight: 500, color: "var(--neutral-700)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+        style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-700)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
       >
         {PROMPT_MARKER_TEXT[state]}
       </span>
       {detail && (
-        <span style={{ fontSize: 14, fontWeight: 400, color: "var(--neutral-600)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0 }}>
+        <span style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-regular)', color: "var(--neutral-600)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0 }}>
           — {detail}
         </span>
       )}
@@ -415,13 +416,13 @@ export function ActivitiesSection({ activities }: { activities: ActivityItem[] }
   if (!activities || activities.length === 0) return null;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 4 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-2-5)', paddingTop: 'var(--space-1)' }}>
       {activities.map((activity, i) => (
         <m.div
           key={activity.id}
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: i * 0.06 }}
+          transition={{ duration: DURATION.base, delay: i * STAGGER.md }}
         >
           <ActivityRow activity={activity} />
         </m.div>

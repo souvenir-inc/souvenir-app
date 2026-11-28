@@ -36,14 +36,14 @@ export function SettingsTable({ children, columns, columnGap, background = 'var(
       <section
         style={{
           border:        '1px solid var(--border-default)',
-          borderRadius:  16,
-          boxShadow:     '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+          borderRadius:  'var(--radius-2xl)',
+          boxShadow:     'var(--shadow-soft)',
           background,
           overflow:      'hidden',
           display:       'flex',
           flexDirection: 'column',
-          gap:           12,
-          padding:       '12px 0',
+          gap:           'var(--space-3)',
+          padding:       'var(--space-3) 0',
         }}
       >
         {children}
@@ -66,8 +66,8 @@ export function SettingsTableToolbar({
       style={{
         display:      'flex',
         alignItems:   'center',
-        gap:          12,
-        padding:      '12px 24px 24px',
+        gap:          'var(--space-3)',
+        padding:      'var(--space-3) var(--space-6) var(--space-6)',
         borderBottom: '1px solid var(--neutral-100)',
         ...style,
       }}
@@ -77,9 +77,9 @@ export function SettingsTableToolbar({
           flex:       '1 0 0',
           minWidth:   0,
           fontFamily: 'var(--font-body)',
-          fontWeight: 500,
-          fontSize:   16,
-          lineHeight: '22px',
+          fontWeight: 'var(--font-weight-medium)',
+          fontSize:   'var(--font-size-body-lg)',
+          lineHeight: 'var(--line-height-body)',
           color:      'var(--neutral-900)',
           margin:     0,
         }}
@@ -118,9 +118,9 @@ export function SettingsTableHeader({
       style={{
         display:              'grid',
         gridTemplateColumns:  columns ?? layout.columns,
-        columnGap:            columnGap ?? layout.columnGap ?? 64,
+        columnGap:            columnGap ?? layout.columnGap ?? 'var(--space-10)',
         alignItems:           'center',
-        padding:              '12px 24px',
+        padding:              'var(--space-3) var(--space-6)',
         borderBottom:         '1px solid var(--neutral-100)',
         ...style,
       }}
@@ -142,9 +142,9 @@ export function SettingsTableHeaderCell({
       role="columnheader"
       style={{
         fontFamily: 'var(--font-body)',
-        fontWeight: 500,
-        fontSize:   14,
-        lineHeight: '22px',
+        fontWeight: 'var(--font-weight-medium)',
+        fontSize:   'var(--font-size-body)',
+        lineHeight: 'var(--line-height-body)',
         color:      'var(--neutral-900)',
         margin:     0,
         textAlign:  align,
@@ -175,10 +175,10 @@ export function SettingsTableRow({
       style={{
         display:             'grid',
         gridTemplateColumns: columns ?? layout.columns,
-        columnGap:           columnGap ?? layout.columnGap ?? 64,
+        columnGap:           columnGap ?? layout.columnGap ?? 'var(--space-10)',
         alignItems:          'center',
         minHeight,
-        padding:             '0 24px',
+        padding:             '0 var(--space-6)',
         borderBottom:        divider ? '1px solid var(--neutral-100)' : undefined,
         cursor:              onClick ? 'pointer' : undefined,
         ...style,
@@ -224,7 +224,7 @@ export function SettingsTableFooter({
   return (
     <div
       style={{
-        padding: '12px 24px',
+        padding: 'var(--space-3) var(--space-6)',
         ...style,
       }}
     >

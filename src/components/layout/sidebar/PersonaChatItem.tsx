@@ -14,9 +14,9 @@ import { toast } from "sonner";
 const personaChatMenuItemStyle: React.CSSProperties = {
   display:     "flex",
   alignItems:  "center",
-  gap:         "8px",
-  padding:     "7px 10px",
-  borderRadius:"8px",
+  gap:         "var(--space-2)",
+  padding:     "var(--space-1-75) var(--space-2-5)",
+  borderRadius:"var(--radius-md)",
   cursor:      "pointer",
   fontFamily:  "var(--font-body)",
   fontWeight:  "var(--font-weight-medium)",
@@ -126,9 +126,9 @@ export function PersonaChatItem({
           }}
           style={{
             backgroundColor: "var(--popover-bg)",
-            borderRadius:    "12px",
-            padding:         "4px",
-            boxShadow:       "0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)",
+            borderRadius:    "var(--radius-xl)",
+            padding:         "var(--space-1)",
+            boxShadow:       "var(--sidebar-menu-shadow)",
             zIndex:          5,
             minWidth:        "168px",
             outline:         "none",
@@ -144,7 +144,7 @@ export function PersonaChatItem({
           </DropdownMenu.Item>
 
           <DropdownMenu.Separator
-            style={{ height: "1px", backgroundColor: "var(--neutral-100)", margin: "4px 0" }}
+            style={{ height: "1px", backgroundColor: "var(--neutral-100)", margin: "var(--space-1) 0" }}
           />
 
           <DropdownMenu.Item

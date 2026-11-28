@@ -40,6 +40,7 @@ import {
   DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent,
   MenuModeContext, useMenuMode, SlotFocusContext,
 } from '@/components/ui/dropdown-menu'
+import { DURATION, SPRING, STAGGER } from "@/styles/tokens/motion"
 
 // Re-export for convenience - callers importing `Dropdown` get these for free.
 export type { PopoverSize, PopoverVariant, DropdownSectionProps, DropdownMenuItemProps }
@@ -56,14 +57,14 @@ export const DROPDOWN_SCALE_PRESET = {
   initial:    { opacity: 0, scaleX: 0.95, scaleY: 0.75, transformOrigin: 'top center' as const },
   animate:    { opacity: 1, scaleX: 1,    scaleY: 1,    transformOrigin: 'top center' as const },
   exit:       { opacity: 0, scaleX: 0.97, scaleY: 0.85, transition: { duration: 0.12, ease: [0.55, 0.085, 0.68, 0.53] } },
-  transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] },
+  transition: { duration: DURATION.base, ease: [0.16, 1, 0.3, 1] },
 } as const
 
 export const DROPDOWN_SPRING_PRESET = {
   initial:    { opacity: 0, scaleX: 0.96, scaleY: 0.7,  transformOrigin: 'top center' as const },
   animate:    { opacity: 1, scaleX: 1,    scaleY: 1,    transformOrigin: 'top center' as const },
   exit:       { opacity: 0, scaleX: 0.97, scaleY: 0.85, transition: { duration: 0.1, ease: [0.55, 0.085, 0.68, 0.53] } },
-  transition: { type: 'spring' as const, stiffness: 500, damping: 14, opacity: { duration: 0.15, ease: [0.16, 1, 0.3, 1] } },
+  transition: { type: 'spring' as const, ...SPRING.pop,  opacity: { duration: DURATION.quick, ease: [0.16, 1, 0.3, 1] } },
 } as const
 
 /**
@@ -80,7 +81,7 @@ export function dropdownItemStagger(index: number) {
   return {
     initial:    { opacity: 0, x: -4 },
     animate:    { opacity: 1, x: 0 },
-    transition: { type: 'spring' as const, stiffness: 600, damping: 25, delay: index * 0.04 },
+    transition: { type: 'spring' as const, ...SPRING.lively,  delay: index * STAGGER.sm },
   }
 }
 
@@ -116,8 +117,8 @@ DropdownRoot.displayName = 'Dropdown'
 //     (start = left edges aligned, end = right edges aligned).
 //   • left-* and right-* placements anchor to the PARENT dropdown panel when
 //     the trigger lives inside one (nested menus), otherwise to the trigger.
-//   • Dropdowns sit at z-index 9998 - exactly one layer below the
-//     tooltip layer (9999), per the KDS overlay-z hierarchy.
+//   • Dropdowns sit on the z-index scale at --z-popover: above dialogs
+//     (--z-modal) and below toasts and tooltips (--z-toast, --z-tooltip).
 // Positioning, dismissal, focus management and keyboard navigation are all
 // delegated to Radix DropdownMenu.
 
@@ -128,7 +129,7 @@ export type DropdownPlacement =
   | 'right-start'  | 'right-end'
 
 const DROPDOWN_GAP = 8
-const DROPDOWN_Z   = 9998
+const DROPDOWN_Z   = 'var(--z-popover)'
 
 type Side  = 'top' | 'bottom' | 'left' | 'right'
 type Align = 'start' | 'center' | 'end'
@@ -144,7 +145,7 @@ const MENU_ANIMATION = {
   initial:    { opacity: 0, scaleX: 0.95, scaleY: 0.75 },
   animate:    { opacity: 1, scaleX: 1,    scaleY: 1    },
   exit:       { opacity: 0, scaleX: 0.97, scaleY: 0.85, transition: { duration: 0.12, ease: [0.55, 0.085, 0.68, 0.53] as const } },
-  transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] as const },
+  transition: { duration: DURATION.base, ease: [0.16, 1, 0.3, 1] as const },
 }
 
 const MENU_ORIGIN_STYLE: React.CSSProperties = {

@@ -13,6 +13,7 @@ import {
   AbacusIcon,
   ArrowDownOneIcon,
 } from '@strange-huge/icons'
+import { BLUR, DURATION, SPRING, LONG } from "@/styles/tokens/motion"
 
 // ── Shadow tokens ──────────────────────────────────────────────────────────────
 
@@ -304,18 +305,18 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
       alignItems:      'center',
       justifyContent:  'space-between',
       overflow:        'hidden',
-      borderRadius:    '10px',
+      borderRadius:    'var(--radius-lg)',
       width:           collapsed ? 'auto' : fluid ? '100%' : '217px',
-      paddingLeft:     '6px',
-      paddingRight:    (!collapsed && isChatItem && isActive) ? '0px' : '6px',
-      paddingTop:      (!collapsed && isChatItem && isActive) ? '0px' : (isAccountItem && collapsed) ? '9px' : isAccountItem ? '6px' : (isChatItem || isEditVariant) ? '3px' : collapsed ? '6px' : '5px',
-      paddingBottom:   (!collapsed && isChatItem && isActive) ? '0px' : (isAccountItem && collapsed) ? '9px' : isAccountItem ? '6px' : (isChatItem || isEditVariant) ? '3px' : collapsed ? '6px' : '5px',
+      paddingLeft:     'var(--space-1-5)',
+      paddingRight:    (!collapsed && isChatItem && isActive) ? '0px' : 'var(--space-1-5)',
+      paddingTop:      (!collapsed && isChatItem && isActive) ? '0px' : (isAccountItem && collapsed) ? 'var(--sidebar-menu-item-padding-top)' : isAccountItem ? 'var(--space-1-5)' : (isChatItem || isEditVariant) ? 'var(--space-0-75)' : collapsed ? 'var(--space-1-5)' : 'var(--space-1-25)',
+      paddingBottom:   (!collapsed && isChatItem && isActive) ? '0px' : (isAccountItem && collapsed) ? 'var(--sidebar-menu-item-padding-bottom)' : isAccountItem ? 'var(--space-1-5)' : (isChatItem || isEditVariant) ? 'var(--space-0-75)' : collapsed ? 'var(--space-1-5)' : 'var(--space-1-25)',
       backgroundColor: isEditVariant || (!isHeader && isActive) ? (isDangerRow ? DANGER_HOVER_BG : 'var(--sidebar-menu-item-hover-bg)') : 'transparent',
       boxShadow:       isEditVariant
                          ? '0px 0px 0px 1px var(--focus-ring)'
                          : (!isHeader && isActive) ? (isDangerRow ? DANGER_HOVER_SHADOW : SHADOW_ITEM_HOVER) : undefined,
       cursor:          isHeader ? 'default' : isEditVariant ? 'text' : isInert ? 'default' : 'pointer',
-      transition:      isEditVariant ? undefined : 'background-color 150ms, box-shadow 150ms',
+      transition:      isEditVariant ? undefined : 'background-color var(--duration-fast), box-shadow var(--duration-fast)',
     }
 
     const rootProps = {
@@ -342,7 +343,7 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
         {isHeader && (
           <>
             {/* Left: label + Show/Hide toggle */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)' }}>
               <p style={{ ...captionTextStyle, fontWeight: 'var(--font-weight-medium)', color: 'var(--sidebar-section-header-muted)' }}>
                 {label}
               </p>
@@ -371,10 +372,10 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                   <AnimatePresence mode="popLayout" initial={false}>
                     <motion.span
                       key={shown ? 'hide' : 'show'}
-                      initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+                      initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                       animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-                      exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                      transition={{ type: 'spring', ...SPRING.snappy }}
                       style={{ display: 'block', transformOrigin: 'left center' }}
                     >
                       {shown ? 'Hide' : 'Show'}
@@ -393,14 +394,14 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                 style={{
                   display:     'flex',
                   alignItems:  'center',
-                  gap:         '2px',
+                  gap:         'var(--space-0-5)',
                   background:  'none',
                   border:      'none',
                   padding:     0,
                   cursor:      'pointer',
                   flexShrink:  0,
                   opacity:     viewAllAlwaysVisible ? 1 : (isActive ? 1 : 0),
-                  transition:  'opacity 150ms ease',
+                  transition:  'opacity var(--duration-fast) ease',
                 }}
               >
                 <p style={{ ...captionTextStyle, fontWeight: 'var(--font-weight-medium)' }}>
@@ -417,7 +418,7 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
         {/* ── Default variant ── */}
         {variant === 'default' && (
           <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0 }}>
               <div style={{ color: danger ? DANGER_COLOR : 'var(--sidebar-icon, var(--sidebar-menu-item-text))', flexShrink: 0, lineHeight: 0 }}>
                 {React.cloneElement(icon, { triggered: isHovered })}
               </div>
@@ -426,10 +427,10 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                   <motion.p
                     key="label"
                     style={danger ? { ...bodyTextStyle, color: DANGER_COLOR } : bodyTextStyle}
-                    initial={{ opacity: 0, filter: 'blur(4px)' }}
+                    initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                     animate={{ opacity: 1, filter: 'blur(0px)' }}
-                    exit={{ opacity: 0, filter: 'blur(4px)' }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    exit={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                    transition={{ type: 'spring', ...SPRING.snappy }}
                   >
                     {label}
                   </motion.p>
@@ -441,17 +442,17 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
               {!collapsed && shortcut && (
                 <motion.div
                   key="shortcut"
-                  initial={{ opacity: 0, filter: 'blur(4px)' }}
+                  initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                   animate={{ opacity: 1, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, filter: 'blur(4px)' }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  exit={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                  transition={{ type: 'spring', ...SPRING.snappy }}
                   style={{
                     display:         'flex',
                     alignItems:      'center',
                     justifyContent:  'center',
                     overflow:        'hidden',
-                    padding:         '2px 4px',
-                    borderRadius:    '4px',
+                    padding:         'var(--space-0-5) var(--space-1)',
+                    borderRadius:    'var(--radius-xs)',
                     height:          '20px',
                     backgroundImage: 'linear-gradient(180deg, var(--neutral-white) 0%, var(--neutral-50) 100%)',
                     boxShadow:       SHADOW_SHORTCUT,
@@ -483,7 +484,7 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
 
         {/* ── New Chat variant ── */}
         {variant === 'new-chat' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0 }}>
             <div style={{ position: 'relative', flexShrink: 0, width: '20px', height: '20px' }}>
               {/* Floating badge — visible at rest, hidden on hover/selected/collapsed */}
               {!collapsed && !isActive && (
@@ -495,7 +496,7 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                     left:            '-2px',
                     width:           '24px',
                     height:          '24px',
-                    borderRadius:    '6px',
+                    borderRadius:    'var(--radius-sm)',
                     backgroundColor: 'var(--sidebar-menu-item-new-chat-badge-bg)',
                     boxShadow:       SHADOW_NEW_CHAT_BADGE,
                     pointerEvents:   'none',
@@ -511,10 +512,10 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                 <motion.p
                   key="label"
                   style={bodyTextStyle}
-                  initial={{ opacity: 0, filter: 'blur(4px)' }}
+                  initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                   animate={{ opacity: 1, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, filter: 'blur(4px)' }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  exit={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                  transition={{ type: 'spring', ...SPRING.snappy }}
                 >
                   {label}
                 </motion.p>
@@ -539,11 +540,11 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                 flexShrink: 1,
                 minWidth:   0,
                 overflow:        'hidden',
-                paddingTop:      '2px',
-                paddingBottom:   '2px',
+                paddingTop:      'var(--space-0-5)',
+                paddingBottom:   'var(--space-0-5)',
                 maskImage:        (isActive && marqueeOffset > 0 && !isMarqueeing && !marqueeDone) ? 'linear-gradient(to right, black calc(100% - 20px), transparent 100%)' : undefined,
                 WebkitMaskImage:  (isActive && marqueeOffset > 0 && !isMarqueeing && !marqueeDone) ? 'linear-gradient(to right, black calc(100% - 20px), transparent 100%)' : undefined,
-                paddingRight:     isMarqueeing ? '48px' : undefined,
+                paddingRight:     isMarqueeing ? 'var(--space-9)' : undefined,
               }}
             >
               <motion.p
@@ -558,8 +559,8 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                   : { x: 0 }
                 }
                 transition={isHovered && marqueeOffset > 0
-                  ? { duration: marqueeOffset / 40, ease: 'linear', delay: 1 }
-                  : { duration: 0.3, ease: 'easeOut' }
+                  ? { duration: marqueeOffset / 40, ease: 'linear', delay: LONG.xs }
+                  : { duration: DURATION.slow, ease: 'easeOut' }
                 }
                 onAnimationComplete={() => { setIsMarqueeing(false); setMarqueeDone(true) }}
               >
@@ -567,9 +568,9 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
               </motion.p>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexShrink: 0 }}>
               {badge && (
-                <motion.div layout transition={{ type: 'spring', stiffness: 400, damping: 28 }} style={{ display: 'flex', alignItems: 'center' }}>
+                <motion.div layout transition={{ type: 'spring', ...SPRING.brisk }} style={{ display: 'flex', alignItems: 'center' }}>
                   {badge}
                 </motion.div>
               )}
@@ -581,15 +582,15 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                     initial={{ opacity: 0, x: 6 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 6 }}
-                    transition={{ duration: 0.14, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: DURATION.quick, ease: [0.16, 1, 0.3, 1] }}
                     onClick={(e) => { e.stopPropagation(); e.preventDefault(); onMoreClick?.(e) }}
                     style={{
                       display:         'flex',
                       alignItems:      'center',
                       justifyContent:  'center',
                       overflow:        'hidden',
-                      padding:         '6px',
-                      borderRadius:    '8px',
+                      padding:         'var(--space-1-5)',
+                      borderRadius:    'var(--radius-md)',
                       flexShrink:      0,
                       backgroundColor: 'var(--sidebar-menu-item-hover-bg)',
                       border:          'none',
@@ -612,7 +613,7 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
 
         {/* ── Chat Item Edit variant ── */}
         {isEditVariant && (
-          <div style={{ display: 'flex', alignItems: 'center', width: '100%', paddingTop: '2px', paddingBottom: '2px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', width: '100%', paddingTop: 'var(--space-0-5)', paddingBottom: 'var(--space-0-5)' }}>
             <input
               ref={inputRef}
               type="text"
@@ -666,7 +667,7 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
         {/* ── Account Item variant ── */}
         {isAccountItem && (
           <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexShrink: 0 }}>
               {/* Avatar */}
               <div style={{ position: 'relative', flexShrink: 0, width: 32, height: 32, borderRadius: userAvatarRadius(32), boxShadow: SHADOW_AVATAR, overflow: 'hidden' }}>
                 <UserAvatar name={label} src={avatarSrc} size={32} />
@@ -677,10 +678,10 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                 {!collapsed && (
                   <motion.div
                     key="user-info"
-                    initial={{ opacity: 0, filter: 'blur(4px)' }}
+                    initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                     animate={{ opacity: 1, filter: 'blur(0px)' }}
-                    exit={{ opacity: 0, filter: 'blur(4px)' }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    exit={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                    transition={{ type: 'spring', ...SPRING.snappy }}
                     style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flexShrink: 0 }}
                   >
                     <p style={bodyTextStyle}>{label}</p>
@@ -711,17 +712,17 @@ export const SidebarMenuItem = React.forwardRef<HTMLDivElement, SidebarMenuItemP
                   key="account-actions"
                   type="button"
                   aria-label="Account settings"
-                  initial={{ opacity: 0, filter: 'blur(4px)' }}
+                  initial={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
                   animate={{ opacity: 1, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, filter: 'blur(4px)' }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  exit={{ opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+                  transition={{ type: 'spring', ...SPRING.snappy }}
                   onClick={(e) => { e.stopPropagation(); onSettingsClick?.(e) }}
                   style={{
                     display:         'flex',
                     alignItems:      'center',
-                    gap:             '4px',
-                    padding:         '6px',
-                    borderRadius:    '8px',
+                    gap:             'var(--space-1)',
+                    padding:         'var(--space-1-5)',
+                    borderRadius:    'var(--radius-md)',
                     flexShrink:      0,
                     backgroundColor: 'transparent',
                     border:          'none',

@@ -12,3 +12,14 @@ describe("Next.js redirects", () => {
     );
   });
 });
+
+describe("old settings links", () => {
+  it.each([
+    ["/settings/billing", "/settings/plans-and-billing"],
+    ["/settings/plans", "/settings/plans-and-billing"],
+    ["/settings/plans/confirmation", "/settings/plans-and-billing/confirmation"],
+  ])("redirects %s on the server to %s", async (source, destination) => {
+    const redirects = await nextConfig.redirects?.();
+    expect(redirects).toContainEqual(expect.objectContaining({ source, destination }));
+  });
+});

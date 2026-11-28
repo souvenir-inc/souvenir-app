@@ -24,21 +24,21 @@ export function ChipsRow({ chips, scroll }: ChipsRowProps) {
   } = scroll;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", flexShrink: 1, minWidth: 0, gap: "3px" }}>
+    <div style={{ display: "flex", flexDirection: "column", flexShrink: 1, minWidth: 0, gap: "var(--space-0-5)" }}>
       <div
         ref={chipsScrollRef}
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "4px",
+          gap: "var(--space-1)",
           overflowX: "auto",
           scrollbarWidth: "none",
           flexShrink: 1,
           minWidth: 0,
-          paddingTop: "3px",
-          paddingBottom: "3px",
-          paddingLeft: "3px",
-          paddingRight: "3px",
+          paddingTop: "var(--space-0-5)",
+          paddingBottom: "var(--space-0-5)",
+          paddingLeft: "var(--space-0-5)",
+          paddingRight: "var(--space-0-5)",
         }}
       >
         {chips}
@@ -47,17 +47,17 @@ export function ChipsRow({ chips, scroll }: ChipsRowProps) {
         // Padded hit zone so the 2 px visual track is easy to grab
         <div
           style={{
-            paddingTop: "4px",
-            paddingBottom: "4px",
-            marginLeft: "3px",
-            marginRight: "3px",
+            paddingTop: "var(--space-1)",
+            paddingBottom: "var(--space-1)",
+            marginLeft: "var(--space-0-5)",
+            marginRight: "var(--space-0-5)",
             userSelect: "none",
           }}
         >
           <div
             style={{
               height: 2,
-              borderRadius: 999,
+              borderRadius: 'var(--radius-full)',
               backgroundColor: "var(--neutral-800-05)",
               position: "relative",
               cursor: isThumbDragging ? "grabbing" : "pointer",
@@ -69,11 +69,11 @@ export function ChipsRow({ chips, scroll }: ChipsRowProps) {
                 position: "absolute",
                 top: 0,
                 height: "100%",
-                borderRadius: 999,
+                borderRadius: 'var(--radius-full)',
                 backgroundColor: "var(--neutral-800-30)",
                 width: `${thumbWidthPct}%`,
                 left: `${thumbOffsetPct}%`,
-                transition: isThumbDragging ? "none" : "left 60ms",
+                transition: isThumbDragging ? "none" : "left var(--chips-row-duration)",
                 cursor: isThumbDragging ? "grabbing" : "grab",
               }}
               onMouseDown={handleThumbMouseDown}

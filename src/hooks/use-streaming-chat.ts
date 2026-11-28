@@ -13,7 +13,9 @@ import { logger } from "@/lib/logger"
 import { friendlyModelError } from "@/lib/model-error"
 import { AguiSSEDecoder } from "@/lib/sse-decoder"
 import type { UIMessage } from "@/types/chat"
-import { registerStream, completeStream, type StreamOutcome } from "@/lib/stream-registry"
+import { registerStream, completeStream, reportStopped, isStreamActive, isStreamOwnedBy, setStreamDetach, subscribeStreams, type StreamOutcome } from "@/lib/stream-registry"
+import { getChatRunState } from "@/lib/api/chat"
+import { currentHoldId, getChatQueue, releaseErrorHold } from "@/lib/message-queue"
 import { updateMessage } from "@/lib/chat/stream/message-patches"
 import {
   AuthExpiredError,
@@ -39,6 +41,72 @@ export type { TurnResume } from "@/lib/chat/stream/stream-request"
 /** How many times one turn re-attaches to its stream, and the pause before each. */
 const FOLLOW_ATTEMPTS = 5
 const FOLLOW_RETRY_MS = 1000
+// The error hold an incomplete follow read left on a chat's queue (by chat id), for the
+// recovery follow that reads the turn to its end to lift.
+const incompleteReadHolds = new Map<string, { hold: number; replyId: string | null }>()
+
+// How often a dropped call asks whether its chat's run has ended, to free the chat.
+export const DROPPED_RUN_POLL_MS = 5000
+
+/**
+ * `next` with the prompt-card answers already recorded on `current` (the same reply). An
+ * answered card that `next` lacks (shown after `prior` was taken) is kept, answer and all:
+ * the replay adds a card only when none with its request id is there, so its replayed copy
+ * then leaves the answered one in place rather than showing it unanswered again.
+ */
+function keepPromptDecisions(next: UIMessage, current: UIMessage): UIMessage {
+  const merge = <P extends { request_id: string; decision?: unknown }>(into?: P[], from?: P[]) => {
+    const answered = (from ?? []).filter((p) => p.decision !== undefined)
+    if (answered.length === 0) return into
+    const decided = new Map(answered.map((p) => [p.request_id, p.decision]))
+    const kept = (into ?? []).map((p) => (decided.has(p.request_id) ? { ...p, decision: decided.get(p.request_id) } : p))
+    const present = new Set(kept.map((p) => p.request_id))
+    return [...kept, ...answered.filter((p) => !present.has(p.request_id))]
+  }
+  return {
+    ...next,
+    connectorConnectPrompts: merge(next.connectorConnectPrompts, current.connectorConnectPrompts),
+    connectorPermissionPrompts: merge(next.connectorPermissionPrompts, current.connectorPermissionPrompts),
+    chatPrompts: merge(next.chatPrompts, current.chatPrompts),
+  }
+}
+
+/**
+ * Asks the backend, every DROPPED_RUN_POLL_MS, whether `chatId`'s run has ended, and calls
+ * `onIdle` once it has. The next lookup is scheduled only after the current one settles,
+ * so lookups never pile up. Stops when `stillWanted` turns false. `onStop` runs once,
+ * however it stops (idle, unwanted, or the returned stop).
+ */
+function pollUntilRunEnds(chatId: string, stillWanted: () => boolean, onIdle: () => void, onStop?: () => void): () => void {
+  let stopped = false
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const stop = () => {
+    if (stopped) return
+    stopped = true
+    clearTimeout(timer)
+    onStop?.()
+  }
+  const schedule = () => {
+    timer = setTimeout(() => {
+      if (stopped) return
+      if (!stillWanted()) { stop(); return }
+      void getChatRunState(chatId).then((state) => {
+        if (stopped) return
+        if (!stillWanted()) { stop(); return }
+        if (state === "idle") { onIdle(); stop(); return }
+        schedule()
+      }, () => { if (!stopped) schedule() })
+    }, DROPPED_RUN_POLL_MS)
+  }
+  schedule()
+  return stop
+}
+
+/** A 409 that says the same send already reached the backend (the Idempotency-Key guard),
+ *  as opposed to a 409 refusal (an unpublished, paused or disabled agent). */
+function isAlreadySent(status: number, body: string): boolean {
+  return status === 409 && body.includes("already_sent")
+}
 
 /** How a follow of a running turn went: it reached the stream, the chat has no
  *  running turn any more (it ended while nobody was reading), or it could not connect. */
@@ -104,8 +172,18 @@ export function useStreamingChat({
 }: UseStreamingChatParams) {
   const xhrRef = useRef<XMLHttpRequest | null>(null)
   const stopRequestedRef = useRef(false)
-  // Set by a follow of a running turn, read by whoever started it.
-  const followResultRef = useRef<FollowResult>("attached")
+
+  // Whether a call's stream state belongs to the chat on screen. With no chat on screen
+  // (a new, unsaved chat) only a send made from that composer is its own: not a follow,
+  // and not a send from a saved chat the user has since left. No ref at all: one view only.
+  const showsChat = (streamChatId: string | null, sentFromNewChat: boolean) => {
+    if (!currentChatIdRef) return true
+    const shown = currentChatIdRef.current
+    if (!shown) return sentFromNewChat
+    // A saved chat on screen shows only its own stream: not a send still waiting for its
+    // new chat's id (null), which belongs to the composer it was sent from.
+    return streamChatId === shown
+  }
 
   // Pending message field updates - flushed to React every FLUSH_INTERVAL_MS
   const pendingFieldsRef = useRef<Partial<UIMessage> | null>(null)
@@ -123,6 +201,26 @@ export function useStreamingChat({
   // Stops the current call's stream, and only that one — registered with the
   // stream registry so the stream can be stopped from wherever its chat is shown.
   const activeStopRef = useRef<(() => void) | null>(null)
+  // Records Stop on the call it stopped too: stopRequestedRef is the hook's, and a call that
+  // takes the hook over resets it, so a call waiting to reconnect would forget a Stop.
+  const markCallStoppedRef = useRef<(() => void) | null>(null)
+  // The call that currently owns this hook. loadingMessageIdRef, resolvedChatIdRef,
+  // the transport refs and the flush buffer are one set shared by every call, so
+  // two overlapping streams — chat A's recovery still reading while chat B's starts —
+  // would have the first finish onto the second's reply. A new call therefore takes
+  // the hook over: it drops the old one (the connection closes, but the registry entry
+  // stays, so the old chat still counts as busy and its queue waits; reopening the chat
+  // clears the entry and follows its turn afresh, as does the end of its run) —
+  // but never a send the backend has not yet accepted, which it waits for instead,
+  // the same rule detachStream keeps: a turn whose run has not started is not dropped.
+  const activeCallRef = useRef<{
+    /** True once dropping it loses nothing: a follow, or a send whose run started. */
+    droppable: () => boolean
+    /** Settles when it becomes droppable, hands the hook to its own retry, or ends. */
+    settled: Promise<void>
+    settle: () => void
+    drop: () => void
+  } | null>(null)
 
   // ── Flush helpers ───────────────────────────────────────────────────────────
 
@@ -192,14 +290,24 @@ export function useStreamingChat({
   // ── handleStopGeneration ────────────────────────────────────────────────────
 
   const handleStopGeneration = () => {
+    // The call being stopped, read before anything is told: the end below notifies listeners,
+    // and one may start another call on this hook, which takes over the shared refs. What
+    // follows is this call's: its chat, its reply, its backend run.
+    const chatId = resolvedChatIdRef.current
+    const msgId = loadingMessageIdRef.current
+    const stoppedCall = activeStopRef.current
     stopRequestedRef.current = true
+    markCallStoppedRef.current?.()
     xhrRef.current?.abort()
     stopFlushInterval()
     flushPending()
-    completeStream(resolvedChatIdRef.current, "aborted")
-    setStreamState?.("aborted")
+    completeStream(chatId, "aborted", { replyId: msgId ?? undefined })
+    // Also when the chat had no entry to end (a follow waiting to reconnect after a drop): the
+    // history's running reply is cleared by this, not only by an end.
+    reportStopped(chatId, msgId)
+    // The composer shows the call that owns the hook: not this one, if another took over above.
+    if (activeStopRef.current === stoppedCall) setStreamState?.("aborted")
 
-    const msgId = loadingMessageIdRef.current
     if (msgId) {
       setMessages((prev) =>
         prev.map((msg) =>
@@ -218,15 +326,15 @@ export function useStreamingChat({
       )
     }
 
-    // Signal the backend to stop generation.
-    const chatId = resolvedChatIdRef.current
-    if (chatId && !chatId.startsWith("temp-")) {
-      if (onStopBackend) {
-        onStopBackend(chatId)
-      } else {
-        void apiFetch(CHAT_STOP_ENDPOINT(chatId), { method: "POST" }).catch(() => {})
-      }
-    }
+    // Signal the backend to stop generation (this call's chat).
+    stopBackend(chatId)
+  }
+
+  // Asks the backend to stop `chatId`'s run.
+  const stopBackend = (chatId: string | null) => {
+    if (!chatId || chatId.startsWith("temp-")) return
+    if (onStopBackend) onStopBackend(chatId)
+    else void apiFetch(CHAT_STOP_ENDPOINT(chatId), { method: "POST" }).catch(() => {})
   }
 
   // ── fetchAiResponse ─────────────────────────────────────────────────────────
@@ -249,41 +357,199 @@ export function useStreamingChat({
     modelId?: string | number | null,
     options?: StreamRequestOptions,
   ): Promise<StreamOutcome> => {
+    // Before any shared ref is written, take the hook over from whoever holds it.
+    // A retry of the same follow (followAttempt > 0) is that call continuing, not a
+    // rival for the refs, so it leaves its own parent alone.
+    // A send made from a new, unsaved chat's composer: that view's own, until the new
+    // chat id reaches it. Read now, before any wait: it is where the user sent from.
+    const sentFromNewChat = options?.follow !== true && !!currentChatIdRef && !currentChatIdRef.current
+    if (!options?.followAttempt) {
+      let holder = activeCallRef.current
+      let waited = false
+      // A send the backend has not accepted yet is never dropped: wait until its run
+      // starts (or it ends), then look again — another call may have taken over meanwhile.
+      while (holder && !holder.droppable()) {
+        waited = true
+        await holder.settled
+        holder = activeCallRef.current
+      }
+      // A follow that had to wait: the user may have left its chat meanwhile, even gone
+      // back to the chat it waited on. It stands down rather than cut that chat's stream.
+      // Nor if whoever asked for it no longer wants it (its chat reloaded and stopped showing
+      // that reply as running, say): it would drop the holder only to read a stale reply.
+      if (waited && options?.follow && ((currentChatIdRef && currentChatIdRef.current !== chatId) || options.stillWanted?.() === false)) {
+        options.onLeftBeforeStart?.()
+        return "done"
+      }
+      if (holder) {
+        // The buffer is shared too: commit what the old call had streamed into its own
+        // reply while the refs still point there (as Stop does). Left behind, it would be
+        // merged into the next call's first update and committed as that call's reply.
+        stopFlushInterval()
+        flushPending()
+        holder.drop()
+      }
+    }
     stopRequestedRef.current = false
     xhrRef.current = null
     // A follow owns the reply only once its stream answers; until then the reply is left as it is.
     const follow = options?.follow === true
     let attached = !follow
     let failedStatus = 0
-    followResultRef.current = "attached"
+    let failedBody = ""
     loadingMessageIdRef.current = loadingMessageId
+    // This call's own reply id. The ref is the hook's, and another call can take it over
+    // while this one waits; finishing this call must still reach this call's reply.
+    let myReplyId: string | null = loadingMessageId
+    // The queue hold this call's drop set, if any (see the catch below).
+    let dropHoldId: number | undefined
+    // Set once a reader of this chat failed during one of this call's waits (or a nested one's):
+    // that failure keeps the hold, so no later full read may lift it.
+    let readerFailedSeen = false
     userMessageIdRef.current = options?.userMessageId ?? null
     resolvedChatIdRef.current = chatId
+    // This call's own chat id, as with its reply id: the ref is the hook's, and after a wait
+    // it may hold another call's chat, whose composer this call must not publish to.
+    let myChatId: string | null = chatId
     // The refs above belong to whichever call ran last, so stopping through
     // the registry is a no-op once a newer call has taken over this hook.
     const stopThisCall = () => {
-      if (activeStopRef.current === stopThisCall) handleStopGeneration()
+      if (activeStopRef.current === stopThisCall) { handleStopGeneration(); return }
+      // Dropped by a takeover, its entry kept while its run goes on: Stop still reaches that
+      // run, through the backend, and settles this call's own reply and entry. The hook's
+      // transport and refs are the newer call's now and are not touched.
+      if (!detached || !myChatId) return
+      stoppedByUser = true
+      // A reconnect's Stop is its caller's too, which may own the queue hold: passed up.
+      options?.onStopped?.()
+      stopBackend(myChatId)
+      const replyId = myReplyId
+      if (replyId) {
+        setMessages((prev) => prev.map((msg) => (msg.id === replyId && msg.isLoading
+          ? { ...msg, isLoading: false, isThinkingInProgress: false, stoppedByUser: true, activities: stopActiveActivities(msg.activities) }
+          : msg)))
+      }
+      if (isStreamOwnedBy(myChatId, stopThisCall)) completeStream(myChatId, "aborted", { replyId: replyId ?? undefined })
+      reportStopped(myChatId, replyId)
     }
     activeStopRef.current = stopThisCall
-    registerStream(chatId, stopThisCall)
+    let stoppedByUser = false
+    // Passed up too: a reconnect's Stop is the Stop of the call it reconnects for, which may
+    // own the queue hold.
+    markCallStoppedRef.current = () => { stoppedByUser = true; options?.onStopped?.() }
     // Set when the chat was reopened and follows this turn afresh: this call's
     // connection is dropped and it leaves the reply and the registry alone.
     let detached = false
     let callXhr: XMLHttpRequest | null = null
+    // A dropped call's registry entry stays, so the chat counts as busy while its run goes on.
+    // Nothing reads that run any more, so nothing would end the entry when the run ends: this
+    // asks until it has, then ends it — if the entry is still this call's (reopening the chat,
+    // or another reader, takes it over first). Its queue then goes on.
+    // The chat API's run state covers the regular chat endpoint only: a turn on a chat's own
+    // endpoint (an agent chat) is not in it, so for those nothing is released from here.
+    const runStateReadable = endpoint === "/api/chat" && !directEndpoints
+    // Once the backend says the chat's run has ended, lifts the error hold this call's drop
+    // set on its queue (one that was already there stays). For a reconnect that was taken
+    // over during its wait: nothing else would ever lift that hold.
+    // Only the hold this drop set (its id): if the user queued again (lifting it) or a newer
+    // failure set another, the lookup stops and leaves that one alone.
+    // Returns a stop for the lookup (it also stops by itself once done or no longer wanted).
+    const releaseHoldWhenRunEnds = (id: string, onStop?: () => void): (() => void) => {
+      if (!runStateReadable || dropHoldId === undefined) { onStop?.(); return () => {} }
+      const holdId = dropHoldId
+      return pollUntilRunEnds(id, () => currentHoldId(id) === holdId && !stoppedByUser, () => releaseErrorHold(id, holdId), onStop)
+    }
+    // Ends this call's registry entry, only while it is still this call's: after a Stop (which
+    // ends it) an end listener may register the chat again, and that newer entry is not ours.
+    const endOwnStream = (outcome: StreamOutcome, opts?: { inconclusive?: boolean; runEnded?: boolean }) => {
+      const id = myChatId
+      if (id && isStreamOwnedBy(id, stopThisCall)) completeStream(id, outcome, { ...opts, ...(myReplyId ? { replyId: myReplyId } : {}) })
+    }
+    // As releaseHoldWhenRunEnds, while another reader has the chat: if that reader ends with a
+    // failure (or a Stop) the asking stops and the hold stays. A "done" end leaves it asking.
+    const releaseHoldUnlessReaderFails = (id: string) => {
+      // No hold this call set: nothing to lift, and nothing to watch (a watcher would stay
+      // subscribed until some reader failed).
+      if (!runStateReadable || dropHoldId === undefined) return
+      let stopWatching = () => {}
+      const stopAsking = releaseHoldWhenRunEnds(id, () => stopWatching())
+      stopWatching = subscribeStreams((event) => {
+        if (event.type !== "end" || event.chatId !== id || event.outcome === "done") return
+        stopAsking()
+        stopWatching()
+      })
+    }
+    // Tells the follow's caller this read was incomplete (it will follow again), noting the
+    // chat's error hold as it stands: a later follow that reads the turn to its end lifts it.
+    const reportIncomplete = () => {
+      // Only a hold this recovery chain set (this call's drop, or the one a reconnect was made
+      // for): an error hold that was already there before is a failure no later read undoes.
+      const id = myChatId
+      const hold = dropHoldId ?? options?.recoveryHoldId
+      if (id && hold !== undefined && currentHoldId(id) === hold && !readerFailedSeen) incompleteReadHolds.set(id, { hold, replyId: myReplyId })
+      options?.onIncomplete?.()
+    }
+    const releaseWhenRunEnds = () => {
+      const id = myChatId
+      if (!id || id.startsWith("temp-") || !runStateReadable) return
+      pollUntilRunEnds(id, () => isStreamOwnedBy(id, stopThisCall), () => completeStream(id, "done", { replyId: myReplyId ?? undefined }))
+    }
+    // A detached call ends as "done", but it did not read its turn to the end: its caller is told.
+    const leftDetached = (): StreamOutcome => {
+      options?.onDetached?.()
+      return "done"
+    }
     const detachThisCall = () => {
+      // Detached from outside (the chat reopened) while it still holds the hook: what it
+      // has buffered goes to its own reply now, or the next call would write it into its own.
+      if (!detached && activeCallRef.current === thisCall) {
+        stopFlushInterval()
+        flushPending()
+      }
       detached = true
       callXhr?.abort()
+    }
+    // A follow only reads a run that is already going, so it can be dropped from the
+    // start; a send registers its detach once its run has started (onRunStarted).
+    registerStream(chatId, stopThisCall, follow ? detachThisCall : undefined)
+    // A send takes the entry over from whatever had it (a follow it replaced, say) and must
+    // not keep that one's detach: until its run starts, reopening the chat waits for it.
+    if (!follow && chatId) setStreamDetach(chatId, undefined)
+    let runStarted = false
+    let markSettled = () => {}
+    const thisCall = {
+      droppable: () => follow || runStarted,
+      settled: new Promise<void>((resolve) => { markSettled = resolve }),
+      settle: () => markSettled(),
+      // Closes the connection but keeps the registry entry: the chat's run is still going
+      // on the backend, so the chat must keep looking busy, or its message queue would send
+      // the next message into that run. Reopening the chat clears the entry
+      // (use-chat-state's detachStream) and follows the run afresh.
+      drop: () => {
+        detachThisCall()
+        releaseWhenRunEnds()
+      },
+    }
+    // A retry of a dropped call is that call's recovery follow taking the hook over: the
+    // call it replaces has handed off, so anyone waiting on it can stop waiting now
+    // rather than for the whole recovery to finish. (The follow itself can be dropped.)
+    const handedFrom = options?.followAttempt ? activeCallRef.current : null
+    activeCallRef.current = thisCall
+    handedFrom?.settle()
+    // Only the call still holding the hook may clear the slot; a dropped one has
+    // already been replaced by the call that dropped it.
+    const releaseThisCall = () => {
+      if (activeCallRef.current === thisCall) activeCallRef.current = null
+      markSettled()
     }
 
     // Returns true if this stream's chat is still the one the user is viewing.
     // Used to suppress setStreamState calls for background (unfocused) streams.
-    const isActiveStream = () => {
-      if (!currentChatIdRef?.current) return true
-      const streamId = resolvedChatIdRef.current
-      return streamId === null || streamId === currentChatIdRef.current
-    }
+    const isActiveStream = () => showsChat(myChatId, sentFromNewChat)
 
-    setStreamState?.("waiting")
+    // Like every other state change here: only for the chat being shown. A call that
+    // waited for another to hand over may belong to a chat the user has since left.
+    if (isActiveStream()) setStreamState?.("waiting")
 
     const turn = createStreamTurn(options?.prior)
     // The event handlers' view of this call: its refs, batching and callbacks.
@@ -291,12 +557,15 @@ export function useStreamingChat({
       setMessages,
       queueUpdate,
       flushPending,
-      messageId: () => loadingMessageIdRef.current,
-      setMessageId: (id) => { loadingMessageIdRef.current = id },
+      messageId: () => myReplyId,
+      setMessageId: (id) => { myReplyId = id; loadingMessageIdRef.current = id },
       userMessageId: () => userMessageIdRef.current,
       chatId: () => resolvedChatIdRef.current,
-      adoptChatId: (id) => adoptChatId(id),
+      adoptChatId: (id) => { adoptChatId(id); myChatId = resolvedChatIdRef.current },
       onRunStarted: () => {
+        // The backend has the turn: dropping this connection now loses nothing.
+        runStarted = true
+        markSettled()
         registerStream(resolvedChatIdRef.current, stopThisCall, detachThisCall)
         if (isActiveStream()) setStreamState?.("streaming")
       },
@@ -305,183 +574,373 @@ export function useStreamingChat({
       saveToLibrary: undefined,
     }
 
-    try {
-      const target = resolveStreamTarget(chatId, endpoint, directEndpoints, options)
-      const directToken = target.useDirectBackend ? await ensureFreshToken() : null
-      const { fd, fileRefs } = buildStreamFormData(input, chatId, modelId, options, target)
-      ctx.saveToLibrary = fileRefs.saveToLibrary
-      // The sent message remembers its Library files, for the chat's Sources panel.
-      if (fileRefs.libraryFileIds.length > 0 && options?.userMessageId) {
-        const sentIds = fileRefs.libraryFileIds
-        // Each attachment that went as a Library file is marked, so Sources lists it once (as that file).
-        const sentFiles = options.files ?? []
-        setMessages(updateMessage(options.userMessageId, (msg) => ({
-          ...msg,
-          libraryFileIds: sentIds,
-          attachments: msg.attachments?.map((att, index) => {
-            const libraryFileId = sentFiles[index] ? libraryFileIdFor(sentFiles[index]) : undefined
-            return libraryFileId && !att.libraryFileId ? { ...att, libraryFileId } : att
-          }),
-        })))
-      }
+    // try/catch inside runCall, release after it: React Compiler cannot compile a
+    // `finally`, and bails out of the whole hook when it meets one. The release still
+    // runs on every path — after a return, and before an exception is passed on.
+    const runCall = async (): Promise<StreamOutcome> => {
+      try {
+        const target = resolveStreamTarget(chatId, endpoint, directEndpoints, options)
+        const directToken = target.useDirectBackend ? await ensureFreshToken() : null
+        const { fd, fileRefs } = buildStreamFormData(input, chatId, modelId, options, target)
+        ctx.saveToLibrary = fileRefs.saveToLibrary
+        // The sent message remembers its Library files, for the chat's Sources panel.
+        if (fileRefs.libraryFileIds.length > 0 && options?.userMessageId) {
+          const sentIds = fileRefs.libraryFileIds
+          // Each attachment that went as a Library file is marked, so Sources lists it once (as that file).
+          const sentFiles = options.files ?? []
+          setMessages(updateMessage(options.userMessageId, (msg) => ({
+            ...msg,
+            libraryFileIds: sentIds,
+            attachments: msg.attachments?.map((att, index) => {
+              const libraryFileId = sentFiles[index] ? libraryFileIdFor(sentFiles[index]) : undefined
+              return libraryFileId && !att.libraryFileId ? { ...att, libraryFileId } : att
+            }),
+          })))
+        }
 
-      const sseDecoder = new AguiSSEDecoder()
-      await sendStreamRequest({
-        target,
-        directToken,
-        fd,
-        chatId,
-        hasFiles: Boolean(options?.files?.length),
-        onUploadProgress: options?.onUploadProgress,
-        setXhr: (xhr) => {
-          callXhr = xhr
-          xhrRef.current = xhr
-        },
-        onUploadEnd: () => {
-          if (isActiveStream()) setStreamState?.("streaming")
-          startFlushInterval()
-        },
-        // Safety-net: start flush interval if upload.loadend didn't fire yet
-        // (e.g. when there are no files to upload).
-        onProgress: () => { if (!flushTimerRef.current) startFlushInterval() },
-        // Each new slice of the response stream, decoded and applied in order.
-        onText: (text, flush = false) => {
-          const decodedEvents = sseDecoder.push(text)
-          if (flush) decodedEvents.push(...sseDecoder.flush())
-          processStreamEvents(ctx, turn, decodedEvents)
-        },
-        // Adopted like the stream's own chat-id events, so the new chat's
-        // stream is registered too — the message queue must not treat a
-        // chat whose first reply is still running as idle.
-        onHeaderChatId: (headerChatId) => {
-          if (!chatId || chatId.startsWith("temp-")) adoptChatId(headerChatId)
-        },
-        isStopRequested: () => stopRequestedRef.current || detached,
-        onFollowAttached: () => {
-          // The stream replays the stretch being worked on from its start, so the reply goes back
-          // to what it held before that stretch: nothing, or what earlier stretches of the run wrote.
-          attached = true
-          const replyId = loadingMessageIdRef.current
-          const prior = options?.prior
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === replyId
-                ? prior
-                  ? { ...prior, isLoading: true }
-                  : { id: msg.id, reactKey: msg.reactKey, role: msg.role, created_at: msg.created_at, chat_id: msg.chat_id, content: "", isLoading: true }
-                : msg,
-            ),
-          )
-        },
-        onFollowFailed: (status) => { failedStatus = status },
-      })
+        // Dropped while getting ready (the token wait above): the request never goes out.
+        // The transport sends synchronously, so a later abort would be too late.
+        if (detached) return leftDetached()
+        // Stopped while getting ready: Stop has already settled the reply and the registry.
+        if (stopRequestedRef.current) return "aborted"
+        const sseDecoder = new AguiSSEDecoder()
+        await sendStreamRequest({
+          target,
+          directToken,
+          fd,
+          chatId,
+          hasFiles: Boolean(options?.files?.length),
+          onUploadProgress: options?.onUploadProgress,
+          setXhr: (xhr) => {
+            callXhr = xhr
+            // Dropped before its connection existed (a takeover can land while this call
+            // was still getting a token): close the connection as soon as it is sent,
+            // rather than leave it open reading a stream nobody listens to. The transport
+            // hands the XHR over before open() and send(), which follow in the same task,
+            // and abort() before send() does nothing, hence the microtask.
+            if (detached) {
+              if (xhr) queueMicrotask(() => xhr.abort())
+              return
+            }
+            // Once detached, xhrRef is the replacing call's: clearing it would leave
+            // that call's Stop with nothing to abort.
+            xhrRef.current = xhr
+          },
+          onUploadEnd: () => {
+            if (detached) return
+            if (isActiveStream()) setStreamState?.("streaming")
+            startFlushInterval()
+          },
+          // Safety-net: start flush interval if upload.loadend didn't fire yet
+          // (e.g. when there are no files to upload).
+          onProgress: () => { if (!detached && !flushTimerRef.current) startFlushInterval() },
+          // Each new slice of the response stream, decoded and applied in order.
+          // A detached call reads nothing more: the reply and chat refs the events
+          // would write through now belong to the call that replaced it.
+          onText: (text, flush = false) => {
+            if (detached) return
+            const decodedEvents = sseDecoder.push(text)
+            if (flush) decodedEvents.push(...sseDecoder.flush())
+            processStreamEvents(ctx, turn, decodedEvents)
+          },
+          // Adopted like the stream's own chat-id events, so the new chat's
+          // stream is registered too — the message queue must not treat a
+          // chat whose first reply is still running as idle.
+          onHeaderChatId: (headerChatId) => {
+            if (detached) return
+            if (!chatId || chatId.startsWith("temp-")) {
+              adoptChatId(headerChatId)
+              myChatId = resolvedChatIdRef.current
+            }
+          },
+          isStopRequested: () => stopRequestedRef.current || detached,
+          onFollowAttached: () => {
+            if (detached) return
+            // The stream replays the stretch being worked on from its start, so the reply goes back
+            // to what it held before that stretch: nothing, or what earlier stretches of the run wrote.
+            attached = true
+            const replyId = myReplyId
+            const prior = options?.prior
+            // Answers given to the reply's prompt cards since the follow started stay: the
+            // reset only takes back the text the replayed stretch will write again.
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === replyId
+                  ? keepPromptDecisions(
+                      prior
+                        ? { ...prior, isLoading: true }
+                        : {
+                            id: msg.id, reactKey: msg.reactKey, role: msg.role, created_at: msg.created_at, chat_id: msg.chat_id, content: "", isLoading: true,
+                            // The cards stay (with their answers): only the text is taken back.
+                            connectorConnectPrompts: msg.connectorConnectPrompts,
+                            connectorPermissionPrompts: msg.connectorPermissionPrompts,
+                            chatPrompts: msg.chatPrompts,
+                          },
+                      msg,
+                    )
+                  : msg,
+              ),
+            )
+          },
+          onFollowFailed: (status, body) => { failedStatus = status; failedBody = body },
+        })
 
-      stopFlushInterval()
-      flushPending()
-      if (detached) return "done"
+        // Checked first: the flush timer and buffer are shared, and now hold the
+        // replacing call's tokens. Stopping or flushing them here would freeze that
+        // call's stream and write its pending text from this call's unwinding.
+        if (detached) return leftDetached()
+        stopFlushInterval()
+        flushPending()
 
-      // Stream ended without a done or error event - treat what was shown as
-      // the complete response. A user Stop already finalised the message.
-      if (!turn.streamFinished && !stopRequestedRef.current) finishTurn(ctx, turn, "ended")
+        // Stream ended without a done or error event - treat what was shown as
+        // the complete response. A user Stop already finalised the message.
+        // No terminal event: the connection closed cleanly, but that says nothing about whether
+        // the run behind it has ended, so its end is recorded as inconclusive.
+        const endedWithoutEvent = !turn.streamFinished && !stopRequestedRef.current
+        if (endedWithoutEvent) finishTurn(ctx, turn, "ended")
 
-      const outcome: StreamOutcome = stopRequestedRef.current ? "aborted" : turn.turnFailed ? "error" : "done"
-      completeStream(resolvedChatIdRef.current, outcome)
-      // The backend saves the files this turn carried to Library; refresh what Library shows.
-      if (options?.files?.length) notifyLibraryFilesChanged()
-      setStreamState?.("done")
-      onStreamDone?.()
-      return outcome
-    } catch (error) {
-      stopFlushInterval()
-      flushPending()
-      if (detached) return "done"
-      completeStream(resolvedChatIdRef.current, stopRequestedRef.current ? "aborted" : "error")
-      // A turn that failed or was stopped part-way may still have saved its files.
-      if (options?.files?.length) notifyLibraryFilesChanged()
+        const outcome: StreamOutcome = stopRequestedRef.current ? "aborted" : turn.turnFailed ? "error" : "done"
+        // A failure the run reported itself (an error event) is its end; marked so, as a dropped
+        // reader's "error" is not.
+        endOwnStream(outcome, endedWithoutEvent ? { inconclusive: true } : outcome === "error" ? { runEnded: true } : undefined)
+        if (endedWithoutEvent && follow) reportIncomplete()
+        // A follow that read the turn to its end: a hold left by an earlier incomplete read of
+        // this chat (a drop whose recovery this is) was no failure after all. Only that hold: a
+        // newer one (its id changed) stays.
+        if (follow && outcome === "done" && !endedWithoutEvent && myChatId) {
+          // Only a full read of the same reply: another reply finishing says nothing about the one
+          // whose read was cut short.
+          const noted = incompleteReadHolds.get(myChatId)
+          if (noted && noted.replyId === myReplyId) {
+            incompleteReadHolds.delete(myChatId)
+            if (currentHoldId(myChatId) === noted.hold) releaseErrorHold(myChatId, noted.hold)
+          }
+        }
+        // The backend saves the files this turn carried to Library; refresh what Library shows.
+        if (options?.files?.length) notifyLibraryFilesChanged()
+        // Not once another stream has the chat: this call's end above notifies listeners, and
+        // one may already have started a follow for it (on this hook, or with an entry of its
+        // own; ours is gone, so an entry now is the newer one's), whose state the composer shows.
+        const replaced = detached || (!!myChatId && isStreamActive(myChatId))
+        if (isActiveStream() && !replaced) setStreamState?.("done")
+        onStreamDone?.()
+        return outcome
+      } catch (error) {
+        if (detached) return leftDetached()
+        stopFlushInterval()
+        flushPending()
+        // The backend answered the send with a refusal (4xx) before any run: it never took
+        // the message. A 409 "already_sent" is the opposite (other 409s, such as a paused
+        // agent, are refusals). Anything else (a dropped
+        // connection, a 5xx) can't rule out that it did, so it is not reported.
+        if (!follow && !runStarted && failedStatus >= 400 && failedStatus < 500 && !isAlreadySent(failedStatus, failedBody)) {
+          options?.onSendRefused?.()
+        }
+        // A follow that never reached the stream did not end a turn: the run it looked for has
+        // ended or can't be read, which its caller settles (the history reloads). Ending it as
+        // an error would hold the chat's queue although nothing failed.
+        // Whether the chat's queue was already held: an error hold this end sets is lifted again
+        // if a reconnect below reads the turn to its end, one that was already there is not.
+        // This call's own chat, read once: the end below notifies listeners synchronously, and one
+        // may start another chat on this hook (moving the hook's ref) before this call reads it.
+        const ownChatId = myChatId
+        const heldBefore = !!getChatQueue(ownChatId)?.heldBy
+        // Inconclusive unless it read the run (a follow that attached, or a send whose run
+        // started): the run it was about may still be going.
+        endOwnStream(
+          stopRequestedRef.current ? "aborted" : follow && !attached ? "done" : "error",
+          { inconclusive: follow ? !attached : !runStarted },
+        )
+        // The hold this end just set (if it set one): what a later recovery may lift.
+        dropHoldId = heldBefore ? undefined : currentHoldId(ownChatId)
+        // A turn that failed or was stopped part-way may still have saved its files.
+        if (options?.files?.length) notifyLibraryFilesChanged()
 
-      // User-initiated stop - not an error
-      if (stopRequestedRef.current) {
-        setStreamState?.("aborted")
-        return "aborted"
-      }
+        // User-initiated stop - not an error
+        if (stopRequestedRef.current) {
+          if (isActiveStream()) setStreamState?.("aborted")
+          return "aborted"
+        }
 
-      // A follow that never reached the stream leaves the reply to whoever started it.
-      if (!attached) {
-        followResultRef.current = failedStatus === 404 ? "gone" : "failed"
-        return "error"
-      }
+        // A follow that never reached the stream leaves the reply to whoever started it.
+        if (!attached) {
+          options?.onFollowResult?.(failedStatus === 404 ? "gone" : "failed")
+          return "error"
+        }
 
-      // The connection dropped but the backend is still running the turn: read
-      // it again from its stream. A regular chat only; other endpoints have none.
-      const liveChatId = resolvedChatIdRef.current
-      const attempt = options?.followAttempt ?? 0
-      if (
-        error instanceof ConnectionDroppedError &&
-        endpoint === "/api/chat" && !directEndpoints &&
-        liveChatId && !liveChatId.startsWith("temp-") &&
-        !stopRequestedRef.current &&
-        attempt < FOLLOW_ATTEMPTS
-      ) {
-        await new Promise((resolve) => setTimeout(resolve, FOLLOW_RETRY_MS))
-        if (!stopRequestedRef.current) {
-          const outcome = await fetchAiResponse("", liveChatId, loadingMessageIdRef.current ?? loadingMessageId, null, {
+        // The connection dropped but the backend is still running the turn: read
+        // it again from its stream. A regular chat only; other endpoints have none.
+        const liveChatId = ownChatId
+        // Set once the follow's caller has been told of an incomplete read (below), so it is
+        // told once.
+        let toldIncomplete = false
+        const attempt = options?.followAttempt ?? 0
+        if (
+          error instanceof ConnectionDroppedError &&
+          endpoint === "/api/chat" && !directEndpoints &&
+          liveChatId && !liveChatId.startsWith("temp-") &&
+          !stopRequestedRef.current &&
+          attempt < FOLLOW_ATTEMPTS
+        ) {
+          // Read while this call still holds the refs: during the wait another chat's
+          // call can take them, and its reply id must not become this retry's.
+          const retryReplyId = myReplyId ?? loadingMessageId
+          const retryUserMessageId = userMessageIdRef.current ?? undefined
+          // Another reader of this chat that fails during the wait (this call has no entry now,
+          // so any end for the chat is another reader's): watched from now, not only after the
+          // wait, since the registry does not replay ends. Its failure keeps the drop's hold.
+          let readerFailedInWait = false
+          const stopWatchingWait = subscribeStreams((event) => {
+            if (event.type === "end" && event.chatId === liveChatId && event.outcome !== "done") { readerFailedInWait = true; readerFailedSeen = true }
+          })
+          await new Promise((resolve) => setTimeout(resolve, FOLLOW_RETRY_MS))
+          stopWatchingWait()
+          // The call this reconnect was made for (which may own the hold) is told too.
+          if (readerFailedInWait) options?.onReaderFailed?.()
+          // Taken over during the wait: the newer call reset stopRequestedRef, so that
+          // alone would let this one start a second follow into the newer call's reply.
+          // The newer call has its own chat; this one's drop hold goes once its run ends.
+          if (detached) {
+            // Not if the user stopped this turn during the wait: the hold stays, as it does
+            // when Stop lands with no takeover. Nor if a reader of this chat (opened meanwhile)
+            // ends with a failure: the hold keeps its id, so the id check alone would lift it.
+            if (!heldBefore && !stoppedByUser && !readerFailedInWait) releaseHoldUnlessReaderFails(liveChatId)
+            return leftDetached() // the call that owns an earlier hold waits for the run's end too
+          }
+          // Stopped during the wait: checked before handing over to another reader, so a Stop
+          // keeps the hold rather than leaving it to that reader's outcome.
+          if (stopRequestedRef.current || stoppedByUser) return "aborted"
+          // Another reader holds the chat now (its own view following it, from another hook):
+          // that one reads the turn, and this retry must not take over its registry entry.
+          // When that reader ends, the drop's hold (set above, not one that was already there)
+          // goes once the backend confirms the run has ended. Its "done" alone is not enough:
+          // a follow that never reached the stream ends as done too. An error end keeps it.
+          if (isStreamActive(liveChatId)) {
+            // The backend is asked from now on, not only once that reader ends: it can also
+            // go silently (reopening the chat detaches it, with no end). If it ends with a
+            // failure the asking stops and the hold stays.
+            if (!heldBefore && dropHoldId !== undefined && !readerFailedInWait) releaseHoldUnlessReaderFails(liveChatId)
+            // Stood down without reading the turn: its caller (owning an earlier hold) must not
+            // take this "done" as a finished turn.
+            return leftDetached()
+          }
+          // Stopped during the wait: Stop has already settled the reply as stopped, and this
+          // turn ends that way too, not as the error that led to the wait.
+          if (stopRequestedRef.current) return "aborted"
+          // This retry's own result, not a value shared by the hook: another call in this
+          // hook could overwrite one before this one reads it.
+          let result: FollowResult = "attached"
+          let retryDetached = false
+          let nestedReaderFailed = false
+          const outcome = await fetchAiResponse("", liveChatId, retryReplyId, null, {
             follow: true,
             followAttempt: attempt + 1,
-            userMessageId: userMessageIdRef.current ?? undefined,
+            userMessageId: retryUserMessageId,
             prior: options?.prior,
+            onFollowResult: (r) => { result = r },
+            onDetached: () => { retryDetached = true },
+            onStopped: () => { stoppedByUser = true; options?.onStopped?.() },
+            // A reader of the chat that failed during a nested wait: the hold stays (passed up).
+            onReaderFailed: () => { nestedReaderFailed = true; readerFailedSeen = true; options?.onReaderFailed?.() },
+            ...(dropHoldId ?? options?.recoveryHoldId) !== undefined ? { recoveryHoldId: dropHoldId ?? options?.recoveryHoldId } : {},
+            ...(options?.onRunGone ? { onRunGone: options.onRunGone } : {}),
+            ...(options?.onIncomplete ? { onIncomplete: options.onIncomplete } : {}),
           })
-          const result = followResultRef.current
-          followResultRef.current = "attached"
-          if (result === "attached") return outcome
+          if (result === "attached") {
+            // Recovered: the drop that held the queue was not a failure after all.
+            // Read to the end: lift it now. Detached part-way (its "done" is no finished turn):
+            // only once the backend says the run has ended.
+            if (outcome === "done" && !heldBefore && dropHoldId !== undefined) {
+              if (retryDetached) {
+                // A Stop keeps the hold; so does a reader that took over from the retry and failed
+                // (the queue keeps the same hold id, so the id check alone would not stop this).
+                if (!stoppedByUser && !nestedReaderFailed && !readerFailedInWait) releaseHoldUnlessReaderFails(liveChatId)
+              } else if (!nestedReaderFailed && !readerFailedInWait) releaseErrorHold(liveChatId, dropHoldId) // a reader that failed during a wait keeps it
+            }
+            // Passed up: a call above this one may own an earlier hold, and must not take a
+            // detached retry's "done" as a finished turn either.
+            return retryDetached ? leftDetached() : outcome
+          }
+          // The reconnect never reached the stream (a 5xx, say): the run may still be going and
+          // nothing reads it, so it counts as an incomplete read; the follow's caller retries
+          // within its budget. Not after a Stop.
+          if (result === "failed" && !retryDetached && !stoppedByUser && !stopRequestedRef.current) {
+            toldIncomplete = true
+            reportIncomplete()
+          }
           if (result === "gone") {
-            completeStream(liveChatId, "done")
-            setStreamState?.("done")
+            // The retry's own failed follow already ended the registry entry (as done). Ending
+            // it again here could remove a reservation someone made in between.
+            // Not over a stream that has taken the chat up since (its entry; ours is gone).
+            if (showsChat(liveChatId, false) && !isStreamActive(liveChatId)) setStreamState?.("done")
             onStreamLost?.(liveChatId)
+            // That reload may fail, and the chat would still show the reply as running: the
+            // caller (the view's recovery) keeps it pending until a history load lands.
+            options?.onRunGone?.()
             onStreamDone?.()
+            // The turn ended on the backend: the drop was no failure, so its hold goes (after
+            // the reload above has started, which the queue waits on).
+            // Not if another reader of the chat failed (or was stopped) during the wait, here or in a
+            // nested one: that failure keeps the hold, as on the other release paths.
+            if (!heldBefore && dropHoldId !== undefined && !readerFailedInWait && !nestedReaderFailed && !stoppedByUser) releaseErrorHold(liveChatId, dropHoldId)
             return "done"
           }
         }
-      }
 
-      // A FriendlyStreamError was already logged where it was raised (status, endpoint,
-      // body); logging it again here only doubles the dev overlay's issue count.
-      if (!(error instanceof FriendlyStreamError)) logger.error("[useStreamingChat] Error", error)
+        // A follow that had attached and then dropped, with no reconnect left to try (the last
+        // allowed one dropped too): the run may still be going and nothing reads it. Reported as
+        // an incomplete read, so the follow's caller retries within its budget and then asks
+        // whether the run ended. Not for a terminal stream error, or after a Stop.
+        if (follow && !toldIncomplete && error instanceof ConnectionDroppedError && !stopRequestedRef.current && !stoppedByUser) {
+          reportIncomplete()
+        }
 
-      if (error instanceof AuthExpiredError) {
-        setStreamState?.("error")
-        // Settle the reply (no cursor or busy state) while the sign-out runs.
-        if (!turn.streamFinished) finishTurn(ctx, turn, "error", SESSION_EXPIRED_MESSAGE)
-        dispatchSessionExpired()
+        // A FriendlyStreamError was already logged where it was raised (status, endpoint,
+        // body); logging it again here only doubles the dev overlay's issue count.
+        if (!(error instanceof FriendlyStreamError)) logger.error("[useStreamingChat] Error", error)
+
+        if (error instanceof AuthExpiredError) {
+          if (isActiveStream()) setStreamState?.("error")
+          // Settle the reply (no cursor or busy state) while the sign-out runs.
+          if (!turn.streamFinished) finishTurn(ctx, turn, "error", SESSION_EXPIRED_MESSAGE)
+          dispatchSessionExpired()
+          return "error"
+        }
+
+        const rawMsg =
+          error instanceof Error ? error.message : "Failed to connect to AI service"
+        const lower = rawMsg.toLowerCase()
+
+        // Fallback for errors that never passed through the XHR reject paths
+        // (e.g. a synchronous throw earlier in this function), so weren't
+        // already classified as AuthExpiredError there.
+        if (isAuthErrorText(lower) || lower.includes("401")) {
+          if (isActiveStream()) setStreamState?.("error")
+          if (!turn.streamFinished) finishTurn(ctx, turn, "error", SESSION_EXPIRED_MESSAGE)
+          dispatchSessionExpired()
+          return "error"
+        }
+
+        if (isActiveStream()) setStreamState?.("error")
+        // A turn already finished by its done/error event keeps that outcome.
+        if (!turn.streamFinished) {
+          // Errors from the XHR paths are already translated by
+          // friendlyModelError at the point of failure, when the real status
+          // code / raw backend text was still available. Re-running the
+          // translator on that already-friendly text would match no known
+          // pattern and flatten it into the generic fallback — so only
+          // translate genuinely-raw messages here.
+          finishTurn(ctx, turn, "error", error instanceof FriendlyStreamError ? rawMsg : friendlyModelError(rawMsg))
+        }
         return "error"
       }
-
-      const rawMsg =
-        error instanceof Error ? error.message : "Failed to connect to AI service"
-      const lower = rawMsg.toLowerCase()
-
-      // Fallback for errors that never passed through the XHR reject paths
-      // (e.g. a synchronous throw earlier in this function), so weren't
-      // already classified as AuthExpiredError there.
-      if (isAuthErrorText(lower) || lower.includes("401")) {
-        setStreamState?.("error")
-        if (!turn.streamFinished) finishTurn(ctx, turn, "error", SESSION_EXPIRED_MESSAGE)
-        dispatchSessionExpired()
-        return "error"
-      }
-
-      setStreamState?.("error")
-      // A turn already finished by its done/error event keeps that outcome.
-      if (!turn.streamFinished) {
-        // Errors from the XHR paths are already translated by
-        // friendlyModelError at the point of failure, when the real status
-        // code / raw backend text was still available. Re-running the
-        // translator on that already-friendly text would match no known
-        // pattern and flatten it into the generic fallback — so only
-        // translate genuinely-raw messages here.
-        finishTurn(ctx, turn, "error", error instanceof FriendlyStreamError ? rawMsg : friendlyModelError(rawMsg))
-      }
-      return "error"
     }
+    const outcome = await runCall().catch((error: unknown) => {
+      releaseThisCall()
+      throw error
+    })
+    releaseThisCall()
+    return outcome
   }
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -490,6 +949,14 @@ export function useStreamingChat({
     if (resolvedChatIdRef.current === chatId) return
     if (resolvedChatIdRef.current && !resolvedChatIdRef.current.startsWith("temp-")) return
     resolvedChatIdRef.current = chatId
+    // The reply and the message it answers were made before the chat had an id: they get
+    // it now, so what hangs off them (a prompt's answer) knows which chat it belongs to.
+    const ownIds = new Set([loadingMessageIdRef.current, userMessageIdRef.current])
+    // A `temp-` chat id is a stand-in too: it is replaced the same way.
+    const needsId = (m: UIMessage) => ownIds.has(m.id) && (!m.chat_id || m.chat_id.startsWith("temp-"))
+    setMessages((prev) => prev.some(needsId)
+      ? prev.map((m) => (needsId(m) ? { ...m, chat_id: chatId } : m))
+      : prev)
     registerStream(chatId, activeStopRef.current ?? undefined)
     onChatCreated?.(chatId)
   }
@@ -499,13 +966,35 @@ export function useStreamingChat({
    * the turn's first event — for a chat opened while its reply is still being
    * generated. A turn that has ended by then is in the chat's history instead.
    */
-  const followStream = async (chatId: string, loadingMessageId: string, prior?: UIMessage): Promise<StreamOutcome> => {
-    const outcome = await fetchAiResponse("", chatId, loadingMessageId, null, { follow: true, prior })
-    const result = followResultRef.current
-    followResultRef.current = "attached"
+  /** `onRefused` runs when the follow never reached the turn's stream (not when it
+   *  attached and later ended), before the history reload that onStreamLost starts. */
+  const followStream = async (chatId: string, loadingMessageId: string, prior?: UIMessage, onRefused?: () => void, stillWanted?: () => boolean, onRunGone?: () => void, onIncomplete?: () => void): Promise<StreamOutcome> => {
+    let leftBeforeStart = false
+    let result: FollowResult = "attached"
+    const outcome = await fetchAiResponse("", chatId, loadingMessageId, null, {
+      follow: true, prior, ...(stillWanted ? { stillWanted } : {}), ...(onRunGone ? { onRunGone } : {}), ...(onIncomplete ? { onIncomplete } : {}),
+      onLeftBeforeStart: () => { leftBeforeStart = true },
+      onFollowResult: (r) => { result = r },
+    })
+    // Never started (the user left the chat while it waited): nothing to settle. Reopening
+    // the chat follows afresh.
+    if (leftBeforeStart) return "done"
     if (result === "attached") return outcome
-    completeStream(chatId, "done")
-    setStreamState?.("done")
+    // Already ended (as done) by the follow itself: no second completeStream, which could
+    // remove a reservation made for the chat's next queued message in between.
+    // Not over a follow an end listener started for the chat meanwhile (it has the entry now).
+    if (showsChat(chatId, false) && !isStreamActive(chatId)) setStreamState?.("done")
+    onRefused?.()
+    // Refused because the run is over (404): a hold an earlier incomplete read of this reply left
+    // was no failure, as when a later read reaches the end. Only that reply's, and only while it
+    // is still the chat's current hold.
+    if (result === "gone") {
+      const noted = incompleteReadHolds.get(chatId)
+      if (noted && noted.replyId === loadingMessageId) {
+        incompleteReadHolds.delete(chatId)
+        if (currentHoldId(chatId) === noted.hold) releaseErrorHold(chatId, noted.hold)
+      }
+    }
     onStreamLost?.(chatId)
     return "done"
   }

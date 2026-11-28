@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { ArrowDownOneIcon, FolderOneIcon } from '@strange-huge/icons'
+import { DURATION, LONG } from "@/styles/tokens/motion"
 
 // ── Shadow token ───────────────────────────────────────────────────────────────
 
@@ -220,7 +221,7 @@ export const SidebarProjectsSection = React.forwardRef<HTMLDivElement, SidebarPr
       <div
         ref={ref}
         className={cn(className)}
-        style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: fluid ? '100%' : '237px' }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', width: fluid ? '100%' : '237px' }}
         {...props}
       >
         {/* ── Header row — clicking opens the project; icon click toggles the list ── */}
@@ -239,22 +240,22 @@ export const SidebarProjectsSection = React.forwardRef<HTMLDivElement, SidebarPr
             alignItems:      'center',
             justifyContent:  'space-between',
             overflow:        'hidden',
-            borderRadius:    '10px',
+            borderRadius:    'var(--radius-lg)',
             width:           '100%',
-            paddingLeft:     '6px',
-            paddingRight:    '6px',
-            paddingTop:      '5px',
-            paddingBottom:   '5px',
+            paddingLeft:     'var(--space-1-5)',
+            paddingRight:    'var(--space-1-5)',
+            paddingTop:      'var(--sidebar-project-row-padding-y)',
+            paddingBottom:   'var(--sidebar-project-row-padding-y)',
             backgroundColor: (isEditing || isActive) ? 'var(--sidebar-menu-item-hover-bg)' : 'transparent',
             boxShadow:       isEditing
                                ? '0px 0px 0px 1px var(--focus-ring)'
                                : isActive ? SHADOW_ITEM_HOVER : undefined,
             cursor:          isEditing ? 'text' : 'pointer',
-            transition:      isEditing ? undefined : 'background-color 150ms, box-shadow 150ms',
+            transition:      isEditing ? undefined : 'background-color var(--duration-quick), box-shadow var(--duration-quick)',
             userSelect:      'none',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, minWidth: 0, flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0, minWidth: 0, flex: 1 }}>
             {/* ── Icon — click toggles expand/collapse ── */}
             {icon !== null && (
               <div
@@ -334,7 +335,7 @@ export const SidebarProjectsSection = React.forwardRef<HTMLDivElement, SidebarPr
                   WebkitMaskImage: (isActive && marqueeOffset > 0 && !isMarqueeing && !marqueeDone)
                                      ? 'linear-gradient(to right, black calc(100% - 20px), transparent 100%)'
                                      : undefined,
-                  paddingRight:    isMarqueeing ? '48px' : undefined,
+                  paddingRight:    isMarqueeing ? 'var(--space-9)' : undefined,
                 }}
               >
                 <m.p
@@ -346,8 +347,8 @@ export const SidebarProjectsSection = React.forwardRef<HTMLDivElement, SidebarPr
                   }}
                   animate={isHovered && marqueeOffset > 0 ? { x: [0, -marqueeOffset] } : { x: 0 }}
                   transition={isHovered && marqueeOffset > 0
-                    ? { duration: marqueeOffset / 40, ease: 'linear', delay: 1 }
-                    : { duration: 0.3, ease: 'easeOut' }
+                    ? { duration: marqueeOffset / 40, ease: 'linear', delay: LONG.xs }
+                    : { duration: DURATION.slow, ease: 'easeOut' }
                   }
                   onAnimationComplete={() => { setIsMarqueeing(false); setMarqueeDone(true) }}
                 >
@@ -358,7 +359,7 @@ export const SidebarProjectsSection = React.forwardRef<HTMLDivElement, SidebarPr
           </div>
 
           {!isEditing && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexShrink: 0 }}>
               {badge}
               {showExpandArrow && (
                 <m.div
@@ -369,7 +370,7 @@ export const SidebarProjectsSection = React.forwardRef<HTMLDivElement, SidebarPr
                   onClick={(e) => { e.stopPropagation(); toggle() }}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggle() } }}
                   animate={{ rotate: isExpanded ? 0 : -90 }}
-                  transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                  transition={{ duration: DURATION.base, ease: [0.4, 0, 0.2, 1] }}
                   style={boxedChevron ? {
                     position:        'relative',
                     display:         'flex',
@@ -377,9 +378,9 @@ export const SidebarProjectsSection = React.forwardRef<HTMLDivElement, SidebarPr
                     justifyContent:  'center',
                     width:           '20px',
                     height:          '20px',
-                    borderRadius:    '4px',
+                    borderRadius:    'var(--radius-xs)',
                     backgroundColor: 'var(--neutral-white)',
-                    boxShadow:       '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4)',
+                    boxShadow:       'var(--team-switcher-avatar-shadow)',
                     flexShrink:      0,
                     cursor:          'pointer',
                     color:           'var(--neutral-600)',
@@ -390,7 +391,7 @@ export const SidebarProjectsSection = React.forwardRef<HTMLDivElement, SidebarPr
                     cursor:         'pointer',
                     color:          'var(--sidebar-menu-item-text)',
                     opacity:        isActive ? 0.7 : 0,
-                    transition:     'opacity 150ms',
+                    transition:     'opacity var(--duration-quick)',
                     display:        'flex',
                     alignItems:     'center',
                     justifyContent: 'center',
@@ -432,10 +433,10 @@ export const SidebarProjectsSection = React.forwardRef<HTMLDivElement, SidebarPr
                   // ancestor DOES establish one and compares against
                   // unrelated content instead of these specific row siblings.
                   isolation:     'isolate',
-                  paddingLeft:   icon === null ? '6px' : '22px',
+                  paddingLeft:   icon === null ? 'var(--space-1-5)' : 'var(--sidebar-projects-section-padding-left)',
                   display:       'flex',
                   flexDirection: 'column',
-                  gap:           '4px',
+                  gap:           'var(--space-1)',
                 }}
               >
                 {showTreeLine && (

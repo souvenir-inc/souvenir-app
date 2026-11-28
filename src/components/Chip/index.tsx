@@ -201,8 +201,8 @@ export function Chip(
             position:        'relative',
             display:         'inline-flex',
             alignItems:      'center',
-            padding:         '2px',
-            borderRadius:    '6px',
+            padding:         'var(--space-0-5)',
+            borderRadius:    'var(--radius-sm)',
             // backgroundColor goes on the element itself - avoids z-index stacking
             // issue where an absolute overlay div would render above inline children
             backgroundColor: cfg.bg,
@@ -238,7 +238,7 @@ export function Chip(
           {/* Label */}
           <span
             style={{
-              padding:    '0 2px',
+              padding:    '0 var(--space-0-5)',
               fontFamily: 'var(--font-body)',
               fontWeight: 'var(--font-weight-medium)',
               fontSize:   'var(--font-size-caption)',
@@ -303,7 +303,7 @@ export function Chip(
           position:        'relative',
           display:         'inline-flex',
           alignItems:      'center',
-          borderRadius:    '10px',
+          borderRadius:    'var(--radius-lg)',
           // Outer padding stays constant at 4 px so hovering NEVER changes the
           // chip's outer footprint - surrounding chips don't reflow, and the
           // hover state is communicated purely by the inner icon swap.
@@ -311,8 +311,8 @@ export function Chip(
           // left slot toggled 32 → 28; the two transitions ran on different
           // timings (CSS vs framer popLayout) which produced a visible
           // shrink/flicker every hover.
-          padding:         '4px',
-          gap:             '2px',
+          padding:         'var(--space-1)',
+          gap:             'var(--space-0-5)',
           // Card-like surface is **always visible** in the Medium variant -
           // structural change in Figma 925:830. Pre-revision the bg / shadow
           // only painted on hover/active; the chip now reads as a solid
@@ -352,7 +352,7 @@ export function Chip(
             width:          28,
             height:         28,
             flexShrink:     0,
-            borderRadius:   8,
+            borderRadius:   'var(--radius-md)',
           }}
         >
           {/* Rest state: persona image or icon */}
@@ -366,15 +366,15 @@ export function Chip(
               justifyContent: 'center',
               opacity:         effectiveActive ? 0 : 1,
               transform:       effectiveActive ? 'scale(0.75)' : 'scale(1)',
-              filter:          !reduceMotion && effectiveActive ? 'blur(4px)' : 'none',
+              filter:          !reduceMotion && effectiveActive ? 'blur(var(--blur-xs))' : 'none',
               transition:      reduceMotion
-                ? 'opacity 120ms'
-                : 'opacity 120ms, transform 120ms cubic-bezier(0.16,1,0.3,1), filter 120ms',
+                ? 'opacity var(--duration-fast)'
+                : 'opacity var(--duration-fast), transform var(--duration-fast) var(--ease-out-expo), filter var(--duration-fast)',
               pointerEvents:   effectiveActive ? 'none' : undefined,
             }}
           >
             {personaAvatar ? personaAvatar : personaImage && !imageError
-              ? <Image src={personaImage} alt="" width={24} height={24} unoptimized style={{ borderRadius: '6px', display: 'block' }} onError={() => setImageError(true)} />
+              ? <Image src={personaImage} alt="" width={24} height={24} unoptimized style={{ borderRadius: 'var(--radius-sm)', display: 'block' }} onError={() => setImageError(true)} />
               : personaImage
                 ? <UserAiIcon size={20} color="var(--chip-text)" animated />
                 : (icon ?? <LogoIcon size={20} color="var(--chip-text)" />)
@@ -391,10 +391,10 @@ export function Chip(
               justifyContent: 'center',
               opacity:         effectiveActive ? 1 : 0,
               transform:       effectiveActive ? 'scale(1)' : 'scale(0.75)',
-              filter:          !reduceMotion && !effectiveActive ? 'blur(4px)' : 'none',
+              filter:          !reduceMotion && !effectiveActive ? 'blur(var(--blur-xs))' : 'none',
               transition:      reduceMotion
-                ? 'opacity 120ms'
-                : 'opacity 120ms, transform 120ms cubic-bezier(0.16,1,0.3,1), filter 120ms',
+                ? 'opacity var(--duration-fast)'
+                : 'opacity var(--duration-fast), transform var(--duration-fast) var(--ease-out-expo), filter var(--duration-fast)',
               pointerEvents:   !effectiveActive ? 'none' : undefined,
             }}
           >
@@ -410,12 +410,12 @@ export function Chip(
         {/* ── Label ── label padding is constant `0 2px` so the text never
             shifts horizontally between rest/hover. ── */}
         {!hideLabel && (
-          <div style={{ paddingLeft: '2px', paddingRight: '2px', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}>
+          <div style={{ paddingLeft: 'var(--space-0-5)', paddingRight: 'var(--space-0-5)', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}>
             <span style={{
               fontFamily: 'var(--font-body)',
               fontWeight: 'var(--font-weight-medium)',
               fontSize:   'var(--font-size-body)',
-              lineHeight: 1,
+              lineHeight: 'var(--leading-none)',
               color:      'var(--chip-text)',
               whiteSpace: 'nowrap',
             }}>
@@ -443,7 +443,7 @@ export function Chip(
               width:          28,
               height:         28,
               flexShrink:     0,
-              borderRadius:   8,
+              borderRadius:   'var(--radius-md)',
             }}
           >
             <ChipButton
@@ -467,7 +467,7 @@ export function Chip(
               width:          28,
               height:         28,
               flexShrink:     0,
-              borderRadius:   8,
+              borderRadius:   'var(--radius-md)',
             }}
           >
             {effectiveActive ? (

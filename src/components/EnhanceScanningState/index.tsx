@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { BLUR, DURATION, SPRING, LONG } from "@/styles/tokens/motion"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -48,8 +49,8 @@ export function EnhanceScanningState({ ref, rotateMs = 900, messages, className,
           flexDirection:  'column',
           alignItems:     'center',
           justifyContent: 'center',
-          gap:            16,
-          padding:        '40px 24px',
+          gap:            'var(--space-4)',
+          padding:        'var(--space-8) var(--space-6)',
           ...style,
         }}
         {...props}
@@ -70,12 +71,12 @@ export function EnhanceScanningState({ ref, rotateMs = 900, messages, className,
           }}
         >
           <AnimatePresence mode="popLayout" initial={false}>
-            {/* eslint-disable-next-line react/no-array-index-as-key -- cycling text segments; positionally stable */}
+            {/* eslint-disable-next-line react/no-array-index-key -- cycling text segments; positionally stable */}
             <m.span key={idx}
-              initial={{ scale: 0.85, opacity: 0, filter: 'blur(4px)' }}
+              initial={{ scale: 0.85, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
               animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-              exit={{    scale: 0.85, opacity: 0, filter: 'blur(4px)' }}
-              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              exit={{    scale: 0.85, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+              transition={{ type: 'spring', ...SPRING.snappy }}
               style={{ display: 'block' }}
             >
               {list[idx]}
@@ -91,7 +92,7 @@ export function EnhanceScanningState({ ref, rotateMs = 900, messages, className,
             width:           '100%',
             maxWidth:        320,
             height:          4,
-            borderRadius:    999,
+            borderRadius:    'var(--radius-full)',
             backgroundColor: 'var(--color-enhance-progress-inactive)',
             overflow:        'hidden',
           }}
@@ -100,13 +101,13 @@ export function EnhanceScanningState({ ref, rotateMs = 900, messages, className,
             // `left`, not `x`: a translate % is of the pill's own width, which only carried it ~40% across.
             initial={{ left: '-30%' }}
             animate={{ left: '100%' }}
-            transition={{ duration: 1.2, ease: 'easeInOut', repeat: Infinity, repeatType: 'loop' }}
+            transition={{ duration: LONG.sm, ease: 'easeInOut', repeat: Infinity, repeatType: 'loop' }}
             style={{
               position:        'absolute',
               width:           '30%',
               top:             0,
               bottom:           0,
-              borderRadius:    999,
+              borderRadius:    'var(--radius-full)',
               backgroundColor: 'var(--color-enhance-primary)',
             }}
           />

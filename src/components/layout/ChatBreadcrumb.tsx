@@ -124,18 +124,18 @@ export function ChatBreadcrumb({ crumbs = [], current, onRename, renderMenu }: C
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0, maxWidth: "100%" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "var(--space-1-5)", minWidth: 0, maxWidth: "100%" }}>
       {/* The pill — one border (the inset ring), square-rounded, as the bar had before. */}
       <nav
         aria-label="Breadcrumb"
         style={{
           display: "inline-flex",
           alignItems: "center",
-          gap: "6px",
+          gap: "var(--space-1-5)",
           minWidth: 0,
           maxWidth: "100%",
-          padding: "5px 8px",
-          borderRadius: "8px",
+          padding: "var(--space-1) var(--space-2)",
+          borderRadius: "var(--radius-md)",
           backgroundColor: "var(--card-bg)",
           boxShadow: "inset 0 0 0 1px var(--button-outline-border)",
           overflow: "hidden",
@@ -144,7 +144,7 @@ export function ChatBreadcrumb({ crumbs = [], current, onRename, renderMenu }: C
         {crumbs.map((crumb) => (
           <span
             key={`${crumb.label}-${crumb.href ?? ""}`}
-            style={{ display: "inline-flex", alignItems: "center", gap: "6px", minWidth: 0 }}
+            style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1-5)", minWidth: 0 }}
           >
             {crumb.href ? (
               <Link
@@ -227,7 +227,7 @@ export function ChatBreadcrumb({ crumbs = [], current, onRename, renderMenu }: C
                 height: 28,
                 padding: 0,
                 border: "none",
-                borderRadius: "8px",
+                borderRadius: "var(--radius-md)",
                 background: menuOpen ? "var(--neutral-50)" : "transparent",
                 color: "var(--neutral-500)",
                 cursor: "pointer",

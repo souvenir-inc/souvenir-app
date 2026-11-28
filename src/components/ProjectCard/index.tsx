@@ -81,27 +81,27 @@ function ProjectCardInner(
           flexDirection:   'column',
           height:          '262px',
           overflow:        'hidden',
-          padding:         '20px',
+          padding:         'var(--space-5)',
           boxSizing:       'border-box',
-          borderRadius:    '12px',
+          borderRadius:    'var(--radius-xl)',
           backgroundColor,
           boxShadow,
           cursor:          'pointer',
-          transition:      'background-color 120ms ease, box-shadow 120ms ease',
+          transition:      'background-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease',
           outline:         'none',
           width:           '100%',
         }}
       >
         {/* Top row — "Created by" (left), visibility badge + ⋮ menu (right, hover-fade) */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', minWidth: 0 }}>
             {ownerName && (
               <span
                 style={{
                   fontFamily:   'var(--font-body)',
-                  fontWeight:   400,
-                  fontSize:     '11px',
-                  lineHeight:   '16px',
+                  fontWeight:   'var(--font-weight-regular)',
+                  fontSize:     'var(--font-size-caption)',
+                  lineHeight:   'var(--line-height-small)',
                   color:        'var(--neutral-500)',
                   overflow:     'hidden',
                   textOverflow: 'ellipsis',
@@ -113,11 +113,11 @@ function ProjectCardInner(
             )}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0 }}>
             <Badge color={VISIBILITY_COLOR[visibility]} label={VISIBILITY_LABEL[visibility]} />
 
             {/* ⋮ menu - always visible (not hover-only) */}
-            {/* eslint-disable-next-line click-events-have-key-events, no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements */}
+            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- interactive div; keyboard handling delegated to inner elements */}
             {hasActions && <div
               style={{ flexShrink: 0 }}
               onClick={(e) => e.stopPropagation()}

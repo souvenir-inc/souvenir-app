@@ -70,7 +70,7 @@ function renderPlainWithMarks(text: string, specs: HighlightSpec[], offsetBase: 
       <mark
         key={`mark-${m.spec.id}-${m.start}`}
         data-highlight-id={m.spec.id}
-        style={{ backgroundColor: bg, color: 'inherit', borderRadius: 2, padding: '0 1px' }}
+        style={{ backgroundColor: bg, color: 'inherit', borderRadius: 'var(--radius-xs)', padding: '0 var(--space-0-5)' }}
       >
         {text.slice(m.start, m.end)}
       </mark>
@@ -158,11 +158,11 @@ function HighlightedCodeBlock({ language, value, elementKey, highlights, sourceO
       className={styles.codeBlock}
       style={{
         position: "relative",
-        borderRadius: "16px",
+        borderRadius: "var(--radius-2xl)",
         backgroundColor: "var(--neutral-50)",
         border: "1px solid var(--border-default)",
         overflow: "hidden",
-        margin: "12px 0",
+        margin: "var(--space-3) 0",
       }}
     >
       {/* Header bar */}
@@ -172,7 +172,7 @@ function HighlightedCodeBlock({ language, value, elementKey, highlights, sourceO
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "8px 16px",
+          padding: "var(--space-2) var(--space-4)",
           borderBottom: "1px solid var(--border-default)",
         }}
       >
@@ -180,10 +180,10 @@ function HighlightedCodeBlock({ language, value, elementKey, highlights, sourceO
           <span
             style={{
               fontFamily: "var(--font-body)",
-              fontSize: "12px",
+              fontSize: "var(--font-size-small)",
               fontWeight: "var(--font-weight-semibold)",
               textTransform: "uppercase",
-              letterSpacing: "0.05em",
+              letterSpacing: "var(--tracking-wider)",
               color: "var(--neutral-600)",
             }}
           >
@@ -191,7 +191,7 @@ function HighlightedCodeBlock({ language, value, elementKey, highlights, sourceO
           </span>
         )}
         {!language && <span />}
-        <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "var(--space-1)", alignItems: "center" }}>
 <button
             type="button"
             onClick={handleCopy}
@@ -199,17 +199,17 @@ function HighlightedCodeBlock({ language, value, elementKey, highlights, sourceO
             style={{
               display: "inline-flex",
               alignItems: "center",
-              gap: "4px",
-              padding: "4px 10px",
-              borderRadius: "999px",
+              gap: "var(--space-1)",
+              padding: "var(--space-1) var(--space-2-5)",
+              borderRadius: "var(--radius-full)",
               border: "1px solid var(--border-default)",
               backgroundColor: "var(--neutral-white)",
               fontFamily: "var(--font-body)",
-              fontSize: "12px",
+              fontSize: "var(--font-size-small)",
               fontWeight: "var(--font-weight-medium)",
               color: copied ? "var(--green-600)" : "var(--neutral-800)",
               cursor: "pointer",
-              transition: "color 150ms",
+              transition: "color var(--duration-fast)",
             }}
           >
             {copied ? <Check size={12} /> : <Copy size={12} />}
@@ -223,7 +223,7 @@ function HighlightedCodeBlock({ language, value, elementKey, highlights, sourceO
         className="kaya-scrollbar"
         style={{
           overflowX: "auto",
-          padding: "16px",
+          padding: "var(--space-4)",
           margin: 0,
           fontFamily: "var(--font-code)",
           fontSize: "var(--prose-size-code)",

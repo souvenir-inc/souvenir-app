@@ -19,6 +19,7 @@ import { InputField } from "@/components/InputField"
 import { ConfirmModal } from "@/components/ConfirmModal"
 import { toast } from "sonner"
 import type { BadgeColor } from "@/components/Badge"
+import { DURATION, SPRING } from "@/styles/tokens/motion"
 
 // ── Category → badge color ────────────────────────────────────────────────────
 
@@ -461,7 +462,7 @@ function RightSidebarImpl() {
     <m.div
       animate={isOpen ? { width: 332, opacity: 1 } : { width: 0, opacity: 0 }}
       initial={{ width: 0, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 260, damping: 32, mass: 0.9 }}
+      transition={{ type: "spring", ...SPRING.glide }}
       style={{
         height:        "100%",
         flexShrink:    0,
@@ -517,17 +518,17 @@ function RightSidebarImpl() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: DURATION.quick }}
             onClick={() => { setShowDeleteConfirmModal(false); setDeleteFolderTarget(null) }}
             style={{
               position:        "fixed",
               inset:           0,
-              zIndex:          9999,
+              zIndex:          'var(--z-modal)',
               display:         "flex",
               alignItems:      "center",
               justifyContent:  "center",
               backgroundColor: "color-mix(in srgb, var(--yellow-950) 40%, transparent)",
-              backdropFilter:  "blur(2px)",
+              backdropFilter:  "blur(var(--blur-2xs))",
             }}
           >
             <m.div
@@ -535,12 +536,12 @@ function RightSidebarImpl() {
               initial={{ opacity: 0, scale: 0.96, y: 8 }}
               animate={{ opacity: 1, scale: 1,    y: 0 }}
               exit={{    opacity: 0, scale: 0.96, y: 8 }}
-              transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.8 }}
+              transition={{ type: "spring", ...SPRING.settle }}
               onClick={(e) => e.stopPropagation()}
               style={{
                 background:    "var(--neutral-white)",
-                borderRadius:  "20px",
-                boxShadow:     "0px 8px 32px 0px rgba(26,23,20,0.24), 0px 0px 0px 1px rgba(59,54,50,0.12)",
+                borderRadius:  "var(--radius-2xl)",
+                boxShadow:     "var(--shadow-4)",
                 width:         "360px",
                 maxWidth:      "calc(100vw - 32px)",
                 display:       "flex",
@@ -548,8 +549,8 @@ function RightSidebarImpl() {
                 overflow:      "hidden",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 20px 16px" }}>
-                <p style={{ margin: 0, fontFamily: "var(--font-title)", fontWeight: 400, fontSize: 18, lineHeight: "26px", color: "var(--neutral-900)" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-5) var(--space-5) var(--space-4)" }}>
+                <p style={{ margin: 0, fontFamily: "var(--font-title)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-sm)', lineHeight: 'var(--line-height-heading-sm)', color: "var(--neutral-900)" }}>
                   Delete folder
                 </p>
                 <IconButton
@@ -560,13 +561,13 @@ function RightSidebarImpl() {
                   onClick={() => { setShowDeleteConfirmModal(false); setDeleteFolderTarget(null) }}
                 />
               </div>
-              <div style={{ padding: "0 20px 20px", display: "flex", flexDirection: "column", gap: 16, }}>
-                <p style={{ margin: 0, fontFamily: "var(--font-body)", fontWeight: 400, fontSize: 14, lineHeight: "20px", color: "var(--neutral-600)" }}>
+              <div style={{ padding: "0 var(--space-5) var(--space-5)", display: "flex", flexDirection: "column", gap: 'var(--space-4)', }}>
+                <p style={{ margin: 0, fontFamily: "var(--font-body)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: "var(--line-height-body-sm)", color: "var(--neutral-600)" }}>
                   {deleteFolderTarget
                     ? `"${deleteFolderTarget.label}" will be deleted, but your pins will still be available in All Pins.`
                     : "This folder will be deleted, but your pins will still be available in All Pins."}
                 </p>
-                <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                <div style={{ display: "flex", gap: 'var(--space-2)', justifyContent: "flex-end" }}>
                   <Button variant="ghost" size="sm" onClick={() => { setShowDeleteConfirmModal(false); setDeleteFolderTarget(null) }}>
                     Cancel
                   </Button>
@@ -591,17 +592,17 @@ function RightSidebarImpl() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: DURATION.quick }}
             onClick={() => { setShowRenameModal(false); setRenameFolderTarget(null); setRenameModalName("") }}
             style={{
               position:        "fixed",
               inset:           0,
-              zIndex:          20,
+              zIndex:          'var(--z-modal)',
               display:         "flex",
               alignItems:      "center",
               justifyContent:  "center",
               backgroundColor: "color-mix(in srgb, var(--yellow-950) 40%, transparent)",
-              backdropFilter:  "blur(2px)",
+              backdropFilter:  "blur(var(--blur-2xs))",
             }}
           >
             <m.div
@@ -609,12 +610,12 @@ function RightSidebarImpl() {
               initial={{ opacity: 0, scale: 0.96, y: 8 }}
               animate={{ opacity: 1, scale: 1,    y: 0 }}
               exit={{    opacity: 0, scale: 0.96, y: 8 }}
-              transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.8 }}
+              transition={{ type: "spring", ...SPRING.settle }}
               onClick={(e) => e.stopPropagation()}
               style={{
                 background:    "var(--neutral-white)",
-                borderRadius:  "20px",
-                boxShadow:     "0px 8px 32px 0px rgba(26,23,20,0.24), 0px 0px 0px 1px rgba(59,54,50,0.12)",
+                borderRadius:  "var(--radius-2xl)",
+                boxShadow:     "var(--shadow-4)",
                 width:         "360px",
                 maxWidth:      "calc(100vw - 32px)",
                 display:       "flex",
@@ -622,8 +623,8 @@ function RightSidebarImpl() {
                 overflow:      "hidden",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 20px 16px" }}>
-                <p style={{ margin: 0, fontFamily: "var(--font-title)", fontWeight: 400, fontSize: 18, lineHeight: "26px", color: "var(--neutral-900)" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-5) var(--space-5) var(--space-4)" }}>
+                <p style={{ margin: 0, fontFamily: "var(--font-title)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-sm)', lineHeight: 'var(--line-height-heading-sm)', color: "var(--neutral-900)" }}>
                   Rename folder
                 </p>
                 <IconButton
@@ -634,7 +635,7 @@ function RightSidebarImpl() {
                   onClick={() => { setShowRenameModal(false); setRenameFolderTarget(null); setRenameModalName("") }}
                 />
               </div>
-              <div style={{ padding: "0 20px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
+              <div style={{ padding: "0 var(--space-5) var(--space-5)", display: "flex", flexDirection: "column", gap: 'var(--space-4)' }}>
                 <InputField
                   label="Folder name"
                   showLabel
@@ -649,7 +650,7 @@ function RightSidebarImpl() {
                   }}
                   aria-label="Folder name"
                 />
-                <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                <div style={{ display: "flex", gap: 'var(--space-2)', justifyContent: "flex-end" }}>
                   <Button variant="cancel" size="sm" onClick={() => { setShowRenameModal(false); setRenameFolderTarget(null); setRenameModalName("") }}>
                     Cancel
                   </Button>
@@ -674,17 +675,17 @@ function RightSidebarImpl() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: DURATION.quick }}
             onClick={() => { setShowFolderModal(false); setFolderModalName("") }}
             style={{
               position:        "fixed",
               inset:           0,
-              zIndex:          22,
+              zIndex:          'var(--z-modal)',
               display:         "flex",
               alignItems:      "center",
               justifyContent:  "center",
               backgroundColor: "color-mix(in srgb, var(--yellow-950) 40%, transparent)",
-              backdropFilter:  "blur(2px)",
+              backdropFilter:  "blur(var(--blur-2xs))",
             }}
           >
             <m.div
@@ -692,12 +693,12 @@ function RightSidebarImpl() {
               initial={{ opacity: 0, scale: 0.96, y: 8 }}
               animate={{ opacity: 1, scale: 1,    y: 0 }}
               exit={{    opacity: 0, scale: 0.96, y: 8 }}
-              transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.8 }}
+              transition={{ type: "spring", ...SPRING.settle }}
               onClick={(e) => e.stopPropagation()}
               style={{
                 background:    "var(--neutral-white)",
-                borderRadius:  "20px",
-                boxShadow:     "0px 8px 32px 0px rgba(26,23,20,0.24), 0px 0px 0px 1px rgba(59,54,50,0.12)",
+                borderRadius:  "var(--radius-2xl)",
+                boxShadow:     "var(--shadow-4)",
                 width:         "360px",
                 maxWidth:      "calc(100vw - 32px)",
                 display:       "flex",
@@ -705,8 +706,8 @@ function RightSidebarImpl() {
                 overflow:      "hidden",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 20px 16px" }}>
-                <p style={{ margin: 0, fontFamily: "var(--font-title)", fontWeight: 400, fontSize: 18, lineHeight: "26px", color: "var(--neutral-900)" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-5) var(--space-5) var(--space-4)" }}>
+                <p style={{ margin: 0, fontFamily: "var(--font-title)", fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading-sm)', lineHeight: 'var(--line-height-heading-sm)', color: "var(--neutral-900)" }}>
                   New folder
                 </p>
                 <IconButton
@@ -717,7 +718,7 @@ function RightSidebarImpl() {
                   onClick={() => { setShowFolderModal(false); setFolderModalName("") }}
                 />
               </div>
-              <div style={{ padding: "0 20px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
+              <div style={{ padding: "0 var(--space-5) var(--space-5)", display: "flex", flexDirection: "column", gap: 'var(--space-4)' }}>
                 <InputField
                   label="Folder name"
                   showLabel
@@ -732,7 +733,7 @@ function RightSidebarImpl() {
                   }}
                   aria-label="Folder name"
                 />
-                <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                <div style={{ display: "flex", gap: 'var(--space-2)', justifyContent: "flex-end" }}>
                   <Button variant="cancel" size="sm" onClick={() => { setShowFolderModal(false); setFolderModalName("") }}>
                     Cancel
                   </Button>

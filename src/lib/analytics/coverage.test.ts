@@ -13,6 +13,7 @@ const NOT_YET_WIRED = new Set<string>([
   "pin_drag", // Pins are switched off (PINS_ENABLED)
   "flashcards", // no flashcards feature in the app yet
   "output_viewed", // its component (Brain ExternalOutputCard) was removed
+  "agent_tested", // its component (AgentEditor TryItBox) was never mounted and was removed 2026-11-25
 ])
 
 const SRC = join(__dirname, "..", "..")

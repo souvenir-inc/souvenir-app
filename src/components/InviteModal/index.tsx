@@ -2,9 +2,7 @@
 
 import { Tooltip } from '@/components/Tooltip'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import * as Dialog from '@radix-ui/react-dialog'
-import { useFocusReturn } from '@/components/ui/dialog'
-import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Slot } from '@radix-ui/react-slot'
 import { CancelOneIcon, ArrowDownOneIcon, InformationCircleIcon } from '@strange-huge/icons'
 import { Button } from '@/components/ui/button'
@@ -13,14 +11,14 @@ import { cn } from '@/lib/utils'
 import type { WorkspaceRole } from '@/types/teams'
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
-const SHADOW_MODAL   = '0px 12px 16px -4px rgba(130,122,116,0.12), 0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)'
-const SHADOW_INPUT   = '0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100)'
+const SHADOW_MODAL   = 'var(--shadow-modal-soft)'
+const SHADOW_INPUT   = 'var(--shadow-control)'
 
 const SECTION_LABEL_STYLE: React.CSSProperties = {
   fontFamily: 'var(--font-body)',
-  fontWeight: 500,
-  fontSize:   13,
-  lineHeight: '18px',
+  fontWeight: 'var(--font-weight-medium)',
+  fontSize:   'var(--font-size-body-sm)',
+  lineHeight: 'var(--line-height-body-sm)',
   color:      'var(--neutral-600)',
 }
 
@@ -67,9 +65,9 @@ const ROLE_LABELS: Record<WorkspaceRole, string> = {
 
 function InfoNote({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '10px 12px', backgroundColor: 'var(--neutral-100)', borderRadius: 10 }}>
-      <InformationCircleIcon size={16} color="var(--neutral-500)" style={{ flexShrink: 0, marginTop: 1 }} />
-      <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: 13, lineHeight: '18px', color: 'var(--neutral-700)', margin: 0 }}>
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)', padding: 'var(--space-2-5) var(--space-3)', backgroundColor: 'var(--neutral-100)', borderRadius: 'var(--radius-lg)' }}>
+      <InformationCircleIcon size={16} color="var(--neutral-500)" style={{ flexShrink: 0, marginTop: 'var(--space-0-5)' }} />
+      <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-body-sm)', color: 'var(--neutral-700)', margin: 0 }}>
         {children}
       </p>
     </div>
@@ -93,19 +91,19 @@ function EmailChipPill({ chip, onRemove }: { chip: EmailChip; onRemove: () => vo
       style={{
         display:         'inline-flex',
         alignItems:      'center',
-        gap:             4,
+        gap:             'var(--space-1)',
         maxWidth:        240,
-        padding:         '4px 6px 4px 8px',
-        borderRadius:    6,
+        padding:         'var(--space-1) var(--space-1-5) var(--space-1) var(--space-2)',
+        borderRadius:    'var(--radius-sm)',
         backgroundColor: isBad ? 'var(--color-tag-Red-bg)' : 'var(--neutral-100)',
         boxShadow:       isBad ? 'inset 0 0 0 1px var(--color-tag-Red-text)' : 'none',
       }}
     >
       <span style={{
         fontFamily:   'var(--font-body)',
-        fontWeight:   500,
-        fontSize:     12,
-        lineHeight:   '16px',
+        fontWeight:   'var(--font-weight-medium)',
+        fontSize:     'var(--font-size-small)',
+        lineHeight:   'var(--line-height-small)',
         color:        isBad ? 'var(--color-tag-Red-text)' : 'var(--neutral-700)',
         overflow:     'hidden',
         textOverflow: 'ellipsis',
@@ -153,7 +151,7 @@ function RoleSelector({ value, onChange }: { value: WorkspaceRole; onChange: (r:
           </Button>
         }
       >
-        <Dropdown maxHeight={false} aria-label="Select role" style={{ padding: 4, minWidth: 220 }}>
+        <Dropdown maxHeight={false} aria-label="Select role" style={{ padding: 'var(--space-1)', minWidth: 220 }}>
           {ROLE_OPTIONS.map(role => (
             <Dropdown.Item
               key={role}
@@ -187,8 +185,8 @@ function CloseButton({ onClick }: { onClick?: () => void }) {
         display:         'flex',
         alignItems:      'center',
         justifyContent:  'center',
-        padding:         3,
-        borderRadius:    6,
+        padding:         'var(--space-0-5)',
+        borderRadius:    'var(--radius-sm)',
         border:          'none',
         backgroundColor: hovered ? 'var(--neutral-100)' : 'transparent',
         cursor:          'pointer',
@@ -197,7 +195,7 @@ function CloseButton({ onClick }: { onClick?: () => void }) {
         lineHeight:      0,
         outline:         'none',
         boxShadow:       focused ? '0px 0px 0px 2px var(--blue-400)' : 'none',
-        transition:      'background-color 120ms, color 120ms',
+        transition:      'background-color var(--duration-fast), color var(--duration-fast)',
       }}
     >
       <CancelOneIcon size={18} />
@@ -380,18 +378,15 @@ export const InviteModal = React.forwardRef<HTMLDivElement, InviteModalProps>(
     return (
       <Comp
         ref={ref}
-        role="dialog"
-        aria-modal="true"
-        aria-label={workspaceName ? `Invite to ${workspaceName}` : 'Invite member'}
         className={cn(className)}
         onKeyDown={handleKeyDown}
         style={{
           display:         'flex',
           flexDirection:   'column',
-          gap:             16,
+          gap:             'var(--space-4)',
           width:           'min(480px, calc(100vw - 32px))',
-          padding:         '16px 14px',
-          borderRadius:    18,
+          padding:         'var(--space-4) var(--space-3)',
+          borderRadius:    'var(--radius-2xl)',
           boxSizing:       'border-box' as const,
           backgroundColor: 'var(--modal-bg)',
           boxShadow:       SHADOW_MODAL,
@@ -402,11 +397,11 @@ export const InviteModal = React.forwardRef<HTMLDivElement, InviteModalProps>(
         {...props}
       >
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2-5)' }}>
           <span style={{
             fontFamily: 'var(--font-title)',
             fontSize:   'var(--font-size-heading)',
-            fontWeight: 400,
+            fontWeight: 'var(--font-weight-regular)',
             lineHeight: 'var(--line-height-heading)',
             color:      'var(--neutral-900)',
             flex:       '1 0 0',
@@ -422,28 +417,28 @@ export const InviteModal = React.forwardRef<HTMLDivElement, InviteModalProps>(
         <div style={{
           display:       'flex',
           flexDirection: 'column',
-          gap:           16,
-          padding:       14,
+          gap:           'var(--space-4)',
+          padding:       'var(--space-3)',
           border:        '1px solid var(--border-default)',
-          borderRadius:  14,
+          borderRadius:  'var(--radius-xl)',
         }}>
 
         {/* Email chips + role selector */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
             <span style={{ ...SECTION_LABEL_STYLE, flex: '1 0 0' }}>Email</span>
             <span style={SECTION_LABEL_STYLE}>Role</span>
           </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'flex-start' }}>
           <div style={{
             display:         'flex',
             flexWrap:        'wrap',
             alignItems:      'center',
-            gap:             6,
+            gap:             'var(--space-1-5)',
             flex:            '1 0 0',
             minHeight:       36,
-            padding:         '6px 8px',
-            borderRadius:    10,
+            padding:         'var(--space-1-5) var(--space-2)',
+            borderRadius:    'var(--radius-lg)',
             backgroundColor: 'var(--field-surface)',
             boxShadow:       SHADOW_INPUT,
             boxSizing:       'border-box' as const,
@@ -470,13 +465,13 @@ export const InviteModal = React.forwardRef<HTMLDivElement, InviteModalProps>(
                 background: 'transparent',
                 fontFamily: 'var(--font-body)',
                 fontSize:   'var(--font-size-body)',
-                fontWeight: 400,
+                fontWeight: 'var(--font-weight-regular)',
                 lineHeight: 'var(--line-height-body)',
                 color:      'var(--neutral-900)',
               }}
             />
           </div>
-          <div style={{ paddingTop: 1 }}>
+          <div style={{ paddingTop: 'var(--space-0-5)' }}>
             <RoleSelector value={role} onChange={setRole} />
           </div>
           </div>
@@ -490,7 +485,7 @@ export const InviteModal = React.forwardRef<HTMLDivElement, InviteModalProps>(
         </div>
 
         {/* Footer */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 'var(--space-2)' }}>
           <Button variant="cancel" size="sm" onClick={onClose}>Cancel</Button>
           <Button
             variant="default"
@@ -534,45 +529,24 @@ export function AppInviteModal({
   existingEmails,
   allowedDomains,
 }: AppInviteModalProps) {
-  // Opened from a button without a Dialog.Trigger: hand focus back to it on close.
-  const { capture, handleCloseAutoFocus } = useFocusReturn()
+  // The card draws its own surface, so the dialog shell is bare.
   return (
-    <Dialog.Root open={isOpen} onOpenChange={open => { if (!open) onClose() }}>
-      <Dialog.Portal>
-        <Dialog.Overlay
-          style={{
-            position:        'fixed',
-            inset:           0,
-            backgroundColor: 'var(--overlay-bg)',
-            zIndex:          100,
-          }}
+    <Dialog open={isOpen} onOpenChange={open => { if (!open) onClose() }}>
+      <DialogContent
+        bare
+        aria-describedby={undefined}
+        style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+      >
+        <DialogTitle visuallyHidden>{workspaceName ? `Invite to ${workspaceName}` : 'Invite member'}</DialogTitle>
+        <InviteModal
+          workspaceName={workspaceName}
+          loading={loading}
+          existingEmails={existingEmails}
+          allowedDomains={allowedDomains}
+          onClose={onClose}
+          onInvite={({ emails, role }) => onInvite(emails, role)}
         />
-        <Dialog.Content
-          aria-label={workspaceName ? `Invite to ${workspaceName}` : 'Invite member'}
-          style={{
-            position:  'fixed',
-            top:       '50%',
-            left:      '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex:    101,
-            outline:   'none',
-          }}
-          onCloseAutoFocus={handleCloseAutoFocus}
-        >
-          {capture}
-          <VisuallyHidden.Root asChild>
-            <Dialog.Title>{workspaceName ? `Invite to ${workspaceName}` : 'Invite member'}</Dialog.Title>
-          </VisuallyHidden.Root>
-          <InviteModal
-            workspaceName={workspaceName}
-            loading={loading}
-            existingEmails={existingEmails}
-            allowedDomains={allowedDomains}
-            onClose={onClose}
-            onInvite={({ emails, role }) => onInvite(emails, role)}
-          />
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+      </DialogContent>
+    </Dialog>
   )
 }

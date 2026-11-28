@@ -76,9 +76,9 @@ export function toComposerAgent(draft: AgentDraft, created: CreatedAgent): Selec
 
 function Working({ title, subtitle }: { title: string; subtitle: string }) {
   return (
-    <div role="status" aria-live="polite" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '36px 20px', textAlign: 'center' }}>
+    <div role="status" aria-live="polite" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2-5)', padding: 'var(--space-7) var(--space-5)', textAlign: 'center' }}>
       <Spinner size={22} />
-      <p style={{ margin: 0, fontFamily: 'var(--font-title)', fontSize: 18, lineHeight: '24px', color: 'var(--neutral-900)' }}>{title}</p>
+      <p style={{ margin: 0, fontFamily: 'var(--font-title)', fontSize: 'var(--font-size-heading-sm)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-900)' }}>{title}</p>
       <p style={HINT_STYLE}>{subtitle}</p>
     </div>
   )
@@ -167,18 +167,18 @@ function Body({
     <button
       type="button"
       onClick={() => { runRef.current += 1; onSendAsMessage(originalMessage); onClose() }}
-      style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline', color: 'var(--neutral-500)', fontFamily: 'var(--font-body)', fontSize: 13 }}
+      style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline', color: 'var(--neutral-500)', fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)' }}
     >
       Not an agent? Send it as a normal message
     </button>
   )
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 20, minHeight: 0, overflowY: 'auto' }} className="kaya-scrollbar">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-5)', minHeight: 0, overflowY: 'auto' }} className="kaya-scrollbar">
       {stage.kind === 'purpose' && (
         <>
-          <p style={{ ...HINT_STYLE, fontSize: 14, lineHeight: '22px' }}>What should this agent do? One sentence is enough.</p>
-          <div className="kaya-field" style={{ ...BOX_STYLE, padding: '10px 12px' }}>
+          <p style={{ ...HINT_STYLE, fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)' }}>What should this agent do? One sentence is enough.</p>
+          <div className="kaya-field" style={{ ...BOX_STYLE, padding: 'var(--space-2-5) var(--space-3)' }}>
             <textarea
               autoFocus
               rows={3}
@@ -205,8 +205,8 @@ function Body({
 
       {stage.kind === 'failed' && (
         <>
-          <p role="alert" style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-800)' }}>{stage.message}</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 8 }}>
+          <p role="alert" style={{ margin: 0, fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-800)' }}>{stage.message}</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
             <Button
               variant="outline"
               size="sm"

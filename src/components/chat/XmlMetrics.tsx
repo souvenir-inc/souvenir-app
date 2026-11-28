@@ -25,6 +25,7 @@ import { StatCard } from "@/components/StatCard"
 import { Sparkline } from "@/components/Sparkline"
 import type { DeltaTrend } from "@/components/DeltaPill"
 import { parseMetricsXml } from "@/components/chat/XmlMetrics.parse"
+import { DURATION, STAGGER } from "@/styles/tokens/motion"
 
 const TREND_PALETTE: Record<DeltaTrend, string> = {
   up: "var(--color-tag-Green-text)",
@@ -41,8 +42,8 @@ export function XmlMetrics({ xml }: { xml: string }) {
       style={{
         display:             "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(min(170px, 100%), 1fr))",
-        gap:                 12,
-        margin:              "12px 0",
+        gap:                 'var(--space-3)',
+        margin:              "var(--space-3) 0",
       }}
     >
       {metrics.map((metric, i) => (
@@ -50,8 +51,8 @@ export function XmlMetrics({ xml }: { xml: string }) {
           key={`${metric.label}-${i}`}
           initial={reduceMotion ? false : { opacity: 0, y: 12, scale: 0.985 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.34, delay: reduceMotion ? 0 : i * 0.065, ease: [0.16, 1, 0.3, 1] }}
-          style={{ height: "100%", borderRadius: 16 }}
+          transition={{ duration: DURATION.slow, delay: reduceMotion ? 0 : i * STAGGER.md, ease: [0.16, 1, 0.3, 1] }}
+          style={{ height: "100%", borderRadius: 'var(--radius-2xl)' }}
         >
           <StatCard
             label={metric.label}
@@ -68,7 +69,7 @@ export function XmlMetrics({ xml }: { xml: string }) {
                 data={metric.spark}
                 height={48}
                 color={TREND_PALETTE[metric.trend]}
-                style={{ margin: "4px -8px -4px", width: "calc(100% + 16px)" }}
+                style={{ margin: "var(--space-1) calc(var(--space-2) * -1) calc(var(--space-1) * -1)", width: "calc(100% + 16px)" }}
               />
             )}
           />

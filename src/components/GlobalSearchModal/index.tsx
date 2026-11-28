@@ -16,6 +16,7 @@ import { TabItem } from '@/components/TabItem'
 import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { resultCountMessage } from '@/lib/search/global-search'
+import { PINS_ENABLED } from '@/lib/feature-flags'
 
 import {
   SHADOW_MODAL,
@@ -26,6 +27,7 @@ import {
   CloseModalButton,
   KbdHint,
 } from './ResultParts'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -153,7 +155,8 @@ const FILTER_TABS: { value: FilterValue; label: string }[] = [
   { value: 'agent-chat',   label: 'Agent Chats' },
   { value: 'project',      label: 'Projects' },
   { value: 'persona',      label: 'Agents' },
-  { value: 'pin',          label: 'Pins' },
+  // Pins are hidden while their feature flag is off: no tab, no ?searchType=pin.
+  ...(PINS_ENABLED ? [{ value: 'pin' as const, label: 'Pins' }] : []),
   { value: 'page',         label: 'Pages' },
 ]
 
@@ -316,7 +319,7 @@ export function GlobalSearchModal({
           <m.div
             initial={{ opacity: 0, scale: 0.97, y: -6 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: DURATION.base, ease: [0.16, 1, 0.3, 1] }}
           >
 
             {/* ── Search header ──────────────────────────────────────────── */}
@@ -324,15 +327,15 @@ export function GlobalSearchModal({
               style={{
                 display:    'flex',
                 alignItems: 'center',
-                gap:        8,
-                padding:    '14px 12px 12px',
+                gap:        'var(--space-2)',
+                padding:    'var(--space-3) var(--space-3) var(--space-3)',
               }}
             >
               <div style={{ flex: 1 }}>
                 <InputField
                   ref={inputRef}
                   fluid
-                  placeholder="Search chats, agent chats, projects, pins…"
+                  placeholder={PINS_ENABLED ? 'Search chats, agent chats, projects, pins…' : 'Search chats, agent chats, projects, agents…'}
                   leftIcon={<SearchOneIcon size={16} color="var(--neutral-400)" />}
                   value={query}
                   onChange={handleQueryChange}
@@ -357,7 +360,7 @@ export function GlobalSearchModal({
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: DURATION.base, ease: [0.16, 1, 0.3, 1] }}
                   style={{ overflow: 'hidden' }}
                 >
                   <div
@@ -366,8 +369,8 @@ export function GlobalSearchModal({
                     style={{
                       display:    'flex',
                       alignItems: 'center',
-                      gap:        2,
-                      padding:    '2px 10px 10px',
+                      gap:        'var(--space-0-5)',
+                      padding:    'var(--space-0-5) var(--space-2-5) var(--space-2-5)',
                     }}
                   >
                     {FILTER_TABS.map(tab => (
@@ -397,7 +400,7 @@ export function GlobalSearchModal({
               style={{
                 maxHeight: 368,
                 overflowY: 'auto',
-                padding:   '8px 0 10px',
+                padding:   'var(--space-2) 0 var(--space-2-5)',
               }}
             >
 
@@ -419,7 +422,7 @@ export function GlobalSearchModal({
                   </>
                 ) : (
                   <p style={{
-                    margin:     '32px 0',
+                    margin:     'var(--space-7) 0',
                     textAlign:  'center',
                     fontFamily: 'var(--font-body)',
                     fontSize:   'var(--font-size-body)',
@@ -433,7 +436,7 @@ export function GlobalSearchModal({
               {/* Has query + loading */}
               {hasQuery && loading && (
                 <p style={{
-                  margin:     '32px 0',
+                  margin:     'var(--space-7) 0',
                   textAlign:  'center',
                   fontFamily: 'var(--font-body)',
                   fontSize:   'var(--font-size-body)',
@@ -449,14 +452,14 @@ export function GlobalSearchModal({
                   display:       'flex',
                   flexDirection: 'column',
                   alignItems:    'center',
-                  padding:       '32px 24px',
-                  gap:           6,
+                  padding:       'var(--space-7) var(--space-6)',
+                  gap:           'var(--space-1-5)',
                 }}>
                   <p style={{
                     margin:     0,
                     fontFamily: 'var(--font-body)',
                     fontSize:   'var(--font-size-body)',
-                    fontWeight: 500,
+                    fontWeight: 'var(--font-weight-medium)',
                     color:      'var(--neutral-700)',
                   }}>
                     No results for &ldquo;{query}&rdquo;
@@ -496,13 +499,13 @@ export function GlobalSearchModal({
                           onClick={() => setActiveFilter(type)}
                           style={{
                             display:    'block',
-                            margin:     '2px 16px 4px',
-                            padding:    '3px 0',
+                            margin:     'var(--space-0-5) var(--space-4) var(--space-1)',
+                            padding:    'var(--space-0-5) 0',
                             border:     'none',
                             background: 'transparent',
                             fontFamily: 'var(--font-body)',
                             fontSize:   'var(--font-size-caption)',
-                            fontWeight: 500,
+                            fontWeight: 'var(--font-weight-medium)',
                             color:      'var(--blue-400)',
                             cursor:     'pointer',
                             textAlign:  'left',
@@ -520,7 +523,7 @@ export function GlobalSearchModal({
               {hasQuery && !loading && activeFilter !== 'all' && (
                 filteredResults.length === 0 ? (
                   <p style={{
-                    margin:     '32px 0',
+                    margin:     'var(--space-7) 0',
                     textAlign:  'center',
                     fontFamily: 'var(--font-body)',
                     fontSize:   'var(--font-size-body)',
@@ -546,7 +549,7 @@ export function GlobalSearchModal({
             {notice && (
               <p role="note" style={{
                 margin:     0,
-                padding:    '0 16px 6px',
+                padding:    '0 var(--space-4) var(--space-1-5)',
                 fontFamily: 'var(--font-body)',
                 fontSize:   'var(--font-size-caption)',
                 color:      'var(--neutral-500)',
@@ -579,8 +582,8 @@ export function GlobalSearchModal({
               style={{
                 display:         'flex',
                 alignItems:      'center',
-                gap:             12,
-                padding:         '8px 16px 10px',
+                gap:             'var(--space-3)',
+                padding:         'var(--space-2) var(--space-4) var(--space-2-5)',
                 backgroundColor: 'var(--neutral-white)',
               }}
             >

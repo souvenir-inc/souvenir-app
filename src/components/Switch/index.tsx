@@ -5,6 +5,7 @@ import * as SwitchPrimitive from '@radix-ui/react-switch'
 import { m, useMotionValue, animate, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { springs } from '@/lib/springs'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Geometry (Figma 2794:27440) ────────────────────────────────────────────────
 const TRACK_W = 34
@@ -162,7 +163,7 @@ function Switch(
       // Switch. Same precedent as IconButton.
       tabIndex={-1}
       whileTap={disabled ? undefined : { scale: 0.94 }}
-      transition={{ duration: 0.1, ease: 'easeOut' }}
+      transition={{ duration: DURATION.snap, ease: 'easeOut' }}
       style={{
         display:       'inline-flex',
         lineHeight:    0,
@@ -170,12 +171,12 @@ function Switch(
         // indicator off the inner button (whose box-shadow already paints a
         // 1 px design ring at the track edge), preventing the "two
         // concentric rings on focus" issue.
-        borderRadius:  TRACK_H,                       // pill - match the Switch's resting shape
+        borderRadius:  'var(--radius-full)',                       // pill - match the Switch's resting shape
         outlineStyle:  'solid',
-        outlineWidth:  '2px',
-        outlineOffset: '2px',
+        outlineWidth:  'var(--focus-ring-width)',
+        outlineOffset: 'var(--focus-ring-offset)',
         outlineColor:  isFocused ? 'var(--focus-ring)' : 'transparent',
-        transition:    'outline-color 150ms',
+        transition:    'outline-color var(--duration-fast)',
       }}
     >
     <SwitchPrimitive.Root
@@ -203,7 +204,7 @@ function Switch(
       className={cn(
         'kds-switch',
         'relative shrink-0 rounded-full cursor-pointer touch-none select-none',
-        'transition-[background-color] duration-150 ease-out',
+        'transition-[background-color] duration-[var(--toggle-transition-duration)] ease-out',
         'disabled:cursor-not-allowed',
         className,
       )}
@@ -220,7 +221,7 @@ function Switch(
       <SwitchPrimitive.Thumb asChild>
         <m.span
           aria-hidden="true"
-          className="absolute top-0 left-0 block rounded-[9.5px]"
+          className="absolute top-0 left-0 block rounded-[var(--switch-thumb-radius)]"
           initial={false}
           style={{
             x: motionX,

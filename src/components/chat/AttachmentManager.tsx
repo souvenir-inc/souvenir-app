@@ -80,7 +80,7 @@ function RemoveButton({
         border:         "none",
         background:     "none",
         opacity:        visible ? 1 : 0,
-        transition:     "opacity 100ms",
+        transition:     "opacity var(--duration-instant)",
         cursor:         disabled ? "not-allowed" : "pointer",
       }}
     >
@@ -125,7 +125,7 @@ function ScrollArrow({ direction, disabled, onClick }: { direction: "left" | "ri
         cursor:          disabled ? "default" : "pointer",
         opacity:         disabled ? 0.4 : 1,
         padding:         0,
-        transition:      "background-color 120ms, opacity 120ms",
+        transition:      "background-color var(--duration-fast), opacity var(--duration-fast)",
       }}
     >
       {direction === "left" ? <ArrowLeftOneIcon size={12} /> : <ArrowRightOneIcon size={12} />}
@@ -323,25 +323,25 @@ export function AttachmentManager({
           style={{
             display:        "flex",
             alignItems:     "center",
-            gap:            "4px",
-            marginBottom:   "6px",
-            paddingLeft:    "2px",
+            gap:            "var(--space-1)",
+            marginBottom:   "var(--space-1-5)",
+            paddingLeft:    "var(--space-0-5)",
           }}
         >
           <span
             style={{
               fontFamily:  "var(--font-body)",
-              fontSize: "12px",
-              fontWeight:  500,
+              fontSize: "var(--font-size-small)",
+              fontWeight:  'var(--font-weight-medium)',
               color:       "var(--neutral-500)",
-              lineHeight:  1,
+              lineHeight:  'var(--leading-none)',
             }}
           >
             {attachments.length} file{attachments.length !== 1 ? "s" : ""} attached
           </span>
           {/* Scroll arrows sit in this header row, not over the cards, so they never cover a card or its remove button. */}
           {(showLeft || showRight) && (
-            <span style={{ marginLeft: "auto", display: "flex", gap: "4px" }}>
+            <span style={{ marginLeft: "auto", display: "flex", gap: "var(--space-1)" }}>
               <ScrollArrow direction="left" disabled={!showLeft} onClick={() => scrollBy(-200)} />
               <ScrollArrow direction="right" disabled={!showRight} onClick={() => scrollBy(200)} />
             </span>
@@ -357,17 +357,17 @@ export function AttachmentManager({
           className="kds-attach-scroll"
           style={{
             display:              "flex",
-            gap:                  "8px",
+            gap:                  "var(--space-2)",
             overflowX:            "auto",
             overflowY:            "hidden",
             scrollbarWidth:       "none",
             msOverflowStyle:      "none",
             WebkitOverflowScrolling: "touch",
-            borderRadius:         "8px",
-            outline:              isDragging ? "2px dashed var(--neutral-300)" : "none",
-            outlineOffset:        "2px",
+            borderRadius:         "var(--radius-md)",
+            outline:              isDragging ? "var(--focus-ring-width) dashed var(--neutral-300)" : "none",
+            outlineOffset:        "var(--focus-ring-offset)",
             minHeight:            "56px",
-            transition:           "outline 100ms",
+            transition:           "outline var(--duration-instant)",
           }}
         >
           {attachments.map((attachment) => {
@@ -384,8 +384,8 @@ export function AttachmentManager({
                   position:     "relative",
                   width:        "56px",
                   height:       "56px",
-                  borderRadius: "14px",
-                  border:       attachment.error ? "1px solid var(--red-400, #f87171)" : "1px solid var(--border-default)",
+                  borderRadius: "var(--radius-xl)",
+                  border:       attachment.error ? "1px solid var(--red-400)" : "1px solid var(--border-default)",
                   overflow:     "hidden",
                   flexShrink:   0,
                   cursor:       attachment.uploading || attachment.error ? "default" : "pointer",
@@ -400,8 +400,8 @@ export function AttachmentManager({
                     unoptimized
                     style={{
                       objectFit: "cover",
-                      filter: attachment.uploading || attachment.processing ? "blur(1.5px)" : "none",
-                      transition: "filter 300ms",
+                      filter: attachment.uploading || attachment.processing ? "blur(var(--attachment-manager-blur))" : "none",
+                      transition: "filter var(--duration-slow)",
                     }}
                   />
                 )}
@@ -416,7 +416,7 @@ export function AttachmentManager({
                       alignItems:      "center",
                       justifyContent:  "center",
                       backgroundColor: "color-mix(in srgb, var(--static-black) 20%, transparent)",
-                      borderRadius:    "14px",
+                      borderRadius:    "var(--radius-xl)",
                     }}
                   >
                     <svg width="26" height="26" viewBox="0 0 28 28">
@@ -429,7 +429,7 @@ export function AttachmentManager({
                         strokeDasharray={`${((attachment.uploadProgress ?? 0) * 62.83) / 100} 62.83`}
                         strokeLinecap="round"
                         transform="rotate(-90 14 14)"
-                        style={{ transition: "stroke-dasharray 300ms ease-out" }}
+                        style={{ transition: "stroke-dasharray var(--duration-slow) ease-out" }}
                       />
                     </svg>
                   </div>
@@ -442,15 +442,15 @@ export function AttachmentManager({
                       position:        "absolute",
                       bottom:          "2px",
                       left:            "2px",
-                      backgroundColor: attachment.error ? "var(--red-600, #dc2626)" : "color-mix(in srgb, var(--static-black) 55%, transparent)",
+                      backgroundColor: attachment.error ? "var(--red-600)" : "color-mix(in srgb, var(--static-black) 55%, transparent)",
                       color:           "var(--static-white)",
-                      fontSize: "12px",
+                      fontSize: "var(--font-size-small)",
                       fontFamily:      "var(--font-body)",
-                      fontWeight:      600,
-                      lineHeight:      1,
-                      padding:         "2px 3px",
-                      borderRadius:    "3px",
-                      letterSpacing:   "0.02em",
+                      fontWeight:      'var(--font-weight-semibold)',
+                      lineHeight:      'var(--leading-none)',
+                      padding:         "var(--space-0-5) var(--space-0-5)",
+                      borderRadius:    "var(--radius-xs)",
+                      letterSpacing:   "var(--tracking-wide)",
                     }}
                   >
                     {attachment.error ? "Failed" : typeLabel}
@@ -476,12 +476,12 @@ export function AttachmentManager({
                   position:        "relative",
                   display:         "flex",
                   alignItems:      "center",
-                  gap:             "10px",
+                  gap:             "var(--space-2-5)",
                   width:           "232px",
                   height:          "56px",
-                  padding:         "0 28px 0 8px",
-                  borderRadius:    "14px",
-                  border:          attachment.error ? "1px solid var(--red-400, #f87171)" : "1px solid var(--border-default)",
+                  padding:         "0 var(--space-6) 0 var(--space-2)",
+                  borderRadius:    "var(--radius-xl)",
+                  border:          attachment.error ? "1px solid var(--red-400)" : "1px solid var(--border-default)",
                   backgroundColor: "var(--card-bg)",
                   flexShrink:      0,
                   cursor:          attachment.uploading || attachment.error ? "default" : "pointer",
@@ -495,7 +495,7 @@ export function AttachmentManager({
                     justifyContent:  "center",
                     width:           "38px",
                     height:          "38px",
-                    borderRadius:    "10px",
+                    borderRadius:    "var(--radius-lg)",
                     border:          "1px solid var(--border-default)",
                     backgroundColor: "var(--neutral-50)",
                     flexShrink:      0,
@@ -504,11 +504,11 @@ export function AttachmentManager({
                   <FormatGlyph format={formatOfFile(attachment.file)} size="sm" />
                 </span>
 
-                <div style={{ flex: 1, minWidth: 0, lineHeight: 1.3 }}>
-                  <p style={{ ...CARD_TEXT, fontSize: "14px", fontWeight: 500, color: "var(--neutral-900)" }}>
+                <div style={{ flex: 1, minWidth: 0, lineHeight: 'var(--leading-tight)' }}>
+                  <p style={{ ...CARD_TEXT, fontSize: "var(--font-size-body)", fontWeight: 'var(--font-weight-medium)', color: "var(--neutral-900)" }}>
                     {attachment.file.name}
                   </p>
-                  <p style={{ ...CARD_TEXT, display: "flex", alignItems: "center", gap: "4px", fontSize: "12px", color: attachment.error ? "var(--red-600, #dc2626)" : "var(--neutral-500)" }}>
+                  <p style={{ ...CARD_TEXT, display: "flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--font-size-small)", color: attachment.error ? "var(--red-600)" : "var(--neutral-500)" }}>
                     {attachment.error ? (
                       attachment.error
                     ) : attachment.uploading || attachment.processing ? (

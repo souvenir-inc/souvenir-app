@@ -8,14 +8,15 @@ import { Button } from '@/components/ui/button'
 import { springs } from '@/lib/springs'
 import { cn } from '@/lib/utils'
 import type { BadgeColor } from '@/components/Badge'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
 // Two-layer shadow system: outer elevation + inner depth overlay (KDS standard).
 // Slightly warmer than CARD_SHADOW (QuestionCard) to distinguish this as
 // elevated above the surrounding chat thread.
 
-const SHADOW_CARD  = '0px 4px 8px 0px rgba(82,75,71,0.10), 0px 0px 0px 1px rgba(59,54,50,0.12)'
-const SHADOW_INNER = 'inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 50%, transparent), inset 0px -1px 0px 0px rgba(82,75,71,0.06)'
+const SHADOW_CARD  = 'var(--approval-card-shadow-card)'
+const SHADOW_INNER = 'var(--approval-card-shadow-inner)'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -84,27 +85,27 @@ function DenyReasonChip({ label, onClick }: DenyReasonChipProps) {
       onMouseDown={() => setPressed(true)}
       onMouseUp={() => setPressed(false)}
       whileTap={{ scale: 0.94 }}
-      transition={{ duration: 0.1, ease: 'easeOut' }}
+      transition={{ duration: DURATION.snap, ease: 'easeOut' }}
       style={{
         display:         'inline-flex',
         alignItems:      'center',
         justifyContent:  'center',
-        padding:         '5px 12px',
-        borderRadius:    8,
+        padding:         'var(--space-1) var(--space-3)',
+        borderRadius:    'var(--radius-md)',
         border:          'none',
         cursor:          'pointer',
-        backgroundColor: hovered ? 'var(--neutral-100, #F5F5F5)' : 'var(--neutral-white, white)',
+        backgroundColor: hovered ? 'var(--neutral-100)' : 'var(--neutral-white, white)',
         boxShadow:       hovered
-          ? '0px 0px 0px 1px rgba(59,54,50,0.4)'
-          : '0px 0px 0px 1px rgba(59,54,50,0.2)',
+          ? 'var(--approval-card-shadow)'
+          : 'var(--approval-card-shadow-2)',
         fontFamily:      'var(--font-body)',
         fontWeight:      'var(--font-weight-medium)',
         fontSize:        'var(--font-size-body)',
         lineHeight:      'var(--line-height-body)',
-        color:           'var(--neutral-700, #524b47)',
+        color:           'var(--neutral-700)',
         whiteSpace:      'nowrap',
         flexShrink:      0,
-        transition:      'background-color 120ms ease, box-shadow 120ms ease',
+        transition:      'background-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease',
         outline:         'none',
       }}
       className="kds-approval-deny-chip"
@@ -128,7 +129,7 @@ function ReversibilitySignal({
       style={{
         display:    'flex',
         alignItems: 'flex-start',
-        gap:        6,
+        gap:        'var(--space-1-5)',
       }}
     >
       {/* Colored status dot — more reliable cross-platform than emoji */}
@@ -143,7 +144,7 @@ function ReversibilitySignal({
             ? 'var(--color-tag-Yellow-text)'
             : 'var(--color-tag-Red-text)',
           flexShrink:      0,
-          marginTop:       7, // optical alignment with 14px cap-height
+          marginTop:       'var(--space-1-5)', // optical alignment with 14px cap-height
         }}
       />
       <span
@@ -226,11 +227,11 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
           style={{
             position:        'relative',
             width:           '100%',
-            borderRadius:    12,
+            borderRadius:    'var(--radius-xl)',
             backgroundColor: resolvedBg ?? 'var(--neutral-white, white)',
             boxShadow:       SHADOW_CARD,
             overflow:        'hidden',
-            transition:      'background-color 200ms ease',
+            transition:      'background-color var(--duration-base) ease',
             ...style,
           }}
           {...props}
@@ -246,7 +247,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 bottom:          0,
                 width:           3,
                 backgroundColor: 'var(--color-tag-Green-text)',
-                borderRadius:    '0 2px 2px 0',
+                borderRadius:    '0 var(--radius-xs) var(--radius-xs) 0',
               }}
             />
           )}
@@ -268,11 +269,11 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
           <div
             style={{
               position:      'relative',
-              zIndex:        0,
+              zIndex:        'var(--z-base)',
               display:       'flex',
               flexDirection: 'column',
-              gap:           12,
-              padding:       16,
+              gap:           'var(--space-3)',
+              padding:       'var(--space-4)',
             }}
           >
             {/* ── Row 1: Action badge + connector name ── */}
@@ -280,7 +281,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
               style={{
                 display:    'flex',
                 alignItems: 'center',
-                gap:        8,
+                gap:        'var(--space-2)',
               }}
             >
               <Badge color={action.color} label={action.label} />
@@ -290,7 +291,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   fontWeight:   'var(--font-weight-medium)',
                   fontSize:     'var(--font-size-caption)',
                   lineHeight:   'var(--line-height-caption)',
-                  color:        'var(--neutral-500, #827a74)',
+                  color:        'var(--neutral-500)',
                   overflow:     'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace:   'nowrap',
@@ -307,7 +308,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 fontWeight:   'var(--font-weight-semibold, 600)',
                 fontSize:     'var(--font-size-body-lg, 16px)',
                 lineHeight:   'var(--line-height-body-lg, 24px)',
-                color:        'var(--neutral-900, #26211e)',
+                color:        'var(--neutral-900)',
                 margin:       0,
                 overflow:     'hidden',
                 textOverflow: 'ellipsis',
@@ -324,7 +325,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 fontWeight: 'var(--font-weight-regular)',
                 fontSize:   'var(--font-size-body)',
                 lineHeight: 'var(--line-height-body)',
-                color:      'var(--neutral-700, #524b47)',
+                color:      'var(--neutral-700)',
                 margin:     0,
               }}
             >
@@ -343,11 +344,11 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 <motion.div
                   key="ctas"
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: { duration: 0.12, ease: 'easeOut' } }}
-                  exit={{    opacity: 0, transition: { duration: 0.08, ease: 'easeIn'  } }}
+                  animate={{ opacity: 1, transition: { duration: DURATION.fast, ease: 'easeOut' } }}
+                  exit={{    opacity: 0, transition: { duration: DURATION.instant, ease: 'easeIn'  } }}
                   style={{
                     display: 'flex',
-                    gap:     8,
+                    gap:     'var(--space-2)',
                     // Full width side-by-side — binary trust decision, both options equal weight
                   }}
                 >
@@ -383,12 +384,12 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   animate={{
                     opacity:    1,
                     height:    'auto',
-                    transition: { ...springs.fast, opacity: { duration: 0.12 } },
+                    transition: { ...springs.fast, opacity: { duration: DURATION.fast } },
                   }}
                   exit={{
                     opacity:    0,
                     height:     0,
-                    transition: { duration: 0.1, ease: 'easeIn' },
+                    transition: { duration: DURATION.snap, ease: 'easeIn' },
                   }}
                   style={{ overflow: 'hidden' }}
                 >
@@ -396,8 +397,8 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                     style={{
                       display:    'flex',
                       flexWrap:   'wrap',
-                      gap:        8,
-                      paddingTop: 4,
+                      gap:        'var(--space-2)',
+                      paddingTop: 'var(--space-1)',
                     }}
                   >
                     {DENY_REASONS.map((reason) => (
@@ -416,11 +417,11 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 <motion.div
                   key="accepted"
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: { duration: 0.15, ease: 'easeOut' } }}
+                  animate={{ opacity: 1, transition: { duration: DURATION.quick, ease: 'easeOut' } }}
                   style={{
                     display:    'flex',
                     alignItems: 'center',
-                    gap:        6,
+                    gap:        'var(--space-1-5)',
                   }}
                 >
                   <span
@@ -459,11 +460,11 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 <motion.div
                   key="denied"
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: { duration: 0.15, ease: 'easeOut' } }}
+                  animate={{ opacity: 1, transition: { duration: DURATION.quick, ease: 'easeOut' } }}
                   style={{
                     display:    'flex',
                     alignItems: 'center',
-                    gap:        4,
+                    gap:        'var(--space-1)',
                   }}
                 >
                   <span
@@ -472,7 +473,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                       fontWeight: 'var(--font-weight-medium)',
                       fontSize:   'var(--font-size-body)',
                       lineHeight: 'var(--line-height-body)',
-                      color:      'var(--neutral-500, #827a74)',
+                      color:      'var(--neutral-500)',
                     }}
                   >
                     Denied
@@ -484,7 +485,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                         fontWeight: 'var(--font-weight-regular)',
                         fontSize:   'var(--font-size-body)',
                         lineHeight: 'var(--line-height-body)',
-                        color:      'var(--neutral-400, #a09890)',
+                        color:      'var(--neutral-400)',
                       }}
                     >
                       · {localDenyReason}

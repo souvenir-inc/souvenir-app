@@ -25,7 +25,7 @@ export function TemplateCardSkeleton({ count = 3, layout = 'tile', bare = false 
       style={{
         display:       'flex',
         flexDirection: isRow ? 'column' : 'row',
-        gap:           isRow ? '8px' : '10px',
+        gap:           isRow ? 'var(--space-2)' : 'var(--space-2-5)',
         alignItems:    'stretch',
         width:         '100%',
       }}
@@ -39,22 +39,22 @@ export function TemplateCardSkeleton({ count = 3, layout = 'tile', bare = false 
             minWidth:      0,
             background:    bare ? 'transparent' : 'var(--neutral-white)',
             border:        bare ? '1px solid transparent' : '1px solid var(--border-default)',
-            borderRadius:  '12px',
-            padding:       isRow ? '12px' : '14px 12px',
+            borderRadius:  'var(--radius-xl)',
+            padding:       isRow ? 'var(--space-3)' : 'var(--space-3-5) var(--space-3)',
             display:       'flex',
             flexDirection: isRow ? 'row' : 'column',
             alignItems:    isRow ? 'center' : 'flex-start',
-            gap:           isRow ? '12px' : '10px',
+            gap:           isRow ? 'var(--space-3)' : 'var(--space-2-5)',
             boxShadow:     bare ? 'none' : '0 1px 3px color-mix(in srgb, var(--static-black) 4%, transparent)',
           }}
         >
-          <div className="kaya-skeleton" style={{ width: 24, height: 24, borderRadius: 6, flexShrink: 0 }} />
+          <div className="kaya-skeleton" style={{ width: 24, height: 24, borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
           {isRow ? (
-            <div className="kaya-skeleton" style={{ height: 11, width: '60%', borderRadius: 6 }} />
+            <div className="kaya-skeleton" style={{ height: 11, width: '60%', borderRadius: 'var(--radius-sm)' }} />
           ) : (
-            <div style={{ width: '100%', minHeight: 36, display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 3 }}>
-              <div className="kaya-skeleton" style={{ height: 11, width: '90%', borderRadius: 6 }} />
-              <div className="kaya-skeleton" style={{ height: 11, width: '60%', borderRadius: 6 }} />
+            <div style={{ width: '100%', minHeight: 36, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', paddingTop: 'var(--space-0-5)' }}>
+              <div className="kaya-skeleton" style={{ height: 11, width: '90%', borderRadius: 'var(--radius-sm)' }} />
+              <div className="kaya-skeleton" style={{ height: 11, width: '60%', borderRadius: 'var(--radius-sm)' }} />
             </div>
           )}
         </div>

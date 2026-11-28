@@ -21,11 +21,11 @@ export function SyncNotice({ notice, onLoadLatest, onDismiss }: SyncNoticeProps)
     <div
       role="status"
       style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
-        padding: '10px 14px', borderRadius: 10,
-        backgroundColor: conflict ? 'var(--color-tag-Yellow-bg, var(--green-50))' : 'var(--blue-50, #eef4fb)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', flexWrap: 'wrap',
+        padding: 'var(--space-2-5) var(--space-3)', borderRadius: 'var(--radius-lg)',
+        backgroundColor: conflict ? 'var(--color-tag-Yellow-bg, var(--green-50))' : 'var(--blue-50)',
         boxShadow: '0px 0px 0px 1px var(--neutral-100)',
-        fontFamily: 'var(--font-body)', fontSize: 14, lineHeight: '22px', color: 'var(--neutral-800)',
+        fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-800)',
       }}
     >
       <span>
@@ -33,7 +33,7 @@ export function SyncNotice({ notice, onLoadLatest, onDismiss }: SyncNoticeProps)
           ? 'This agent was updated elsewhere. Your unsaved edits are still here.'
           : 'Updated — this agent was changed elsewhere and is now up to date.'}
       </span>
-      <span style={{ display: 'flex', gap: 8 }}>
+      <span style={{ display: 'flex', gap: 'var(--space-2)' }}>
         {conflict && <Button type="button" variant="outline" size="sm" onClick={onLoadLatest}>Load latest</Button>}
         <Button type="button" variant="ghost" size="sm" onClick={onDismiss}>{conflict ? 'Keep mine' : 'Dismiss'}</Button>
       </span>

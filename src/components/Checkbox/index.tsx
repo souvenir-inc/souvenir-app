@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 
 // ── Geometry (Figma 2870:44159 / 2870:44160) ──────────────────────────────────
 const SIZE = 16
-const RADIUS = 4
+const RADIUS = 'var(--radius-xs)'
 
 // Delay (ms) before the tick draws after the box flips checked. The fill
 // cross-fade plays first, then the stroke draws on top - reads as a confident
@@ -32,8 +32,7 @@ function Checkbox(
   // Required because the Checkbox's resting box-shadow contains a 1 px ring
   // at the box edge (gray off / blue on); a class-based outline on the inner
   // button would stack outside that ring and read as two concentric rings on
-  // focus - same precedent as Switch. See specs/accessibility/focus-visible.md
-  // → "Two-rings issue (Switch precedent)".
+  // focus - same precedent as Switch.
   const [isFocused,  setIsFocused]  = React.useState(false)
   const [isPressed,  setIsPressed]  = React.useState(false)
   React.useEffect(() => {
@@ -55,11 +54,11 @@ function Checkbox(
         lineHeight:    0,
         borderRadius:  RADIUS,
         outlineStyle:  'solid',
-        outlineWidth:  '2px',
-        outlineOffset: '2px',
+        outlineWidth:  'var(--focus-ring-width)',
+        outlineOffset: 'var(--focus-ring-offset)',
         outlineColor:  isFocused ? 'var(--focus-ring)' : 'transparent',
         transform:     isPressed && !disabled ? 'scale(0.9)' : undefined,
-        transition:    'outline-color 150ms, transform 100ms ease-out',
+        transition:    'outline-color var(--duration-fast), transform var(--duration-instant) ease-out',
       }}
     >
     <CheckboxPrimitive.Root
@@ -82,7 +81,7 @@ function Checkbox(
       className={cn(
         'kds-checkbox',
         'shrink-0 cursor-pointer select-none',
-        'transition-[background-color] duration-150 ease-out',
+        'transition-[background-color] duration-[var(--toggle-transition-duration)] ease-out',
         'disabled:cursor-not-allowed',
         className,
       )}

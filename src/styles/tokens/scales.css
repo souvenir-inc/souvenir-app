@@ -1,0 +1,329 @@
+/* ── Scales: radius, type styles, elevation, motion, layering, spacing aliases ──
+   Phase 1 of docs/design-system-primitives-plan.md. Values come from what the
+   code already renders most often (see the plan's snapping table, Appendix B).
+
+   Each token is defined once below, under :root, so inline styles and CSS
+   modules can use var(--radius-md). The @theme block at the end maps the same
+   names into Tailwind, so `rounded-md`, `text-body`, `shadow-2`, `duration-fast`,
+   `ease-standard`, `z-modal` and `p-inset-md` resolve to these tokens.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+:root {
+
+  /* ── Radius ──────────────────────────────────────────────────────────────────
+     Seven steps cover ~90% of the 57 radii in use (4, 6, 8, 10, 12, 16, 999). */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:   10px;
+  --radius-xl:   12px;
+  --radius-2xl:  16px;
+  --radius-full: 9999px;
+  --radius-hairline: 1px;  /* caret and cursor bars, thin legend and indicator bars */
+  --radius-2xs:      2px;  /* chart legend swatches */
+  --radius-3xl:      28px;
+  --radius-4xl:      32px;
+  --space-px:        1px;  /* hairline overlaps, visually-hidden elements */
+
+  /* ── Spacing: half steps ─────────────────────────────────────────────────────
+     The 4px scale in primitives.css skips 2, 6 and 10, which are among the
+     most used gaps (6 and 10 alone: ~230 uses). */
+  --space-0-5:  2px;
+  --space-1-5:  6px;
+  --space-2-5: 10px;
+  /* Added 2026-11-26 with the Tailwind mapping below: steps that Tailwind classes
+     (gap-3.5, p-7, pb-20) and a few exact component values (3, 5, 7, 18px) render. */
+  --space-0-75: 3px;
+  --space-1-25: 5px;
+  --space-1-75: 7px;
+  --space-3-5: 14px;
+  --space-4-5: 18px;
+  --space-6-5: 28px;
+  --space-11:  80px;
+
+  /* ── Spacing: semantic aliases ───────────────────────────────────────────────
+     inset  = padding inside a container
+     stack  = vertical space between stacked blocks
+     inline = horizontal space between items in a row */
+  --space-inset-xs:  var(--space-1);    /*  4 */
+  --space-inset-sm:  var(--space-2);    /*  8 */
+  --space-inset-md:  var(--space-3);    /* 12 */
+  --space-inset-lg:  var(--space-4);    /* 16 */
+  --space-inset-xl:  var(--space-6);    /* 24 */
+
+  --space-stack-xs:  var(--space-1);    /*  4 */
+  --space-stack-sm:  var(--space-2);    /*  8 */
+  --space-stack-md:  var(--space-4);    /* 16 */
+  --space-stack-lg:  var(--space-6);    /* 24 */
+  --space-stack-xl:  var(--space-7);    /* 32 */
+
+  --space-inline-xs: var(--space-1);    /*  4 */
+  --space-inline-sm: var(--space-1-5);  /*  6 */
+  --space-inline-md: var(--space-2);    /*  8 */
+  --space-inline-lg: var(--space-3);    /* 12 */
+
+  /* ── Type styles ─────────────────────────────────────────────────────────────
+     Size + line height pairs, in the order the code uses them most. Weight is
+     set separately (--font-weight-*), because the same size appears at 400, 500
+     and 600 across the app. The base sizes live in typography.css. */
+  --font-size-heading-xl:   28px;
+  --line-height-heading-xl: 36px;
+  --font-size-heading-md:   20px;
+  --line-height-heading-md: 28px;
+  --font-size-heading-sm:   18px;
+  --line-height-heading-sm: 24px;
+  --font-size-body-sm:      13px;
+  --line-height-body-sm:    20px;
+  --font-size-small:        12px;
+  --line-height-small:      16px;
+  --font-size-body-md:      15px;  /* dialog titles and lead lines (dashboard, checkout) */
+  --line-height-compact:    18px;  /* compact rows and chips */
+
+  /* Unitless line heights, relative to the element's own font size: for text whose size is inherited
+     or varies (markdown, single-line controls). Same values as Tailwind's leading-* defaults. */
+  --leading-none:   1;
+  --leading-tight:  1.25;
+  --leading-snug:   1.375;
+  --leading-normal: 1.5;
+  --leading-loose:  2;
+
+  /* ── Elevation ───────────────────────────────────────────────────────────────
+     Generic levels on top of the existing component shadows; dark mode follows
+     because each one points at a token theme.css already overrides. */
+  --shadow-1: var(--shadow-surface-card);  /* cards, list rows on a page */
+  --shadow-2: var(--shadow-card-deep);     /* raised cards (projects, schedules) */
+  --shadow-3: var(--shadow-popover);       /* menus, popovers, tooltips */
+  --shadow-4: 0px 19px 32px 0px rgba(18, 12, 8, 0.15), 0px 2px 2.8px 0px rgba(130, 122, 116, 0.1); /* dialogs, sheets: the ui/dialog surface */
+
+  /* Settings surfaces: a soft drop plus a hairline ring. The drop was written out by hand 46 times
+     in 33 files before these tokens existed. */
+  --shadow-soft:  0px 2px 2.8px 0px rgba(82, 75, 71, 0.12);
+  --shadow-panel: var(--shadow-soft), 0px 0px 0px 1px var(--neutral-200);  /* bordered panels */
+  --shadow-tile:  var(--shadow-soft), 0px 0px 0px 1px var(--neutral-100);  /* stat tiles inside a panel */
+
+  /* ── Motion ──────────────────────────────────────────────────────────────── */
+  --duration-instant: 80ms;
+  --duration-fast:    120ms;
+  --duration-base:    200ms;
+  --duration-slow:    320ms;
+  /* Snapped scale (2026-11-26), mirrored by DURATION in motion.ts */
+  --duration-tick:     30ms;   /* staggers */
+  --duration-snap:     100ms;
+  --duration-moderate: 250ms;
+  --duration-gentle:   400ms;
+  --duration-long:     500ms;
+  --duration-longer:   700ms;
+
+  --ease-standard:   cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.3, 0, 0, 1.3);
+  --ease-exit:       cubic-bezier(0, 0, 0.2, 1);
+
+  /* ── Layering ────────────────────────────────────────────────────────────── */
+  --z-base:     0;
+  --z-raised:   10;
+  --z-raised-2: 20;   /* layers inside one surface: dragged cards, floating board actions */
+  --z-raised-3: 30;
+  --z-sticky:   100;
+  --z-dropdown: 1000;
+  --z-overlay:  1100;
+  --z-modal:    1200;
+  --z-popover:  1300;
+  --z-toast:    1400;
+  --z-tooltip:  1500;
+}
+
+
+/* ── Added 2026-11-26: steps the fix-all pass needed ─────────────────────────────
+   Focus rings, underline offsets, a blur scale (Tailwind's names and values, plus 2xs), two easing
+   curves and the shadows several components wrote out by hand. Exact current values. */
+:root {
+  --focus-ring-width: 2px; /* focus outline width */
+  --focus-ring-width-thin: 1px;
+  --focus-ring-offset: 2px; /* focus outline offset */
+  --focus-ring-offset-sm: 1px;
+  --focus-ring-offset-md: 3px;
+  --focus-ring-offset-lg: 4px;
+  --focus-ring-offset-xl: 6px; /* search fields, while the ring settles */
+  --underline-offset: 2px; /* link underline offset */
+  --underline-offset-lg: 3px;
+  --underline-offset-xl: 4px;
+  --decoration-thickness: 1px;
+  --border-width-thick: 2px;
+  --border-width-medium: 1.5px;
+  --blur-2xs: 2px; /* blur scale: the same names and values as Tailwind's, plus 2xs */
+  --blur-xs: 4px;
+  --blur-sm: 8px;
+  --blur-md: 12px;
+  --blur-lg: 16px;
+  --blur-xl: 24px;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1); /* long settles: disclosure rows, chart sweeps */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-quick: 150ms; /* between fast and base: sidebar rows, message bubble */
+  --radius-card: 14px; /* agent, connector and skeleton cards */
+  --shadow-drop-xs: 0px 1px 1.5px 0px rgba(82, 75, 71, 0.12); /* the small drop under controls */
+  --shadow-control: var(--shadow-drop-xs), 0px 0px 0px 1px var(--neutral-100); /* controls and rows: drop + hairline ring */
+  --shadow-field: var(--shadow-drop-xs), 0px 0px 0px 1px var(--text-field-ring); /* text fields */
+  --shadow-field-hover: var(--shadow-drop-xs), 0px 0px 0px 1px var(--text-field-ring-hover);
+  --shadow-chip: var(--shadow-drop-xs), 0px 0px 0px 1px rgba(212, 212, 212, 0.4); /* raised chips and badges */
+  --shadow-chip-selected: 0px 1px 1.5px 0px rgba(2, 15, 24, 0.2), 0px 0px 0px 1px var(--blue-600-50);
+  --shadow-badge-inner: inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 61%, transparent), inset 0px -1px 0px 0px rgba(106, 98, 93, 0.05); /* bevel inside chips and badges */
+  --shadow-card-raised: 0px 1.091px 1.091px 0px rgba(59, 54, 50, 0.05), 0px 1.455px 3.127px 0px rgba(38, 33, 30, 0.15), 0px 0px 0px 1px var(--neutral-100); /* settings cards and pickers */
+  --shadow-card-raised-danger: 0px 1.091px 1.091px 0px rgba(24, 2, 2, 0.05), 0px 1.455px 3.127px 0px rgba(24, 2, 2, 0.15), 0px 0px 0px 1px var(--red-100);
+  --shadow-pill-active: 0px 0px 0px 1px var(--neutral-black), 0px 1.091px 1.091px 0px rgba(59, 54, 50, 0.1), 0px 1.455px 3.127px 0px rgba(59, 54, 50, 0.4); /* selected pills */
+  --shadow-modal-soft: 0px 12px 16px -4px rgba(130, 122, 116, 0.12), var(--shadow-soft), 0px 0px 0px 1px var(--neutral-100); /* share and invite modals */
+  --shadow-ring-strong: 0px 0px 0px 1px rgba(59, 54, 50, 0.3);
+}
+
+/* ── Tailwind mapping ──────────────────────────────────────────────────────────
+   `inline` makes each utility use var(--token) directly, so a theme override on
+   :root (dark mode) reaches the class too; `reference` stops Tailwind writing its
+   own copy of each variable, since the :root block above already defines them.
+   Tailwind's own defaults for these names (rounded-md = 6px, rounded-lg = 8px, …) are
+   replaced. */
+@theme inline reference {
+  --radius-xs:   var(--radius-xs);
+  --radius-sm:   var(--radius-sm);
+  --radius-md:   var(--radius-md);
+  --radius-lg:   var(--radius-lg);
+  --radius-xl:   var(--radius-xl);
+  --radius-2xl:  var(--radius-2xl);
+  --radius-full: var(--radius-full);
+  --radius-hairline: var(--radius-hairline);
+  --radius-2xs:  var(--radius-2xs);
+  --radius-3xl:  var(--radius-3xl);
+  --radius-4xl:  var(--radius-4xl);
+
+  /* Tailwind's numeric spacing steps (p-2, gap-1.5, mt-4, w-5, …) on the spacing tokens,
+     same pixels as Tailwind's 0.25rem steps at the default 16px root size. Steps not
+     listed here (w-9, h-11, …) keep Tailwind's calc(var(--spacing) * n). */
+  --spacing-0\.5: var(--space-0-5);
+  --spacing-1:    var(--space-1);
+  --spacing-1\.5: var(--space-1-5);
+  --spacing-2:    var(--space-2);
+  --spacing-2\.5: var(--space-2-5);
+  --spacing-3:    var(--space-3);
+  --spacing-3\.5: var(--space-3-5);
+  --spacing-4:    var(--space-4);
+  --spacing-5:    var(--space-5);
+  --spacing-6:    var(--space-6);
+  --spacing-7:    var(--space-6-5);
+  --spacing-8:    var(--space-7);
+  --spacing-10:   var(--space-8);
+  --spacing-12:   var(--space-9);
+  --spacing-16:   var(--space-10);
+  --spacing-20:   var(--space-11);
+
+  --spacing-inset-xs:  var(--space-inset-xs);
+  --spacing-inset-sm:  var(--space-inset-sm);
+  --spacing-inset-md:  var(--space-inset-md);
+  --spacing-inset-lg:  var(--space-inset-lg);
+  --spacing-inset-xl:  var(--space-inset-xl);
+  --spacing-stack-xs:  var(--space-stack-xs);
+  --spacing-stack-sm:  var(--space-stack-sm);
+  --spacing-stack-md:  var(--space-stack-md);
+  --spacing-stack-lg:  var(--space-stack-lg);
+  --spacing-stack-xl:  var(--space-stack-xl);
+  --spacing-inline-xs: var(--space-inline-xs);
+  --spacing-inline-sm: var(--space-inline-sm);
+  --spacing-inline-md: var(--space-inline-md);
+  --spacing-inline-lg: var(--space-inline-lg);
+
+  --text-display:                  var(--font-size-display);
+  --text-display--line-height:     var(--line-height-display);
+  --text-heading-xl:               var(--font-size-heading-xl);
+  --text-heading-xl--line-height:  var(--line-height-heading-xl);
+  --text-heading:                  var(--font-size-heading);
+  --text-heading--line-height:     var(--line-height-heading);
+  --text-heading-md:               var(--font-size-heading-md);
+  --text-heading-md--line-height:  var(--line-height-heading-md);
+  --text-heading-sm:               var(--font-size-heading-sm);
+  --text-heading-sm--line-height:  var(--line-height-heading-sm);
+  --text-body-lg:                  var(--font-size-body-lg);
+  --text-body-lg--line-height:     var(--line-height-body-lg);
+  --text-body:                     var(--font-size-body);
+  --text-body--line-height:        var(--line-height-body);
+  --text-body-sm:                  var(--font-size-body-sm);
+  --text-body-sm--line-height:     var(--line-height-body-sm);
+  --text-small:                    var(--font-size-small);
+  --text-small--line-height:       var(--line-height-small);
+  --text-caption:                  var(--font-size-caption);
+  --text-caption--line-height:     var(--line-height-caption);
+  --text-code:                     var(--font-size-code);
+  --text-code--line-height:        var(--line-height-code);
+  /* Tailwind's size names on the type scale. Only the size is mapped: each keeps
+     Tailwind's unitless line height (text-sm = 14px / 1.43), so text inside still scales. */
+  --text-xs:                       var(--font-size-small);       /* 12 */
+  --text-sm:                       var(--font-size-body);        /* 14 */
+  --text-lg:                       var(--font-size-heading-sm);  /* 18 */
+  --text-xl:                       var(--font-size-heading-md);  /* 20 */
+  --text-2xl:                      var(--font-size-heading);     /* 24 */
+
+  --leading-none:   var(--leading-none);
+  --leading-tight:  var(--leading-tight);
+  --leading-snug:   var(--leading-snug);
+  --leading-normal: var(--leading-normal);
+  --leading-loose:  var(--leading-loose);
+  /* Tailwind's numeric line heights (leading-5 = 20px) on the line-height tokens. */
+  --leading-4: var(--line-height-small);       /* 16 */
+  --leading-5: var(--line-height-body-sm);     /* 20 */
+  --leading-6: var(--line-height-heading-sm);  /* 24 */
+  --leading-7: var(--line-height-heading-md);  /* 28 */
+  --leading-8: var(--line-height-heading);     /* 32 */
+
+  /* font-medium / -semibold / -bold already read the --font-weight-* tokens by name. */
+  --font-weight-normal: var(--font-weight-regular);
+
+  --shadow-1: var(--shadow-1);
+  --shadow-2: var(--shadow-2);
+  --shadow-3: var(--shadow-3);
+  --shadow-4: var(--shadow-4);
+  --shadow-soft:  var(--shadow-soft);
+  --shadow-panel: var(--shadow-panel);
+  --shadow-tile:  var(--shadow-tile);
+
+  --transition-duration-instant: var(--duration-instant);
+  --transition-duration-fast:    var(--duration-fast);
+  --transition-duration-base:    var(--duration-base);
+  --transition-duration-slow:    var(--duration-slow);
+  --transition-duration-quick:    var(--duration-quick);
+  --transition-duration-moderate: var(--duration-moderate);
+  --transition-duration-gentle:   var(--duration-gentle);
+  --transition-duration-long:     var(--duration-long);
+
+  --ease-standard:   var(--ease-standard);
+  --ease-emphasized: var(--ease-emphasized);
+  --ease-exit:       var(--ease-exit);
+  --ease-out:        var(--ease-exit);  /* same curve as Tailwind's ease-out */
+
+  --z-index-base:     var(--z-base);
+  --z-index-raised:   var(--z-raised);
+  --z-index-10:       var(--z-raised);
+  --z-index-20:       var(--z-raised-2);
+  --z-index-30:       var(--z-raised-3);
+
+  /* Focus rings and underlines: outline-2, outline-offset-2, underline-offset-2, decoration-1 */
+  --outline-width-1: var(--focus-ring-width-thin);
+  --outline-width-2: var(--focus-ring-width);
+  --outline-offset-1: var(--focus-ring-offset-sm);
+  --outline-offset-2: var(--focus-ring-offset);
+  --outline-offset-3: var(--focus-ring-offset-md);
+  --outline-offset-4: var(--focus-ring-offset-lg);
+  --outline-offset-6: var(--focus-ring-offset-xl);
+  --text-underline-offset-2: var(--underline-offset);
+  --text-underline-offset-4: var(--underline-offset-xl);
+  --text-decoration-thickness-1: var(--decoration-thickness);
+
+  /* Blur: Tailwind's names, on the blur tokens */
+  --blur-xs: var(--blur-xs);
+  --blur-sm: var(--blur-sm);
+  --blur-md: var(--blur-md);
+  --blur-lg: var(--blur-lg);
+  --blur-xl: var(--blur-xl);
+  --z-index-sticky:   var(--z-sticky);
+  --z-index-dropdown: var(--z-dropdown);
+  --z-index-overlay:  var(--z-overlay);
+  --z-index-modal:    var(--z-modal);
+  --z-index-popover:  var(--z-popover);
+  --z-index-toast:    var(--z-toast);
+  --z-index-tooltip:  var(--z-tooltip);
+}

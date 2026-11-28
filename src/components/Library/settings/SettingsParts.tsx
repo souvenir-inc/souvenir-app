@@ -15,7 +15,7 @@ import styles from './SettingsParts.module.css'
 export function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h2 style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 16, lineHeight: '24px', color: 'var(--neutral-900)' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-900)' }}>{title}</h2>
       {children}
     </section>
   )
@@ -211,7 +211,7 @@ type ControlShape = 'select' | 'switch' | 'value' | 'none'
 function LineSkeleton({ lineHeight, barHeight, width, marginTop }: { lineHeight: number | string; barHeight: number; width: number | string; marginTop?: number }) {
   return (
     <div style={{ height: lineHeight, marginTop, display: 'flex', alignItems: 'center' }}>
-      <Skeleton height={barHeight} radius={6} width={width} />
+      <Skeleton height={barHeight} radius={'var(--radius-sm)'} width={width} />
     </div>
   )
 }
@@ -224,8 +224,8 @@ export function SettingRowSkeleton({ titleWidth = 140, hintWidth = 220, hint = f
         <LineSkeleton lineHeight={22} barHeight={14} width={titleWidth} />
         {hint && <LineSkeleton lineHeight="calc(13px * 1.4)" barHeight={12} width={hintWidth} marginTop={2} />}
       </div>
-      {control === 'select' && <Skeleton height={36} radius={10} width={100} />}
-      {control === 'switch' && <Skeleton height={20} radius={999} width={34} />}
+      {control === 'select' && <Skeleton height={36} radius={'var(--radius-lg)'} width={100} />}
+      {control === 'switch' && <Skeleton height={20} radius={'var(--radius-full)'} width={34} />}
       {control === 'value' && <LineSkeleton lineHeight={22} barHeight={14} width={304} />}
     </div>
   )

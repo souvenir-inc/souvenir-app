@@ -90,13 +90,13 @@ export function AgentsGrid({
   })
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
       {isLoading ? (
         <div style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${GRID_COLS}, minmax(0, ${PERSONA_CARD_WIDTH}px))`,
           justifyContent: 'center',
-          gap: GRID_GAP,
+          gap: GRID_GAP, /* ds-keep: also used in layout maths */
         }}>
           {/* Two rows of cards, in as many columns as the real grid has right now. */}
           {Array.from({ length: GRID_COLS * 2 }).map((_, i) => (
@@ -110,14 +110,14 @@ export function AgentsGrid({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 12,
-            padding: '80px 24px',
+            gap: 'var(--space-3)',
+            padding: 'var(--agents-empty-padding)',
           }}>
             <p role="status" style={{
               fontFamily: 'var(--font-body)',
               fontWeight: 'var(--font-weight-regular)',
-              fontSize: 14,
-              lineHeight: '22px',
+              fontSize: 'var(--font-size-body)',
+              lineHeight: 'var(--line-height-body)',
               color: 'var(--neutral-500)',
               textAlign: 'center',
               margin: 0,
@@ -132,8 +132,8 @@ export function AgentsGrid({
                 onClick={() => onClearFilters()}
                 style={{
                   background: 'none', border: '1px solid var(--border-default)',
-                  borderRadius: 8, cursor: 'pointer', padding: '6px 14px',
-                  fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 500,
+                  borderRadius: 'var(--radius-md)', cursor: 'pointer', padding: 'var(--space-1-5) var(--space-3)',
+                  fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body-sm)', fontWeight: 'var(--font-weight-medium)',
                   color: 'var(--neutral-600)',
                 }}
               >
@@ -147,15 +147,15 @@ export function AgentsGrid({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 24,
-            padding: '48px 24px',
+            gap: 'var(--space-6)',
+            padding: 'var(--space-9) var(--space-6)',
           }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', alignItems: 'center' }}>
               <p style={{
                 fontFamily: 'var(--font-title)',
                 fontWeight: 'var(--font-weight-regular)',
-                fontSize: 24,
-                lineHeight: '32px',
+                fontSize: 'var(--font-size-heading)',
+                lineHeight: 'var(--line-height-heading)',
                 color: 'var(--legacy-1a1916)',
                 margin: 0,
                 whiteSpace: 'nowrap',
@@ -165,8 +165,8 @@ export function AgentsGrid({
               <p style={{
                 fontFamily: 'var(--font-body)',
                 fontWeight: 'var(--font-weight-regular)',
-                fontSize: 16,
-                lineHeight: '22px',
+                fontSize: 'var(--font-size-body-lg)',
+                lineHeight: 'var(--line-height-body)',
                 color: 'var(--legacy-1a1916)',
                 textAlign: 'center',
                 maxWidth: 427,
@@ -198,8 +198,8 @@ export function AgentsGrid({
                 // row is centred so cards never stretch unevenly.
                 gridTemplateColumns: `repeat(${GRID_COLS}, minmax(0, ${PERSONA_CARD_WIDTH}px))`,
                 justifyContent:      'center',
-                gap:                 GRID_GAP,
-                paddingBottom:       16,
+                gap:                 GRID_GAP, /* ds-keep: also used in layout maths */
+                paddingBottom:       'var(--space-4)',
               }}
             >
               {gridRows[vRow.index].map(persona => (

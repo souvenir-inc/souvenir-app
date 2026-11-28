@@ -162,7 +162,6 @@ export const CHAT_SAVE_TO_DRIVE_ENDPOINT = (attachmentId: string) =>
 export const MODELS_ENDPOINT = withBase("/llm/models");
 export const MODELS_ALL_ENDPOINT = withBase("/llm/models/all");
 export const MODELS_BLOCK_ENDPOINT = withBase("/llm/models/block");
-export const MODELS_TEST_ENDPOINT = withBase("/llm/models/test");
 
 // ── Personas ─────────────────────────────────────────────────────────────────
 export const PERSONAS_ENDPOINT = withBase("/persona");
@@ -248,6 +247,10 @@ export const PERSONA_SHARES_SENT_ENDPOINT      = withBase('/persona-shares/sent'
 export const PERSONA_SHARES_DASHBOARD_ENDPOINT = withBase('/persona-shares/dashboard')
 export const PERSONA_SHARE_DETAIL_ENDPOINT     = (id: string) => withBase(`/persona-shares/${id}`)
 export const PERSONA_SHARE_ACCEPT_ENDPOINT     = (id: string) => withBase(`/persona-shares/${id}/accept`)
+
+// ── Warehouse ─────────────────────────────────────────────────────────────────
+// The org's warehouses; everything else is under /warehouse/{id}.
+export const WAREHOUSE_ENDPOINT = withBase('/warehouse')
 
 // ── Connectors ────────────────────────────────────────────────────────────────
 export const CONNECTORS_ENDPOINT            = withBase('/connectors')

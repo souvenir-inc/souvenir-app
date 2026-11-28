@@ -31,6 +31,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { deleteFilesWithChat, takeTrashedWithChat } from '@/lib/api/chat'
 import { libraryKeys } from '@/lib/library/keys'
 import { useLibraryViewer } from '@/lib/library/viewer'
+import { BLUR, DURATION, SPRING } from "@/styles/tokens/motion"
 
 type ChatsTab = 'all' | 'shared' | 'archived'
 
@@ -74,10 +75,10 @@ function LibraryTabDropdown<T extends string>({
           <AnimatePresence mode="popLayout" initial={false}>
             <m.span
               key={value}
-              initial={{ scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
+              initial={{ scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
               animate={{ scale: 1,    opacity: 1, filter: 'blur(0px)' }}
-              exit={{    scale: 0.75, opacity: 0, filter: 'blur(4px)' }}
-              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              exit={{    scale: 0.75, opacity: 0, filter: `blur(${BLUR.xs}px)` }}
+              transition={{ type: 'spring', ...SPRING.snappy }}
               style={{ display: 'block', transformOrigin: 'left center' }}
             >
               {labels[value]}
@@ -337,14 +338,14 @@ function ChatsPageInner() {
         height:        '100%',
         overflowY:     'auto',
         overflowX:     'hidden',
-        paddingBottom: 40,
+        paddingBottom: 'var(--space-8)',
         boxSizing:     'border-box',
         backgroundColor: 'var(--neutral-50)',
       }}
     >
       {/* Horizontal padding lives here, not on the scrolling element above —
           keeps the scrollbar flush with the container's edge. */}
-      <div style={{ width: '100%', maxWidth: 884, padding: '0 24px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ width: '100%', maxWidth: 884, padding: '0 var(--space-6)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
 
         {/* ── Page header ─────────────────────────────────────────────────── */}
         <div
@@ -352,7 +353,7 @@ function ChatsPageInner() {
             display:        'flex',
             alignItems:     'center',
             justifyContent: 'space-between',
-            padding:        '16px 0 14px',
+            padding:        'var(--space-4) 0 var(--space-3)',
             minHeight:      60,
           }}
         >
@@ -361,9 +362,9 @@ function ChatsPageInner() {
             style={{
               margin:     0,
               fontFamily: 'var(--font-title)',
-              fontSize:   24,
-              fontWeight: 400,
-              lineHeight: '32px',
+              fontSize:   'var(--font-size-heading)',
+              fontWeight: 'var(--font-weight-regular)',
+              lineHeight: 'var(--line-height-heading)',
               color:      'var(--neutral-900)',
               flexShrink: 0,
             }}
@@ -379,7 +380,7 @@ function ChatsPageInner() {
                 initial={{ opacity: 0, x: 8 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 8 }}
-                transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: DURATION.quick, ease: [0.16, 1, 0.3, 1] }}
               >
                 <ChatSelectionBar
                   selectedCount={selectedIds.size}
@@ -396,8 +397,8 @@ function ChatsPageInner() {
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -8 }}
-                transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-                style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                transition={{ duration: DURATION.quick, ease: [0.16, 1, 0.3, 1] }}
+                style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
               >
                 {chatsTab === 'all' && (
                   <Button variant="outline" onClick={enterSelection}>
@@ -421,7 +422,7 @@ function ChatsPageInner() {
         {selectionMode && (
           <p
             style={{
-              margin:     '0 0 12px',
+              margin:     '0 0 var(--space-3)',
               fontFamily: 'var(--font-body)',
               fontSize:   'var(--font-size-body)',
               color:      'var(--neutral-400)',
@@ -438,10 +439,10 @@ function ChatsPageInner() {
               display:        'flex',
               alignItems:     'center',
               justifyContent: 'space-between',
-              gap:            12,
-              padding:        '4px 0 12px',
+              gap:            'var(--space-3)',
+              padding:        'var(--space-1) 0 var(--space-3)',
               borderBottom:   '1px solid var(--neutral-100)',
-              marginBottom:   12,
+              marginBottom:   'var(--space-3)',
             }}
           >
             <LibraryTabDropdown
@@ -451,7 +452,7 @@ function ChatsPageInner() {
               descriptions={CHATS_TAB_DESCRIPTION}
               onChange={handleChatsTabChange}
             />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: searchOpen ? '1 0 0' : undefined, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flex: searchOpen ? '1 0 0' : undefined, minWidth: 0 }}>
               {/* Search — same morph-in-place pattern as PinboardHeader's own
                   search button: a ghost IconButton that turns into an inline
                   InputField (with its close icon embedded in the field
@@ -464,9 +465,9 @@ function ChatsPageInner() {
                       <m.span
                         key="search-btn"
                         layout
-                        initial={{ opacity: 0, y: 4, filter: 'blur(4px)' }}
-                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { type: 'spring', duration: 0.3, bounce: 0 } }}
-                        exit={{ opacity: 0, scale: 0.25, filter: 'blur(4px)', transition: { type: 'spring', duration: 0.2, bounce: 0 } }}
+                        initial={{ opacity: 0, y: 4, filter: `blur(${BLUR.xs}px)` }}
+                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { type: 'spring', duration: DURATION.slow, bounce: 0 } }}
+                        exit={{ opacity: 0, scale: 0.25, filter: `blur(${BLUR.xs}px)`, transition: { type: 'spring', duration: DURATION.base, bounce: 0 } }}
                         style={{ display: 'inline-flex', flexShrink: 0 }}
                       >
                         <IconButton
@@ -480,9 +481,9 @@ function ChatsPageInner() {
                     ) : (
                       <m.div
                         key="search-input"
-                        initial={{ opacity: 0, scale: 0.95, filter: 'blur(4px)' }}
-                        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)', transition: { type: 'spring', duration: 0.3, bounce: 0 } }}
-                        exit={{ opacity: 0, scale: 0.95, filter: 'blur(4px)', transition: { duration: 0.15, ease: 'easeIn' } }}
+                        initial={{ opacity: 0, scale: 0.95, filter: `blur(${BLUR.xs}px)` }}
+                        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)', transition: { type: 'spring', duration: DURATION.slow, bounce: 0 } }}
+                        exit={{ opacity: 0, scale: 0.95, filter: `blur(${BLUR.xs}px)`, transition: { duration: DURATION.quick, ease: 'easeIn' } }}
                         style={{ flex: '1 0 0', minWidth: 0 }}
                       >
                         <InputField
@@ -521,19 +522,19 @@ function ChatsPageInner() {
 
         {/* ── Shared with me view ─────────────────────────────────────────── */}
         {chatsTab === 'shared' && !selectionMode && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             {sharedLoading && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
                 {[...Array(4)].map((_, i) => (
-                  <Skeleton key={i} height={68} radius={12} style={{ opacity: 1 - i * 0.15 }} />
+                  <Skeleton key={i} height={68} radius={'var(--radius-xl)'} style={{ opacity: 1 - i * 0.15 }} />
                 ))}
               </div>
             )}
             {!sharedLoading && sharedItems.length === 0 && (
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-400)', margin: '32px 0', textAlign: 'center' }}>No chats have been shared with you yet.</p>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-400)', margin: 'var(--space-7) 0', textAlign: 'center' }}>No chats have been shared with you yet.</p>
             )}
             {!sharedLoading && sharedItems.length > 0 && filteredSharedItems.length === 0 && (
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-400)', margin: '32px 0', textAlign: 'center' }}>No shared chats match &ldquo;{searchQuery}&rdquo;</p>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-400)', margin: 'var(--space-7) 0', textAlign: 'center' }}>No shared chats match &ldquo;{searchQuery}&rdquo;</p>
             )}
             {filteredSharedItems.map(item => (
               <div
@@ -541,22 +542,22 @@ function ChatsPageInner() {
                 style={{
                   display:         'flex',
                   alignItems:      'center',
-                  gap:             12,
-                  padding:         '12px 16px',
-                  borderRadius:    12,
+                  gap:             'var(--space-3)',
+                  padding:         'var(--space-3) var(--space-4)',
+                  borderRadius:    'var(--radius-xl)',
                   backgroundColor: 'var(--neutral-white)',
-                  boxShadow:       '0px 1px 2px rgba(18,12,8,0.08), 0px 0px 0px 1px var(--neutral-100)',
+                  boxShadow:       'var(--chats-shadow)',
                 }}
               >
                 <div style={{ flex: '1 0 0', minWidth: 0 }}>
-                  <p style={{ fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: 14, color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <p style={{ fontFamily: 'var(--font-body)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-900)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {item.chatTitle || 'Untitled chat'}
                   </p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2, flexWrap: 'wrap' }}>
-                    <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--neutral-400)' }}>
-                      Shared by <span style={{ fontWeight: 700, color: 'var(--neutral-700)' }}>{item.sharedByName ?? 'someone'}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', marginTop: 'var(--space-0-5)', flexWrap: 'wrap' }}>
+                    <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-400)' }}>
+                      Shared by <span style={{ fontWeight: 'var(--font-weight-bold)', color: 'var(--neutral-700)' }}>{item.sharedByName ?? 'someone'}</span>
                     </span>
-                    <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--neutral-300)' }}>·</span>
+                    <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-small)', color: 'var(--neutral-300)' }}>·</span>
                     <Badge label="Read-only" color="Red" />
                   </div>
                 </div>
@@ -574,22 +575,22 @@ function ChatsPageInner() {
 
         {/* ── Archived chats view ──────────────────────────────────────────── */}
         {chatsTab === 'archived' && !selectionMode && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }} role="list" aria-label="Archived chats">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)' }} role="list" aria-label="Archived chats">
             {isLoading && chats.length === 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
                 {[...Array(3)].map((_, i) => (
-                  <Skeleton key={i} height={68} radius={12} style={{ opacity: 1 - i * 0.15 }} />
+                  <Skeleton key={i} height={68} radius={'var(--radius-xl)'} style={{ opacity: 1 - i * 0.15 }} />
                 ))}
               </div>
             )}
             {!isLoading && archivedChats.length === 0 && (
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-400)', margin: '32px 0', textAlign: 'center' }}>No archived chats.</p>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-400)', margin: 'var(--space-7) 0', textAlign: 'center' }}>No archived chats.</p>
             )}
             {!isLoading && archivedChats.length > 0 && filteredArchivedChats.length === 0 && (
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--neutral-400)', margin: '32px 0', textAlign: 'center' }}>No archived chats match &ldquo;{searchQuery}&rdquo;</p>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', color: 'var(--neutral-400)', margin: 'var(--space-7) 0', textAlign: 'center' }}>No archived chats match &ldquo;{searchQuery}&rdquo;</p>
             )}
             {filteredArchivedChats.map((chat) => (
-              <div key={chat.id} role="listitem" style={{ padding: '1px 0 6px' }}>
+              <div key={chat.id} role="listitem" style={{ padding: 'var(--space-0-5) 0 var(--space-1-5)' }}>
                 <ChatRow
                   title={chat.title}
                   timestamp={formatRelativeTime(chat.last_message_at ?? chat.updated_at)}
@@ -611,9 +612,9 @@ function ChatsPageInner() {
 
         {/* ── Loading skeleton ─────────────────────────────────────────────── */}
         {isLoading && chats.length === 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
             {[...Array(7)].map((_, i) => (
-              <Skeleton key={i} height={68} radius={12} style={{ opacity: 1 - i * 0.15 }} />
+              <Skeleton key={i} height={68} radius={'var(--radius-xl)'} style={{ opacity: 1 - i * 0.15 }} />
             ))}
           </div>
         )}
@@ -626,7 +627,7 @@ function ChatsPageInner() {
             {filteredChats.length === 0 && searchQuery && (
               <p
                 style={{
-                  margin:     '32px 0',
+                  margin:     'var(--space-7) 0',
                   textAlign:  'center',
                   fontFamily: 'var(--font-body)',
                   fontSize:   'var(--font-size-body)',
@@ -639,7 +640,7 @@ function ChatsPageInner() {
 
             {/* Empty slot — only when no chats exist and not searching/selecting */}
             {!selectionMode && !searchQuery && activeChats.length === 0 && (
-              <div role="listitem" style={{ padding: '1px 0' }}>
+              <div role="listitem" style={{ padding: 'var(--space-0-5) 0' }}>
                 <ChatRow isEmpty />
               </div>
             )}
@@ -648,12 +649,12 @@ function ChatsPageInner() {
             {selectionMode && activeChats.length === 0 && (
               <p
                 style={{
-                  margin:     '32px 0',
+                  margin:     'var(--space-7) 0',
                   textAlign:  'center',
                   fontFamily: 'var(--font-title)',
-                  fontSize:   24,
-                  fontWeight: 400,
-                  lineHeight: '32px',
+                  fontSize:   'var(--font-size-heading)',
+                  fontWeight: 'var(--font-weight-regular)',
+                  lineHeight: 'var(--line-height-heading)',
                   color:      'var(--neutral-400)',
                 }}
               >
@@ -677,7 +678,7 @@ function ChatsPageInner() {
                         width:     '100%',
                         height:    selectionMode ? 69 : 75,
                         boxSizing: 'border-box',
-                        padding:   '1px 0 6px',
+                        padding:   'var(--space-0-5) 0 var(--space-1-5)',
                         transform: `translateY(${vRow.start}px)`,
                       }}
                     >
@@ -735,9 +736,9 @@ function ChatsPageInner() {
         <ConfirmModal
           title={`Delete ${selectedIds.size} chat${selectedIds.size > 1 ? 's' : ''}?`}
           description={
-            <span style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <span style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               <span>Files these chats saved stay in Library unless you delete them too.</span>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', cursor: 'pointer' }}>
                 <Checkbox checked={bulkDeleteFiles} onCheckedChange={(value) => setBulkDeleteFiles(value === true)} aria-label="Also delete the files these chats saved" />
                 <span>Also delete the files these chats saved</span>
               </label>

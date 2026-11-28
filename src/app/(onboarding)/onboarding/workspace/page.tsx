@@ -52,22 +52,22 @@ function SizePill({
       onClick={onSelect}
       aria-pressed={selected}
       style={{
-        padding: "6px 10px 8px",
-        borderRadius: 10,
+        padding: "var(--space-1-5) var(--space-2-5) var(--space-2)",
+        borderRadius: 'var(--radius-lg)',
         border: "none",
         cursor: "pointer",
         outline: "none",
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "var(--static-white)",
         boxShadow: selected
-          ? "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1.5px var(--neutral-900,#26211E)"
-          : "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+          ? "var(--workspace-shadow)"
+          : "var(--shadow-control)",
         fontFamily: "var(--font-body)",
-        fontWeight: 500,
-        fontSize: 14,
-        lineHeight: "16px",
-        color: selected ? "var(--neutral-900,#26211E)" : "var(--neutral-700,#524b47)",
+        fontWeight: 'var(--font-weight-medium)',
+        fontSize: 'var(--font-size-body)',
+        lineHeight: "var(--line-height-small)",
+        color: selected ? "var(--neutral-900)" : "var(--neutral-700)",
         whiteSpace: "nowrap",
-        transition: "background-color 120ms, box-shadow 120ms",
+        transition: "background-color var(--duration-fast), box-shadow var(--duration-fast)",
       }}
     >
       {label}
@@ -146,24 +146,24 @@ export default function OnboardingWorkspacePage() {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: 20,
+          gap: 'var(--space-5)',
           width: "100%",
-          padding: "24px 0 0",
+          padding: "var(--space-6) 0 0",
         }}
       >
         {/* Workspace name */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)' }}>
           <FieldLabel error={showError}>Workspace&apos;s name*</FieldLabel>
           <div
             style={{
               display: "flex",
               alignItems: "center",
               width: "100%",
-              padding: "7px 10px",
-              borderRadius: 10,
+              padding: "var(--space-1-5) var(--space-2-5)",
+              borderRadius: 'var(--radius-lg)',
               backgroundColor: "var(--field-surface)",
               boxSizing: "border-box",
-              boxShadow: "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+              boxShadow: "var(--shadow-control)",
             }}
           >
             <input
@@ -178,10 +178,10 @@ export default function OnboardingWorkspacePage() {
                 outline: "none",
                 background: "transparent",
                 fontFamily: "var(--font-body)",
-                fontWeight: 400,
-                fontSize: 14,
-                lineHeight: "16px",
-                color: "var(--neutral-900,#26211e)",
+                fontWeight: 'var(--font-weight-regular)',
+                fontSize: 'var(--font-size-body)',
+                lineHeight: "var(--line-height-small)",
+                color: "var(--neutral-900)",
                 padding: 0,
               }}
             />
@@ -189,10 +189,10 @@ export default function OnboardingWorkspacePage() {
               style={{
                 flexShrink: 0,
                 fontFamily: "var(--font-body)",
-                fontWeight: 500,
-                fontSize: 14,
-                lineHeight: "16px",
-                color: "var(--neutral-900,#26211e)",
+                fontWeight: 'var(--font-weight-medium)',
+                fontSize: 'var(--font-size-body)',
+                lineHeight: "var(--line-height-small)",
+                color: "var(--neutral-900)",
                 whiteSpace: "nowrap",
               }}
             >
@@ -203,9 +203,9 @@ export default function OnboardingWorkspacePage() {
         </div>
 
         {/* Workspace size */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-2)' }}>
           <FieldLabel>Workspace size</FieldLabel>
-          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: 'var(--space-4)', flexWrap: "wrap" }}>
             {SIZE_OPTIONS.map((opt) => (
               <SizePill
                 key={opt.value}

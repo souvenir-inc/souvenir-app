@@ -98,7 +98,7 @@ const headerActionButtonStyle = (visible: boolean, iconHovered: boolean): React.
   cursor: 'pointer',
   color: iconHovered ? 'var(--neutral-black)' : 'var(--sidebar-icon-muted, var(--sidebar-menu-item-muted))',
   opacity: visible ? 1 : 0,
-  transition: 'opacity 150ms, color 150ms',
+  transition: 'opacity var(--duration-quick), color var(--duration-quick)',
 })
 
 export const FlatSidebarRow = React.forwardRef<HTMLDivElement, FlatSidebarRowProps>(
@@ -201,12 +201,12 @@ export const FlatSidebarRow = React.forwardRef<HTMLDivElement, FlatSidebarRowPro
       borderRadius: 'var(--radius-010, 10px)',
       width: collapsed ? 'auto' : '100%',
       height: isHeader ? 'auto' : '32px',
-      paddingLeft: collapsed ? '6px' : 'var(--space-008, 8px)',
-      paddingRight: collapsed ? '6px' : 'var(--space-008, 8px)',
+      paddingLeft: collapsed ? 'var(--space-1-5)' : 'var(--space-008, 8px)',
+      paddingRight: collapsed ? 'var(--space-1-5)' : 'var(--space-008, 8px)',
       backgroundColor: !isHeader && isActive ? 'var(--sidebar-menu-item-hover-bg)' : 'transparent',
       boxShadow: !isHeader && isActive ? 'var(--shadow-sidebar-item-hover)' : undefined,
       cursor: isHeader ? 'default' : isEditVariant ? 'text' : 'pointer',
-      transition: 'background-color 150ms, box-shadow 150ms',
+      transition: 'background-color var(--duration-fast), box-shadow var(--duration-fast)',
       boxSizing: 'border-box',
     }
 
@@ -215,7 +215,7 @@ export const FlatSidebarRow = React.forwardRef<HTMLDivElement, FlatSidebarRowPro
         <div
           ref={ref}
           className={cn(className)}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', height: 24, padding: '2px 8px', boxSizing: 'border-box' }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', height: 24, padding: 'var(--space-0-5) var(--space-2)', boxSizing: 'border-box' }}
           onMouseEnter={(e) => { setIsHovered(true); externalMouseEnter?.(e) }}
           onMouseLeave={(e) => { setIsHovered(false); externalMouseLeave?.(e) }}
           {...props}
@@ -226,19 +226,19 @@ export const FlatSidebarRow = React.forwardRef<HTMLDivElement, FlatSidebarRowPro
             aria-expanded={shown}
             aria-label={shown ? `Collapse ${label}` : `Expand ${label}`}
             onClick={(e) => { e.stopPropagation(); onShowClick?.(e) }}
-            style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', padding: 0, cursor: onShowClick ? 'pointer' : 'default', minWidth: 0 }}
+            style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', background: 'none', border: 'none', padding: 0, cursor: onShowClick ? 'pointer' : 'default', minWidth: 0 }}
           >
             <p style={{
               ...headerLabelTextStyle,
               ...(compact ? { fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)' } : null),
               textDecoration: isHovered ? 'underline' : 'none',
             }}>{label}</p>
-            <span style={{ display: 'inline-flex', lineHeight: 0, color: 'var(--sidebar-icon, var(--sidebar-menu-item-text))', flexShrink: 0, transform: shown ? 'none' : 'rotate(-90deg)', transition: 'transform 150ms' }}>
+            <span style={{ display: 'inline-flex', lineHeight: 0, color: 'var(--sidebar-icon, var(--sidebar-menu-item-text))', flexShrink: 0, transform: shown ? 'none' : 'rotate(-90deg)', transition: 'transform var(--duration-fast)' }}>
               <ArrowDownOneIcon size={12} />
             </span>
           </button>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexShrink: 0 }}>
             {onMoreClick && (
               <Tooltip content={`${label} options`} side="top" delayDuration={300}>
                 <button
@@ -281,7 +281,7 @@ export const FlatSidebarRow = React.forwardRef<HTMLDivElement, FlatSidebarRowPro
                 </button>
               </Tooltip>
             ) : (
-              <span style={{ display: 'inline-flex', lineHeight: 0, color: 'var(--sidebar-icon-muted, var(--sidebar-menu-item-muted))', opacity: showActions ? 1 : 0, transition: 'opacity 150ms' }}>
+              <span style={{ display: 'inline-flex', lineHeight: 0, color: 'var(--sidebar-icon-muted, var(--sidebar-menu-item-muted))', opacity: showActions ? 1 : 0, transition: 'opacity var(--duration-fast)' }}>
                 {headerIcon}
               </span>
             ))}
@@ -343,7 +343,7 @@ export const FlatSidebarRow = React.forwardRef<HTMLDivElement, FlatSidebarRowPro
         )}
         {!collapsed && <p style={{ ...bodyTextStyle, color: isHovered ? 'var(--neutral-black)' : bodyTextStyle.color }}>{label}</p>}
         {!collapsed && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexShrink: 0 }}>
             {badge}
             {trailing && (isActive ? (
               <div style={{ display: 'inline-flex', alignItems: 'center' }}>{trailing}</div>

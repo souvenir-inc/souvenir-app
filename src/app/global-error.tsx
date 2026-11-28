@@ -8,6 +8,9 @@ import { AUTH_LOGIN_ROUTE } from '@/lib/routes'
  * Last-resort boundary: the root layout itself failed (providers, auth
  * hydration), so nothing from it is available. Plain HTML and inline styles,
  * with a way back in through login when the session is what broke.
+ *
+ * The global stylesheet comes from that layout too, so every token here carries
+ * its own value as a fallback; without one it resolves to nothing.
  */
 export default function GlobalError({
   error,
@@ -25,20 +28,20 @@ export default function GlobalError({
       <body
         style={{
           margin: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center',
-          justifyContent: 'center', gap: 12, padding: 32, textAlign: 'center',
-          fontFamily: 'system-ui, sans-serif', background: '#fff', color: '#1a1a1a',
+          justifyContent: 'center', gap: 'var(--space-3, 12px)', padding: 'var(--space-7, 32px)', textAlign: 'center',
+          fontFamily: 'system-ui, sans-serif', background: 'var(--static-white, #ffffff)', color: '#1a1a1a', // ds-keep: renders without the app stylesheet (replaces the root layout)
         }}
       >
-        <h1 style={{ margin: 0, fontSize: 24, fontWeight: 500 }}>Something went wrong</h1>
-        <p style={{ margin: 0, fontSize: 14, color: '#555' }}>
+        <h1 style={{ margin: 0, fontSize: 'var(--font-size-heading, 24px)', fontWeight: 'var(--font-weight-medium, 500)' }}>Something went wrong</h1>
+        <p style={{ margin: 0, fontSize: 'var(--font-size-body, 14px)', color: '#555' /* ds-keep: renders without the app stylesheet */ }}>
           Souvenir could not load. Try again, or sign in again if it keeps happening.
         </p>
-        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-          <button type="button" onClick={unstable_retry} style={{ padding: '8px 16px', cursor: 'pointer' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-2, 8px)', marginTop: 'var(--space-2, 8px)' }}>
+          <button type="button" onClick={unstable_retry} style={{ padding: 'var(--space-2, 8px) var(--space-4, 16px)', cursor: 'pointer' }}>
             Try again
           </button>
           {/* A full navigation, not next/link: the router may be what failed. */}
-          <a href={AUTH_LOGIN_ROUTE} style={{ padding: '8px 16px', color: 'inherit' }}>Sign in again</a>
+          <a href={AUTH_LOGIN_ROUTE} style={{ padding: 'var(--space-2, 8px) var(--space-4, 16px)', color: 'inherit' }}>Sign in again</a>
         </div>
       </body>
     </html>

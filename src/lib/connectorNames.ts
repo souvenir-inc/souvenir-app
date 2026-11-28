@@ -1,8 +1,7 @@
-// Canonical display names for connector slugs. Used when reconstructing
-// connector context from historical tool_calls (which only carry slugs).
-// Live `context` SSE events already include `display_name`; this only fills
-// the gap when no name is available. Heuristic fallback (title-cased slug)
-// covers everything else.
+// Canonical display names for connector slugs. `toConnector` (@/lib/connector)
+// falls back to these when a payload carries a slug and no name of its own —
+// live `context` SSE events and the catalogue both send `display_name`, so this
+// only fills the gap. Heuristic fallback (title-cased slug) covers the rest.
 //
 // Logos are NOT resolved here — every connector image comes from the backend's
 // logo_url/icon_url (see toConnector in @/lib/connector). There are no bundled

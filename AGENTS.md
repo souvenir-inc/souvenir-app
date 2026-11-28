@@ -1,12 +1,19 @@
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know
 
-This version has breaking changes - APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+This version (Next 16) has breaking changes - APIs, conventions, and file structure may all differ from your training data. Before touching routing, layouts, data fetching/caching, server actions, route handlers, `src/proxy.ts` (formerly middleware), or `next.config`, read the relevant guide in `node_modules/next/dist/docs/`. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
 # Design reference
 
-Before creating or changing UI, review `C:\Users\kunals\may-day` for established design components, layouts, tokens, and interaction patterns. Reuse those patterns where they fit.
+The UI is built on shadcn/ui. Before creating or changing UI, reuse the components in `src/components/ui/` and the design tokens in `src/styles/tokens/` (`primitives.css` → `aliases.css` → `semantic.css` → `typography.css`, plus `theme.css`). Never hard-code hex values in components; use the tokens.
+
+# Project rules
+
+- **React Compiler is on.** Don't read external stores directly inside hooks or components; subscribe through `useSyncExternalStore` (or an existing hook built on it), or renders freeze on stale values.
+- **Tickets** go in dated folders: `docs-v2/tickets/<YYYY-MM-DD>/`, never the project root.
+- **Hidden features stay hidden.** Pins/Pinboard and Highlights are turned off on purpose. Don't enable, test, or fix them unless asked.
+- **Docs map:** `docs/INDEX.md`. Anything under `docs/_archive/` is superseded; don't treat it as current guidance.
 
 # Analytics (Mixpanel)
 

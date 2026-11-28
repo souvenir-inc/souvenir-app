@@ -18,9 +18,9 @@ import { FolderOneIcon, PenOneIcon, StarIcon } from "@strange-huge/icons";
 const menuItemStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: "8px",
-  padding: "7px 10px",
-  borderRadius: "8px",
+  gap: "var(--space-2)",
+  padding: "var(--space-1-75) var(--space-2-5)",
+  borderRadius: "var(--radius-md)",
   cursor: "pointer",
   fontFamily: "var(--font-body)",
   fontWeight: "var(--font-weight-medium)",
@@ -158,8 +158,8 @@ export function ChatHistoryItem({
           }}
           style={{
             backgroundColor: "var(--popover-bg)",
-            borderRadius: "12px",
-            padding: "4px",
+            borderRadius: "var(--radius-xl)",
+            padding: "var(--space-1)",
             boxShadow:
               "0 4px 16px color-mix(in srgb, var(--static-black) 10%, transparent), 0 1px 4px color-mix(in srgb, var(--static-black) 6%, transparent), 0 0 0 1px color-mix(in srgb, var(--static-black) 4%, transparent)",
             zIndex: 5,
@@ -222,7 +222,7 @@ export function ChatHistoryItem({
             style={{
               height: "1px",
               backgroundColor: "var(--neutral-100)",
-              margin: "4px 0",
+              margin: "var(--space-1) 0",
             }}
           />
 

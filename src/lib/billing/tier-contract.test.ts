@@ -30,7 +30,7 @@ describe("TeamsTier credits match the backend catalog", () => {
 
 describe("backend 402 and the client exhausted state agree", () => {
   it("a 402 reads as out of credits", () => {
-    expect(friendlyApiError("Request failed with status 402", 402)).toMatch(/run out of credits/);
-    expect(friendlyApiError("Insufficient credits")).toMatch(/run out of credits/);
+    expect(friendlyApiError("Request failed with status 402", 402)).toMatch(/out of credits/);
+    expect(friendlyApiError("Insufficient credits")).toMatch(/out of credits/);
   });
 });

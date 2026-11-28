@@ -3,6 +3,7 @@
 import type { ReactNode } from "react"
 import { m, useReducedMotion } from "framer-motion"
 import styles from "./ChatWidget.module.css"
+import { DURATION } from "@/styles/tokens/motion"
 
 /** Shared KDS surface for inline assistant widgets. */
 export function ChatWidgetShell({ title, eyebrow, icon, actions, children }: {
@@ -11,7 +12,7 @@ export function ChatWidgetShell({ title, eyebrow, icon, actions, children }: {
   const reducedMotion = useReducedMotion()
   return (
     <m.section className={styles.shell} aria-label={title}
-      initial={reducedMotion ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+      initial={reducedMotion ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: DURATION.base }}>
       <div className={styles.header}>
         <span className={styles.icon} aria-hidden="true">{icon}</span>
         <div className={styles.heading}>

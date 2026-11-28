@@ -3,32 +3,32 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 100px 132px 140px 80px;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-4);
   box-sizing: border-box;
   width: 100%;
   font-family: var(--font-body);
 }
 
 .header {
-  padding: 12px 20px;
+  padding: var(--space-3) var(--space-5);
   border-bottom: 1px solid var(--neutral-100);
   background: var(--neutral-50);
   color: var(--neutral-500);
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 18px;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-small);
 }
 
 .row {
   min-height: 76px;
-  padding: 16px 20px;
+  padding: var(--space-4) var(--space-5);
 }
 
 .identity {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-0-5);
 }
 
 .name,
@@ -40,32 +40,32 @@
 
 .name {
   color: var(--neutral-900);
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 22px;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-body);
 }
 
 .email,
 .date {
   color: var(--color-text-muted);
-  font-size: 12px;
-  line-height: 18px;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
 }
 
 .visibility {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .pill {
   display: inline-flex;
-  padding: 2px 7px;
-  border-radius: 5px;
+  padding: var(--space-0-5) var(--space-1-5);
+  border-radius: var(--radius-sm);
   background: var(--neutral-100);
   color: var(--neutral-600);
-  font-size: 12px;
-  line-height: 18px;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
 }
 
 .pill[data-tone='shared'] {
@@ -76,10 +76,10 @@
 .permissionLabel {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--space-1);
   color: var(--neutral-600);
-  font-size: 12px;
-  line-height: 18px;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
 }
 
 .permissionLabel[data-permission='blocked'] {
@@ -88,8 +88,8 @@
 
 .warning {
   color: var(--neutral-700);
-  font-size: 12px;
-  line-height: 18px;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
 }
 
 .action {
@@ -108,7 +108,7 @@
 
   .row {
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 8px 12px;
+    gap: var(--space-2) var(--space-3);
   }
 
   .identity {
@@ -125,7 +125,7 @@
   .visibility {
     grid-column: 1;
     grid-row: 2;
-    padding-right: 112px;
+    padding-right: var(--account-row-actions-inset);
   }
 
   .permission {
@@ -133,7 +133,7 @@
     grid-row: 2;
     justify-self: end;
     align-self: start;
-    padding-top: 2px;
+    padding-top: var(--space-0-5);
   }
 
   .date {
@@ -148,7 +148,7 @@
 
 @container (max-width: 440px) {
   .row {
-    padding: 16px;
+    padding: var(--space-4);
   }
 
   .visibility {

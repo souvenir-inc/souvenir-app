@@ -122,6 +122,14 @@ export function announceLinkResult(slug: string, link: string): void {
   channel.close()
 }
 
+/** Calls back when any app's sign-in ends, in any tab (the dashboard re-reads its warehouse). */
+export function onAnyLinkResult(heard: (slug: string, link: string) => void): () => void {
+  if (typeof BroadcastChannel === 'undefined') return () => {}
+  const channel = new BroadcastChannel(LINK_RESULT_CHANNEL)
+  channel.onmessage = (event: MessageEvent<{ slug: string; link: string }>) => heard(event.data.slug, event.data.link)
+  return () => channel.close()
+}
+
 /** Calls back when a sign-in for this app ends; returns how to stop listening. */
 export function onLinkResult(slug: string, heard: (link: string) => void): () => void {
   if (typeof BroadcastChannel === 'undefined') return () => {}

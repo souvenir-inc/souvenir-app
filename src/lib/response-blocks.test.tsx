@@ -45,7 +45,7 @@ describe("structured response blocks", () => {
     expect(html).toContain("DS handoff timing")
     expect(html).toContain("First user batch")
     expect(html).toContain("border-left:3px solid var(--warning-500)")
-    expect(html).toContain("border-radius:99px")
+    expect(html).toContain("border-radius:var(--radius-full)")
     expect(html).toContain("font-family:var(--font-body)")
   })
 
@@ -71,7 +71,7 @@ describe("structured response blocks", () => {
     expect(html).toContain("Choose the workspace to connect.")
     expect(html).toContain("background:var(--brown-700)")
     expect(html).toContain("background:var(--neutral-100)")
-    expect(html).toContain("font-size:11px")
+    expect(html).toContain("font-size:var(--font-size-caption)") // 11px
     expect(html).toContain("font-family:var(--font-body)")
   })
 })

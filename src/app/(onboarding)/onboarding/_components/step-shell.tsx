@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 
 // ── Shared shell for the v1.5 workspace-onboarding steps ─────────────────────
 // Figma: Onboarding v1, nodes 27:1196 / 55:2726 ("Setup your workspace"),
@@ -24,16 +25,16 @@ const BG = "var(--neutral-50)";
 
 export function StepDots({ total, activeIndex }: { total: number; activeIndex: number }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 4 }} role="presentation" aria-hidden>
+    <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)' }} role="presentation" aria-hidden>
       {Array.from({ length: total }, (_, i) => (
         <div
           key={i}
           style={{
             height: 4,
             width: i === activeIndex ? 12 : 4,
-            borderRadius: 8,
-            backgroundColor: i === activeIndex ? "var(--neutral-600,#6a625d)" : "var(--neutral-200,#dcd1c8)",
-            transition: "width 200ms ease, background-color 200ms ease",
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: i === activeIndex ? "var(--neutral-600)" : "var(--neutral-200)",
+            transition: "width var(--duration-base) ease, background-color var(--duration-base) ease",
           }}
         />
       ))}
@@ -53,15 +54,15 @@ export function StepHeader({
   title: string;
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-2)' }}>
       <StepDots total={total} activeIndex={activeIndex} />
       <h1
         style={{
           fontFamily: "var(--font-title)",
-          fontWeight: 400,
-          fontSize: 24,
-          lineHeight: "32px",
-          color: "var(--neutral-800,#3b3632)",
+          fontWeight: 'var(--font-weight-regular)',
+          fontSize: 'var(--font-size-heading)',
+          lineHeight: "var(--line-height-heading)",
+          color: "var(--neutral-800)",
           margin: 0,
         }}
       >
@@ -80,10 +81,10 @@ export function FieldLabel({ children, error }: { children: React.ReactNode; err
     <p
       style={{
         fontFamily: "var(--font-body)",
-        fontWeight: 400,
-        fontSize: 14,
-        lineHeight: "16px",
-        color: error ? "var(--red-600,#c62b29)" : "var(--neutral-700,#524b47)",
+        fontWeight: 'var(--font-weight-regular)',
+        fontSize: 'var(--font-size-body)',
+        lineHeight: "var(--line-height-small)",
+        color: error ? "var(--red-600)" : "var(--neutral-700)",
         margin: 0,
       }}
     >
@@ -97,10 +98,10 @@ export function FieldError({ children }: { children: React.ReactNode }) {
     <p
       style={{
         fontFamily: "var(--font-body)",
-        fontWeight: 400,
-        fontSize: 14,
-        lineHeight: "16px",
-        color: "var(--red-600,#c62b29)",
+        fontWeight: 'var(--font-weight-regular)',
+        fontSize: 'var(--font-size-body)',
+        lineHeight: "var(--line-height-small)",
+        color: "var(--red-600)",
         margin: 0,
       }}
     >
@@ -129,7 +130,7 @@ export function TextField({
   error?: boolean;
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1, minWidth: 0 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)', flex: 1, minWidth: 0 }}>
       <FieldLabel error={error}>
         {label}
         {required ? "*" : ""}
@@ -139,13 +140,13 @@ export function TextField({
           display: "flex",
           alignItems: "center",
           width: "100%",
-          padding: "7px 10px",
-          borderRadius: 10,
+          padding: "var(--space-1-5) var(--space-2-5)",
+          borderRadius: 'var(--radius-lg)',
           backgroundColor: "var(--field-surface)",
           boxSizing: "border-box",
           boxShadow: error
-            ? "0px 0px 0px 1px var(--red-600,#c62b29)"
-            : "0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+            ? "0px 0px 0px 1px var(--red-600)"
+            : "var(--shadow-control)",
         }}
       >
         <input
@@ -159,10 +160,10 @@ export function TextField({
             outline: "none",
             background: "transparent",
             fontFamily: "var(--font-body)",
-            fontWeight: 400,
-            fontSize: 14,
-            lineHeight: "16px",
-            color: "var(--neutral-900,#26211e)",
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: 'var(--font-size-body)',
+            lineHeight: "var(--line-height-small)",
+            color: "var(--neutral-900)",
             padding: 0,
           }}
         />
@@ -256,66 +257,45 @@ export function LeaveGuardModal({
   onStay: () => void;
   onLeave: () => void;
 }) {
-  if (!open) return null;
   return (
-    <div
-      role="presentation"
-      onClick={onStay}
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 10000,
-        backgroundColor: "var(--overlay-bg)",
-        backdropFilter: "blur(2px)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="Unsaved changes"
-        onClick={(e) => e.stopPropagation()}
+    <Dialog open={open} onOpenChange={(next) => { if (!next) onStay(); }}>
+      <DialogContent
+        hideClose
         style={{
           backgroundColor: "var(--modal-bg)",
-          borderRadius: 16,
-          padding: 24,
+          padding: 'var(--space-6)',
           width: 380,
-          maxWidth: "calc(100vw - 32px)",
-          display: "flex",
-          flexDirection: "column",
-          gap: 20,
-          boxShadow: "0px 8px 32px 0px rgba(38,33,30,0.18), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+          gap: 'var(--space-5)',
+          boxShadow: "var(--shadow-4)",
         }}
       >
         <div>
-          <p
+          <DialogTitle
             style={{
               fontFamily: "var(--font-body)",
-              fontWeight: 600,
-              fontSize: 16,
-              lineHeight: "24px",
-              color: "var(--neutral-900,#26211e)",
+              fontWeight: 'var(--font-weight-semibold)',
+              fontSize: 'var(--font-size-body-lg)',
+              lineHeight: "var(--line-height-heading-sm)",
+              color: "var(--neutral-900)",
               margin: 0,
             }}
           >
             Leave this step?
-          </p>
-          <p
+          </DialogTitle>
+          <DialogDescription
             style={{
               fontFamily: "var(--font-body)",
-              fontWeight: 400,
-              fontSize: 14,
-              lineHeight: "22px",
-              color: "var(--neutral-500,#8a8078)",
-              margin: "8px 0 0",
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: 'var(--font-size-body)',
+              lineHeight: "var(--line-height-body)",
+              color: "var(--neutral-500)",
+              margin: "var(--space-2) 0 0",
             }}
           >
             You have unsaved changes on this page. If you leave now, they won&apos;t be saved.
-          </p>
+          </DialogDescription>
         </div>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 'var(--space-2)' }}>
           <Button variant="ghost" size="sm" onClick={onStay}>
             Stay on this page
           </Button>
@@ -323,8 +303,8 @@ export function LeaveGuardModal({
             Leave without saving
           </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -386,7 +366,7 @@ export function StepFooter({
       ) : (
         <span />
       )}
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-4)' }}>
         {onSkip && (
           <Button variant="ghost" size="sm" onClick={onSkip} disabled={skipDisabled} loading={skipLoading}>
             {skipLabel}
@@ -414,11 +394,11 @@ export function StepCanvas({ children }: { children: React.ReactNode }) {
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: BG,
-        padding: "40px 16px",
+        padding: "var(--space-8) var(--space-4)",
         boxSizing: "border-box",
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 20, width: "100%", maxWidth: 403 }}>{children}</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-5)', width: "100%", maxWidth: 403 }}>{children}</div>
     </div>
   );
 }
@@ -427,6 +407,6 @@ export function StepCanvas({ children }: { children: React.ReactNode }) {
 
 export function StepCard({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20, width: "100%", borderRadius: 18 }}>{children}</div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-5)', width: "100%", borderRadius: 'var(--radius-2xl)' }}>{children}</div>
   );
 }

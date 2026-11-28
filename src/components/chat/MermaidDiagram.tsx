@@ -20,6 +20,7 @@ import { Check, Copy, GitBranch, Maximize2, Minimize2 } from "lucide-react"
 import { ChatChartShell } from "@/components/chat/ChatChartShell"
 import { sanitizeSVG } from "@/lib/security"
 import { CHAT_CHART_PALETTE } from "@/components/chat/chat-chart-theme"
+import { DURATION, SPRING } from "@/styles/tokens/motion"
 
 const THEME = {
   bg:          "var(--neutral-white)",
@@ -57,14 +58,14 @@ function Skeleton() {
       style={{
         display:      "flex",
         alignItems:   "center",
-        gap:          8,
-        margin:       "12px 0",
-        padding:      "10px 16px",
-        borderRadius: 8,
+        gap:          'var(--space-2)',
+        margin:       "var(--space-3) 0",
+        padding:      "var(--space-2-5) var(--space-4)",
+        borderRadius: 'var(--radius-md)',
         border:       "1px dashed var(--border-default)",
         background:   "var(--neutral-50)",
         color:        "var(--neutral-600)",
-        fontSize:     13,
+        fontSize:     'var(--font-size-body-sm)',
         fontFamily:   "var(--font-body)",
       }}
     >
@@ -137,15 +138,15 @@ export function MermaidDiagram({ code }: { code: string }) {
 
   if (failed) {
     return (
-      <div style={{ margin: "12px 0", borderRadius: 8, border: "1px solid var(--border-default)", background: "var(--neutral-50)" }}>
+      <div style={{ margin: "var(--space-3) 0", borderRadius: 'var(--radius-md)', border: "1px solid var(--border-default)", background: "var(--neutral-50)" }}>
         <pre
           className="kaya-scrollbar"
           style={{
             margin:     0,
-            padding:    "12px 16px",
+            padding:    "var(--space-3) var(--space-4)",
             overflowX:  "auto",
             fontFamily: "var(--font-code)",
-            fontSize:   13,
+            fontSize:   'var(--font-size-body-sm)',
             color:      "var(--neutral-700)",
           }}
         >
@@ -154,7 +155,7 @@ export function MermaidDiagram({ code }: { code: string }) {
         <p
           style={{
             margin:     0,
-            padding:    "6px 16px",
+            padding:    "var(--space-1-5) var(--space-4)",
             borderTop:  "1px solid var(--border-default)",
             fontFamily: "var(--font-body)",
             fontSize:   "var(--font-size-caption)",
@@ -173,18 +174,18 @@ export function MermaidDiagram({ code }: { code: string }) {
     <ChatChartShell
       initial={reduceMotion ? false : { opacity: 0, y: 10, scale: 0.99 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: DURATION.slow, ease: [0.16, 1, 0.3, 1] }}
       style={{
         position: expanded ? "fixed" : "relative",
         inset: expanded ? 24 : undefined,
-        zIndex: expanded ? 1100 : undefined,
+        zIndex: expanded ? "var(--z-overlay)" : undefined,
         display: "flex",
         flexDirection: "column",
-        margin: expanded ? 0 : "16px 0",
+        margin: expanded ? 0 : "var(--space-4) 0",
         padding: 0,
         minHeight: expanded ? 0 : 220,
         maxHeight: expanded ? "calc(100vh - 48px)" : undefined,
-        boxShadow: expanded ? "0 28px 80px rgba(18,12,8,0.28)" : undefined,
+        boxShadow: expanded ? "var(--mermaid-diagram-shadow)" : undefined,
         overflow: "hidden",
       }}
     >
@@ -192,9 +193,9 @@ export function MermaidDiagram({ code }: { code: string }) {
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 9,
+          gap: 'var(--space-2)',
           minHeight: 52,
-          padding: "10px 12px 10px 18px",
+          padding: "var(--space-2-5) var(--space-3) var(--space-2-5) var(--space-4)",
           borderBottom: "1px solid var(--neutral-100)",
         }}
       >
@@ -202,7 +203,7 @@ export function MermaidDiagram({ code }: { code: string }) {
           aria-hidden
           initial={reduceMotion ? false : { scale: 0.82, rotate: -8 }}
           animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 340, damping: 24 }}
+          transition={{ type: "spring", ...SPRING.springy }}
           style={{ display: "grid", placeItems: "center", color: CHAT_CHART_PALETTE[0] }}
         >
           <GitBranch size={15} strokeWidth={1.8} />
@@ -213,8 +214,8 @@ export function MermaidDiagram({ code }: { code: string }) {
             minWidth: 0,
             color: "var(--neutral-900)",
             fontFamily: "var(--font-body)",
-            fontSize: 13,
-            fontWeight: 600,
+            fontSize: 'var(--font-size-body-sm)',
+            fontWeight: 'var(--font-weight-semibold)',
           }}
         >
           Flow visualization
@@ -225,7 +226,7 @@ export function MermaidDiagram({ code }: { code: string }) {
           aria-label={copied ? "Diagram source copied" : "Copy diagram source"}
           whileHover={reduceMotion ? undefined : { scale: 1.04 }}
           whileTap={reduceMotion ? undefined : { scale: 0.96 }}
-          style={{ width: 32, height: 32, display: "grid", placeItems: "center", borderRadius: 9, border: "1px solid var(--neutral-100)", backgroundColor: "var(--neutral-white)", color: copied ? "var(--green-700)" : "var(--neutral-500)", cursor: "pointer" }}
+          style={{ width: 32, height: 32, display: "grid", placeItems: "center", borderRadius: 'var(--radius-lg)', border: "1px solid var(--neutral-100)", backgroundColor: "var(--neutral-white)", color: copied ? "var(--green-700)" : "var(--neutral-500)", cursor: "pointer" }}
         >
           {copied ? <Check size={14} /> : <Copy size={14} />}
         </m.button>
@@ -236,7 +237,7 @@ export function MermaidDiagram({ code }: { code: string }) {
           aria-pressed={expanded}
           whileHover={reduceMotion ? undefined : { scale: 1.04 }}
           whileTap={reduceMotion ? undefined : { scale: 0.96 }}
-          style={{ width: 32, height: 32, display: "grid", placeItems: "center", borderRadius: 9, border: "1px solid var(--neutral-100)", backgroundColor: "var(--neutral-white)", color: "var(--neutral-500)", cursor: "pointer" }}
+          style={{ width: 32, height: 32, display: "grid", placeItems: "center", borderRadius: 'var(--radius-lg)', border: "1px solid var(--neutral-100)", backgroundColor: "var(--neutral-white)", color: "var(--neutral-500)", cursor: "pointer" }}
         >
           {expanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
         </m.button>
@@ -246,13 +247,13 @@ export function MermaidDiagram({ code }: { code: string }) {
         className="kaya-scrollbar"
         initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: reduceMotion ? 0 : 0.08, duration: 0.34 }}
+        transition={{ delay: reduceMotion ? 0 : DURATION.instant, duration: DURATION.slow }}
         style={{
           flex: expanded ? "1 1 0" : undefined,
           minHeight: 0,
           display: "grid",
           placeItems: "center",
-          padding: expanded ? 24 : 18,
+          padding: expanded ? "var(--space-6)" : "var(--space-4-5)",
           overflow: "auto",
           backgroundColor: "var(--neutral-white)",
           backgroundImage: "radial-gradient(circle at 1px 1px, var(--neutral-800-05) 1px, transparent 0)",

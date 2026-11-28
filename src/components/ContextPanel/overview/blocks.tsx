@@ -4,6 +4,7 @@ import React, { useId, useState } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { ArrowDownOneIcon } from '@strange-huge/icons'
 import { CAPTION, EASE, ONE_LINE, ROW_CLASS, TEXT, TWO_LINES } from './styles'
+import { DURATION, LONG } from "@/styles/tokens/motion"
 
 // ── Building blocks ───────────────────────────────────────────────────────────
 
@@ -14,7 +15,7 @@ export function PanelCard({ children }: { children: React.ReactNode }) {
       style={{
         display:         'flex',
         flexDirection:   'column',
-        borderRadius:    16,
+        borderRadius:    'var(--radius-2xl)',
         backgroundColor: 'var(--card-bg)',
         boxShadow:       'inset 0 0 0 1px var(--neutral-200)',
         overflow:        'hidden',
@@ -68,37 +69,37 @@ export function PanelSection({
     <section style={{ borderTop: first ? undefined : '1px solid var(--border-default)' }}>
       {/* The toggle covers the whole header; the visible pieces sit over it, inert, so only
           `action` is a separate target. */}
-      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 10, minHeight: 52, padding: '0 10px 0 12px' }}>
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', minHeight: 52, padding: '0 var(--space-2-5) 0 var(--space-3)' }}>
         <button
           type="button"
           aria-expanded={open}
           aria-controls={bodyId}
           onClick={toggle}
           className="bg-transparent hover:bg-[color-mix(in_srgb,var(--neutral-200)_50%,transparent)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--blue-500)]"
-          style={{ position: 'absolute', inset: 0, border: 0, padding: 0, margin: 0, cursor: 'pointer', transition: 'background-color 150ms ease' }}
+          style={{ position: 'absolute', inset: 0, border: 0, padding: 0, margin: 0, cursor: 'pointer', transition: 'background-color var(--duration-fast) ease' }}
         >
           <span style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>{title}</span>
         </button>
         {icon && (
-          <span aria-hidden style={{ position: 'relative', pointerEvents: 'none', flexShrink: 0, width: 28, height: 28, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--neutral-100)', boxShadow: 'inset 0 0 0 1px var(--border-default)', color: count === 0 ? 'var(--neutral-400)' : 'var(--neutral-700)' }}>
+          <span aria-hidden style={{ position: 'relative', pointerEvents: 'none', flexShrink: 0, width: 28, height: 28, borderRadius: 'var(--radius-md)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--neutral-100)', boxShadow: 'inset 0 0 0 1px var(--border-default)', color: count === 0 ? 'var(--neutral-400)' : 'var(--neutral-700)' }}>
             {icon}
           </span>
         )}
         <h3 aria-hidden style={{ ...TEXT, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', color: count === 0 ? 'var(--neutral-500)' : 'var(--neutral-800)', pointerEvents: 'none', position: 'relative' }}>{title}</h3>
         {count !== undefined && count > 0 && (
-          <span aria-hidden style={{ ...CAPTION, position: 'relative', pointerEvents: 'none', minWidth: 18, height: 18, padding: '0 5px', boxSizing: 'border-box', borderRadius: 999, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--neutral-200)', color: 'var(--neutral-700)', fontSize: 11, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+          <span aria-hidden style={{ ...CAPTION, position: 'relative', pointerEvents: 'none', minWidth: 18, height: 18, padding: '0 var(--space-1)', boxSizing: 'border-box', borderRadius: 'var(--radius-full)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--neutral-200)', color: 'var(--neutral-700)', fontSize: 'var(--font-size-caption)', fontWeight: 'var(--font-weight-semibold)', fontVariantNumeric: 'tabular-nums' }}>
             {count}
           </span>
         )}
         <div style={{ flex: '1 1 0' }} />
-        {aside && <span style={{ ...CAPTION, position: 'relative', pointerEvents: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>{aside}</span>}
+        {aside && <span style={{ ...CAPTION, position: 'relative', pointerEvents: 'none', display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1-5)', whiteSpace: 'nowrap' }}>{aside}</span>}
         {!aside && count === 0 && <span aria-hidden style={{ ...CAPTION, position: 'relative', pointerEvents: 'none', color: 'var(--neutral-400)' }}>None</span>}
         {action && <span style={{ position: 'relative', display: 'inline-flex' }}>{action}</span>}
         <m.span
           aria-hidden
           initial={false}
           animate={{ rotate: open ? 0 : -90 }}
-          transition={reduceMotion ? { duration: 0 } : { duration: 0.24, ease: EASE }}
+          transition={reduceMotion ? { duration: 0 } : { duration: DURATION.moderate, ease: EASE }}
           style={{ position: 'relative', pointerEvents: 'none', display: 'inline-flex', width: 24, height: 24, alignItems: 'center', justifyContent: 'center', color: 'var(--neutral-500)' }}
         >
           <ArrowDownOneIcon size={16} />
@@ -114,10 +115,10 @@ export function PanelSection({
             initial={animateEntry ? { height: 0, opacity: 0 } : false}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={reduceMotion ? { duration: 0 } : { height: { duration: 0.28, ease: EASE }, opacity: { duration: 0.18 } }}
+            transition={reduceMotion ? { duration: 0 } : { height: { duration: DURATION.moderate, ease: EASE }, opacity: { duration: DURATION.base } }}
             style={{ overflow: 'hidden' }}
           >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '0 8px 10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', padding: '0 var(--space-2) var(--space-2-5)' }}>
               {children}
             </div>
           </m.div>
@@ -160,29 +161,29 @@ export function ItemRow({
         <span style={{ ...TEXT, ...(wrap ? TWO_LINES : ONE_LINE), ...labelStyle }}>{label}</span>
         {detail && <span style={{ ...CAPTION, ...ONE_LINE }}>{detail}</span>}
       </span>
-      {right && <span style={{ ...CAPTION, flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>{right}</span>}
+      {right && <span style={{ ...CAPTION, flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1-5)', whiteSpace: 'nowrap' }}>{right}</span>}
     </>
   )
   const style: React.CSSProperties = {
     display:        'flex',
     alignItems:     wrap ? 'flex-start' : 'center',
-    gap:            10,
+    gap:            'var(--space-2-5)',
     width:          '100%',
     minWidth:       0,
-    padding:        '6px 6px',
-    borderRadius:   8,
+    padding:        'var(--space-1-5) var(--space-1-5)',
+    borderRadius:   'var(--radius-md)',
     border:         0,
     textAlign:      'left',
     textDecoration: 'none',
     color:          'inherit',
-    transition:     'background-color 150ms ease',
+    transition:     'background-color var(--duration-fast) ease',
   }
   const row = rowElement(body, style, href, onClick)
   if (!trailing) return row
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', minWidth: 0 }}>
       <span style={{ flex: '1 1 0', minWidth: 0, display: 'flex' }}>{row}</span>
-      <span style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', paddingRight: 6 }}>{trailing}</span>
+      <span style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', paddingRight: 'var(--space-1-5)' }}>{trailing}</span>
     </div>
   )
 }
@@ -212,7 +213,7 @@ export function AnimatedList({ children }: { children: React.ReactNode[] }) {
             initial={firstKeys.has(child.key) ? false : { opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            transition={reduceMotion ? { duration: 0 } : { duration: 0.2, ease: EASE }}
+            transition={reduceMotion ? { duration: 0 } : { duration: DURATION.base, ease: EASE }}
           >
             {child}
           </m.div>
@@ -223,7 +224,7 @@ export function AnimatedList({ children }: { children: React.ReactNode[] }) {
 }
 
 export const EmptyHint = ({ children }: { children: React.ReactNode }) => (
-  <p style={{ ...CAPTION, padding: '4px 6px 2px' }}>{children}</p>
+  <p style={{ ...CAPTION, padding: 'var(--space-1) var(--space-1-5) var(--space-0-5)' }}>{children}</p>
 )
 
 export function MoreButton({ hidden, expanded, onClick, noun }: { hidden: number; expanded: boolean; onClick: () => void; noun: string }) {
@@ -232,7 +233,7 @@ export function MoreButton({ hidden, expanded, onClick, noun }: { hidden: number
       type="button"
       onClick={onClick}
       className={ROW_CLASS}
-      style={{ ...CAPTION, alignSelf: 'flex-start', marginTop: 2, padding: '4px 6px', border: 0, borderRadius: 6, cursor: 'pointer', color: 'var(--neutral-600)' }}
+      style={{ ...CAPTION, alignSelf: 'flex-start', marginTop: 'var(--space-0-5)', padding: 'var(--space-1) var(--space-1-5)', border: 0, borderRadius: 'var(--radius-sm)', cursor: 'pointer', color: 'var(--neutral-600)' }}
     >
       {expanded ? 'Show less' : `Show ${hidden} ${noun}`}
     </button>
@@ -250,14 +251,14 @@ function LoadingLine() {
       <m.span
         initial={{ x: reduceMotion ? '0%' : '-100%' }}
         animate={reduceMotion ? { x: '0%' } : { x: ['-100%', '334%'] }}
-        transition={reduceMotion ? { duration: 0 } : { duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+        transition={reduceMotion ? { duration: 0 } : { duration: LONG.lg, repeat: Infinity, ease: 'easeInOut' }}
         style={{
           position:        'absolute',
           top:             0,
           bottom:          0,
           left:            0,
           width:           '30%',
-          borderRadius:    2,
+          borderRadius:    'var(--radius-xs)',
           backgroundImage: 'linear-gradient(90deg, transparent, var(--blue-500), transparent)',
           opacity:         reduceMotion ? 0.5 : 0.9,
         }}

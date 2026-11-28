@@ -15,6 +15,7 @@ import { ContactSalesModal } from '@/components/ContactSalesModal'
 import { Spinner } from '@/components/Spinner'
 import { Dropdown } from '@/components/Dropdown'
 import { ORG_PLANS_ROUTE } from '@/lib/routes'
+import { DURATION } from "@/styles/tokens/motion"
 
 const TITLE = 'var(--font-title)'
 const BODY  = 'var(--font-body)'
@@ -55,16 +56,16 @@ function Badge({ label, color }: { label: string; color: 'brown' | 'yellow' }) {
   return (
     <div style={{
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-      position: 'relative', borderRadius: 6, overflow: 'hidden',
+      position: 'relative', borderRadius: 'var(--radius-sm)', overflow: 'hidden',
       boxShadow: isBrown
-        ? '0px 1px 1.5px 0px rgba(20,12,5,0.2), 0px 0px 0px 1px rgba(126,84,53,0.5)'
-        : '0px 1px 1.5px 0px rgba(20,16,5,0.2), 0px 0px 0px 1px color-mix(in srgb, var(--yellow-600) 50%, transparent)',
+        ? 'var(--color-tag-Brown-shadow)'
+        : 'var(--change-plan-shadow)',
     }}>
-      <div style={{ position: 'absolute', inset: 0, backgroundColor: isBrown ? 'var(--brown-100)' : 'var(--yellow-100)', borderRadius: 6 }} />
-      <div style={{ position: 'absolute', inset: 0, borderRadius: 6, pointerEvents: 'none', boxShadow: isBrown
-        ? 'inset 0px 1px 0px 0px rgba(250,241,235,0.7), inset 0px -1px 0px 0px rgba(126,84,53,0.1)'
-        : 'inset 0px 1px 0px 0px rgba(250,246,235,0.7), inset 0px -1px 0px 0px rgba(143,116,39,0.1)' }} />
-      <span style={{ fontFamily: BODY, fontWeight: 500, fontSize: 11, lineHeight: '16px', color: isBrown ? 'var(--brown-700)' : 'var(--yellow-700)', position: 'relative', padding: '2px 6px' }}>
+      <div style={{ position: 'absolute', inset: 0, backgroundColor: isBrown ? 'var(--brown-100)' : 'var(--yellow-100)', borderRadius: 'var(--radius-sm)' }} />
+      <div style={{ position: 'absolute', inset: 0, borderRadius: 'var(--radius-sm)', pointerEvents: 'none', boxShadow: isBrown
+        ? 'var(--change-plan-shadow-2)'
+        : 'var(--change-plan-shadow-3)' }} />
+      <span style={{ fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)', color: isBrown ? 'var(--brown-700)' : 'var(--yellow-700)', position: 'relative', padding: 'var(--space-0-5) var(--space-1-5)' }}>
         {label}
       </span>
     </div>
@@ -93,13 +94,13 @@ function FeatureLine({ item }: { item: FeatureItemDef }) {
   const label = typeof item === 'string' ? item : item.label
   const icon  = typeof item === 'string' ? null : item.icon
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
       {/* Checkmark, not a dot — Figma 85:22111's tick-01 glyph, matching the
           TickTwoIcon already used elsewhere in this app as a selected/included
           indicator (e.g. ModelMenu's own selected-row tick). */}
       <TickTwoIcon size={16} color="var(--neutral-900)" />
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-        <p style={{ fontFamily: BODY, fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-800)', margin: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
+        <p style={{ fontFamily: BODY, fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-800)', margin: 0 }}>
           {label}
         </p>
         {icon}
@@ -110,8 +111,8 @@ function FeatureLine({ item }: { item: FeatureItemDef }) {
 
 function FeatureGroup({ title, items }: { title: string; items: FeatureItemDef[] }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <p style={{ fontFamily: MONO, fontWeight: 400, fontSize: 13, lineHeight: '16px', color: 'var(--neutral-500)', margin: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+      <p style={{ fontFamily: MONO, fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-sm)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-500)', margin: 0 }}>
         {title}
       </p>
       {items.map(item => <FeatureLine key={typeof item === 'string' ? item : item.label} item={item} />)}
@@ -137,7 +138,7 @@ function Bone({ w, h = 14, r = 6, style: extra }: { w?: number | string; h?: num
 
 function FeatureLineSkeleton({ w }: { w: number | string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
       {/* Matches the real row's 16px checkmark footprint (was a small round
           dot before the Figma-driven switch to checkmarks). */}
       <Bone w={16} h={16} r={4} />
@@ -148,7 +149,7 @@ function FeatureLineSkeleton({ w }: { w: number | string }) {
 
 function FeatureGroupSkeleton({ items }: { items: (number | string)[] }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
       <Bone w={90} h={13} />
       {items.map((w, i) => <FeatureLineSkeleton key={i} w={w} />)}
     </div>
@@ -163,16 +164,16 @@ function ChangePlanSkeleton() {
       style={{
         minHeight: '100vh', overflowX: 'hidden',
         display: 'flex', flexDirection: 'column', alignItems: 'center',
-        padding: '24px 24px 48px',
+        padding: 'var(--space-6) var(--space-6) var(--space-9)',
         background: 'linear-gradient(to bottom, var(--neutral-50) 0%, var(--neutral-100) 65%, var(--neutral-200) 100%)',
       }}
     >
-      <div style={{ width: '100%', maxWidth: 1200, display: 'flex', flexDirection: 'column', gap: 32, alignItems: 'center' }}>
+      <div style={{ width: '100%', maxWidth: 1200, display: 'flex', flexDirection: 'column', gap: 'var(--space-7)', alignItems: 'center' }}>
 
         {/* ── Header ── */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%' }}>
           <Bone w={100} h={30} r={10} />
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)' }}>
             <Bone w={90} h={28} r={8} />
             <Bone w={340} h={16} />
           </div>
@@ -183,16 +184,16 @@ function ChangePlanSkeleton() {
         <Bone w={220} h={38} r={10} />
 
         {/* ── Cards Row ── */}
-        <div style={{ display: 'flex', gap: 32, alignItems: 'stretch', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-7)', alignItems: 'stretch', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}>
 
           {/* Workspace card */}
           <div style={{ flex: '0 0 400px', maxWidth: 400, display: 'flex', flexDirection: 'column' }}>
             <div style={{
-              backgroundColor: 'var(--neutral-white)', border: '2px solid var(--border-default)', borderRadius: 24, padding: 32,
-              display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 28,
+              backgroundColor: 'var(--neutral-white)', border: '2px solid var(--border-default)', borderRadius: 'var(--radius-2xl)', padding: 'var(--space-7)',
+              display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 'var(--space-6)',
               boxShadow: '0px 1px 1px color-mix(in srgb, var(--static-black) 5%, transparent)', height: '100%',
             }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Bone w={110} h={28} r={8} />
                   <Bone w={90} h={20} r={6} />
@@ -202,7 +203,7 @@ function ChangePlanSkeleton() {
                   <Bone w={80} h={16} />
                 </div>
                 <Hairline />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
                   <FeatureGroupSkeleton items={['70%', '55%', '85%', '80%', '75%', '65%', '80%', '60%']} />
                 </div>
               </div>
@@ -213,17 +214,17 @@ function ChangePlanSkeleton() {
           {/* Enterprise card */}
           <div style={{ flex: '0 0 400px', maxWidth: 400, display: 'flex', flexDirection: 'column' }}>
             <div style={{
-              backgroundColor: 'var(--neutral-white)', border: '1px solid var(--border-default)', borderRadius: 24, padding: 32,
-              display: 'flex', flexDirection: 'column', gap: 28,
+              backgroundColor: 'var(--neutral-white)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-2xl)', padding: 'var(--space-7)',
+              display: 'flex', flexDirection: 'column', gap: 'var(--space-6)',
               boxShadow: '0px 1px 1px color-mix(in srgb, var(--static-black) 5%, transparent)', height: '100%',
             }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <Bone w={60} h={28} r={8} />
                 <Bone w="80%" h={14} />
               </div>
               <Bone w="100%" h={36} r={10} />
               <Hairline />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 24, flex: 1 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', flex: 1 }}>
                 <FeatureGroupSkeleton items={['65%', '85%', '70%', '60%', '80%', '55%']} />
               </div>
             </div>
@@ -427,11 +428,11 @@ function OrgChangePlanPageInner() {
         style={{
           minHeight: '100vh', overflowX: 'hidden',
           display: 'flex', flexDirection: 'column', alignItems: 'center',
-          padding: '24px 24px 48px',
+          padding: 'var(--space-6) var(--space-6) var(--space-9)',
           background: 'linear-gradient(to bottom, var(--neutral-50) 0%, var(--neutral-100) 65%, var(--neutral-200) 100%)',
         }}
       >
-        <div style={{ width: '100%', maxWidth: 1200, display: 'flex', flexDirection: 'column', gap: 32, alignItems: 'center' }}>
+        <div style={{ width: '100%', maxWidth: 1200, display: 'flex', flexDirection: 'column', gap: 'var(--space-7)', alignItems: 'center' }}>
 
           {/* ── Header ── */}
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%' }}>
@@ -439,11 +440,11 @@ function OrgChangePlanPageInner() {
               type="button"
               onClick={() => router.push(ORG_PLANS_ROUTE)}
               style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                padding: '6px 10px 8px 10px', borderRadius: 10,
+                display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1-5)',
+                padding: 'var(--space-1-5) var(--space-2-5) var(--space-2) var(--space-2-5)', borderRadius: 'var(--radius-lg)',
                 border: 'none', backgroundColor: 'color-mix(in srgb, var(--static-black) 0%, transparent)', cursor: 'pointer',
-                fontFamily: BODY, fontWeight: 500, fontSize: 14, lineHeight: '16px',
-                color: 'var(--neutral-700)', transition: 'background-color 120ms ease, color 120ms ease',
+                fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-small)',
+                color: 'var(--neutral-700)', transition: 'background-color var(--duration-fast) ease, color var(--duration-fast) ease',
               }}
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--neutral-100)' }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'color-mix(in srgb, var(--static-black) 0%, transparent)' }}
@@ -455,25 +456,25 @@ function OrgChangePlanPageInner() {
             </button>
 
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-              <p style={{ fontFamily: TITLE, fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: 0 }}>
+              <p style={{ fontFamily: TITLE, fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0 }}>
                 Pricing
               </p>
-              <p style={{ fontFamily: BODY, fontWeight: 400, fontSize: 16, lineHeight: '22px', color: 'var(--neutral-500)', margin: 0 }}>
+              <p style={{ fontFamily: BODY, fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body-lg)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-500)', margin: 0 }}>
                 Choose the plan that works for your workspace. Shared credits across unlimited members. No per-seat fees.
               </p>
             </div>
 
             {/* Invisible mirror of the back button, keeps the title centered */}
-            <div style={{ padding: '6px 10px 8px 10px', opacity: 0, pointerEvents: 'none' }}>
-              <span style={{ fontFamily: BODY, fontWeight: 500, fontSize: 14 }}>Back to billing</span>
+            <div style={{ padding: 'var(--space-1-5) var(--space-2-5) var(--space-2) var(--space-2-5)', opacity: 0, pointerEvents: 'none' }}>
+              <span style={{ fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)' }}>Back to billing</span>
             </div>
           </div>
 
           {/* ── Monthly / Yearly tab ── */}
           <div ref={billingRowRef} style={{
             position: 'relative',
-            display: 'flex', alignItems: 'center', gap: 4, padding: 4,
-            borderRadius: 10, backgroundColor: 'var(--neutral-100)',
+            display: 'flex', alignItems: 'center', gap: 'var(--space-1)', padding: 'var(--space-1)',
+            borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--neutral-100)',
             boxShadow: 'inset 0px -1px 0px 0px var(--neutral-white-90), inset 0px 1px 0px 0px var(--neutral-100), inset 0px 0px 4px 0px var(--neutral-200-50)',
           }}>
             {/* Sliding active pill — same measure-then-animate technique as
@@ -487,9 +488,9 @@ function OrgChangePlanPageInner() {
                 transition={springs.fast}
                 style={{
                   position: 'absolute', top: 4, bottom: 4, left: 0,
-                  borderRadius: 10,
+                  borderRadius: 'var(--radius-lg)',
                   background: 'linear-gradient(to bottom, var(--color-interactive-primary-surface-from), var(--color-interactive-primary-surface-to))',
-                  boxShadow: '0px 0px 0px 1px var(--neutral-black), 0px 1.091px 1.091px 0px rgba(59,54,50,0.1), 0px 1.455px 3.127px 0px rgba(59,54,50,0.4)',
+                  boxShadow: 'var(--shadow-pill-active)',
                   pointerEvents: 'none',
                 }}
               />
@@ -502,10 +503,10 @@ function OrgChangePlanPageInner() {
               style={{
                 position: 'relative',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: '6px 10px 8px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                padding: 'var(--space-1-5) var(--space-2-5) var(--space-2)', borderRadius: 'var(--radius-lg)', border: 'none', cursor: 'pointer',
                 backgroundColor: 'transparent',
-                fontFamily: BODY, fontWeight: 500, fontSize: 14, lineHeight: '22px',
-                transition: 'color 150ms ease',
+                fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)',
+                transition: 'color var(--duration-fast) ease',
                 ...(billing === 'monthly'
                   ? {
                       color: 'var(--color-interactive-primary-text)',
@@ -524,10 +525,10 @@ function OrgChangePlanPageInner() {
               style={{
                 position: 'relative',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: '6px 8px 8px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                padding: 'var(--space-1-5) var(--space-2) var(--space-2)', borderRadius: 'var(--radius-lg)', border: 'none', cursor: 'pointer',
                 backgroundColor: 'transparent',
-                fontFamily: BODY, fontWeight: 500, fontSize: 14, lineHeight: '22px',
-                transition: 'color 150ms ease',
+                fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)',
+                transition: 'color var(--duration-fast) ease',
                 ...(billing === 'annual'
                   ? {
                       color: 'var(--color-interactive-primary-text)',
@@ -542,23 +543,23 @@ function OrgChangePlanPageInner() {
           </div>
 
           {/* ── Cards Row ── */}
-          <div style={{ display: 'flex', gap: 32, alignItems: 'stretch', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-7)', alignItems: 'stretch', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}>
 
             {/* ── Workspace (Core) ── */}
             <div style={{ flex: '0 0 400px', maxWidth: 400, display: 'flex', flexDirection: 'column' }}>
               <div style={{
                 backgroundColor: 'color-mix(in srgb, var(--brown-100) 40%, var(--neutral-white))',
                 border: '2px solid var(--brown-700)',
-                borderRadius: 24,
-                padding: 32,
-                display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 28,
+                borderRadius: 'var(--radius-2xl)',
+                padding: 'var(--space-7)',
+                display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 'var(--space-6)',
                 boxShadow: '0px 1px 1px color-mix(in srgb, var(--static-black) 5%, transparent)',
                 height: '100%',
               }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
                   {/* Header */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <p style={{ fontFamily: TITLE, fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: 0 }}>
+                    <p style={{ fontFamily: TITLE, fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0 }}>
                       Core
                     </p>
                     <Badge label="Recommended" color="brown" />
@@ -571,20 +572,20 @@ function OrgChangePlanPageInner() {
                   {isOnFreePlan && (
                     <div style={{
                       position: 'relative',
-                      backgroundColor: 'var(--neutral-white)', border: '1px solid var(--blue-600-50)', borderRadius: 10,
-                      padding: '24px 16px 16px', display: 'flex', flexDirection: 'column', gap: 16,
+                      backgroundColor: 'var(--neutral-white)', border: '1px solid var(--blue-600-50)', borderRadius: 'var(--radius-lg)',
+                      padding: 'var(--space-6) var(--space-4) var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)',
                     }}>
                       <div style={{
                         position: 'absolute', top: -11, left: 16,
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        borderRadius: 6, overflow: 'hidden', backgroundColor: 'var(--blue-100)',
-                        boxShadow: '0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px rgba(13,110,178,0.5), inset 0px 1px 0px 0px rgba(231,244,253,0.7), inset 0px -1px 0px 0px rgba(13,110,178,0.1)',
+                        borderRadius: 'var(--radius-sm)', overflow: 'hidden', backgroundColor: 'var(--blue-100)',
+                        boxShadow: 'var(--change-plan-shadow-4)',
                       }}>
-                        <span style={{ fontFamily: BODY, fontWeight: 500, fontSize: 11, lineHeight: '16px', color: 'var(--blue-700)', padding: '2px 6px' }}>
+                        <span style={{ fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-small)', color: 'var(--blue-700)', padding: 'var(--space-0-5) var(--space-1-5)' }}>
                           FREE PLAN ACTIVE
                         </span>
                       </div>
-                      <div style={{ fontFamily: TITLE, fontWeight: 500, fontSize: 20, lineHeight: '24px', color: 'var(--neutral-700)' }}>
+                      <div style={{ fontFamily: TITLE, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-heading-md)', lineHeight: 'var(--line-height-heading-sm)', color: 'var(--neutral-700)' }}>
                         <p style={{ margin: 0 }}>You have been assigned</p>
                         <p style={{ margin: 0 }}>$20 worth of free credits</p>
                       </div>
@@ -593,9 +594,9 @@ function OrgChangePlanPageInner() {
                         onClick={() => router.push(ORG_PLANS_ROUTE)}
                         style={{
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          width: '100%', padding: '6px 10px 8px', borderRadius: 10, border: 'none',
+                          width: '100%', padding: 'var(--space-1-5) var(--space-2-5) var(--space-2)', borderRadius: 'var(--radius-lg)', border: 'none',
                           backgroundColor: 'transparent', boxShadow: '0px 0px 0px 1px var(--color-border-interactive)',
-                          cursor: 'pointer', fontFamily: BODY, fontWeight: 500, fontSize: 14, lineHeight: '16px', color: 'var(--neutral-700)',
+                          cursor: 'pointer', fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-700)',
                         }}
                       >
                         View usage
@@ -605,7 +606,7 @@ function OrgChangePlanPageInner() {
 
                   {/* Price + tier picker */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
                       <Dropdown.Float
                         open={tierMenuOpen}
                         onOpenChange={setTierMenuOpen}
@@ -614,10 +615,10 @@ function OrgChangePlanPageInner() {
                           <button
                             type="button"
                             style={{
-                              display: 'flex', alignItems: 'center', gap: 2,
-                              padding: '6px 10px 8px', borderRadius: 10, border: 'none',
+                              display: 'flex', alignItems: 'center', gap: 'var(--space-0-5)',
+                              padding: 'var(--space-1-5) var(--space-2-5) var(--space-2)', borderRadius: 'var(--radius-lg)', border: 'none',
                               backgroundColor: 'transparent', boxShadow: '0px 0px 0px 1px var(--color-border-interactive)',
-                              cursor: 'pointer', fontFamily: BODY, fontWeight: 500, fontSize: 14, lineHeight: '16px', color: 'var(--neutral-700)',
+                              cursor: 'pointer', fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-small)', color: 'var(--neutral-700)',
                             }}
                           >
                             {workspacePriceLabel}
@@ -653,11 +654,11 @@ function OrgChangePlanPageInner() {
                           </Dropdown.Section>
                         </Dropdown>
                       </Dropdown.Float>
-                      <p style={{ fontFamily: BODY, fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-800)', margin: 0 }}>
+                      <p style={{ fontFamily: BODY, fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-800)', margin: 0 }}>
                         /month
                       </p>
                     </div>
-                    <p style={{ fontFamily: BODY, fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-800)', margin: 0 }}>
+                    <p style={{ fontFamily: BODY, fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-800)', margin: 0 }}>
                       {fmtNum(new TeamsTier(selectedWorkspace.planId, billing).credits)} credits
                     </p>
                   </div>
@@ -665,7 +666,7 @@ function OrgChangePlanPageInner() {
                   <Hairline />
 
                   {/* Features — per Figma 85:22108 */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
                     <FeatureGroup
                       title="Plan includes:"
                       items={[
@@ -686,13 +687,13 @@ function OrgChangePlanPageInner() {
                   onClick={() => { void handleSelectWorkspace() }}
                   disabled={workspaceButtonDisabled}
                   style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                    width: '100%', padding: '6px 2px 8px', borderRadius: 10, border: 'none',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)',
+                    width: '100%', padding: 'var(--space-1-5) var(--space-0-5) var(--space-2)', borderRadius: 'var(--radius-lg)', border: 'none',
                     cursor: workspaceButtonDisabled ? 'default' : 'pointer',
                     opacity: workspaceButtonDisabled ? 0.55 : 1,
                     background: 'linear-gradient(to bottom, var(--color-interactive-primary-surface-from), var(--color-interactive-primary-surface-to))',
-                    boxShadow: '0px 0px 0px 1px var(--neutral-black), 0px 1.091px 1.091px 0px rgba(59,54,50,0.1), 0px 1.455px 3.127px 0px rgba(59,54,50,0.4), inset 0px 1px 0.364px 0px var(--neutral-white-30), inset 0px -2.182px 0.364px 0px var(--neutral-950), inset 0px -2.545px 4px -2.182px var(--neutral-white-50)',
-                    fontFamily: BODY, fontWeight: 500, fontSize: 14, lineHeight: '22px', color: 'var(--color-interactive-primary-text)',
+                    boxShadow: 'var(--change-plan-shadow-5)',
+                    fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--color-interactive-primary-text)',
                     textShadow: '0px -0.727px 0.364px color-mix(in srgb, var(--static-black) 25%, transparent), 0px 0.364px 0.364px color-mix(in srgb, var(--static-white) 25%, transparent)',
                   }}
                 >
@@ -707,14 +708,14 @@ function OrgChangePlanPageInner() {
               <div style={{
                 backgroundColor: 'color-mix(in srgb, var(--neutral-100) 70%, var(--neutral-white))',
                 border: '1px solid var(--border-default)',
-                borderRadius: 24,
-                padding: 32,
-                display: 'flex', flexDirection: 'column', gap: 28,
+                borderRadius: 'var(--radius-2xl)',
+                padding: 'var(--space-7)',
+                display: 'flex', flexDirection: 'column', gap: 'var(--space-6)',
                 boxShadow: '0px 1px 1px color-mix(in srgb, var(--static-black) 5%, transparent)',
                 height: '100%',
               }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <p style={{ fontFamily: TITLE, fontWeight: 400, fontSize: 24, lineHeight: '32px', color: 'var(--neutral-900)', margin: 0 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                  <p style={{ fontFamily: TITLE, fontWeight: 'var(--font-weight-regular)', fontSize: 'var(--font-size-heading)', lineHeight: 'var(--line-height-heading)', color: 'var(--neutral-900)', margin: 0 }}>
                     Pro (Enterprise)
                   </p>
                 </div>
@@ -724,13 +725,13 @@ function OrgChangePlanPageInner() {
                   onClick={() => { if (!changingTo && org?.plan !== 'enterprise') { setPlanParam('pro'); setContactSalesOpen(true) } }}
                   disabled={!!changingTo || org?.plan === 'enterprise'}
                   whileTap={(!!changingTo || org?.plan === 'enterprise') ? undefined : { scale: 0.98 }}
-                  transition={{ duration: 0.1, ease: 'easeOut' }}
+                  transition={{ duration: DURATION.snap, ease: 'easeOut' }}
                   style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-                    width: '100%', padding: '6px 2px 8px', borderRadius: 10, border: 'none',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-1)',
+                    width: '100%', padding: 'var(--space-1-5) var(--space-0-5) var(--space-2)', borderRadius: 'var(--radius-lg)', border: 'none',
                     backgroundColor: 'var(--neutral-white)', cursor: changingTo ? 'wait' : 'pointer',
-                    boxShadow: '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-300), inset 0px -2.182px 0.364px 0px var(--neutral-200)',
-                    fontFamily: BODY, fontWeight: 500, fontSize: 14, lineHeight: '22px', color: 'var(--neutral-700)',
+                    boxShadow: 'var(--change-plan-shadow-6)',
+                    fontFamily: BODY, fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: 'var(--neutral-700)',
                   }}
                 >
                   {org?.plan === 'enterprise' ? 'Current plan' : 'Get in touch'}
@@ -744,7 +745,7 @@ function OrgChangePlanPageInner() {
                 <Hairline />
 
                 {/* Features — per Figma 85:22149 */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 24, flex: 1 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', flex: 1 }}>
                   <FeatureGroup
                     title="Everything in Core, plus"
                     items={[

@@ -41,10 +41,10 @@ export function StarredSection({ activeChatId, onSelectChat, chatHistory }: Sect
           initial="closed"
           variants={sectionStaggerVariants}
           style={{
-            paddingTop: "4px",
+            paddingTop: "var(--space-1)",
             display: "flex",
             flexDirection: "column",
-            gap: "4px",
+            gap: "var(--space-1)",
           }}
         >
           {starredChats.map((chat) => (

@@ -15,6 +15,7 @@ import { Spinner } from '@/components/Spinner'
 import { Tooltip } from '@/components/Tooltip'
 import { useFocusTrap } from '@/hooks/use-focus-trap'
 import type { BrowserInput, BrowserSession, BrowserSessionStatus } from './use-browser-session'
+import { DURATION, SPRING, LONG } from "@/styles/tokens/motion"
 
 // The agent's screen: the latest screencast frame, at the tab's own aspect ratio.
 // One element plays both roles — a thumbnail in the Context panel and a full-screen
@@ -27,7 +28,6 @@ import type { BrowserInput, BrowserSession, BrowserSessionStatus } from './use-b
 const DEFAULT_ASPECT = 1431 / 808
 
 const HEADER_H = 52
-const Z_BACKDROP = 50
 
 const CAPTION: React.CSSProperties = {
   margin:     0,
@@ -64,10 +64,10 @@ export function StatusPill({ status, overlay }: { status: BrowserSessionStatus; 
       style={{
         display:         'inline-flex',
         alignItems:      'center',
-        gap:             6,
+        gap:             'var(--space-1-5)',
         height:          24,
-        padding:         '0 9px 0 8px',
-        borderRadius:    999,
+        padding:         '0 var(--space-2) 0 var(--space-2)',
+        borderRadius:    'var(--radius-full)',
         flexShrink:      0,
         fontFamily:      'var(--font-body)',
         fontWeight:      'var(--font-weight-medium)',
@@ -76,14 +76,14 @@ export function StatusPill({ status, overlay }: { status: BrowserSessionStatus; 
         color:           'var(--neutral-800)',
         backgroundColor: overlay ? 'color-mix(in srgb, var(--neutral-white) 88%, transparent)' : 'var(--neutral-100)',
         boxShadow:       'inset 0 0 0 1px var(--neutral-200)',
-        backdropFilter:  overlay ? 'blur(6px)' : undefined,
+        backdropFilter:  overlay ? 'blur(var(--browser-screen-blur))' : undefined,
       }}
     >
       <m.span
         aria-hidden
         animate={pulsing ? { opacity: [1, 0.35, 1] } : { opacity: 1 }}
-        transition={pulsing ? { duration: 1.6, repeat: Infinity, ease: 'easeInOut' } : { duration: 0 }}
-        style={{ width: 7, height: 7, borderRadius: 999, backgroundColor: color }}
+        transition={pulsing ? { duration: LONG.lg, repeat: Infinity, ease: 'easeInOut' } : { duration: 0 }}
+        style={{ width: 7, height: 7, borderRadius: 'var(--radius-full)', backgroundColor: color }}
       />
       {label}
     </span>
@@ -108,9 +108,9 @@ function OpenForm({ session, large }: { session: BrowserSession; large: boolean 
   return (
     <form
       onSubmit={event => { event.preventDefault(); void session.open(toUrl(text)) }}
-      style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', maxWidth: large ? 420 : 280 }}
+      style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', width: '100%', maxWidth: large ? 420 : 280 }}
     >
-      <div style={{ display: 'flex', gap: 6 }}>
+      <div style={{ display: 'flex', gap: 'var(--space-1-5)' }}>
         <InputField fluid size="small" value={text} onChange={setText} placeholder="Search or enter a URL" aria-label="Search or enter a URL" />
         <Button type="submit" size="sm" disabled={session.opening}>Open</Button>
       </div>
@@ -232,7 +232,7 @@ function StateMessage({ icon, title, body, action, large }: { icon: React.ReactN
     <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.18 }}
+      transition={{ duration: DURATION.base }}
       style={{
         position:       'absolute',
         inset:          0,
@@ -240,13 +240,13 @@ function StateMessage({ icon, title, body, action, large }: { icon: React.ReactN
         flexDirection:  'column',
         alignItems:     'center',
         justifyContent: 'center',
-        gap:            large ? 12 : 8,
-        padding:        16,
+        gap:            large ? 'var(--space-3)' : 'var(--space-2)',
+        padding:        'var(--space-4)',
         textAlign:      'center',
       }}
     >
-      <span style={{ color: 'var(--neutral-600)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: 12, backgroundColor: 'var(--neutral-100)', boxShadow: 'inset 0 0 0 1px var(--border-default)' }}>{icon}</span>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxWidth: large ? 360 : 260 }}>
+      <span style={{ color: 'var(--neutral-600)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: 'var(--radius-xl)', backgroundColor: 'var(--neutral-100)', boxShadow: 'inset 0 0 0 1px var(--border-default)' }}>{icon}</span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', maxWidth: large ? 360 : 260 }}>
         <p style={{ ...BODY, fontFamily: 'var(--font-title)', fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-900)' }}>{title}</p>
         {body && <p style={CAPTION}>{body}</p>}
       </div>
@@ -262,7 +262,7 @@ function Shimmer() {
       aria-hidden
       initial={{ backgroundPosition: '100% 0' }}
       animate={reduceMotion ? undefined : { backgroundPosition: ['100% 0', '-100% 0'] }}
-      transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
+      transition={{ duration: LONG.lg, repeat: Infinity, ease: 'linear' }}
       style={{
         position:       'absolute',
         inset:          0,
@@ -417,15 +417,16 @@ export function BrowserScreen({ session, expanded, onExpandedChange }: BrowserSc
   // Esc minimizes; Tab stays inside the viewer.
   useFocusTrap(cardRef, expanded, collapse)
 
-  const transition = reduceMotion ? { duration: 0 } : { type: 'spring' as const, stiffness: 320, damping: 34, mass: 0.9 }
+  const transition = reduceMotion ? { duration: 0 } : { type: 'spring' as const, ...SPRING.glide }
   const phase = expanded ? 'full' : returning ? 'returning' : 'docked'
 
   // In the panel the screen sits in the same card as the Context tab's sections.
   // A real border, not an inset box-shadow, so the screen inside can't paint over it.
-  const THUMB_LOOK: React.CSSProperties = { borderRadius: 16, backgroundColor: 'var(--card-bg)', border: '1px solid var(--neutral-200)', boxSizing: 'border-box' }
+  // borderRadius stays a number: framer-motion's layout animation corrects px radii, not var().
+  const THUMB_LOOK: React.CSSProperties = { borderRadius: 'var(--radius-2xl)', backgroundColor: 'var(--card-bg)', border: '1px solid var(--neutral-200)', boxSizing: 'border-box' } // ds-keep
   const cardPlacement: React.CSSProperties =
-    phase === 'full'      ? { position: 'fixed', zIndex: Z_BACKDROP + 1, ...fullFrame(windowSize, aspect), borderRadius: 16, backgroundColor: 'var(--neutral-white)', boxShadow: '0px 8px 32px 0px rgba(26,23,20,0.24), 0px 0px 0px 1px rgba(59,54,50,0.12)' }
-    : phase === 'returning' ? { position: 'fixed', zIndex: Z_BACKDROP + 1, ...returnRect, ...THUMB_LOOK }
+    phase === 'full'      ? { position: 'fixed', zIndex: 'calc(var(--browser-screen-z-backdrop) + 1)', ...fullFrame(windowSize, aspect), borderRadius: 'var(--radius-2xl)', backgroundColor: 'var(--neutral-white)', boxShadow: 'var(--shadow-4)' }
+    : phase === 'returning' ? { position: 'fixed', zIndex: 'calc(var(--browser-screen-z-backdrop) + 1)', ...returnRect, ...THUMB_LOOK }
     : { position: 'absolute', inset: 0, ...THUMB_LOOK }
 
   return (
@@ -439,7 +440,7 @@ export function BrowserScreen({ session, expanded, onExpandedChange }: BrowserSc
             display:        'flex',
             alignItems:     'center',
             justifyContent: 'center',
-            borderRadius:   12,
+            borderRadius:   'var(--radius-xl)',
             border:         '1px dashed var(--neutral-300)',
           }}
         >
@@ -455,14 +456,14 @@ export function BrowserScreen({ session, expanded, onExpandedChange }: BrowserSc
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: reduceMotion ? 0 : 0.2 }}
+            transition={{ duration: reduceMotion ? 0 : DURATION.base }}
             onClick={collapse}
             style={{
               position:        'fixed',
               inset:           0,
-              zIndex:          Z_BACKDROP,
+              zIndex:          'var(--browser-screen-z-backdrop)',
               backgroundColor: 'color-mix(in srgb, var(--yellow-950) 40%, transparent)',
-              backdropFilter:  'blur(2px)',
+              backdropFilter:  'blur(var(--blur-2xs))',
             }}
           />
         )}
@@ -491,14 +492,14 @@ export function BrowserScreen({ session, expanded, onExpandedChange }: BrowserSc
             layout="position"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: reduceMotion ? 0 : 0.2, delay: reduceMotion ? 0 : 0.08 }}
-            style={{ height: HEADER_H, flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8, padding: '0 10px 0 14px' }}
+            transition={{ duration: reduceMotion ? 0 : DURATION.base, delay: reduceMotion ? 0 : DURATION.instant }}
+            style={{ height: HEADER_H, flexShrink: 0, display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: '0 var(--space-2-5) 0 var(--space-3)' }}
           >
             <StatusPill status={session.status} />
             <div style={{ flex: '1 0 0' }} />
             {session.status === 'live' && !session.control && (
               <Tooltip content="You can watch the agent, but not click or type">
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 32, padding: '0 10px', borderRadius: 10, ...CAPTION, color: 'var(--neutral-600)', whiteSpace: 'nowrap' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1-5)', height: 32, padding: '0 var(--space-2-5)', borderRadius: 'var(--radius-lg)', ...CAPTION, color: 'var(--neutral-600)', whiteSpace: 'nowrap' }}>
                   <ViewIcon size={16} />
                   View only
                 </span>
@@ -536,7 +537,7 @@ export function BrowserScreen({ session, expanded, onExpandedChange }: BrowserSc
                 key="action"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: reduceMotion ? 0 : 0.2, delay: reduceMotion ? 0 : 0.15 }}
+                transition={{ duration: reduceMotion ? 0 : DURATION.base, delay: reduceMotion ? 0 : DURATION.quick }}
                 style={{ position: 'absolute', left: 0, right: 0, bottom: 16, display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}
               >
                 <span
@@ -544,14 +545,14 @@ export function BrowserScreen({ session, expanded, onExpandedChange }: BrowserSc
                     ...BODY,
                     display:         'inline-flex',
                     alignItems:      'center',
-                    gap:             8,
+                    gap:             'var(--space-2)',
                     maxWidth:        '80%',
-                    padding:         '6px 14px 6px 10px',
-                    borderRadius:    999,
+                    padding:         'var(--space-1-5) var(--space-3) var(--space-1-5) var(--space-2-5)',
+                    borderRadius:    'var(--radius-full)',
                     color:           'var(--neutral-900)',
                     backgroundColor: 'color-mix(in srgb, var(--neutral-white) 90%, transparent)',
-                    backdropFilter:  'blur(8px)',
-                    boxShadow:       '0px 2px 8px 0px rgba(26,23,20,0.16), 0px 0px 0px 1px rgba(59,54,50,0.10)',
+                    backdropFilter:  'blur(var(--blur-sm))',
+                    boxShadow:       'var(--browser-screen-shadow)',
                   }}
                 >
                   <Spinner size={14} />
@@ -566,7 +567,7 @@ export function BrowserScreen({ session, expanded, onExpandedChange }: BrowserSc
             <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: reduceMotion ? 0 : 0.15 }}
+              transition={{ duration: reduceMotion ? 0 : DURATION.quick }}
               style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
             >
               <div style={{ position: 'absolute', top: 8, left: 8 }}>
@@ -598,11 +599,11 @@ function ExpandOverlay({ ref, onExpand }: { ref?: React.Ref<HTMLButtonElement>; 
         inset:           0,
         padding:         0,
         border:          0,
-        borderRadius:    12,
+        borderRadius:    'var(--radius-xl)',
         cursor:          'zoom-in',
         pointerEvents:   'auto',
         background:      hot ? 'color-mix(in srgb, var(--neutral-950) 6%, transparent)' : 'transparent',
-        transition:      'background-color 150ms ease',
+        transition:      'background-color var(--duration-fast) ease',
       }}
     >
       <span
@@ -616,13 +617,13 @@ function ExpandOverlay({ ref, onExpand }: { ref?: React.Ref<HTMLButtonElement>; 
           display:         'flex',
           alignItems:      'center',
           justifyContent:  'center',
-          borderRadius:    8,
+          borderRadius:    'var(--radius-md)',
           color:           'var(--neutral-800)',
           backgroundColor: 'color-mix(in srgb, var(--neutral-white) 88%, transparent)',
-          backdropFilter:  'blur(6px)',
+          backdropFilter:  'blur(var(--browser-screen-blur))',
           boxShadow:       'inset 0 0 0 1px var(--neutral-200)',
           transform:       hot ? 'scale(1.06)' : 'scale(1)',
-          transition:      'transform 150ms ease',
+          transition:      'transform var(--duration-fast) ease',
         }}
       >
         <ArrowExpandOneIcon size={16} />

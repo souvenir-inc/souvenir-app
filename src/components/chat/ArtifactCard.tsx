@@ -4,6 +4,7 @@ import React from 'react'
 import { m } from 'framer-motion'
 import { ArrowRightOneIcon, FileTwoIcon } from '@strange-huge/icons'
 import { Badge } from '@/components/Badge'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Types ───────────────────────────────────────────────────────────────────────
 
@@ -40,9 +41,9 @@ export function ArtifactCard({ icon, title, meta, onClick, draftVersion, onViewH
     <div style={{
       display:         'flex',
       alignItems:      'center',
-      gap:             12,
-      padding:         '12px 16px',
-      borderRadius:    12,
+      gap:             'var(--space-3)',
+      padding:         'var(--space-3) var(--space-4)',
+      borderRadius:    'var(--radius-xl)',
       backgroundColor: 'var(--color-surface-glass)',
       boxShadow:       CARD_SHADOW,
       width:           '100%',
@@ -57,7 +58,7 @@ export function ArtifactCard({ icon, title, meta, onClick, draftVersion, onViewH
       <div style={{
         display:       'flex',
         flexDirection: 'column',
-        gap:           2,
+        gap:           'var(--space-0-5)',
         flex:          '1 0 0',
         minWidth:      0,
       }}>
@@ -87,7 +88,7 @@ export function ArtifactCard({ icon, title, meta, onClick, draftVersion, onViewH
           </span>
         )}
         {draftVersion != null && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1-5)', marginTop: 'var(--space-0-5)' }}>
             <Badge color="Blue" label={`Draft v${draftVersion}`} />
             {onViewHistory && (
               <button
@@ -103,7 +104,7 @@ export function ArtifactCard({ icon, title, meta, onClick, draftVersion, onViewH
                   padding:             0,
                   cursor:              'pointer',
                   textDecoration:      'underline',
-                  textUnderlineOffset: '2px',
+                  textUnderlineOffset: 'var(--underline-offset)',
                 }}
               >
                 See history
@@ -130,7 +131,7 @@ export function ArtifactCard({ icon, title, meta, onClick, draftVersion, onViewH
       className="brain-artifact-card brain-card-action"
       onClick={onClick}
       whileTap={{ scale: 0.98 }}
-      transition={{ duration: 0.1, ease: 'easeOut' }}
+      transition={{ duration: DURATION.snap, ease: 'easeOut' }}
       style={{
         display:      'block',
         width:        '100%',
@@ -138,7 +139,7 @@ export function ArtifactCard({ icon, title, meta, onClick, draftVersion, onViewH
         border:       'none',
         padding:      0,
         cursor:       'pointer',
-        borderRadius: 12,
+        borderRadius: 'var(--radius-xl)',
         outline:      'none',
       }}
     >

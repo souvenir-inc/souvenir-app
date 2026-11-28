@@ -9,6 +9,7 @@ import CheckmarkCircle01Icon from "@hugeicons/core-free-icons/CheckmarkCircle01I
 import Idea01Icon from "@hugeicons/core-free-icons/Idea01Icon";
 import type { CalloutData } from "@/types/chat";
 import { HIcon, InlineMd } from "./response-blocks-shared";
+import { SPRING } from "@/styles/tokens/motion"
 
 // �"��"� AnimatedCallout �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 
@@ -34,14 +35,14 @@ export function AnimatedCallout({ data, onComplete }: { data: CalloutData; onCom
   useEffect(() => { const t = setTimeout(onComplete, dwell); return () => clearTimeout(t); }, []); // eslint-disable-line
   return (
     <m.div initial={{ opacity: 0, x: -10, y: 4 }} animate={{ opacity: 1, x: 0, y: 0 }}
-      transition={{ type: "spring", stiffness: 340, damping: 26 }}
-      style={{ borderLeft: `3px solid ${cfg.border}`, background: cfg.bg, borderRadius: "0 10px 10px 0", padding: "10px 14px", display: "flex", gap: 10, alignItems: "flex-start", fontFamily: "var(--font-body)" }}>
-      <span style={{ flexShrink: 0, marginTop: 1, lineHeight: 0 }}>
+      transition={{ type: "spring", ...SPRING.brisk }}
+      style={{ borderLeft: `3px solid ${cfg.border}`, background: cfg.bg, borderRadius: "0 var(--radius-lg) var(--radius-lg) 0", padding: "var(--space-2-5) var(--space-3)", display: "flex", gap: 'var(--space-2-5)', alignItems: "flex-start", fontFamily: "var(--font-body)" }}>
+      <span style={{ flexShrink: 0, marginTop: 'var(--space-0-5)', lineHeight: 0 }}>
         <HIcon icon={cfg.icon} size={16} color={cfg.color} strokeWidth={1.8} />
       </span>
       <div>
-        {data.title && <div style={{ fontWeight: 600, fontSize: 14, color: "var(--neutral-900)", marginBottom: 4, lineHeight: "20px" }}><InlineMd text={data.title} /></div>}
-        <div style={{ fontSize: 14, lineHeight: "21px", color: "var(--neutral-700)" }}><InlineMd text={data.body} /></div>
+        {data.title && <div style={{ fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--font-size-body)', color: "var(--neutral-900)", marginBottom: 'var(--space-1)', lineHeight: "var(--line-height-body-sm)" }}><InlineMd text={data.title} /></div>}
+        <div style={{ fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', color: "var(--neutral-700)" }}><InlineMd text={data.body} /></div>
       </div>
     </m.div>
   );

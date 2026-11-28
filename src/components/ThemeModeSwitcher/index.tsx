@@ -23,8 +23,8 @@ const OPTIONS: ReadonlyArray<{ value: ThemeMode; label: string; icon: typeof Sun
 // Matches the plan chip beside it: 20px tall (2px padding + 16px buttons), 6px corners, 64px wide.
 // `sm` is the compact account-menu control; `lg` is the larger one used in the settings header.
 const SIZES = {
-  sm: { padding: 2, width: 20, height: 16, icon: 12, track: 6, inner: 4 },
-  lg: { padding: 3, width: 28, height: 24, icon: 16, track: 9, inner: 6 },
+  sm: { padding: 'var(--space-0-5)', width: 20, height: 16, icon: 12, track: 6, inner: 4 },
+  lg: { padding: 'var(--space-0-75)', width: 28, height: 24, icon: 16, track: 9, inner: 6 },
 } as const
 
 // What each icon does when its option is selected.
@@ -93,10 +93,10 @@ export function ThemeModeSwitcher({ size = 'sm' }: { size?: keyof typeof SIZES }
           width:           BUTTON_WIDTH,
           borderRadius:    INNER_RADIUS,
           // White in light mode (the shared segmented-control thumb is cream there); the usual raised grey in dark.
-          backgroundColor: isDark ? 'var(--kaya-seg-thumb-bg)' : '#ffffff',
+          backgroundColor: isDark ? 'var(--kaya-seg-thumb-bg)' : 'var(--static-white)',
           boxShadow:       isDark
             ? '0px 1px 2px 0px var(--neutral-700-12), 0px 0px 0px 1px var(--neutral-200)'
-            : '0px 1px 2px 0px rgba(0, 0, 0, 0.25), 0px 0px 0px 1px rgba(0, 0, 0, 0.08)',
+            : 'var(--theme-mode-switcher-shadow)',
         }}
       />
 
@@ -126,8 +126,8 @@ export function ThemeModeSwitcher({ size = 'sm' }: { size?: keyof typeof SIZES }
               background:     'transparent',
               cursor:         'pointer',
               // The active icon follows the thumb: dark on the white thumb (light), the normal text colour on the grey one (dark).
-              color:          active ? (isDark ? 'var(--neutral-900)' : '#1c1c1c') : 'var(--neutral-500)',
-              transition:     reduceMotion ? 'none' : 'color 180ms ease',
+              color:          active ? (isDark ? 'var(--neutral-900)' : 'var(--theme-mode-switcher-color)') : 'var(--neutral-500)',
+              transition:     reduceMotion ? 'none' : 'color var(--theme-mode-switcher-duration) ease',
             }}
           >
             <m.span

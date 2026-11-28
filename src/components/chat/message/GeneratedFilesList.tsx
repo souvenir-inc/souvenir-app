@@ -11,27 +11,28 @@ import { FormatGlyph, formatTintTile } from "@/components/Library/FormatGlyph";
 import { formatLabel } from "@/lib/library/format";
 import type { Format } from "@/lib/library/schemas";
 import type { GeneratedFile } from "@/types/chat";
+import { SPRING, STAGGER } from "@/styles/tokens/motion"
 
 // ── Generated files: the file-type icon (as Library shows it), name, type, View + Download ──
 
 const listStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  gap: 8,
-  marginTop: 12,
+  gap: 'var(--space-2)',
+  marginTop: 'var(--space-3)',
 };
 
 const cardStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: 12,
+  gap: 'var(--space-3)',
   width: "100%",
   maxWidth: 315,
-  padding: "8px 8px 8px 8px",
-  borderRadius: 14,
+  padding: "var(--space-2) var(--space-2) var(--space-2) var(--space-2)",
+  borderRadius: 'var(--radius-xl)',
   backgroundColor: "var(--card-bg)",
   border: "1px solid var(--neutral-200)",
-  boxShadow: "0 1px 2px rgba(0, 0, 0, 0.04)",
+  boxShadow: "var(--generated-files-list-shadow)",
   boxSizing: "border-box",
 };
 
@@ -45,7 +46,7 @@ function tileStyle(format: Format): React.CSSProperties {
     flexShrink: 0,
     width: 40,
     height: 40,
-    borderRadius: 10,
+    borderRadius: "var(--radius-lg)",
     // The tag tints are badge-strength; mixed halfway into the card they read as a light accent.
     backgroundColor: `color-mix(in srgb, ${tint.background} 50%, var(--card-bg))`,
     boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${tint.ring} 55%, var(--card-bg))`,
@@ -160,7 +161,7 @@ export function GeneratedFilesList({ files }: { files: GeneratedFile[] }) {
             key={file.url}
             initial={{ opacity: 0, y: 8, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ type: "spring", stiffness: 360, damping: 26, delay: i * 0.07 }}
+            transition={{ type: "spring", ...SPRING.brisk,  delay: i * STAGGER.lg }}
             style={cardStyle}
           >
             <span style={tileStyle(format)}>
@@ -172,7 +173,7 @@ export function GeneratedFilesList({ files }: { files: GeneratedFile[] }) {
               <p style={typeStyle}>{typeLine(format, ext)}</p>
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 'var(--space-1)', flexShrink: 0 }}>
               {file.documentId ? (
                 <LibraryViewButton fileId={file.documentId} filename={file.filename} />
               ) : canView(file, ext) && (

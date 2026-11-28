@@ -28,10 +28,10 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
     <p
       style={{
         fontFamily: "var(--font-body)",
-        fontWeight: 400,
-        fontSize: 14,
-        lineHeight: "22px",
-        color: "var(--neutral-700,#524b47)",
+        fontWeight: 'var(--font-weight-regular)',
+        fontSize: 'var(--font-size-body)',
+        lineHeight: "var(--line-height-body)",
+        color: "var(--neutral-700)",
         margin: 0,
       }}
     >
@@ -63,14 +63,14 @@ function RoleSelect({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: 8,
+            gap: 'var(--space-2)',
             width: "100%",
-            padding: "7px 10px",
-            borderRadius: 10,
+            padding: "var(--space-1-5) var(--space-2-5)",
+            borderRadius: 'var(--radius-lg)',
             border: "none",
             backgroundColor: "var(--text-field-bg)",
             boxShadow:
-              "0px 1px 1.5px 0px var(--neutral-700-12,rgba(82,75,71,0.12)), 0px 0px 0px 1px var(--neutral-100,#F5F5F5)",
+              "0px 1px 1.5px 0px var(--neutral-700-12), 0px 0px 0px 1px var(--neutral-100)",
             cursor: "pointer",
             outline: "none",
           }}
@@ -78,10 +78,10 @@ function RoleSelect({
           <span
             style={{
               fontFamily: "var(--font-body)",
-              fontWeight: 400,
-              fontSize: 14,
-              lineHeight: "22px",
-              color: value ? "var(--text-field-text,#26211e)" : "var(--text-field-placeholder,#9c938b)",
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: 'var(--font-size-body)',
+              lineHeight: "var(--line-height-body)",
+              color: value ? "var(--text-field-text)" : "var(--text-field-placeholder)",
             }}
           >
             {value ?? "Roles"}
@@ -89,7 +89,7 @@ function RoleSelect({
           <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden>
             <path
               d="M5 8l5 5 5-5"
-              stroke="var(--neutral-400,#9c938b)"
+              stroke="var(--neutral-400)"
               strokeWidth="1.4"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -192,9 +192,9 @@ export default function OnboardingHelloPage() {
         />
       }
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-4)' }}>
         {/* Name row */}
-        <div style={{ display: "flex", gap: 16 }}>
+        <div style={{ display: "flex", gap: 'var(--space-4)' }}>
           <InputField label="First name" placeholder="First name" value={data.firstName} onChange={setFirstName} fluid />
           <InputField label="Last name" placeholder="Last name" value={data.lastName} onChange={setLastName} fluid />
         </div>
@@ -209,7 +209,7 @@ export default function OnboardingHelloPage() {
         />
 
         {/* Role */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 'var(--space-1)' }}>
           <FieldLabel>Let&apos;s understand your role so we can update you accordingly</FieldLabel>
           <RoleSelect value={data.role} onChange={setRole} />
         </div>

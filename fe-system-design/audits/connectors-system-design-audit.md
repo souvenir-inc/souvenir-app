@@ -1,5 +1,7 @@
 # Connectors: System Design Audit
 
+> **Note (2026-11-25):** `lib/connect-apps-cache.ts` was replaced by `lib/connectors/connector-queries.ts`; `ConnectorRequestModal`, `ConnectorRequestRow`, `ConnectorStatusBadge` and `ConnectorPausedBadge` are deleted. Current status: [re-audit](./reaudit-2026-11-25.md).
+
 > **Status (Oct 14 2026): Phases 1–4 done**, except `next/image` for logos (decision D20), reconnect nudges in chat and the manual screen-reader pass.
 >
 > Done (Phase 1):

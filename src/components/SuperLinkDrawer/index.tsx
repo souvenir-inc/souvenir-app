@@ -17,6 +17,7 @@ import { TokenBudgetBar } from '@/components/TokenBudgetBar'
 import { springs } from '@/lib/springs'
 import { cn } from '@/lib/utils'
 import type { SuperLinkStatus } from '@/components/SuperLinkRow'
+import { DURATION } from "@/styles/tokens/motion"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -69,8 +70,8 @@ function fmtK(n: number): string {
 
 function DrawerOverview({ link }: { link: SuperLinkDrawerLink }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-2-5)' }}>
         <StatCard
           label="Credits used"
           value={fmtK(link.tokenUsed)}
@@ -93,7 +94,7 @@ function DrawerOverview({ link }: { link: SuperLinkDrawerLink }) {
         />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-700)' }}>
             Credit budget
@@ -102,7 +103,7 @@ function DrawerOverview({ link }: { link: SuperLinkDrawerLink }) {
         <TokenBudgetBar used={link.tokenUsed} limit={link.tokenLimit} size="lg" showLabel />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-700)' }}>
           Last 7 days
         </span>
@@ -115,7 +116,7 @@ function DrawerOverview({ link }: { link: SuperLinkDrawerLink }) {
 function DrawerSessions({ link }: { link: SuperLinkDrawerLink }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-500)', marginBottom: 8 }}>
+      <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--neutral-500)', marginBottom: 'var(--space-2)' }}>
         {link.sessions.length} conversations · {link.uniqueUsers} unique users
       </span>
       {link.sessions.map((s, i) => (
@@ -161,12 +162,12 @@ function DrawerSettings({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingBottom: 16 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', paddingBottom: 'var(--space-4)' }}>
         <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-700)' }}>
           Credit limit
         </span>
         {editing ? (
-          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'flex-end' }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <InputField
                 fluid
@@ -183,13 +184,13 @@ function DrawerSettings({
             <Button size="sm" variant="cancel" onClick={() => { setLimitDraft(String(link.tokenLimit)); setEditing(false) }}>Cancel</Button>
           </div>
         ) : (
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
             <div
               style={{
                 flex:            1,
                 minWidth:        0,
-                padding:         '8px 12px',
-                borderRadius:    10,
+                padding:         'var(--space-2) var(--space-3)',
+                borderRadius:    'var(--radius-lg)',
                 backgroundColor: 'var(--neutral-50)',
                 boxShadow:       '0px 0px 0px 1px var(--neutral-100)',
                 fontFamily:      'var(--font-body)',
@@ -212,8 +213,8 @@ function DrawerSettings({
 
       <Divider />
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '16px 0' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', padding: 'var(--space-4) 0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', minWidth: 0 }}>
           <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-900)' }}>
             Pause this link
           </span>
@@ -230,7 +231,7 @@ function DrawerSettings({
 
       <Divider />
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 16 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)', paddingTop: 'var(--space-4)' }}>
         <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', fontWeight: 'var(--font-weight-medium)', color: 'var(--neutral-900)' }}>
           Revoke link
         </span>
@@ -244,13 +245,13 @@ function DrawerSettings({
         ) : (
           <div
             style={{
-              padding:         12,
-              borderRadius:    12,
+              padding:         'var(--space-3)',
+              borderRadius:    'var(--radius-xl)',
               backgroundColor: 'var(--color-status-danger-bg)',
               boxShadow:       '0 0 0 1px var(--color-status-danger-dot)',
               display:         'flex',
               flexDirection:   'column',
-              gap:             10,
+              gap:             'var(--space-2-5)',
             }}
           >
             <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-body)', lineHeight: 'var(--line-height-body)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-status-danger-text)' }}>
@@ -259,7 +260,7 @@ function DrawerSettings({
             <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--font-size-caption)', lineHeight: 'var(--line-height-caption)', color: 'var(--color-status-danger-text)' }}>
               Anyone using this link will lose access immediately. This cannot be undone.
             </span>
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
               <Button
                 size="sm"
                 variant="danger"
@@ -318,15 +319,15 @@ export function SuperLinkDrawer({ ref, link, onClose, onStatusChange, onLimitCha
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{    opacity: 0 }}
-            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: DURATION.base, ease: [0.16, 1, 0.3, 1] }}
             style={{
               position:        'fixed',
               inset:           0,
-              zIndex:          10,
+              zIndex:          'var(--z-raised)',
               display:         'flex',
               alignItems:      'center',
               justifyContent:  'center',
-              padding:         24,
+              padding:         'var(--space-6)',
               backgroundColor: 'var(--overlay-bg)',
               backdropFilter:  'blur(var(--overlay-blur))',
               WebkitBackdropFilter: 'blur(var(--overlay-blur))',
@@ -336,6 +337,7 @@ export function SuperLinkDrawer({ ref, link, onClose, onStatusChange, onLimitCha
           <m.aside
             ref={ref}
             key={link.id}
+            // eslint-disable-next-line no-restricted-syntax -- ds-allow: framer-motion exit animation; moves to ui/dialog once it has a motion variant (plan Phase 2 follow-up)
             role="dialog"
             aria-modal="true"
             aria-label={`${link.personaName} Super Link detail`}
@@ -354,7 +356,7 @@ export function SuperLinkDrawer({ ref, link, onClose, onStatusChange, onLimitCha
               flexShrink:      0,
               display:         'flex',
               flexDirection:   'column',
-              borderRadius:    16,
+              borderRadius:    'var(--radius-2xl)',
               backgroundColor: 'var(--modal-bg)',
               boxShadow:       'var(--shadow-popover)',
               overflow:        'hidden',
@@ -367,14 +369,14 @@ export function SuperLinkDrawer({ ref, link, onClose, onStatusChange, onLimitCha
                 display:         'flex',
                 alignItems:      'center',
                 justifyContent:  'space-between',
-                gap:             12,
-                padding:         '16px 18px',
+                gap:             'var(--space-3)',
+                padding:         'var(--space-4) var(--space-4)',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2-5)', minWidth: 0 }}>
                 {/* The agent's own avatar, as on the Super Links table row this drawer opened from */}
                 <MentionAvatar agent={{ id: link.repoId ?? link.id, name: link.personaName }} />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0-5)', minWidth: 0 }}>
                   <span
                     style={{
                       fontFamily: 'var(--font-title)',
@@ -408,7 +410,7 @@ export function SuperLinkDrawer({ ref, link, onClose, onStatusChange, onLimitCha
             </header>
 
             <Tabs defaultValue="overview" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-              <div style={{ padding: '0 18px' }}>
+              <div style={{ padding: '0 var(--space-4)' }}>
                 <TabsList size="small">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
                   <TabsTrigger value="sessions" count={link.sessions.length}>Sessions</TabsTrigger>
@@ -428,7 +430,7 @@ export function SuperLinkDrawer({ ref, link, onClose, onStatusChange, onLimitCha
                 {/* Horizontal (and vertical) padding lives on this inner
                     wrapper, not the scrolling element above — keeps the
                     scrollbar flush with the drawer's edge. */}
-                <div style={{ padding: '18px' }}>
+                <div style={{ padding: 'var(--space-4)' }}>
                 <TabsContent value="overview"><DrawerOverview link={link} /></TabsContent>
                 <TabsContent value="sessions"><DrawerSessions link={link} /></TabsContent>
                 <TabsContent value="settings">

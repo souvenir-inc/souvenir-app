@@ -5,6 +5,7 @@ import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { AIModel } from "@/types/ai-model";
 import { ModelIcon } from "@/components/ModelIcon";
+import { SPRING } from "@/styles/tokens/motion"
 
 interface ModelSwitchDialogProps {
   isOpen: boolean;
@@ -34,7 +35,7 @@ export function ModelSwitchDialog({
             style={{
               position: "fixed",
               inset: 0,
-              zIndex: 60,
+              zIndex: 'var(--z-overlay)',
               backgroundColor: "color-mix(in srgb, var(--static-black) 40%, transparent)",
             }}
           />
@@ -44,7 +45,7 @@ export function ModelSwitchDialog({
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            transition={{ type: "spring", ...SPRING.brisk }}
             role="alertdialog"
             aria-labelledby="model-switch-title"
             aria-describedby="model-switch-desc"
@@ -53,13 +54,13 @@ export function ModelSwitchDialog({
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              zIndex: 61,
+              zIndex: 'var(--z-modal)',
               width: "400px",
               maxWidth: "calc(100vw - 32px)",
               backgroundColor: "var(--modal-bg)",
-              borderRadius: "16px",
+              borderRadius: "var(--radius-2xl)",
               boxShadow: "var(--shadow-xl)",
-              padding: "24px",
+              padding: "var(--space-6)",
             }}
           >
             {/* Warning icon */}
@@ -70,9 +71,9 @@ export function ModelSwitchDialog({
                 justifyContent: "center",
                 width: "40px",
                 height: "40px",
-                borderRadius: "10px",
+                borderRadius: "var(--radius-lg)",
                 backgroundColor: "var(--yellow-50)",
-                marginBottom: "16px",
+                marginBottom: "var(--space-4)",
               }}
             >
               <AlertTriangle size={20} style={{ color: "var(--yellow-600)" }} />
@@ -85,7 +86,7 @@ export function ModelSwitchDialog({
                 fontSize: "var(--font-size-body-lg)",
                 fontWeight: "var(--font-weight-semibold)",
                 color: "var(--neutral-900)",
-                margin: "0 0 8px",
+                margin: "0 0 var(--space-2)",
               }}
             >
               Switch model mid-chat?
@@ -97,8 +98,8 @@ export function ModelSwitchDialog({
                 fontFamily: "var(--font-body)",
                 fontSize: "var(--font-size-body-sm)",
                 color: "var(--neutral-600)",
-                lineHeight: 1.5,
-                margin: "0 0 20px",
+                lineHeight: 'var(--leading-normal)',
+                margin: "0 0 var(--space-5)",
               }}
             >
               Switching from{" "}
@@ -112,21 +113,21 @@ export function ModelSwitchDialog({
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "12px",
-                padding: "12px",
-                borderRadius: "10px",
+                gap: "var(--space-3)",
+                padding: "var(--space-3)",
+                borderRadius: "var(--radius-lg)",
                 backgroundColor: "var(--neutral-50)",
-                marginBottom: "20px",
+                marginBottom: "var(--space-5)",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", flex: 1 }}>
                 <span style={{ lineHeight: 0, flexShrink: 0 }}>
                   <ModelIcon model={fromModel.companyName ?? fromModel.modelName} size={20} />
                 </span>
                 <span
                   style={{
                     fontFamily: "var(--font-body)",
-                    fontSize: "12px",
+                    fontSize: "var(--font-size-small)",
                     color: "var(--neutral-600)",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -137,16 +138,16 @@ export function ModelSwitchDialog({
                 </span>
               </div>
 
-              <span style={{ color: "var(--neutral-600)", fontSize: "14px" }}>→</span>
+              <span style={{ color: "var(--neutral-600)", fontSize: "var(--font-size-body)" }}>→</span>
 
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", flex: 1 }}>
                 <span style={{ lineHeight: 0, flexShrink: 0 }}>
                   <ModelIcon model={toModel.companyName ?? toModel.modelName} size={20} />
                 </span>
                 <span
                   style={{
                     fontFamily: "var(--font-body)",
-                    fontSize: "12px",
+                    fontSize: "var(--font-size-small)",
                     color: "var(--neutral-900)",
                     fontWeight: "var(--font-weight-medium)",
                     overflow: "hidden",
@@ -160,7 +161,7 @@ export function ModelSwitchDialog({
             </div>
 
             {/* Actions */}
-            <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+            <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "flex-end" }}>
               <Button variant="cancel" size="sm" onClick={onCancel}>
                 Cancel
               </Button>

@@ -1,17 +1,17 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
+import React, { useEffect, useRef, useState } from 'react'
 import { CancelOneIcon } from '@strange-huge/icons'
 import { Button, IconButton } from '@/components/ui/button'
 import { InputField } from '@/components/InputField'
 import { TimeField } from '@/components/TimeField'
 import Tabs from '@/components/Tabs'
 import { trackFeature } from '@/lib/analytics/events'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { useZodForm } from '@/hooks/use-zod-form'
 import {
   initialFormValues,
+  parseFrequency,
   previewText,
   scheduleFormSchema,
   toEditData,
@@ -28,6 +28,9 @@ export interface ScheduleEditData {
   /** IANA zone the frequency time is in. Always set by the modal on save;
    *  optional on input since edit data carries it inside `frequency`. */
   timezone?:    string
+  /** Saved with the schedule's own trigger left as it is (one this form can't express: every few
+   *  minutes, on an app event, once), so the update doesn't ask Task to change it. */
+  frequencyUnchanged?: boolean
 }
 
 export interface ScheduleEditModalProps {
@@ -51,9 +54,22 @@ const isInDropdown = (t: EventTarget | null) => t instanceof Element && !!t.clos
 // Pure parts (parse/format the cadence, schema, preview) live in
 // lib/schedules/schedule-form.ts; the day and timezone pickers in SchedulePickers.
 
+/** The form's starting values; a trigger it can't express gets a valid stand-in time, kept out of the save. */
+function startValues(schedule: ScheduleEditData | undefined) {
+  const values = initialFormValues(schedule)
+  return schedule && !parseFrequency(schedule.frequency) && !values.time ? { ...values, time: '09:00' } : values
+}
+
 export function ScheduleEditModal({ isOpen, schedule, onSave, onClose }: ScheduleEditModalProps) {
   const isCreate = !schedule
-  const form = useZodForm(scheduleFormSchema, initialFormValues(schedule))
+  // A trigger the Daily / Weekly fields can't express is shown as it is, and left alone unless the
+  // person chooses to replace it: opening it on "Daily 9:00" and saving would quietly change it.
+  const unreadable = !!schedule && !parseFrequency(schedule.frequency)
+  const [replacing, setReplacing] = useState(false)
+  const keepFrequency = unreadable && !replacing
+  const form = useZodForm(scheduleFormSchema, startValues(schedule))
+  // Closing ends a "replace the timing" choice: the next open shows the schedule's own again.
+  const close = () => { setReplacing(false); onClose() }
   const { values, setField, errors, isValid, isDirty, reset } = form
 
   const nameInputRef = useRef<HTMLInputElement>(null)
@@ -62,7 +78,7 @@ export function ScheduleEditModal({ isOpen, schedule, onSave, onClose }: Schedul
   const resetRef = useRef(reset)
   useEffect(() => { resetRef.current = reset }, [reset])
   useEffect(() => {
-    if (isOpen) resetRef.current(initialFormValues(schedule))
+    if (isOpen) resetRef.current(startValues(schedule))
   // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the schedule's fields, not its object identity
   }, [isOpen, schedule?.name, schedule?.instructions, schedule?.frequency, schedule?.timezone])
 
@@ -70,14 +86,17 @@ export function ScheduleEditModal({ isOpen, schedule, onSave, onClose }: Schedul
   const save = form.handleSubmit(data => {
     if (isCreate) trackFeature('schedule_created', { frequency_type: data.freqType })
     else trackFeature('schedule_edit_started', { frequency_type: data.freqType })
-    onSave(toEditData(data))
+    setReplacing(false)
+    onSave(keepFrequency && schedule
+      ? { name: data.name, instructions: data.instructions, frequency: schedule.frequency, frequencyUnchanged: true }
+      : toEditData(data))
   })
   const preview = previewText(values)
 
   return (
     // Esc, the X and Cancel always close. A stray click outside must not throw away typed
     // details: once edited, only Cancel, the X or Esc close it.
-    <Dialog open={isOpen} onOpenChange={(next) => { if (!next) onClose() }}>
+    <Dialog open={isOpen} onOpenChange={(next) => { if (!next) close() }}>
       <DialogContent
         hideClose
         aria-label={isCreate ? 'New schedule' : 'Edit schedule'}
@@ -90,26 +109,26 @@ export function ScheduleEditModal({ isOpen, schedule, onSave, onClose }: Schedul
           maxHeight: 'calc(100vh - 48px)',
           minHeight: 600,
           background: 'var(--modal-bg)',
-          boxShadow: '0 8px 40px color-mix(in srgb, var(--static-black) 12%, transparent)',
+          boxShadow: 'var(--shadow-4)',
         }}
       >
         {/* Header */}
         <div className="flex shrink-0 items-start gap-3 px-6 pt-6">
           <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-            <DialogPrimitive.Title asChild>
+            <DialogTitle asChild>
             <span className="font-[family-name:var(--font-title)] text-[length:var(--font-size-heading)] leading-[var(--line-height-heading)] text-[var(--neutral-900)]">
               {isCreate ? 'New schedule' : 'Edit schedule'}
             </span>
-            </DialogPrimitive.Title>
-            <DialogPrimitive.Description asChild>
+            </DialogTitle>
+            <DialogDescription asChild>
             <span className="text-[length:var(--font-size-caption)] leading-[var(--line-height-caption)] text-[var(--neutral-500)]">
               {isCreate
                 ? 'Schedules are created via Task — review the details below, then send to create it.'
                 : 'Changes are applied via Task — review the details below, then send to update it.'}
             </span>
-            </DialogPrimitive.Description>
+            </DialogDescription>
           </div>
-          <IconButton variant="ghost" size="xs" icon={<CancelOneIcon />} aria-label="Close" onClick={onClose} />
+          <IconButton variant="ghost" size="xs" icon={<CancelOneIcon />} aria-label="Close" onClick={close} />
         </div>
 
         {/* Body scrolls on its own when long instructions push past the viewport. */}
@@ -135,7 +154,7 @@ export function ScheduleEditModal({ isOpen, schedule, onSave, onClose }: Schedul
               placeholder="Describe what Task should do on each run…"
               rows={3}
               aria-invalid={!!errors.instructions || undefined}
-              className="min-h-20 w-full resize-y rounded-[10px] border-none bg-[var(--field-surface)] px-3 py-[9px] text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--neutral-800)] shadow-[0px_1px_1.5px_0px_var(--neutral-700-12),0px_0px_0px_1px_var(--neutral-100)] outline-none transition-shadow"
+              className="min-h-20 w-full resize-y rounded-lg border-none bg-[var(--field-surface)] px-3 py-[var(--schedule-instructions-padding-y)] text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--neutral-800)] shadow-[0px_1px_1.5px_0px_var(--neutral-700-12),0px_0px_0px_1px_var(--neutral-100)] outline-none transition-shadow"
             />
             {errors.instructions && <p className={errorText} role="alert">{errors.instructions}</p>}
           </div>
@@ -143,6 +162,13 @@ export function ScheduleEditModal({ isOpen, schedule, onSave, onClose }: Schedul
           {/* Cadence, day, time and timezone read as one decision. */}
           <div className="flex flex-col gap-2">
             <p className={sectionLabel}>When and how often it should run</p>
+            {keepFrequency && schedule ? (
+              <div data-schedule-frequency-kept className="flex flex-col items-start gap-2 rounded-xl border border-[var(--border-default)] p-4">
+                <p className="m-0 text-[length:var(--font-size-body)] leading-[var(--line-height-body)] text-[var(--neutral-800)]">{schedule.frequency || 'Runs on its own trigger'}</p>
+                <p className="m-0 text-[length:var(--font-size-caption)] leading-[var(--line-height-caption)] text-[var(--neutral-600)]">This schedule’s timing stays as it is.</p>
+                <Button variant="outline" size="sm" onClick={() => setReplacing(true)}>Change to daily or weekly</Button>
+              </div>
+            ) : (
             <div className="flex flex-col gap-4 rounded-xl border border-[var(--border-default)] p-4">
               <div className={row}>
                 <p className={rowLabel}>Frequency</p>
@@ -174,12 +200,13 @@ export function ScheduleEditModal({ isOpen, schedule, onSave, onClose }: Schedul
               {/* Plain-English confirmation before it becomes a Task prompt. */}
               {preview && <p className="m-0 text-[length:var(--font-size-caption)] leading-[var(--line-height-caption)] text-[var(--neutral-600)]">{preview}</p>}
             </div>
+            )}
           </div>
         </div>
 
         {/* Actions */}
         <div className="flex shrink-0 justify-end gap-2 border-t border-[var(--neutral-100)] px-6 py-4">
-          <Button variant="cancel" size="sm" onClick={onClose}>Cancel</Button>
+          <Button variant="cancel" size="sm" onClick={close}>Cancel</Button>
           <Button variant="default" size="sm" disabled={!isValid} onClick={save}>
             {isCreate ? 'Start task' : 'Update in Tasks'}
           </Button>

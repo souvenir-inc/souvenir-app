@@ -15,13 +15,13 @@ function SettingsCard({ children }: { children: React.ReactNode }) {
     <div
       style={{
         border:        '1px solid var(--border-default)',
-        borderRadius:  16,
-        boxShadow:     '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+        borderRadius:  'var(--radius-2xl)',
+        boxShadow:     'var(--shadow-soft)',
         display:       'flex',
         flexDirection: 'column',
         overflow:      'hidden',
-        paddingTop:    12,
-        paddingBottom: 12,
+        paddingTop:    'var(--space-3)',
+        paddingBottom: 'var(--space-3)',
       }}
     >
       {children}
@@ -45,7 +45,7 @@ function CardSection({
       style={{
         display:      'flex',
         flexDirection:'column',
-        padding:      `${padTop}px 24px ${padBottom}px`,
+        padding:      `${padTop}px var(--space-6) ${padBottom}px`,
         borderBottom: divider ? '1px solid var(--neutral-100)' : undefined,
       }}
     >
@@ -60,7 +60,7 @@ function ProgressBar({ used, total }: { used: number; total: number }) {
     <div
       style={{
         height:          4,
-        borderRadius:    2,
+        borderRadius:    'var(--settings-preview-radius-xs)',
         backgroundColor: 'var(--neutral-white)',
         overflow:        'hidden',
         position:        'relative',
@@ -90,9 +90,9 @@ function BlueBadge({ children }: { children: React.ReactNode }) {
         display:         'inline-flex',
         alignItems:      'center',
         justifyContent:  'center',
-        padding:         '2px',
-        borderRadius:    6,
-        boxShadow:       '0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px rgba(13,110,178,0.5)',
+        padding:         'var(--space-0-5)',
+        borderRadius:    'var(--radius-sm)',
+        boxShadow:       'var(--color-tag-Blue-shadow)',
         overflow:        'hidden',
       }}
     >
@@ -101,7 +101,7 @@ function BlueBadge({ children }: { children: React.ReactNode }) {
         style={{
           position:        'absolute',
           inset:           0,
-          borderRadius:    6,
+          borderRadius:    'var(--radius-sm)',
           backgroundColor: 'var(--blue-100)',
           pointerEvents:   'none',
         }}
@@ -112,7 +112,7 @@ function BlueBadge({ children }: { children: React.ReactNode }) {
           position:     'absolute',
           inset:        0,
           borderRadius: 'inherit',
-          boxShadow:    'inset 0px 1px 0px 0px rgba(231,244,253,0.7), inset 0px -1px 0px 0px rgba(13,110,178,0.1)',
+          boxShadow:    'var(--color-tag-Blue-inner-shadow)',
           pointerEvents:'none',
         }}
       />
@@ -121,11 +121,11 @@ function BlueBadge({ children }: { children: React.ReactNode }) {
         display:    'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding:    '0 2px',
+        padding:    '0 var(--space-0-5)',
         fontFamily: 'var(--font-body)',
-        fontWeight: 500,
-        fontSize: 12,
-        lineHeight: '16px',
+        fontWeight: 'var(--font-weight-medium)',
+        fontSize: 'var(--font-size-small)',
+        lineHeight: 'var(--line-height-small)',
         color:      'var(--blue-700)',
         whiteSpace: 'nowrap',
       }}>
@@ -143,9 +143,9 @@ function BrownBadge({ children }: { children: React.ReactNode }) {
         display:         'inline-flex',
         alignItems:      'center',
         justifyContent:  'center',
-        padding:         '2px',
-        borderRadius:    6,
-        boxShadow:       '0px 1px 1.5px 0px rgba(20,12,5,0.2), 0px 0px 0px 1px rgba(126,84,53,0.5)',
+        padding:         'var(--space-0-5)',
+        borderRadius:    'var(--radius-sm)',
+        boxShadow:       'var(--color-tag-Brown-shadow)',
         overflow:        'hidden',
         flexShrink:      0,
       }}
@@ -155,7 +155,7 @@ function BrownBadge({ children }: { children: React.ReactNode }) {
         style={{
           position:        'absolute',
           inset:           0,
-          borderRadius:    6,
+          borderRadius:    'var(--radius-sm)',
           backgroundColor: 'var(--brown-100)',
           pointerEvents:   'none',
         }}
@@ -166,7 +166,7 @@ function BrownBadge({ children }: { children: React.ReactNode }) {
           position:     'absolute',
           inset:        0,
           borderRadius: 'inherit',
-          boxShadow:    'inset 0px 1px 0px 0px rgba(250,241,235,0.7), inset 0px -1px 0px 0px rgba(126,84,53,0.1)',
+          boxShadow:    'var(--color-tag-Brown-inner-shadow)',
           pointerEvents:'none',
         }}
       />
@@ -175,11 +175,11 @@ function BrownBadge({ children }: { children: React.ReactNode }) {
         display:    'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding:    '0 2px',
+        padding:    '0 var(--space-0-5)',
         fontFamily: 'var(--font-body)',
-        fontWeight: 500,
-        fontSize: 12,
-        lineHeight: '16px',
+        fontWeight: 'var(--font-weight-medium)',
+        fontSize: 'var(--font-size-small)',
+        lineHeight: 'var(--line-height-small)',
         color:      'var(--brown-700)',
         whiteSpace: 'nowrap',
       }}>
@@ -246,7 +246,7 @@ function StorageRow({
       style={{
         display:      'flex',
         alignItems:   'center',
-        padding:      '12px 0',
+        padding:      'var(--space-3) 0',
         borderBottom: divider ? '1px solid var(--neutral-100)' : undefined,
       }}
     >
@@ -254,9 +254,9 @@ function StorageRow({
         flex:         '1 0 0',
         minWidth:     0,
         fontFamily:   'var(--font-body)',
-        fontWeight:   400,
-        fontSize:     14,
-        lineHeight:   '22px',
+        fontWeight:   'var(--font-weight-regular)',
+        fontSize:     'var(--font-size-body)',
+        lineHeight:   'var(--line-height-body)',
         color:        'var(--neutral-900)',
         overflow:     'hidden',
         textOverflow: 'ellipsis',
@@ -266,9 +266,9 @@ function StorageRow({
       </span>
       <span style={{
         fontFamily:   'var(--font-body)',
-        fontWeight:   400,
-        fontSize:     14,
-        lineHeight:   '22px',
+        fontWeight:   'var(--font-weight-regular)',
+        fontSize:     'var(--font-size-body)',
+        lineHeight:   'var(--line-height-body)',
         color:        'var(--neutral-500)',
         whiteSpace:   'nowrap',
         flexShrink:   0,
@@ -296,17 +296,17 @@ function SettingRow({
       style={{
         display:      'flex',
         flexDirection:'column',
-        padding:      '12px 24px 24px',
+        padding:      'var(--space-3) var(--space-6) var(--space-6)',
         borderBottom: divider ? '1px solid var(--neutral-100)' : undefined,
       }}
     >
-      <div style={{ display: 'flex', gap: 64, alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-10)', alignItems: 'flex-start' }}>
         <div style={{ flex: '1 0 0', minWidth: 0 }}>
           <p style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 500,
-            fontSize:   14,
-            lineHeight: '22px',
+            fontWeight: 'var(--font-weight-medium)',
+            fontSize:   'var(--font-size-body)',
+            lineHeight: 'var(--line-height-body)',
             color:      'var(--neutral-900)',
             margin:     0,
           }}>
@@ -314,9 +314,9 @@ function SettingRow({
           </p>
           <p style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 400,
-            fontSize: 12,
-            lineHeight: '16px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize: 'var(--font-size-small)',
+            lineHeight: 'var(--line-height-small)',
             color:      'var(--neutral-500)',
             margin:     0,
           }}>
@@ -340,17 +340,17 @@ function OutlineButton({ children, onClick }: { children: React.ReactNode; onCli
         display:         'inline-flex',
         alignItems:      'center',
         justifyContent:  'center',
-        gap:             2,
-        padding:         '6px 10px 8px',
-        borderRadius:    10,
+        gap:             'var(--space-0-5)',
+        padding:         'var(--space-1-5) var(--space-2-5) var(--space-2)',
+        borderRadius:    'var(--radius-lg)',
         border:          'none',
         cursor:          'pointer',
         backgroundColor: 'var(--neutral-white)',
-        boxShadow:       '0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100)',
+        boxShadow:       'var(--shadow-card-raised)',
         fontFamily:      'var(--font-body)',
-        fontWeight:      500,
-        fontSize:        14,
-        lineHeight:      '22px',
+        fontWeight:      'var(--font-weight-medium)',
+        fontSize:        'var(--font-size-body)',
+        lineHeight:      'var(--line-height-body)',
         color:           'var(--neutral-700)',
         whiteSpace:      'nowrap',
         overflow:        'hidden',
@@ -360,7 +360,7 @@ function OutlineButton({ children, onClick }: { children: React.ReactNode; onCli
         position:     'absolute',
         inset:        0,
         borderRadius: 'inherit',
-        boxShadow:    'inset 0px -2.182px 0.364px 0px var(--neutral-100)',
+        boxShadow:    'var(--shadow-model-featured-default-inner)',
         pointerEvents:'none',
       }} />
       {children}
@@ -379,17 +379,17 @@ function DangerButton({ children, onClick }: { children: React.ReactNode; onClic
         display:         'inline-flex',
         alignItems:      'center',
         justifyContent:  'center',
-        gap:             2,
-        padding:         '6px 10px 8px',
-        borderRadius:    10,
+        gap:             'var(--space-0-5)',
+        padding:         'var(--space-1-5) var(--space-2-5) var(--space-2)',
+        borderRadius:    'var(--radius-lg)',
         border:          'none',
         cursor:          'pointer',
         backgroundColor: 'var(--neutral-white)',
-        boxShadow:       '0px 1.091px 1.091px 0px rgba(24,2,2,0.05), 0px 1.455px 3.127px 0px rgba(24,2,2,0.15), 0px 0px 0px 1px var(--red-100)',
+        boxShadow:       'var(--shadow-card-raised-danger)',
         fontFamily:      'var(--font-body)',
-        fontWeight:      500,
-        fontSize:        14,
-        lineHeight:      '22px',
+        fontWeight:      'var(--font-weight-medium)',
+        fontSize:        'var(--font-size-body)',
+        lineHeight:      'var(--line-height-body)',
         color:           'var(--red-700)',
         whiteSpace:      'nowrap',
         overflow:        'hidden',
@@ -455,21 +455,21 @@ export default function FilesPage() {
         display:        'flex',
         alignItems:     'flex-start',
         justifyContent: 'center',
-        paddingTop:     64,
-        paddingBottom:  48,
+        paddingTop:     'var(--space-10)',
+        paddingBottom:  'var(--space-9)',
       }}
     >
       {/* Horizontal padding lives here, not on the scrolling element above —
           keeps the scrollbar flush with the container's edge. */}
-      <div style={{ width: '100%', maxWidth: 908, padding: '0 24px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ width: '100%', maxWidth: 908, padding: '0 var(--space-6)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 'var(--space-2-5)' }}>
 
         {/* ── Page header ── */}
-        <div style={{ paddingLeft: 4, marginBottom: 4 }}>
+        <div style={{ paddingLeft: 'var(--space-1)', marginBottom: 'var(--space-1)' }}>
           <h1 style={{
             fontFamily:   'var(--font-title)',
-            fontWeight:   400,
-            fontSize:     24,
-            lineHeight:   '32px',
+            fontWeight:   'var(--font-weight-regular)',
+            fontSize:     'var(--font-size-heading)',
+            lineHeight:   'var(--line-height-heading)',
             color:        'var(--neutral-900)',
             margin:       0,
             overflow:     'hidden',
@@ -480,9 +480,9 @@ export default function FilesPage() {
           </h1>
           <p style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 400,
-            fontSize:   14,
-            lineHeight: '22px',
+            fontWeight: 'var(--font-weight-regular)',
+            fontSize:   'var(--font-size-body)',
+            lineHeight: 'var(--line-height-body)',
             color:      'var(--neutral-500)',
             margin:     0,
           }}>
@@ -494,13 +494,13 @@ export default function FilesPage() {
         <SettingsCard>
           {/* Header */}
           <CardSection divider padTop={12} padBottom={24}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4 }}>
-              <div style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-1)' }}>
+              <div style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 'var(--space-1-5)' }}>
                 <p style={{
                   fontFamily:   'var(--font-body)',
-                  fontWeight:   500,
-                  fontSize:     16,
-                  lineHeight:   '22px',
+                  fontWeight:   'var(--font-weight-medium)',
+                  fontSize:     'var(--font-size-body-lg)',
+                  lineHeight:   'var(--line-height-body)',
                   color:        'var(--neutral-900)',
                   margin:       0,
                   overflow:     'hidden',
@@ -511,9 +511,9 @@ export default function FilesPage() {
                 </p>
                 <p style={{
                   fontFamily:   'var(--font-body)',
-                  fontWeight:   400,
-                  fontSize:     14,
-                  lineHeight:   '22px',
+                  fontWeight:   'var(--font-weight-regular)',
+                  fontSize:     'var(--font-size-body)',
+                  lineHeight:   'var(--line-height-body)',
                   color:        'var(--neutral-500)',
                   margin:       0,
                   overflow:     'hidden',
@@ -529,15 +529,15 @@ export default function FilesPage() {
 
           {/* Total storage + progress bar */}
           <CardSection divider padTop={12} padBottom={24}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--settings-preview-gap-sm)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-6)' }}>
                 <p style={{
                   flex:         '1 0 0',
                   minWidth:     0,
                   fontFamily:   'var(--font-body)',
-                  fontWeight:   500,
-                  fontSize:     16,
-                  lineHeight:   '22px',
+                  fontWeight:   'var(--font-weight-medium)',
+                  fontSize:     'var(--font-size-body-lg)',
+                  lineHeight:   'var(--line-height-body)',
                   color:        'var(--neutral-900)',
                   margin:       0,
                   overflow:     'hidden',
@@ -548,9 +548,9 @@ export default function FilesPage() {
                 </p>
                 <p style={{
                   fontFamily:   'var(--font-body)',
-                  fontWeight:   400,
-                  fontSize:     14,
-                  lineHeight:   '22px',
+                  fontWeight:   'var(--font-weight-regular)',
+                  fontSize:     'var(--font-size-body)',
+                  lineHeight:   'var(--line-height-body)',
                   color:        'var(--neutral-500)',
                   margin:       0,
                   whiteSpace:   'nowrap',
@@ -562,9 +562,9 @@ export default function FilesPage() {
               <ProgressBar used={storageUsedGB} total={storageTotalGB} />
               <p style={{
                 fontFamily:   'var(--font-body)',
-                fontWeight:   400,
-                fontSize:     14,
-                lineHeight:   '22px',
+                fontWeight:   'var(--font-weight-regular)',
+                fontSize:     'var(--font-size-body)',
+                lineHeight:   'var(--line-height-body)',
                 color:        'var(--neutral-500)',
                 margin:       0,
                 overflow:     'hidden',
@@ -577,7 +577,7 @@ export default function FilesPage() {
           </CardSection>
 
           {/* Storage breakdown rows */}
-          <div style={{ padding: '0 24px' }}>
+          <div style={{ padding: '0 var(--space-6)' }}>
             <StorageRow label="Chat attachments"      value="1.2 GB" divider />
             <StorageRow label="Agent knowledge files" value="0.8 GB" divider />
             <StorageRow label="Workspace shared files" value="0.4 GB" />
@@ -590,11 +590,11 @@ export default function FilesPage() {
           <CardSection divider padTop={12} padBottom={24}>
             <p style={{
               fontFamily:   'var(--font-body)',
-              fontWeight:   500,
-              fontSize:     16,
-              lineHeight:   '22px',
+              fontWeight:   'var(--font-weight-medium)',
+              fontSize:     'var(--font-size-body-lg)',
+              lineHeight:   'var(--line-height-body)',
               color:        'var(--neutral-900)',
-              margin:       '0 0 4px',
+              margin:       '0 0 var(--space-1)',
               overflow:     'hidden',
               textOverflow: 'ellipsis',
               whiteSpace:   'nowrap',
@@ -603,9 +603,9 @@ export default function FilesPage() {
             </p>
             <p style={{
               fontFamily:   'var(--font-body)',
-              fontWeight:   400,
-              fontSize:     14,
-              lineHeight:   '22px',
+              fontWeight:   'var(--font-weight-regular)',
+              fontSize:     'var(--font-size-body)',
+              lineHeight:   'var(--line-height-body)',
               color:        'var(--neutral-500)',
               margin:       0,
               overflow:     'hidden',
@@ -648,25 +648,25 @@ export default function FilesPage() {
           <CardSection padTop={12} padBottom={12}>
             <p style={{
               fontFamily: 'var(--font-body)',
-              fontWeight: 500,
-              fontSize:   14,
-              lineHeight: '22px',
+              fontWeight: 'var(--font-weight-medium)',
+              fontSize:   'var(--font-size-body)',
+              lineHeight: 'var(--line-height-body)',
               color:      'var(--neutral-900)',
-              margin:     '0 0 2px',
+              margin:     '0 0 var(--space-0-5)',
             }}>
               Allowed file types
             </p>
             <p style={{
               fontFamily: 'var(--font-body)',
-              fontWeight: 400,
-              fontSize: 12,
-              lineHeight: '16px',
+              fontWeight: 'var(--font-weight-regular)',
+              fontSize: 'var(--font-size-small)',
+              lineHeight: 'var(--line-height-small)',
               color:      'var(--neutral-500)',
-              margin:     '0 0 12px',
+              margin:     '0 0 var(--space-3)',
             }}>
               File types accepted for upload across all surfaces - chat, agents, and knowledge base.
             </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
               {FILE_TYPES.map(type => (
                 <BrownBadge key={type}>{type}</BrownBadge>
               ))}
@@ -679,11 +679,11 @@ export default function FilesPage() {
           <CardSection divider padTop={12} padBottom={24}>
             <p style={{
               fontFamily:   'var(--font-body)',
-              fontWeight:   500,
-              fontSize:     16,
-              lineHeight:   '22px',
+              fontWeight:   'var(--font-weight-medium)',
+              fontSize:     'var(--font-size-body-lg)',
+              lineHeight:   'var(--line-height-body)',
               color:        'var(--neutral-900)',
-              margin:       '0 0 4px',
+              margin:       '0 0 var(--space-1)',
               overflow:     'hidden',
               textOverflow: 'ellipsis',
               whiteSpace:   'nowrap',
@@ -692,9 +692,9 @@ export default function FilesPage() {
             </p>
             <p style={{
               fontFamily:   'var(--font-body)',
-              fontWeight:   400,
-              fontSize:     14,
-              lineHeight:   '22px',
+              fontWeight:   'var(--font-weight-regular)',
+              fontSize:     'var(--font-size-body)',
+              lineHeight:   'var(--line-height-body)',
               color:        'var(--neutral-500)',
               margin:       0,
               overflow:     'hidden',
@@ -709,26 +709,26 @@ export default function FilesPage() {
             {/* Inner white table card */}
             <div style={{
               backgroundColor: 'var(--neutral-white)',
-              borderRadius:    8,
+              borderRadius:    'var(--radius-md)',
               border:          '1px solid var(--neutral-100)',
-              boxShadow:       '0px 2px 2.8px 0px rgba(82,75,71,0.12)',
+              boxShadow:       'var(--shadow-soft)',
               overflow:        'hidden',
-              padding:         12,
+              padding:         'var(--space-3)',
             }}>
               {/* Table header */}
               <div style={{
                 display:             'grid',
                 gridTemplateColumns: '1fr 1fr 1fr 1fr',
-                gap:                 42,
-                padding:             '0 12px 12px',
+                gap:                 'var(--settings-preview-gap-lg)',
+                padding:             '0 var(--space-3) var(--space-3)',
                 borderBottom:        '1px solid var(--neutral-100)',
               }}>
                 {['Plan', 'Storage', 'Max file size', 'Retention'].map(col => (
                   <span key={col} style={{
                     fontFamily: 'var(--font-body)',
-                    fontWeight: 400,
-                    fontSize:   14,
-                    lineHeight: '22px',
+                    fontWeight: 'var(--font-weight-regular)',
+                    fontSize:   'var(--font-size-body)',
+                    lineHeight: 'var(--line-height-body)',
                     color:      'var(--neutral-900)',
                     overflow:   'hidden',
                     textOverflow:'ellipsis',
@@ -746,17 +746,17 @@ export default function FilesPage() {
                   style={{
                     display:             'grid',
                     gridTemplateColumns: '1fr 1fr 1fr 1fr',
-                    gap:                 42,
-                    padding:             '12px',
+                    gap:                 'var(--settings-preview-gap-lg)',
+                    padding:             'var(--space-3)',
                     borderBottom:        row.last ? undefined : '1px solid var(--neutral-100)',
                     alignItems:          'center',
                   }}
                 >
                   <span style={{
                     fontFamily:   'var(--font-body)',
-                    fontWeight:   500,
-                    fontSize:     14,
-                    lineHeight:   '22px',
+                    fontWeight:   'var(--font-weight-medium)',
+                    fontSize:     'var(--font-size-body)',
+                    lineHeight:   'var(--line-height-body)',
                     color:        'var(--neutral-900)',
                     overflow:     'hidden',
                     textOverflow: 'ellipsis',
@@ -766,9 +766,9 @@ export default function FilesPage() {
                   </span>
                   <span style={{
                     fontFamily:   'var(--font-body)',
-                    fontWeight:   500,
-                    fontSize:     14,
-                    lineHeight:   '22px',
+                    fontWeight:   'var(--font-weight-medium)',
+                    fontSize:     'var(--font-size-body)',
+                    lineHeight:   'var(--line-height-body)',
                     color:        'var(--neutral-900)',
                     overflow:     'hidden',
                     textOverflow: 'ellipsis',
@@ -778,9 +778,9 @@ export default function FilesPage() {
                   </span>
                   <span style={{
                     fontFamily:   'var(--font-body)',
-                    fontWeight:   400,
-                    fontSize:     14,
-                    lineHeight:   '22px',
+                    fontWeight:   'var(--font-weight-regular)',
+                    fontSize:     'var(--font-size-body)',
+                    lineHeight:   'var(--line-height-body)',
                     color:        'var(--neutral-900)',
                     overflow:     'hidden',
                     textOverflow: 'ellipsis',
@@ -790,9 +790,9 @@ export default function FilesPage() {
                   </span>
                   <span style={{
                     fontFamily:   'var(--font-body)',
-                    fontWeight:   400,
-                    fontSize:     14,
-                    lineHeight:   '22px',
+                    fontWeight:   'var(--font-weight-regular)',
+                    fontSize:     'var(--font-size-body)',
+                    lineHeight:   'var(--line-height-body)',
                     color:        'var(--neutral-900)',
                     overflow:     'hidden',
                     textOverflow: 'ellipsis',
@@ -811,11 +811,11 @@ export default function FilesPage() {
           <CardSection divider padTop={12} padBottom={24}>
             <p style={{
               fontFamily:   'var(--font-body)',
-              fontWeight:   500,
-              fontSize:     16,
-              lineHeight:   '22px',
+              fontWeight:   'var(--font-weight-medium)',
+              fontSize:     'var(--font-size-body-lg)',
+              lineHeight:   'var(--line-height-body)',
               color:        'var(--neutral-900)',
-              margin:       '0 0 4px',
+              margin:       '0 0 var(--space-1)',
               overflow:     'hidden',
               textOverflow: 'ellipsis',
               whiteSpace:   'nowrap',
@@ -824,9 +824,9 @@ export default function FilesPage() {
             </p>
             <p style={{
               fontFamily:   'var(--font-body)',
-              fontWeight:   400,
-              fontSize:     14,
-              lineHeight:   '22px',
+              fontWeight:   'var(--font-weight-regular)',
+              fontSize:     'var(--font-size-body)',
+              lineHeight:   'var(--line-height-body)',
               color:        'var(--neutral-500)',
               margin:       0,
               overflow:     'hidden',
@@ -839,13 +839,13 @@ export default function FilesPage() {
 
           {/* Export all data */}
           <CardSection divider padTop={12} padBottom={24}>
-            <div style={{ display: 'flex', gap: 64, alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-10)', alignItems: 'flex-start' }}>
               <div style={{ flex: '1 0 0', minWidth: 0 }}>
                 <p style={{
                   fontFamily: 'var(--font-body)',
-                  fontWeight: 500,
-                  fontSize:   14,
-                  lineHeight: '22px',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontSize:   'var(--font-size-body)',
+                  lineHeight: 'var(--line-height-body)',
                   color:      'var(--neutral-900)',
                   margin:     0,
                 }}>
@@ -853,9 +853,9 @@ export default function FilesPage() {
                 </p>
                 <p style={{
                   fontFamily: 'var(--font-body)',
-                  fontWeight: 400,
-                  fontSize: 12,
-                  lineHeight: '16px',
+                  fontWeight: 'var(--font-weight-regular)',
+                  fontSize: 'var(--font-size-small)',
+                  lineHeight: 'var(--line-height-small)',
                   color:      'var(--neutral-500)',
                   margin:     0,
                 }}>
@@ -868,13 +868,13 @@ export default function FilesPage() {
 
           {/* Clear all files */}
           <CardSection padTop={12} padBottom={12}>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'flex-start' }}>
               <div style={{ flex: '1 0 0', minWidth: 0 }}>
                 <p style={{
                   fontFamily: 'var(--font-body)',
-                  fontWeight: 500,
-                  fontSize:   14,
-                  lineHeight: '22px',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontSize:   'var(--font-size-body)',
+                  lineHeight: 'var(--line-height-body)',
                   color:      'var(--neutral-900)',
                   margin:     0,
                 }}>
@@ -882,9 +882,9 @@ export default function FilesPage() {
                 </p>
                 <p style={{
                   fontFamily: 'var(--font-body)',
-                  fontWeight: 400,
-                  fontSize: 12,
-                  lineHeight: '16px',
+                  fontWeight: 'var(--font-weight-regular)',
+                  fontSize: 'var(--font-size-small)',
+                  lineHeight: 'var(--line-height-small)',
                   color:      'var(--neutral-500)',
                   margin:     0,
                 }}>

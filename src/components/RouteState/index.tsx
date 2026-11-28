@@ -33,7 +33,7 @@ export function RouteState({
       <Heading className="m-0 font-[family-name:var(--font-title)] text-2xl leading-8 font-normal text-[var(--neutral-900)]">
         {heading}
       </Heading>
-      <p className="m-0 max-w-[420px] text-sm leading-[22px] text-[var(--neutral-600)]">
+      <p className="m-0 max-w-[420px] text-sm leading-[var(--line-height-body)] text-[var(--neutral-600)]">
         {body}
       </p>
       {actions && <div className="flex gap-2">{actions}</div>}

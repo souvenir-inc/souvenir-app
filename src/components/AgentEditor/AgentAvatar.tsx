@@ -14,7 +14,6 @@ import { useStoredAvatarChoice } from '@/lib/avatar-choice'
 // inside a halo of its own colour (40%). Used wherever the editor shows the avatar, so it
 // matches the agent cards. Plays its hover animation when the pointer is over it.
 
-const HALO = 2
 
 export function AgentAvatar({
   name,
@@ -46,17 +45,17 @@ export function AgentAvatar({
       onMouseLeave={() => { setHovered(false); gaze.setPointer(null) }}
       onPointerMove={e => gaze.setPointer({ x: e.clientX, y: e.clientY })}
       onClick={() => setBounceKey(n => n + 1)}
-      style={{ position: 'relative', width: size, height: size, margin: HALO, flexShrink: 0, cursor: 'pointer' }}
+      style={{ position: 'relative', width: size, height: size, margin: 'var(--space-0-5)', flexShrink: 0, cursor: 'pointer' }}
     >
       <div
         style={{
           position:        'absolute',
-          inset:           -HALO,
+          inset:           'calc(var(--space-0-5) * -1)',
           borderRadius:    '50%',
           backgroundColor: `color-mix(in srgb, ${config.colors[0]} 40%, transparent)`,
           boxShadow:       'var(--shadow-avatar-ring)',
           transform:       hovered ? 'scale(1.08)' : 'scale(1)',
-          transition:      'transform 300ms cubic-bezier(0.22, 1, 0.36, 1)',
+          transition:      'transform var(--duration-slow) var(--ease-out-quint)',
         }}
       />
       {/* The agent card's glass orb, so the avatar reads the same here as on the card. */}

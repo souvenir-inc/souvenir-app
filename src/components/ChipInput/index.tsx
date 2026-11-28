@@ -3,6 +3,7 @@
 import React, { useCallback, useRef, useState } from 'react'
 import { AnimatePresence, m, useAnimation } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { BLUR, DURATION } from "@/styles/tokens/motion"
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -68,7 +69,7 @@ export function ChipInput(
     const [isHovered, setIsHovered] = useState(false)
     const [isFocused, setIsFocused] = useState(false)
     // Shake-on-cap animation - same controls API as `PinCommentField`'s
-    // 2-line cap, applied here when the user types past `MAX_LENGTH`.
+    // 2-line cap, applied here when the user types past `maxLength`.
     const shakeControls = useAnimation()
 
     const isControlled = controlledValue !== undefined
@@ -98,7 +99,7 @@ export function ChipInput(
         if (inputRef.current) inputRef.current.value = value
         shakeControls.start({
           x: [0, -3, 3, -2, 2, -1, 1, 0],
-          transition: { duration: 0.25, ease: 'easeInOut' },
+          transition: { duration: DURATION.moderate, ease: 'easeInOut' },
         })
         return
       }
@@ -122,12 +123,12 @@ export function ChipInput(
           display:         'inline-grid',
           alignItems:      'center',
           minWidth:        MIN_WIDTH,
-          padding:         '2px 4px',
-          borderRadius:    '6px',
+          padding:         'var(--space-0-5) var(--space-1)',
+          borderRadius:    'var(--radius-sm)',
           backgroundColor: 'var(--field-surface)',
           boxShadow:       shadow,
           overflow:        'clip',
-          transition:      'box-shadow 150ms',
+          transition:      'box-shadow var(--duration-fast)',
           cursor:          'text',
           ...style,
         }}
@@ -139,9 +140,9 @@ export function ChipInput(
             <m.span
               key="placeholder"
               aria-hidden
-              initial={{ opacity: 0, filter: 'blur(2px)' }}
-              animate={{ opacity: 1, filter: 'blur(0px)', transition: { duration: 0.2 } }}
-              exit={{    opacity: 0, filter: 'blur(2px)', transition: { duration: 0.15 } }}
+              initial={{ opacity: 0, filter: `blur(${BLUR['2xs']}px)` }}
+              animate={{ opacity: 1, filter: 'blur(0px)', transition: { duration: DURATION.base } }}
+              exit={{    opacity: 0, filter: `blur(${BLUR['2xs']}px)`, transition: { duration: DURATION.quick } }}
               style={{
                 position:      'absolute',
                 top:           2,

@@ -1,5 +1,7 @@
 # Global Search: System Design Audit
 
+> **Note (2026-11-25):** `lib/search.ts` is now `lib/search/global-search.ts`. Current status: [re-audit](./reaudit-2026-11-25.md).
+
 > **Status (Oct 14 2026): Phase 1 done**, except keyboard/focus tests for the modal (no DOM test setup). **Phase 2 done** (2.2 as a notice + load-more until a search endpoint exists). **Phase 3.3 and Phase 4.4 done; 3.1, 3.2, 3.4 wait on the backend search endpoint.**
 >
 > Done (Phase 1):

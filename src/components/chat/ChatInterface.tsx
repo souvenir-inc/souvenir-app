@@ -47,7 +47,10 @@ import { useInitialPrompt } from "./hooks/use-initial-prompt";
 import { useAttachmentIntake } from "./hooks/use-attachment-intake";
 import { useComposerQueue, useQueuedSend } from "./hooks/use-composer-queue";
 import { useRevealSettle } from "./hooks/use-reveal-settle";
+import { useFollowRunningReply } from "./hooks/use-follow-running-reply";
+import { composerMustQueue, runningReplyToWaitOn } from "./composer-must-queue";
 import { sendTurn as sendTurnWith, useMessageActions, useTurnGuards, type TurnKit } from "./hooks/use-chat-turns";
+
 
 // The container for a chat: message state, sending/queueing turns and the
 // composer. Each hook below is called in the order its effects must run.
@@ -191,8 +194,12 @@ export function ChatInterface({
     refreshMessages,
     messagesLoadError,
     historyLoadId,
-    runningMessageId,
+    runningMessageId: historyRunningId,
   } = useChatState(chatId, chatStateOptions);
+  // The reply the history shows still running, which sends wait on. Not for a chat on its own
+  // endpoint: nothing here follows that reply or can ask whether its run ended (the run-state
+  // lookup covers the regular chat endpoint only), so waiting on it would hold every send.
+  const runningMessageId = runningReplyToWaitOn(historyRunningId, endpoint);
 
   // Append host-supplied local messages (the agent card) — merged during render; see the hook.
   useInjectedMessages(injectedMessages, setMessages, onInjectedMessagesConsumed);
@@ -227,7 +234,9 @@ export function ChatInterface({
     onChatMoveToTop: (id) => moveToTop(id),
     setStreamState,
     onStreamDone: refreshUser,
-    onStreamLost: () => void refreshMessages(),
+    // Only the chat on screen reloads: a stream lost after the user moved to another chat
+    // must not install its chat's history over that one.
+    onStreamLost: (lostChatId) => { if (lostChatId === currentChatIdRef.current) void refreshMessages() },
     currentChatIdRef,
     // Streamed tokens go to lib/chat/stream-store and re-render only the
     // streaming row (LiveChatMessage), not this whole tree.
@@ -236,14 +245,11 @@ export function ChatInterface({
     ...(onStopBackend ? { onStopBackend } : {}),
   });
 
-  // A chat opened while its reply is still being generated (a reload, another
-  // tab, coming back from another chat) reads the reply from the turn's stream,
-  // into the turn's own message. Only the regular chat endpoint has one.
-  useEffect(() => {
-    if (!chatId || endpoint || !runningMessageId || isStreamActive(chatId)) return
-    void followStream(chatId, runningMessageId, messages.find((message) => message.id === runningMessageId))
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per history load that finds a running turn; followStream is fresh each render
-  }, [chatId, runningMessageId, historyLoadId])
+  // Follows a reply still being generated when the chat is opened (see the hook).
+  const resetFollowBudget = useFollowRunningReply({
+    chatId, enabled: !endpoint, runningMessageId, historyLoadId, messages, followStream,
+    onRunEnded: () => void refreshMessages(),
+  })
 
   const isStreaming = streamState === "streaming" || streamState === "waiting";
   // This chat's reply is running — here, or still from before the user
@@ -379,7 +385,7 @@ export function ChatInterface({
     if (!text.trim() && allFiles.length === 0) return;
 
     // Hard-stop backstop: an exhausted credit/topup user cannot send. The input is
-    // already disabled and the CreditStatusBanner explains why, so block silently.
+    // already disabled and the credit banner (ExhaustionBanner) explains why, so block silently.
     if (creditStatus.blocked) return;
 
     // Same idea: a just-selected persona's system prompt/model is still being
@@ -401,8 +407,13 @@ export function ChatInterface({
 
     // A reply is still running (or messages are already waiting): this one is
     // queued to follow, in order. The isSendingRef check also catches a
-    // second send in the same tick, before `isStreaming` lands.
-    if (replyInFlight || isSendingRef.current || askingSaveRef.current > 0 || getChatQueue(queueKey)) {
+    // second send in the same tick, before `isStreaming` lands. runningMessageId: the
+    // history shows a reply still running that nothing here is reading yet; it goes out
+    // after that one, as a queued message would (see queueReady).
+    if (composerMustQueue({
+      replyInFlight, runningMessageId, sending: isSendingRef.current,
+      askingSave: askingSaveRef.current > 0, hasQueue: !!getChatQueue(queueKey),
+    })) {
       queueFromComposer(text);
       return;
     }
@@ -462,8 +473,14 @@ export function ChatInterface({
   // starts the next turn, so the answer is sent like any other message.
   // An answer given after the turn's run had left takes the run back up on the
   // backend: the history is read again, and the running reply is followed from it.
-  const handlePromptAnswered = () => {
-    if (chatId && !isStreamActive(chatId)) void refreshMessages();
+  const handlePromptAnswered = (answeredChatId: string) => {
+    // The answer takes the run up again, often under the same reply id: refusals counted
+    // before it say nothing about the resumed run, so it starts with a fresh budget. Only
+    // that chat's: the answer can land after the user has moved to another chat.
+    resetFollowBudget(answeredChatId);
+    // The chat on screen now, not when this callback was made: the answer can land after
+    // the user has opened another chat, whose history must not be replaced with this one's.
+    if (answeredChatId === currentChatIdRef.current && !isStreamActive(answeredChatId)) void refreshMessages();
   };
 
   const { revealingMessage, isRevealing, handleRevealSettled } = useRevealSettle({
@@ -475,9 +492,15 @@ export function ChatInterface({
   // settled (see useQueuedSend).
   const queueReady =
     queuedMessages.length > 0 && !queueHeldBy &&
-    !replyInFlight && !hookBusy && !askingSave &&
+    // runningMessageId: the history shows a reply still running that no stream here has
+    // followed to its end yet (just opened, before the follow starts): a message sent now
+    // would go into that run.
+    !replyInFlight && !runningMessageId && !hookBusy && !askingSave &&
     (!isRevealing || pageHidden) &&
-    !isLoadingMessages && !isSettling &&
+    // A history that failed to load: whether the reply before is still running is unknown (a
+    // message handed back from the background waits on this too), so nothing goes out until a
+    // load succeeds.
+    !isLoadingMessages && !messagesLoadError && !isSettling &&
     !queuePausedReason && !readOnly && !archived;
   useQueuedSend({
     queueReady, queueKey, pageHidden, isSendingRef, askingSaveRef, setQueuedRowExit, sendTurn: sendTurnLatest,

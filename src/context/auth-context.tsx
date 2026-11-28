@@ -24,7 +24,8 @@ import { creditsFromUsage, creditsFromBilling } from "@/lib/credits";
 import { normalizePct } from "@/lib/utils/format-utils";
 import { AUTH_LOGIN_ROUTE, AUTH_LOGOUT_ROUTE } from "@/lib/routes";
 import { isLoggingOut, markLoggingOut } from "@/lib/auth/logout-state";
-import { clearOrgIdCache, clearSearchRecents, clearSessionTiming } from "@/lib/storage-keys";
+import { clearDataPreferences, clearOrgIdCache, clearSearchRecents, clearSessionTiming } from "@/lib/storage-keys";
+import { clearChatSettings } from "@/lib/chat/chat-settings-storage";
 import { getQueryClient } from "@/lib/query-client";
 import { clearUserScopedCache } from "@/lib/query-invalidation";
 import { queryKeys } from "@/lib/query-keys";
@@ -34,7 +35,7 @@ import { clearSelection } from "@/lib/models/model-selection-store";
 export interface AuthUser {
   id?: string | number | null;
   /** Auth0 subject claim (the `sub`). Stable primary identity across every surface —
-   *  used as the Mixpanel distinct_id (never email; see docs/analytics/mixpanel-backend-contract.md). */
+   *  used as the Mixpanel distinct_id (never email; see fe-handbook/reference/analytics/mixpanel-backend-contract.md). */
   auth0Id?: string | null;
   email?: string | null;
   name?: string | null;
@@ -284,6 +285,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearOrgIdCache();
     clearSearchRecents();
     clearSessionTiming();
+    clearDataPreferences();
+    clearChatSettings();
     clearSelection();
     clearUserScopedCache(getQueryClient());
   };
@@ -317,6 +320,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearSessionTiming();
     clearSearchRecents();
     clearOrgIdCache();
+    clearDataPreferences();
+    clearChatSettings();
     // Other tabs share the cleared session cookie but still hold a token in
     // memory, so tell them to sign out too.
     broadcastLogout();

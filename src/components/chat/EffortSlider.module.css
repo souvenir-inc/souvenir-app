@@ -16,7 +16,7 @@
   position: relative;
   flex-grow: 1;
   height: 20px;
-  border-radius: 7px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-default);
   background: var(--neutral-100);
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.08), inset 0 0 0 1px var(--neutral-white);
@@ -29,17 +29,17 @@
   position: absolute;
   top: 2px;
   bottom: 2px;
-  margin-left: 2px;
-  border-radius: 4px;
+  margin-left: var(--space-0-5);
+  border-radius: var(--radius-xs);
   background: var(--effort-range-bg, var(--neutral-900));
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
-  transition: right 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: var(--effort-thumb-shadow);
+  transition: right var(--duration-base) cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Radix positions each thumb inside a wrapper span via `left` — easing that
    wrapper is what makes the thumb glide between snapped steps. */
 .root > span:has(> .thumb) {
-  transition: left 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: left var(--duration-base) cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* A thin light bar sitting just inside the fill's end. */
@@ -47,13 +47,13 @@
   display: block;
   width: 3px;
   height: 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--neutral-white);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--neutral-900) 18%, transparent);
   transform: translateX(-6px);
   outline: none;
   cursor: ew-resize;
-  transition: height 160ms ease, box-shadow 160ms ease;
+  transition: height var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
 }
 .thumb:hover { height: 13px; }
 .thumb:focus-visible {
@@ -68,15 +68,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 10px;
+  padding: 0 var(--space-2-5);
   pointer-events: none;
 }
 .pip {
   width: 2px;
   height: 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--neutral-300);
-  transition: background-color 260ms ease;
+  transition: background-color var(--duration-base) ease;
 }
 .pip[data-active="true"] { background: color-mix(in srgb, var(--neutral-white) 45%, transparent); }
 .pip[data-current="true"] { background: transparent; }
@@ -84,19 +84,19 @@
 .value {
   display: inline-block;
   color: var(--effort-color);
-  font-weight: 600;
-  transition: color 260ms ease;
+  font-weight: var(--font-weight-semibold);
+  transition: color var(--duration-base) ease;
 }
 
 .labels {
   display: flex;
   justify-content: space-between;
-  padding: 0 4px;
-  font-size: 11px;
+  padding: 0 var(--space-1);
+  font-size: var(--font-size-caption);
   color: var(--neutral-500);
 }
-.label { transition: color 260ms ease, font-weight 260ms ease; }
-.label[data-active="true"] { color: var(--neutral-900); font-weight: 600; }
+.label { transition: color var(--duration-base) ease, font-weight var(--duration-base) ease; }
+.label[data-active="true"] { color: var(--neutral-900); font-weight: var(--font-weight-semibold); }
 
 @media (prefers-reduced-motion: reduce) {
   .range, .thumb, .pip, .value, .label, .root > span:has(> .thumb) { transition: none; }

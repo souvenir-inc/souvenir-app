@@ -882,3 +882,606 @@
   outline:        2px solid var(--focus-ring);
   outline-offset: -2px;
 }
+
+/* ── Dashboard (Figma wRr8cpImqSXbIgk0XhNj7a, node 17:889) ───────────────────
+   Board panel, metric cards and charts. Values the palette already has point at
+   it; the rest are the Figma literals. The dark block sits here, outside the
+   generated theme.css, so regenerating the theme can't drop it (same as
+   --border-default in globals.css).
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --dashboard-panel-bg:        #FAF9F7;
+  --dashboard-card-bg:         var(--card-bg);
+  --dashboard-card-shadow:     0px 1px 2px 0px rgba(38, 33, 30, 0.04), 0px 0px 0px 1px rgba(38, 33, 30, 0.07);
+  --dashboard-raised-shadow:   0px 16px 32px -8px rgba(38, 33, 30, 0.14), 0px 4px 8px -2px rgba(38, 33, 30, 0.06), 0px 0px 0px 1px rgba(38, 33, 30, 0.08);
+  --dashboard-label:           var(--neutral-600);   /* card titles, idle tabs */
+  --dashboard-figure:          var(--neutral-900);   /* big numbers, period label */
+  --dashboard-muted:           var(--neutral-500);   /* axis ticks, legend, "vs previous" */
+  --dashboard-positive:        var(--success-700);
+  --dashboard-negative:        #B42318;
+  --dashboard-chart-ink:       var(--neutral-900);   /* bars, current-period line */
+  --dashboard-chart-area:      rgba(38, 33, 30, 0.04);
+  --dashboard-chart-soft:      var(--neutral-200);   /* gridlines, in-progress bar */
+  --dashboard-chart-compare:   #D3CEC8;              /* previous-period dashed line */
+  --dashboard-tabs-track:      #EFEBE7;
+  --dashboard-tab-active-from: var(--color-interactive-primary-surface-from);
+  --dashboard-tab-active-to:   var(--color-interactive-primary-surface-to);
+  --dashboard-tab-active-text: var(--color-interactive-primary-text);
+  --dashboard-sync-bg:         #F0ECE8;
+  --dashboard-sync-icon:       var(--neutral-700);
+  /* Board tabs (Figma 136:20976 "Tabs · every state") */
+  --dashboard-tab-hover:       #E5E0DA;
+  --dashboard-tab-pressed:     #DCD6CF;
+  --dashboard-tab-lifted:      #FFFFFF;              /* rename field, drag copy, open "N more" */
+  --dashboard-tab-lifted-shadow: 0px 6px 16px 0px rgba(38, 33, 30, 0.14), 0px 1px 2px 0px rgba(38, 33, 30, 0.08);
+  --dashboard-drop-line:       var(--focus-ring);    /* #0D6EB2 */
+  --dashboard-faint:           #8C847E;              /* placeholder, hidden boards, counts */
+  --dashboard-error:           #9F2623;
+  --dashboard-error-bg:        #FEF2F1;
+  --dashboard-error-border:    #EFC6C3;
+  /* Board screen 6D (Figma 73:20404) */
+  --dashboard-sync-behind:     #B45309;              /* amber dot: an app is behind */
+  --dashboard-sync-failed:     #B42318;              /* red dot: an app failed */
+  --dashboard-popover-shadow:  0px 12px 28px -6px rgba(38, 33, 30, 0.18), 0px 2px 4px 0px rgba(38, 33, 30, 0.06), 0px 0px 0px 1px rgba(38, 33, 30, 0.08);
+  --dashboard-control-shadow:  0px 1px 2px 0px rgba(38, 33, 30, 0.1), 0px 0px 0px 1px rgba(38, 33, 30, 0.06);  /* card ×, Refresh */
+  --dashboard-drop-slot:       rgba(13, 110, 178, 0.06);  /* where a dragged card will land */
+  /* Manage tabs (Figma 415:64464) */
+  --dashboard-tag-bg:          rgba(38, 33, 30, 0.07);  /* Tag / Shared: text colour at 7 %, see-through */
+  --dashboard-tag-bg-muted:    rgba(38, 33, 30, 0.04);  /* Tag / Shared, Muted (Hidden list) */
+  --dashboard-row-hover:       rgba(38, 33, 30, 0.04);  /* a Manage tabs row on hover or with its ⋯ open */
+  --dashboard-avatar-violet:   #8B6CC9;                 /* the owner avatar in a shared board's menu */
+  /* Sync (Figma 95:18703) */
+  --dashboard-sync-fresh:      var(--dashboard-positive);  /* green dot, synced banner icon */
+  --dashboard-sync-offline:    var(--dashboard-faint);     /* grey dot: can't check now */
+  --dashboard-spinner-track:   #DDD7D1;
+  --dashboard-spinner-ink:     var(--neutral-700);
+  --dashboard-shimmer-light:   #C9C2BC;                    /* the light band across a syncing number */
+  --dashboard-banner-failed-bg:     #FDEFED;
+  --dashboard-banner-failed-border: #F2CBC6;
+  --dashboard-banner-behind-bg:     #FDF4E7;
+  --dashboard-banner-behind-border: #F1D9B5;
+  --dashboard-banner-syncing-bg:    #F5F2EF;
+  --dashboard-banner-syncing-border: var(--neutral-200);
+  --dashboard-banner-synced-bg:     #EDF7F0;
+  --dashboard-banner-synced-border: #C9E7D3;
+  --dashboard-toast-border:    #E7E2DC;
+  --dashboard-toast-shadow:    0px 1px 2px 0px rgba(38, 33, 30, 0.06), 0px 8px 24px 0px rgba(38, 33, 30, 0.12);
+  --dashboard-window-bar-bg:   var(--neutral-900);         /* offline bar above the window */
+  --dashboard-window-bar-text: #F7F2ED;
+  --dashboard-window-bar-muted: #C9C2BC;
+  --dashboard-window-bar-online: var(--dashboard-positive);
+  /* Cards while reading (Figma 167:27720) */
+  --dashboard-card-hover-shadow: 0px 0px 0px 1px rgba(38, 33, 30, 0.16), 0px 8px 20px -10px rgba(38, 33, 30, 0.16);
+  --dashboard-chart-previous:  #C9C4BF;              /* the period before: dashed line, legend, readout dot */
+  --dashboard-hover-line:      #C9C4BF;              /* the hairline on the hovered day */
+  --dashboard-hover-band:      #F5F2EF;              /* the hovered week behind its bar; a hovered list row */
+  --dashboard-readout-shadow:  0px 4px 12px -2px rgba(38, 33, 30, 0.12), 0px 0px 0px 1px #E4E0DC;
+  --dashboard-window-shadow:   0px 24px 48px -12px rgba(38, 33, 30, 0.28);
+  --dashboard-list-shadow:     0px 12px 24px -8px rgba(38, 33, 30, 0.16);
+  --dashboard-list-border:     #D3CEC8;
+  --dashboard-shimmer-from:    #F0ECE8;              /* a loading number's shape */
+  --dashboard-shimmer-via:     #F8F6F3;
+  --dashboard-pill-bg:         #F9F8F5;              /* health pill: on track, below / above healthy */
+  --dashboard-pill-border:     #E4E0DC;
+  --dashboard-pill-bad-bg:     rgba(239, 68, 68, 0.08);  /* health pill: off target, red flag */
+  --dashboard-pill-bad-border: rgba(239, 68, 68, 0.3);
+  --dashboard-pill-bad-text:   #B91C1C;
+  --dashboard-pill-warn-text:  #92400E;
+  --dashboard-pill-warn-dot:   #D97706;
+  /* Add cards (Figma 167:27723) */
+  --dashboard-checkbox-border: #C9C2BB;
+  --dashboard-landed-ring:     #8A817B;              /* a new card for 2 s */
+  --dashboard-landed-halo:     rgba(38, 33, 30, 0.08);
+  --dashboard-field-shadow:    0px 0px 0px 3px rgba(38, 33, 30, 0.06);  /* the picker search field's soft ring */
+  --dashboard-rail-rule:       rgba(59, 54, 50, 0.1);
+  --dashboard-lift-shadow:     0px 1px 1px rgba(38, 33, 30, 0.06);  /* a selected rail item, a picked row */
+  --dashboard-button-shadow:   0px 1px 2px rgba(38, 33, 30, 0.06);  /* outlined Connect, Clear search */
+  /* The Toast component (Figma 16:993, 07 CP-2) */
+  --dashboard-toast-ring:      0px 1px 1.5px rgba(82, 74, 71, 0.12), 0px 6px 16px -4px rgba(38, 33, 31, 0.1), 0px 0px 0px 1px var(--neutral-200);
+  --dashboard-toast-action-bg: var(--neutral-900);
+  --dashboard-toast-action-text: #F7F2ED;
+  /* New board (Figma 167:27724) */
+  --dashboard-waiting-border:  #C9C2BC;              /* a card waiting for its app, a faded outline card */
+  --dashboard-way-border:      #A39A93;              /* a chooser card hovered or focused */
+  --dashboard-outline-bar:     #EDE8E3;              /* where an outline card's number will sit */
+  --dashboard-chooser-shadow:  0px 1px 2px rgba(18, 12, 8, 0.06), 0px 8px 24px rgba(18, 12, 8, 0.12);
+  /* Share and export (Figma 167:27725): people's soft avatar fills, initials in --dashboard-figure */
+  --dashboard-avatar-1:        #F0E4D4;
+  --dashboard-avatar-2:        #DDE6F0;
+  --dashboard-avatar-3:        #E1EBDD;
+  --dashboard-avatar-4:        #EFE0E6;
+  --dashboard-avatar-5:        #E8E2F2;
+  --dashboard-avatar-6:        #F2E8D0;
+  --dashboard-chip-bg:         #EFEBE7;              /* a picked person or team in the add field */
+  --dashboard-slack-preview:   #FBFAF8;              /* the Slack message preview's fill */
+  /* Edit mode (Figma 19:4778, 19:5600): the remove badge, the resize arc, the resize landing slot */
+  --dashboard-badge-bg:        #E4E0DC;
+  --dashboard-badge-shadow:    0px 2px 6px -1px rgba(38, 33, 31, 0.18);
+  --dashboard-slot-line:       #9C938B;              /* the landing slot's dashed line */
+  --dashboard-slot-fill:       rgba(38, 33, 30, 0.03);
+  --dashboard-resize-shadow:   0px 10px 24px 0px rgba(38, 33, 30, 0.16);
+}
+
+/* ── Component values (mapped 2026-11-25) ── */
+/* Exact values one component (or a few) use, named for what they style. Generated by
+   scripts/codemods/component-tokens.mjs; edit the values here. */
+:root {
+  /* Chat answer prose (never snapped: plan, Appendix B) */
+  --prose-table-cell-padding: 10px 14px;
+  --prose-code-padding: 1px 5px;
+  --prose-list-indent: 22px;
+  --prose-list-gap: 5px;
+  --raw-output-padding: 10px 14px; /* the 'Show raw output' block under a tool result */
+  --latex-inline-size: 0.875em;
+  /* Chat widgets */
+  --widget-border: 1px solid rgba(82, 75, 71, 0.12);
+  --widget-code-bg: #1E1A17;
+  --chart-tooltip-bg: #26211E; /* dark in both themes, unlike --neutral-900 */
+  --chart-label-line-height: 15px;
+  --chart-tick-line-height: 14px;
+  --chat-widget-title-size: 13.5px;
+  --funnel-card-shadow: 0 10px 28px rgba(82, 75, 71, 0.09), 0 2px 4px rgba(82, 75, 71, 0.07);
+  --map-bar-track: rgba(82, 75, 71, 0.09);
+  --map-chip-shadow: 0 2px 8px rgba(82, 75, 71, 0.08);
+  --map-control-shadow: 0 1px 4px rgba(38, 33, 30, 0.18);
+  --map-popup-shadow: 0 6px 20px rgba(38, 33, 30, 0.16);
+  --weather-card-padding: 24px clamp(20px, 4vw, 30px);
+  --weather-temp-size: clamp(46px, 9vw, 68px);
+  --weather-temp-line-height: 0.9;
+  --weather-unit-size: 0.42em;
+  --weather-chip-border: 1px solid rgba(255, 255, 255, 0.72);
+  --activity-row-detail-indent: 44px;
+  /* Chat home and composer */
+  --chat-home-padding: 32px clamp(20px, 5vw, 64px);
+  --chat-home-app-stack-overlap: -5px;
+  --chat-home-context-bar-bg-dark: #202020;
+  --chat-home-context-action-hover-dark: rgba(255, 255, 255, 0.12);
+  --dark-surface-border: rgba(255, 255, 255, 0.14); /* a hairline on dark surfaces */
+  --model-menu-scroll-bleed: -5px;
+  --effort-thumb-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  --chip-tooltip-bg: color-mix(in srgb, currentColor 12%, transparent);
+  --chip-tooltip-underline: inset 0 -1px 0 color-mix(in srgb, currentColor 22%, transparent);
+  --enhance-field-gap: 25px;
+  --exhaustion-banner-padding: 4px 4% 8px;
+  --citation-divider-bleed: 0 -14px;
+  /* Agents */
+  --agents-page-gap: 41px;
+  --agents-new-gap: 35px;
+  --agents-empty-padding: 80px 24px;
+  --agent-published-gap: 76px;
+  --agent-template-card-padding: 16px 17px;
+  --agent-template-card-radius: 15px;
+  --agent-card-chip-bg: rgba(255, 255, 255, 0.6);
+  --agent-card-chip-bg-dark: rgba(10, 10, 10, 0.32);
+  --agent-card-chip-bg-solid: rgba(255, 255, 255, 0.92); /* reduced transparency */
+  --agent-card-chip-bg-solid-dark: rgba(10, 10, 10, 0.5);
+  --agent-card-chip-border: 1px solid rgba(0, 0, 0, 0.06);
+  --agent-hero-inner-ring: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  --agent-hero-vignette-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 -24px 32px -24px rgba(0, 0, 0, 0.45);
+  --agent-hero-vignette: radial-gradient(ellipse 70% 80% at 50% 52%, transparent 45%, rgba(0, 0, 0, 0.38) 100%);
+  --agent-orb-dots: radial-gradient(circle, rgba(0, 0, 0, 0.05) 0.6px, transparent 0.9px) 0 0 / 4px 4px;
+  --agent-orb-glint: linear-gradient(transparent, rgba(255, 255, 255, 0.12), transparent);
+  --agent-cta-sheen: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%) -150% 0 / 250% 100% no-repeat;
+  --agent-zzz-color: rgba(255, 255, 255, 0.75);
+  --agent-zzz-size-md: 8px;
+  --agent-zzz-size-sm: 6px;
+  /* Buttons */
+  --button-shine: linear-gradient(100deg, transparent 40%, rgba(255, 255, 255, 0.5) 50%, transparent 60%) no-repeat;
+  --button-shiny: linear-gradient(120deg, transparent 40%, rgba(255, 255, 255, 0.45) 50%, transparent 60%);
+  --danger-chip-ring: 0px 0px 0px 1px rgba(238, 48, 48, 0.22);
+  /* Sidebar, menus and shell */
+  --sidebar-header-top: 17px;
+  --sidebar-project-row-padding-y: 5px;
+  --sidebar-menu-shadow: 0 4px 16px rgba(0, 0, 0, 0.10), 0 1px 4px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --team-switcher-avatar-shadow: 0px 1px 1.5px 0px rgba(82, 75, 71, 0.12), 0px 0px 0px 1px rgba(212, 212, 212, 0.4);
+  --settings-drawer-shadow: 4px 0 24px rgba(0, 0, 0, 0.16);
+  --drawer-scrim: rgba(0, 0, 0, 0.32);
+  --dialog-header-close-inset: 56px; /* room for the close button */
+  --folder-icon-tab-dark: #2B2B2B;
+  --selection-popover-radius: 8.73px;
+  --notification-row-padding: 8px 26px 8px 8px;
+  --memory-item-detail-padding: 4px 24px 18px 44px;
+  --account-row-actions-inset: 112px;
+  /* Pages */
+  --page-top-inset: 80px; /* new-agent and new-project pages */
+  --projects-page-top: 35px;
+  --project-form-field-shadow: 0px 1px 1.5px 0px rgba(82, 75, 71, 0.12);
+  --members-toolbar-padding: 12px 23px 0 24px;
+  --avatar-upload-scrim: rgba(38, 33, 30, 0.55);
+  --help-tile-hover-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  --share-accept-note-ring: 0px 0px 0px 1px rgba(13, 110, 178, 0.15);
+  --chat-share-answer-inset: 10%;
+  --compare-lab-top: 8vh;
+  --super-link-gap: 31px;
+  --welcome-title-size: 34px;
+  --welcome-wordmark-gap: 11.5px;
+  --welcome-cta-shadow: 0px 0px 0px 1px black, 0px 1px 1px rgba(59, 54, 50, 0.1), 0px 1.5px 3px rgba(59, 54, 50, 0.4);
+  --context-overview-cta-shadow: 0 6px 18px -6px rgba(38, 33, 30, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  /* Onboarding */
+  --onboarding-plans-section-gap: 78px;
+  --onboarding-plans-pair-gap: 92px;
+  --onboarding-plans-compact-gap: 53px;
+  --onboarding-plans-card-shadow: 0px 1.091px 1.091px rgba(59, 54, 50, 0.05), 0px 1.455px 3.127px rgba(38, 33, 30, 0.15);
+  --onboarding-join-card-radius: 11.5px;
+  /* Library */
+  --library-empty-padding: 24px 24px 10vh;
+  --library-empty-art-overlap: -36px;
+  --library-header-padding: 28px clamp(8px, 4vw, 40px) 13px;
+  --library-suggested-padding: 15px 40px 120px;
+  --library-card-skeleton-padding: 15px 17px 13px;
+  --file-screen-padding: 64px 32px 120px;
+  --file-screen-page-padding: 56px 64px;
+  --file-screen-page-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --file-screen-slide-margin: 0 16px 96px;
+  --file-screen-radius: 19px;
+  --file-row-hover-bg: rgba(0, 0, 0, 0.03);
+  --picker-tools-scrolled-shadow: 0 6px 12px -10px rgba(0, 0, 0, 0.28);
+  --picker-card-hover-shadow: 0 6px 16px -10px rgba(0, 0, 0, 0.25);
+  /* Slack config */
+  --slack-config-search-padding: 0 10px 0 31px;
+  --slack-config-content-padding: 30px 34px 38px;
+  --slack-config-card-padding: 17px 20px 16px;
+  --slack-config-empty-padding: 56px 32px 48px;
+  --slack-config-focus-ring: 0 0 0 3px rgba(114, 105, 98, 0.08);
+  --slack-config-card-shadow: 0 1px 2px rgba(82, 75, 71, .03);
+  --slack-config-panel-shadow: 0 1px 2px rgba(82, 75, 71, 0.04);
+  --slack-config-empty-icon-shadow: 0 2px 6px -2px rgba(82, 75, 71, 0.18);
+  --slack-config-heading-size: 21px;
+  --slack-config-weight-light: 450;
+  --slack-config-weight-strong: 550;
+  --slack-config-weight-heavy: 650;
+  /* Dashboard (Figma values) */
+  --dashboard-toast-padding: 12px 14px;
+  --dashboard-toast-action-padding: 3px 10px;
+  --dashboard-toast-line-height: 18px;
+  --dashboard-scrollbar-radius: 2px;
+  /* Hidden settings previews (behind NEXT_PUBLIC_ENABLE_SETTINGS_PREVIEW) */
+  --settings-preview-ring: 0px 0px 0px 1px rgba(59, 54, 50, 0.3);
+  --settings-preview-border: 0.727px solid rgba(59, 54, 50, 0.3);
+  --settings-preview-gap-xs: 5px;
+  --settings-preview-gap-sm: 9px;
+  --settings-preview-gap-lg: 42px;
+  --settings-preview-chip-padding: 5px 8px;
+  --settings-preview-pill-padding: 7px 10px;
+  --settings-preview-radius-xs: 2px;
+  --settings-preview-radius-sm: 3px;
+  /* Question card */
+  --question-card-meta-line-height: 11px;
+
+  /* Tailwind arbitrary values (mapped 2026-11-26): exact values from className strings */
+  --button-lg-padding-x: 22px;
+  --switch-thumb-radius: 9.5px;
+  --toggle-transition-duration: var(--duration-quick); /* Checkbox and Switch fill */
+  --schedule-instructions-padding-y: 9px;
+  --connector-modal-icon-radius: 11px;
+  --connector-modal-title-size: 22px;
+  --connector-modal-title-line-height: 1.2;
+  --checkout-title-line-height: 34px;
+  --template-title-line-height: 26px;
+  --citation-popover-z: 9999;
+  --instructions-field-shadow: 0px 1px 1.5px 0px rgba(82, 75, 71, 0.08);
+  --instructions-field-focus-shadow: 0px 0px 0px 3px rgba(74, 131, 191, 0.25), 0px 1px 1.5px 0px rgba(82, 75, 71, 0.12);
+  /* Dashboard (Figma values, from className strings) */
+  --dashboard-page-top: 15px;
+  --dashboard-download-note-indent: 21px;
+  --dashboard-tab-lifted-padding-x: 13px;
+  --dashboard-empty-bar-gap: 8%;
+  --dashboard-empty-bar-inset: 4%;
+  --dashboard-sync-icon-radius: 3px;
+  --dashboard-toggle-radius: 7px;
+  --dashboard-line-height-sm: 17px;
+  --dashboard-tag-line-height: 14px;
+  --dashboard-micro-size: 10px;
+  --dashboard-avatar-xs-size: 8px;
+  --dashboard-metric-value-size: 44px;
+  --dashboard-metric-value-line-height: 52px;
+  --dashboard-metric-value-tracking: -0.88px;
+  --dashboard-card-value-tracking: -0.56px;
+  --dashboard-tab-tracking: -0.07px;
+  --dashboard-section-tracking: 0.6px;
+}
+/* ── end component values ── */
+
+/* ── Component values (mapped 2026-11-26) ── */
+/* Exact values from style constants, ternaries, template strings, CSSProperties objects and props that
+   ds-scan did not read. One component each, named for it; grouped by file. */
+:root {
+  /* app/(app)/agents/_components/AgentPageShell.tsx */
+  --agent-page-shell-blur: 10px;
+  --agent-page-shell-padding-right: min(340px, 45%);
+  /* app/(app)/agents/_components/SuperLinkParts.tsx */
+  --super-link-parts-radius: 5px;
+  /* app/(app)/agents/_components/SuperLinksTab.tsx */
+  --super-links-tab-radius: 5px;
+  /* app/(app)/agents/new/page.tsx */
+  --new-shadow: 0px 1px 2px 0px rgba(82,75,71,0.16), 0px 0px 0px 1px var(--neutral-300);
+  /* app/(app)/agents/published/page.tsx */
+  --published-blur: 108px;
+  --published-shadow: 0px 1.091px 1.09px 0px rgba(59,54,50,0.05), 0px 1.455px 1px 0px rgba(38,33,30,0.15), 0px 0px 0px 5px var(--neutral-100);
+  /* app/(app)/chats/page.tsx */
+  --chats-shadow: 0px 1px 2px rgba(18,12,8,0.08), 0px 0px 0px 1px var(--neutral-100);
+  /* app/(app)/projects/new/page.tsx */
+  --new-shadow-2: 0px 0px 0px 3px rgba(74,131,191,0.25), 0px 1px 1.5px 0px rgba(82,75,71,0.12);
+  /* app/(app)/schedules/ScheduleSkeletons.tsx */
+  --schedule-skeletons-card-shadow: 0px 1px 3px 0px rgba(82,75,71,0.08), 0px 0px 0px 1px var(--border-default);
+  /* app/(app)/settings/(shell)/(org)/analytics/_components/AnalyticsParts.tsx */
+  --analytics-parts-radius: 11px;
+  /* app/(app)/settings/(shell)/(org)/general/_components/GeneralSkeleton.tsx */
+  --general-skeleton-radius: 5px;
+  /* app/(app)/settings/(shell)/plans-and-billing/_components/billing-primitives.tsx */
+  --billing-primitives-shadow-color: rgba(2,15,24,0.2);
+  /* app/(app)/settings/(shell)/plans-and-billing/_components/billing-widgets.tsx */
+  --billing-widgets-shadow: 0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--blue-700-70);
+  --billing-widgets-shadow-2: 0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--blue-700-40), inset 0px -1px 0px 0px var(--blue-800-15);
+  --billing-widgets-shadow-3: 0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4), inset 0px -1px 0px 0px rgba(106,98,93,0.05);
+  /* app/(app)/settings/(shell)/preferences/page.tsx */
+  --preferences-hairline: #F5F2EF;
+  --preferences-ink: #26211E;
+  --preferences-mid: #827A74;
+  --preferences-dark-bar: #3B3632;
+  /* app/(app)/settings/(shell)/security/page.tsx */
+  --security-shadow: 0px 0px 0px 1px black, 0px 1.091px 1.091px 0px rgba(59,54,50,0.1), 0px 1.455px 3.127px 0px rgba(59,54,50,0.4), inset 0px 1px 0.364px 0px color-mix(in srgb, var(--static-white) 30%, transparent), inset 0px -2.182px 0.364px 0px #120c08, inset 0px -2.545px 4px -2.182px color-mix(in srgb, var(--static-white) 50%, transparent);
+  --security-shadow-2: 0px 1.091px 1.091px 0px rgba(24,2,2,0.05), 0px 1.455px 3.127px 0px rgba(24,2,2,0.15), 0px 0px 0px 1px var(--red-100), inset 0px -2.182px 0.364px 0px var(--red-100);
+  /* app/(app)/slack/link/page.tsx */
+  --link-padding: 40px 44px;
+  --link-shadow: 0px 12px 16px -4px rgba(130,122,116,0.12), 0px 0px 0px 1px var(--neutral-100);
+  /* app/(onboarding)/onboarding/account-type/page.tsx */
+  --account-type-shadow: 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 2px var(--neutral-900);
+  /* app/(onboarding)/onboarding/import/page.tsx */
+  --import-shadow: 0px 1px 1.5px 0px rgba(2,15,24,0.2), inset 0px 1px 0px 0px var(--blue-50-70), inset 0px -1px 0px 0px var(--blue-600-10);
+  /* app/(onboarding)/onboarding/invite/page.tsx */
+  --invite-shadow: 0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--red-500);
+  --invite-shadow-2: 0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--yellow-500);
+  /* app/(onboarding)/onboarding/plans/page.tsx */
+  --plans-shadow: 0px 1px 1.5px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(212, 212, 212,0.4), inset 0px 1px 0px color-mix(in srgb, var(--static-white) 61%, transparent), inset 0px -1px 0px rgba(106,98,93,0.05);
+  --plans-shadow-2: inset 0px -1px 0px color-mix(in srgb, var(--static-white) 90%, transparent), inset 0px 1px 0px var(--neutral-100), inset 0px 0px 4px rgba(229, 229, 229,0.5);
+  --plans-shadow-3: 0 1px 4px color-mix(in srgb, var(--static-black) 22%, transparent), 0 0 0 1px rgba(59,54,50,0.2);
+  --plans-shadow-4: 0px 1.091px 1.091px rgba(59,54,50,0.05), 0px 1.455px 3.127px rgba(38,33,30,0.15), inset 0px -2.182px 0.364px var(--neutral-100);
+  --plans-shadow-5: 0px 1.091px 1.091px rgba(59,54,50,0.05), 0px 1.455px 3.127px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100), inset 0px -2.182px 0.364px var(--neutral-100);
+  --plans-box-shadow: 0px 1px 1.5px rgba(82,75,71,0.12);
+  --plans-box-shadow-2: 0px 0px 0px 1px rgba(212, 212, 212,0.4);
+  --plans-box-shadow-3: inset 0px -1px 0px rgba(106,98,93,0.05);
+  --plans-box-shadow-4: 0px 1.091px 1.091px rgba(59,54,50,0.1);
+  --plans-box-shadow-5: 0px 1.455px 3.127px rgba(59,54,50,0.4);
+  --plans-box-shadow-6: inset 0px -2.182px 0.364px #120c08;
+  /* app/(onboarding)/onboarding/setup/page.tsx */
+  --setup-shadow: 0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px var(--blue-600-50), inset 0px 1px 0px 0px var(--blue-50-70), inset 0px -1px 0px 0px var(--blue-600-10);
+  /* app/(onboarding)/onboarding/tone/page.tsx */
+  --tone-shadow: 0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 2px var(--neutral-900);
+  --tone-shadow-2: 0px 1.091px 1.09px 0px rgba(59,54,50,0.05), 0px 1.455px 1px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100);
+  /* app/(onboarding)/onboarding/workspace/page.tsx */
+  --workspace-shadow: 0px 1px 1.5px 0px rgba(82,75,71,0.12), 0px 0px 0px 1.5px var(--neutral-900);
+  /* app/(standalone)/org/change-plan/page.tsx */
+  --change-plan-shadow: 0px 1px 1.5px 0px rgba(20,16,5,0.2), 0px 0px 0px 1px color-mix(in srgb, var(--yellow-600) 50%, transparent);
+  --change-plan-shadow-2: inset 0px 1px 0px 0px rgba(250,241,235,0.7), inset 0px -1px 0px 0px rgba(126,84,53,0.1);
+  --change-plan-shadow-3: inset 0px 1px 0px 0px rgba(250,246,235,0.7), inset 0px -1px 0px 0px rgba(143,116,39,0.1);
+  --change-plan-shadow-4: 0px 1px 1.5px 0px rgba(2,15,24,0.2), 0px 0px 0px 1px var(--blue-600-50), inset 0px 1px 0px 0px rgba(231,244,253,0.7), inset 0px -1px 0px 0px rgba(13,110,178,0.1);
+  --change-plan-shadow-5: 0px 0px 0px 1px var(--neutral-black), 0px 1.091px 1.091px 0px rgba(59,54,50,0.1), 0px 1.455px 3.127px 0px rgba(59,54,50,0.4), inset 0px 1px 0.364px 0px var(--neutral-white-30), inset 0px -2.182px 0.364px 0px var(--neutral-950), inset 0px -2.545px 4px -2.182px var(--neutral-white-50);
+  --change-plan-shadow-6: 0px 1.091px 1.091px 0px rgba(59,54,50,0.05), 0px 1.455px 3.127px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-300), inset 0px -2.182px 0.364px 0px var(--neutral-200);
+  /* app/globals.css */
+  --globals-text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  /* components/AgentEditor/AvatarCarousel.tsx */
+  --avatar-carousel-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--neutral-100);
+  /* components/AiModelsView/parts.tsx */
+  --ai-models-view-shadow: 0px 2px 2.8px 0px rgba(82,75,71,0.06);
+  --ai-models-view-inner-shadow: inset 0px 1px 0px 0px rgba(231,244,253,0.7), inset 0px -1px 0px 0px rgba(13,110,178,0.1);
+  --ai-models-view-inner-shadow-2: inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 70%, transparent), inset 0px -1px 0px 0px rgba(106,98,93,0.1);
+  --ai-models-view-inner-shadow-3: inset 0px 1px 0px 0px rgba(253,231,231,0.7), inset 0px -1px 0px 0px rgba(159,38,35,0.1);
+  --ai-models-view-inner-shadow-4: inset 0px 1px 0px 0px rgba(247,254,230,0.7), inset 0px -1px 0px 0px rgba(128,183,7,0.1);
+  --ai-models-view-inner-shadow-5: inset 0px 1px 0px 0px rgba(250,241,235,0.7), inset 0px -1px 0px 0px rgba(126,84,53,0.1);
+  --ai-models-view-outer-shadow: 0px 1px 1.5px 0px rgba(10,2,24,0.2), 0px 0px 0px 1px rgba(109,40,217,0.5);
+  --ai-models-view-inner-shadow-6: inset 0px 1px 0px 0px rgba(237,233,254,0.7), inset 0px -1px 0px 0px rgba(109,40,217,0.1);
+  /* components/ApprovalCard/index.tsx */
+  --approval-card-shadow: 0px 0px 0px 1px rgba(59,54,50,0.4);
+  --approval-card-shadow-2: 0px 0px 0px 1px rgba(59,54,50,0.2);
+  --approval-card-shadow-card: 0px 4px 8px 0px rgba(82,75,71,0.10), 0px 0px 0px 1px rgba(59,54,50,0.12);
+  --approval-card-shadow-inner: inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 50%, transparent), inset 0px -1px 0px 0px rgba(82,75,71,0.06);
+  /* components/Avatar/index.tsx */
+  --avatar-hairline: inset 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+  /* components/BrowserPanel/BrowserScreen.tsx */
+  --browser-screen-blur: 6px;
+  --browser-screen-shadow: 0px 2px 8px 0px rgba(26,23,20,0.16), 0px 0px 0px 1px var(--neutral-800-10);
+  /* components/ChatInput/index.tsx */
+  --chat-input-radius: 24px;
+  /* components/ChatRow/index.tsx */
+  --chat-row-outline-width: 1.5px;
+  /* components/ChatSelectionBar/index.tsx */
+  --chat-selection-bar-chip-ring: 0px 0px 0px 1px rgba(59,54,50,0.28);
+  /* components/DocumentCard/index.tsx */
+  --document-card-shadow: 0px 4px 4px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-100);
+  /* components/DropdownMenuItem/index.tsx */
+  --dropdown-menu-item-size: calc(var(--font-size-body) - 2px);
+  /* components/EditProjectModal/index.tsx */
+  --edit-project-modal-shadow: 0px 0px 0px 3px rgba(74,131,191,0.25), 0px 1px 1.5px 0px rgba(82,75,71,0.12);
+  /* components/EnhancePromptField/index.tsx */
+  --enhance-prompt-field-border-width: 1.5px;
+  --enhance-prompt-field-border-width-2: 1px;
+  /* components/FlatSidebar/index.tsx */
+  --flat-sidebar-shadow: 4px 0 24px rgba(0, 0, 0, 0.16);
+  --flat-sidebar-padding: 19px 8px 8px;
+  --flat-sidebar-padding-2: 19px 8px 8px 16px;
+  /* components/Library/FileMarks.tsx */
+  --file-marks-stop-color: #a6ebcf;
+  --file-marks-stop-color-2: #3fb98a;
+  /* components/Library/FileTable/FileTable.module.css */
+  --file-table-blur: 14px;
+  /* components/Library/PersonAvatar.tsx */
+  --person-avatar-hairline: inset 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+  /* components/Library/viewers/PdfViewer.tsx */
+  --pdf-viewer-outline-width: 3px;
+  /* components/Library/viewers/TextViewer.tsx */
+  --text-viewer-outline-width: 3px;
+  /* components/MessageBubble/index.tsx */
+  --message-bubble-shadow: 0px 1px 2px rgba(59,54,50,0.08), 0px 0px 0px 1px var(--neutral-200);
+  /* components/MoveToProjectModal/index.tsx */
+  --move-to-project-modal-shadow: 0px 0px 0px 1.5px rgba(59,54,50,0.28);
+  --move-to-project-modal-shadow-row-hover: 0px 0px 0px 1px rgba(59,54,50,0.14);
+  /* components/NotificationPanel/index.tsx */
+  --notification-panel-blur: 3px;
+  /* components/OptionRow/index.tsx */
+  --option-row-check-inner-shadow: inset 0px 1px 0px 0px var(--yellow-200), inset 0px -1px 0px 0px rgba(106,98,93,0.05);
+  /* components/PasswordInputField/index.tsx */
+  --password-input-field-tracking: 1px;
+  /* components/PersonaCard/AgentCardButton.tsx */
+  --agent-card-button-secondary-bg-hover: #f1efec;
+  --agent-card-button-secondary-text: #1c1c1c;
+  --agent-card-button-secondary-text-disabled: rgba(28, 28, 28, 0.45);
+  /* components/PersonaCard/HeroScene.tsx */
+  --hero-scene-duration: var(--duration-slow);
+  /* components/Projects/ProjectRouteStates.tsx */
+  --project-route-states-radius: 24px;
+  /* components/QuestionCard/index.tsx */
+  --question-card-shadow: 0px 0px 0px 1px rgba(59,54,50,0.5);
+  --question-card-shadow-2: inset 0px 1px 0.364px 0px color-mix(in srgb, var(--static-white) 30%, transparent), inset 0px -2.182px 0.364px 0px #120c08, inset 0px -2.545px 4px -2.182px color-mix(in srgb, var(--static-white) 50%, transparent);
+  --question-card-shadow-3: 0px 8px 24px rgba(82,75,71,0.18), 0px 0px 0px 1px rgba(212, 212, 212,0.3);
+  --question-card-card-shadow: 0px 2px 2.8px 0px rgba(82,75,71,0.12), 0px 0px 0px 1px rgba(59,54,50,0.1);
+  /* components/RoleBadge/index.tsx */
+  --role-badge-shadow: 0px 1px 1.5px 0px rgba(20,16,5,0.2);
+  --role-badge-shadow-2: inset 0px 1px 0px 0px rgba(250,246,235,0.7);
+  --role-badge-shadow-3: inset 0px -1px 0px 0px rgba(143,116,39,0.1);
+  --role-badge-shadow-4: 0px 1px 1.5px 0px rgba(2,15,24,0.2);
+  /* components/Schedules/ScheduleCard.tsx */
+  --schedule-card-box-shadow: 0px 1px 3px 0px rgba(82, 75, 71, 0.08), 0px 0px 0px 2px var(--blue-300);
+  --schedule-card-box-shadow-2: 0px 1px 3px 0px rgba(82, 75, 71, 0.08), 0px 0px 0px 1px var(--border-default);
+  /* components/SelectionPopover/index.tsx */
+  --selection-popover-blur: 7.273px;
+  /* components/ShareModal/index.tsx */
+  --share-modal-btn-shadow: 0px 0px 0px 2px var(--blue-400), 0px 0px 0px 1px rgba(59,54,50,0.3);
+  /* components/Sidebar/index.tsx */
+  --sidebar-shadow: inset 0px -1px 0px 0px color-mix(in srgb, var(--static-white) 90%, transparent), inset 0px 1px 0px 0px var(--neutral-100), inset 0px 0px 4px 0px rgba(229, 229, 229,0.5);
+  /* components/SidebarMenuItem/index.tsx */
+  --sidebar-menu-item-padding-top: 9px;
+  --sidebar-menu-item-padding-bottom: 9px;
+  /* components/SidebarProjectsSection/index.tsx */
+  --sidebar-projects-section-padding-left: 22px;
+  /* components/SlackConnectModal/index.tsx */
+  --slack-connect-modal-shadow-card-border: 0px 1px 1.5px rgba(82,75,71,0.12), 0px 0px 0px 1px var(--neutral-200);
+  /* components/TabItem/index.tsx */
+  --tab-item-padding: 7px 9px;
+  --tab-item-size: 10px;
+  /* components/Tabs/index.tsx */
+  --tabs-padding-left: 30px;
+  --tabs-padding-right: 30px;
+  /* components/TeamChip/index.tsx */
+  --team-chip-size: 7px;
+  --team-chip-size-2: 9px;
+  /* components/TeamSwitcher/index.tsx */
+  --team-switcher-shadow: inset 0px 4px 4px 0px color-mix(in srgb, var(--static-black) 25%, transparent), inset 0px -1px 0.4px 0px rgba(18,60,95,0.65);
+  /* components/TeamSwitcherDropdown/index.tsx */
+  --team-switcher-dropdown-shadow: inset 0px 4px 4px color-mix(in srgb, var(--static-black) 25%, transparent), inset 0px -1px 0.4px rgba(18,60,95,0.65);
+  /* components/TeamSwitcherRow/index.tsx */
+  --team-switcher-row-shadow: inset 0px 4px 4px 0px color-mix(in srgb, var(--static-black) 25%, transparent), inset 0px -1px 0.4px 0px rgba(18,60,95,0.65);
+  /* components/ThemeModeSwitcher/index.tsx */
+  --theme-mode-switcher-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25), 0px 0px 0px 1px rgba(0, 0, 0, 0.08);
+  --theme-mode-switcher-color: #1c1c1c;
+  --theme-mode-switcher-duration: var(--duration-base);
+  /* components/UndoToast/index.tsx */
+  --undo-toast-shadow-inner: inset 0px 1px 0px 0px color-mix(in srgb, var(--static-white) 60%, transparent), inset 0px -1px 0px 0px rgba(82,75,71,0.05);
+  /* components/UsageBarChart/index.tsx */
+  --usage-bar-chart-shadow: 0px 1px 4px rgba(59,54,50,0.5), 0px 0px 0px 0.5px var(--neutral-black);
+  /* components/VersionCard/index.tsx */
+  --version-card-shadow-avatar: 0px 1.091px 1.09px 0px rgba(59,54,50,0.05), 0px 1.455px 1px 0px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-100);
+  /* components/VisibilityRow/index.tsx */
+  --visibility-row-shadow-chip-inner: inset 0px 1px 0px 0px rgba(231,244,253,0.7), inset 0px -1px 0px 0px rgba(13,110,178,0.1);
+  /* components/WorkspaceConnectorCard/index.tsx */
+  --workspace-connector-card-shadow: 0px 1px 2px 0px rgba(82,75,71,0.08), 0px 0px 0px 1px var(--neutral-100);
+  /* components/chat/ActivityRow.tsx */
+  --activity-row-duration: var(--duration-moderate);
+  --activity-row-bg: rgba(59,54,50,0.05);
+  /* components/chat/AnimatedCodeBlock.tsx */
+  --animated-code-block-shadow: 0px 0px 0px 1px color-mix(in srgb, var(--static-black) 90%, transparent), 0px 1px 1px rgba(59,54,50,0.12), 0px 2px 4px rgba(59,54,50,0.28);
+  --animated-code-block-box-shadow: 0px 1px 1px rgba(59,54,50,0.10);
+  --animated-code-block-box-shadow-2: 0px 1.5px 3px rgba(59,54,50,0.35);
+  --animated-code-block-box-shadow-3: inset 0px -2px 0.4px #120C08;
+  /* components/chat/AnimatedPieChart.tsx */
+  --animated-pie-chart-duration: var(--duration-long);
+  --animated-pie-chart-size: 22px;
+  --animated-pie-chart-size-2: 10px;
+  /* components/chat/AnimatedTable.tsx */
+  --animated-table-bg: rgba(59,54,50,0.05);
+  --animated-table-padding: 9px 14px;
+  --animated-table-padding-left: 17px;
+  --animated-table-row-border-bottom: rgba(82,75,71,0.12);
+  /* components/chat/AnimatedTags.tsx */
+  --animated-tags-text: #F9F8F5;
+  /* components/chat/AttachmentManager.tsx */
+  --attachment-manager-blur: 1.5px;
+  /* components/chat/ChatHome.module.css */
+  --chat-home-border-top-color: rgba(255, 255, 255, 0.08);
+  /* components/chat/FileDropOverlay.tsx */
+  --file-drop-overlay-blur: 6px;
+  --file-drop-overlay-top-layer: 2147483000;
+  /* components/chat/ImageGenerationPreview.module.css */
+  --image-generation-preview-blur: 30px;
+  --image-generation-preview-blur-2: 20px;
+  --image-generation-preview-blur-3: 7px;
+  /* components/chat/InitialPrompts.tsx */
+  --initial-prompts-size: 34px;
+  /* components/chat/MermaidDiagram.tsx */
+  --mermaid-diagram-shadow: 0 28px 80px rgba(18,12,8,0.28);
+  /* components/chat/ModelMenu.tsx */
+  --model-menu-effort-ramp: #3b82f6;
+  --model-menu-effort-ramp-2: #8b5cf6;
+  --model-menu-effort-ramp-3: #f59e0b;
+  --model-menu-effort-ramp-4: #ef4444;
+  /* components/chat/PinChipStrip.tsx */
+  --pin-chip-strip-duration: 60ms;
+  /* components/chat/WidgetSkeleton.tsx */
+  --widget-skeleton-radius: 99px;
+  /* components/chat/XmlChart.tsx */
+  --xml-chart-duration: var(--duration-long);
+  --xml-chart-size: 10px;
+  --xml-chart-size-2: 9px;
+  /* components/chat/XmlWeather.tsx */
+  --xml-weather-blur: 18px;
+  /* components/chat/composer/ChipsRow.tsx */
+  --chips-row-duration: var(--duration-instant);
+  /* components/chat/message/GeneratedFilesList.tsx */
+  --generated-files-list-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  /* components/chat/message/StandaloneActivitiesBlock.tsx */
+  --standalone-activities-block-duration: var(--duration-moderate);
+  --standalone-activities-block-duration-2: var(--duration-base);
+  /* components/connectors/connections-shared.tsx */
+  --connections-shared-padding: 72px;
+  /* components/layout/AppLayout.tsx */
+  --app-layout-padding: 19px;
+  /* components/layout/SidebarChromeSkeleton.tsx */
+  --sidebar-chrome-skeleton-radius: 3px;
+  /* components/onboarding/WelcomeModal.tsx */
+  --welcome-modal-shadow: 0px 8px 32px 0px rgba(82,75,71,0.18), 0px 0px 0px 1px var(--neutral-100);
+  --welcome-modal-shadow-2: inset 0px 1px 0.4px var(--neutral-50-30), inset 0px -2px 0.4px #120c08, inset 0px -2.5px 4px -2px var(--neutral-50-50);
+  --welcome-modal-shadow-3: 0px 1px 1px rgba(59,54,50,0.05), 0px 1.5px 3px rgba(38,33,30,0.15), 0px 0px 0px 1px var(--neutral-200);
+  --welcome-modal-backdrop-z: 9998;
+  --welcome-modal-z: 9999;
+  /* components/ui/sheet.tsx */
+  --sheet-color: rgba(0, 0, 0, 0.32);
+  /* lib/team-gradients.ts */
+  --team-gradients: #4FACDE;
+  --team-gradients-2: #2D8BBF;
+  --team-gradients-3: #9B6FE0;
+  --team-gradients-4: #7B4FC0;
+  --team-gradients-5: #F59542;
+  --team-gradients-6: #D4742A;
+  --team-gradients-7: #4CAF78;
+  --team-gradients-8: #2D8F58;
+  --team-gradients-9: #E06060;
+  --team-gradients-10: #B83C3C;
+  --team-gradients-11: #60A8E0;
+  --team-gradients-12: #3C80C0;
+  /* constants mapped by hand */
+  --agent-created-card-radius: 20px;
+  --agent-hero-radius: 20px;
+  --browser-screen-z-backdrop: 50;
+  --add-cards-dialog-border-width: 1.25px;
+  --button-raised-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  --preferences-mid-40: rgba(130, 122, 116, 0.4);
+  --preferences-mid-30: rgba(130, 122, 116, 0.3);
+  --preferences-mid-20: rgba(130, 122, 116, 0.2);
+  --xml-funnel-glow-blur: 12px;
+  --xml-weather-drop-y: 18px;
+  --xml-weather-drop-blur: 24px;
+  --activity-row-reveal-duration: var(--duration-moderate);
+  --standalone-activities-block-reveal-duration: var(--duration-moderate);
+  --standalone-activities-block-fade-duration: var(--duration-base);
+}
+/* ── end component values (2026-11-26) ── */
