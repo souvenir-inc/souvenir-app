@@ -124,6 +124,8 @@ export const queryKeys = {
     one: (org: string, id: string) => [...queryKeys.warehouse.all(org), id] as const,
     catalog: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "catalog"] as const,
     scorecards: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "scorecards"] as const,
+    /** GET /warehouse/{id}/proposals: the metric library's Review list. */
+    proposals: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "proposals"] as const,
     boards: (org: string, id: string) => [...queryKeys.warehouse.one(org, id), "boards"] as const,
     status: (org: string, id: string, board: string) => [...queryKeys.warehouse.one(org, id), "status", board] as const,
     measure: (org: string, id: string, request: object) => [...queryKeys.warehouse.one(org, id), "measure", request] as const,

@@ -6,7 +6,7 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import type { CustomMetric } from '@/lib/api/warehouse'
+import type { MetricDefinition } from '@/lib/api/warehouse'
 import { mentionedMetrics } from '@/lib/metrics/catalog'
 import { metricErrorMessage } from '@/lib/metrics/errors'
 import { metricFromTemplate, type TemplateOption } from '@/lib/metrics/templates'
@@ -26,7 +26,7 @@ export function useMetricChat(library: Library, initialPrompt = '') {
   const draft = useMutation(draftMetricOptions(library.org, library.warehouse))
   const [messages, setMessages] = useState<Turn[]>([])
   const [text, setText] = useState(initialPrompt.slice(0, MESSAGE_MAX))
-  const [proposal, setProposal] = useState<CustomMetric | null>(null)
+  const [proposal, setProposal] = useState<MetricDefinition | null>(null)
   const nextId = useRef(0)
   const turn = (role: Turn['role'], content: string): Turn => ({ id: nextId.current++, role, content })
 
@@ -37,7 +37,7 @@ export function useMetricChat(library: Library, initialPrompt = '') {
     const next = [...messages, turn('user', content)]
     setMessages(next)
     setText('')
-    draft.mutate(next.map(({ role, content: c }) => ({ role, content: c })), {
+    draft.mutate({ messages: next.map(({ role, content: c }) => ({ role, content: c })) }, {
       onSuccess: answer => {
         setMessages(current => [...current, turn('assistant', answer.reply.slice(0, REPLY_MAX) || 'Here’s a metric for that.')])
         if (answer.metric) setProposal(answer.metric)

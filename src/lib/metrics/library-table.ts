@@ -2,18 +2,14 @@
 // filters (status, created by, area, app) and grouping. Pure, so the screen stays thin and this is testable.
 // Filter values and creator ids come from the catalog, so every tally is a Map (JS-1).
 
-import type { MetricEntry } from '@/lib/api/warehouse-schemas'
+import type { MetricEntry, MetricStatus } from '@/lib/api/warehouse-schemas'
 import { originOf, type Origin } from './catalog'
 import { categoryName, categoryOrder } from './display'
 
-/** Confirmed: someone checked the definition (`verified`); Proposed: waiting for a check. */
-export type MetricStatus = 'confirmed' | 'proposed'
-export const STATUS_ORDER: readonly MetricStatus[] = ['confirmed', 'proposed']
-export const STATUS_NAMES: ReadonlyMap<MetricStatus, string> = new Map([['confirmed', 'Confirmed'], ['proposed', 'Proposed']])
-
-export function statusOf(entry: Pick<MetricEntry, 'verified'>): MetricStatus {
-  return entry.verified ? 'confirmed' : 'proposed'
-}
+/** Confirmed by an admin; proposed by a member and waiting for one; retired, still measuring but replaced. */
+export type { MetricStatus }
+export const STATUS_ORDER: readonly MetricStatus[] = ['confirmed', 'proposed', 'retired']
+export const STATUS_NAMES: ReadonlyMap<MetricStatus, string> = new Map([['confirmed', 'Confirmed'], ['proposed', 'Proposed'], ['retired', 'Retired']])
 
 /** Who made a metric: Souvenir for library metrics, else the person the catalog names. */
 export interface Creator {
@@ -60,7 +56,7 @@ export function tableRows(
       category: entry.category,
       area: categoryName(entry.category),
       origin,
-      status: statusOf(entry),
+      status: entry.status,
       creator: createdBy ? { kind: 'person', name: person(createdBy) } : origin === 'builtin' ? SOUVENIR : { kind: 'person', name: 'Your team' },
       apps: appsOf(entry.category),
     }

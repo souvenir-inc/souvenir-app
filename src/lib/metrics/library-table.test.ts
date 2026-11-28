@@ -5,14 +5,14 @@ import { countLine, filterTable, groupTable, initials, NO_TABLE_FILTER, optionsO
 const entry = (name: string, category: string, extra: Partial<MetricEntry> = {}): MetricEntry => ({
   name, label: name.replace(/_/g, ' '), unit: 'money', description: `${name} described`, category,
   value: { kind: 'count', table: 'orders', column: null, day: 'placed_at', where: null },
-  overridden: false, createdBy: null, verified: true, ...extra,
+  overridden: false, createdBy: null, status: 'confirmed', version: 1, updatedBy: null, updatedAt: null, confirmedBy: null, confirmedAt: null, replacement: null, reason: null, ...extra,
 })
 
 const entries = [
   entry('net_sales', 'store'),
   entry('orders', 'store', { overridden: true }),
   entry('ad_spend', 'ads'),
-  entry('blended_roas', 'custom', { verified: false, createdBy: 'google-oauth2|123' }),
+  entry('blended_roas', 'custom', { status: 'proposed', createdBy: 'google-oauth2|123' }),
 ]
 
 const APPS = new Map<string, App[]>([['store', [{ slug: 'shopify', name: 'Shopify' }]], ['ads', [{ slug: 'metaads', name: 'Meta Ads' }]]])

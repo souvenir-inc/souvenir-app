@@ -60,8 +60,7 @@ describe('why a metric can’t be measured: our words, from the code (API-ER-06)
     expect(unavailableSentence('first_sync')).toBe('Its app is still on its first sync.')
     expect(unavailableSentence('feed_failed')).toBe('Its app’s last sync failed.')
   })
-  it('an unknown code or none gets a general sentence', () => {
-    expect(unavailableSentence('quota_exceeded')).toBe('This store can’t read it right now.')
+  it('no code gets a general sentence', () => {
     expect(unavailableSentence(null)).toBe('This store has nothing for this metric yet.')
   })
 })

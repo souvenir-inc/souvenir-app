@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowUp } from 'lucide-react'
-import { Badge } from '@/components/Badge'
+import { Badge, type BadgeColor } from '@/components/Badge'
 import { ORIGIN_NAMES, type Origin } from '@/lib/metrics/catalog'
 import type { Change } from '@/lib/metrics/display'
 import { STATUS_NAMES, type MetricStatus } from '@/lib/metrics/library-table'
@@ -32,6 +32,8 @@ export function OriginTag({ origin }: { origin: Origin }) {
   return <Badge label={ORIGIN_NAMES.get(origin)} color={origin === 'builtin' ? 'Neutral' : origin === 'custom' ? 'Purple' : 'Blue'} />
 }
 
+const STATUS_COLORS: Record<MetricStatus, BadgeColor> = { confirmed: 'Green', proposed: 'Yellow', retired: 'Neutral' }
+
 export function StatusTag({ status }: { status: MetricStatus }) {
-  return <Badge label={STATUS_NAMES.get(status)} color={status === 'confirmed' ? 'Green' : 'Yellow'} />
+  return <Badge label={STATUS_NAMES.get(status)} color={STATUS_COLORS[status]} />
 }

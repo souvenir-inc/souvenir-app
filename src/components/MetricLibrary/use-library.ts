@@ -19,7 +19,7 @@ import { unavailableCopy } from '@/components/Dashboard/live/metrics'
 const NO_ENTRIES: MetricEntry[] = []
 
 export function useLibrary(warehouse: Warehouse) {
-  const { orgId } = useOrgIdentity()
+  const { orgId, orgRole } = useOrgIdentity()
   const catalog = useCatalog(warehouse)
   const entries = catalog.data ?? NO_ENTRIES
   const byName = new Map(entries.map(entry => [entry.name, entry]))
@@ -27,6 +27,8 @@ export function useLibrary(warehouse: Warehouse) {
   return {
     warehouse,
     org: orgScope(orgId),
+    /** Admins save and confirm metrics; members propose them. */
+    admin: orgRole === 'admin',
     catalog,
     entries,
     byName,

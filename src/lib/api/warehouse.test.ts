@@ -42,12 +42,14 @@ describe('Warehouse', () => {
       {
         name: 'revenue', label: 'Revenue', unit: 'money', description: '', category: 'store',
         value: { kind: 'sum', table: 'orders', column: 'total', day: 'created_at', where: null },
-        overridden: false, createdBy: null, verified: true,
+        overridden: false, createdBy: null, status: 'confirmed', version: 1,
+        updatedBy: null, updatedAt: null, confirmedBy: null, confirmedAt: null, replacement: null, reason: null,
       },
       {
         name: 'shipping_share', label: 'Shipping share', unit: 'ratio', description: '', category: 'custom',
         value: { op: 'ratio', numerator: { op: 'add', terms: ['shipping_revenue', 1] }, denominator: 'revenue' },
-        overridden: false, createdBy: 'auth0|x', verified: false,
+        overridden: false, createdBy: 'auth0|x', status: 'proposed', version: 1,
+        updatedBy: 'auth0|x', updatedAt: '2026-11-27T10:00:00Z', confirmedBy: null, confirmedAt: null, replacement: null, reason: null,
       },
     ])
     const metrics = await new Warehouse(summary).metrics()
@@ -60,6 +62,7 @@ describe('Warehouse', () => {
       grain: 'total', start: '2026-10-15', end: '2026-11-15', timezone: 'America/New_York',
       periods: [{ start: '2026-10-15', values: { revenue: 1200.5, refund_rate: null } }],
       unavailable: { sessions: { code: 'no_connection', reason: 'No connection fills site_sessions', connectors: ['microsoft_clarity'] } },
+      parts: null,
     })
     const request = { metrics: ['revenue'], start: '2026-10-15', end: '2026-11-15', grain: 'total' as const }
     const measurement = await new Warehouse(summary).measure(request)
@@ -131,20 +134,57 @@ describe('Warehouse', () => {
     expect(got.connections[0].feeds[0].status).toBe('paused')
   })
 
-  it('reads a count metric that leaves out column and where (API spec Aggregate)', async () => {
+  it('refuses a count metric whose definition leaves out column and where: the server always sends them', async () => {
     apiFetchJson.mockResolvedValue([{
       name: 'orders', label: 'Orders', unit: 'count', description: '', category: 'sales',
-      value: { kind: 'count', table: 'orders', day: 'created_at' }, overridden: false, verified: false, createdBy: null,
+      value: { kind: 'count', table: 'orders', day: 'created_at' }, overridden: false, createdBy: null, status: 'confirmed', version: 1,
+        updatedBy: null, updatedAt: null, confirmedBy: null, confirmedAt: null, replacement: null, reason: null,
     }])
-    const [entry] = await new Warehouse(summary).metrics()
-    expect(entry.value).toMatchObject({ kind: 'count', column: null, where: null })
+    await expect(new Warehouse(summary).metrics()).rejects.toBeInstanceOf(ResponseShapeError)
   })
 
-  it('reads a summary without defaultBoard as no default', async () => {
+  it('refuses a summary without defaultBoard: the server always sends it', async () => {
     const bare: Partial<typeof summary> = { ...summary }
     delete bare.defaultBoard
     apiFetchJson.mockResolvedValue(bare)
-    expect((await Warehouse.get(ID)).defaultBoard).toBeNull()
+    await expect(Warehouse.get(ID)).rejects.toBeInstanceOf(ResponseShapeError)
+  })
+
+  it('refuses an unavailable code the server does not send', async () => {
+    apiFetchJson.mockResolvedValue({
+      grain: 'total', start: '2026-10-15', end: '2026-11-15', timezone: 'UTC', periods: [], parts: null,
+      unavailable: { sessions: { code: 'paused', reason: '', connectors: [] } },
+    })
+    await expect(new Warehouse(summary).measure({ metrics: [], start: '2026-10-15', end: '2026-11-15', grain: 'total' }))
+      .rejects.toBeInstanceOf(ResponseShapeError)
+  })
+
+  it('drafts a metric with the conversation and the metric being changed', async () => {
+    apiFetchJson.mockResolvedValue({
+      reply: 'Here it is', draftVersion: 1, baseVersion: 3, questions: [], checks: [], preview: null, impact: [],
+      metric: { name: 'mer', label: 'MER', unit: 'ratio', description: '', value: { op: 'ratio', numerator: 'revenue', denominator: 'ad_spend' } },
+    })
+    const request = { messages: [{ role: 'user' as const, content: 'count gift cards out' }], metric: 'mer' }
+    const draft = await new Warehouse(summary).draftMetric(request)
+    expect(apiFetchJson).toHaveBeenCalledWith(`${WAREHOUSE_ENDPOINT}/${ID}/metrics/draft`, { method: 'POST', body: JSON.stringify(request), signal: undefined })
+    expect(draft.baseVersion).toBe(3)
+  })
+
+  it('confirms through the status route and proposes through proposals', async () => {
+    const warehouse = new Warehouse(summary)
+    apiFetchJson.mockResolvedValue([])
+    await warehouse.setStatus({ names: ['mer'], status: 'confirmed' })
+    expect(apiFetchJson).toHaveBeenLastCalledWith(`${WAREHOUSE_ENDPOINT}/${ID}/metrics/status`,
+      { method: 'POST', body: JSON.stringify({ names: ['mer'], status: 'confirmed' }), signal: undefined })
+    const definition = { label: 'MER', unit: 'ratio' as const, description: '', value: { op: 'ratio' as const, numerator: 'revenue', denominator: 'ad_spend' } }
+    apiFetchJson.mockResolvedValue({
+      id: '5b0c6f3e-2f4a-4c1e-9d7b-1a2b3c4d5e6f', kind: 'change', name: 'mer', before: definition, after: definition,
+      beforeValue: 2.1, afterValue: 2.4, baseVersion: 3, chatId: null, createdBy: 'auth0|x', status: 'open', reason: null,
+      answeredBy: null, answeredAt: null, createdAt: '2026-11-27T10:00:00Z',
+    })
+    const proposal = await warehouse.propose({ kind: 'change', metric: { name: 'mer', ...definition }, baseVersion: 3 })
+    expect(apiFetchJson).toHaveBeenLastCalledWith(`${WAREHOUSE_ENDPOINT}/${ID}/proposals`, expect.objectContaining({ method: 'POST' }))
+    expect(proposal.status).toBe('open')
   })
 
   it('reads how each connection is syncing (GET /{id}/connections), with a signal', async () => {

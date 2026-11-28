@@ -1,7 +1,7 @@
 'use client'
 
 import { Badge } from '@/components/Badge'
-import type { CustomMetric } from '@/lib/api/warehouse'
+import type { MetricDefinition } from '@/lib/api/warehouse'
 import { DISPLAY_NAMES, describeSource } from '@/lib/metrics/display'
 import { printFormula } from '@/lib/metrics/formula'
 import { buildTree, isAggregate, isMetricValue } from '@/lib/metrics/tree'
@@ -13,7 +13,7 @@ import { withProposal, windowLabel, type Library, type WindowRange } from './use
  * live numbers for its inputs. Everything it would save is on screen before "Add to library" (AO-1); its inputs
  * are measured for real and the arithmetic is done here, so nothing is written to preview it.
  */
-export function ProposalPreview({ library, proposal, range }: { library: Library; proposal: CustomMetric; range: WindowRange }) {
+export function ProposalPreview({ library, proposal, range }: { library: Library; proposal: MetricDefinition; range: WindowRange }) {
   if (!isMetricValue(proposal.value)) {
     return <p className="m-0 text-body-sm text-[var(--red-600)]" role="alert">This formula is too big or too deep to use. Ask for a simpler one.</p>
   }

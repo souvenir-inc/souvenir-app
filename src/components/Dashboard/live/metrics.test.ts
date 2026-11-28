@@ -65,12 +65,11 @@ describe('Metrics from the warehouse', () => {
     expect(card(30_000, 'down', 0)?.verdict).toBe('off')
   })
 
-  it('maps each unavailable code to its own copy, and an unknown one to a generic line', () => {
+  it('maps each unavailable code to its own copy', () => {
     const base = { reason: 'internal: feed orders errored with KeyError', connectors: [] }
     expect(unavailableCopy({ ...base, code: 'first_sync' })).toBe('its app is still on its first sync')
     expect(unavailableCopy({ ...base, code: 'feed_failed' })).toBe('its app’s last sync failed')
-    expect(unavailableCopy({ ...base, code: 'something_new' })).toBe('this store can’t read it right now')
-    expect(unavailableCopy({ ...base, code: '__proto__' })).toBe('this store can’t read it right now')
+    expect(unavailableCopy({ ...base, code: 'no_connection' })).toBe('no connected app records it')
   })
 
   it('a sum adds up over days; a ratio does not', () => {

@@ -72,7 +72,7 @@ export function FormulaEditorDialog({ library, entry, windowId, range, onClose }
     const label = saveAs === 'new' ? data.label : custom ? data.label : entry.label
     const description = data.description || printFormula(value, { pretty: true, labelOf: library.labelOf })
     const done = custom ? `${label} updated` : saveAs === 'replace' ? `${label} now uses your formula in this workspace` : `${label} added to the library`
-    const saved = await actions.save({ name, label, unit: entry.unit, description, value, verified: false }, done)
+    const saved = await actions.save({ name, label, unit: entry.unit, description, value }, done)
     if (!saved) return
     onClose()
     if (saveAs === 'new') push(DASHBOARD_METRIC_ROUTE(name))

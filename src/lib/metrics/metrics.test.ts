@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Aggregate, Expression, MetricEntry, Unit } from '@/lib/api/warehouse-schemas'
-import { mentionedMetrics, originOf, requestOf, usersOf } from './catalog'
+import { mentionedMetrics, originOf, usersOf } from './catalog'
 import { compareNames, compareValues, impactNames, impactOf, proposedTree } from './compare'
 import { categoryName, categoryOrder, changeOf, columnWords, describeSource, ruleWords } from './display'
 import { closestName, isMetricName, metricNameOf, parseFormula, printFormula } from './formula'
@@ -33,7 +33,7 @@ const values = (record: Record<string, number | null>) => new Map(Object.entries
 function entry(name: string, overrides: Partial<MetricEntry> = {}): MetricEntry {
   return {
     name, label: name, unit: 'money', description: '', category: 'store', value: ORDER_COUNT,
-    overridden: false, createdBy: null, verified: true, ...overrides,
+    overridden: false, createdBy: null, status: 'confirmed', version: 1, updatedBy: null, updatedAt: null, confirmedBy: null, confirmedAt: null, replacement: null, reason: null, ...overrides,
   }
 }
 
@@ -382,7 +382,7 @@ describe('templates', () => {
   })
 
   it('offers MER as revenue / ad_spend, unconfirmed', () => {
-    expect(metricFromTemplate(TEMPLATES.find(t => t.id === 'mer')!)).toMatchObject({ name: 'mer', unit: 'ratio', value: MER, verified: false })
+    expect(metricFromTemplate(TEMPLATES.find(t => t.id === 'mer')!)).toEqual({ name: 'mer', label: expect.any(String), unit: 'ratio', description: expect.any(String), value: MER })
   })
 
   it('notices a template already in the library, a missing input and data the store cannot measure', () => {
@@ -429,16 +429,15 @@ describe('the catalog', () => {
     entry('mer', { label: 'MER', unit: 'ratio', category: 'blended', value: MER }),
     entry('revenue', { label: 'Revenue', value: ORDERS_REVENUE, overridden: true }),
     entry('ad_spend', { label: 'Ad spend', category: 'ads' }),
-    entry('roas_custom', { category: 'custom', value: { op: 'ratio', numerator: 'mer', denominator: 2 }, verified: false }),
+    entry('roas_custom', { category: 'custom', value: { op: 'ratio', numerator: 'mer', denominator: 2 }, status: 'proposed' }),
   ]
 
   it('names whose definition it is', () => {
     expect(catalog.map(originOf)).toEqual(['builtin', 'adjusted', 'builtin', 'custom'])
   })
 
-  it('finds the metrics built on one, and keeps every field when confirming', () => {
+  it('finds the metrics built on one', () => {
     expect(usersOf('mer', catalog).map(e => e.name)).toEqual(['roas_custom'])
-    expect(requestOf(catalog[3], true)).toEqual({ name: 'roas_custom', label: 'roas_custom', unit: 'money', description: '', value: catalog[3].value, verified: true })
   })
 
   it('finds the metric a reply says already exists, and nothing in a partial word', () => {

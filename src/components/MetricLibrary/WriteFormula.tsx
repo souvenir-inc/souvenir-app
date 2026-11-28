@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { useZodForm } from '@/hooks/use-zod-form'
-import type { CustomMetric, Unit } from '@/lib/api/warehouse'
+import type { MetricDefinition, Unit } from '@/lib/api/warehouse'
 import { DISPLAY_NAMES } from '@/lib/metrics/display'
 import { metricNameOf, printFormula } from '@/lib/metrics/formula'
 import { checkPieces, type Piece } from '@/lib/metrics/tokens'
@@ -31,8 +31,8 @@ export function useFormulaDraft(library: Library) {
   const body = parsed ? buildTreeFromValue(name || 'new_metric', parsed.value, library.lookup).body : null
   const suggested = body ? unitForDisplay(displayOfNode(body, library.unitOf, library.lookup)) : 'money'
   const unit = unitChoice ?? suggested
-  const proposal: CustomMetric | null = parsed && name !== '' && form.isValid
-    ? { name, label: form.values.label.trim(), unit, description: printFormula(parsed.value, { pretty: true, labelOf: library.labelOf }), value: parsed.value, verified: false }
+  const proposal: MetricDefinition | null = parsed && name !== '' && form.isValid
+    ? { name, label: form.values.label.trim(), unit, description: printFormula(parsed.value, { pretty: true, labelOf: library.labelOf }), value: parsed.value }
     : null
 
   return { form, pieces, setPieces, setPending, check, name, unit, setUnitChoice, proposal, started: form.isDirty || pieces.length > 0 }

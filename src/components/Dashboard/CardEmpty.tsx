@@ -1,6 +1,7 @@
 'use client'
 
 import { CalendarX2, CircleSlash, Hourglass, Plug, TriangleAlert, Archive, type LucideIcon } from 'lucide-react'
+import type { UnavailableCode } from '@/lib/api/warehouse'
 import { ORG_CONNECTORS_ROUTE } from '@/lib/routes'
 import { Button } from '@/components/ui'
 import { cn } from '@/lib/utils'
@@ -43,14 +44,14 @@ export interface EmptyAction {
  * (live/metrics.ts unavailableCopy, the one source of that wording; API-ER-06: never the
  * warehouse's free text). With no code, the general sentence.
  */
-export function unavailableSentence(code: string | null | undefined): string {
+export function unavailableSentence(code: UnavailableCode | null | undefined): string {
   if (!code) return 'This store has nothing for this metric yet.'
   const phrase = unavailableCopy({ code })
   return `${phrase.charAt(0).toUpperCase()}${phrase.slice(1)}.`
 }
 
 /** Why, in a sentence, for each kind; `apps` are the names of the apps the metric reads, `code` the warehouse's reason code. */
-export function emptyDetail(kind: EmptyKind, opts: { apps: string[]; code?: string | null }): string {
+export function emptyDetail(kind: EmptyKind, opts: { apps: string[]; code?: UnavailableCode | null }): string {
   switch (kind) {
     case 'first-sync':
       return opts.apps.length ? `${listNames(opts.apps)} ${plural(opts.apps.length, { one: 'is', other: 'are' })} doing a first sync. This fills in when it’s done.` : 'The first sync is still running. This fills in when it’s done.'

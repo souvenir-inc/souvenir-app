@@ -49,7 +49,7 @@ export function CreateMetricDialog({ library, onClose, initialPrompt }: CreateMe
 
   const add = async () => {
     if (proposal === null || clash || busy) return
-    const saved = await actions.save({ ...proposal, verified: false }, `${proposal.label} added to the library`)
+    const saved = await actions.save(proposal, `${proposal.label} added to the library`)
     if (!saved) return
     onClose()
     push(DASHBOARD_METRIC_ROUTE(proposal.name))

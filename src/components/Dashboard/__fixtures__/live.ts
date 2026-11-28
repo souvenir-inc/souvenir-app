@@ -19,7 +19,8 @@ export const CONNECTIONS: AttachedConnection[] = [
 ]
 
 const entry = (name: string, label: string, unit: MetricEntry['unit'], category: string, value: MetricEntry['value'], description = ''): MetricEntry =>
-  ({ name, label, unit, description, category, value, overridden: false, createdBy: null, verified: true })
+  ({ name, label, unit, description, category, value, overridden: false, createdBy: null, status: 'confirmed', version: 1,
+    updatedBy: null, updatedAt: null, confirmedBy: null, confirmedAt: null, replacement: null, reason: null })
 
 const sum = (table: string, column: string) => ({ kind: 'sum' as const, table, column, day: 'placed_at', where: null })
 const count = (table: string) => ({ kind: 'count' as const, table, column: null, day: 'placed_at', where: null })
@@ -35,7 +36,7 @@ export const CATALOG: MetricEntry[] = [
   entry('platform_cpa', 'Platform CPA', 'money', 'ads', { op: 'ratio', numerator: 'ad_spend', denominator: 'platform_purchases' }),
   entry('mer', 'MER', 'ratio', 'blended', { op: 'ratio', numerator: 'revenue', denominator: 'ad_spend' }),
   entry('shipping_cost', 'Shipping cost', 'money', 'shipping', sum('shipments', 'label_cost')),
-  { ...entry('net_after_ads', 'Net after ads', 'money', 'custom', { op: 'subtract', left: 'revenue', right: 'ad_spend' }), createdBy: 'auth0|maker', verified: false },
+  { ...entry('net_after_ads', 'Net after ads', 'money', 'custom', { op: 'subtract', left: 'revenue', right: 'ad_spend' }), createdBy: 'auth0|maker', status: 'proposed' },
 ]
 
 export const SCORECARDS: Scorecard[] = [{
@@ -55,7 +56,7 @@ const days = (from: number, values: (number | null)[], metric: string) =>
 export const TOTAL: Measurement = {
   grain: 'total', start: '2025-11-08', end: '2025-11-14', timezone: 'America/New_York',
   periods: [{ start: '2025-11-08', values: { revenue: 48200, orders: 558, aov: 86.38, refund_rate: 0.0432, cancellation_rate: 0.018, ad_spend: 15600, platform_roas: 2.6, platform_cpa: 24.1, mer: 3.09, net_after_ads: 32600 } }],
-  unavailable: { shipping_cost: { code: 'no_connection', reason: 'needs shipments, which no connection in this store fills', connectors: ['shiphero'] } },
+  unavailable: { shipping_cost: { code: 'no_connection', reason: 'needs shipments, which no connection in this store fills', connectors: ['shiphero'] } }, parts: null,
 }
 
 export const TOTAL_BEFORE: Measurement = {
@@ -65,7 +66,7 @@ export const TOTAL_BEFORE: Measurement = {
 
 export const DAILY: Measurement = {
   grain: 'day', start: '2025-11-08', end: '2025-11-14', timezone: 'America/New_York',
-  periods: days(8, [6100, 6400, 7000, 6900, 7300, 7500, 7000], 'revenue'), unavailable: {},
+  periods: days(8, [6100, 6400, 7000, 6900, 7300, 7500, 7000], 'revenue'), unavailable: {}, parts: null,
 }
 
 /** The comparison week has only two days recorded: mostly empty, so nothing to compare (CR-24). */
@@ -76,7 +77,7 @@ export const DAILY_BEFORE: Measurement = {
 export const WEEKLY: Measurement = {
   grain: 'week', start: '2025-10-13', end: '2025-11-14', timezone: 'America/New_York',
   periods: ['2025-10-13', '2025-10-20', '2025-10-27', '2025-11-03', '2025-11-10'].map((start, i) => ({ start, values: { orders: [165, 152, 156, 160, 84][i] } })),
-  unavailable: {},
+  unavailable: {}, parts: null,
 }
 
 export const apps = () => new Apps(CONNECTIONS)

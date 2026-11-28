@@ -12,7 +12,6 @@ import { TextLink } from '@/components/ui/link'
 import type { MetricEntry, Warehouse } from '@/lib/api/warehouse'
 import { originOf, usersOf } from '@/lib/metrics/catalog'
 import { categoryName, changeOf } from '@/lib/metrics/display'
-import { statusOf } from '@/lib/metrics/library-table'
 import { buildTree } from '@/lib/metrics/tree'
 import { displayOfMetric } from '@/lib/metrics/units'
 import { DASHBOARD_METRIC_ROUTE, SETTINGS_METRICS_ROUTE } from '@/lib/routes'
@@ -25,6 +24,12 @@ import { LoadFailed, LoadingRows } from './MetricStates'
 import { againstOf, useLibrary, useTotals, WINDOW_IDS, windowLabel, windowRange, type Library, type WindowId } from './use-library'
 import { WarehouseGate } from './WarehouseGate'
 import { WhatMovedIt } from './WhatMovedIt'
+
+const STATUS_TEXT: Record<MetricEntry['status'], string> = {
+  confirmed: 'Confirmed',
+  proposed: 'Proposed: waiting for an admin to confirm it',
+  retired: 'Retired: it still measures, but use its replacement',
+}
 
 export interface MetricPageScreenProps {
   /** The metric's catalog name, already checked against ^[a-z][a-z0-9_]*$ by the route. */
@@ -98,7 +103,7 @@ function MetricDetail({ library, entry }: { library: Library; entry: MetricEntry
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="m-0 text-heading font-normal text-[var(--neutral-900)] [font-family:var(--font-title)]">{entry.label}</h1>
-          <StatusTag status={statusOf(entry)} />
+          <StatusTag status={entry.status} />
           {origin !== 'builtin' && <OriginTag origin={origin} />}
           <KindTag kind={tree.kind} />
         </div>
@@ -139,7 +144,7 @@ function MetricDetail({ library, entry }: { library: Library; entry: MetricEntry
       <Section id="metric-definition" title="Definition">
         <dl className="m-0 grid grid-cols-[max-content_1fr] gap-x-6 gap-y-2 text-body-sm">
           <dt className="text-[var(--neutral-500)]">Whose</dt><dd className="m-0 text-[var(--neutral-900)]">{origin === 'builtin' ? 'Souvenir’s library' : origin === 'adjusted' ? 'Your workspace’s version of a library metric' : 'Your workspace'}</dd>
-          <dt className="text-[var(--neutral-500)]">Status</dt><dd className="m-0 text-[var(--neutral-900)]">{entry.verified ? 'Confirmed' : 'Proposed: waiting for someone to confirm it'}</dd>
+          <dt className="text-[var(--neutral-500)]">Status</dt><dd className="m-0 text-[var(--neutral-900)]">{STATUS_TEXT[entry.status]}</dd>
           <dt className="text-[var(--neutral-500)]">Counted in</dt><dd className="m-0 text-[var(--neutral-900)]">The store’s time zone ({library.warehouse.timezone})</dd>
         </dl>
       </Section>

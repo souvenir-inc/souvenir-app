@@ -2,10 +2,9 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import type { CustomMetric, MetricEntry } from '@/lib/api/warehouse'
-import { requestOf } from '@/lib/metrics/catalog'
+import type { MetricDefinition, MetricEntry } from '@/lib/api/warehouse'
 import { metricErrorMessage } from '@/lib/metrics/errors'
-import { deleteMetricOptions, putMetricOptions } from '@/lib/metrics/metric-mutations'
+import { deleteMetricOptions, proposeOptions, putMetricOptions, setStatusOptions } from '@/lib/metrics/metric-mutations'
 import type { Library } from './use-library'
 
 /**
@@ -15,12 +14,24 @@ import type { Library } from './use-library'
 export function useMetricActions(library: Library) {
   const qc = useQueryClient()
   const put = useMutation(putMetricOptions(qc, library.org, library.warehouse))
+  const propose = useMutation(proposeOptions(qc, library.org, library.warehouse))
+  const status = useMutation(setStatusOptions(qc, library.org, library.warehouse))
   const remove = useMutation(deleteMetricOptions(qc, library.org, library.warehouse))
 
-  const save = async (metric: CustomMetric, done: string): Promise<boolean> => {
+  /**
+   * An admin's save is the metric's next version, sent with the version last read so a save in between is refused;
+   * a member's is a proposal (a change when the metric exists, else a new one) for an admin to confirm.
+   */
+  const save = async (metric: MetricDefinition, done: string): Promise<boolean> => {
+    const current = library.byName.get(metric.name)
     try {
-      await put.mutateAsync(metric)
-      toast.success(done)
+      if (library.admin) {
+        await put.mutateAsync({ ...metric, version: current ? current.version : null })
+        toast.success(done)
+      } else {
+        await propose.mutateAsync({ kind: current ? 'change' : 'new', metric, baseVersion: current ? current.version : null })
+        toast.success(`${metric.label} sent to an admin to confirm`)
+      }
       return true
     } catch (error) {
       toast.error(metricErrorMessage(error, 'save'))
@@ -28,9 +39,9 @@ export function useMetricActions(library: Library) {
     }
   }
 
-  /** Confirm: the entry exactly as it is, with `verified: true`. */
+  /** Admins confirm a proposed metric as it is. */
   const confirm = (entry: MetricEntry) => {
-    put.mutate(requestOf(entry, true), {
+    status.mutate({ names: [entry.name], status: 'confirmed' }, {
       onSuccess: () => toast.success(`${entry.label} confirmed`),
       onError: error => toast.error(metricErrorMessage(error, 'confirm')),
     })
@@ -49,5 +60,10 @@ export function useMetricActions(library: Library) {
     }
   }
 
-  return { save, confirm, deleteMetric, saving: put.isPending, deleting: remove.isPending, confirming: put.isPending ? put.variables?.name : undefined }
+  return {
+    save, confirm, deleteMetric,
+    saving: put.isPending || propose.isPending,
+    deleting: remove.isPending,
+    confirming: status.isPending ? status.variables?.names[0] : undefined,
+  }
 }

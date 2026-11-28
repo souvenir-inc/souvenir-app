@@ -2,7 +2,7 @@
 // against this workspace's catalog: ready to add, already there, missing an input, or waiting on data no
 // connected app sends (contribution margin needs product cost).
 
-import type { CustomMetric, Expression, MetricEntry, Unit } from '@/lib/api/warehouse-schemas'
+import type { MetricDefinition, Expression, MetricEntry, Unit } from '@/lib/api/warehouse-schemas'
 import { parseFormula } from './formula'
 
 export interface MetricTemplate {
@@ -126,8 +126,8 @@ export function templatesFor(catalog: readonly Pick<MetricEntry, 'name'>[], unme
 }
 
 /** The metric a template adds, ready to preview and put. Unchecked until someone confirms it. */
-export function metricFromTemplate(template: MetricTemplate): CustomMetric | null {
+export function metricFromTemplate(template: MetricTemplate): MetricDefinition | null {
   const value = templateValue(template)
   if (value === null) return null
-  return { name: template.name, label: template.label, unit: template.unit, description: template.description, value, verified: false }
+  return { name: template.name, label: template.label, unit: template.unit, description: template.description, value }
 }

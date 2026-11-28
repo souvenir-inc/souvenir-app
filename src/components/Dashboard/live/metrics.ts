@@ -11,16 +11,15 @@ const WEEKS = 5
 // Why a metric can't be measured, in the app's words: the warehouse's own `reason` is never shown
 // (API-ER-06). A phrase, not a sentence: cards capitalise it, the metric window reads "This store
 // can't measure it yet: …", the new-board list puts it after the name.
-const UNAVAILABLE_COPY = new Map<string, string>([
-  ['no_connection', 'no connected app records it'],
-  ['first_sync', 'its app is still on its first sync'],
-  ['feed_failed', 'its app’s last sync failed'],
-] satisfies [UnavailableCode, string][])
-const UNAVAILABLE_FALLBACK = 'this store can’t read it right now'
+const UNAVAILABLE_COPY: Record<UnavailableCode, string> = {
+  no_connection: 'no connected app records it',
+  first_sync: 'its app is still on its first sync',
+  feed_failed: 'its app’s last sync failed',
+}
 
-/** App copy for an Unavailable, by its code; a code added later reads the generic line. */
+/** App copy for an Unavailable, by its code. */
 export function unavailableCopy(unavailable: Pick<Unavailable, 'code'>): string {
-  return UNAVAILABLE_COPY.get(unavailable.code) ?? UNAVAILABLE_FALLBACK
+  return UNAVAILABLE_COPY[unavailable.code]
 }
 
 /** What the warehouse measured for the board's dates; anything not yet back is undefined. */

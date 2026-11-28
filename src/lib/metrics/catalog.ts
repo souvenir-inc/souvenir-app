@@ -22,14 +22,6 @@ export function usersOf(name: string, entries: readonly MetricEntry[]): MetricEn
   return entries.filter(entry => entry.name !== name && isMetricValue(entry.value) && referencesOf(entry.value).includes(name))
 }
 
-/**
- * The fields PUT /metrics takes, from a catalog entry: what confirming (verified: true) or editing sends, so a
- * save never drops the label, unit or description the entry already has.
- */
-export function requestOf(entry: MetricEntry, verified: boolean) {
-  return { name: entry.name, label: entry.label, unit: entry.unit, description: entry.description, value: entry.value, verified }
-}
-
 const SAYS_EXISTS = /\b(already|exists?|available|use the existing)\b/i
 /** Longest reply searched for metric names (RG-1: cap first). */
 const REPLY_LIMIT = 4000

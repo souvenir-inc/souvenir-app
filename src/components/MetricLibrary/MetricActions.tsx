@@ -16,7 +16,7 @@ type Asking = 'delete' | 'reset' | null
 
 /**
  * What can be done to one metric, each mapped to the warehouse's metric endpoints:
- * Confirm (PUT with `verified: true`), Edit formula / Your own formula (PUT under its name), Go back to Souvenir's
+ * Confirm (POST /metrics/status), Edit formula / Your own formula (PUT under its name), Go back to Souvenir's
  * definition (DELETE of the workspace's own version) and Delete (DELETE of a custom metric). Every member may try;
  * the warehouse decides (R-A4). Irreversible ones ask first, naming the metric (UX-CU-01).
  */
@@ -29,7 +29,7 @@ export function MetricActions({ library, entry, windowId, range }: { library: Li
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {!entry.verified && (
+      {entry.status === 'proposed' && (
         <Button size="sm" variant="secondary" leftIcon={<CircleCheck size={14} aria-hidden />} loading={actions.confirming === entry.name} disabled={actions.saving} onClick={() => actions.confirm(entry)}>
           Confirm
         </Button>
